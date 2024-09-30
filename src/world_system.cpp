@@ -25,12 +25,12 @@ WorldSystem::WorldSystem()
 WorldSystem::~WorldSystem() {
 	
 	// destroy music components
-	if (background_music != nullptr)
-		Mix_FreeMusic(background_music);
-	if (salmon_dead_sound != nullptr)
-		Mix_FreeChunk(salmon_dead_sound);
-	if (salmon_eat_sound != nullptr)
-		Mix_FreeChunk(salmon_eat_sound);
+	if (backgroundMusic != nullptr)
+		Mix_FreeMusic(backgroundMusic);
+	if (salmonDeadSound != nullptr)
+		Mix_FreeChunk(salmonDeadSound);
+	if (salmonEatSound != nullptr)
+		Mix_FreeChunk(salmonEatSound);
 
 	Mix_CloseAudio();
 
@@ -50,7 +50,7 @@ namespace {
 
 // World initialization
 // Note, this has a lot of OpenGL specific things, could be moved to the renderer
-GLFWwindow* WorldSystem::create_window() {
+GLFWwindow* WorldSystem::createWindow() {
 	///////////////////////////////////////
 	// Initialize GLFW
 	glfwSetErrorCallback(glfw_err_cb);
@@ -83,8 +83,8 @@ GLFWwindow* WorldSystem::create_window() {
 	// Input is handled using GLFW, for more info see
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
-	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
-	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
+	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->onKey(_0, _1, _2, _3); };
+	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->onMouseMove({ _0, _1 }); };
 	glfwSetKeyCallback(window, key_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 
@@ -99,11 +99,11 @@ GLFWwindow* WorldSystem::create_window() {
 		return nullptr;
 	}
 
-	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
-	salmon_dead_sound = Mix_LoadWAV(audio_path("death_sound.wav").c_str());
-	salmon_eat_sound = Mix_LoadWAV(audio_path("eat_sound.wav").c_str());
+	backgroundMusic = Mix_LoadMUS(audio_path("music.wav").c_str());
+	salmonDeadSound = Mix_LoadWAV(audio_path("death_sound.wav").c_str());
+	salmonEatSound = Mix_LoadWAV(audio_path("eat_sound.wav").c_str());
 
-	if (background_music == nullptr || salmon_dead_sound == nullptr || salmon_eat_sound == nullptr) {
+	if (backgroundMusic == nullptr || salmonDeadSound == nullptr || salmonEatSound == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
 			audio_path("death_sound.wav").c_str(),
@@ -117,11 +117,11 @@ GLFWwindow* WorldSystem::create_window() {
 void WorldSystem::init(RenderSystem* renderer_arg) {
 	this->renderer = renderer_arg;
 	// Playing background music indefinitely
-	Mix_PlayMusic(background_music, -1);
+	Mix_PlayMusic(backgroundMusic, -1);
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default
-    restart_game();
+    restartGame();
 }
 
 // Update our game world
@@ -166,7 +166,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (counter.counter_ms < 0) {
 			registry.deathTimers.remove(entity);
 			screen.darken_screen_factor = 0;
-            restart_game();
+            restartGame();
 			return true;
 		}
 	}
@@ -190,13 +190,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 }
 
 // Reset the world state to its initial state
-void WorldSystem::restart_game() {
+void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 	printf("Restarting\n");
 
 	// Reset the game speed
-	current_speed = 1.f;
+	currentSpeed = 1.f;
 
 	// Remove all entities that we created
 	// All that have a motion, we could also iterate over all fish, eels, ... but that would be more cumbersome
@@ -210,7 +210,7 @@ void WorldSystem::restart_game() {
 }
 
 // Compute collisions between entities
-void WorldSystem::handle_collisions() {
+void WorldSystem::handleCollisions() {
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -228,7 +228,7 @@ void WorldSystem::handle_collisions() {
 				if (!registry.deathTimers.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.deathTimers.emplace(entity);
-					Mix_PlayChannel(-1, salmon_dead_sound, 0);
+					Mix_PlayChannel(-1, salmonDeadSound, 0);
 
 					Motion& player_motion = registry.motions.get(entity);
 					player_motion.angle = M_PI;
@@ -242,7 +242,7 @@ void WorldSystem::handle_collisions() {
 				if (!registry.deathTimers.has(entity)) {
 					// chew, count points, and set the LightUp timer
 					registry.remove_all_components_of(entity_other);
-					Mix_PlayChannel(-1, salmon_eat_sound, 0);
+					Mix_PlayChannel(-1, salmonEatSound, 0);
 					++points;
 
 					if (!registry.lightUp.has(entity))
@@ -259,16 +259,16 @@ void WorldSystem::handle_collisions() {
 	registry.collisions.clear();
 }
 
-void WorldSystem::close_game() {
+void WorldSystem::closeGame() {
 	glfwSetWindowShouldClose(window,1);
 }
 
 // Should the game be over ?
-bool WorldSystem::is_over() const {
+bool WorldSystem::isOver() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
-void WorldSystem::move_player(int key, int action, Entity& player) {
+void WorldSystem::movePlayer(int key, int action, Entity& player) {
 	Motion& player_motion = registry.motions.get(player);
 	float speed = 100.0f;
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
@@ -293,10 +293,10 @@ void WorldSystem::move_player(int key, int action, Entity& player) {
 }
 
 // On key callback
-void WorldSystem::on_key(int key, int, int action, int mod) {
+void WorldSystem::onKey(int key, int, int action, int mod) {
 	// Close game
 	if (key == GLFW_KEY_ESCAPE) {
-		close_game();
+		closeGame();
 	}
 
 	// Resetting game
@@ -304,12 +304,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
 
-        restart_game();
+        restartGame();
 	}
 
 	//Player movement
-	if(!player_is_dead()) {
-		move_player(key,action,player);
+	if(!playerIsDead()) {
+		movePlayer(key,action,player);
 	}
 	
 
@@ -323,27 +323,27 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Control the current speed with `<` `>`
 	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
-		current_speed -= 0.1f;
-		printf("Current speed = %f\n", current_speed);
+		currentSpeed -= 0.1f;
+		printf("Current speed = %f\n", currentSpeed);
 	}
 	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
-		current_speed += 0.1f;
-		printf("Current speed = %f\n", current_speed);
+		currentSpeed += 0.1f;
+		printf("Current speed = %f\n", currentSpeed);
 	}
-	current_speed = fmax(0.f, current_speed);
+	currentSpeed = fmax(0.f, currentSpeed);
 }
 
-bool WorldSystem::player_is_dead() {
+bool WorldSystem::playerIsDead() {
 	return registry.deathTimers.has(player);
 }
 
-void WorldSystem::on_mouse_move(vec2 mouse_position) {
-	this->mouse_position = mouse_position;
+void WorldSystem::onMouseMove(vec2 mousePosition) {
+	this->mousePosition = mousePosition;
 	
 	//rotate player to face cursor
-	if(!player_is_dead() && registry.motions.has(player)) {
+	if(!playerIsDead() && registry.motions.has(player)) {
 		Motion& player_motion = registry.motions.get(player);
-		vec2 diff = mouse_position - player_motion.position;
+		vec2 diff = mousePosition - player_motion.position;
 		float angle = atan2(diff[1],diff[0]);
 		player_motion.angle = angle;
 	}

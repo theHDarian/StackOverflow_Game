@@ -21,7 +21,7 @@ int main()
 	PhysicsSystem physics;
 
 	// Initializing window
-	GLFWwindow* window = world.create_window();
+	GLFWwindow* window = world.createWindow();
 	if (!window) {
 		// Time to read the error message
 		printf("Press any key to exit");
@@ -35,7 +35,7 @@ int main()
 
 	// variable timestep loop
 	auto t = Clock::now();
-	while (!world.is_over()) {
+	while (!world.isOver()) {
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
 
@@ -47,7 +47,7 @@ int main()
 
 		world.step(elapsed_ms);
 		physics.step(elapsed_ms);
-		world.handle_collisions();
+		world.handleCollisions();
 
 		renderer.draw();
 	}
