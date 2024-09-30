@@ -48,11 +48,7 @@ private:
 	// restart level
 	void restart_game();
 
-	//toggle mode
-	void toggle_advanced_mode(bool mode);
-
 	bool player_is_dead();
-	void update_closest_player();
 
 	// OpenGL window handle
 	GLFWwindow* window;
@@ -63,13 +59,9 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	float current_speed;
-	float next_eel_spawn;
-	float next_fish_spawn;
 
-	//Advanced Feature
-	bool is_advanced_mode = false;
-	Entity player_salmons[2];
-	Entity* closest_player = &player_salmons[0];
+	// Player Controls
+	Entity player;
 	vec2 mouse_position;
 
 	// music references

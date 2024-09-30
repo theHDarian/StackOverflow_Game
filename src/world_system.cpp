@@ -17,9 +17,7 @@ const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
 
 // create the underwater world
 WorldSystem::WorldSystem()
-	: points(0)
-	, next_eel_spawn(0.f)
-	, next_fish_spawn(0.f) {
+	: points(0) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -151,28 +149,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// spawn new eels
-	next_eel_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.deadlys.components.size() <= MAX_NUM_EELS && next_eel_spawn < 0.f) {
-		// reset timer
-		next_eel_spawn = (EEL_SPAWN_DELAY_MS / 2) + uniform_dist(rng) * (EEL_SPAWN_DELAY_MS / 2);
-
-		// create Eel with random initial position
-        createEel(renderer, vec2(window_width_px + 50.f, uniform_dist(rng) * window_height_px));
-	}
-
-	// spawn fish
-	next_fish_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.eatables.components.size() <= MAX_NUM_FISH && next_fish_spawn < 0.f) {
-		createFish(renderer,vec2(window_width_px + 50.f, uniform_dist(rng) * window_height_px));
-		next_fish_spawn = (FISH_SPAWN_DELAY_MS / 2) + uniform_dist(rng) * (FISH_SPAWN_DELAY_MS / 2);
-	}
-
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE EGG SPAWN HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
@@ -185,8 +161,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if(counter.counter_ms < min_counter_ms){
 		    min_counter_ms = counter.counter_ms;
 		}
-
-		std::cout << "Death Timer: " << counter.counter_ms << std::endl;
 
 		// restart the game once the death timer expired
 		if (counter.counter_ms < 0) {
@@ -232,28 +206,7 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	// create a new Salmon
-	player_salmons[0] = createSalmon(renderer, { 0, 0 });
-	registry.colors.insert(player_salmons[0], {1, 0.8f, 0.8f});
-
-	if (is_advanced_mode) {
-		player_salmons[1] = createSalmon(renderer, { 0, window_height_px - 100 });
-		registry.colors.insert(player_salmons[1], {0.0, 0.5f, 1.0f});
-	}
-
-	// !! TODO A2: Enable static eggs on the ground, for reference
-	// Create eggs on the floor, use this for reference
-	/*
-	for (uint i = 0; i < 20; i++) {
-		int w, h;
-		glfwGetWindowSize(window, &w, &h);
-		float radius = 30 * (uniform_dist(rng) + 0.3f); // range 0.3 .. 1.3
-		Entity egg = createEgg({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 },
-			         { radius, radius });
-		float brightness = uniform_dist(rng) * 0.5 + 0.5;
-		registry.colors.insert(egg, { brightness, brightness, brightness});
-	}
-	*/
+	player = createSalmon(renderer,{0,0});
 }
 
 // Compute collisions between entities
@@ -337,21 +290,6 @@ void WorldSystem::move_player(int key, int action, Entity& player) {
 		else if (key == GLFW_KEY_DOWN)
 			player_motion.velocity = {player_motion.velocity[0],glm::min(0.0f,player_motion.velocity[1])};
 	}
-
-	for(Entity& p : player_salmons) {
-		//stop movement of other salmons
-		if (p != player && registry.motions.has(p)) {
-			Motion& m = registry.motions.get(p);
-			m.velocity = {0,0};
-		}
-	}
-}
-
-void WorldSystem::toggle_advanced_mode(bool is_advanced) {
-	is_advanced_mode = is_advanced;
-	std::cout << "Toggle Advanced Mode: " << is_advanced << std::endl;
-
-	restart_game();
 }
 
 // On key callback
@@ -369,16 +307,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
 	}
 
-	if (key == GLFW_KEY_A) { //advanced mode
-		toggle_advanced_mode(true);
-	} else if (key == GLFW_KEY_B) {
-		toggle_advanced_mode(false);
-	}
-
-	//Salmon movement
+	//Player movement
 	if(!player_is_dead()) {
-		update_closest_player();
-		move_player(key,action,*closest_player);
+		move_player(key,action,player);
 	}
 	
 
@@ -403,33 +334,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 }
 
 bool WorldSystem::player_is_dead() {
-	return registry.deathTimers.has(player_salmons[0]) 
-		|| registry.deathTimers.has(player_salmons[1]);
-}
-
-void WorldSystem::update_closest_player() {
-	Entity* closest = &player_salmons[0];
-	float min_dist = -1;
-	for(Entity& player : player_salmons) {
-		if (!registry.motions.has(player)) { 
-			continue;
-		}
-		Motion player_motion = registry.motions.get(player);
-		float dist = distance(mouse_position,player_motion.position);
-		if (min_dist < 0 || dist < min_dist) {
-			min_dist = dist;
-			closest = &player;
-		}
-	}
-	closest_player = closest;
+	return registry.deathTimers.has(player);
 }
 
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	this->mouse_position = mouse_position;
 	
 	//rotate player to face cursor
-	if(!player_is_dead() && registry.motions.has(*closest_player)) {
-		Motion& player_motion = registry.motions.get(*closest_player);
+	if(!player_is_dead() && registry.motions.has(player)) {
+		Motion& player_motion = registry.motions.get(player);
 		vec2 diff = mouse_position - player_motion.position;
 		float angle = atan2(diff[1],diff[0]);
 		player_motion.angle = angle;
