@@ -21,7 +21,7 @@ public:
 	WorldSystem();
 
 	// Creates a window
-	GLFWwindow* create_window();
+	GLFWwindow* createWindow();
 
 	// starts the game
 	void init(RenderSystem* renderer);
@@ -33,22 +33,22 @@ public:
 	bool step(float elapsed_ms);
 
 	// Check for collisions
-	void handle_collisions();
+	void handleCollisions();
 
 	// Should the game be over ?
-	bool is_over()const;
+	bool isOver()const;
 
-	void close_game();
-	void move_player(int key,int action, Entity& player);
+	void closeGame();
+	void movePlayer(int key,int action, Entity& player);
 private:
 	// Input callback functions
-	void on_key(int key, int, int action, int mod);
-	void on_mouse_move(vec2 pos);
+	void onKey(int key, int, int action, int mod);
+	void onMouseMove(vec2 pos);
 
 	// restart level
-	void restart_game();
+	void restartGame();
 
-	bool player_is_dead();
+	bool playerIsDead();
 
 	// OpenGL window handle
 	GLFWwindow* window;
@@ -58,18 +58,18 @@ private:
 
 	// Game state
 	RenderSystem* renderer;
-	float current_speed;
+	float currentSpeed;
 
 	// Player Controls
 	Entity player;
-	vec2 mouse_position;
+	vec2 mousePosition;
 
 	// music references
-	Mix_Music* background_music;
-	Mix_Chunk* salmon_dead_sound;
-	Mix_Chunk* salmon_eat_sound;
+	Mix_Music* backgroundMusic;
+	Mix_Chunk* salmonDeadSound;
+	Mix_Chunk* salmonEatSound;
 
 	// C++ random number generator
 	std::default_random_engine rng;
-	std::uniform_real_distribution<float> uniform_dist; // number between 0..1
+	std::uniform_real_distribution<float> uniformDist; // number between 0..1
 };
