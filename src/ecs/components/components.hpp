@@ -3,49 +3,10 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
-#include "bullet_effect_types.cpp"
 
-// Player component
-struct Player
-{
-};
+#include "map_components.hpp"
+#include "actor_components.hpp"
 
-// anything that is deadly to the player
-struct Enemy {
-
-};
-
-
-struct Bullet {
-	bool isFriendly;
-	BulletStackEffect stackEffect;
-};
-
-struct EnemyHealth {
-	int maxHealth;
-	int currHealth;
-};
-struct PlayerStack {
-	int stackSize;
-
-};
-
-// anything the player can eat
-struct Eatable
-{
-
-};
-struct LightUp {
-	float counter_ms = 3000;
-};
-
-// All data relevant to the shape and motion of entities
-struct Motion {
-	vec2 position = { 0, 0 };
-	float angle = 0;
-	vec2 velocity = { 0, 0 };
-	vec2 scale = { 10, 10 };
-};
 
 // Stucture to store collision information
 struct Collision
@@ -158,5 +119,13 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+};
+
+//TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
+enum SoundType { Background, SFX };
+struct Sound {
+	SoundType type;
+	float volume; //0 to 1
+	bool isLooped;
 };
 
