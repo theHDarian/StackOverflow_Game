@@ -223,7 +223,7 @@ void WorldSystem::handleCollisions() {
 			//Player& player = registry.players.get(entity);
 
 			// Checking Player - Deadly collisions
-			if (registry.deadlys.has(entity_other)) {
+			if (registry.enemies.has(entity_other)) {
 				// initiate death unless already dying
 				if (!registry.deathTimers.has(entity)) {
 					// Scream, reset timer, and make the salmon sink

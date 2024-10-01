@@ -3,16 +3,30 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+#include "bullet_effect_types.cpp"
 
 // Player component
 struct Player
 {
-
 };
 
 // anything that is deadly to the player
-struct Deadly
-{
+struct Enemy {
+
+};
+
+
+struct Bullet {
+	bool isFriendly;
+	BulletStackEffect stackEffect;
+};
+
+struct EnemyHealth {
+	int maxHealth;
+	int currHealth;
+};
+struct PlayerStack {
+	int stackSize;
 
 };
 

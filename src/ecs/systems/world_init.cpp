@@ -77,7 +77,7 @@ Entity createEel(RenderSystem* renderer, vec2 position)
 	motion.scale = vec2({ -EEL_BB_WIDTH, EEL_BB_HEIGHT });
 
 	// create an empty Eel component to be able to refer to all eels
-	registry.deadlys.emplace(entity);
+	registry.enemies.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{
@@ -124,7 +124,7 @@ Entity createEgg(vec2 pos, vec2 size)
 	motion.scale = size;
 
 	// create an empty component for our eggs
-	registry.deadlys.emplace(entity);
+	registry.enemies.emplace(entity);
 	registry.renderRequests.insert(
 		entity, {
 			TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
