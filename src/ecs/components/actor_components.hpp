@@ -5,89 +5,134 @@
 enum BulletEffectType {
     BulletDamage,
     ProjectileSpeed,
+    ProjectileSize,
     FireRate,
     BulletRange,
+    BulletSpread,
+    BulletNum,
     Bounce,
     Pierce,
+    Homing,
     PlayerSpeed,
     PlayerNumDash,
     PlayerStackSize,
     PlayerDashCDR,
-    Regular //damaging bullet
+    Inert // Bullet that does nothing but take up stack space
+};
+
+enum EffectCalculation {
+    Additive,
+    Multiplicative
 };
 
 struct BulletStackEffect {
-	BulletEffectType type = BulletEffectType::Regular;
-	int tier;
+	BulletEffectType type = BulletEffectType::Inert;
+    EffectCalculation effectCalc;
+    float value;
 };
 
 // Player component
 struct Player
 {
+    int baseStackSize;
+    std::vector<BulletStackEffect> currStack;
+
+    float baseSpeed;
+    float baseFireRate;
+    float baseDashNum;
+    float baseDashCDR;
+
+    float dashDistance;
+    int currDashCharges;
+    float currDashCooldown;
+    float currFireRateCooldown;
+};
+
+// Holds the actual data of currStack
+// Referenced on Player and PlayerBullet steps
+// ie (baseSpeed + PlayerSpeedAdditive ) * PlayerSpeedMultiplicative
+// When adding/removing something to the stack, update relevant fields
+// Must be easily accessible
+struct StackCompile {
+    // Could probably be changed to a hardcoded map<BulletEffectType, float>, one for additive, one for multiplicative
+    float BulletDamageAdditive;
+    float BulletDamageMultiplicative;
+
+    float ProjectileSpeedAdditive;
+    float ProjectileSpeedMultiplicative;
+
+    float ProjectileSizeAdditive;
+    float ProjectileSizeMultiplicative;
+
+    float FireRateAdditive;
+    float FireRateMultiplicative;
+
+    float BulletRangeAdditive;
+    float BulletRangeMultiplicative;
+
+    float BulletSpreadAdditive;
+    float BulletSpreadMultiplicative;
+
+    int BulletNumAdditive;
+    int BulletNumMultiplicative;
+
+    int BounceAdditive;
+    int PierceAdditive;
+    // If homing >0, homing value represents search radius for enemies 
+    float HomingAdditive;
+
+    float PlayerSpeedAdditive;
+    float PlayerSpeedMultiplicative;
+
+    int PlayerNumDashAdditive;
+    int PlayerNumDashMultiplicative;
+
+    float PlayerDashCDRAdditive;
+    float PlayerDashCDRMultiplicative;
+
+    int PlayerStackSizeAdditive;
 };
 
 // anything that is deadly to the player
 struct Enemy {
 	int state; //TODO: can change to enum once state determined
+    int maxHealth;
+    int currHealth;
+    float speed;
+    // TODO add attack pattern data?
 };
 
 struct BossEnemy {
-
 };
 
-struct EnemyHealth {
-	int maxHealth;
-	int currHealth;
-};
-struct PlayerStack {
-	int stackSize;
-	std::vector<BulletStackEffect> currStack;
+struct Invincible {
+    // Deletes itself when countdown <0
+    // Entity can't be hit while has Invincible component
+    int countdown;
 };
 
+// TODO Add a way to use parametric equations for bullet path
 
-struct Bullet {
-	bool isFriendly;
-    int damage;
-    float range;
+struct PlayerBullet {
+    float damage;
     float bulletSpeed;
-    int type; //for damaging bullets ex. lightning bullets 
-    //TODO can add bounce and piercing later
-	BulletStackEffect stackEffect;
-
-    //for destroying bullet when reaching max range, this method allows calculating range for bullets without fixed trajectory
-    vec2 m_lastPosition; //update each frame
-    float m_distTravelled; 
+    // Number than counts down every step, delete bullet when <0
+    float bulletRange;
+    // Player bullet only scale in all directions?
+    float bulletSize;
+    int bulletPierce;
+    int bulletBounce;
 };
 
-//entities that can shoot Bullets
-struct Shooter {
-    float fireRate;
-
-    Bullet bulletType;
-    float angle;
-    float m_timeUntilNextBullet;
+struct EnemyBullet {
+    float bulletSpeed;
+    // Number than counts down every step, delete bullet when <0
+    float bulletRange;
+    // Enemy bullet can scale x,y independently?
+    vec2 bulletSize;
+    int bulletBounce;
+    std::vector<BulletStackEffect> bulletEffects;
 };
-
-
-//entities that can move
-struct Movement {
-	float speed;
-	int maxDashCharge;
-	float dashCooldown; //in seconds
-	float dashDistance;
-
-    float m_timeUntilNextDash;
-    int m_currDashCharge;
-    Movement(float speed,int maxDashCharge = 0,float dashCooldown = 0.0f,float dashDistance = 0.0f) { 
-        this->speed = speed; 
-        this->maxDashCharge = maxDashCharge;
-        this->dashCooldown = dashCooldown;
-        this->dashDistance = dashDistance;
-        this->m_currDashCharge = maxDashCharge;
-        this->m_timeUntilNextDash = 0;
-    }
-};
-
 
 // All data relevant to the shape and motion of entities
 struct Motion {
