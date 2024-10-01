@@ -29,6 +29,13 @@ struct ScreenState
 	float darken_screen_factor = -1;
 };
 
+struct IOState {
+	bool shouldEnd;
+	bool shouldRestart;
+	vec2 inputAxis;
+	vec2 mousePosition;
+};
+
 // A struct to refer to debugging graphics in the ECS
 struct DebugComponent
 {
@@ -40,6 +47,15 @@ struct DeathTimer
 {
 	float counter_ms = 3000;
 };
+
+//TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
+enum SoundType { Background, SFX };
+struct Sound {
+	SoundType type;
+	float volume; //0 to 1
+	bool isLooped;
+};
+
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & salmon.vs.glsl)
 struct ColoredVertex
@@ -121,11 +137,4 @@ struct RenderRequest {
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 };
 
-//TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
-enum SoundType { Background, SFX };
-struct Sound {
-	SoundType type;
-	float volume; //0 to 1
-	bool isLooped;
-};
 

@@ -9,6 +9,7 @@
 #include "physics_system.hpp"
 #include "render_system.hpp"
 #include "world_system.hpp"
+#include "io_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -19,6 +20,7 @@ int main()
 	WorldSystem world;
 	RenderSystem renderer;
 	PhysicsSystem physics;
+	IOSystem ioSystem;
 
 	// Initializing window
 	GLFWwindow* window = world.createWindow();
@@ -31,6 +33,7 @@ int main()
 
 	// initialize the main systems
 	renderer.init(window);
+	ioSystem.init(window);
 	world.init(&renderer);
 
 	// variable timestep loop

@@ -88,10 +88,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			GLint light_up_uloc = glGetUniformLocation(program, "light_up");
 			assert(light_up_uloc >= 0);
 
-			// similar to the glUniform1f call below. The 1f or 1i specified the type, here a single int.
-			int lightUp = registry.lightUp.has(entity) ? 1 : 0;
-			glUniform1i(light_up_uloc, lightUp);
-
 			gl_has_errors();
 		}
 	}

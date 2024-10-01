@@ -1,6 +1,26 @@
 #pragma once
 #include <vector>
 
+
+enum BulletEffectType {
+    BulletDamage,
+    ProjectileSpeed,
+    FireRate,
+    BulletRange,
+    Bounce,
+    Pierce,
+    PlayerSpeed,
+    PlayerNumDash,
+    PlayerStackSize,
+    PlayerDashCDR,
+    Regular //damaging bullet
+};
+
+struct BulletStackEffect {
+	BulletEffectType type = BulletEffectType::Regular;
+	int tier;
+};
+
 // Player component
 struct Player
 {
@@ -25,33 +45,6 @@ struct PlayerStack {
 };
 
 
-//entities that can shoot Bullets
-struct Shooter {
-    float fireRate;
-    float bulletSpeed;
-
-    float m_timeUntilNextBullet;
-};
-
-enum BulletEffectType {
-    BulletDamage,
-    ProjectileSpeed,
-    FireRate,
-    BulletRange,
-    Bounce,
-    Pierce,
-    PlayerSpeed,
-    PlayerNumDash,
-    PlayerStackSize,
-    PlayerDashCDR,
-    Regular //damaging bullet
-};
-
-struct BulletStackEffect {
-	BulletEffectType type = BulletEffectType::Regular;
-	int tier;
-};
-
 struct Bullet {
 	bool isFriendly;
     int damage;
@@ -66,6 +59,16 @@ struct Bullet {
     float m_distTravelled; 
 };
 
+//entities that can shoot Bullets
+struct Shooter {
+    float fireRate;
+
+    Bullet bulletType;
+    float angle;
+    float m_timeUntilNextBullet;
+};
+
+
 //entities that can move
 struct Movement {
 	float speed;
@@ -75,6 +78,14 @@ struct Movement {
 
     float m_timeUntilNextDash;
     int m_currDashCharge;
+    Movement(float speed,int maxDashCharge = 0,float dashCooldown = 0.0f,float dashDistance = 0.0f) { 
+        this->speed = speed; 
+        this->maxDashCharge = maxDashCharge;
+        this->dashCooldown = dashCooldown;
+        this->dashDistance = dashDistance;
+        this->m_currDashCharge = maxDashCharge;
+        this->m_timeUntilNextDash = 0;
+    }
 };
 
 

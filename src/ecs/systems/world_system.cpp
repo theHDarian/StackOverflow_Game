@@ -83,10 +83,6 @@ GLFWwindow* WorldSystem::createWindow() {
 	// Input is handled using GLFW, for more info see
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
-	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->onKey(_0, _1, _2, _3); };
-	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->onMouseMove({ _0, _1 }); };
-	glfwSetKeyCallback(window, key_redirect);
-	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 
 	//////////////////////////////////////
 	// Loading music and sounds with SDL
@@ -149,6 +145,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Processing inputs
+	handleInput();
+
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
@@ -173,19 +172,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// reduce window brightness if the salmon is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
-	for (Entity entity : registry.lightUp.entities) {
-		// progress timer
-		LightUp& counter = registry.lightUp.get(entity);
-		counter.counter_ms -= elapsed_ms_since_last_update;
-
-		std::cout << "LightUp Timer: " << counter.counter_ms << std::endl;
-
-		// restart the game once the death timer expired
-		if (counter.counter_ms < 0) {
-			registry.lightUp.remove(entity);
-		}
-	}
-
 	return true;
 }
 
@@ -206,7 +192,7 @@ void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createSalmon(renderer,{0,0});
+	player = createPlayer(renderer,{0,0});
 }
 
 // Compute collisions between entities
@@ -237,26 +223,34 @@ void WorldSystem::handleCollisions() {
 					player_color = {1.0f,0.0f,0.0f};
 				}
 			}
-			// Checking Player - Eatable collisions
-			else if (registry.eatables.has(entity_other)) {
-				if (!registry.deathTimers.has(entity)) {
-					// chew, count points, and set the LightUp timer
-					registry.remove_all_components_of(entity_other);
-					Mix_PlayChannel(-1, salmonEatSound, 0);
-					++points;
-
-					if (!registry.lightUp.has(entity))
-						registry.lightUp.emplace(entity);
-					else {
-						registry.lightUp.get(entity).counter_ms = 3000.0f;
-					}
-				}
-			}
 		}
 	}
 
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
+}
+
+void WorldSystem::handleInput() {
+	assert(registry.ioStates.components.size() <= 1);
+    IOState &input = registry.ioStates.components[0];
+	if (input.shouldEnd) {
+		input.shouldEnd = false;
+		closeGame();
+	}
+	if (input.shouldRestart) {
+		input.shouldRestart = false;
+		restartGame();
+	}
+	movePlayer(input.inputAxis);
+
+	if(registry.shooters.has(player) && registry.motions.has(player)) {
+		Shooter& playerShooter = registry.shooters.get(player);
+		Motion& playerMotion = registry.motions.get(player);
+		vec2 diff = input.mousePosition - playerMotion.position;
+		float angle = atan2(diff[1],diff[0]);
+		playerMotion.angle = angle;
+	}
+
 }
 
 void WorldSystem::closeGame() {
@@ -268,84 +262,18 @@ bool WorldSystem::isOver() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
-void WorldSystem::movePlayer(int key, int action, Entity& player) {
+void WorldSystem::movePlayer(vec2 inputAxis) {
 	Motion& player_motion = registry.motions.get(player);
-	float speed = 100.0f;
-	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		if (key == GLFW_KEY_LEFT)
-			player_motion.velocity = {-speed,player_motion.velocity[1]};
-		else if (key == GLFW_KEY_RIGHT)
-			player_motion.velocity = {speed,player_motion.velocity[1]};
-		else if (key == GLFW_KEY_UP)
-			player_motion.velocity = {player_motion.velocity[0],-speed}; //up is negative
-		else if (key == GLFW_KEY_DOWN)
-			player_motion.velocity = {player_motion.velocity[0],speed};
-	} else if (action == GLFW_RELEASE) { //on release, reset to zero or based on other held key
-		if (key == GLFW_KEY_LEFT)
-			player_motion.velocity = {glm::max(player_motion.velocity[0],0.0f),player_motion.velocity[1]};
-		else if (key == GLFW_KEY_RIGHT)
-			player_motion.velocity = {glm::min(player_motion.velocity[0],0.0f),player_motion.velocity[1]};
-		else if (key == GLFW_KEY_UP)
-			player_motion.velocity = {player_motion.velocity[0],glm::max(0.0f,player_motion.velocity[1])}; //up is negative
-		else if (key == GLFW_KEY_DOWN)
-			player_motion.velocity = {player_motion.velocity[0],glm::min(0.0f,player_motion.velocity[1])};
+	Movement& player_movement = registry.movements.get(player);
+	if (glm::length(inputAxis) <= 0.0f) {
+		player_motion.velocity = {0,0};
+	} else {
+		player_motion.velocity = glm::normalize(inputAxis) * player_movement.speed;
 	}
-}
-
-// On key callback
-void WorldSystem::onKey(int key, int, int action, int mod) {
-	// Close game
-	if (key == GLFW_KEY_ESCAPE) {
-		closeGame();
-	}
-
-	// Resetting game
-	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
-		int w, h;
-		glfwGetWindowSize(window, &w, &h);
-
-        restartGame();
-	}
-
-	//Player movement
-	if(!playerIsDead()) {
-		movePlayer(key,action,player);
-	}
-	
-
-	// Debugging
-	if (key == GLFW_KEY_D) {
-		if (action == GLFW_RELEASE)
-			debugging.in_debug_mode = false;
-		else
-			debugging.in_debug_mode = true;
-	}
-
-	// Control the current speed with `<` `>`
-	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
-		currentSpeed -= 0.1f;
-		printf("Current speed = %f\n", currentSpeed);
-	}
-	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
-		currentSpeed += 0.1f;
-		printf("Current speed = %f\n", currentSpeed);
-	}
-	currentSpeed = fmax(0.f, currentSpeed);
 }
 
 bool WorldSystem::playerIsDead() {
 	return registry.deathTimers.has(player);
 }
 
-void WorldSystem::onMouseMove(vec2 mousePosition) {
-	this->mousePosition = mousePosition;
-	
-	//rotate player to face cursor
-	if(!playerIsDead() && registry.motions.has(player)) {
-		Motion& player_motion = registry.motions.get(player);
-		vec2 diff = mousePosition - player_motion.position;
-		float angle = atan2(diff[1],diff[0]);
-		player_motion.angle = angle;
-	}
-	
-}
+

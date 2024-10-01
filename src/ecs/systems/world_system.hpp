@@ -39,16 +39,13 @@ public:
 	bool isOver()const;
 
 	void closeGame();
-	void movePlayer(int key,int action, Entity& player);
 private:
-	// Input callback functions
-	void onKey(int key, int, int action, int mod);
-	void onMouseMove(vec2 pos);
-
 	// restart level
 	void restartGame();
 
 	bool playerIsDead();
+	void handleInput();
+	void movePlayer(vec2 inputAxis);
 
 	// OpenGL window handle
 	GLFWwindow* window;
@@ -62,7 +59,6 @@ private:
 
 	// Player Controls
 	Entity player;
-	vec2 mousePosition;
 
 	// music references
 	Mix_Music* backgroundMusic;
