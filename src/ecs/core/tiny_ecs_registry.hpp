@@ -18,11 +18,12 @@ public:
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
-	ComponentContainer<Eatable> eatables;
+	ComponentContainer<IOState> ioStates;
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
-	ComponentContainer<LightUp> lightUp;
+	ComponentContainer<Movement> movements;
+	ComponentContainer<Shooter> shooters;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -35,11 +36,12 @@ public:
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);
-		registry_list.push_back(&eatables);
+		registry_list.push_back(&ioStates);
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
-		registry_list.push_back(&lightUp);
+		registry_list.push_back(&movements);
+		registry_list.push_back(&shooters);
 	}
 
 	void clear_all_components() {
