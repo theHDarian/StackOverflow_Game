@@ -42,12 +42,6 @@ struct DebugComponent
 	// Note, an empty struct has size 1
 };
 
-// A timer that will be associated to dying salmon
-struct DeathTimer
-{
-	float counter_ms = 3000;
-};
-
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType { Background, SFX };
 struct Sound {
