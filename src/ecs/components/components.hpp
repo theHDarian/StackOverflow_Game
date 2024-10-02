@@ -16,6 +16,15 @@ struct Collision
 	Collision(Entity& other) { this->other = other; };
 };
 
+struct CircleCollider {
+	float radius;
+};
+
+struct RingCollider {
+	float innerRadius;
+	float outerRadius;
+};
+
 // Data structure for toggling debug mode
 struct Debug {
 	bool in_debug_mode = 0;
@@ -40,12 +49,6 @@ struct IOState {
 struct DebugComponent
 {
 	// Note, an empty struct has size 1
-};
-
-// A timer that will be associated to dying salmon
-struct DeathTimer
-{
-	float counter_ms = 3000;
 };
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
