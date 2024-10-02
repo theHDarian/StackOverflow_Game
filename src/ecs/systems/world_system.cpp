@@ -153,22 +153,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     ScreenState &screen = registry.screenStates.components[0];
 
     float min_counter_ms = 3000.f;
-	for (Entity entity : registry.deathTimers.entities) {
-		// progress timer
-		DeathTimer& counter = registry.deathTimers.get(entity);
-		counter.counter_ms -= elapsed_ms_since_last_update;
-		if(counter.counter_ms < min_counter_ms){
-		    min_counter_ms = counter.counter_ms;
-		}
-
-		// restart the game once the death timer expired
-		if (counter.counter_ms < 0) {
-			registry.deathTimers.remove(entity);
-			screen.darken_screen_factor = 0;
-            restartGame();
-			return true;
-		}
-	}
 	// reduce window brightness if the salmon is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
@@ -211,9 +195,9 @@ void WorldSystem::handleCollisions() {
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
 				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity)) {
+				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
-					registry.deathTimers.emplace(entity);
+					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
 
 					Motion& player_motion = registry.motions.get(entity);
@@ -243,8 +227,7 @@ void WorldSystem::handleInput() {
 	}
 	movePlayer(input.inputAxis);
 
-	if(registry.shooters.has(player) && registry.motions.has(player)) {
-		Shooter& playerShooter = registry.shooters.get(player);
+	if(registry.motions.has(player)) {
 		Motion& playerMotion = registry.motions.get(player);
 		vec2 diff = input.mousePosition - playerMotion.position;
 		float angle = atan2(diff[1],diff[0]);
@@ -264,16 +247,16 @@ bool WorldSystem::isOver() const {
 
 void WorldSystem::movePlayer(vec2 inputAxis) {
 	Motion& player_motion = registry.motions.get(player);
-	Movement& player_movement = registry.movements.get(player);
 	if (glm::length(inputAxis) <= 0.0f) {
 		player_motion.velocity = {0,0};
 	} else {
-		player_motion.velocity = glm::normalize(inputAxis) * player_movement.speed;
+		player_motion.velocity = glm::normalize(inputAxis) * getModifiedValue(PlayerSpeed, registry.players.get(player).baseSpeed);
 	}
 }
 
-bool WorldSystem::playerIsDead() {
-	return registry.deathTimers.has(player);
+float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
+{
+	return (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf];
 }
 
 

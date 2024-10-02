@@ -47,6 +47,8 @@ private:
 	void handleInput();
 	void movePlayer(vec2 inputAxis);
 
+	float getModifiedValue(BulletEffectType bf, float value);
+
 	// OpenGL window handle
 	GLFWwindow* window;
 

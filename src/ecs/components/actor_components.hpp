@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <string>
+#include <map>
 
 
 enum BulletEffectType {
@@ -29,6 +31,10 @@ struct BulletStackEffect {
 	BulletEffectType type = BulletEffectType::Inert;
     EffectCalculation effectCalc;
     float value;
+
+    // For UI
+    std::string name;
+    std::string tooltip;
 };
 
 // Player component
@@ -54,43 +60,39 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    // Could probably be changed to a hardcoded map<BulletEffectType, float>, one for additive, one for multiplicative
-    float BulletDamageAdditive;
-    float BulletDamageMultiplicative;
 
-    float ProjectileSpeedAdditive;
-    float ProjectileSpeedMultiplicative;
-
-    float ProjectileSizeAdditive;
-    float ProjectileSizeMultiplicative;
-
-    float FireRateAdditive;
-    float FireRateMultiplicative;
-
-    float BulletRangeAdditive;
-    float BulletRangeMultiplicative;
-
-    float BulletSpreadAdditive;
-    float BulletSpreadMultiplicative;
-
-    int BulletNumAdditive;
-    int BulletNumMultiplicative;
-
-    int BounceAdditive;
-    int PierceAdditive;
-    // If homing >0, homing value represents search radius for enemies 
-    float HomingAdditive;
-
-    float PlayerSpeedAdditive;
-    float PlayerSpeedMultiplicative;
-
-    int PlayerNumDashAdditive;
-    int PlayerNumDashMultiplicative;
-
-    float PlayerDashCDRAdditive;
-    float PlayerDashCDRMultiplicative;
-
-    int PlayerStackSizeAdditive;
+    std::map<BulletEffectType, float> additives = {
+        {BulletDamage,      0},
+        {ProjectileSpeed,   0},
+        {ProjectileSize,    0},
+        {FireRate,          0},
+        {BulletRange,       0},
+        {BulletSpread,      0},
+        {BulletNum,         0},
+        {Bounce,            0},
+        {Pierce,            0},
+        {Homing,            0},
+        {PlayerSpeed,       0},
+        {PlayerNumDash,     0},
+        {PlayerStackSize,   0},
+        {PlayerDashCDR,     0}
+    };
+    std::map<BulletEffectType, float> multiplicatives = {
+        {BulletDamage,      1},
+        {ProjectileSpeed,   1},
+        {ProjectileSize,    1},
+        {FireRate,          1},
+        {BulletRange,       1},
+        {BulletSpread,      1},
+        {BulletNum,         1},
+        {Bounce,            1},
+        {Pierce,            1},
+        {Homing,            1},
+        {PlayerSpeed,       1},
+        {PlayerNumDash,     1},
+        {PlayerStackSize,   1},
+        {PlayerDashCDR,     1}
+    };
 };
 
 // anything that is deadly to the player
@@ -122,6 +124,8 @@ struct PlayerBullet {
     float bulletSize;
     int bulletPierce;
     int bulletBounce;
+
+    vec2 bulletDirection;
 };
 
 struct EnemyBullet {
@@ -131,7 +135,15 @@ struct EnemyBullet {
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize;
     int bulletBounce;
+
+    vec2 bulletDirection;
+
     std::vector<BulletStackEffect> bulletEffects;
+};
+
+struct Homing {
+    Entity target;
+    float homingIntensity; // How quickly it can turn towards the target
 };
 
 // All data relevant to the shape and motion of entities

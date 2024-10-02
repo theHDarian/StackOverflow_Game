@@ -17,12 +17,13 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	motion.scale = mesh.original_size * 300.f;
 	motion.scale.y *= -1; // point front to the right
 
-	registry.movements.emplace(entity,100.0f, 1, 1.0f, 200.0f);
-	Shooter& shooter = registry.shooters.emplace(entity); //TODO initialize shooter
-
 
 	// create an empty Salmon component for our character
-	registry.players.emplace(entity);
+	Player& player = registry.players.emplace(entity);
+	player.baseSpeed = 200;
+
+	registry.stackCompile.emplace(entity);
+	registry.circleColliders.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no texture is needed

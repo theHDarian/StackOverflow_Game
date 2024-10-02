@@ -41,7 +41,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		world_velocity[0] = cos(motion.angle)*motion.velocity[0] - sin(motion.angle)*motion.velocity[1];
 		world_velocity[1] = sin(motion.angle) * motion.velocity[0] + cos(motion.angle) * motion.velocity[1];
 		motion.position += world_velocity * step_seconds;
-		(void)elapsed_ms; // placeholder to silence unused warning until implemented
+		//(void)elapsed_ms; // placeholder to silence unused warning until implemented
 	}
 
 	// Check for collisions between all moving entities
