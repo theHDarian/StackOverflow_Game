@@ -22,6 +22,13 @@ public:
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
 
+	ComponentContainer<StackCompile> stackCompile;
+	ComponentContainer<Invincible> invincibles;
+	ComponentContainer<CircleCollider> circleColliders;
+	ComponentContainer<PlayerBullet> playerBullets;
+	ComponentContainer<EnemyBullet> enemyBullets;
+
+
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry()

@@ -16,6 +16,15 @@ struct Collision
 	Collision(Entity& other) { this->other = other; };
 };
 
+struct CircleCollider {
+	float radius;
+};
+
+struct RingCollider {
+	float innerRadius;
+	float outerRadius;
+};
+
 // Data structure for toggling debug mode
 struct Debug {
 	bool in_debug_mode = 0;
