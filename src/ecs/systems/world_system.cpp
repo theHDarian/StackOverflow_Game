@@ -256,7 +256,7 @@ void WorldSystem::movePlayer(vec2 inputAxis) {
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 {
-	return min(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
+	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
 }
 
 
