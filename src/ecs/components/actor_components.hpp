@@ -35,14 +35,13 @@ struct BulletStackEffect {
     // For UI
     std::string name;
     std::string tooltip;
+
+
 };
 
 // Player component
 struct Player
 {
-    int baseStackSize;
-    std::vector<BulletStackEffect> currStack;
-
     float baseSpeed;
     float baseFireRate;
     float baseDashNum;
@@ -60,6 +59,8 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
+    int baseStackSize;
+    std::vector<BulletStackEffect> currStack;
 
     std::map<BulletEffectType, float> additives = {
         {BulletDamage,      0},
@@ -93,6 +94,60 @@ struct StackCompile {
         {PlayerStackSize,   1},
         {PlayerDashCDR,     1}
     };
+
+    // TODO choose reasonable minimums
+    std::map<BulletEffectType, float> minimums = {
+        {BulletDamage,      1},
+        {ProjectileSpeed,   1},
+        {ProjectileSize,    1},
+        {FireRate,          1},
+        {BulletRange,       1},
+        {BulletSpread,      1},
+        {BulletNum,         1},
+        {Bounce,            0},
+        {Pierce,            0},
+        {Homing,            0},
+        {PlayerSpeed,       1},
+        {PlayerNumDash,     0},
+        {PlayerStackSize,   1},
+        {PlayerDashCDR,     1}
+    };
+
+    bool add(BulletStackEffect effect) {
+        int maxStackSize = (baseStackSize + additives[PlayerStackSize]) * multiplicatives[PlayerStackSize];
+        if (currStack.size() >= maxStackSize) {
+            return false;
+        }
+        if (effect.effectCalc == Additive) {
+            additives[effect.type] += effect.value;
+        } else {
+            multiplicatives[effect.type] *= effect.value;
+        }
+        currStack.push_back(effect);
+        return true;
+    }
+    BulletStackEffect remove(int index) {
+        assert(index < currStack.size() && index >= 0);
+
+        BulletStackEffect effect = currStack[index];
+        currStack.erase(currStack.begin() + index);
+        if (effect.effectCalc == EffectCalculation::Additive) {
+            additives[effect.type] -= effect.value;
+        } else {
+            multiplicatives[effect.type] /= effect.value;
+        }
+        return effect;
+    }
+    BulletStackEffect modify(int index) {
+        BulletStackEffect effect = remove(index);
+        if (effect.effectCalc == EffectCalculation::Additive) {
+            effect.value = -effect.value;
+        } else {
+            effect.value = 1 / effect.value;
+        }
+        add(effect);
+        return effect;
+    }
 };
 
 // anything that is deadly to the player

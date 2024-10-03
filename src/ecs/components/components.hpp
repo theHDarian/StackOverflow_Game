@@ -1,11 +1,13 @@
 #pragma once
 #include "common.hpp"
 #include <vector>
+#include <stack>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 
 #include "map_components.hpp"
 #include "actor_components.hpp"
+#include "../utils/extended_stack.hpp"
 
 
 // Stucture to store collision information
@@ -43,6 +45,9 @@ struct IOState {
 	bool shouldRestart;
 	vec2 inputAxis;
 	vec2 mousePosition;
+
+	ExtendedStack<int> pressedHorizontal;
+	ExtendedStack<int> pressedVertical;
 };
 
 // A struct to refer to debugging graphics in the ECS

@@ -37,10 +37,10 @@ void PhysicsSystem::step(float elapsed_ms)
 		Entity entity = motion_registry.entities[i];
 		float step_seconds = elapsed_ms / 1000.f;
 		//have velocity be relative to local rotation angle
-		vec2 world_velocity;
-		world_velocity[0] = cos(motion.angle)*motion.velocity[0] - sin(motion.angle)*motion.velocity[1];
-		world_velocity[1] = sin(motion.angle) * motion.velocity[0] + cos(motion.angle) * motion.velocity[1];
-		motion.position += world_velocity * step_seconds;
+		// vec2 world_velocity;
+		// world_velocity[0] = cos(motion.angle)*motion.velocity[0] - sin(motion.angle)*motion.velocity[1];
+		// world_velocity[1] = sin(motion.angle) * motion.velocity[0] + cos(motion.angle) * motion.velocity[1];
+		motion.position += motion.velocity * step_seconds;
 		//(void)elapsed_ms; // placeholder to silence unused warning until implemented
 	}
 
