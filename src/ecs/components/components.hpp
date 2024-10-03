@@ -134,10 +134,30 @@ enum class GEOMETRY_BUFFER_ID {
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
+// Expected sprite states other systems can use
+// eg: physics system sets object's sprite to DAMAGED upon collision
+// not all entities may have all these sprites, so should check
+// state exists in Sprites' component's sprite map first
+enum class SPRITE_STATE {
+	BASE = 0,
+	ATTACKING = BASE + 1,
+	DAMAGED = ATTACKING + 1,
+	DEAD = DAMAGED + 1,
+	MOVING = DEAD + 1
+};
+
 struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+};
+
+// all the sprites this entity will use
+struct Sprites {
+	// map of sprite type (enum) to sprite texture
+	// eg: when bullet collides w/ enemy in physics system,
+	// physics system will change the sprite to "DAMAGED_SPRITE"
+	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
 };
 
 

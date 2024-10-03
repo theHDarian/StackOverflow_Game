@@ -58,6 +58,21 @@ void PhysicsSystem::step(float elapsed_ms)
 			if (collides(motion_i, motion_j))
 			{
 				Entity entity_j = motion_container.entities[j];
+
+				// if other entity has damaged sprite, make it switch to damaged sprite on hit
+				if (registry.sprites.has(entity_j)) {
+					auto& spriteMap = registry.sprites.get(entity_j).sprites;
+					if (spriteMap.count(SPRITE_STATE::DAMAGED))
+						registry.renderRequests.get(entity_j).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+				}
+
+				// same for this entity?
+				if (registry.sprites.has(entity_i)) {
+					auto& spriteMap = registry.sprites.get(entity_i).sprites;
+					if (spriteMap.count(SPRITE_STATE::DAMAGED))
+						registry.renderRequests.get(entity_i).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+				}
+
 				// Create a collisions event
 				// We are abusing the ECS system a bit in that we potentially insert muliple collisions for the same entity
 				registry.collisions.emplace_with_duplicates(entity_i, entity_j);

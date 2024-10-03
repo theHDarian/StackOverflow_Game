@@ -127,6 +127,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	title_ss << "Points: " << points;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
+	// have just one blob enemy for now for simplicity
+	if (registry.enemies.components.size() < 1) 
+		createBlob(renderer, vec2(500,500));
+
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
@@ -201,10 +205,9 @@ void WorldSystem::handleCollisions() {
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
 
 					Motion& player_motion = registry.motions.get(entity);
+
 					player_motion.angle = M_PI;
 					player_motion.velocity = {0,100};
-					vec3& player_color = registry.colors.get(entity);
-					player_color = {1.0f,0.0f,0.0f};
 				}
 			}
 		}
