@@ -21,5 +21,5 @@ private:
     void onKey(int key, int, int action, int mod);
     void onMouseMove(vec2 mousePosition);
 
-    vec2 handleMovementInput(int key, int action,vec2 lastInput);
+    void handleMovementInput(int key, int action, IOState& state);
 };
