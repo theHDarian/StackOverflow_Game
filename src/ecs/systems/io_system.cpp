@@ -6,10 +6,8 @@
 
 
 IOSystem::IOSystem() {
-    std::cout << "create sys" << std::endl;    
 }
 IOSystem::~IOSystem() {
-    std::cout << "destroy sys" << std::endl;
 }
 bool IOSystem::init(GLFWwindow* window) {
     this->window = window;
@@ -40,7 +38,8 @@ void IOSystem::onKey(int key, int, int action, int mod) {
 	}
 
 	//Player movement
-	state.inputAxis = handleMovementInput(key,action,state.inputAxis);
+	handleMovementInput(key,action,state);
+
 }
 
 void IOSystem::onMouseMove(vec2 mousePosition) {	
@@ -48,25 +47,31 @@ void IOSystem::onMouseMove(vec2 mousePosition) {
     state.mousePosition = mousePosition;
 }
 
-vec2 IOSystem::handleMovementInput(int key, int action, vec2 lastInput) {
-	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		if (key == GLFW_KEY_A)
-			lastInput = {-1.0f,lastInput[1]};
-		else if (key == GLFW_KEY_D)
-			lastInput = {1.0f,lastInput[1]};
-		else if (key == GLFW_KEY_W)
-			lastInput = {lastInput[0],-1.0f}; //up is negative
-		else if (key == GLFW_KEY_S)
-			lastInput = {lastInput[0],1.0f};
-	} else if (action == GLFW_RELEASE) { //on release, reset to zero or based on other held key
-		if (key == GLFW_KEY_A)
-			lastInput = {glm::max(lastInput[0],0.0f),lastInput[1]};
-		else if (key == GLFW_KEY_D)
-			lastInput = {glm::min(lastInput[0],0.0f),lastInput[1]};
-		else if (key == GLFW_KEY_W)
-			lastInput = {lastInput[0],glm::max(0.0f,lastInput[1])}; //up is negative
-		else if (key == GLFW_KEY_S)
-			lastInput = {lastInput[0],glm::min(0.0f,lastInput[1])};
+void IOSystem::handleMovementInput(int key, int action, IOState& state) {
+	if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_A) {
+			state.pressedHorizontal.push(-1.0f);
+		} else if (key == GLFW_KEY_D) {
+			state.pressedHorizontal.push(1.0f);
+		} else if (key == GLFW_KEY_W) {
+			state.pressedVertical.push(-1.0f);
+		} else if (key == GLFW_KEY_S) {
+			state.pressedVertical.push(1.0f);
+		}
+	} else if (action == GLFW_RELEASE) {
+		//on release, reset to last pressed key
+		if (key == GLFW_KEY_A) {
+			state.pressedHorizontal.remove(-1.0f);
+		} else if (key == GLFW_KEY_D){
+			state.pressedHorizontal.remove(1.0f);
+		} else if (key == GLFW_KEY_W){
+			state.pressedVertical.remove(-1.0f);
+		} else if (key == GLFW_KEY_S){
+			state.pressedVertical.remove(1.0f);
+		}
 	}
-    return lastInput;
+	float horizontalAxis = state.pressedHorizontal.empty() ? 0.0f : state.pressedHorizontal.top();
+	float verticalAxis = state.pressedVertical.empty() ? 0.0f : state.pressedVertical.top();
+	// std::cout << horizontalAxis << " " << verticalAxis << std::endl;
+    state.inputAxis = {horizontalAxis,verticalAxis};
 }
