@@ -20,9 +20,28 @@ struct CircleCollider {
 	float radius;
 };
 
-struct RingCollider {
-	float innerRadius;
-	float outerRadius;
+struct PolyCollider {
+	// Points are relative to the origin {0,0}
+	// Points are in order around the polygon
+	std::vector<vec2> offsetVertices;
+	float maxLength;
+
+	// Call this function after creating offsetVertices please
+	void setMaxLength() {
+		maxLength = 0;
+		for (uint i = 0; i < offsetVertices.size(); i++) {
+			if (glm::distance(offsetVertices[i], { 0,0 }) > maxLength) maxLength = glm::distance(offsetVertices[i], { 0,0 });
+		}
+	}
+};
+
+struct WallCollider {
+	// Start an end of the line segment
+	vec2 startPosition;
+	vec2 endPosition;
+
+	// Normal to the line, used to move the player away from the wall in the correct direction
+	vec2 normal;
 };
 
 // Data structure for toggling debug mode

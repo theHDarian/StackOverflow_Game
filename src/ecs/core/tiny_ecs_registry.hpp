@@ -27,6 +27,9 @@ public:
 	ComponentContainer<CircleCollider> circleColliders;
 	ComponentContainer<PlayerBullet> playerBullets;
 	ComponentContainer<EnemyBullet> enemyBullets;
+	ComponentContainer<PolyCollider> polyColliders;
+	ComponentContainer<WallCollider> walls;
+
 
 
 	// constructor that adds all containers for looping over them
