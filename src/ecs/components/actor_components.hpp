@@ -49,7 +49,9 @@ struct Player
 
     float dashDistance;
     int currDashCharges;
+    int maxDashCharges;
     float currDashCooldown;
+    float dashCooldown;
     float currFireRateCooldown;
 };
 

@@ -1,4 +1,5 @@
 #include "io_system.hpp"
+#include "world_system.hpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
@@ -58,6 +59,9 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
+        if (key == GLFW_KEY_SPACE) {
+            state.shouldDash = 1000.0f;
+        }
 	} else if (action == GLFW_RELEASE) {
 		//on release, reset to last pressed key
 		if (key == GLFW_KEY_A) {

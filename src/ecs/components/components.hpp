@@ -43,12 +43,15 @@ struct ScreenState
 struct IOState {
 	bool shouldEnd;
 	bool shouldRestart;
+    float shouldDash;
 	vec2 inputAxis;
 	vec2 mousePosition;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
 };
+
+// Struct for dash
 
 // A struct to refer to debugging graphics in the ECS
 struct DebugComponent
