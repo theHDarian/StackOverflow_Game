@@ -22,8 +22,10 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	Player& player = registry.players.emplace(entity);
 	player.baseSpeed = 200;
 
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x;
+
 	registry.stackCompile.emplace(entity);
-	registry.circleColliders.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no texture is needed
