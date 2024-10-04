@@ -27,7 +27,9 @@ public:
 	ComponentContainer<CircleCollider> circleColliders;
 	ComponentContainer<PlayerBullet> playerBullets;
 	ComponentContainer<EnemyBullet> enemyBullets;
-	ComponentContainer<Sprites> sprites;
+	ComponentContainer<PolyCollider> polyColliders;
+	ComponentContainer<WallCollider> walls;
+
 
 
 	// constructor that adds all containers for looping over them
@@ -44,7 +46,6 @@ public:
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
-		registry_list.push_back(&sprites);
 	}
 
 	void clear_all_components() {

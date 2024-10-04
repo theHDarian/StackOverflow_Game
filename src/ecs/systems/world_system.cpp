@@ -127,10 +127,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	title_ss << "Points: " << points;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
-	// have just one blob enemy for now for simplicity
-	if (registry.enemies.components.size() < 1) 
-		createBlob(renderer, vec2(500,500));
-
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
@@ -148,9 +144,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.remove_all_components_of(motions_registry.entities[i]);
 		}
 	}
+	vec2 oldSpeed = registry.motions.get(player).velocity;
 
 	// Processing inputs
 	handleInput();
+
+    //check dash related variables
+    dash(oldSpeed, elapsed_ms_since_last_update);
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -205,9 +205,10 @@ void WorldSystem::handleCollisions() {
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
 
 					Motion& player_motion = registry.motions.get(entity);
-
 					player_motion.angle = M_PI;
 					player_motion.velocity = {0,100};
+					vec3& player_color = registry.colors.get(entity);
+					player_color = {1.0f,0.0f,0.0f};
 				}
 			}
 		}
@@ -238,6 +239,42 @@ void WorldSystem::handleInput() {
 	}
 
 }
+
+void WorldSystem::dash(vec2 oldspeed, float elapsed_ms_since_last_update) {
+    Player& pl = registry.players.get(player);
+    if (pl.currDashCharges < pl.maxDashCharges) {
+        pl.currDashCooldown -= elapsed_ms_since_last_update;
+        if (pl.currDashCooldown <= 0) {
+            pl.currDashCharges++;
+            pl.currDashCooldown = pl.dashCooldown;
+        }
+    }
+    IOState& input = registry.ioStates.components[0];
+    if (!input.shouldDash) {
+        return;
+    }
+    if (pl.currDashCharges <= 0) {
+        input.shouldDash = 0.0f;
+        return;
+    }
+    Motion& player_motion = registry.motions.get(player);
+            // save the current speed and direction
+    if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
+        if (!registry.invincibles.has(player))
+            registry.invincibles.emplace(player);
+        player_motion.velocity = pl.dashSpeed * glm::normalize(input.inputAxis);
+    }
+    else if (input.shouldDash <= 0.0f) {
+        // dash is over, remove invincibility and restore speed
+        if (registry.invincibles.has(player))
+            registry.invincibles.remove(player);
+        player_motion.velocity = oldspeed;
+        pl.currDashCharges--;
+        input.shouldDash = 0.0f;
+        return;
+    }
+}
+
 
 void WorldSystem::closeGame() {
 	glfwSetWindowShouldClose(window,1);

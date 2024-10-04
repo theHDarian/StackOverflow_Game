@@ -22,9 +22,28 @@ struct CircleCollider {
 	float radius;
 };
 
-struct RingCollider {
-	float innerRadius;
-	float outerRadius;
+struct PolyCollider {
+	// Points are relative to the origin {0,0}
+	// Points are in order around the polygon
+	std::vector<vec2> offsetVertices;
+	float maxLength;
+
+	// Call this function after creating offsetVertices please
+	void setMaxLength() {
+		maxLength = 0;
+		for (uint i = 0; i < offsetVertices.size(); i++) {
+			if (glm::distance(offsetVertices[i], { 0,0 }) > maxLength) maxLength = glm::distance(offsetVertices[i], { 0,0 });
+		}
+	}
+};
+
+struct WallCollider {
+	// Start an end of the line segment
+	vec2 startPosition;
+	vec2 endPosition;
+
+	// Normal to the line, used to move the player away from the wall in the correct direction
+	vec2 normal;
 };
 
 // Data structure for toggling debug mode
@@ -43,12 +62,15 @@ struct ScreenState
 struct IOState {
 	bool shouldEnd;
 	bool shouldRestart;
+    float shouldDash;
 	vec2 inputAxis;
 	vec2 mousePosition;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
 };
+
+// Struct for dash
 
 // A struct to refer to debugging graphics in the ECS
 struct DebugComponent
@@ -139,30 +161,10 @@ enum class GEOMETRY_BUFFER_ID {
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
-// Expected sprite states other systems can use
-// eg: physics system sets object's sprite to DAMAGED upon collision
-// not all entities may have all these sprites, so should check
-// state exists in Sprites' component's sprite map first
-enum class SPRITE_STATE {
-	BASE = 0,
-	ATTACKING = BASE + 1,
-	DAMAGED = ATTACKING + 1,
-	DEAD = DAMAGED + 1,
-	MOVING = DEAD + 1
-};
-
 struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
-};
-
-// all the sprites this entity will use
-struct Sprites {
-	// map of sprite type (enum) to sprite texture
-	// eg: when bullet collides w/ enemy in physics system,
-	// physics system will change the sprite to "DAMAGED_SPRITE"
-	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
 };
 
 
