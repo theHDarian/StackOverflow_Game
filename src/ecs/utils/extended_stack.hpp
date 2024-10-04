@@ -37,5 +37,6 @@ public:
             stack.erase(it);
             return true; 
         }
+        return false;
     }
 };
