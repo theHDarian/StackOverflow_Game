@@ -144,6 +144,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.remove_all_components_of(motions_registry.entities[i]);
 		}
 	}
+
+	// have just one blob enemy for now for simplicity
+	if (registry.enemies.components.size() < 1)
+		createBlob(renderer, vec2(500, 500));
+
 	vec2 oldSpeed = registry.motions.get(player).velocity;
 
 	// Processing inputs
@@ -207,8 +212,6 @@ void WorldSystem::handleCollisions() {
 					Motion& player_motion = registry.motions.get(entity);
 					player_motion.angle = M_PI;
 					player_motion.velocity = {0,100};
-					vec3& player_color = registry.colors.get(entity);
-					player_color = {1.0f,0.0f,0.0f};
 				}
 			}
 		}

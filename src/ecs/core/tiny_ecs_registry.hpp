@@ -21,6 +21,7 @@ public:
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
+	ComponentContainer<Sprites> sprites;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -46,6 +47,7 @@ public:
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
+		registry_list.push_back(&sprites);
 	}
 
 	void clear_all_components() {

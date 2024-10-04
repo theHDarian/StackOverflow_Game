@@ -71,6 +71,23 @@ void PhysicsSystem::step(float elapsed_ms)
 	ComponentContainer<PlayerBullet>& pBullets = registry.playerBullets;
 	for (uint i = 0; i < enemies.components.size(); i++) {
 		if (CircleToCircle(player, enemies.entities[i])) {
+
+			// if enemy has damaged sprite, make it switch to damaged sprite on hit
+			// note: this is just a demonstration of sprite switching,
+			// won't necessarily have enemy on collision sprites
+			if (registry.sprites.has(enemies.entities[i])) {
+				auto& spriteMap = registry.sprites.get(enemies.entities[i]).sprites;
+				if (spriteMap.count(SPRITE_STATE::DAMAGED))
+					registry.renderRequests.get(enemies.entities[i]).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+			}
+
+			// the same can be done with the player
+			if (registry.sprites.has(player)) {
+				auto& spriteMap = registry.sprites.get(player).sprites;
+				if (spriteMap.count(SPRITE_STATE::DAMAGED))
+					registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+			}
+
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
 		}
 		for (uint j = 0; j < pBullets.components.size(); j++) {
