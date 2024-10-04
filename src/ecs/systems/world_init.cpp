@@ -23,7 +23,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	player.baseSpeed = 200;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x;
+	cc.radius = motion.scale.x/2;
 
 	registry.stackCompile.emplace(entity);
 	registry.sprites.emplace(entity);
@@ -58,7 +58,7 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	motion.scale = vec2({ 100, 100 });
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x;
+	cc.radius = motion.scale.x/2;
 
 	registry.enemies.emplace(entity);
 	registry.sprites.emplace(entity);
