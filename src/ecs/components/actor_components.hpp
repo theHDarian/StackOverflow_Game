@@ -47,9 +47,11 @@ struct Player
     float baseDashNum;
     float baseDashCDR;
 
-    float dashDistance;
-    int currDashCharges;
-    float currDashCooldown;
+    float dashSpeed = 2500.0f;
+    int currDashCharges = 3;
+    int maxDashCharges = 3;
+    float currDashCooldown = 0.0f;
+    float dashCooldown = 3000.0f;
     float currFireRateCooldown;
 };
 
@@ -165,7 +167,7 @@ struct BossEnemy {
 struct Invincible {
     // Deletes itself when countdown <0
     // Entity can't be hit while has Invincible component
-    int countdown = 3000;
+    int countdown;
 };
 
 // TODO Add a way to use parametric equations for bullet path

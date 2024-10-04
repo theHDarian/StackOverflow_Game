@@ -58,6 +58,10 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
+        if (key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_2) {
+
+            state.shouldDash = 120.0f;
+        }
 	} else if (action == GLFW_RELEASE) {
 		//on release, reset to last pressed key
 		if (key == GLFW_KEY_A) {

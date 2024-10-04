@@ -46,6 +46,7 @@ private:
 	bool playerIsDead();
 	void handleInput();
 	void movePlayer(vec2 inputAxis);
+    void dash(vec2 oldspeed, float elapsed_ms_since_last_update);
 
 	float getModifiedValue(BulletEffectType bf, float value);
 
@@ -70,4 +71,5 @@ private:
 	// C++ random number generator
 	std::default_random_engine rng;
 	std::uniform_real_distribution<float> uniformDist; // number between 0..1
+
 };
