@@ -47,11 +47,11 @@ struct Player
     float baseDashNum;
     float baseDashCDR;
 
-    float dashDistance;
-    int currDashCharges;
-    int maxDashCharges;
-    float currDashCooldown;
-    float dashCooldown;
+    float dashSpeed = 2500.0f;
+    int currDashCharges = 3;
+    int maxDashCharges = 3;
+    float currDashCooldown = 0.0f;
+    float dashCooldown = 3000.0f;
     float currFireRateCooldown;
 };
 

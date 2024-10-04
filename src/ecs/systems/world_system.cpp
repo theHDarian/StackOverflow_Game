@@ -144,12 +144,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.remove_all_components_of(motions_registry.entities[i]);
 		}
 	}
+	vec2 oldSpeed = registry.motions.get(player).velocity;
 
 	// Processing inputs
 	handleInput();
 
     //check dash related variables
-    dash(elapsed_ms_since_last_update);
+    dash(oldSpeed, elapsed_ms_since_last_update);
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -239,7 +240,7 @@ void WorldSystem::handleInput() {
 
 }
 
-void WorldSystem::dash(float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 oldspeed, float elapsed_ms_since_last_update) {
     Player& pl = registry.players.get(player);
     if (pl.currDashCharges < pl.maxDashCharges) {
         pl.currDashCooldown -= elapsed_ms_since_last_update;
@@ -258,17 +259,16 @@ void WorldSystem::dash(float elapsed_ms_since_last_update) {
     }
     Motion& player_motion = registry.motions.get(player);
             // save the current speed and direction
-    vec2 oldSpeed = player_motion.velocity;
     if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
-        player_motion.velocity = pl.dashDistance * glm::normalize(input.inputAxis);
+        player_motion.velocity = pl.dashSpeed * glm::normalize(input.inputAxis);
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
         if (registry.invincibles.has(player))
             registry.invincibles.remove(player);
-        player_motion.velocity = oldSpeed;
+        player_motion.velocity = oldspeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;
         return;
