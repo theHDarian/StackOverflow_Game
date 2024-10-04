@@ -150,6 +150,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createBlob(renderer, vec2(500, 500));
 
 	vec2 oldSpeed = registry.motions.get(player).velocity;
+	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
+		oldSpeed = registry.ioStates.components[0].lastInputAxis;
+	}
 
 	// Processing inputs
 	handleInput();
@@ -243,7 +246,7 @@ void WorldSystem::handleInput() {
 
 }
 
-void WorldSystem::dash(vec2 oldspeed, float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
     Player& pl = registry.players.get(player);
     if (pl.currDashCharges < pl.maxDashCharges) {
         pl.currDashCooldown -= elapsed_ms_since_last_update;
@@ -265,13 +268,13 @@ void WorldSystem::dash(vec2 oldspeed, float elapsed_ms_since_last_update) {
     if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
-        player_motion.velocity = pl.dashSpeed * glm::normalize(input.inputAxis);
+        player_motion.velocity = pl.dashSpeed * glm::normalize(oldSpeed);
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
         if (registry.invincibles.has(player))
             registry.invincibles.remove(player);
-        player_motion.velocity = oldspeed;
+        player_motion.velocity = oldSpeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;
         return;
