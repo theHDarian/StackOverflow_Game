@@ -259,7 +259,7 @@ void WorldSystem::dash(float elapsed_ms_since_last_update) {
     Motion& player_motion = registry.motions.get(player);
             // save the current speed and direction
     vec2 oldSpeed = player_motion.velocity;
-    if (input.shouldDash -= elapsed_ms_since_last_update > 0.0f) {
+    if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
         player_motion.velocity = pl.dashDistance * glm::normalize(input.inputAxis);
