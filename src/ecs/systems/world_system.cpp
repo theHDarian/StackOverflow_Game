@@ -189,6 +189,8 @@ void WorldSystem::restartGame() {
 	registry.list_all_components();
 
 	player = createPlayer(renderer,{0,0});
+
+	createTestWall(renderer, {500,10}, {1000, 600});
 }
 
 // Compute collisions between entities
@@ -217,6 +219,20 @@ void WorldSystem::handleCollisions() {
 					player_motion.velocity = {0,100};
 				}
 			}
+
+			// Checking Player -> Wall collision
+			// If found, move the player position away from the wall by radius in direction reflection of projection
+			if (registry.walls.has(entity_other)) {
+				Motion& motion = registry.motions.get(entity);
+				CircleCollider& circle = registry.circleColliders.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
+
+				vec2 a = motion.position - wall.startPosition;
+				vec2 b = wall.endPosition - wall.startPosition;
+				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+				vec2 d = a - c;
+				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
+			}
 		}
 	}
 
@@ -241,7 +257,7 @@ void WorldSystem::handleInput() {
 		Motion& playerMotion = registry.motions.get(player);
 		vec2 diff = input.mousePosition - playerMotion.position;
 		float angle = atan2(diff[1],diff[0]);
-		playerMotion.angle = angle;
+		//playerMotion.angle = angle;
 	}
 
 }

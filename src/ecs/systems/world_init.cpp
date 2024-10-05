@@ -40,6 +40,19 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
+// Purely for testing walls, puts 2 fish at either end of the line segment
+Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition) {
+	createBlob(renderer, startPosition);
+	createBlob(renderer, endPosition);
+
+	auto entity = Entity();
+	auto& wall = registry.walls.emplace(entity);
+	wall.startPosition = startPosition;
+	wall.endPosition = endPosition;
+
+	return entity;
+}
+
 // basic enemy that doesn't do anything
 Entity createBlob(RenderSystem* renderer, vec2 position) {
 	auto entity = Entity();
