@@ -20,3 +20,5 @@ Entity createBlob(RenderSystem* renderer, vec2 pos);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
+Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float rad);
+

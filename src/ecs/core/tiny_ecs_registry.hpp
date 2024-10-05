@@ -22,6 +22,7 @@ public:
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
 	ComponentContainer<Sprites> sprites;
+	ComponentContainer<CollisionShape> collisionShapes;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -48,6 +49,7 @@ public:
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
 		registry_list.push_back(&sprites);
+		registry_list.push_back(&collisionShapes);
 	}
 
 	void clear_all_components() {
