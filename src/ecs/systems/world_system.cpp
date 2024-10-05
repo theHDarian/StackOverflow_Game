@@ -150,7 +150,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createBlob(renderer, vec2(500, 500));
 
 	vec2 oldSpeed = registry.motions.get(player).velocity;
-	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
+	if (oldSpeed == vec2(0,0)) {
 		oldSpeed = registry.ioStates.components[0].lastInputAxis;
 	}
 
@@ -159,6 +159,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     //check dash related variables
     dash(oldSpeed, elapsed_ms_since_last_update);
+
+	shoot(elapsed_ms_since_last_update);
+
+	// Updating the invincibility timer
+	if (registry.invincibles.components.size() > 0 && registry.ioStates.components[0].shouldDash <= 0.0f) {
+		for (auto& invincible : registry.invincibles.components) {
+			invincible.counter_ms -= elapsed_ms_since_last_update;
+			if (invincible.counter_ms <= 0) {
+				registry.invincibles.remove(invincible.entity);
+			}
+		}
+	}
+
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -189,6 +202,7 @@ void WorldSystem::restartGame() {
 	registry.list_all_components();
 
 	player = createPlayer(renderer,{0,0});
+
 
 	createTestWall(renderer, {500,10}, {1000, 600});
 }
@@ -295,6 +309,30 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
         input.shouldDash = 0.0f;
         return;
     }
+}
+
+void WorldSystem::shoot(float elapsed_ms_since_last_update) {
+	IOState& input = registry.ioStates.components[0];
+	if (!input.shouldShoot) {
+		return;
+	}
+	Player& pl = registry.players.get(player);
+	if (pl.currFiringInterval > 0) {
+		pl.currFiringInterval -= elapsed_ms_since_last_update;
+	}
+	if (input.shouldShoot && pl.currFiringInterval <= 0) {
+		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
+		// create bullet
+
+		vec2 playerPos = registry.motions.get(player).position;
+		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
+		vec2 bulletPos = playerPos + bulletDir * 50.f;
+		createPlayerBullet(renderer, bulletPos, bulletDir, getModifiedValue(BulletDamage, 100),
+		                   getModifiedValue(BulletRange, 1000), getModifiedValue(ProjectileSpeed, 200),
+		                   getModifiedValue(ProjectileSize, 15),
+		                   getModifiedValue(Pierce, 0), getModifiedValue(Bounce, 0));
+	}
 }
 
 

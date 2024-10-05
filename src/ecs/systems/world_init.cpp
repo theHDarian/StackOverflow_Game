@@ -21,7 +21,6 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	// create an empty Salmon component for our character
 	Player& player = registry.players.emplace(entity);
 	player.baseSpeed = 200;
-
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2;
 
@@ -108,3 +107,45 @@ Entity createLine(vec2 position, vec2 scale)
 	registry.debugComponents.emplace(entity);
 	return entity;
 }
+
+Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float damage, float range, float speed, float size, int pierce, int bounce)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = atan2(direction.y, direction.x);
+	motion.velocity = direction * speed;
+	motion.position = position;
+	motion.scale = vec2({ size, size });
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x/2;
+
+	// Setting initial values
+	PlayerBullet& bullet = registry.playerBullets.emplace(entity);
+	bullet.damage = damage;
+	bullet.bulletSpeed = speed;
+	bullet.bulletRange = range;
+	bullet.bulletSize = size;
+	bullet.bulletPierce = pierce;
+	bullet.bulletBounce = bounce;
+	bullet.bulletDirection = direction;
+
+	registry.sprites.emplace(entity);
+	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
+	registry.renderRequests.insert(
+		entity,
+		{
+			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	return entity;
+}
+

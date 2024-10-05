@@ -43,16 +43,21 @@ struct BulletStackEffect {
 struct Player
 {
     float baseSpeed;
-    float baseFireRate;
-    float baseDashNum;
-    float baseDashCDR;
+    float baseFiringInterval = 100.0f;
+    int baseDashNum = 3;
+    float baseDashCDR = 3000.0f;
+    float baseDashSpeed = 2500.0f;
 
-    float dashSpeed = 2500.0f;
+    float dashSpeed = baseDashSpeed;
     int currDashCharges = 3;
-    int maxDashCharges = 3;
+
+    int maxDashCharges = baseDashNum;
+
     float currDashCooldown = 0.0f;
-    float dashCooldown = 3000.0f;
-    float currFireRateCooldown;
+    float dashCooldown = baseDashCDR;
+
+    float currFiringInterval = 0.0f;
+    float maxFiringInterval = baseFiringInterval;
 };
 
 // Holds the actual data of currStack

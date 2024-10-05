@@ -60,9 +60,11 @@ struct IOState {
 	bool shouldEnd;
 	bool shouldRestart;
     float shouldDash;
+	bool shouldShoot;
 	vec2 inputAxis;
 	vec2 lastInputAxis = {1,1};
 	vec2 mousePosition;
+
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
