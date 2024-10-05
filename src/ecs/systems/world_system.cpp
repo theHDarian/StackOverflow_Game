@@ -305,8 +305,6 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
-        if (registry.invincibles.has(player))
-            registry.invincibles.remove(player);
         player_motion.velocity = oldSpeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;

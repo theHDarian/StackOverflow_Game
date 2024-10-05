@@ -110,42 +110,61 @@ Entity createLine(vec2 position, vec2 scale)
 
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float damage, float range, float speed, float size, int pierce, int bounce)
 {
-	auto entity = Entity();
+    auto entity = Entity();
 
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
+    // Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+    Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+    registry.meshPtrs.emplace(entity, &mesh);
 
-	// Initialize the motion
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = atan2(direction.y, direction.x);
-	motion.velocity = direction * speed;
-	motion.position = position;
-	motion.scale = vec2({ size, size });
+    // Initialize the motion
+    auto& motion = registry.motions.emplace(entity);
+    motion.angle = atan2(direction.y, direction.x);
+    motion.velocity = direction * speed;
+    motion.position = position;
+    motion.scale = vec2(size, size); // Ensure scale is initialized
 
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x/2;
+    std::cout << "Motion scale: " << motion.scale.x << ", " << motion.scale.y << std::endl;
+    std::cout << "Motion position: " << motion.position.x << ", " << motion.position.y << std::endl;
+    std::cout << "Motion velocity: " << motion.velocity.x << ", " << motion.velocity.y << std::endl;
 
-	// Setting initial values
-	PlayerBullet& bullet = registry.playerBullets.emplace(entity);
-	bullet.damage = damage;
-	bullet.bulletSpeed = speed;
-	bullet.bulletRange = range;
-	bullet.bulletSize = size;
-	bullet.bulletPierce = pierce;
-	bullet.bulletBounce = bounce;
-	bullet.bulletDirection = direction;
+    CircleCollider& cc = registry.circleColliders.emplace(entity);
+    cc.radius = motion.scale.x / 2;
 
-	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
-	registry.renderRequests.insert(
-		entity,
-		{
-			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		});
+    std::cout << "CircleCollider radius: " << cc.radius << std::endl;
 
-	return entity;
+    // Setting initial values
+    PlayerBullet& bullet = registry.playerBullets.emplace(entity);
+    bullet.damage = damage;
+    bullet.bulletSpeed = speed;
+    bullet.bulletRange = range;
+    bullet.bulletSize = size;
+    bullet.bulletPierce = pierce;
+    bullet.bulletBounce = bounce;
+    bullet.bulletDirection = direction;
+
+    std::cout << "Bullet damage: " << bullet.damage << std::endl;
+    std::cout << "Bullet speed: " << bullet.bulletSpeed << std::endl;
+    std::cout << "Bullet range: " << bullet.bulletRange << std::endl;
+    std::cout << "Bullet size: " << bullet.bulletSize << std::endl;
+    std::cout << "Bullet pierce: " << bullet.bulletPierce << std::endl;
+    std::cout << "Bullet bounce: " << bullet.bulletBounce << std::endl;
+    std::cout << "Bullet direction: " << bullet.bulletDirection.x << ", " << bullet.bulletDirection.y << std::endl;
+
+    auto& spriteComponent = registry.sprites.emplace(entity);
+    spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
+
+    std::cout << "Sprites map size: " << spriteComponent.sprites.size() << std::endl;
+
+    registry.renderRequests.insert(
+        entity,
+        {
+            spriteComponent.sprites[SPRITE_STATE::BASE],
+            EFFECT_ASSET_ID::TEXTURED,
+            GEOMETRY_BUFFER_ID::SPRITE
+        });
+	std::cout << "Render request inserted" << std::endl;
+
+    return entity;
 }
+
 
