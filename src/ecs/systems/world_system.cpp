@@ -163,11 +163,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	shoot(elapsed_ms_since_last_update);
 
 	// Updating the invincibility timer
-	if (registry.invincibles.components.size() > 0 && registry.ioStates.components[0].shouldDash <= 0.0f) {
-		for (auto& invincible : registry.invincibles.components) {
-			invincible.counter_ms -= elapsed_ms_since_last_update;
-			if (invincible.counter_ms <= 0) {
-				registry.invincibles.remove(invincible.entity);
+	if (registry.invincibles.entities.size() > 0) {
+		for (Entity& invincible : registry.invincibles.entities) {
+			float& invincible_timer = registry.invincibles.get(invincible).countdown;
+			invincible_timer -= elapsed_ms_since_last_update;
+			if (invincible_timer <= 0) {
+				registry.invincibles.remove(invincible);
+				std::cout << "entity is no longer invincible" << std::endl;
 			}
 		}
 	}
@@ -298,6 +300,7 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
     if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
+    	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
         player_motion.velocity = pl.dashSpeed * glm::normalize(oldSpeed);
     }
     else if (input.shouldDash <= 0.0f) {

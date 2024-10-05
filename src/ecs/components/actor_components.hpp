@@ -172,7 +172,7 @@ struct BossEnemy {
 struct Invincible {
     // Deletes itself when countdown <0
     // Entity can't be hit while has Invincible component
-    int countdown;
+    float countdown;
 };
 
 // TODO Add a way to use parametric equations for bullet path
