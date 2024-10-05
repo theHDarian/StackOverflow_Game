@@ -181,8 +181,6 @@ struct PlayerBullet {
     float bulletSize;
     int bulletPierce;
     int bulletBounce;
-
-    vec2 bulletDirection;
 };
 
 struct EnemyBullet {
@@ -192,8 +190,6 @@ struct EnemyBullet {
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize;
     int bulletBounce;
-
-    vec2 bulletDirection;
 
     std::vector<BulletStackEffect> bulletEffects;
 };
