@@ -141,14 +141,8 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction,
     motion.position = position;
     motion.scale = vec2(size, size); // Ensure scale is initialized
 
-    std::cout << "Motion scale: " << motion.scale.x << ", " << motion.scale.y << std::endl;
-    std::cout << "Motion position: " << motion.position.x << ", " << motion.position.y << std::endl;
-    std::cout << "Motion velocity: " << motion.velocity.x << ", " << motion.velocity.y << std::endl;
-
     CircleCollider& cc = registry.circleColliders.emplace(entity);
     cc.radius = motion.scale.x / 2;
-
-    std::cout << "CircleCollider radius: " << cc.radius << std::endl;
 
     // Setting initial values
     PlayerBullet& bullet = registry.playerBullets.emplace(entity);
@@ -158,20 +152,9 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction,
     bullet.bulletSize = size;
     bullet.bulletPierce = pierce;
     bullet.bulletBounce = bounce;
-    bullet.bulletDirection = direction;
-
-    std::cout << "Bullet damage: " << bullet.damage << std::endl;
-    std::cout << "Bullet speed: " << bullet.bulletSpeed << std::endl;
-    std::cout << "Bullet range: " << bullet.bulletRange << std::endl;
-    std::cout << "Bullet size: " << bullet.bulletSize << std::endl;
-    std::cout << "Bullet pierce: " << bullet.bulletPierce << std::endl;
-    std::cout << "Bullet bounce: " << bullet.bulletBounce << std::endl;
-    std::cout << "Bullet direction: " << bullet.bulletDirection.x << ", " << bullet.bulletDirection.y << std::endl;
 
     auto& spriteComponent = registry.sprites.emplace(entity);
     spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
-
-    std::cout << "Sprites map size: " << spriteComponent.sprites.size() << std::endl;
 
     registry.renderRequests.insert(
         entity,
@@ -180,7 +163,6 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction,
             EFFECT_ASSET_ID::TEXTURED,
             GEOMETRY_BUFFER_ID::SPRITE
         });
-	std::cout << "Render request inserted" << std::endl;
 
     return entity;
 }
