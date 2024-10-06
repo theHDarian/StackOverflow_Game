@@ -6,6 +6,7 @@
 #include <cassert>
 #include <sstream>
 #include <iostream>
+#include <glm/detail/func_trigonometric.inl>
 
 #include "physics_system.hpp"
 
@@ -172,18 +173,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	vec2 oldSpeed = registry.motions.get(player).velocity;
-	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
-		oldSpeed = registry.ioStates.components[0].lastInputAxis;
+	vec2 preDashSpeed = registry.motions.get(player).velocity;
+	if (preDashSpeed[0] == 0 && preDashSpeed[1] == 0) {
+		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
 	}
 
 	// Processing inputs
 	handleInput();
 
     //check dash related variables
-    dash(oldSpeed, elapsed_ms_since_last_update);
+    dash(preDashSpeed, elapsed_ms_since_last_update);
 
-	shoot(elapsed_ms_since_last_update);
+	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster), getModifiedValue(BulletBurst,registry.players.get(player).maxBulletBurst));
 
 	// Updating the invincibility timer
 	if (registry.invincibles.entities.size() > 0) {
@@ -199,20 +200,25 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Updating the bullet ranges
 	if (registry.playerBullets.entities.size() > 0) {
-		for (Entity& bullet : registry.playerBullets.entities) {
-			float& range_timer = registry.playerBullets.get(bullet).bulletRange;
-			range_timer -= elapsed_ms_since_last_update;
-			if (range_timer <= 0) {
-				registry.remove_all_components_of(bullet);
+		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+			PlayerBullet& bullet = registry.playerBullets.components[i];
+			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				registry.remove_all_components_of(registry.playerBullets.entities[i]);
 			}
 		}
 	}
 	if (registry.enemyBullets.entities.size() > 0) {
-		for (Entity& bullet : registry.enemyBullets.entities) {
-			float& range_timer = registry.enemyBullets.get(bullet).bulletRange;
-			range_timer -= elapsed_ms_since_last_update;
-			if (range_timer <= 0) {
-				registry.remove_all_components_of(bullet);
+		// for (Entity& bullet : registry.enemyBullets.entities) {
+		// 	float& range_timer = registry.enemyBullets.get(bullet).bulletRange;
+		// 	range_timer -= elapsed_ms_since_last_update;
+		// 	if (range_timer <= 0) {
+		// 		registry.remove_all_components_of(bullet);
+		// 	}
+		// }
+		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
+			EnemyBullet& bullet = registry.enemyBullets.components[i];
+			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				registry.remove_all_components_of(registry.enemyBullets.entities[i]);
 			}
 		}
 	}
@@ -401,13 +407,13 @@ void WorldSystem::handleInput() {
 
 }
 
-void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
     Player& pl = registry.players.get(player);
-    if (pl.currDashCharges < pl.maxDashCharges) {
+    if (pl.currDashCharges < getModifiedValue(PlayerNumDash, pl.maxDashCharges)) {
         pl.currDashCooldown -= elapsed_ms_since_last_update;
         if (pl.currDashCooldown <= 0) {
             pl.currDashCharges++;
-            pl.currDashCooldown = pl.dashCooldown;
+            pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
         }
     }
     IOState& input = registry.ioStates.components[0];
@@ -424,24 +430,18 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
     	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
-        player_motion.velocity = pl.dashSpeed * glm::normalize(oldSpeed);
+        player_motion.velocity = pl.dashSpeed * glm::normalize(preDashSpeed);
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
-        player_motion.velocity = oldSpeed;
+        player_motion.velocity = preDashSpeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;
         return;
     }
 }
 
-void WorldSystem::shoot(float elapsed_ms_since_last_update) {
-	for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
-		PlayerBullet& bullet = registry.playerBullets.components[i];
-		if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-			registry.remove_all_components_of(registry.playerBullets.entities[i]);
-		}
-	}
+void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster, int burst) {
 	IOState& input = registry.ioStates.components[0];
 	if (!input.shouldShoot) {
 		return;
@@ -450,15 +450,51 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update) {
 	if (pl.currFiringInterval > 0) {
 		pl.currFiringInterval -= elapsed_ms_since_last_update;
 	}
-	if (input.shouldShoot && pl.currFiringInterval <= 0) {
+	if (pl.currFiringInterval <= 0) {
 		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
 		// create bullet
 
 		vec2 playerPos = registry.motions.get(player).position;
 		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
-		vec2 bulletPos = playerPos + bulletDir * 50.f;
-		createPlayerBullet(renderer, bulletPos, bulletDir);
+		vec2 bulletPos = playerPos + bulletDir * 100.f;
+
+		if (cluster == 1) {
+			createPlayerBullet(renderer, bulletPos, bulletDir);
+			return;
+		}
+
+		// Calculate the offset between bullets for cluster shots
+
+		float offSet = radians(getModifiedValue(BulletSpread, 30)) / cluster;
+		// Create a rotation matrix
+		glm::mat2 rotationMatrix = glm::mat2(
+			glm::cos(offSet), -glm::sin(offSet),
+			glm::sin(offSet),  glm::cos(offSet)
+		);
+
+
+		if (cluster == 2) {
+			createPlayerBullet(renderer, bulletPos, bulletDir*rotationMatrix);
+			createPlayerBullet(renderer, bulletPos, bulletDir*glm::transpose(rotationMatrix));
+			return;
+		}
+
+		for (int i = 0; i < cluster; i++) {
+			if (i == 0) {
+				createPlayerBullet(renderer, bulletPos, bulletDir);
+				continue;
+			}
+			for (int j = 0; j < i; j++) {
+				if (i % 2 == 0) {
+					bulletDir = bulletDir * rotationMatrix;
+				}
+				else {
+					bulletDir = bulletDir * glm::transpose(rotationMatrix);
+				}
+			}
+			createPlayerBullet(renderer, bulletPos, bulletDir);
+		}
 	}
 }
 

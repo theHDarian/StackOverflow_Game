@@ -12,7 +12,8 @@ enum BulletEffectType {
     FireRate,
     BulletRange,
     BulletSpread,
-    BulletNum,
+    BulletNum, // Number of bullets fired in a single shot
+    BulletBurst, // Number of bullets fired in a burst
     Bounce,
     Pierce,
     Homing,
@@ -59,6 +60,10 @@ struct Player
 
     float currFiringInterval = 0.0f;
     float maxFiringInterval = baseFiringInterval;
+
+    int bulletCluster = 1;
+
+    int maxBulletBurst = 1;
 };
 
 // Holds the actual data of currStack
@@ -78,6 +83,7 @@ struct StackCompile {
         {BulletRange,       0},
         {BulletSpread,      0},
         {BulletNum,         0},
+        {BulletBurst,       0},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -94,6 +100,7 @@ struct StackCompile {
         {BulletRange,       1},
         {BulletSpread,      1},
         {BulletNum,         1},
+        {BulletBurst,       1},
         {Bounce,            1},
         {Pierce,            1},
         {Homing,            1},
@@ -112,6 +119,7 @@ struct StackCompile {
         {BulletRange,       1},
         {BulletSpread,      1},
         {BulletNum,         1},
+        {BulletBurst,       1},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -207,7 +215,7 @@ struct PlayerBullet {
 struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 1000;
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize;
     int bulletBounce;
