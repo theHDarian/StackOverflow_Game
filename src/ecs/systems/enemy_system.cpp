@@ -37,7 +37,7 @@ void EnemySystem:: step(float elapsed_ms) {
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             } else if (enemy.attackPattern == EnemyAttackPattern::DOUBLE_SHOT) {
                 shoot(enemy, pos, angle);
-                shoot(enemy, pos, angle + M_PI_2);
+                shoot(enemy, pos, angle + 30);
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
         }

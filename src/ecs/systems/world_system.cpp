@@ -231,10 +231,6 @@ void WorldSystem::handleCollisions() {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
-
-					Motion& player_motion = registry.motions.get(entity);
-					player_motion.angle = M_PI;
-					player_motion.velocity = {0,100};
 				}
 			}
 
@@ -245,7 +241,6 @@ void WorldSystem::handleCollisions() {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
-					std::cout << "TEST" << std::endl;
 					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
 					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
