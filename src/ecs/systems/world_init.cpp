@@ -1,6 +1,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
 #include <glm/trigonometric.hpp>
+#include "bullet_effects.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
