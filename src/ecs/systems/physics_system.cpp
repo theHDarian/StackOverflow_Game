@@ -35,6 +35,7 @@ void PhysicsSystem::step(float elapsed_ms)
 	{
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
+
 		float step_seconds = elapsed_ms / 1000.f;
 		//have velocity be relative to local rotation angle
 		// vec2 world_velocity;
@@ -57,13 +58,17 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// Player  -> EnemyBullets	(Circle to Poly)
-	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
-	for (uint i = 0; i < eBullets.components.size(); i++) {
-		if (CircleToPoly(player, eBullets.entities[i])) {
-			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
-		}
-	}
+	// // Player  -> EnemyBullets	(Circle to Poly)
+	// ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
+	// std::cout << "enemy bullet counts" << eBullets.size() << std::endl;
+	// for (uint i = 0; i < eBullets.components.size(); i++) {
+	// 	// if (CircleToPoly(player, eBullets.entities[i])) {
+	// 	// 	registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
+	// 	// }
+	// 	if (CircleToCircle(player, eBullets.entities[i])) {
+	// 		registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
+	// 	}
+	// }
 
 	// Player  -> Enemies		(Circle to Circle)
 	// Enemies -> PlayerBullets	(Circle to Circle)
@@ -74,8 +79,8 @@ void PhysicsSystem::step(float elapsed_ms)
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
 		}
 		for (uint j = 0; j < pBullets.components.size(); j++) {
-			if (CircleToCircle(eBullets.entities[i], pBullets.entities[i])) {
-				registry.collisions.emplace_with_duplicates(enemies.entities[i], pBullets.entities[i]);
+			if (CircleToCircle(enemies.entities[i], pBullets.entities[j])) {
+				registry.collisions.emplace_with_duplicates(enemies.entities[i], pBullets.entities[j]);
 			}
 		}
 	}
