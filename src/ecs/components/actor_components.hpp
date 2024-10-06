@@ -184,14 +184,14 @@ struct Invincible {
 // TODO Add a way to use parametric equations for bullet path
 
 struct PlayerBullet {
-    float damage;
-    float bulletSpeed;
+    float damage = 10;
+    float bulletSpeed = 400;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 15000;
     // Player bullet only scale in all directions?
-    float bulletSize;
-    int bulletPierce;
-    int bulletBounce;
+    float bulletSize = 20;
+    int bulletPierce = 0;
+    int bulletBounce = 0;
 };
 
 struct EnemyBullet {

@@ -27,5 +27,6 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 Entity createLine(vec2 position, vec2 size);
 
 // a player-fired bullet
-Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float damage, float range, float speed, float size, int pierce, int bounce);
+Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
+float getModifiedValue(BulletEffectType bf, float value);

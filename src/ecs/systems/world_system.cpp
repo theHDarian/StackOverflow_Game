@@ -150,7 +150,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createBlob(renderer, vec2(500, 500));
 
 	vec2 oldSpeed = registry.motions.get(player).velocity;
-	if (oldSpeed == vec2(0,0)) {
+	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
 		oldSpeed = registry.ioStates.components[0].lastInputAxis;
 	}
 
@@ -233,7 +233,7 @@ void WorldSystem::handleCollisions() {
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate invincibility unless already invincible
+				// initiate death unless already dying
 				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
@@ -338,6 +338,12 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
 }
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update) {
+	// for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+	// 	PlayerBullet& bullet = registry.playerBullets.components[0];
+	// 	if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+	// 		registry.remove_all_components_of(registry.playerBullets.entities[0]);
+	// 	}
+	// }
 	IOState& input = registry.ioStates.components[0];
 	if (!input.shouldShoot) {
 		return;
@@ -354,10 +360,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update) {
 		vec2 playerPos = registry.motions.get(player).position;
 		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
 		vec2 bulletPos = playerPos + bulletDir * 50.f;
-		createPlayerBullet(renderer, bulletPos, bulletDir, getModifiedValue(BulletDamage, 100),
-		                   getModifiedValue(BulletRange, 1000), getModifiedValue(ProjectileSpeed, 200),
-		                   getModifiedValue(ProjectileSize, 15),
-		                   getModifiedValue(Pierce, 0), getModifiedValue(Bounce, 0));
+		createPlayerBullet(renderer, bulletPos, bulletDir);
 	}
 }
 

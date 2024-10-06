@@ -126,45 +126,52 @@ Entity createLine(vec2 position, vec2 scale)
 	return entity;
 }
 
-Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float damage, float range, float speed, float size, int pierce, int bounce)
+Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 {
-    auto entity = Entity();
+	auto entity = Entity();
 
-    // Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-    Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-    registry.meshPtrs.emplace(entity, &mesh);
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
 
-    // Initialize the motion
-    auto& motion = registry.motions.emplace(entity);
-    motion.angle = atan2(direction.y, direction.x);
-    motion.velocity = direction * speed;
-    motion.position = position;
-    motion.scale = vec2(size, size); // Ensure scale is initialized
+	// Setting initial values
+	PlayerBullet& bullet = registry.playerBullets.emplace(entity);
+	bullet.damage = getModifiedValue(BulletDamage, bullet.damage);
+	bullet.bulletSpeed = getModifiedValue(ProjectileSpeed, bullet.bulletSpeed);
+	bullet.bulletRange = getModifiedValue(BulletRange, bullet.bulletRange);
+	bullet.bulletSize = getModifiedValue(ProjectileSize,  bullet.bulletSize);
+	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
+	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
 
-    CircleCollider& cc = registry.circleColliders.emplace(entity);
-    cc.radius = motion.scale.x / 2;
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = atan2(direction.y, direction.x);
+	motion.velocity = direction * bullet.bulletSpeed;
+	motion.position = position;
+	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
 
-    // Setting initial values
-    PlayerBullet& bullet = registry.playerBullets.emplace(entity);
-    bullet.damage = damage;
-    bullet.bulletSpeed = speed;
-    bullet.bulletRange = range;
-    bullet.bulletSize = size;
-    bullet.bulletPierce = pierce;
-    bullet.bulletBounce = bounce;
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x / 2;
 
-    auto& spriteComponent = registry.sprites.emplace(entity);
-    spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
 
-    registry.renderRequests.insert(
-        entity,
-        {
-            spriteComponent.sprites[SPRITE_STATE::BASE],
-            EFFECT_ASSET_ID::TEXTURED,
-            GEOMETRY_BUFFER_ID::SPRITE
-        });
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
 
-    return entity;
+	registry.renderRequests.insert(
+		entity,
+		{
+			spriteComponent.sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	return entity;
+}
+
+float getModifiedValue(BulletEffectType bf, float value)
+{
+	Entity& player = registry.players.entities[0];
+	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
 }
 
 
