@@ -134,6 +134,8 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 		});
 
 	Entity c = createCollisionCircle(renderer, position, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
 
 	return entity;
 }
