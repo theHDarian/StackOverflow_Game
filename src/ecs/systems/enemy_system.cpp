@@ -22,15 +22,16 @@ EnemySystem:: ~EnemySystem()
 void EnemySystem:: step(float elapsed_ms) {
     auto& enemy_registry = registry.enemies;
     auto& motion_registry = registry.motions;
-    for(uint i = 0; i < enemy_registry.size(); i++) {
+    for(uint i = 0; i < enemy_registry.components.size(); i++) {
         Enemy& enemy = enemy_registry.components[i];
         Entity& entity = enemy_registry.entities[i];
+
         Motion& motion = motion_registry.get(entity);
         vec2 pos = motion.position;
         float angle = motion.angle;
 
         enemy.attackCooldown -= elapsed_ms;
-        std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
+        //std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
         if (enemy.attackCooldown < 0.f) {
             if (enemy.attackPattern == EnemyAttackPattern::SINGLE_SHOT)  {
                 shoot(enemy, pos, angle);

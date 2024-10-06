@@ -37,7 +37,6 @@ void PhysicsSystem::step(float elapsed_ms)
 
 	// Player  -> EnemyBullets	(Circle to Poly)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
-	std::cout << "enemy bullet counts" << eBullets.size() << std::endl;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
 		// if (CircleToPoly(player, eBullets.entities[i])) {
 		// 	registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
@@ -82,7 +81,7 @@ void PhysicsSystem::step(float elapsed_ms)
 
 
 bool PhysicsSystem::CircleToCircle(Entity circleA, Entity circleB) {
-	if (!registry.circleColliders.has(circleA) || !registry.circleColliders.has(circleB)) return false;
+	//if (!registry.circleColliders.has(circleA) || !registry.circleColliders.has(circleB)) return false;
 	Motion& motionA = registry.motions.get(circleA);
 	Motion& motionB = registry.motions.get(circleB);
 
@@ -93,7 +92,7 @@ bool PhysicsSystem::CircleToCircle(Entity circleA, Entity circleB) {
 }
 
 bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
-	if (!registry.circleColliders.has(circle) || !registry.walls.has(wall)) return false;
+	//if (!registry.circleColliders.has(circle) || !registry.walls.has(wall)) return false;
 	Motion& m = registry.motions.get(circle);
 	CircleCollider& c = registry.circleColliders.get(circle);
 
@@ -106,7 +105,7 @@ bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
 // false if the circle is wholly inside the polygon
 // (No case should arise where that happens though)
 bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
-	if (!registry.circleColliders.has(circle) || !registry.polyColliders.has(poly)) return false;
+	//if (!registry.circleColliders.has(circle) || !registry.polyColliders.has(poly)) return false;
 	Motion& mA = registry.motions.get(circle);
 	Motion& mB = registry.motions.get(poly);
 
