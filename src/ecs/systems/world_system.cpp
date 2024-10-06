@@ -129,8 +129,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+	// comment this out for now
+	//while (registry.debugComponents.entities.size() > 0)
+	//    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
@@ -143,6 +144,31 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (motion.position.x + abs(motion.scale.x) < 0.f) {
 			if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
 				registry.remove_all_components_of(motions_registry.entities[i]);
+		}
+	}
+
+	// simplistic way to have collision outlines follow their "owner" when the owner moves
+	// potentially buggy implementation with poly outlines, but currently works with circles
+	for (auto& owner : registry.collisionShapes.entities) {
+		for (auto& shape : registry.collisionShapes.get(owner).shapes) {
+			// very rough check to see if owner has moved (has velocity)
+			// but doesn't account for change in angle, etc
+			if ((registry.motions.get(owner).velocity.x > 0 || registry.motions.get(owner).velocity.y > 0) || owner == player) {
+				auto& motion = registry.motions.get(shape);
+				motion.angle = registry.motions.get(owner).angle;
+				motion.position = registry.motions.get(owner).position;
+				motion.velocity = registry.motions.get(owner).velocity;
+			}
+		}
+	}
+
+	// place sprite timer progression here for now
+	for (auto& entity : registry.spriteTimers.entities) {
+		auto& spriteTimer = registry.spriteTimers.get(entity);
+		spriteTimer.count_ms -= elapsed_ms_since_last_update;
+		if (spriteTimer.count_ms <= 0) {
+			registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
+			registry.spriteTimers.remove(entity);
 		}
 	}
 
@@ -170,7 +196,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
-
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -202,10 +227,11 @@ void WorldSystem::restartGame() {
 
 	player = createPlayer(renderer,{0,0});
 
-
 	// Test calls:
+	
+	createTestWall(renderer, {500,100}, {500, 200});
 
-	//createTestWall(renderer, {500,10}, {1000, 600});
+	createBlob(renderer, vec2(600, 300));
 
 	createTestPoly(renderer, { 500,500 }, {
 		{100, 0},
@@ -215,10 +241,10 @@ void WorldSystem::restartGame() {
 		, 90);
 
 	// spawning 1 enemies to test
-	//if (ENEMY_NUM <= 0) {
-	//	createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
-	//	ENEMY_NUM = 1;
-	//}
+	if (ENEMY_NUM <= 0) {
+		createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
+		ENEMY_NUM = 1;
+	}
 }
 
 // Compute collisions between entities

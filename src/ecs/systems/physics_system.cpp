@@ -3,6 +3,20 @@
 #include "world_init.hpp"
 #include <glm/trigonometric.hpp>
 
+// change sprite of player when hit by enemy
+// maybe should be placed somewhere else?
+void playerHitSprite(Entity& player) {
+	auto& spriteMap = registry.sprites.get(player).sprites;
+	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+		if (!registry.spriteTimers.has(player)) {
+			auto& spriteTimer = registry.spriteTimers.emplace(player);
+			spriteTimer.count_ms = 100;
+			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+		}
+	}
+}
+
 void PhysicsSystem::step(float elapsed_ms)
 {
 	// Move based on how much time has passed, this is to (partially) avoid
@@ -35,13 +49,12 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// Player  -> EnemyBullets	(Circle to Poly)
+	// Player  -> EnemyBullets	(Circle to Circle for now)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
-		// if (CircleToPoly(player, eBullets.entities[i])) {
-		// 	registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
-		// }
 		if (CircleToCircle(player, eBullets.entities[i])) {
+			// player hit sprite
+			playerHitSprite(player);
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
 	}
@@ -63,11 +76,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			}
 
 			// the same can be done with the player
-			if (registry.sprites.has(player)) {
-				auto& spriteMap = registry.sprites.get(player).sprites;
-				if (spriteMap.count(SPRITE_STATE::DAMAGED))
-					registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
-			}
+			playerHitSprite(player);
 
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
 		}
@@ -75,6 +84,16 @@ void PhysicsSystem::step(float elapsed_ms)
 			if (CircleToCircle(enemies.entities[i], pBullets.entities[j])) {
 				registry.collisions.emplace_with_duplicates(enemies.entities[i], pBullets.entities[j]);
 			}
+		}
+	}
+
+	 //Player  -> debugComponents (circle to poly)
+	ComponentContainer<DebugComponent>& debug = registry.debugComponents;
+	for (uint i = 0; i < debug.components.size(); i++) {
+		if (CircleToPoly(player, debug.entities[i])) {
+			// player hit sprite
+			playerHitSprite(player);
+			registry.collisions.emplace_with_duplicates(player, debug.entities[i]);
 		}
 	}
 }

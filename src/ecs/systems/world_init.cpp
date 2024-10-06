@@ -16,11 +16,8 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 300.f;
-	motion.scale.y *= -1; // point front to the right
+	motion.scale = mesh.original_size * 100.f;
 
-
-	// create an empty Salmon component for our character
 	Player& player = registry.players.emplace(entity);
 	player.baseSpeed = 200;
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
@@ -28,12 +25,41 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 	registry.stackCompile.emplace(entity);
 	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::EEL;
-	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
+	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
+	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
 	registry.renderRequests.insert(
 		entity,
 		{
 			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
+
+	return entity;
+}
+
+// circle outline for circle collision
+Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float radius) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = angle;
+	motion.velocity = velocity;
+	motion.position = position;
+	motion.scale = vec2(radius * 2, radius * 2);
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			TEXTURE_ASSET_ID::CIRCLE,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -43,8 +69,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 // Purely for testing walls, puts 2 fish at either end of the line segment
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition) {
-	createBlob(renderer, startPosition);
-	createBlob(renderer, endPosition);
+	drawLineAtoB(renderer, startPosition, endPosition);
 
 	auto entity = Entity();
 	auto& wall = registry.walls.emplace(entity);
@@ -54,21 +79,66 @@ Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPositi
 	return entity;
 }
 
-// Purely for testing polygons, puts fish at the vertices
-Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle) {
-	angle = glm::radians(angle);
-	for (int i = 0; i < points.size(); i++) {
-		vec2 mArot = { points[i].x * cos(angle) - points[i].y * sin(angle), points[i].x * sin(angle) + points[i].y * cos(angle) };
-		createBlob(renderer, mArot + position);
-	}
+// draw a line from point A to B
+// as a consequence of render system, each line is an entity for now
+Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b) {
+	// borrowing code from createLine(), may change later
 	auto entity = Entity();
-	auto& poly = registry.polyColliders.emplace(entity);
-	poly.offsetVertices = points;
-	poly.setMaxLength();
+
+	// calculate how the line will look
+	float length = distance(a, b);
+	float angle = atan2(b.y - a.y, b.x - a.x);
+	vec2 position = vec2(cos(angle) * length * 0.5 + a.x, sin(angle) * length * 0.5 + a.y);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = angle;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = vec2(length, 5);
+
+	registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	//std::cout << "created line from point a(" << a.x << ", " << a.y << ") to b(" << b.x << ", " << b.y << ") at (" << position.x << ", " << position.y << ")" << " angle: " << angle << ", length: " << length << std::endl;
 
 	return entity;
 }
 
+// Purely for testing polygons
+Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle) {
+	angle = glm::radians(angle);
+	auto entity = Entity();
+
+	auto& poly = registry.polyColliders.emplace(entity);
+	poly.offsetVertices = points;
+	poly.setMaxLength();
+
+	registry.debugComponents.emplace(entity);
+	auto& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.angle = angle;
+	
+	auto& shapes = registry.collisionShapes.emplace(entity);
+
+	// draw lines of polygon by drawing a line from point i to point i + 1
+	for (int i = 0; i < points.size(); i++) {
+		vec2 thisRotatedPoint = { points[i].x * cos(angle) - points[i].y * sin(angle), points[i].x * sin(angle) + points[i].y * cos(angle) };
+		if (i == points.size() - 1) {
+			vec2 nextRotatedPoint = vec2(points[0].x * cos(angle) - points[0].y * sin(angle), points[0].x * sin(angle) + points[0].y * cos(angle));
+			auto line = drawLineAtoB(renderer, thisRotatedPoint + position, nextRotatedPoint + position);
+			shapes.shapes.push_back(line);
+		}
+		else {
+			vec2 nextRotatedPoint = vec2(points[i + 1].x * cos(angle) - points[i + 1].y * sin(angle), points[i + 1].x * sin(angle) + points[i + 1].y * cos(angle));
+			auto line = drawLineAtoB(renderer, thisRotatedPoint + position, nextRotatedPoint + position);
+			shapes.shapes.push_back(line);
+		}
+	}
+
+	return entity;
+}
 
 // basic enemy that doesn't do anything
 Entity createBlob(RenderSystem* renderer, vec2 position) {
@@ -90,7 +160,14 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2;
 
-	registry.enemies.emplace(entity);
+	auto enemy = registry.enemies.emplace(entity);
+	enemy.attackCooldown = 5000;
+	enemy.maxHealth = 1000;
+	enemy.currHealth = enemy.maxHealth;
+	enemy.speed = 100;
+	enemy.state = 10;
+	enemy.attackPattern = EnemyAttackPattern::SINGLE_SHOT;
+
 	registry.sprites.emplace(entity);
 	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::EEL;
 	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
@@ -101,6 +178,10 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+
+	Entity c = createCollisionCircle(renderer, position, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
 
 	return entity;
 }
@@ -126,7 +207,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.attackPattern = atkPattern;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x;
+	cc.radius = abs(motion.scale.x)/2;
 
 	registry.renderRequests.insert(
 		entity,
@@ -135,6 +216,10 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+
+	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
 
 	return entity;
 };
@@ -157,7 +242,7 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	motion.scale = vec2({ -FISH_BB_WIDTH, FISH_BB_HEIGHT });
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = abs(motion.scale.x);
+	cc.radius = abs(motion.scale.x)/2;
 
 	registry.renderRequests.insert(
 		entity,
@@ -166,6 +251,10 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+
+	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
 
 	return entity;
 }
