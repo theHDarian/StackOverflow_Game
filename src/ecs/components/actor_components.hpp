@@ -44,16 +44,21 @@ struct BulletStackEffect {
 struct Player
 {
     float baseSpeed;
-    float baseFireRate;
-    float baseDashNum;
-    float baseDashCDR;
+    float baseFiringInterval = 100.0f;
+    int baseDashNum = 3;
+    float baseDashCDR = 3000.0f;
+    float baseDashSpeed = 2500.0f;
 
-    float dashSpeed = 2500.0f;
+    float dashSpeed = baseDashSpeed;
     int currDashCharges = 3;
-    int maxDashCharges = 3;
+
+    int maxDashCharges = baseDashNum;
+
     float currDashCooldown = 0.0f;
-    float dashCooldown = 3000.0f;
-    float currFireRateCooldown;
+    float dashCooldown = baseDashCDR;
+
+    float currFiringInterval = 0.0f;
+    float maxFiringInterval = baseFiringInterval;
 };
 
 // Holds the actual data of currStack
@@ -158,6 +163,13 @@ struct StackCompile {
     }
 };
 
+enum class EnemyAttackPattern {
+    // this is the attack pattern 
+    SINGLE_SHOT,
+    DOUBLE_SHOT,
+    ALL_DIRECTION, 
+};
+
 // anything that is deadly to the player
 struct Enemy {
 	int state; //TODO: can change to enum once state determined
@@ -165,6 +177,9 @@ struct Enemy {
     int currHealth;
     float speed;
     // TODO add attack pattern data?
+    float attackCooldown;
+    EnemyAttackPattern attackPattern;
+
 };
 
 struct BossEnemy {
@@ -173,20 +188,20 @@ struct BossEnemy {
 struct Invincible {
     // Deletes itself when countdown <0
     // Entity can't be hit while has Invincible component
-    int countdown;
+    float countdown = 1000;
 };
 
 // TODO Add a way to use parametric equations for bullet path
 
 struct PlayerBullet {
-    float damage;
-    float bulletSpeed;
+    float damage = 10;
+    float bulletSpeed = 400;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 3000;
     // Player bullet only scale in all directions?
-    float bulletSize;
-    int bulletPierce;
-    int bulletBounce;
+    float bulletSize = 20;
+    int bulletPierce = 0;
+    int bulletBounce = 0;
 };
 
 struct EnemyBullet {
@@ -196,7 +211,6 @@ struct EnemyBullet {
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize;
     int bulletBounce;
-
     std::vector<BulletStackEffect> bulletEffects;
 };
 

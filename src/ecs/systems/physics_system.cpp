@@ -3,6 +3,20 @@
 #include "world_init.hpp"
 #include <glm/trigonometric.hpp>
 
+// change sprite of player when hit by enemy
+// maybe should be placed somewhere else?
+void playerHitSprite(Entity& player) {
+	auto& spriteMap = registry.sprites.get(player).sprites;
+	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+		if (!registry.spriteTimers.has(player)) {
+			auto& spriteTimer = registry.spriteTimers.emplace(player);
+			spriteTimer.count_ms = 100;
+			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+		}
+	}
+}
+
 void PhysicsSystem::step(float elapsed_ms)
 {
 	// Move based on how much time has passed, this is to (partially) avoid
@@ -12,6 +26,7 @@ void PhysicsSystem::step(float elapsed_ms)
 	{
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
+
 		float step_seconds = elapsed_ms / 1000.f;
 		//have velocity be relative to local rotation angle
 		// vec2 world_velocity;
@@ -34,10 +49,12 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// Player  -> EnemyBullets	(Circle to Poly)
+	// Player  -> EnemyBullets	(Circle to Circle for now)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
-		if (CircleToPoly(player, eBullets.entities[i])) {
+		if (CircleToCircle(player, eBullets.entities[i])) {
+			// player hit sprite
+			playerHitSprite(player);
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
 	}
@@ -59,11 +76,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			}
 
 			// the same can be done with the player
-			if (registry.sprites.has(player)) {
-				auto& spriteMap = registry.sprites.get(player).sprites;
-				if (spriteMap.count(SPRITE_STATE::DAMAGED))
-					registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
-			}
+			playerHitSprite(player);
 
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
 		}
@@ -73,10 +86,21 @@ void PhysicsSystem::step(float elapsed_ms)
 			}
 		}
 	}
+
+	 //Player  -> debugComponents (circle to poly)
+	ComponentContainer<DebugComponent>& debug = registry.debugComponents;
+	for (uint i = 0; i < debug.components.size(); i++) {
+		if (CircleToPoly(player, debug.entities[i])) {
+			// player hit sprite
+			playerHitSprite(player);
+			registry.collisions.emplace_with_duplicates(player, debug.entities[i]);
+		}
+	}
 }
 
 
 bool PhysicsSystem::CircleToCircle(Entity circleA, Entity circleB) {
+	//if (!registry.circleColliders.has(circleA) || !registry.circleColliders.has(circleB)) return false;
 	Motion& motionA = registry.motions.get(circleA);
 	Motion& motionB = registry.motions.get(circleB);
 
@@ -87,6 +111,7 @@ bool PhysicsSystem::CircleToCircle(Entity circleA, Entity circleB) {
 }
 
 bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
+	//if (!registry.circleColliders.has(circle) || !registry.walls.has(wall)) return false;
 	Motion& m = registry.motions.get(circle);
 	CircleCollider& c = registry.circleColliders.get(circle);
 
@@ -99,6 +124,7 @@ bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
 // false if the circle is wholly inside the polygon
 // (No case should arise where that happens though)
 bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
+	//if (!registry.circleColliders.has(circle) || !registry.polyColliders.has(poly)) return false;
 	Motion& mA = registry.motions.get(circle);
 	Motion& mB = registry.motions.get(poly);
 
@@ -121,7 +147,9 @@ bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
 
 // Formula for distance from a point to a line defined by 2 points, taken from wikipedia
 bool PhysicsSystem::CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3) {
-	float dist = abs((p3.y - p2.y) * p1.x - (p3.x - p2.x) * p1.y + p3.x * p2.y - p2.x * p3.y);
-	dist /= sqrt((p3.y - p2.y) * (p3.y - p2.y) + (p3.x - p2.x) * (p3.x - p2.x));
-	return (dist < r);
+	vec2 a = p1 - p2;
+	vec2 b = p3 - p2;
+	vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+	vec2 d = a - c;
+	return (abs(glm::length(c) + glm::length(p3-p2-c) - glm::length(p3-p2)) < 0.01 && glm::length(d) < r);
 }

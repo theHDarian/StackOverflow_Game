@@ -14,6 +14,7 @@ const size_t MAX_NUM_EELS = 15;
 const size_t MAX_NUM_FISH = 5;
 const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
+uint ENEMY_NUM = 0;
 
 // create the underwater world
 WorldSystem::WorldSystem()
@@ -128,8 +129,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+	// comment this out for now
+	//while (registry.debugComponents.entities.size() > 0)
+	//    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
@@ -145,9 +147,30 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// have just one blob enemy for now for simplicity
-	if (registry.enemies.components.size() < 1)
-		createBlob(renderer, vec2(500, 500));
+	// simplistic way to have collision outlines follow their "owner" when the owner moves
+	// potentially buggy implementation with poly outlines, but currently works with circles
+	for (auto& owner : registry.collisionShapes.entities) {
+		for (auto& shape : registry.collisionShapes.get(owner).shapes) {
+			// very rough check to see if owner has moved (has velocity)
+			// but doesn't account for change in angle, etc
+			if ((registry.motions.get(owner).velocity.x > 0 || registry.motions.get(owner).velocity.y > 0) || owner == player) {
+				auto& motion = registry.motions.get(shape);
+				motion.angle = registry.motions.get(owner).angle;
+				motion.position = registry.motions.get(owner).position;
+				motion.velocity = registry.motions.get(owner).velocity;
+			}
+		}
+	}
+
+	// place sprite timer progression here for now
+	for (auto& entity : registry.spriteTimers.entities) {
+		auto& spriteTimer = registry.spriteTimers.get(entity);
+		spriteTimer.count_ms -= elapsed_ms_since_last_update;
+		if (spriteTimer.count_ms <= 0) {
+			registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
+			registry.spriteTimers.remove(entity);
+		}
+	}
 
 	vec2 oldSpeed = registry.motions.get(player).velocity;
 	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
@@ -159,6 +182,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     //check dash related variables
     dash(oldSpeed, elapsed_ms_since_last_update);
+
+	shoot(elapsed_ms_since_last_update);
+
+	// Updating the invincibility timer
+	if (registry.invincibles.entities.size() > 0) {
+		for (Entity& invincible : registry.invincibles.entities) {
+			float& invincible_timer = registry.invincibles.get(invincible).countdown;
+			invincible_timer -= elapsed_ms_since_last_update;
+			if (invincible_timer <= 0) {
+				registry.invincibles.remove(invincible);
+				std::cout << "entity is no longer invincible" << std::endl;
+			}
+		}
+	}
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -190,10 +227,11 @@ void WorldSystem::restartGame() {
 
 	player = createPlayer(renderer,{0,0});
 
-
 	// Test calls:
 	
-	//createTestWall(renderer, {500,10}, {1000, 600});
+	createTestWall(renderer, {500,100}, {500, 200});
+
+	createBlob(renderer, vec2(600, 300));
 
 	createTestPoly(renderer, { 500,500 }, {
 		{100, 0},
@@ -201,6 +239,12 @@ void WorldSystem::restartGame() {
 		{-50, -50}
 		}
 		, 90);
+
+	// spawning 1 enemies to test
+	if (ENEMY_NUM <= 0) {
+		createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
+		ENEMY_NUM = 1;
+	}
 }
 
 // Compute collisions between entities
@@ -218,15 +262,11 @@ void WorldSystem::handleCollisions() {
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate invincibility unless already invincible
+				// initiate death unless already dying
 				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
-
-					Motion& player_motion = registry.motions.get(entity);
-					player_motion.angle = M_PI;
-					player_motion.velocity = {0,100};
 				}
 			}
 
@@ -237,7 +277,6 @@ void WorldSystem::handleCollisions() {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
-					std::cout << "TEST" << std::endl;
 					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
 					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
@@ -310,17 +349,43 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
     if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
+    	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
         player_motion.velocity = pl.dashSpeed * glm::normalize(oldSpeed);
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
-        if (registry.invincibles.has(player))
-            registry.invincibles.remove(player);
         player_motion.velocity = oldSpeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;
         return;
     }
+}
+
+void WorldSystem::shoot(float elapsed_ms_since_last_update) {
+	for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+		PlayerBullet& bullet = registry.playerBullets.components[i];
+		if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+			registry.remove_all_components_of(registry.playerBullets.entities[i]);
+		}
+	}
+	IOState& input = registry.ioStates.components[0];
+	if (!input.shouldShoot) {
+		return;
+	}
+	Player& pl = registry.players.get(player);
+	if (pl.currFiringInterval > 0) {
+		pl.currFiringInterval -= elapsed_ms_since_last_update;
+	}
+	if (input.shouldShoot && pl.currFiringInterval <= 0) {
+		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
+		// create bullet
+
+		vec2 playerPos = registry.motions.get(player).position;
+		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
+		vec2 bulletPos = playerPos + bulletDir * 50.f;
+		createPlayerBullet(renderer, bulletPos, bulletDir);
+	}
 }
 
 
