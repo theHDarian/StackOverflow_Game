@@ -50,6 +50,7 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&sprites);
 		registry_list.push_back(&collisionShapes);
+		registry_list.push_back(&enemyBullets);
 	}
 
 	void clear_all_components() {

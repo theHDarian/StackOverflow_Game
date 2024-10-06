@@ -145,19 +145,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// update collision shapes?
+	// simplistic way to have collision outlines follow their "owner" when the owner moves
+	// potentially buggy implementation with poly outlines
+	// but works with circles
 	for (auto& owner : registry.collisionShapes.entities) {
 		for (auto& shape : registry.collisionShapes.get(owner).shapes) {
-			auto& motion = registry.motions.get(shape);
-			motion.angle = registry.motions.get(owner).angle;
-			motion.position = registry.motions.get(owner).position;
-			motion.velocity = registry.motions.get(owner).velocity;
+			if ((registry.motions.get(owner).velocity.x > 0 || registry.motions.get(owner).velocity.y > 0) || owner == player) {
+				auto& motion = registry.motions.get(shape);
+				motion.angle = registry.motions.get(owner).angle;
+				motion.position = registry.motions.get(owner).position;
+				motion.velocity = registry.motions.get(owner).velocity;
+			}
 		}
 	}
-
-	// have just one blob enemy for now for simplicity
-	if (registry.enemies.components.size() < 1)
-		createBlob(renderer, vec2(500, 500));
 
 	vec2 oldSpeed = registry.motions.get(player).velocity;
 	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
@@ -200,10 +200,11 @@ void WorldSystem::restartGame() {
 
 	player = createPlayer(renderer,{0,0});
 
-
 	// Test calls:
 	
-	//createTestWall(renderer, {500,10}, {1000, 600});
+	createTestWall(renderer, {500,100}, {500, 200});
+
+	createBlob(renderer, vec2(600, 300));
 
 	createTestPoly(renderer, { 500,500 }, {
 		{100, 0},

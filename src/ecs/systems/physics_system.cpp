@@ -38,6 +38,12 @@ void PhysicsSystem::step(float elapsed_ms)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
 		if (CircleToPoly(player, eBullets.entities[i])) {
+			// player hit sprite
+			if (registry.sprites.has(player)) {
+				auto& spriteMap = registry.sprites.get(player).sprites;
+				if (spriteMap.count(SPRITE_STATE::DAMAGED))
+					registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+			}
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
 	}
@@ -106,7 +112,7 @@ bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
 	PolyCollider& s = registry.polyColliders.get(poly);
 
 	float ang = -glm::radians(mB.angle);
-	vec2 mArot = {mA.position.x * cos(ang) - mA.position.y * sin(ang), mA.position.x * sin(ang) + mA.position.y * cos(ang)};
+	vec2 thisRotatedPoint = {mA.position.x * cos(ang) - mA.position.y * sin(ang), mA.position.x * sin(ang) + mA.position.y * cos(ang)};
 
 	// Quick test to remove obviously not overlapping shapes
 	if (glm::distance(mA.position, mB.position) > c.radius + s.maxLength) return false;
