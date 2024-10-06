@@ -20,6 +20,9 @@ Entity createBlob(RenderSystem* renderer, vec2 pos);
 // Wall for testing, denoted by 2 blobs
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
+// Poly for testing
+Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle);
+
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 

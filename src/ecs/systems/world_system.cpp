@@ -206,7 +206,16 @@ void WorldSystem::restartGame() {
 	player = createPlayer(renderer,{0,0});
 
 
-	createTestWall(renderer, {500,10}, {1000, 600});
+	// Test calls:
+
+	//createTestWall(renderer, {500,10}, {1000, 600});
+
+	createTestPoly(renderer, { 500,500 }, {
+		{100, 0},
+		{-50, 50},
+		{-50, -50}
+		}
+		, 90);
 }
 
 // Compute collisions between entities
@@ -224,7 +233,7 @@ void WorldSystem::handleCollisions() {
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate death unless already dying
+				// initiate invincibility unless already invincible
 				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
@@ -235,6 +244,22 @@ void WorldSystem::handleCollisions() {
 					player_motion.velocity = {0,100};
 				}
 			}
+
+			// Check Player -> EnemyBullets collision
+			if (registry.enemyBullets.has(entity_other)) {
+				// initiate invincibility unless already invincible
+				if (!registry.invincibles.has(entity)) {
+					// Scream, reset timer, and make the salmon sink
+					registry.invincibles.emplace(entity);
+					Mix_PlayChannel(-1, salmonDeadSound, 0);
+					std::cout << "TEST" << std::endl;
+					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
+					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
+						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+					}
+				}
+			}
+
 
 			// Checking Player -> Wall collision
 			// If found, move the player position away from the wall by radius in direction reflection of projection

@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <iostream>
 
 
 enum BulletEffectType {
@@ -125,7 +126,7 @@ struct StackCompile {
         if (currStack.size() >= maxStackSize) {
             return false;
         }
-        if (effect.effectCalc == Additive) {
+        if (effect.type != Inert && effect.effectCalc == Additive) {
             additives[effect.type] += effect.value;
         } else {
             multiplicatives[effect.type] *= effect.value;
@@ -154,6 +155,11 @@ struct StackCompile {
         }
         add(effect);
         return effect;
+    }
+    void printStack() {
+        for (auto& element : currStack) {
+            std::cout << element.name << std::endl;
+        }
     }
 };
 
@@ -186,8 +192,6 @@ struct PlayerBullet {
     float bulletSize;
     int bulletPierce;
     int bulletBounce;
-
-    vec2 bulletDirection;
 };
 
 struct EnemyBullet {
@@ -197,8 +201,6 @@ struct EnemyBullet {
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize;
     int bulletBounce;
-
-    vec2 bulletDirection;
 
     std::vector<BulletStackEffect> bulletEffects;
 };
