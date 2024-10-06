@@ -146,20 +146,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// have just one blob enemy for now for simplicity
-	if (registry.enemies.components.size() < 1)
-		createBlob(renderer, vec2(500, 500));
-
 	vec2 oldSpeed = registry.motions.get(player).velocity;
 	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
 		oldSpeed = registry.ioStates.components[0].lastInputAxis;
-	}
-
-	// spawning 1 enemies to test
-	if (ENEMY_NUM <= 0) {
-		std::cout << "got here" << std::endl;
-		createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
-		ENEMY_NUM = 1;
 	}
 
 	// Processing inputs
@@ -209,6 +198,12 @@ void WorldSystem::restartGame() {
 		{-50, -50}
 		}
 		, 90);
+
+	// spawning 1 enemies to test
+	if (ENEMY_NUM <= 0) {
+		createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
+		ENEMY_NUM = 1;
+	}
 }
 
 // Compute collisions between entities

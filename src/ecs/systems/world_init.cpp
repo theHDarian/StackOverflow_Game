@@ -129,7 +129,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x;
 
-	registry.stackCompile.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{
@@ -161,7 +160,6 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x);
 
-	registry.stackCompile.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{
