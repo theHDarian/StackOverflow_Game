@@ -48,6 +48,8 @@ private:
 	void movePlayer(vec2 inputAxis);
     void dash(vec2 oldSpeed, float elapsed_ms_since_last_update);
 
+	void shoot(float elapsed_ms_since_last_update);
+
 	float getModifiedValue(BulletEffectType bf, float value);
 
 	// OpenGL window handle

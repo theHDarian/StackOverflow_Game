@@ -17,10 +17,13 @@ bool IOSystem::init(GLFWwindow* window) {
 
     auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onKey(_0, _1, _2, _3); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onMouseMove({ _0, _1 }); };
+	auto mouseClick = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->mouseClick(_0, _1, _2); };
 	glfwSetKeyCallback(window, key_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
+	glfwSetMouseButtonCallback(window, mouseClick);
     return true;
 }
+
 
 // On key callback
 void IOSystem::onKey(int key, int, int action, int mod) {
@@ -42,6 +45,17 @@ void IOSystem::onKey(int key, int, int action, int mod) {
 
 }
 
+void IOSystem::mouseClick(int button, int action, int mods) {
+	IOState& state = registry.ioStates.components[0];
+	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
+		state.shouldDash = 120.0f;
+	}
+	if (button == GLFW_MOUSE_BUTTON_1) {
+		state.shouldShoot = (action == GLFW_PRESS  || action == GLFW_REPEAT);
+	}
+
+}
+
 void IOSystem::onMouseMove(vec2 mousePosition) {	
     IOState& state = registry.ioStates.components[0];
     state.mousePosition = mousePosition;
@@ -58,7 +72,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
-        if (key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_2) {
+        if (key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) {
 
             state.shouldDash = 120.0f;
         }
