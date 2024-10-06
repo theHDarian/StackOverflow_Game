@@ -1,0 +1,6 @@
+# Basic ignore
+/build
+/.vscode
+/.vs
+/out
+/ext/project_path.hpp
