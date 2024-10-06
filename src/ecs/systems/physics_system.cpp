@@ -58,17 +58,17 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// // Player  -> EnemyBullets	(Circle to Poly)
-	// ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
-	// std::cout << "enemy bullet counts" << eBullets.size() << std::endl;
-	// for (uint i = 0; i < eBullets.components.size(); i++) {
-	// 	// if (CircleToPoly(player, eBullets.entities[i])) {
-	// 	// 	registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
-	// 	// }
-	// 	if (CircleToCircle(player, eBullets.entities[i])) {
-	// 		registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
-	// 	}
-	// }
+	// Player  -> EnemyBullets	(Circle to Poly)
+	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
+	std::cout << "enemy bullet counts" << eBullets.size() << std::endl;
+	for (uint i = 0; i < eBullets.components.size(); i++) {
+		// if (CircleToPoly(player, eBullets.entities[i])) {
+		// 	registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
+		// }
+		if (CircleToCircle(player, eBullets.entities[i])) {
+			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
+		}
+	}
 
 	// Player  -> Enemies		(Circle to Circle)
 	// Enemies -> PlayerBullets	(Circle to Circle)
