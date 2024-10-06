@@ -189,6 +189,18 @@ void WorldSystem::restartGame() {
 	registry.list_all_components();
 
 	player = createPlayer(renderer,{0,0});
+
+
+	// Test calls:
+	
+	//createTestWall(renderer, {500,10}, {1000, 600});
+
+	createTestPoly(renderer, { 500,500 }, {
+		{100, 0},
+		{-50, 50},
+		{-50, -50}
+		}
+		, 90);
 }
 
 // Compute collisions between entities
@@ -206,7 +218,7 @@ void WorldSystem::handleCollisions() {
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate death unless already dying
+				// initiate invincibility unless already invincible
 				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
@@ -216,6 +228,36 @@ void WorldSystem::handleCollisions() {
 					player_motion.angle = M_PI;
 					player_motion.velocity = {0,100};
 				}
+			}
+
+			// Check Player -> EnemyBullets collision
+			if (registry.enemyBullets.has(entity_other)) {
+				// initiate invincibility unless already invincible
+				if (!registry.invincibles.has(entity)) {
+					// Scream, reset timer, and make the salmon sink
+					registry.invincibles.emplace(entity);
+					Mix_PlayChannel(-1, salmonDeadSound, 0);
+					std::cout << "TEST" << std::endl;
+					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
+					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
+						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+					}
+				}
+			}
+
+
+			// Checking Player -> Wall collision
+			// If found, move the player position away from the wall by radius in direction reflection of projection
+			if (registry.walls.has(entity_other)) {
+				Motion& motion = registry.motions.get(entity);
+				CircleCollider& circle = registry.circleColliders.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
+
+				vec2 a = motion.position - wall.startPosition;
+				vec2 b = wall.endPosition - wall.startPosition;
+				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+				vec2 d = a - c;
+				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
 			}
 		}
 	}
@@ -241,7 +283,7 @@ void WorldSystem::handleInput() {
 		Motion& playerMotion = registry.motions.get(player);
 		vec2 diff = input.mousePosition - playerMotion.position;
 		float angle = atan2(diff[1],diff[0]);
-		playerMotion.angle = angle;
+		//playerMotion.angle = angle;
 	}
 
 }

@@ -41,9 +41,6 @@ struct WallCollider {
 	// Start an end of the line segment
 	vec2 startPosition;
 	vec2 endPosition;
-
-	// Normal to the line, used to move the player away from the wall in the correct direction
-	vec2 normal;
 };
 
 // Data structure for toggling debug mode

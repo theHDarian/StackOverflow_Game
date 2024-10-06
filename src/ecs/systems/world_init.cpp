@@ -1,5 +1,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
+#include <glm/trigonometric.hpp>
+#include "bullet_effects.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
@@ -39,6 +41,35 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 	return entity;
 }
+
+// Purely for testing walls, puts 2 fish at either end of the line segment
+Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition) {
+	createBlob(renderer, startPosition);
+	createBlob(renderer, endPosition);
+
+	auto entity = Entity();
+	auto& wall = registry.walls.emplace(entity);
+	wall.startPosition = startPosition;
+	wall.endPosition = endPosition;
+
+	return entity;
+}
+
+// Purely for testing polygons, puts fish at the vertices
+Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle) {
+	angle = glm::radians(angle);
+	for (int i = 0; i < points.size(); i++) {
+		vec2 mArot = { points[i].x * cos(angle) - points[i].y * sin(angle), points[i].x * sin(angle) + points[i].y * cos(angle) };
+		createBlob(renderer, mArot + position);
+	}
+	auto entity = Entity();
+	auto& poly = registry.polyColliders.emplace(entity);
+	poly.offsetVertices = points;
+	poly.setMaxLength();
+
+	return entity;
+}
+
 
 // basic enemy that doesn't do anything
 Entity createBlob(RenderSystem* renderer, vec2 position) {
