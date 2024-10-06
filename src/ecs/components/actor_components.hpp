@@ -44,16 +44,21 @@ struct BulletStackEffect {
 struct Player
 {
     float baseSpeed;
-    float baseFireRate;
-    float baseDashNum;
-    float baseDashCDR;
+    float baseFiringInterval = 100.0f;
+    int baseDashNum = 3;
+    float baseDashCDR = 3000.0f;
+    float baseDashSpeed = 2500.0f;
 
-    float dashSpeed = 2500.0f;
+    float dashSpeed = baseDashSpeed;
     int currDashCharges = 3;
-    int maxDashCharges = 3;
+
+    int maxDashCharges = baseDashNum;
+
     float currDashCooldown = 0.0f;
-    float dashCooldown = 3000.0f;
-    float currFireRateCooldown;
+    float dashCooldown = baseDashCDR;
+
+    float currFiringInterval = 0.0f;
+    float maxFiringInterval = baseFiringInterval;
 };
 
 // Holds the actual data of currStack
@@ -183,20 +188,20 @@ struct BossEnemy {
 struct Invincible {
     // Deletes itself when countdown <0
     // Entity can't be hit while has Invincible component
-    int countdown;
+    float countdown;
 };
 
 // TODO Add a way to use parametric equations for bullet path
 
 struct PlayerBullet {
-    float damage;
-    float bulletSpeed;
+    float damage = 10;
+    float bulletSpeed = 400;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 15000;
     // Player bullet only scale in all directions?
-    float bulletSize;
-    int bulletPierce;
-    int bulletBounce;
+    float bulletSize = 20;
+    int bulletPierce = 0;
+    int bulletBounce = 0;
 };
 
 struct EnemyBullet {

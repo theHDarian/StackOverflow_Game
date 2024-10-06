@@ -168,6 +168,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     //check dash related variables
     dash(oldSpeed, elapsed_ms_since_last_update);
 
+	shoot(elapsed_ms_since_last_update);
+
+	// Updating the invincibility timer
+	if (registry.invincibles.entities.size() > 0) {
+		for (Entity& invincible : registry.invincibles.entities) {
+			float& invincible_timer = registry.invincibles.get(invincible).countdown;
+			invincible_timer -= elapsed_ms_since_last_update;
+			if (invincible_timer <= 0) {
+				registry.invincibles.remove(invincible);
+				std::cout << "entity is no longer invincible" << std::endl;
+			}
+		}
+	}
+
+
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
@@ -200,7 +215,7 @@ void WorldSystem::restartGame() {
 
 
 	// Test calls:
-	
+
 	//createTestWall(renderer, {500,10}, {1000, 600});
 
 	createTestPoly(renderer, { 500,500 }, {
@@ -226,7 +241,7 @@ void WorldSystem::handleCollisions() {
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate invincibility unless already invincible
+				// initiate death unless already dying
 				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
@@ -313,17 +328,43 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
     if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
+    	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
         player_motion.velocity = pl.dashSpeed * glm::normalize(oldSpeed);
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
-        if (registry.invincibles.has(player))
-            registry.invincibles.remove(player);
         player_motion.velocity = oldSpeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;
         return;
     }
+}
+
+void WorldSystem::shoot(float elapsed_ms_since_last_update) {
+	// for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+	// 	PlayerBullet& bullet = registry.playerBullets.components[0];
+	// 	if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+	// 		registry.remove_all_components_of(registry.playerBullets.entities[0]);
+	// 	}
+	// }
+	IOState& input = registry.ioStates.components[0];
+	if (!input.shouldShoot) {
+		return;
+	}
+	Player& pl = registry.players.get(player);
+	if (pl.currFiringInterval > 0) {
+		pl.currFiringInterval -= elapsed_ms_since_last_update;
+	}
+	if (input.shouldShoot && pl.currFiringInterval <= 0) {
+		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
+		// create bullet
+
+		vec2 playerPos = registry.motions.get(player).position;
+		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
+		vec2 bulletPos = playerPos + bulletDir * 50.f;
+		createPlayerBullet(renderer, bulletPos, bulletDir);
+	}
 }
 
 

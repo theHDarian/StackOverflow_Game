@@ -19,6 +19,9 @@ public:
 private:
 	GLFWwindow* window;
     void onKey(int key, int, int action, int mod);
+
+    void mouseClick(int button, int action, int mods);
+
     void onMouseMove(vec2 mousePosition);
 
     void handleMovementInput(int key, int action, IOState& state);
