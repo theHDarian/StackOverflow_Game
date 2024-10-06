@@ -146,10 +146,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// simplistic way to have collision outlines follow their "owner" when the owner moves
-	// potentially buggy implementation with poly outlines
-	// but works with circles
+	// potentially buggy implementation with poly outlines, but currently works with circles
 	for (auto& owner : registry.collisionShapes.entities) {
 		for (auto& shape : registry.collisionShapes.get(owner).shapes) {
+			// very rough check to see if owner has moved (has velocity)
+			// but doesn't account for change in angle, etc
 			if ((registry.motions.get(owner).velocity.x > 0 || registry.motions.get(owner).velocity.y > 0) || owner == player) {
 				auto& motion = registry.motions.get(shape);
 				motion.angle = registry.motions.get(owner).angle;
