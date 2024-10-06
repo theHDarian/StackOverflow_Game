@@ -26,3 +26,8 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
+// the enemy
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern);
+
+Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
+

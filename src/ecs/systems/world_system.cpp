@@ -14,6 +14,7 @@ const size_t MAX_NUM_EELS = 15;
 const size_t MAX_NUM_FISH = 5;
 const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
+uint ENEMY_NUM = 0;
 
 // create the underwater world
 WorldSystem::WorldSystem()
@@ -152,6 +153,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	vec2 oldSpeed = registry.motions.get(player).velocity;
 	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
 		oldSpeed = registry.ioStates.components[0].lastInputAxis;
+	}
+
+	// spawning 1 enemies to test
+	if (ENEMY_NUM <= 0) {
+		std::cout << "got here" << std::endl;
+		createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
+		ENEMY_NUM = 1;
 	}
 
 	// Processing inputs

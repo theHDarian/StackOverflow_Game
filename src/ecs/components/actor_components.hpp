@@ -158,6 +158,13 @@ struct StackCompile {
     }
 };
 
+enum class EnemyAttackPattern {
+    // this is the attack pattern 
+    SINGLE_SHOT,
+    DOUBLE_SHOT,
+    ALL_DIRECTION, 
+};
+
 // anything that is deadly to the player
 struct Enemy {
 	int state; //TODO: can change to enum once state determined
@@ -165,6 +172,9 @@ struct Enemy {
     int currHealth;
     float speed;
     // TODO add attack pattern data?
+    float attackCooldown;
+    EnemyAttackPattern attackPattern;
+
 };
 
 struct BossEnemy {
@@ -196,7 +206,6 @@ struct EnemyBullet {
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize;
     int bulletBounce;
-
     std::vector<BulletStackEffect> bulletEffects;
 };
 

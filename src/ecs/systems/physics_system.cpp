@@ -12,6 +12,7 @@ void PhysicsSystem::step(float elapsed_ms)
 	{
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
+
 		float step_seconds = elapsed_ms / 1000.f;
 		//have velocity be relative to local rotation angle
 		// vec2 world_velocity;
@@ -36,8 +37,12 @@ void PhysicsSystem::step(float elapsed_ms)
 
 	// Player  -> EnemyBullets	(Circle to Poly)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
+	std::cout << "enemy bullet counts" << eBullets.size() << std::endl;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
-		if (CircleToPoly(player, eBullets.entities[i])) {
+		// if (CircleToPoly(player, eBullets.entities[i])) {
+		// 	registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
+		// }
+		if (CircleToCircle(player, eBullets.entities[i])) {
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
 	}
