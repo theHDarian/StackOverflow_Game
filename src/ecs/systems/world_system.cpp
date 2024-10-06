@@ -341,12 +341,12 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
 }
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update) {
-	// for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
-	// 	PlayerBullet& bullet = registry.playerBullets.components[0];
-	// 	if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-	// 		registry.remove_all_components_of(registry.playerBullets.entities[0]);
-	// 	}
-	// }
+	for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+		PlayerBullet& bullet = registry.playerBullets.components[i];
+		if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+			registry.remove_all_components_of(registry.playerBullets.entities[i]);
+		}
+	}
 	IOState& input = registry.ioStates.components[0];
 	if (!input.shouldShoot) {
 		return;
