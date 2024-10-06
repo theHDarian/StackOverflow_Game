@@ -1,30 +1,7 @@
 // internal
 #include "physics_system.hpp"
 #include "world_init.hpp"
-
-// Returns the local bounding coordinates scaled by the current size of the entity
-vec2 get_bounding_box(const Motion& motion)
-{
-	// abs is to avoid negative scale due to the facing direction.
-	return { abs(motion.scale.x), abs(motion.scale.y) };
-}
-
-// This is a SUPER APPROXIMATE check that puts a circle around the bounding boxes and sees
-// if the center point of either object is inside the other's bounding-box-circle. You can
-// surely implement a more accurate detection
-bool collides(const Motion& motion1, const Motion& motion2)
-{
-	vec2 dp = motion1.position - motion2.position;
-	float dist_squared = dot(dp,dp);
-	const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
-	const float other_r_squared = dot(other_bonding_box, other_bonding_box);
-	const vec2 my_bonding_box = get_bounding_box(motion2) / 2.f;
-	const float my_r_squared = dot(my_bonding_box, my_bonding_box);
-	const float r_squared = max(other_r_squared, my_r_squared);
-	if (dist_squared < r_squared)
-		return true;
-	return false;
-}
+#include <glm/trigonometric.hpp>
 
 void PhysicsSystem::step(float elapsed_ms)
 {
@@ -76,6 +53,23 @@ void PhysicsSystem::step(float elapsed_ms)
 	ComponentContainer<PlayerBullet>& pBullets = registry.playerBullets;
 	for (uint i = 0; i < enemies.components.size(); i++) {
 		if (CircleToCircle(player, enemies.entities[i])) {
+
+			// if enemy has damaged sprite, make it switch to damaged sprite on hit
+			// note: this is just a demonstration of sprite switching,
+			// won't necessarily have enemy on collision sprites
+			if (registry.sprites.has(enemies.entities[i])) {
+				auto& spriteMap = registry.sprites.get(enemies.entities[i]).sprites;
+				if (spriteMap.count(SPRITE_STATE::DAMAGED))
+					registry.renderRequests.get(enemies.entities[i]).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+			}
+
+			// the same can be done with the player
+			if (registry.sprites.has(player)) {
+				auto& spriteMap = registry.sprites.get(player).sprites;
+				if (spriteMap.count(SPRITE_STATE::DAMAGED))
+					registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+			}
+
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
 		}
 		for (uint j = 0; j < pBullets.components.size(); j++) {
@@ -109,12 +103,15 @@ bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
 // Returns true if the circle is intersecting a side of the polygon, 
 // false if the circle is wholly inside the polygon
 // (No case should arise where that happens though)
-bool PhysicsSystem::CircleToPoly(Entity circle, Entity sat) {
+bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
 	Motion& mA = registry.motions.get(circle);
-	Motion& mB = registry.motions.get(sat);
+	Motion& mB = registry.motions.get(poly);
 
 	CircleCollider& c = registry.circleColliders.get(circle);
-	PolyCollider& s = registry.polyColliders.get(sat);
+	PolyCollider& s = registry.polyColliders.get(poly);
+
+	float ang = -glm::radians(mB.angle);
+	vec2 mArot = {mA.position.x * cos(ang) - mA.position.y * sin(ang), mA.position.x * sin(ang) + mA.position.y * cos(ang)};
 
 	// Quick test to remove obviously not overlapping shapes
 	if (glm::distance(mA.position, mB.position) > c.radius + s.maxLength) return false;

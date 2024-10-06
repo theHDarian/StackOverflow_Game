@@ -145,7 +145,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.remove_all_components_of(motions_registry.entities[i]);
 		}
 	}
+
+	// have just one blob enemy for now for simplicity
+	if (registry.enemies.components.size() < 1)
+		createBlob(renderer, vec2(500, 500));
+
 	vec2 oldSpeed = registry.motions.get(player).velocity;
+	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
+		oldSpeed = registry.ioStates.components[0].lastInputAxis;
+	}
 
 	// spawning 1 enemies to test
 	if (ENEMY_NUM <= 0) {
@@ -189,6 +197,18 @@ void WorldSystem::restartGame() {
 	registry.list_all_components();
 
 	player = createPlayer(renderer,{0,0});
+
+
+	// Test calls:
+	
+	//createTestWall(renderer, {500,10}, {1000, 600});
+
+	createTestPoly(renderer, { 500,500 }, {
+		{100, 0},
+		{-50, 50},
+		{-50, -50}
+		}
+		, 90);
 }
 
 // Compute collisions between entities
@@ -206,7 +226,7 @@ void WorldSystem::handleCollisions() {
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate death unless already dying
+				// initiate invincibility unless already invincible
 				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
@@ -215,9 +235,37 @@ void WorldSystem::handleCollisions() {
 					Motion& player_motion = registry.motions.get(entity);
 					player_motion.angle = M_PI;
 					player_motion.velocity = {0,100};
-					vec3& player_color = registry.colors.get(entity);
-					player_color = {1.0f,0.0f,0.0f};
 				}
+			}
+
+			// Check Player -> EnemyBullets collision
+			if (registry.enemyBullets.has(entity_other)) {
+				// initiate invincibility unless already invincible
+				if (!registry.invincibles.has(entity)) {
+					// Scream, reset timer, and make the salmon sink
+					registry.invincibles.emplace(entity);
+					Mix_PlayChannel(-1, salmonDeadSound, 0);
+					std::cout << "TEST" << std::endl;
+					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
+					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
+						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+					}
+				}
+			}
+
+
+			// Checking Player -> Wall collision
+			// If found, move the player position away from the wall by radius in direction reflection of projection
+			if (registry.walls.has(entity_other)) {
+				Motion& motion = registry.motions.get(entity);
+				CircleCollider& circle = registry.circleColliders.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
+
+				vec2 a = motion.position - wall.startPosition;
+				vec2 b = wall.endPosition - wall.startPosition;
+				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+				vec2 d = a - c;
+				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
 			}
 		}
 	}
@@ -243,12 +291,12 @@ void WorldSystem::handleInput() {
 		Motion& playerMotion = registry.motions.get(player);
 		vec2 diff = input.mousePosition - playerMotion.position;
 		float angle = atan2(diff[1],diff[0]);
-		playerMotion.angle = angle;
+		//playerMotion.angle = angle;
 	}
 
 }
 
-void WorldSystem::dash(vec2 oldspeed, float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
     Player& pl = registry.players.get(player);
     if (pl.currDashCharges < pl.maxDashCharges) {
         pl.currDashCooldown -= elapsed_ms_since_last_update;
@@ -270,13 +318,13 @@ void WorldSystem::dash(vec2 oldspeed, float elapsed_ms_since_last_update) {
     if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
-        player_motion.velocity = pl.dashSpeed * glm::normalize(input.inputAxis);
+        player_motion.velocity = pl.dashSpeed * glm::normalize(oldSpeed);
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
         if (registry.invincibles.has(player))
             registry.invincibles.remove(player);
-        player_motion.velocity = oldspeed;
+        player_motion.velocity = oldSpeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;
         return;

@@ -78,4 +78,8 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 	float verticalAxis = state.pressedVertical.empty() ? 0.0f : state.pressedVertical.top();
 	// std::cout << horizontalAxis << " " << verticalAxis << std::endl;
     state.inputAxis = {horizontalAxis,verticalAxis};
+	if (state.inputAxis != vec2(0.0f)) {
+		state.lastInputAxis = state.inputAxis;
+	}
+
 }

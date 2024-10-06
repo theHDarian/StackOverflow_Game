@@ -41,9 +41,6 @@ struct WallCollider {
 	// Start an end of the line segment
 	vec2 startPosition;
 	vec2 endPosition;
-
-	// Normal to the line, used to move the player away from the wall in the correct direction
-	vec2 normal;
 };
 
 // Data structure for toggling debug mode
@@ -64,6 +61,7 @@ struct IOState {
 	bool shouldRestart;
     float shouldDash;
 	vec2 inputAxis;
+	vec2 lastInputAxis = {1,1};
 	vec2 mousePosition;
 
 	ExtendedStack<int> pressedHorizontal;
@@ -167,4 +165,23 @@ struct RenderRequest {
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 };
 
+// Expected sprite states other systems can use
+// eg: physics system sets object's sprite to DAMAGED upon collision
+// not all entities may have all these sprites, so should check
+// state exists in Sprites' component's sprite map first
+enum class SPRITE_STATE {
+	BASE = 0,
+	ATTACKING = BASE + 1,
+	DAMAGED = ATTACKING + 1,
+	DEAD = DAMAGED + 1,
+	MOVING = DEAD + 1
+};
+
+// all the sprites this entity will use
+struct Sprites {
+	// map of sprite type (enum) to sprite texture
+	// eg: when bullet collides w/ enemy in physics system,
+	// physics system will change the sprite to "DAMAGED_SPRITE"
+	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
+};
 
