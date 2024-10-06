@@ -184,7 +184,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     //check dash related variables
     dash(preDashSpeed, elapsed_ms_since_last_update);
 
-	shoot(elapsed_ms_since_last_update, 4);
+	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster), getModifiedValue(BulletBurst,registry.players.get(player).maxBulletBurst));
 
 	// Updating the invincibility timer
 	if (registry.invincibles.entities.size() > 0) {
