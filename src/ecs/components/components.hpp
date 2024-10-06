@@ -135,7 +135,8 @@ struct Mesh
 enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	EEL = FISH + 1,
-	TEXTURE_COUNT = EEL + 1
+	CIRCLE = EEL + 1,
+	TEXTURE_COUNT = CIRCLE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -183,5 +184,10 @@ struct Sprites {
 	// eg: when bullet collides w/ enemy in physics system,
 	// physics system will change the sprite to "DAMAGED_SPRITE"
 	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
+};
+
+struct CollisionShape {
+	// not sure if we need to draw that many
+	std::vector<Entity> shapes;
 };
 

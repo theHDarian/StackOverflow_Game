@@ -145,6 +145,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// update collision shapes?
+	for (auto& owner : registry.collisionShapes.entities) {
+		for (auto& shape : registry.collisionShapes.get(owner).shapes) {
+			auto& motion = registry.motions.get(shape);
+			motion.angle = registry.motions.get(owner).angle;
+			motion.position = registry.motions.get(owner).position;
+			motion.velocity = registry.motions.get(owner).velocity;
+		}
+	}
+
 	// have just one blob enemy for now for simplicity
 	if (registry.enemies.components.size() < 1)
 		createBlob(renderer, vec2(500, 500));

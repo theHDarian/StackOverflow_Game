@@ -26,3 +26,5 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
+Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float rad);
+

@@ -39,6 +39,36 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
+	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
+
+	return entity;
+}
+
+// circle outline for circle collision
+Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float rad) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	//auto& entityMotion = registry.motions.get(e);
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = angle;
+	motion.velocity = velocity;
+	motion.position = position;
+	motion.scale = vec2(rad * 2, rad * 2);
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			TEXTURE_ASSET_ID::CIRCLE,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
 	return entity;
 }
 
@@ -102,6 +132,8 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+
+	Entity c = createCollisionCircle(renderer, position, motion.angle, motion.velocity, cc.radius);
 
 	return entity;
 }
