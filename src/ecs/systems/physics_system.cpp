@@ -50,12 +50,22 @@ void PhysicsSystem::step(float elapsed_ms)
 	}
 
 	// Player  -> EnemyBullets	(Circle to Circle for now)
+	// EnemyBullets -> Walls	(Circle to wall for now)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
+		// Will be PolyCollider for enemy bullets
+		// if (CircleToPoly(player, eBullets.entities[i])) {
 		if (CircleToCircle(player, eBullets.entities[i])) {
 			// player hit sprite
 			playerHitSprite(player);
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
+		}
+		for (uint j = 0; j < walls.components.size(); j++) {
+			// Will be PolyCollider for enemy bullets
+			// if (PolyToWall(eBullets.entities[i], walls.entities[j])) {
+			if (CircleToWall(eBullets.entities[i], walls.entities[j])) {
+				registry.collisions.emplace_with_duplicates(eBullets.entities[i], walls.entities[j]);
+			}
 		}
 	}
 
@@ -86,6 +96,17 @@ void PhysicsSystem::step(float elapsed_ms)
 			}
 		}
 	}
+
+	// PlayerBullets -> Walls	(Circle to Wall)
+	for (uint i = 0; i < pBullets.components.size(); i++) {
+		for (uint j = 0; j < walls.components.size(); j++) {
+			if (CircleToWall(pBullets.entities[i], walls.entities[j])) {
+				registry.collisions.emplace_with_duplicates(pBullets.entities[i], walls.entities[j]);
+			}
+		}
+	}
+
+
 
 	 //Player  -> debugComponents (circle to poly)
 	ComponentContainer<DebugComponent>& debug = registry.debugComponents;
@@ -118,6 +139,16 @@ bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
 	WallCollider& w = registry.walls.get(wall);
 
 	return CircleToLine(m.position, c.radius, w.startPosition, w.endPosition);
+}
+
+bool PhysicsSystem::PolyToWall(Entity poly, Entity wall) {
+	//if (!registry.circleColliders.has(circle) || !registry.walls.has(wall)) return false;
+	Motion& m = registry.motions.get(poly);
+
+	WallCollider& w = registry.walls.get(wall);
+	
+	// Assumes a small circle around the center of the polygon as the collision point for walls
+	return CircleToLine(m.position, 20, w.startPosition, w.endPosition);
 }
 
 // Returns true if the circle is intersecting a side of the polygon, 

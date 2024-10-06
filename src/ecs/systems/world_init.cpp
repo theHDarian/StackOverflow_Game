@@ -232,7 +232,7 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
 	bullet.bulletSpeed = 1.f;
-	bullet.bulletRange = 500.f;
+	bullet.bulletRange = 50000.f;
 	bullet.bulletBounce = 3;
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -295,7 +295,8 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 	bullet.bulletRange = getModifiedValue(BulletRange, bullet.bulletRange);
 	bullet.bulletSize = getModifiedValue(ProjectileSize,  bullet.bulletSize);
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
-	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
+	//bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
+	bullet.bulletBounce = 1;
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);

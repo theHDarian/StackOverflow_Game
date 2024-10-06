@@ -192,7 +192,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			invincible_timer -= elapsed_ms_since_last_update;
 			if (invincible_timer <= 0) {
 				registry.invincibles.remove(invincible);
-				std::cout << "entity is no longer invincible" << std::endl;
+				//std::cout << "entity is no longer invincible" << std::endl;
+			}
+		}
+	}
+
+	// Updating the bullet ranges
+	if (registry.playerBullets.entities.size() > 0) {
+		for (Entity& bullet : registry.playerBullets.entities) {
+			float& range_timer = registry.playerBullets.get(bullet).bulletRange;
+			range_timer -= elapsed_ms_since_last_update;
+			if (range_timer <= 0) {
+				registry.remove_all_components_of(bullet);
+			}
+		}
+	}
+	if (registry.enemyBullets.entities.size() > 0) {
+		for (Entity& bullet : registry.enemyBullets.entities) {
+			float& range_timer = registry.enemyBullets.get(bullet).bulletRange;
+			range_timer -= elapsed_ms_since_last_update;
+			if (range_timer <= 0) {
+				registry.remove_all_components_of(bullet);
 			}
 		}
 	}
@@ -229,20 +249,20 @@ void WorldSystem::restartGame() {
 
 	// Test calls:
 	
-	createTestWall(renderer, {500,100}, {500, 200});
+	createTestWall(renderer, {100,200}, {400, 600});
 
-	createBlob(renderer, vec2(600, 300));
+	//createBlob(renderer, vec2(600, 300));
 
-	createTestPoly(renderer, { 500,500 }, {
-		{100, 0},
-		{-50, 50},
-		{-50, -50}
-		}
-		, 90);
+	//createTestPoly(renderer, { 500,500 }, {
+	//	{100, 0},
+	//	{-50, 50},
+	//	{-50, -50}
+	//	}
+	//	, 90);
 
 	// spawning 1 enemies to test
 	if (ENEMY_NUM <= 0) {
-		createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
+		createEnemy(renderer, vec2(800,500), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
 		ENEMY_NUM = 1;
 	}
 }
@@ -256,7 +276,7 @@ void WorldSystem::handleCollisions() {
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
 
-		// for now, we are only interested in collisions that involve the salmon
+		// Player centric collision handling
 		if (registry.players.has(entity)) {
 			//Player& player = registry.players.get(entity);
 
@@ -277,13 +297,13 @@ void WorldSystem::handleCollisions() {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
+
 					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
 					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
 					}
 				}
 			}
-
 
 			// Checking Player -> Wall collision
 			// If found, move the player position away from the wall by radius in direction reflection of projection
@@ -299,6 +319,60 @@ void WorldSystem::handleCollisions() {
 				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
 			}
 		}
+
+		// Enemy bullet centric handling
+		if (registry.enemyBullets.has(entity)) {
+			if (registry.walls.has(entity_other)) {
+				if (registry.enemyBullets.get(entity).bulletBounce > 0) {
+					// Bounce / reflect the enemy bullet against the wall
+					Motion& motion = registry.motions.get(entity);
+					WallCollider& wall = registry.walls.get(entity_other);
+
+					vec2 a = motion.position - wall.startPosition;
+					vec2 b = wall.endPosition - wall.startPosition;
+					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+					vec2 n = glm::normalize(a - c);
+
+					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+
+					// Assumes bullet flies towards facing direction
+					motion.angle = atan(motion.velocity.y / motion.velocity.x);
+
+					registry.enemyBullets.get(entity).bulletBounce -= 1;
+				}
+				else {
+					registry.remove_all_components_of(entity);
+				}
+			}
+		}
+
+		// Player bullet centric handling
+		if (registry.playerBullets.has(entity)) {
+			if (registry.walls.has(entity_other)) {
+				if (registry.playerBullets.get(entity).bulletBounce > 0) {
+					// Bounce / reflect the enemy bullet against the wall
+					Motion& motion = registry.motions.get(entity);
+					WallCollider& wall = registry.walls.get(entity_other);
+
+					vec2 a = motion.position - wall.startPosition;
+					vec2 b = wall.endPosition - wall.startPosition;
+					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+					vec2 n = glm::normalize(a - c);
+
+					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+
+					// Assumes bullet flies towards facing direction
+					motion.angle = atan(motion.velocity.y/motion.velocity.x);
+
+					registry.playerBullets.get(entity).bulletBounce -= 1;
+				}
+				else {
+					registry.remove_all_components_of(entity);
+				}
+			}
+		}
+
+
 	}
 
 	// Remove all collisions from this simulation step
