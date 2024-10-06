@@ -128,7 +128,9 @@ bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
 
 // Formula for distance from a point to a line defined by 2 points, taken from wikipedia
 bool PhysicsSystem::CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3) {
-	float dist = abs((p3.y - p2.y) * p1.x - (p3.x - p2.x) * p1.y + p3.x * p2.y - p2.x * p3.y);
-	dist /= sqrt((p3.y - p2.y) * (p3.y - p2.y) + (p3.x - p2.x) * (p3.x - p2.x));
-	return (dist < r);
+	vec2 a = p1 - p2;
+	vec2 b = p3 - p2;
+	vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+	vec2 d = a - c;
+	return (abs(glm::length(c) + glm::length(p3-p2-c) - glm::length(p3-p2)) < 0.01 && glm::length(d) < r);
 }

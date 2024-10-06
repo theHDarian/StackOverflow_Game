@@ -190,7 +190,7 @@ void WorldSystem::restartGame() {
 
 	// Test calls:
 	
-	//createTestWall(renderer, {500,10}, {1000, 600});
+	createTestWall(renderer, {500,10}, {1000, 300});
 
 	createTestPoly(renderer, { 500,500 }, {
 		{100, 0},
@@ -200,10 +200,10 @@ void WorldSystem::restartGame() {
 		, 90);
 
 	// spawning 1 enemies to test
-	if (ENEMY_NUM <= 0) {
-		createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
-		ENEMY_NUM = 1;
-	}
+	//if (ENEMY_NUM <= 0) {
+	//	createEnemy(renderer, vec2(1280 - 100.f, 50.f + uniformDist(rng) * (720 - 100.f)), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
+	//	ENEMY_NUM = 1;
+	//}
 }
 
 // Compute collisions between entities
