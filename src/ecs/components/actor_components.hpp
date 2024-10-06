@@ -59,6 +59,8 @@ struct Player
 
     float currFiringInterval = 0.0f;
     float maxFiringInterval = baseFiringInterval;
+
+    int bulletCluster = 1;
 };
 
 // Holds the actual data of currStack
@@ -207,7 +209,7 @@ struct PlayerBullet {
 struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 1000;
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize;
     int bulletBounce;

@@ -295,8 +295,7 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 	bullet.bulletRange = getModifiedValue(BulletRange, bullet.bulletRange);
 	bullet.bulletSize = getModifiedValue(ProjectileSize,  bullet.bulletSize);
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
-	//bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
-	bullet.bulletBounce = 1;
+	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);
