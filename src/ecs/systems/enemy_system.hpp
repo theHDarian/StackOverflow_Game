@@ -18,6 +18,6 @@ public:
     ~EnemySystem();
     void step(float elapsed_ms);
 private:
-    void shoot(Enemy& enemy, vec2 pos, float angle);
+    void shoot(vec2 velocity, vec2 pos, float angle);
     RenderSystem* render;
 };

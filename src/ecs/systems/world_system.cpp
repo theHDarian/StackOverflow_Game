@@ -15,7 +15,7 @@ const size_t MAX_NUM_EELS = 15;
 const size_t MAX_NUM_FISH = 5;
 const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
-uint ENEMY_NUM = 0;
+
 
 #pragma region init
 // create the underwater world
@@ -224,6 +224,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
+	if (registry.enemies.size() == 0) {
+		createEnemy(renderer, vec2(1280 * uniformDist(rng),720 * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+	}
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -269,10 +272,6 @@ void WorldSystem::restartGame() {
 	//	, 90);
 
 	// spawning 1 enemies to test
-	if (ENEMY_NUM <= 0) {
-		createEnemy(renderer, vec2(800,500), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
-		ENEMY_NUM = 1;
-	}
 }
 
 // Compute collisions between entities
@@ -439,16 +438,31 @@ void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster, int burst) {
 	IOState& input = registry.ioStates.components[0];
+	Player& pl = registry.players.get(player);
 	if (!input.shouldShoot) {
+		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
+			pl.currBulletBurst++;
+		}
 		return;
 	}
-	Player& pl = registry.players.get(player);
 	if (pl.currFiringInterval > 0) {
 		pl.currFiringInterval -= elapsed_ms_since_last_update;
 	}
+	if (pl.bulletBurstCooldown > 0) {
+		pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
+	}
 	if (pl.currFiringInterval <= 0) {
-		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
+	}
+	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
+		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currBulletBurst--;
+		pl.bulletBurstCooldown = min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst)
+		);
 		// create bullet
 
 		vec2 playerPos = registry.motions.get(player).position;
