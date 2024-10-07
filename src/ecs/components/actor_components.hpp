@@ -219,7 +219,7 @@ struct EnemyBullet {
     // Number than counts down every step, delete bullet when <0
     float bulletRange = 1000;
     // Enemy bullet can scale x,y independently?
-    vec2 bulletSize;
+    vec2 bulletSize =  vec2(20, 10);
     int bulletBounce;
     std::vector<BulletStackEffect> bulletEffects;
 };
