@@ -22,6 +22,8 @@ public:
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
 	ComponentContainer<Sprites> sprites;
+	ComponentContainer<CollisionShape> collisionShapes;
+	ComponentContainer<SpriteTimer> spriteTimers;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -30,7 +32,7 @@ public:
 	ComponentContainer<EnemyBullet> enemyBullets;
 	ComponentContainer<PolyCollider> polyColliders;
 	ComponentContainer<WallCollider> walls;
-
+	ComponentContainer<Shoots> shoots;
 
 
 	// constructor that adds all containers for looping over them
@@ -48,6 +50,17 @@ public:
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
 		registry_list.push_back(&sprites);
+		registry_list.push_back(&spriteTimers);
+
+		registry_list.push_back(&stackCompile);
+		registry_list.push_back(&invincibles);
+		registry_list.push_back(&circleColliders);
+		registry_list.push_back(&playerBullets);
+		registry_list.push_back(&enemyBullets);
+		registry_list.push_back(&polyColliders);
+		registry_list.push_back(&walls);
+		registry_list.push_back(&collisionShapes);
+		registry_list.push_back(&shoots);
 	}
 
 	void clear_all_components() {

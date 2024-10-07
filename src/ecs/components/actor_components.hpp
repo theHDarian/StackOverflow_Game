@@ -12,7 +12,8 @@ enum BulletEffectType {
     FireRate,
     BulletRange,
     BulletSpread,
-    BulletNum,
+    BulletNum, // Number of bullets fired in a single shot
+    BulletBurst, // Number of bullets fired in a burst
     Bounce,
     Pierce,
     Homing,
@@ -44,16 +45,27 @@ struct BulletStackEffect {
 struct Player
 {
     float baseSpeed;
-    float baseFireRate;
-    float baseDashNum;
-    float baseDashCDR;
+    float baseFiringInterval = 300.0f;
+    int baseDashNum = 3;
+    float baseDashCDR = 3000.0f;
+    float baseDashSpeed = 2500.0f;
 
-    float dashSpeed = 2500.0f;
+    float dashSpeed = baseDashSpeed;
     int currDashCharges = 3;
-    int maxDashCharges = 3;
+
+    int maxDashCharges = baseDashNum;
+
     float currDashCooldown = 0.0f;
-    float dashCooldown = 3000.0f;
-    float currFireRateCooldown;
+    float dashCooldown = baseDashCDR;
+
+    float currFiringInterval = 0.0f;
+    float maxFiringInterval = baseFiringInterval;
+
+    int bulletCluster = 1;
+
+    int maxBulletBurst = 1;
+    int currBulletBurst = 1;
+    float bulletBurstCooldown = 0;
 };
 
 // Holds the actual data of currStack
@@ -73,6 +85,7 @@ struct StackCompile {
         {BulletRange,       0},
         {BulletSpread,      0},
         {BulletNum,         0},
+        {BulletBurst,       0},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -89,6 +102,7 @@ struct StackCompile {
         {BulletRange,       1},
         {BulletSpread,      1},
         {BulletNum,         1},
+        {BulletBurst,       1},
         {Bounce,            1},
         {Pierce,            1},
         {Homing,            1},
@@ -107,6 +121,7 @@ struct StackCompile {
         {BulletRange,       1},
         {BulletSpread,      1},
         {BulletNum,         1},
+        {BulletBurst,       1},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -158,6 +173,13 @@ struct StackCompile {
     }
 };
 
+enum class EnemyAttackPattern {
+    // this is the attack pattern 
+    SINGLE_SHOT,
+    DOUBLE_SHOT,
+    ALL_DIRECTION, 
+};
+
 // anything that is deadly to the player
 struct Enemy {
 	int state; //TODO: can change to enum once state determined
@@ -165,6 +187,9 @@ struct Enemy {
     int currHealth;
     float speed;
     // TODO add attack pattern data?
+    float attackCooldown;
+    EnemyAttackPattern attackPattern;
+
 };
 
 struct BossEnemy {
@@ -173,30 +198,39 @@ struct BossEnemy {
 struct Invincible {
     // Deletes itself when countdown <0
     // Entity can't be hit while has Invincible component
-    int countdown;
+    float countdown = 1000;
+};
+
+struct Shoots {
+    float currFiringInterval = 0.0f;
+    float maxFiringInterval = 1000.0f;
+    float bulletSpeed = 400;
+
+    int maxBulletBurst = 1;
+    int currBulletBurst = 1;
+    float bulletBurstCooldown = 50;
 };
 
 // TODO Add a way to use parametric equations for bullet path
 
 struct PlayerBullet {
-    float damage;
-    float bulletSpeed;
+    float damage = 10;
+    float bulletSpeed = 400;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 3000;
     // Player bullet only scale in all directions?
-    float bulletSize;
-    int bulletPierce;
-    int bulletBounce;
+    float bulletSize = 20;
+    int bulletPierce = 0;
+    int bulletBounce = 0;
 };
 
 struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 1000;
     // Enemy bullet can scale x,y independently?
-    vec2 bulletSize;
+    vec2 bulletSize =  vec2(20, 10);
     int bulletBounce;
-
     std::vector<BulletStackEffect> bulletEffects;
 };
 

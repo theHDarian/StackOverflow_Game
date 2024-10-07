@@ -6,6 +6,7 @@
 #include <cassert>
 #include <sstream>
 #include <iostream>
+#include <glm/detail/func_trigonometric.inl>
 
 #include "physics_system.hpp"
 
@@ -14,6 +15,7 @@ const size_t MAX_NUM_EELS = 15;
 const size_t MAX_NUM_FISH = 5;
 const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
+
 
 // create the underwater world
 WorldSystem::WorldSystem()
@@ -128,8 +130,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+	// comment this out for now
+	//while (registry.debugComponents.entities.size() > 0)
+	//    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
@@ -145,20 +148,83 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// have just one blob enemy for now for simplicity
-	if (registry.enemies.components.size() < 1)
-		createBlob(renderer, vec2(500, 500));
+	// simplistic way to have collision outlines follow their "owner" when the owner moves
+	// potentially buggy implementation with poly outlines, but currently works with circles
+	for (auto& owner : registry.collisionShapes.entities) {
+		for (auto& shape : registry.collisionShapes.get(owner).shapes) {
+			// very rough check to see if owner has moved (has velocity)
+			// but doesn't account for change in angle, etc
+			if ((registry.motions.get(owner).velocity.x > 0 || registry.motions.get(owner).velocity.y > 0) || owner == player) {
+				auto& motion = registry.motions.get(shape);
+				motion.angle = registry.motions.get(owner).angle;
+				motion.position = registry.motions.get(owner).position;
+				motion.velocity = registry.motions.get(owner).velocity;
+			}
+		}
+	}
 
-	vec2 oldSpeed = registry.motions.get(player).velocity;
-	if (oldSpeed[0] == 0 && oldSpeed[1] == 0) {
-		oldSpeed = registry.ioStates.components[0].lastInputAxis;
+	// place sprite timer progression here for now
+	for (auto& entity : registry.spriteTimers.entities) {
+		auto& spriteTimer = registry.spriteTimers.get(entity);
+		spriteTimer.count_ms -= elapsed_ms_since_last_update;
+		if (spriteTimer.count_ms <= 0) {
+			registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
+			registry.spriteTimers.remove(entity);
+		}
+	}
+
+	vec2 preDashSpeed = registry.motions.get(player).velocity;
+	if (preDashSpeed[0] == 0 && preDashSpeed[1] == 0) {
+		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
 	}
 
 	// Processing inputs
 	handleInput();
 
     //check dash related variables
-    dash(oldSpeed, elapsed_ms_since_last_update);
+    dash(preDashSpeed, elapsed_ms_since_last_update);
+
+	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
+
+	// Updating the invincibility timer
+	if (registry.invincibles.entities.size() > 0) {
+		for (Entity& invincible : registry.invincibles.entities) {
+			float& invincible_timer = registry.invincibles.get(invincible).countdown;
+			invincible_timer -= elapsed_ms_since_last_update;
+			if (invincible_timer <= 0) {
+				registry.invincibles.remove(invincible);
+				//std::cout << "entity is no longer invincible" << std::endl;
+			}
+		}
+	}
+
+	// Updating the bullet ranges
+	if (registry.playerBullets.entities.size() > 0) {
+		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+			PlayerBullet& bullet = registry.playerBullets.components[i];
+			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				registry.remove_all_components_of(registry.playerBullets.entities[i]);
+			}
+		}
+	}
+	if (registry.enemyBullets.entities.size() > 0) {
+		// for (Entity& bullet : registry.enemyBullets.entities) {
+		// 	float& range_timer = registry.enemyBullets.get(bullet).bulletRange;
+		// 	range_timer -= elapsed_ms_since_last_update;
+		// 	if (range_timer <= 0) {
+		// 		registry.remove_all_components_of(bullet);
+		// 	}
+		// }
+		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
+			EnemyBullet& bullet = registry.enemyBullets.components[i];
+			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				registry.remove_all_components_of(registry.enemyBullets.entities[i]);
+			}
+		}
+	}
+	if (registry.enemies.size() == 0) {
+		createEnemy(renderer, vec2(1280 * uniformDist(rng),720 * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+	}
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -190,17 +256,20 @@ void WorldSystem::restartGame() {
 
 	player = createPlayer(renderer,{0,0});
 
-
 	// Test calls:
 	
-	//createTestWall(renderer, {500,10}, {1000, 600});
+	createTestWall(renderer, {100,200}, {400, 600});
 
-	createTestPoly(renderer, { 500,500 }, {
-		{100, 0},
-		{-50, 50},
-		{-50, -50}
-		}
-		, 90);
+	//createBlob(renderer, vec2(600, 300));
+
+	//createTestPoly(renderer, { 500,500 }, {
+	//	{100, 0},
+	//	{-50, 50},
+	//	{-50, -50}
+	//	}
+	//	, 90);
+
+	// spawning 1 enemies to test
 }
 
 // Compute collisions between entities
@@ -212,21 +281,17 @@ void WorldSystem::handleCollisions() {
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
 
-		// for now, we are only interested in collisions that involve the salmon
+		// Player centric collision handling
 		if (registry.players.has(entity)) {
 			//Player& player = registry.players.get(entity);
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate invincibility unless already invincible
+				// initiate death unless already dying
 				if (!registry.invincibles.has(entity)) {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
-
-					Motion& player_motion = registry.motions.get(entity);
-					player_motion.angle = M_PI;
-					player_motion.velocity = {0,100};
 				}
 			}
 
@@ -237,14 +302,13 @@ void WorldSystem::handleCollisions() {
 					// Scream, reset timer, and make the salmon sink
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
-					std::cout << "TEST" << std::endl;
+
 					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
 					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
 					}
 				}
 			}
-
 
 			// Checking Player -> Wall collision
 			// If found, move the player position away from the wall by radius in direction reflection of projection
@@ -260,6 +324,60 @@ void WorldSystem::handleCollisions() {
 				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
 			}
 		}
+
+		// Enemy bullet centric handling
+		if (registry.enemyBullets.has(entity)) {
+			if (registry.walls.has(entity_other)) {
+				if (registry.enemyBullets.get(entity).bulletBounce > 0) {
+					// Bounce / reflect the enemy bullet against the wall
+					Motion& motion = registry.motions.get(entity);
+					WallCollider& wall = registry.walls.get(entity_other);
+
+					vec2 a = motion.position - wall.startPosition;
+					vec2 b = wall.endPosition - wall.startPosition;
+					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+					vec2 n = glm::normalize(a - c);
+
+					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+
+					// Assumes bullet flies towards facing direction
+					motion.angle = atan(motion.velocity.y / motion.velocity.x);
+
+					registry.enemyBullets.get(entity).bulletBounce -= 1;
+				}
+				else {
+					registry.remove_all_components_of(entity);
+				}
+			}
+		}
+
+		// Player bullet centric handling
+		if (registry.playerBullets.has(entity)) {
+			if (registry.walls.has(entity_other)) {
+				if (registry.playerBullets.get(entity).bulletBounce > 0) {
+					// Bounce / reflect the enemy bullet against the wall
+					Motion& motion = registry.motions.get(entity);
+					WallCollider& wall = registry.walls.get(entity_other);
+
+					vec2 a = motion.position - wall.startPosition;
+					vec2 b = wall.endPosition - wall.startPosition;
+					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+					vec2 n = glm::normalize(a - c);
+
+					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+
+					// Assumes bullet flies towards facing direction
+					motion.angle = atan(motion.velocity.y/motion.velocity.x);
+
+					registry.playerBullets.get(entity).bulletBounce -= 1;
+				}
+				else {
+					registry.remove_all_components_of(entity);
+				}
+			}
+		}
+
+
 	}
 
 	// Remove all collisions from this simulation step
@@ -288,13 +406,13 @@ void WorldSystem::handleInput() {
 
 }
 
-void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
     Player& pl = registry.players.get(player);
-    if (pl.currDashCharges < pl.maxDashCharges) {
+    if (pl.currDashCharges < getModifiedValue(PlayerNumDash, pl.maxDashCharges)) {
         pl.currDashCooldown -= elapsed_ms_since_last_update;
         if (pl.currDashCooldown <= 0) {
             pl.currDashCharges++;
-            pl.currDashCooldown = pl.dashCooldown;
+            pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
         }
     }
     IOState& input = registry.ioStates.components[0];
@@ -310,17 +428,88 @@ void WorldSystem::dash(vec2 oldSpeed, float elapsed_ms_since_last_update) {
     if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
         if (!registry.invincibles.has(player))
             registry.invincibles.emplace(player);
-        player_motion.velocity = pl.dashSpeed * glm::normalize(oldSpeed);
+    	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
+        player_motion.velocity = pl.dashSpeed * glm::normalize(preDashSpeed);
     }
     else if (input.shouldDash <= 0.0f) {
         // dash is over, remove invincibility and restore speed
-        if (registry.invincibles.has(player))
-            registry.invincibles.remove(player);
-        player_motion.velocity = oldSpeed;
+        player_motion.velocity = preDashSpeed;
         pl.currDashCharges--;
         input.shouldDash = 0.0f;
         return;
     }
+}
+
+void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
+	IOState& input = registry.ioStates.components[0];
+	Player& pl = registry.players.get(player);
+	if (!input.shouldShoot) {
+		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
+			pl.currBulletBurst++;
+		}
+		return;
+	}
+	if (pl.currFiringInterval > 0) {
+		pl.currFiringInterval -= elapsed_ms_since_last_update;
+	}
+	if (pl.bulletBurstCooldown > 0) {
+		pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
+	}
+	if (pl.currFiringInterval <= 0) {
+		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
+		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
+	}
+	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
+		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currBulletBurst--;
+		pl.bulletBurstCooldown = min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst)
+		);
+		// create bullet
+
+		vec2 playerPos = registry.motions.get(player).position;
+		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
+		vec2 bulletPos = playerPos + bulletDir * 100.f;
+
+		if (cluster == 1) {
+			createPlayerBullet(renderer, bulletPos, bulletDir);
+			return;
+		}
+
+		// Calculate the offset between bullets for cluster shots
+
+		float offSet = radians(getModifiedValue(BulletSpread, 30)) / cluster;
+		// Create a rotation matrix
+		glm::mat2 rotationMatrix = glm::mat2(
+			glm::cos(offSet), -glm::sin(offSet),
+			glm::sin(offSet),  glm::cos(offSet)
+		);
+
+
+		if (cluster == 2) {
+			createPlayerBullet(renderer, bulletPos, bulletDir*rotationMatrix);
+			createPlayerBullet(renderer, bulletPos, bulletDir*glm::transpose(rotationMatrix));
+			return;
+		}
+
+		for (int i = 0; i < cluster; i++) {
+			if (i == 0) {
+				createPlayerBullet(renderer, bulletPos, bulletDir);
+				continue;
+			}
+			for (int j = 0; j < i; j++) {
+				if (i % 2 == 0) {
+					bulletDir = bulletDir * rotationMatrix;
+				}
+				else {
+					bulletDir = bulletDir * glm::transpose(rotationMatrix);
+				}
+			}
+			createPlayerBullet(renderer, bulletPos, bulletDir);
+		}
+	}
 }
 
 

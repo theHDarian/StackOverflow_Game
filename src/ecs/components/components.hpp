@@ -60,9 +60,11 @@ struct IOState {
 	bool shouldEnd;
 	bool shouldRestart;
     float shouldDash;
+	bool shouldShoot;
 	vec2 inputAxis;
 	vec2 lastInputAxis = {1,1};
 	vec2 mousePosition;
+
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
@@ -132,10 +134,14 @@ struct Mesh
  * enums there are, and as a default value to represent uninitialized fields.
  */
 
+// maybe a universal map would be easier to load + manage files with...
 enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	EEL = FISH + 1,
-	TEXTURE_COUNT = EEL + 1
+	CIRCLE = EEL + 1,
+	MC_BASE = CIRCLE + 1,
+	MC_HIT = MC_BASE + 1,
+	TEXTURE_COUNT = MC_HIT + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -183,5 +189,16 @@ struct Sprites {
 	// eg: when bullet collides w/ enemy in physics system,
 	// physics system will change the sprite to "DAMAGED_SPRITE"
 	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
+};
+
+struct CollisionShape {
+	// not sure if we need to draw that many
+	std::vector<Entity> shapes;
+};
+
+// if a sprite should switch after a certain amount of time
+struct SpriteTimer {
+	float count_ms = 1000;
+	TEXTURE_ASSET_ID nextSprite;
 };
 

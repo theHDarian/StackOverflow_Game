@@ -46,7 +46,9 @@ private:
 	bool playerIsDead();
 	void handleInput();
 	void movePlayer(vec2 inputAxis);
-    void dash(vec2 oldSpeed, float elapsed_ms_since_last_update);
+    void dash(vec2 preDashSpeed, float elapsed_ms_since_last_update);
+
+	void shoot(float elapsed_ms_since_last_update, int cluster = 1);
 
 	float getModifiedValue(BulletEffectType bf, float value);
 
