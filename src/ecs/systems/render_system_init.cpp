@@ -13,6 +13,22 @@
 #include <iostream>
 #include <sstream>
 
+#if IMGUI_ENABLED
+	#include "imgui.h"
+	#include "backends/imgui_impl_glfw.h"
+	#include "backends/imgui_impl_opengl3.h"
+	#include "imguiThemes.h"
+#endif
+
+
+void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	RenderSystem* renderSystem = (RenderSystem*)glfwGetWindowUserPointer(window);
+	renderSystem->window_width = width;
+	renderSystem->window_height = height;
+	std::cout << width << " " << height << std::endl;
+	glViewport(0, 0, width, height);
+	// glfwSetWindowSize(window,width,height);
+}
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)
 {
@@ -42,11 +58,11 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 		printf("window width_height = %d,%d\n", window_width_px, window_height_px);
 	}
 
+	window_width = window_width_px;
+	window_height = window_height_px;
 	glfwSetWindowAspectRatio(window,window_width_px,window_height_px);
 	// Window resize callback
-	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-		glViewport(0, 0, width, height);
-	});
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// Hint: Ask your TA for how to setup pretty OpenGL error callbacks. 
 	// This can not be done in macOS, so do not enable
@@ -65,6 +81,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	initImGui();
 
 	return true;
 }
@@ -383,3 +400,29 @@ bool loadEffectFromFile(
 	return true;
 }
 
+
+
+void RenderSystem::initImGui() {
+	ImGui::CreateContext();
+	//ImGui::StyleColorsDark();
+	imguiThemes::embraceTheDarkness();
+
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+	//io.ConfigViewportsNoAutoMerge = true;
+	//io.ConfigViewportsNoTaskBarIcon = true;
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		//style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 0.f;
+		style.Colors[ImGuiCol_DockingEmptyBg].w = 0.f;
+	}
+
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+}

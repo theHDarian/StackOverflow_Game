@@ -3,6 +3,9 @@
 #include <SDL.h>
 
 #include "tiny_ecs_registry.hpp"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 void RenderSystem::drawTexturedMesh(Entity entity,
 									const mat3 &projection)
@@ -215,6 +218,15 @@ void RenderSystem::draw()
 		drawTexturedMesh(entity, projection_2D);
 	}
 
+	//draw Imgui
+	// ImGui_ImplOpenGL3_NewFrame();
+	// ImGui_ImplGlfw_NewFrame();
+	// ImGui::NewFrame();
+	// bool show_demo = true;
+	// ImGui::ShowDemoWindow(&show_demo);
+	// ImGui::Render();
+	// ImGui::UpdatePlatformWindows();
+
 	// Truely render to the screen
 	drawToScreen();
 
@@ -230,8 +242,8 @@ mat3 RenderSystem::createProjectionMatrix()
 	float top = 0.f;
 
 	gl_has_errors();
-	float right = (float) window_width_px;
-	float bottom = (float) window_height_px;
+	float right = (float) window_width;
+	float bottom = (float) window_height;
 
 	float sx = 2.f / (right - left);
 	float sy = 2.f / (top - bottom);

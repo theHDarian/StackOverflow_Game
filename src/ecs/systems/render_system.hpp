@@ -77,10 +77,13 @@ public:
 
 	mat3 createProjectionMatrix();
 
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void initImGui();
 
 	// Window handle
 	GLFWwindow* window;
@@ -89,6 +92,9 @@ private:
 	GLuint frame_buffer;
 	GLuint off_screen_render_buffer_color;
 	GLuint off_screen_render_buffer_depth;
+
+	int window_width;
+	int window_height;
 
 	Entity screen_state_entity;
 };

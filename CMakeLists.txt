@@ -56,6 +56,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC ext/stb_image/)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/gl3w)
 
 add_subdirectory(ext/imgui-docking)
+set(IMGUI_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ext/imgui-docking/imgui")
+file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
+target_include_directories("imgui" PUBLIC ${IMGUI_PATH})
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)
@@ -157,6 +160,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${GLFW_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_INCLUDE_DIRS})
+target_include_directories(imgui PUBLIC ${IMGUI_PATH}/backends)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${GLFW_LIBRARIES} ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} glm::glm imgui)
 
