@@ -3,6 +3,9 @@
 #include <iostream>
 
 #include "tiny_ecs_registry.hpp"
+#if IMGUI_ENABLED
+#include "imgui_impl_glfw.h"
+#endif
 
 
 IOSystem::IOSystem() {
@@ -26,7 +29,10 @@ bool IOSystem::init(GLFWwindow* window) {
 
 
 // On key callback
-void IOSystem::onKey(int key, int, int action, int mod) {
+void IOSystem::onKey(int key, int _, int action, int mod) {
+	#if IMGUI_ENABLED
+	ImGui_ImplGlfw_KeyCallback(window, key,_,action,mod);
+	#endif
     IOState& state = registry.ioStates.components[0];
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		state.gamePaused = !state.gamePaused;
@@ -46,6 +52,10 @@ void IOSystem::onKey(int key, int, int action, int mod) {
 }
 
 void IOSystem::mouseClick(int button, int action, int mods) {
+	#if IMGUI_ENABLED
+	ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+	#endif
+
 	IOState& state = registry.ioStates.components[0];
 	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
 		state.shouldDash = 120.0f;
@@ -57,6 +67,9 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 }
 
 void IOSystem::onMouseMove(vec2 mousePosition) {	
+	#if IMGUI_ENABLED
+	ImGui_ImplGlfw_CursorPosCallback(window, mousePosition.x, mousePosition.y);
+	#endif
     IOState& state = registry.ioStates.components[0];
     state.mousePosition = mousePosition;
 }

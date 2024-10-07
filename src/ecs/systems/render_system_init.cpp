@@ -17,6 +17,7 @@
 	#include "imgui.h"
 	#include "backends/imgui_impl_glfw.h"
 	#include "backends/imgui_impl_opengl3.h"
+	#include "backends/imgui_impl_sdl2.h"
 	#include "imguiThemes.h"
 #endif
 
@@ -81,7 +82,9 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	#if IMGUI_ENABLED
 	initImGui();
+	#endif
 
 	return true;
 }
@@ -269,6 +272,12 @@ RenderSystem::~RenderSystem()
 	// remove all entities created by the render system
 	while (registry.renderRequests.entities.size() > 0)
 	    registry.remove_all_components_of(registry.renderRequests.entities.back());
+
+	#if IMGUI_ENABLED
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+	#endif
 }
 
 // Initialize the screen texture from a standard sprite
@@ -401,28 +410,22 @@ bool loadEffectFromFile(
 }
 
 
-
+#if IMGUI_ENABLED
 void RenderSystem::initImGui() {
-	ImGui::CreateContext();
-	//ImGui::StyleColorsDark();
-	imguiThemes::embraceTheDarkness();
+	IMGUI_CHECKVERSION();
+    imgui_context = ImGui::CreateContext();
+	ImGui::SetCurrentContext(imgui_context);
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
 
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-	//io.ConfigViewportsNoAutoMerge = true;
-	//io.ConfigViewportsNoTaskBarIcon = true;
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
 
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		//style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 0.f;
-		style.Colors[ImGuiCol_DockingEmptyBg].w = 0.f;
-	}
-
+    // Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 }
+#endif

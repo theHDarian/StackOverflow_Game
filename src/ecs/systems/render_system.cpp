@@ -3,9 +3,12 @@
 #include <SDL.h>
 
 #include "tiny_ecs_registry.hpp"
+#if IMGUI_ENABLED
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#endif
 
 void RenderSystem::drawTexturedMesh(Entity entity,
 									const mat3 &projection)
@@ -217,15 +220,10 @@ void RenderSystem::draw()
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
 	}
-
+	#if IMGUI_ENABLED
 	//draw Imgui
-	// ImGui_ImplOpenGL3_NewFrame();
-	// ImGui_ImplGlfw_NewFrame();
-	// ImGui::NewFrame();
-	// bool show_demo = true;
-	// ImGui::ShowDemoWindow(&show_demo);
-	// ImGui::Render();
-	// ImGui::UpdatePlatformWindows();
+	drawImGui();
+	#endif
 
 	// Truely render to the screen
 	drawToScreen();
@@ -251,3 +249,22 @@ mat3 RenderSystem::createProjectionMatrix()
 	float ty = -(top + bottom) / (top - bottom);
 	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
 }
+#if IMGUI_ENABLED
+void RenderSystem::drawImGui() {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	const ImVec2& size = ImVec2(200,window_height);
+	ImGui::SetNextWindowSize(size);
+	ImGui::SetNextWindowPos(ImVec2(window_width - 200, 0));
+	ImGui::Begin("Debug window");
+    ImGui::Text("Enemy Bullet Count: %d",registry.enemyBullets.size());
+	if (ImGui::Button("Click Me")) {
+		std::cout << "clicked" << std::endl; // Call the function when the button is clicked
+	}
+    ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui::UpdatePlatformWindows();
+}
+#endif

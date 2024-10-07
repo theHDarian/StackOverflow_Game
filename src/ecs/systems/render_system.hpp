@@ -2,8 +2,12 @@
 
 #include <array>
 #include <utility>
-
 #include "common.hpp"
+
+#if IMGUI_ENABLED
+#include "imgui.h"
+#endif
+
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
@@ -79,11 +83,11 @@ public:
 
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
-	void initImGui();
 
 	// Window handle
 	GLFWwindow* window;
@@ -97,6 +101,14 @@ private:
 	int window_height;
 
 	Entity screen_state_entity;
+
+	#if IMGUI_ENABLED
+	public:
+		ImGuiContext* imgui_context;
+	private:
+		void initImGui();
+		void drawImGui();
+	#endif
 };
 
 bool loadEffectFromFile(
