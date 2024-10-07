@@ -200,7 +200,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 
 	Enemy & enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 1000;
+	enemy.maxHealth = 100;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
@@ -239,15 +239,21 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	motion.angle = angle;
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
-	motion.scale = vec2({ -FISH_BB_WIDTH, FISH_BB_HEIGHT });
+
+
+	motion.scale = bullet.bulletSize; // Ensure scale is initialized
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = abs(motion.scale.x)/2;
+	cc.radius = motion.scale.x / 2;
+
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			TEXTURE_ASSET_ID::FISH,
+			spriteComponent.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
