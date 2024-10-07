@@ -168,7 +168,7 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	enemy.state = 10;
 	enemy.attackPattern = EnemyAttackPattern::SINGLE_SHOT;
 
-	auto& shoot = registry.shoots.emplace(entity);
+	Shoots &shoot = registry.shoots.emplace(entity);
 	shoot.maxBulletBurst = 3;
 	shoot.maxFiringInterval = 3000.0f;
 	shoot.bulletSpeed = 300;
@@ -213,7 +213,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
 
-	auto& shoot = registry.shoots.emplace(entity);
+	Shoots &shoot = registry.shoots.emplace(entity);
 	shoot.maxBulletBurst = 3;
 	shoot.maxFiringInterval = 3000.0f;
 	shoot.bulletSpeed = 200;

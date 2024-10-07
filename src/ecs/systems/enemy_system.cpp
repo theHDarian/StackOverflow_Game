@@ -31,14 +31,14 @@ void EnemySystem::step(float elapsed_ms)
     auto &enemy_registry = registry.enemies;
     auto &motion_registry = registry.motions;
     auto &collision_registry = registry.collisions;
-    for (uint i = 0; i < enemy_registry.components.size(); i++)
-    {
+    for (uint i = 0; i < enemy_registry.components.size(); i++) {
         Enemy &enemy = enemy_registry.components[i];
         Entity &entity = enemy_registry.entities[i];
 
         Motion &motion = motion_registry.get(entity);
         vec2 pos = motion.position;
         float angle = motion.angle;
+
         // HANDLING DAMGE FROM COLLISION
         for (auto &entity : collision_registry.entities)
         {
@@ -54,6 +54,7 @@ void EnemySystem::step(float elapsed_ms)
                 std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
                 if (enemyStat.currHealth <= 0)
                 {
+                    registry.list_all_components_of(entity);
                     registry.remove_all_components_of(entity);
                 }
 
@@ -61,18 +62,23 @@ void EnemySystem::step(float elapsed_ms)
             }
         }
 
-         /*
-          * Sky's AI logic: firing cooldown is handled by the shoot function, so no need to worry about that here
-          * The number of bursts and the interval between bursts is stored in the Shoots component
-          * change them per enemy type in createEnemy function in world_init.cpp
-          * pass render and elapsed_ms directly
-          * instead of an angle, pass a normalized vector. in the example, it's a vector pointing towards the player
-          * after that, pass the number of shots in a spread (think shotgun) and the spread angle (angle from the leftmost to the rightmost bullet)
-          */
-        vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
-        vec2 playerDir = playerPos - pos;
-        playerDir = glm::normalize(playerDir);
-        shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
+        /*
+        * Sky's AI logic: firing cooldown is handled by the shoot function, so no need to worry about that here
+        * The number of bursts and the interval between bursts is stored in the Shoots component
+        * change them per enemy type in createEnemy function in world_init.cpp
+        * pass render and elapsed_ms directly
+        * instead of an angle, pass a normalized vector. in the example, it's a vector pointing towards the player
+        * after that, pass the number of shots in a spread (think shotgun) and the spread angle (angle from the leftmost to the rightmost bullet)
+        * !! careful with the enemy death logic, this may crash if the enemy is removed before the function runs.
+        * the check for shoots component is there to prevent that
+        */
+
+        if (registry.shoots.has(entity)) {
+            vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+            vec2 playerDir = playerPos - pos;
+            playerDir = glm::normalize(playerDir);
+            shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
+        }
 
         enemy.attackCooldown -= elapsed_ms;
         // std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
