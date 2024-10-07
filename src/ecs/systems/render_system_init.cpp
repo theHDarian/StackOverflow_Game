@@ -23,11 +23,16 @@
 
 
 void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	RenderSystem* renderSystem = (RenderSystem*)glfwGetWindowUserPointer(window);
-	renderSystem->window_width = width;
-	renderSystem->window_height = height;
-	std::cout << width << " " << height << std::endl;
-	glViewport(0, 0, width, height);
+	WindowState& windowState = registry.windowStates.components[0];
+	if (windowState.isRetinaDisplay) {
+		windowState.width = width / 2;
+		windowState.height = height / 2;
+	} else {
+		windowState.width = width;
+		windowState.height = height;
+	}
+
+	glViewport(0, 0, windowState.width, windowState.height);
 	// glfwSetWindowSize(window,width,height);
 }
 // World initialization
@@ -48,19 +53,23 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	gl_has_errors();
 
-	// For some high DPI displays (ex. Retina Display on Macbooks)
-	// https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value
 	int frame_buffer_width_px, frame_buffer_height_px;
 	glfwGetFramebufferSize(window, &frame_buffer_width_px, &frame_buffer_height_px);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
+
+	Entity ent = Entity();
+	WindowState& windowState = registry.windowStates.emplace(ent);
+	windowState.width = window_width_px;
+	windowState.height = window_height_px;
+
 	if (frame_buffer_width_px != window_width_px)
 	{
 		printf("WARNING: retina display! https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value\n");
 		printf("glfwGetFramebufferSize = %d,%d\n", frame_buffer_width_px, frame_buffer_height_px);
 		printf("window width_height = %d,%d\n", window_width_px, window_height_px);
+		windowState.isRetinaDisplay = true;
 	}
 
-	window_width = window_width_px;
-	window_height = window_height_px;
+
 	glfwSetWindowAspectRatio(window,window_width_px,window_height_px);
 	// Window resize callback
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);

@@ -97,9 +97,6 @@ private:
 	GLuint off_screen_render_buffer_color;
 	GLuint off_screen_render_buffer_depth;
 
-	int window_width;
-	int window_height;
-
 	Entity screen_state_entity;
 
 	#if IMGUI_ENABLED

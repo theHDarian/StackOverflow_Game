@@ -238,10 +238,12 @@ mat3 RenderSystem::createProjectionMatrix()
 	// Fake projection matrix, scales with respect to window coordinates
 	float left = 0.f;
 	float top = 0.f;
+	
 
 	gl_has_errors();
-	float right = (float) window_width;
-	float bottom = (float) window_height;
+	WindowState& windowState = registry.windowStates.components[0];
+	float right = (float) windowState.width;
+	float bottom = (float) windowState.height;
 
 	float sx = 2.f / (right - left);
 	float sy = 2.f / (top - bottom);
@@ -251,14 +253,20 @@ mat3 RenderSystem::createProjectionMatrix()
 }
 #if IMGUI_ENABLED
 void RenderSystem::drawImGui() {
+	IOState& ioState = registry.ioStates.components[0];
+	WindowState& windowState = registry.windowStates.components[0];
+	// std::cout << windowState.width << " " << windowState.height << std::endl;
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	const ImVec2& size = ImVec2(200,window_height);
+	const ImVec2& size = ImVec2(200,windowState.height);
 	ImGui::SetNextWindowSize(size);
-	ImGui::SetNextWindowPos(ImVec2(window_width - 200, 0));
+	ImGui::SetNextWindowPos(ImVec2(windowState.width - 200, 0));
 	ImGui::Begin("Debug window");
-    ImGui::Text("Enemy Bullet Count: %d",registry.enemyBullets.size());
+    ImGui::Text("Enemy Bullet Count: %lu",registry.enemyBullets.size());
+	ImGui::Text("Viewport Size: (%d, %d)",windowState.width,windowState.height);
+	ImGui::Text("Mouse Pos: (%.2f, %.2f)",ioState.mousePosition.x,ioState.mousePosition.y);
 	if (ImGui::Button("Click Me")) {
 		std::cout << "clicked" << std::endl; // Call the function when the button is clicked
 	}

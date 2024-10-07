@@ -7,7 +7,7 @@
 
 #include "map_components.hpp"
 #include "actor_components.hpp"
-#include "../utils/extended_stack.hpp"
+#include "io_components.hpp"
 
 
 // Stucture to store collision information
@@ -54,21 +54,6 @@ extern Debug debugging;
 struct ScreenState
 {
 	float darken_screen_factor = -1;
-};
-
-struct IOState {
-	bool shouldEnd;
-	bool shouldRestart;
-	bool gamePaused;
-    float shouldDash;
-	bool shouldShoot;
-	vec2 inputAxis;
-	vec2 lastInputAxis = {1,1};
-	vec2 mousePosition;
-
-
-	ExtendedStack<int> pressedHorizontal;
-	ExtendedStack<int> pressedVertical;
 };
 
 // Struct for dash
