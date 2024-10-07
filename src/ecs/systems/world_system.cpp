@@ -184,7 +184,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     //check dash related variables
     dash(preDashSpeed, elapsed_ms_since_last_update);
 
-	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster), getModifiedValue(BulletBurst,registry.players.get(player).maxBulletBurst));
+	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
 
 	// Updating the invincibility timer
 	if (registry.invincibles.entities.size() > 0) {
@@ -441,7 +441,7 @@ void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
     }
 }
 
-void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster, int burst) {
+void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
 	Player& pl = registry.players.get(player);
 	if (!input.shouldShoot) {

@@ -33,7 +33,8 @@ Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle,
 // the enemy
 Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern);
 
-Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
+// Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
+Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed);
 
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);

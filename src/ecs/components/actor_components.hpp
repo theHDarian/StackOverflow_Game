@@ -201,6 +201,16 @@ struct Invincible {
     float countdown = 1000;
 };
 
+struct Shoots {
+    float currFiringInterval = 0.0f;
+    float maxFiringInterval = 1000.0f;
+    float bulletSpeed = 400;
+
+    int maxBulletBurst = 1;
+    int currBulletBurst = 1;
+    float bulletBurstCooldown = 50;
+};
+
 // TODO Add a way to use parametric equations for bullet path
 
 struct PlayerBullet {
