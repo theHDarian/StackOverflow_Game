@@ -210,8 +210,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	motion.scale = vec2({ -EEL_BB_WIDTH, EEL_BB_HEIGHT });
 
 	Enemy & enemy = registry.enemies.emplace(entity);
-	enemy.attackCooldown = 1000;
-	enemy.maxHealth = 1000;
+	enemy.attackCooldown = 5000;
+	enemy.maxHealth = 100;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
@@ -235,41 +235,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	return entity;
 };
 
-// Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle) {
-// 	auto entity = Entity();
-//
-// 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-// 	registry.meshPtrs.emplace(entity, &mesh);
-//
-// 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-// 	bullet.bulletSpeed = 1.f;
-// 	bullet.bulletRange = 50000.f;
-// 	bullet.bulletBounce = 3;
-//
-// 	Motion &motion = registry.motions.emplace(entity);
-// 	motion.angle = angle;
-// 	motion.position = pos;
-// 	motion.velocity = velocity * bullet.bulletSpeed;
-// 	motion.scale = vec2({ -FISH_BB_WIDTH, FISH_BB_HEIGHT });
-//
-// 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-// 	cc.radius = abs(motion.scale.x)/2;
-//
-// 	registry.renderRequests.insert(
-// 		entity,
-// 		{
-// 			TEXTURE_ASSET_ID::FISH,
-// 			EFFECT_ASSET_ID::TEXTURED,
-// 			GEOMETRY_BUFFER_ID::SPRITE
-// 		});
-//
-// 	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
-// 	auto& shapes = registry.collisionShapes.emplace(entity);
-// 	shapes.shapes.push_back(c);
-//
-// 	return entity;
-// }
-
 Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed) {
 	auto entity = Entity();
 
@@ -285,15 +250,21 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	motion.angle = atan2(velocity.y, velocity.x);
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
-	motion.scale = vec2({ -FISH_BB_WIDTH, FISH_BB_HEIGHT });
+
+
+	motion.scale = bullet.bulletSize; // Ensure scale is initialized
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = abs(motion.scale.x)/2;
+	cc.radius = motion.scale.x / 2;
+
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			TEXTURE_ASSET_ID::FISH,
+			spriteComponent.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});

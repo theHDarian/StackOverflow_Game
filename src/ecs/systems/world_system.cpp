@@ -15,7 +15,7 @@ const size_t MAX_NUM_EELS = 15;
 const size_t MAX_NUM_FISH = 5;
 const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
-uint ENEMY_NUM = 0;
+
 
 // create the underwater world
 WorldSystem::WorldSystem()
@@ -222,6 +222,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
+	if (registry.enemies.size() == 0) {
+		createEnemy(renderer, vec2(1280 * uniformDist(rng),720 * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+	}
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -267,10 +270,6 @@ void WorldSystem::restartGame() {
 	//	, 90);
 
 	// spawning 1 enemies to test
-	if (ENEMY_NUM <= 0) {
-		createEnemy(renderer, vec2(800,500), vec2(0, 0), EnemyAttackPattern::DOUBLE_SHOT);
-		ENEMY_NUM = 1;
-	}
 }
 
 // Compute collisions between entities
