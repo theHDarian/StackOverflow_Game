@@ -168,10 +168,10 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	enemy.state = 10;
 	enemy.attackPattern = EnemyAttackPattern::SINGLE_SHOT;
 
-	auto shoot = registry.shoots.emplace(entity);
+	auto& shoot = registry.shoots.emplace(entity);
 	shoot.maxBulletBurst = 3;
 	shoot.maxFiringInterval = 3000.0f;
-	shoot.bulletSpeed = 100;
+	shoot.bulletSpeed = 300;
 
 
 	registry.sprites.emplace(entity);
@@ -198,10 +198,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	auto shoot = registry.shoots.emplace(entity);
-	shoot.maxBulletBurst = 3;
-	shoot.maxFiringInterval = 10000.0f;
-	shoot.bulletSpeed = 100;
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -209,13 +205,18 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	motion.velocity = velocity;
 	motion.scale = vec2({ -EEL_BB_WIDTH, EEL_BB_HEIGHT });
 
-	Enemy & enemy = registry.enemies.emplace(entity);
+	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
 	enemy.maxHealth = 100;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
+
+	auto& shoot = registry.shoots.emplace(entity);
+	shoot.maxBulletBurst = 3;
+	shoot.maxFiringInterval = 3000.0f;
+	shoot.bulletSpeed = 200;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x)/2;
@@ -235,7 +236,48 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	return entity;
 };
 
-Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed) {
+Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle) {
+	auto entity = Entity();
+
+	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = 1.0f;
+	bullet.bulletRange = 50000.f;
+	bullet.bulletBounce = 3;
+
+	Motion &motion = registry.motions.emplace(entity);
+	motion.angle = angle;
+	motion.position = pos;
+	motion.velocity = velocity * bullet.bulletSpeed;
+
+
+	motion.scale = bullet.bulletSize; // Ensure scale is initialized
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x / 2;
+
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			spriteComponent.sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
+
+	return entity;
+}
+
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);

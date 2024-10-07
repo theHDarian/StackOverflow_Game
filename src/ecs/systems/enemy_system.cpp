@@ -9,6 +9,11 @@
 #include <thread>
 #include <chrono>
 
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+
 float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
 float PLACEHOLDER_FOR_ANGLE = 0.f;
@@ -56,6 +61,19 @@ void EnemySystem::step(float elapsed_ms)
             }
         }
 
+         /*
+          * Sky's AI logic: firing cooldown is handled by the shoot function, so no need to worry about that here
+          * The number of bursts and the interval between bursts is stored in the Shoots component
+          * change them per enemy type in createEnemy function in world_init.cpp
+          * pass render and elapsed_ms directly
+          * instead of an angle, pass a normalized vector. in the example, it's a vector pointing towards the player
+          * after that, pass the number of shots in a spread (think shotgun) and the spread angle (angle from the leftmost to the rightmost bullet)
+          */
+        vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+        vec2 playerDir = playerPos - pos;
+        playerDir = glm::normalize(playerDir);
+        shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
+
         enemy.attackCooldown -= elapsed_ms;
         // std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
         if (enemy.attackCooldown < 0.f)
@@ -91,13 +109,12 @@ void EnemySystem::step(float elapsed_ms)
 }
 
 
-void EnemySystem::shoot(vec2 velocity, vec2 pos, float angle)
-{
+void EnemySystem::shoot(vec2 velocity, vec2 pos, float angle) {
     // SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
     createBulletEnemy(render, pos, velocity, angle + PLACEHOLDER_FOR_ANGLE);
+}
 
-
-void EnemySystem:: shoot(Entity& enemy, vec2 pos, float angle, float elapsed_ms_since_last_update, int cluster, float BulletSpread) {
+void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread) {
     //SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
     // createBulletEnemy(render, pos, vec2(-100, 0), angle + PLACEHOLDER_FOR_ANGLE);
     Shoots& pl = registry.shoots.get(enemy);
@@ -119,13 +136,10 @@ void EnemySystem:: shoot(Entity& enemy, vec2 pos, float angle, float elapsed_ms_
             (pl.maxFiringInterval / pl.maxBulletBurst)
         );
         // create bullet
-
-        float angleRad = radians(angle);
-        vec2 bulletDir = glm::normalize(vec2(cos(angleRad), sin(angleRad)));
         vec2 bulletPos = pos;
 
         if (cluster == 1) {
-            createBulletEnemy(render, bulletPos, bulletDir, pl.bulletSpeed);
+            createEnemyBullet(render, bulletPos, bulletDir, pl.bulletSpeed);
             return;
         }
 
@@ -140,14 +154,14 @@ void EnemySystem:: shoot(Entity& enemy, vec2 pos, float angle, float elapsed_ms_
 
 
         if (cluster == 2) {
-            createBulletEnemy(render, bulletPos, bulletDir*rotationMatrix, pl.bulletSpeed);
-            createBulletEnemy(render, bulletPos, bulletDir*glm::transpose(rotationMatrix), pl.bulletSpeed);
+            createEnemyBullet(render, bulletPos, bulletDir*rotationMatrix, pl.bulletSpeed);
+            createEnemyBullet(render, bulletPos, bulletDir*glm::transpose(rotationMatrix), pl.bulletSpeed);
             return;
         }
 
         for (int i = 0; i < cluster; i++) {
             if (i == 0) {
-                createBulletEnemy(render, bulletPos, bulletDir, pl.bulletSpeed);
+                createEnemyBullet(render, bulletPos, bulletDir, pl.bulletSpeed);
                 continue;
             }
             for (int j = 0; j < i; j++) {
@@ -158,7 +172,7 @@ void EnemySystem:: shoot(Entity& enemy, vec2 pos, float angle, float elapsed_ms_
                     bulletDir = bulletDir * glm::transpose(rotationMatrix);
                 }
             }
-            createBulletEnemy(render, bulletPos, bulletDir, pl.bulletSpeed);
+            createEnemyBullet(render, bulletPos, bulletDir, pl.bulletSpeed);
         }
     }
 }
