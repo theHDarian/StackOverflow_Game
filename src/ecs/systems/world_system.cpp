@@ -1,6 +1,7 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
+#include "text_system.hpp"
 
 // stlib
 #include <cassert>
@@ -108,6 +109,12 @@ GLFWwindow* WorldSystem::createWindow() {
 			audio_path("eat_sound.wav").c_str());
 		return nullptr;
 	}
+
+	///////////////////////////////////
+	// load text rendering
+	if (initFreetypeLib() > 0) {
+		std::cout << "Freetype loaded!" << std::endl;
+	}		
 
 	return window;
 }
@@ -259,6 +266,7 @@ void WorldSystem::restartGame() {
 	// Test calls:
 	
 	createTestWall(renderer, {100,200}, {400, 600});
+	createTestWall(renderer, { 100,200 }, { 600, 600 });
 
 	//createBlob(renderer, vec2(600, 300));
 
