@@ -42,6 +42,12 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 		printf("window width_height = %d,%d\n", window_width_px, window_height_px);
 	}
 
+	glfwSetWindowAspectRatio(window,window_width_px,window_height_px);
+	// Window resize callback
+	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+		glViewport(0, 0, width, height);
+	});
+
 	// Hint: Ask your TA for how to setup pretty OpenGL error callbacks. 
 	// This can not be done in macOS, so do not enable
 	// it unless you are on Linux or Windows. You will need to change the window creation

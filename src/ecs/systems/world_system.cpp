@@ -73,7 +73,7 @@ GLFWwindow* WorldSystem::createWindow() {
 #if __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-	glfwWindowHint(GLFW_RESIZABLE, 0);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
@@ -225,7 +225,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 	if (registry.enemies.size() == 0) {
-		createEnemy(renderer, vec2(1280 * uniformDist(rng),720 * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+		createEnemy(renderer, vec2(window_width_px * uniformDist(rng),window_height_px * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
 	}
 
 	// Processing the salmon state
