@@ -443,16 +443,31 @@ void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster, int burst) {
 	IOState& input = registry.ioStates.components[0];
+	Player& pl = registry.players.get(player);
 	if (!input.shouldShoot) {
+		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
+			pl.currBulletBurst++;
+		}
 		return;
 	}
-	Player& pl = registry.players.get(player);
 	if (pl.currFiringInterval > 0) {
 		pl.currFiringInterval -= elapsed_ms_since_last_update;
 	}
+	if (pl.bulletBurstCooldown > 0) {
+		pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
+	}
 	if (pl.currFiringInterval <= 0) {
-		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
+	}
+	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
+		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
+		pl.currBulletBurst--;
+		pl.bulletBurstCooldown = min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst)
+		);
 		// create bullet
 
 		vec2 playerPos = registry.motions.get(player).position;

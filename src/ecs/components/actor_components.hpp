@@ -45,7 +45,7 @@ struct BulletStackEffect {
 struct Player
 {
     float baseSpeed;
-    float baseFiringInterval = 100.0f;
+    float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;
     float baseDashSpeed = 2500.0f;
@@ -64,6 +64,8 @@ struct Player
     int bulletCluster = 1;
 
     int maxBulletBurst = 1;
+    int currBulletBurst = 1;
+    float bulletBurstCooldown = 0;
 };
 
 // Holds the actual data of currStack
