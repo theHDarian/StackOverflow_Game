@@ -14,6 +14,13 @@
 
 using Clock = std::chrono::high_resolution_clock;
 
+#if IMGUI_ENABLED
+	#include "imgui.h"
+	#include "backends/imgui_impl_glfw.h"
+	#include "backends/imgui_impl_opengl3.h"
+	#include "imguiThemes.h"
+#endif
+
 // Entry point
 int main()
 {

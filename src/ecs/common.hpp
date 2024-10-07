@@ -37,6 +37,10 @@ const int window_height_px = 720;
 #define M_PI 3.14159265358979323846f
 #endif
 
+#ifndef IMGUI_ENABLED
+#define IMGUI_ENABLED 1
+#endif
+
 // The 'Transform' component handles transformations passed to the Vertex shader
 // (similar to the gl Immediate mode equivalent, e.g., glTranslate()...)
 // We recomment making all components non-copyable by derving from ComponentNonCopyable
