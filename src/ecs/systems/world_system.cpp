@@ -17,6 +17,7 @@ const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
 uint ENEMY_NUM = 0;
 
+#pragma region init
 // create the underwater world
 WorldSystem::WorldSystem()
 	: points(0) {
@@ -121,9 +122,13 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	// Set all states to default
     restartGame();
 }
+#pragma endregion
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	// Processing inputs
+	handleInput();
+
 	// Updating window title with points
 	std::stringstream title_ss;
 	title_ss << "Points: " << points;
@@ -177,9 +182,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (preDashSpeed[0] == 0 && preDashSpeed[1] == 0) {
 		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
 	}
-
-	// Processing inputs
-	handleInput();
 
     //check dash related variables
     dash(preDashSpeed, elapsed_ms_since_last_update);
@@ -396,15 +398,9 @@ void WorldSystem::handleInput() {
 		input.shouldRestart = false;
 		restartGame();
 	}
+
+	//game playing
 	movePlayer(input.inputAxis);
-
-	if(registry.motions.has(player)) {
-		Motion& playerMotion = registry.motions.get(player);
-		vec2 diff = input.mousePosition - playerMotion.position;
-		float angle = atan2(diff[1],diff[0]);
-		//playerMotion.angle = angle;
-	}
-
 }
 
 void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {

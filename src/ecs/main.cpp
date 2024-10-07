@@ -50,11 +50,14 @@ int main()
 		float elapsed_ms =
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
+		if (ioSystem.isPaused()) {
+		} else {
+			world.step(elapsed_ms);
+			physics.step(elapsed_ms);
+			enemySystem.step(elapsed_ms);
+			world.handleCollisions();
+		}
 
-		world.step(elapsed_ms);
-		physics.step(elapsed_ms);
-		enemySystem.step(elapsed_ms);
-		world.handleCollisions();
 
 		renderer.draw();
 	}

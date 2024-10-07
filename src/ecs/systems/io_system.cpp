@@ -28,8 +28,8 @@ bool IOSystem::init(GLFWwindow* window) {
 // On key callback
 void IOSystem::onKey(int key, int, int action, int mod) {
     IOState& state = registry.ioStates.components[0];
-	if (key == GLFW_KEY_ESCAPE) {
-		state.shouldEnd = true;
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		state.gamePaused = !state.gamePaused;
 	}
 
 	// Resetting game
@@ -97,3 +97,8 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 	}
 
 }
+
+bool IOSystem::isPaused()const {
+	IOState& state = registry.ioStates.components[0];
+	return state.gamePaused;
+};

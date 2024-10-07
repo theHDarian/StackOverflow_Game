@@ -59,6 +59,7 @@ struct ScreenState
 struct IOState {
 	bool shouldEnd;
 	bool shouldRestart;
+	bool gamePaused;
     float shouldDash;
 	bool shouldShoot;
 	vec2 inputAxis;
