@@ -16,7 +16,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 100.f;
+	motion.scale = mesh.original_size * 50.f;
 
 	Player& player = registry.players.emplace(entity);
 	player.baseSpeed = 200;
@@ -283,6 +283,43 @@ Entity createLine(vec2 position, vec2 scale)
 	motion.scale = scale;
 
 	registry.debugComponents.emplace(entity);
+	return entity;
+}
+
+// draws dialogue box
+// may end up setting globals for box position later?
+Entity createDialogueBox(vec2 position, vec2 scale) {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	// consider doing a check of "should I render now"? Or hide entity?
+	registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = scale;
+
+	// change its colour to black for now
+	auto& color = registry.colors.emplace(entity);
+	color.r = 0;
+	color.b = 0;
+	color.g = 0;
+
+	// attach 1 text render request
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	// want to place at top of dialogue box
+	// with current text projection matrix being "flipped" coords
+	text.x = window_width_px - scale.x + 25; // 25 is just some padding
+	text.y = window_height_px - position.y + scale.y/4; // place text slightly above middle of box
+	text.scale = 0.5; // for some reason, scale should be small
+	text.text = "hello this is test dialogue!";
+
 	return entity;
 }
 

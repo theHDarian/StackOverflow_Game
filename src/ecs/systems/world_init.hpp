@@ -38,5 +38,7 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
-
 float getModifiedValue(BulletEffectType bf, float value);
+
+// create dialogue box
+Entity createDialogueBox(vec2 position, vec2 scale);

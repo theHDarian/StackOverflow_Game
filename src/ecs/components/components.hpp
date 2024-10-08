@@ -64,7 +64,7 @@ struct IOState {
 	vec2 inputAxis;
 	vec2 lastInputAxis = {1,1};
 	vec2 mousePosition;
-
+	bool shouldShowDialogue = false;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
@@ -169,6 +169,7 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+	bool show = true;
 };
 
 // Expected sprite states other systems can use
@@ -202,3 +203,18 @@ struct SpriteTimer {
 	TEXTURE_ASSET_ID nextSprite;
 };
 
+// used to store info of what text needs to be rendered
+// currently, 1 request per entity (like how render requests work)
+// but may consider changing (eg: emplace with duplicates)
+// for things like menus that may have many text sections
+struct TextRenderRequest {
+	std::string text;
+
+	// maybe position should be vec2 to match with rest of game?
+	float x;
+	float y;
+
+	// from experience, this is often a small number < 10, not sure why
+	float scale; 
+	glm::vec3 color;
+};

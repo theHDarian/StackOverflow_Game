@@ -40,6 +40,18 @@ void IOSystem::onKey(int key, int, int action, int mod) {
         state.shouldRestart = true;
 	}
 
+	// show/hide dialogue window (temp function)
+	if (action == GLFW_RELEASE && key == GLFW_KEY_E) {
+		if (state.shouldShowDialogue) {
+			state.shouldShowDialogue = false;
+			std::cout << "hiding dialogue box" << std::endl;
+		} 
+		else {
+			state.shouldShowDialogue = true;
+			std::cout << "showing dialogue box" << std::endl;
+		}
+	}
+
 	//Player movement
 	handleMovementInput(key,action,state);
 

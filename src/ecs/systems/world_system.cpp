@@ -11,6 +11,10 @@
 
 #include "physics_system.hpp"
 
+// include these for now
+// but may change to handle like render system does
+#include "text_system.hpp"
+
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
 const size_t MAX_NUM_FISH = 5;
@@ -108,13 +112,7 @@ GLFWwindow* WorldSystem::createWindow() {
 			audio_path("death_sound.wav").c_str(),
 			audio_path("eat_sound.wav").c_str());
 		return nullptr;
-	}
-
-	///////////////////////////////////
-	// load text rendering
-	if (initFreetypeLib() > 0) {
-		std::cout << "Freetype loaded!" << std::endl;
-	}		
+	}	
 
 	return window;
 }
@@ -124,6 +122,12 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	// Playing background music indefinitely
 	Mix_PlayMusic(backgroundMusic, -1);
 	fprintf(stderr, "Loaded music\n");
+
+	///////////////////////////////////
+	// load text rendering
+	if (initFreetypeLib() > 0) {
+		std::cout << "Freetype loaded!" << std::endl;
+	}
 
 	// Set all states to default
     restartGame();
@@ -265,8 +269,8 @@ void WorldSystem::restartGame() {
 
 	// Test calls:
 	
-	createTestWall(renderer, {100,200}, {400, 600});
-	createTestWall(renderer, { 100,200 }, { 600, 600 });
+	createTestWall(renderer, {100,200}, {500, 200});
+	createTestWall(renderer, { 100,200 }, { 100, 600 });
 
 	//createBlob(renderer, vec2(600, 300));
 
@@ -277,7 +281,7 @@ void WorldSystem::restartGame() {
 	//	}
 	//	, 90);
 
-	// spawning 1 enemies to test
+	dialogueBox = createDialogueBox(vec2(window_width_px/2, window_height_px - window_height_px/8), vec2(window_width_px, window_height_px/4));
 }
 
 // Compute collisions between entities
@@ -295,9 +299,9 @@ void WorldSystem::handleCollisions() {
 
 			// Checking Player - Deadly collisions
 			if (registry.enemies.has(entity_other)) {
-				// initiate death unless already dying
+				// initiate death unless entity is invincible
 				if (!registry.invincibles.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
+					// Scream, start invincibility timer
 					registry.invincibles.emplace(entity);
 					Mix_PlayChannel(-1, salmonDeadSound, 0);
 				}
@@ -411,7 +415,8 @@ void WorldSystem::handleInput() {
 		float angle = atan2(diff[1],diff[0]);
 		//playerMotion.angle = angle;
 	}
-
+	
+	registry.renderRequests.get(dialogueBox).show = input.shouldShowDialogue;
 }
 
 void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {

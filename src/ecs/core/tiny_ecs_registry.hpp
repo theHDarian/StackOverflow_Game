@@ -24,6 +24,7 @@ public:
 	ComponentContainer<Sprites> sprites;
 	ComponentContainer<CollisionShape> collisionShapes;
 	ComponentContainer<SpriteTimer> spriteTimers;
+	ComponentContainer<TextRenderRequest> textRenderRequests;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -51,6 +52,7 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&sprites);
 		registry_list.push_back(&spriteTimers);
+		registry_list.push_back(&textRenderRequests);
 
 		registry_list.push_back(&stackCompile);
 		registry_list.push_back(&invincibles);

@@ -19,6 +19,7 @@ class RenderSystem {
 	 */
 	std::array<GLuint, texture_count> texture_gl_handles;
 	std::array<ivec2, texture_count> texture_dimensions;
+	GLuint vao;
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path

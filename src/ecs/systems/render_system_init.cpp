@@ -13,6 +13,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "render_system_init.hpp"
+
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)
 {
@@ -50,7 +52,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 
 	// We are not really using VAO's but without at least one bound we will crash in
 	// some systems.
-	GLuint vao;
+	/*GLuint vao;*/
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	gl_has_errors();

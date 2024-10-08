@@ -11,7 +11,7 @@ void playerHitSprite(Entity& player) {
 		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
 		if (!registry.spriteTimers.has(player)) {
 			auto& spriteTimer = registry.spriteTimers.emplace(player);
-			spriteTimer.count_ms = 100;
+			spriteTimer.count_ms = 250; // hard code value for now, maybe better to use map
 			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
 		}
 	}

@@ -4,6 +4,8 @@
 
 #include "tiny_ecs_registry.hpp"
 
+#include "text_system.hpp"
+
 void RenderSystem::drawTexturedMesh(Entity entity,
 									const mat3 &projection)
 {
@@ -32,6 +34,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
 
 	// Setting vertex and index buffers
+	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
@@ -130,6 +133,7 @@ void RenderSystem::drawToScreen()
 	// Setting shaders
 	// get the water texture, sprite mesh, and program
 	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WATER]);
+	glBindVertexArray(vao);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -208,11 +212,23 @@ void RenderSystem::draw()
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.motions.has(entity))
+		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
+	}
+
+	// copied above method to draw all text components
+	// note: because current rendering system places last rendered things on top
+	// may end up above old things (like player) but below newer things (like newly spawned enemies)
+	for (Entity entity : registry.textRenderRequests.entities)
+	{
+		auto& textReq = registry.textRenderRequests.get(entity);
+		// for now, tie text visibility to entitie's render visibility
+		// but assumption may not always hold
+		if (registry.renderRequests.get(entity).show)
+			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
 
 	// Truely render to the screen

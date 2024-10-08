@@ -61,6 +61,7 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	float currentSpeed;
+	Entity dialogueBox;
 
 	// Player Controls
 	Entity player;
