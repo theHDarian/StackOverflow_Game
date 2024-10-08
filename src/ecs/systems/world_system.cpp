@@ -283,40 +283,18 @@ void WorldSystem::restartGame() {
 
 // Compute collisions between entities
 void WorldSystem::handleCollisions() {
-	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
-		// The entity and its collider
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
 
 		// Player centric collision handling
 		if (registry.players.has(entity)) {
-			//Player& player = registry.players.get(entity);
-
 			// Checking Player - Deadly collisions
-			if (registry.enemies.has(entity_other)) {
-				// initiate death unless already dying
-				if (!registry.invincibles.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
-					registry.invincibles.emplace(entity);
-					Mix_PlayChannel(-1, salmonDeadSound, 0);
-				}
-			}
-
-			// Check Player -> EnemyBullets collision
-			if (registry.enemyBullets.has(entity_other)) {
-				// initiate invincibility unless already invincible
-				if (!registry.invincibles.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
-					registry.invincibles.emplace(entity);
-					Mix_PlayChannel(-1, salmonDeadSound, 0);
-
-					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
-					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
-						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
-					}
-				}
+			if (!registry.invincibles.has(entity)
+				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))
+			) {
+				handlePlayerHit(entity_other);
 			}
 
 			// Checking Player -> Wall collision
@@ -548,6 +526,32 @@ void WorldSystem::movePlayer(vec2 inputAxis) {
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 {
 	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
+}
+
+void WorldSystem::handlePlayerHit(Entity& other) {
+	//change sprite
+	auto& spriteMap = registry.sprites.get(player).sprites;
+	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+		if (!registry.spriteTimers.has(player)) {
+			auto& spriteTimer = registry.spriteTimers.emplace(player);
+			spriteTimer.count_ms = 100;
+			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+		}
+	}
+	//play hit sound
+	Mix_PlayChannel(-1, salmonDeadSound, 0);
+	//add player invincibility frames
+	if (!registry.invincibles.has(player))
+		registry.invincibles.emplace(player);
+
+	//add to stack for enemy bullets
+	if (registry.enemyBullets.has(other)) {
+		EnemyBullet& eBullet = registry.enemyBullets.get(other);
+		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
+			registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+		}
+	}
 }
 
 

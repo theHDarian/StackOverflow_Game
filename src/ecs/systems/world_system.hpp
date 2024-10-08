@@ -44,6 +44,7 @@ private:
 	void restartGame();
 
 	bool playerIsDead();
+	void handlePlayerHit(Entity& other);
 	void handleInput();
 	void movePlayer(vec2 inputAxis);
     void dash(vec2 preDashSpeed, float elapsed_ms_since_last_update);
