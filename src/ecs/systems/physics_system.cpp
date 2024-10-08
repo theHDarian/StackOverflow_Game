@@ -148,7 +148,7 @@ bool PhysicsSystem::PolyToWall(Entity poly, Entity wall) {
 	WallCollider& w = registry.walls.get(wall);
 	
 	// Assumes a small circle around the center of the polygon as the collision point for walls
-	return CircleToLine(m.position, 20, w.startPosition, w.endPosition);
+	return CircleToLine(m.position, registry.polyColliders.get(poly).minLength , w.startPosition, w.endPosition);
 }
 
 // Returns true if the circle is intersecting a side of the polygon, 
@@ -170,6 +170,7 @@ bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
 
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
+	if (CircleToLine({ mA.position.x - mB.position.x, mA.position.y - mB.position.y }, c.radius, s.offsetVertices[0], s.offsetVertices[s.offsetVertices.size()-1])) return true;
 	for (uint i = 1; i < s.offsetVertices.size(); i++) {
 		if (CircleToLine({ mA.position.x - mB.position.x, mA.position.y - mB.position.y }, c.radius, s.offsetVertices[i], s.offsetVertices[i - 1])) return true;
 	}
@@ -181,6 +182,15 @@ bool PhysicsSystem::CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3) {
 	vec2 a = p1 - p2;
 	vec2 b = p3 - p2;
 	vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
-	vec2 d = a - c;
-	return (abs(glm::length(c) + glm::length(p3-p2-c) - glm::length(p3-p2)) < 0.01 && glm::length(d) < r);
+
+	// Circle center projected onto the line is between p2 and p3
+	if (abs(glm::length(c) + glm::length(b - c) - glm::length(b)) < 0.01) {
+		vec2 d = a - c;
+		return (glm::length(d) < r);
+	}
+
+	// Circle is intersecting with p2 or p3
+	if (glm::distance(p1, p2) < r || glm::distance(p1, p3) < r) return true;
+
+	return false;
 }

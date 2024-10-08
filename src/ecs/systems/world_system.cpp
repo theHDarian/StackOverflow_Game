@@ -22,6 +22,7 @@ const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
 
 
+#pragma region init
 // create the underwater world
 WorldSystem::WorldSystem()
 	: points(0) {
@@ -77,14 +78,19 @@ GLFWwindow* WorldSystem::createWindow() {
 #if __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-	glfwWindowHint(GLFW_RESIZABLE, 0);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
+	int window_width_px,window_height_px;
+	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	window_width_px = vidMode->width;
+	window_height_px = vidMode->height;
 	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+	glfwSetWindowMonitor(window,glfwGetPrimaryMonitor(),0,0,window_width_px,window_height_px,GLFW_DONT_CARE);
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -132,9 +138,13 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	// Set all states to default
     restartGame();
 }
+#pragma endregion
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	// Processing inputs
+	handleInput();
+
 	// Updating window title with points
 	std::stringstream title_ss;
 	title_ss << "Points: " << points;
@@ -189,13 +199,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
 	}
 
-	// Processing inputs
-	handleInput();
-
     //check dash related variables
     dash(preDashSpeed, elapsed_ms_since_last_update);
 
-	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster), getModifiedValue(BulletBurst,registry.players.get(player).maxBulletBurst));
+	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
 
 	// Updating the invincibility timer
 	if (registry.invincibles.entities.size() > 0) {
@@ -233,8 +240,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
+	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
-		createEnemy(renderer, vec2(1280 * uniformDist(rng),720 * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
 	}
 
 	// Processing the salmon state
@@ -269,8 +277,8 @@ void WorldSystem::restartGame() {
 
 	// Test calls:
 	
-	createTestWall(renderer, {100,200}, {500, 200});
 	createTestWall(renderer, { 100,200 }, { 100, 600 });
+	createTestWall(renderer, { 100,200 }, { 400, 200 });
 
 	//createBlob(renderer, vec2(600, 300));
 
@@ -281,7 +289,9 @@ void WorldSystem::restartGame() {
 	//	}
 	//	, 90);
 
-	dialogueBox = createDialogueBox(vec2(window_width_px/2, window_height_px - window_height_px/8), vec2(window_width_px, window_height_px/4));
+	// this feels very bad, put as temp fix for getting window size for now
+	WindowState& windowState = registry.windowStates.components[0];
+	dialogueBox = createDialogueBox(vec2(window_width_px /2, windowState.height - windowState.height /8), vec2(windowState.width, windowState.height /4));
 }
 
 // Compute collisions between entities
@@ -333,7 +343,18 @@ void WorldSystem::handleCollisions() {
 				vec2 b = wall.endPosition - wall.startPosition;
 				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 				vec2 d = a - c;
-				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
+				// Player center projects onto the wall;
+				if (abs(glm::length(c) + glm::length(b - c) - glm::length(b)) < 0.01) {
+					motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
+				}
+				// Player circle collides with startPosition
+				else if (glm::length(a) < circle.radius) {
+					motion.position = (wall.startPosition + glm::normalize(a) * (circle.radius));
+				}
+				// Player circle collides with endPosition
+				else if (glm::length(motion.position - wall.endPosition) < circle.radius) {
+					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
+				}
 			}
 		}
 
@@ -408,15 +429,11 @@ void WorldSystem::handleInput() {
 		restartGame();
 	}
 	movePlayer(input.inputAxis);
-
-	if(registry.motions.has(player)) {
-		Motion& playerMotion = registry.motions.get(player);
-		vec2 diff = input.mousePosition - playerMotion.position;
-		float angle = atan2(diff[1],diff[0]);
-		//playerMotion.angle = angle;
-	}
 	
 	registry.renderRequests.get(dialogueBox).show = input.shouldShowDialogue;
+
+	//game playing
+	movePlayer(input.inputAxis);
 }
 
 void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
@@ -453,7 +470,7 @@ void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
     }
 }
 
-void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster, int burst) {
+void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
 	Player& pl = registry.players.get(player);
 	if (!input.shouldShoot) {

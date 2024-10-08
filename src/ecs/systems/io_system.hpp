@@ -16,6 +16,8 @@ public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
 
+    bool isPaused()const;
+
 private:
 	GLFWwindow* window;
     void onKey(int key, int, int action, int mod);

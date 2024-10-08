@@ -168,6 +168,12 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	enemy.state = 10;
 	enemy.attackPattern = EnemyAttackPattern::SINGLE_SHOT;
 
+	Shoots &shoot = registry.shoots.emplace(entity);
+	shoot.maxBulletBurst = 3;
+	shoot.maxFiringInterval = 3000.0f;
+	shoot.bulletSpeed = 300;
+
+
 	registry.sprites.emplace(entity);
 	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::EEL;
 	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
@@ -192,19 +198,25 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.position = pos;
 	motion.velocity = velocity;
 	motion.scale = vec2({ -EEL_BB_WIDTH, EEL_BB_HEIGHT });
 
-	Enemy & enemy = registry.enemies.emplace(entity);
+	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
 	enemy.maxHealth = 100;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
+
+	Shoots &shoot = registry.shoots.emplace(entity);
+	shoot.maxBulletBurst = 3;
+	shoot.maxFiringInterval = 3000.0f;
+	shoot.bulletSpeed = 200;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x)/2;
@@ -231,12 +243,53 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	bullet.bulletSpeed = 1.f;
+	bullet.bulletSpeed = 1.0f;
 	bullet.bulletRange = 50000.f;
 	bullet.bulletBounce = 3;
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = angle;
+	motion.position = pos;
+	motion.velocity = velocity * bullet.bulletSpeed;
+
+
+	motion.scale = bullet.bulletSize; // Ensure scale is initialized
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x / 2;
+
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			spriteComponent.sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
+
+	return entity;
+}
+
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed) {
+	auto entity = Entity();
+
+	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = speed;
+	bullet.bulletRange = 50000.f;
+	bullet.bulletBounce = 3;
+
+	Motion &motion = registry.motions.emplace(entity);
+	motion.angle = atan2(velocity.y, velocity.x);
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
 
@@ -304,19 +357,21 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 	motion.position = position;
 	motion.scale = scale;
 
-	// change its colour to black for now
+	// temp colour
 	auto& color = registry.colors.emplace(entity);
-	color.r = 0;
-	color.b = 0;
-	color.g = 0;
+	color.r = 0.0;
+	color.b = 0.9;
+	color.g = 0.9;
 
 	// attach 1 text render request
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 	// want to place at top of dialogue box
 	// with current text projection matrix being "flipped" coords
-	text.x = window_width_px - scale.x + 25; // 25 is just some padding
-	text.y = window_height_px - position.y + scale.y/4; // place text slightly above middle of box
+	// temp fix for getting window size for now
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = windowState.width - scale.x + 25; // 25 is just some padding
+	text.y = windowState.height - position.y + scale.y/4; // place text slightly above middle of box
 	text.scale = 0.5; // for some reason, scale should be small
 	text.text = "hello this is test dialogue!";
 

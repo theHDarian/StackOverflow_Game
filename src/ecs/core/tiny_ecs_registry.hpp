@@ -18,6 +18,7 @@ public:
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<IOState> ioStates;
+	ComponentContainer<WindowState> windowStates;
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
@@ -33,7 +34,7 @@ public:
 	ComponentContainer<EnemyBullet> enemyBullets;
 	ComponentContainer<PolyCollider> polyColliders;
 	ComponentContainer<WallCollider> walls;
-
+	ComponentContainer<Shoots> shoots;
 
 
 	// constructor that adds all containers for looping over them
@@ -47,6 +48,7 @@ public:
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&ioStates);
+		registry_list.push_back(&windowStates);
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
@@ -62,6 +64,7 @@ public:
 		registry_list.push_back(&polyColliders);
 		registry_list.push_back(&walls);
 		registry_list.push_back(&collisionShapes);
+		registry_list.push_back(&shoots);
 	}
 
 	void clear_all_components() {
