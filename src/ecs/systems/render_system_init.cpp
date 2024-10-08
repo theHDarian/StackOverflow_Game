@@ -60,6 +60,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	window_width_px = vidMode->width;
 	window_height_px = vidMode->height;
+	glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, window_width_px, window_height_px, 120);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
