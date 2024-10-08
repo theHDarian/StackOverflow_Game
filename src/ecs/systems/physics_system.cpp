@@ -53,17 +53,15 @@ void PhysicsSystem::step(float elapsed_ms)
 	// EnemyBullets -> Walls	(Circle to wall for now)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
-		// Will be PolyCollider for enemy bullets
-		// if (CircleToPoly(player, eBullets.entities[i])) {
-		if (CircleToCircle(player, eBullets.entities[i])) {
+		if ((registry.circleColliders.has(eBullets.entities[i]) && CircleToCircle(player, eBullets.entities[i])) || 
+			(registry.polyColliders.has(eBullets.entities[i]) && CircleToPoly(player, eBullets.entities[i]))) {
 			// player hit sprite
 			playerHitSprite(player);
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
 		for (uint j = 0; j < walls.components.size(); j++) {
-			// Will be PolyCollider for enemy bullets
-			// if (PolyToWall(eBullets.entities[i], walls.entities[j])) {
-			if (CircleToWall(eBullets.entities[i], walls.entities[j])) {
+			if ((registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
+				(registry.polyColliders.has(eBullets.entities[i]) && PolyToWall(eBullets.entities[i], walls.entities[j]))) {
 				registry.collisions.emplace_with_duplicates(eBullets.entities[i], walls.entities[j]);
 			}
 		}
