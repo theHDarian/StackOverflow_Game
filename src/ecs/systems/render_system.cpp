@@ -3,6 +3,9 @@
 #include <SDL.h>
 
 #include "tiny_ecs_registry.hpp"
+#include "../utils/enum_string_mapping.hpp"
+
+
 #if IMGUI_ENABLED
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -253,6 +256,7 @@ mat3 RenderSystem::createProjectionMatrix()
 }
 #if IMGUI_ENABLED
 void RenderSystem::drawImGui() {
+	int menuWidth = 200;
 	IOState& ioState = registry.ioStates.components[0];
 	WindowState& windowState = registry.windowStates.components[0];
 	// std::cout << windowState.width << " " << windowState.height << std::endl;
@@ -260,14 +264,37 @@ void RenderSystem::drawImGui() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	const ImVec2& size = ImVec2(200,windowState.height);
+	const ImVec2& size = ImVec2(menuWidth,windowState.height);
 	ImGui::SetNextWindowSize(size);
-	ImGui::SetNextWindowPos(ImVec2(windowState.width - 200, 0));
+	ImGui::SetNextWindowPos(ImVec2(windowState.width - menuWidth, 0));
 	ImGui::Begin("Debug window");
+
+	// BASIC INFORMATION
     ImGui::Text("Enemy Bullet Count: %lu",registry.enemyBullets.size());
 	ImGui::Text("Viewport Size: (%d, %d)",windowState.width,windowState.height);
 	ImGui::Text("Mouse Pos: (%.2f, %.2f)",ioState.mousePosition.x,ioState.mousePosition.y);
-	if (ImGui::Button("Click Me")) {
+	
+	// STACK INFORMATION
+	StackCompile& sc = registry.stackCompile.components[0];
+	ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
+	ImGui::BeginChild("AdditiveContent",ImVec2(180,250),true);
+		std::map<BulletEffectType, float>::iterator it;
+		for (it = sc.additives.begin(); it != sc.additives.end(); it++) {
+			// if (it->second == 0) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	ImGui::TextColored(ImVec4(1,1,0,1), "Multiplicatives");
+	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,250),true);
+		for (it = sc.multiplicatives.begin(); it != sc.multiplicatives.end(); it++) {
+			// if (it->second == 1) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	if (ImGui::Button("Toggle Debug (Not Implemented)")) {
 		std::cout << "clicked" << std::endl; // Call the function when the button is clicked
 	}
     ImGui::End();

@@ -77,15 +77,15 @@ GLFWwindow* WorldSystem::createWindow() {
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
-	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 	window_width_px = vidMode->width;
 	window_height_px = vidMode->height;
-	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
-	glfwSetWindowMonitor(window,glfwGetPrimaryMonitor(),0,0,window_width_px,window_height_px,GLFW_DONT_CARE);
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
