@@ -55,10 +55,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 0)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/stb_image/)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/gl3w)
 
+include_directories(ext/glfw/include)
+
 add_subdirectory(ext/imgui-docking)
 set(IMGUI_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ext/imgui-docking/imgui")
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
-target_include_directories("imgui" PUBLIC ${IMGUI_PATH})
+target_include_directories("imgui" PUBLIC ${IMGUI_PATH} ext/glfw/include)
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)
@@ -115,6 +117,7 @@ elseif (IS_OS_WINDOWS)
 	set(GLFW_DLL "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/lib/glfw3-x86.dll")
 	set(SDL2_DLL "${CMAKE_CURRENT_SOURCE_DIR}/ext/sdl/lib/SDL2-x86.dll")
 	set(SDL2MIXER_DLL "${CMAKE_CURRENT_SOURCE_DIR}/ext/sdl/lib/SDL2_mixer-x86.dll")
+
     endif()
 
     # Copy and rename dlls
@@ -165,6 +168,7 @@ target_include_directories(imgui PUBLIC ${IMGUI_PATH}/backends)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${GLFW_LIBRARIES} ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} glm::glm imgui)
 
 # Needed to add this
+
 if(IS_OS_LINUX)
   target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${CMAKE_DL_LIBS})
 endif()

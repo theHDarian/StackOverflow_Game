@@ -73,14 +73,19 @@ GLFWwindow* WorldSystem::createWindow() {
 #if __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
+	int window_width_px,window_height_px;
+	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	window_width_px = vidMode->width;
+	window_height_px = vidMode->height;
 	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+	glfwSetWindowMonitor(window,glfwGetPrimaryMonitor(),0,0,window_width_px,window_height_px,GLFW_DONT_CARE);
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -224,8 +229,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
+	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
-		createEnemy(renderer, vec2(window_width_px * uniformDist(rng),window_height_px * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
 	}
 
 	// Processing the salmon state

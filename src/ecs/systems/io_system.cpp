@@ -37,6 +37,9 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		state.gamePaused = !state.gamePaused;
 	}
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+		state.shouldEnd = true;
+	}
 
 	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {

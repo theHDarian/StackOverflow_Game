@@ -56,6 +56,11 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	int frame_buffer_width_px, frame_buffer_height_px;
 	glfwGetFramebufferSize(window, &frame_buffer_width_px, &frame_buffer_height_px);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
 
+	int window_width_px,window_height_px;
+	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	window_width_px = vidMode->width;
+	window_height_px = vidMode->height;
+
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
 	windowState.width = window_width_px;
