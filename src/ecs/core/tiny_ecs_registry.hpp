@@ -33,7 +33,7 @@ public:
 	ComponentContainer<EnemyBullet> enemyBullets;
 	ComponentContainer<PolyCollider> polyColliders;
 	ComponentContainer<WallCollider> walls;
-
+	ComponentContainer<Shoots> shoots;
 
 
 	// constructor that adds all containers for looping over them
@@ -62,6 +62,7 @@ public:
 		registry_list.push_back(&polyColliders);
 		registry_list.push_back(&walls);
 		registry_list.push_back(&collisionShapes);
+		registry_list.push_back(&shoots);
 	}
 
 	void clear_all_components() {
