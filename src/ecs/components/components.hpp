@@ -27,12 +27,20 @@ struct PolyCollider {
 	// Points are in order around the polygon
 	std::vector<vec2> offsetVertices;
 	float maxLength;
+	float minLength;
 
 	// Call this function after creating offsetVertices please
+	// Bit pricey though, so if you know the max and min length just hardcode them in!
 	void setMaxLength() {
-		maxLength = 0;
-		for (uint i = 0; i < offsetVertices.size(); i++) {
+		maxLength = glm::distance(offsetVertices[0], { 0,0 });
+		minLength = glm::distance(offsetVertices[0], { 0,0 });
+		for (uint i = 1; i < offsetVertices.size(); i++) {
 			if (glm::distance(offsetVertices[i], { 0,0 }) > maxLength) maxLength = glm::distance(offsetVertices[i], { 0,0 });
+			vec2 a = -offsetVertices[i];
+			vec2 b = offsetVertices[i-1] - offsetVertices[i];
+			vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+			if (glm::distance(a - c, { 0,0 }) < minLength) minLength = glm::distance(a - c, { 0,0 });
+			if (glm::distance(offsetVertices[i], { 0,0 }) < minLength) minLength = glm::distance(offsetVertices[i], { 0,0 });
 		}
 	}
 };

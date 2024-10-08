@@ -266,7 +266,8 @@ void WorldSystem::restartGame() {
 
 	// Test calls:
 	
-	createTestWall(renderer, {100,200}, {400, 600});
+	createTestWall(renderer, { 100,200 }, { 100, 600 });
+	createTestWall(renderer, { 100,200 }, { 400, 200 });
 
 	//createBlob(renderer, vec2(600, 300));
 
@@ -329,7 +330,18 @@ void WorldSystem::handleCollisions() {
 				vec2 b = wall.endPosition - wall.startPosition;
 				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 				vec2 d = a - c;
-				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
+				// Player center projects onto the wall;
+				if (abs(glm::length(c) + glm::length(b - c) - glm::length(b)) < 0.01) {
+					motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
+				}
+				// Player circle collides with startPosition
+				else if (glm::length(a) < circle.radius) {
+					motion.position = (wall.startPosition + glm::normalize(a) * (circle.radius));
+				}
+				// Player circle collides with endPosition
+				else if (glm::length(motion.position - wall.endPosition) < circle.radius) {
+					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
+				}
 			}
 		}
 
