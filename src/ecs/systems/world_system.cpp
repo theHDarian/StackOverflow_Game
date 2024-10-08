@@ -17,6 +17,7 @@ const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
 
 
+#pragma region init
 // create the underwater world
 WorldSystem::WorldSystem()
 	: points(0) {
@@ -72,14 +73,19 @@ GLFWwindow* WorldSystem::createWindow() {
 #if __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-	glfwWindowHint(GLFW_RESIZABLE, 0);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
+	int window_width_px,window_height_px;
+	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	window_width_px = vidMode->width;
+	window_height_px = vidMode->height;
 	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+	glfwSetWindowMonitor(window,glfwGetPrimaryMonitor(),0,0,window_width_px,window_height_px,GLFW_DONT_CARE);
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -121,9 +127,13 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	// Set all states to default
     restartGame();
 }
+#pragma endregion
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	// Processing inputs
+	handleInput();
+
 	// Updating window title with points
 	std::stringstream title_ss;
 	title_ss << "Points: " << points;
@@ -178,9 +188,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
 	}
 
-	// Processing inputs
-	handleInput();
-
     //check dash related variables
     dash(preDashSpeed, elapsed_ms_since_last_update);
 
@@ -222,8 +229,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
+	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
-		createEnemy(renderer, vec2(1280 * uniformDist(rng),720 * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
 	}
 
 	// Processing the salmon state
@@ -395,15 +403,9 @@ void WorldSystem::handleInput() {
 		input.shouldRestart = false;
 		restartGame();
 	}
+
+	//game playing
 	movePlayer(input.inputAxis);
-
-	if(registry.motions.has(player)) {
-		Motion& playerMotion = registry.motions.get(player);
-		vec2 diff = input.mousePosition - playerMotion.position;
-		float angle = atan2(diff[1],diff[0]);
-		//playerMotion.angle = angle;
-	}
-
 }
 
 void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {

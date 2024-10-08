@@ -2,8 +2,12 @@
 
 #include <array>
 #include <utility>
-
 #include "common.hpp"
+
+#if IMGUI_ENABLED
+#include "imgui.h"
+#endif
+
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
@@ -77,6 +81,9 @@ public:
 
 	mat3 createProjectionMatrix();
 
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
@@ -91,6 +98,14 @@ private:
 	GLuint off_screen_render_buffer_depth;
 
 	Entity screen_state_entity;
+
+	#if IMGUI_ENABLED
+	public:
+		ImGuiContext* imgui_context;
+	private:
+		void initImGui();
+		void drawImGui();
+	#endif
 };
 
 bool loadEffectFromFile(

@@ -13,6 +13,28 @@
 #include <iostream>
 #include <sstream>
 
+#if IMGUI_ENABLED
+	#include "imgui.h"
+	#include "backends/imgui_impl_glfw.h"
+	#include "backends/imgui_impl_opengl3.h"
+	#include "backends/imgui_impl_sdl2.h"
+	#include "imguiThemes.h"
+#endif
+
+
+void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	WindowState& windowState = registry.windowStates.components[0];
+	if (windowState.isRetinaDisplay) {
+		windowState.width = width / 2;
+		windowState.height = height / 2;
+	} else {
+		windowState.width = width;
+		windowState.height = height;
+	}
+
+	glViewport(0, 0, windowState.width, windowState.height);
+	// glfwSetWindowSize(window,width,height);
+}
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)
 {
@@ -31,16 +53,31 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	gl_has_errors();
 
-	// For some high DPI displays (ex. Retina Display on Macbooks)
-	// https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value
 	int frame_buffer_width_px, frame_buffer_height_px;
 	glfwGetFramebufferSize(window, &frame_buffer_width_px, &frame_buffer_height_px);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
+
+	int window_width_px,window_height_px;
+	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	window_width_px = vidMode->width;
+	window_height_px = vidMode->height;
+
+	Entity ent = Entity();
+	WindowState& windowState = registry.windowStates.emplace(ent);
+	windowState.width = window_width_px;
+	windowState.height = window_height_px;
+
 	if (frame_buffer_width_px != window_width_px)
 	{
 		printf("WARNING: retina display! https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value\n");
 		printf("glfwGetFramebufferSize = %d,%d\n", frame_buffer_width_px, frame_buffer_height_px);
 		printf("window width_height = %d,%d\n", window_width_px, window_height_px);
+		windowState.isRetinaDisplay = true;
 	}
+
+
+	glfwSetWindowAspectRatio(window,window_width_px,window_height_px);
+	// Window resize callback
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// Hint: Ask your TA for how to setup pretty OpenGL error callbacks. 
 	// This can not be done in macOS, so do not enable
@@ -59,6 +96,9 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	#if IMGUI_ENABLED
+	initImGui();
+	#endif
 
 	return true;
 }
@@ -246,6 +286,12 @@ RenderSystem::~RenderSystem()
 	// remove all entities created by the render system
 	while (registry.renderRequests.entities.size() > 0)
 	    registry.remove_all_components_of(registry.renderRequests.entities.back());
+
+	#if IMGUI_ENABLED
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+	#endif
 }
 
 // Initialize the screen texture from a standard sprite
@@ -377,3 +423,23 @@ bool loadEffectFromFile(
 	return true;
 }
 
+
+#if IMGUI_ENABLED
+void RenderSystem::initImGui() {
+	IMGUI_CHECKVERSION();
+    imgui_context = ImGui::CreateContext();
+	ImGui::SetCurrentContext(imgui_context);
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+}
+#endif

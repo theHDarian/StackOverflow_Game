@@ -3,6 +3,12 @@
 #include <SDL.h>
 
 #include "tiny_ecs_registry.hpp"
+#if IMGUI_ENABLED
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#endif
 
 void RenderSystem::drawTexturedMesh(Entity entity,
 									const mat3 &projection)
@@ -195,7 +201,7 @@ void RenderSystem::draw()
 	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
-	glClearColor(GLfloat(172 / 255), GLfloat(216 / 255), GLfloat(255 / 255), 1.0);
+	glClearColor(GLfloat(32/ 255), GLfloat(43 / 255), GLfloat(81 / 255), 1.0);
 	glClearDepth(10.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -214,6 +220,10 @@ void RenderSystem::draw()
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
 	}
+	#if IMGUI_ENABLED
+	//draw Imgui
+	drawImGui();
+	#endif
 
 	// Truely render to the screen
 	drawToScreen();
@@ -228,10 +238,12 @@ mat3 RenderSystem::createProjectionMatrix()
 	// Fake projection matrix, scales with respect to window coordinates
 	float left = 0.f;
 	float top = 0.f;
+	
 
 	gl_has_errors();
-	float right = (float) window_width_px;
-	float bottom = (float) window_height_px;
+	WindowState& windowState = registry.windowStates.components[0];
+	float right = (float) windowState.width;
+	float bottom = (float) windowState.height;
 
 	float sx = 2.f / (right - left);
 	float sy = 2.f / (top - bottom);
@@ -239,3 +251,28 @@ mat3 RenderSystem::createProjectionMatrix()
 	float ty = -(top + bottom) / (top - bottom);
 	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
 }
+#if IMGUI_ENABLED
+void RenderSystem::drawImGui() {
+	IOState& ioState = registry.ioStates.components[0];
+	WindowState& windowState = registry.windowStates.components[0];
+	// std::cout << windowState.width << " " << windowState.height << std::endl;
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	const ImVec2& size = ImVec2(200,windowState.height);
+	ImGui::SetNextWindowSize(size);
+	ImGui::SetNextWindowPos(ImVec2(windowState.width - 200, 0));
+	ImGui::Begin("Debug window");
+    ImGui::Text("Enemy Bullet Count: %lu",registry.enemyBullets.size());
+	ImGui::Text("Viewport Size: (%d, %d)",windowState.width,windowState.height);
+	ImGui::Text("Mouse Pos: (%.2f, %.2f)",ioState.mousePosition.x,ioState.mousePosition.y);
+	if (ImGui::Button("Click Me")) {
+		std::cout << "clicked" << std::endl; // Call the function when the button is clicked
+	}
+    ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui::UpdatePlatformWindows();
+}
+#endif
