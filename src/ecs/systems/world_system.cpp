@@ -77,15 +77,15 @@ GLFWwindow* WorldSystem::createWindow() {
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
-	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 	window_width_px = vidMode->width;
 	window_height_px = vidMode->height;
-	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
-	glfwSetWindowMonitor(window,glfwGetPrimaryMonitor(),0,0,window_width_px,window_height_px,GLFW_DONT_CARE);
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -183,13 +183,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	vec2 preDashSpeed = registry.motions.get(player).velocity;
-	if (preDashSpeed[0] == 0 && preDashSpeed[1] == 0) {
-		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
-	}
+	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
     //check dash related variables
-    dash(preDashSpeed, elapsed_ms_since_last_update);
+    dash(dashDirection, elapsed_ms_since_last_update);
 
 	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
 
@@ -249,6 +246,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
+	WindowState& wS = registry.windowStates.components[0];
 	printf("Restarting\n");
 
 	// Reset the game speed
@@ -262,13 +260,18 @@ void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createPlayer(renderer,{0,0});
+	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
 
 	// Test calls:
-	
-	createTestWall(renderer, { 100,200 }, { 100, 600 });
-	createTestWall(renderer, { 100,200 }, { 400, 200 });
+	createTestWall(renderer, {100,200}, {500, 200});
+	createTestWall(renderer, {100,200}, {100, 600});
 
+	//bounding walls
+	
+	createTestWall(renderer, {0,0}, {wS.width, 0});
+	createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
+	createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
+	createTestWall(renderer, {0, wS.height}, {0,0});
 	//createBlob(renderer, vec2(600, 300));
 
 	//createTestPoly(renderer, { 500,500 }, {
@@ -283,40 +286,18 @@ void WorldSystem::restartGame() {
 
 // Compute collisions between entities
 void WorldSystem::handleCollisions() {
-	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
-		// The entity and its collider
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
 
 		// Player centric collision handling
 		if (registry.players.has(entity)) {
-			//Player& player = registry.players.get(entity);
-
 			// Checking Player - Deadly collisions
-			if (registry.enemies.has(entity_other)) {
-				// initiate death unless already dying
-				if (!registry.invincibles.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
-					registry.invincibles.emplace(entity);
-					Mix_PlayChannel(-1, salmonDeadSound, 0);
-				}
-			}
-
-			// Check Player -> EnemyBullets collision
-			if (registry.enemyBullets.has(entity_other)) {
-				// initiate invincibility unless already invincible
-				if (!registry.invincibles.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
-					registry.invincibles.emplace(entity);
-					Mix_PlayChannel(-1, salmonDeadSound, 0);
-
-					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
-					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
-						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
-					}
-				}
+			if (!registry.invincibles.has(entity)
+				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))
+			) {
+				handlePlayerHit(entity_other);
 			}
 
 			// Checking Player -> Wall collision
@@ -420,38 +401,48 @@ void WorldSystem::handleInput() {
 	movePlayer(input.inputAxis);
 }
 
-void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
+	// Tick Dash Charge Timer
     Player& pl = registry.players.get(player);
     if (pl.currDashCharges < getModifiedValue(PlayerNumDash, pl.maxDashCharges)) {
-        pl.currDashCooldown -= elapsed_ms_since_last_update;
-        if (pl.currDashCooldown <= 0) {
+		if (pl.currDashCooldown > 0) {
+        	pl.currDashCooldown -= elapsed_ms_since_last_update;
+		} else {
             pl.currDashCharges++;
             pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
         }
     }
-    IOState& input = registry.ioStates.components[0];
-    if (!input.shouldDash) {
-        return;
-    }
-    if (pl.currDashCharges <= 0) {
-        input.shouldDash = 0.0f;
-        return;
-    }
-    Motion& player_motion = registry.motions.get(player);
-            // save the current speed and direction
-    if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
-        if (!registry.invincibles.has(player))
-            registry.invincibles.emplace(player);
-    	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
-        player_motion.velocity = pl.dashSpeed * glm::normalize(preDashSpeed);
-    }
-    else if (input.shouldDash <= 0.0f) {
-        // dash is over, remove invincibility and restore speed
-        player_motion.velocity = preDashSpeed;
-        pl.currDashCharges--;
-        input.shouldDash = 0.0f;
-        return;
-    }
+	// Player wants to start a new dash
+	IOState& input = registry.ioStates.components[0];
+	Motion& playerMotion = registry.motions.get(player);
+	if (input.shouldDash) {
+		input.shouldDash = false;
+
+		if (!registry.dashes.has(player) && pl.currDashCharges > 0) {
+			pl.currDashCharges--;
+			Dash& dash = registry.dashes.emplace(player);
+			dash.dashDirection = direction;
+			dash.startPosition = playerMotion.position;
+		}
+	}
+	// Tick dash timer
+	if (registry.dashes.has(player)) {
+		Dash& dash = registry.dashes.get(player);
+		dash.endTimer -= elapsed_ms_since_last_update;
+		if (dash.endTimer <= 0) {
+			registry.dashes.remove(player);
+			playerMotion.velocity = {0,0};
+		} else {
+			// Tick IFrame timer
+			if (!registry.invincibles.has(player))
+            	registry.invincibles.emplace(player);
+			registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, dash.endTimer);
+
+			// Update Velocity
+			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
+			// std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
+		}
+	}
 }
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
@@ -548,6 +539,32 @@ void WorldSystem::movePlayer(vec2 inputAxis) {
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 {
 	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
+}
+
+void WorldSystem::handlePlayerHit(Entity& other) {
+	//change sprite
+	auto& spriteMap = registry.sprites.get(player).sprites;
+	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+		if (!registry.spriteTimers.has(player)) {
+			auto& spriteTimer = registry.spriteTimers.emplace(player);
+			spriteTimer.count_ms = 100;
+			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+		}
+	}
+	//play hit sound
+	Mix_PlayChannel(-1, salmonDeadSound, 0);
+	//add player invincibility frames
+	if (!registry.invincibles.has(player))
+		registry.invincibles.emplace(player);
+
+	//add to stack for enemy bullets
+	if (registry.enemyBullets.has(other)) {
+		EnemyBullet& eBullet = registry.enemyBullets.get(other);
+		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
+			registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+		}
+	}
 }
 
 

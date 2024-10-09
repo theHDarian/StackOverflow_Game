@@ -239,6 +239,12 @@ struct Homing {
     float homingIntensity; // How quickly it can turn towards the target
 };
 
+struct Dash {
+    vec2 startPosition;
+    float endTimer = 120.0f; //ms
+    vec2 dashDirection;
+};
+
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };

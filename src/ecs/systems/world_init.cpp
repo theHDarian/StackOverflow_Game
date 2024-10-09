@@ -16,7 +16,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 100.f;
+	motion.scale = mesh.original_size * 50.f;
 
 	Player& player = registry.players.emplace(entity);
 	player.baseSpeed = 200;
