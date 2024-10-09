@@ -246,6 +246,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
+	WindowState& wS = registry.windowStates.components[0];
 	printf("Restarting\n");
 
 	// Reset the game speed
@@ -259,13 +260,18 @@ void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createPlayer(renderer,{0,0});
+	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
 
 	// Test calls:
-	
-	createTestWall(renderer, { 100,200 }, { 100, 600 });
-	createTestWall(renderer, { 100,200 }, { 400, 200 });
+	createTestWall(renderer, {100,200}, {500, 200});
+	createTestWall(renderer, {100,200}, {100, 600});
 
+	//bounding walls
+	
+	createTestWall(renderer, {0,0}, {wS.width, 0});
+	createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
+	createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
+	createTestWall(renderer, {0, wS.height}, {0,0});
 	//createBlob(renderer, vec2(600, 300));
 
 	//createTestPoly(renderer, { 500,500 }, {
