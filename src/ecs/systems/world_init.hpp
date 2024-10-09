@@ -14,6 +14,8 @@ const float EEL_BB_HEIGHT  = 0.6f * 202.f;	// 870
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
 
+Entity createAimIndicator(RenderSystem* renderer);
+
 // basic enemy
 Entity createBlob(RenderSystem* renderer, vec2 pos);
 

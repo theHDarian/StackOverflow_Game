@@ -289,6 +289,7 @@ void WorldSystem::restartGame() {
 	registry.list_all_components();
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
+	aimIndicator = createAimIndicator(renderer);
 
 	// Test calls:
 	createTestWall(renderer, {100,200}, {500, 200});
@@ -564,6 +565,15 @@ void WorldSystem::movePlayer() {
 	} else {
 		player_motion.velocity = glm::normalize(inputAxis) * getModifiedValue(PlayerSpeed, registry.players.get(player).baseSpeed);
 	}
+
+	//move aim indicator
+	Motion& aimMotion = registry.motions.get(aimIndicator);
+	vec2 mousePos = input.mousePosition;
+	vec2 diff = mousePos - player_motion.position;
+	float range = 50.0f;
+	aimMotion.angle = atan(diff.y,diff.x);
+	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
+	
 }
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
