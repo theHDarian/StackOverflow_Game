@@ -61,7 +61,7 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 
 	IOState& state = registry.ioStates.components[0];
 	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
-		state.shouldDash = 120.0f;
+		state.shouldDash = true;
 	}
 	if (button == GLFW_MOUSE_BUTTON_1) {
 		state.shouldShoot = (action == GLFW_PRESS  || action == GLFW_REPEAT);
@@ -90,7 +90,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 		}
         if (key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) {
 
-            state.shouldDash = 120.0f;
+            state.shouldDash = true;
         }
 	} else if (action == GLFW_RELEASE) {
 		//on release, reset to last pressed key

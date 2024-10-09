@@ -3,46 +3,64 @@
 #include "world_init.hpp"
 #include <glm/trigonometric.hpp>
 
-// change sprite of player when hit by enemy
-// maybe should be placed somewhere else?
-void playerHitSprite(Entity& player) {
-	auto& spriteMap = registry.sprites.get(player).sprites;
-	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
-		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
-		if (!registry.spriteTimers.has(player)) {
-			auto& spriteTimer = registry.spriteTimers.emplace(player);
-			spriteTimer.count_ms = 100;
-			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
-		}
-	}
-}
-
 void PhysicsSystem::step(float elapsed_ms)
 {
-	// Move based on how much time has passed, this is to (partially) avoid
-	// having entities move at different speed based on the machine.
 	auto& motion_registry = registry.motions;
+	float step_seconds = elapsed_ms / 1000.f;
+	Entity player = registry.players.entities[0];
+	auto& dash_registry = registry.dashes;
+	ComponentContainer<WallCollider>& walls = registry.walls;
+
+	// Move motion entities that are not dashing
 	for(uint i = 0; i< motion_registry.size(); i++)
 	{
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
-
-		float step_seconds = elapsed_ms / 1000.f;
-		//have velocity be relative to local rotation angle
-		// vec2 world_velocity;
-		// world_velocity[0] = cos(motion.angle)*motion.velocity[0] - sin(motion.angle)*motion.velocity[1];
-		// world_velocity[1] = sin(motion.angle) * motion.velocity[0] + cos(motion.angle) * motion.velocity[1];
+		if (dash_registry.has(entity)) 
+			continue;
 		motion.position += motion.velocity * step_seconds;
-		//(void)elapsed_ms; // placeholder to silence unused warning until implemented
+	}
+
+	// Move dashing entities
+	for(uint i = 0; i< dash_registry.size(); i++)
+	{
+		Dash& dash = dash_registry.components[i];
+		Entity entity = dash_registry.entities[i];
+		Motion& motion = motion_registry.get(entity);
+		// check if dashing entity will intersect a wall
+		vec2 startPosition = motion.position;
+		vec2 endPosition = motion.position + motion.velocity * step_seconds;
+		bool hasCollided = false;
+		vec2 closestIntersection;
+		for (uint i = 0; i < walls.components.size(); i++) {
+			WallCollider& wall = walls.components[i];
+			vec2 intersectionPoint;
+			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
+				//get intersection point of the closest wall
+				if (registry.circleColliders.has(entity)) {
+					if (!hasCollided || glm::distance(intersectionPoint,motion.position) < glm::distance(closestIntersection,motion.position)) {
+						closestIntersection = intersectionPoint;
+					}
+					hasCollided = true;
+				} else {
+					std::cout << "Unhandled Dash Component Collision!!" << std::endl;
+				}
+			}
+		}
+
+		if (!hasCollided) {
+			motion.position += motion.velocity * step_seconds;
+		} else { //stop at closest wall
+			CircleCollider& circle = registry.circleColliders.get(entity);
+			vec2 bounceBack = glm::normalize(-motion.velocity) * circle.radius;
+			motion.position = closestIntersection + bounceBack;
+		}
 	}
 
 
 	// Collision tests:
 
-	Entity player = registry.players.entities[0];
-
 	// Player  -> Walls			(Circle to Line)
-	ComponentContainer<WallCollider>& walls = registry.walls;
 	for (uint i = 0; i < walls.components.size(); i++) {
 		if (CircleToWall(player, walls.entities[i])) {
 			registry.collisions.emplace_with_duplicates(player, walls.entities[i]);
@@ -53,17 +71,13 @@ void PhysicsSystem::step(float elapsed_ms)
 	// EnemyBullets -> Walls	(Circle to wall for now)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
-		// Will be PolyCollider for enemy bullets
-		// if (CircleToPoly(player, eBullets.entities[i])) {
-		if (CircleToCircle(player, eBullets.entities[i])) {
-			// player hit sprite
-			playerHitSprite(player);
+		if ((registry.circleColliders.has(eBullets.entities[i]) && CircleToCircle(player, eBullets.entities[i])) || 
+			(registry.polyColliders.has(eBullets.entities[i]) && CircleToPoly(player, eBullets.entities[i]))) {
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
 		for (uint j = 0; j < walls.components.size(); j++) {
-			// Will be PolyCollider for enemy bullets
-			// if (PolyToWall(eBullets.entities[i], walls.entities[j])) {
-			if (CircleToWall(eBullets.entities[i], walls.entities[j])) {
+			if ((registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
+				(registry.polyColliders.has(eBullets.entities[i]) && PolyToWall(eBullets.entities[i], walls.entities[j]))) {
 				registry.collisions.emplace_with_duplicates(eBullets.entities[i], walls.entities[j]);
 			}
 		}
@@ -84,9 +98,6 @@ void PhysicsSystem::step(float elapsed_ms)
 				if (spriteMap.count(SPRITE_STATE::DAMAGED))
 					registry.renderRequests.get(enemies.entities[i]).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
 			}
-
-			// the same can be done with the player
-			playerHitSprite(player);
 
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
 		}
@@ -113,7 +124,6 @@ void PhysicsSystem::step(float elapsed_ms)
 	for (uint i = 0; i < debug.components.size(); i++) {
 		if (CircleToPoly(player, debug.entities[i])) {
 			// player hit sprite
-			playerHitSprite(player);
 			registry.collisions.emplace_with_duplicates(player, debug.entities[i]);
 		}
 	}
@@ -193,4 +203,13 @@ bool PhysicsSystem::CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3) {
 	if (glm::distance(p1, p2) < r || glm::distance(p1, p3) < r) return true;
 
 	return false;
+}
+bool PhysicsSystem::LineToLine(vec2 line1Start,vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint) {
+	auto cross = [](const glm::vec2& v1, const glm::vec2& v2) { return v1.x * v2.y - v1.y * v2.x; };
+    glm::vec2 r = line1End - line1Start, s = line2End - line2Start, pq = line2Start - line1Start;
+    float rxs = cross(r, s);
+    if (rxs == 0) return false; // Lines are parallel
+    float t = cross(pq, s) / rxs, u = cross(pq, r) / rxs;
+	intersectionPoint = line1Start + t * r;
+    return (t >= 0 && t <= 1 && u >= 0 && u <= 1);
 }

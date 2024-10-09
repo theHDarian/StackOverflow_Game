@@ -35,6 +35,7 @@ public:
 	ComponentContainer<WallCollider> walls;
 	ComponentContainer<Shoots> shoots;
     ComponentContainer<Invisible> invisibles;
+	ComponentContainer<Dash> dashes;
 
 
 	// constructor that adds all containers for looping over them
@@ -65,6 +66,7 @@ public:
 		registry_list.push_back(&collisionShapes);
 		registry_list.push_back(&shoots);
         registry_list.push_back(&invisibles);
+		registry_list.push_back(&dashes);
 	}
 
 	void clear_all_components() {

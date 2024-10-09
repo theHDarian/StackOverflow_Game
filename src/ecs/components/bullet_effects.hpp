@@ -33,6 +33,14 @@ BulletStackEffect numBulletsUpA = {
 	""
 };
 
+BulletStackEffect sizeUpA = {
+	ProjectileSize,
+	Additive,
+	10,
+	"sizeUpA",
+	""
+};
+
 BulletStackEffect spreadUpA = {
 	BulletSpread,
 	Additive,

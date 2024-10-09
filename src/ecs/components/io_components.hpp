@@ -11,7 +11,7 @@ struct IOState {
 	bool shouldEnd;
 	bool shouldRestart;
 	bool gamePaused;
-    float shouldDash;
+    bool shouldDash;
 	bool shouldShoot;
 	vec2 inputAxis;
 	vec2 lastInputAxis = {1,1};

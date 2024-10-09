@@ -3,6 +3,9 @@
 #include <SDL.h>
 
 #include "tiny_ecs_registry.hpp"
+#include "../utils/enum_string_mapping.hpp"
+
+
 #if IMGUI_ENABLED
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -135,7 +138,7 @@ void RenderSystem::drawToScreen()
 {
 	// Setting shaders
 	// get the water texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WATER]);
+	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS]);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -159,17 +162,18 @@ void RenderSystem::drawToScreen()
 		index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
 																	 // indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
-	const GLuint water_program = effects[(GLuint)EFFECT_ASSET_ID::WATER];
+	const GLuint postprocess_program = effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS];
 	// Set clock
-	GLuint time_uloc = glGetUniformLocation(water_program, "time");
-	GLuint dead_timer_uloc = glGetUniformLocation(water_program, "darken_screen_factor");
+	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
+	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-	ScreenState &screen = registry.screenStates.get(screen_state_entity);
-	glUniform1f(dead_timer_uloc, screen.darken_screen_factor);
+	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
+	float intensity = (float)stack.currStack.size() / ((stack.baseStackSize + stack.additives[PlayerStackSize]) * stack.multiplicatives[PlayerStackSize]);
+	glUniform1f(chrom_abb_intensity_uloc, intensity);
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
-	GLint in_position_loc = glGetAttribLocation(water_program, "in_position");
+	GLint in_position_loc = glGetAttribLocation(postprocess_program, "in_position");
 	glEnableVertexAttribArray(in_position_loc);
 	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
 	gl_has_errors();
@@ -256,6 +260,7 @@ mat3 RenderSystem::createProjectionMatrix()
 }
 #if IMGUI_ENABLED
 void RenderSystem::drawImGui() {
+	int menuWidth = 200;
 	IOState& ioState = registry.ioStates.components[0];
 	WindowState& windowState = registry.windowStates.components[0];
 	// std::cout << windowState.width << " " << windowState.height << std::endl;
@@ -263,14 +268,37 @@ void RenderSystem::drawImGui() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	const ImVec2& size = ImVec2(200,windowState.height);
+	const ImVec2& size = ImVec2(menuWidth,windowState.height);
 	ImGui::SetNextWindowSize(size);
-	ImGui::SetNextWindowPos(ImVec2(windowState.width - 200, 0));
+	ImGui::SetNextWindowPos(ImVec2(windowState.width - menuWidth, 0));
 	ImGui::Begin("Debug window");
+
+	// BASIC INFORMATION
     ImGui::Text("Enemy Bullet Count: %lu",registry.enemyBullets.size());
 	ImGui::Text("Viewport Size: (%d, %d)",windowState.width,windowState.height);
 	ImGui::Text("Mouse Pos: (%.2f, %.2f)",ioState.mousePosition.x,ioState.mousePosition.y);
-	if (ImGui::Button("Click Me")) {
+	
+	// STACK INFORMATION
+	StackCompile& sc = registry.stackCompile.components[0];
+	ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
+	ImGui::BeginChild("AdditiveContent",ImVec2(180,250),true);
+		std::map<BulletEffectType, float>::iterator it;
+		for (it = sc.additives.begin(); it != sc.additives.end(); it++) {
+			// if (it->second == 0) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	ImGui::TextColored(ImVec4(1,1,0,1), "Multiplicatives");
+	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,250),true);
+		for (it = sc.multiplicatives.begin(); it != sc.multiplicatives.end(); it++) {
+			// if (it->second == 1) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	if (ImGui::Button("Toggle Debug (Not Implemented)")) {
 		std::cout << "clicked" << std::endl; // Call the function when the button is clicked
 	}
     ImGui::End();

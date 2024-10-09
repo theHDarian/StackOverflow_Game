@@ -74,7 +74,7 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize;
+    int baseStackSize = 10;
     std::vector<BulletStackEffect> currStack;
 
     std::map<BulletEffectType, float> additives = {
@@ -242,6 +242,12 @@ struct EnemyBullet {
 struct Homing {
     Entity target;
     float homingIntensity; // How quickly it can turn towards the target
+};
+
+struct Dash {
+    vec2 startPosition;
+    float endTimer = 120.0f; //ms
+    vec2 dashDirection;
 };
 
 // All data relevant to the shape and motion of entities
