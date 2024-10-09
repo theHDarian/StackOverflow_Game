@@ -67,6 +67,7 @@ private:
 
 	// Player Controls
 	Entity player;
+	Entity aimIndicator;
 
 	// music references
 	Mix_Music* backgroundMusic;

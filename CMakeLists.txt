@@ -79,6 +79,13 @@ if (IS_OS_LINUX OR IS_OS_MAC)
     # Since we're on OSX or Linux, we can just use pkgconfig.
     find_package(PkgConfig REQUIRED)
 
+    # Freetype
+    find_package(Freetype REQUIRED)
+    set(FREETYPE_INCLUDE_DIRS "/opt/homebrew/include/freetype2")
+    set(FREETYPE_LIBRARIES "/opt/homebrew/lib/libfreetype.dylib")
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FREETYPE_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${FREETYPE_LIBRARIES})
+
     pkg_search_module(GLFW REQUIRED glfw3)
 
     pkg_search_module(SDL2 REQUIRED sdl2)

@@ -26,13 +26,15 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
     Shoots& shoot = registry.shoots.emplace(entity);
 
 	registry.stackCompile.emplace(entity);
-	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
-	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
+
+	//add player sprite
+	Sprites& playerSprites = registry.sprites.emplace(entity);
+	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
+	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
 	registry.renderRequests.insert(
 		entity,
 		{
-			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+			playerSprites.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -43,7 +45,23 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 	return entity;
 }
-
+Entity createAimIndicator(RenderSystem* renderer) {
+	//add aim indicator
+	auto aimIndicator = Entity();
+	Motion& aimMotion = registry.motions.emplace(aimIndicator);
+	aimMotion.scale = {50,50};
+	Sprites& indicatorSprites =  registry.sprites.emplace(aimIndicator);
+	indicatorSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::AIM_INDICATOR;
+	registry.renderRequests.insert(
+		aimIndicator,
+		{
+			indicatorSprites.sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		}
+	);
+	return aimIndicator;
+}
 // circle outline for circle collision
 Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float radius) {
 	auto entity = Entity();

@@ -39,7 +39,9 @@ class RenderSystem {
 			textures_path("eel.png"),
 			textures_path("circle.png"),
 			textures_path("mcv1_base.png"), 
-			textures_path("mcv1_hit.png") };
+			textures_path("mcv1_hit.png"),
+			textures_path("aim_indicator.png") 
+	};
 
 	std::array<GLuint, effect_count> effects;
 	// Make sure these paths remain in sync with the associated enumerators.
