@@ -439,7 +439,8 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, dash.endTimer);
 
 			// Update Velocity
-			playerMotion.velocity = pl.dashCooldown * glm::normalize(dash.dashDirection);
+			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
+			std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
 		}
 	}
 }
