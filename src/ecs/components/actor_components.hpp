@@ -34,7 +34,7 @@ struct BulletStackEffect {
     EffectCalculation effectCalc;
     float value;
 
-    // For UI
+    // For UIq
     std::string name;
     std::string tooltip;
 
@@ -201,6 +201,10 @@ struct Invincible {
     float countdown = 1000;
 };
 
+struct Invisible {
+    float countdown = 1000;
+};
+
 struct Shoots {
     float currFiringInterval = 0.0f;
     float maxFiringInterval = 1000.0f;
@@ -228,6 +232,7 @@ struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0
     float bulletRange = 1000;
+    float initialRange = 0;
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize =  vec2(20, 10);
     int bulletBounce;
