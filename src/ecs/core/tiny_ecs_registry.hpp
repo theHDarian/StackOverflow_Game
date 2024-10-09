@@ -27,6 +27,7 @@ public:
 	ComponentContainer<CollisionShape> collisionShapes;
 	ComponentContainer<SpriteTimer> spriteTimers;
 	ComponentContainer<TextRenderRequest> textRenderRequests;
+	ComponentContainer<UI> uis;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -59,6 +60,7 @@ public:
 		registry_list.push_back(&sprites);
 		registry_list.push_back(&spriteTimers);
 		registry_list.push_back(&textRenderRequests);
+		registry_list.push_back(&uis);
 
 		registry_list.push_back(&stackCompile);
 		registry_list.push_back(&invincibles);
@@ -95,6 +97,18 @@ public:
 	void remove_all_components_of(Entity e) {
 		for (ContainerInterface* reg : registry_list)
 			reg->remove(e);
+	}
+
+	// deletes all entities associated with entities
+	void deleteEntityAndRelatedEntities(Entity& entity) {
+		// remove all other entities associated with this entity
+		// notably, check collision outlines
+		if (collisionShapes.has(entity)) {
+			for (Entity shape : collisionShapes.get(entity).shapes) {
+				remove_all_components_of(shape);
+			}
+		}
+		remove_all_components_of(entity);
 	}
 };
 

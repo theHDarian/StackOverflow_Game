@@ -72,10 +72,10 @@ void EnemySystem::step(float elapsed_ms)
                 std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
                 if (enemyStat.currHealth <= 0)
                 {
-                    registry.remove_all_components_of(entity);
+                    registry.deleteEntityAndRelatedEntities(entity);
                 }
 
-                registry.remove_all_components_of(other_entity);
+                registry.deleteEntityAndRelatedEntities(other_entity);
             }
         }
 

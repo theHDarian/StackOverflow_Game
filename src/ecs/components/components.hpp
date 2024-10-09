@@ -8,6 +8,7 @@
 #include "map_components.hpp"
 #include "actor_components.hpp"
 #include "io_components.hpp"
+#include "ui_components.hpp"
 
 
 // Stucture to store collision information

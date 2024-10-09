@@ -234,6 +234,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				// remove enemy bullet
 				registry.remove_all_components_of(registry.enemyBullets.entities[i]);
 			}
 		}
@@ -378,7 +379,7 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.remove_all_components_of(entity);
+					registry.deleteEntityAndRelatedEntities(entity);
 				}
 			}
 		}
@@ -404,7 +405,7 @@ void WorldSystem::handleCollisions() {
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.remove_all_components_of(entity);
+					registry.deleteEntityAndRelatedEntities(entity);
 				}
 			}
 		}

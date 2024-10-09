@@ -222,7 +222,7 @@ void RenderSystem::draw()
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity))
+		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
@@ -239,9 +239,11 @@ void RenderSystem::draw()
 	// should put draw UI here
 	// should also remove show from render request
 	// and add ui here
-	//for (Entity entity : registry.uiRender.entities) {
-	//	auto& textReq = registry.textRenderRequests.get(entity);
-	//}
+	for (Entity entity : registry.uis.entities) {
+		if (!registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
 
 	// copied above method to draw all text components
 	for (Entity entity : registry.textRenderRequests.entities)
@@ -263,7 +265,6 @@ mat3 RenderSystem::createProjectionMatrix()
 	// Fake projection matrix, scales with respect to window coordinates
 	float left = 0.f;
 	float top = 0.f;
-	
 
 	gl_has_errors();
 	WindowState& windowState = registry.windowStates.components[0];

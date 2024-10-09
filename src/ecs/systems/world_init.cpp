@@ -379,6 +379,8 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 				 EFFECT_ASSET_ID::EGG,
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
+	registry.uis.emplace(entity);
+
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
@@ -394,6 +396,7 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 	// attach 1 text render request
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
+
 	// want to place at top of dialogue box
 	// with current text projection matrix being "flipped" coords
 	// temp fix for getting window size for now
