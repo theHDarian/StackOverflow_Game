@@ -228,12 +228,11 @@ void RenderSystem::draw()
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
 	}
-	#if IMGUI_ENABLED
-	//draw Imgui
-	drawImGui();
-	#endif
 
 	// Truely render to the screen
+	// since post-processing happens here
+	// consider moving post-processing later if UI elements (like dialogue)
+	// should be affected too
 	drawToScreen();
 
 	// should put draw UI here
@@ -254,6 +253,11 @@ void RenderSystem::draw()
 		if (registry.renderRequests.get(entity).show)
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
+
+	#if IMGUI_ENABLED
+		//draw Imgui
+		drawImGui();
+	#endif
 
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
