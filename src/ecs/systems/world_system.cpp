@@ -183,13 +183,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	vec2 preDashSpeed = registry.motions.get(player).velocity;
-	if (preDashSpeed[0] == 0 && preDashSpeed[1] == 0) {
-		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
-	}
+	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
     //check dash related variables
-    dash(preDashSpeed, elapsed_ms_since_last_update);
+    dash(dashDirection, elapsed_ms_since_last_update);
 
 	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
 
@@ -398,38 +395,47 @@ void WorldSystem::handleInput() {
 	movePlayer(input.inputAxis);
 }
 
-void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
+	// Tick Dash Charge Timer
     Player& pl = registry.players.get(player);
     if (pl.currDashCharges < getModifiedValue(PlayerNumDash, pl.maxDashCharges)) {
-        pl.currDashCooldown -= elapsed_ms_since_last_update;
-        if (pl.currDashCooldown <= 0) {
+		if (pl.currDashCooldown > 0) {
+        	pl.currDashCooldown -= elapsed_ms_since_last_update;
+		} else {
             pl.currDashCharges++;
             pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
         }
     }
-    IOState& input = registry.ioStates.components[0];
-    if (!input.shouldDash) {
-        return;
-    }
-    if (pl.currDashCharges <= 0) {
-        input.shouldDash = 0.0f;
-        return;
-    }
-    Motion& player_motion = registry.motions.get(player);
-            // save the current speed and direction
-    if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
-        if (!registry.invincibles.has(player))
-            registry.invincibles.emplace(player);
-    	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
-        player_motion.velocity = pl.dashSpeed * glm::normalize(preDashSpeed);
-    }
-    else if (input.shouldDash <= 0.0f) {
-        // dash is over, remove invincibility and restore speed
-        player_motion.velocity = preDashSpeed;
-        pl.currDashCharges--;
-        input.shouldDash = 0.0f;
-        return;
-    }
+	// Player wants to start a new dash
+	IOState& input = registry.ioStates.components[0];
+	Motion& playerMotion = registry.motions.get(player);
+	if (input.shouldDash) {
+		input.shouldDash = false;
+
+		if (!registry.dashes.has(player) && pl.currDashCharges > 0) {
+			pl.currDashCharges--;
+			Dash& dash = registry.dashes.emplace(player);
+			dash.dashDirection = direction;
+			dash.startPosition = playerMotion.position;
+		}
+	}
+	// Tick dash timer
+	if (registry.dashes.has(player)) {
+		Dash& dash = registry.dashes.get(player);
+		dash.endTimer -= elapsed_ms_since_last_update;
+		if (dash.endTimer <= 0) {
+			registry.dashes.remove(player);
+			playerMotion.velocity = {0,0};
+		} else {
+			// Tick IFrame timer
+			if (!registry.invincibles.has(player))
+            	registry.invincibles.emplace(player);
+			registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, dash.endTimer);
+
+			// Update Velocity
+			playerMotion.velocity = pl.dashCooldown * glm::normalize(dash.dashDirection);
+		}
+	}
 }
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
