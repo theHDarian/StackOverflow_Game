@@ -291,7 +291,7 @@ void WorldSystem::restartGame() {
 
 	// this feels very bad, put as temp fix for getting window size for now
 	WindowState& windowState = registry.windowStates.components[0];
-	dialogueBox = createDialogueBox(vec2(window_width_px /2, windowState.height - windowState.height /8), vec2(windowState.width, windowState.height /4));
+	dialogueBox = createDialogueBox(vec2(windowState.width /2, windowState.height - windowState.height /8), vec2(windowState.width, windowState.height /4));
 }
 
 // Compute collisions between entities

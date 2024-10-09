@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include "render_system_init.hpp"
+#include "tiny_ecs_registry.hpp"
 
 struct Character {
     unsigned int TextureID;  // ID handle of the glyph texture
@@ -19,13 +20,15 @@ struct Character {
 std::map<GLchar, Character> Characters;
 GLuint text_VAO, VBO;
 GLuint program;
-// projection matrix
-// may consider using one for render system instead
+// projection matrix; may consider using same one as render system instead
 // note: original render system has bottom right be (window width, window height)
 // but this tutorial's projection matrix has top right be (Window width, window height)
-glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_height_px), 0.0f, static_cast<float>(window_height_px));
+glm::mat4 projection;
 
 int initFreetypeLib() {
+    // set up projection matrix
+    WindowState& windowState = registry.windowStates.components[0];
+    projection = glm::ortho(0.0f, static_cast<float>(windowState.width), 0.0f, static_cast<float>(windowState.height));
 
     FT_Library ft;
     if (FT_Init_FreeType(&ft))
@@ -35,7 +38,7 @@ int initFreetypeLib() {
     }
 
     // find path to font
-    std::string font_name = font_path("pixelated.ttf").c_str();
+    std::string font_name = font_path("Pixeled.ttf").c_str();
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
@@ -100,6 +103,8 @@ int initFreetypeLib() {
 
     gl_has_errors();
 
+    // set up VAO for text rendering specifically
+    // but shared VAO with render system might be easier
     glGenVertexArrays(1, &text_VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(text_VAO);
@@ -109,13 +114,9 @@ int initFreetypeLib() {
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     gl_has_errors();
-    // this line below is meant to unbind, but seems to be "unauthorized action" and crash program
-    // might be okay since we always bind before rendering
-    // or maybe there's another way to do it?
     glBindVertexArray(0); 
     gl_has_errors();
 
-    // shouldn't be "twice loaded" but render system init
     bool is_valid = loadEffectFromFile(shader_path("text.vs.glsl").c_str(), shader_path("text.fs.glsl").c_str(), program);
     assert(is_valid && (GLuint)program != 0);
     gl_has_errors();
@@ -128,14 +129,13 @@ void RenderText(std::string text, float x, float y, float scale, glm::vec3 color
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // activate corresponding render state
-    // maybe hard code current text rendering program?
+    // activate corresponding render state, hard code to just 1 text rendering program for now
+    // (can also pass shader itself as parameter and use that)
     glUseProgram(program);
     gl_has_errors();
 
-    unsigned int transformLoc = glGetUniformLocation(program, "projection");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    //glUniformMatrix4fv(glGetUniformLocation(transformLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    unsigned int projectionLoc = glGetUniformLocation(program, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     gl_has_errors();
 
     glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);

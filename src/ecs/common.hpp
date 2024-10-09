@@ -31,12 +31,6 @@ inline std::string audio_path(const std::string& name) {return data_path() + "/a
 inline std::string mesh_path(const std::string& name) {return data_path() + "/meshes/" + std::string(name);};
 inline std::string font_path(const std::string& name) { return data_path() + "/fonts/" + std::string(name); };
 
-// leave here for now until figure out how to share window size across all systems
-// notably, the text rendering system needs it upon init
-// so it should be instantiated after the windowstate is, but haven't figured out where
-const int window_width_px = 1920;
-const int window_height_px = 1200;
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif
