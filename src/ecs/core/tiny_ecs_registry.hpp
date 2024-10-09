@@ -18,6 +18,7 @@ public:
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<IOState> ioStates;
+	ComponentContainer<GameState> gameStates;
 	ComponentContainer<WindowState> windowStates;
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<DebugComponent> debugComponents;
@@ -48,6 +49,7 @@ public:
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&ioStates);
+		registry_list.push_back(&gameStates);
 		registry_list.push_back(&windowStates);
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&debugComponents);

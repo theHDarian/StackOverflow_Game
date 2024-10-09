@@ -10,14 +10,17 @@ struct WindowState {
 struct IOState {
 	bool shouldEnd;
 	bool shouldRestart;
-	bool gamePaused;
     bool shouldDash;
 	bool shouldShoot;
 	vec2 inputAxis;
 	vec2 lastInputAxis = {1,1};
 	vec2 mousePosition;
 
-
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
+};
+
+struct GameState {
+	bool gamePaused;
+	bool gameOver;
 };

@@ -24,7 +24,6 @@ void PhysicsSystem::step(float elapsed_ms)
 	// Move dashing entities
 	for(uint i = 0; i< dash_registry.size(); i++)
 	{
-		Dash& dash = dash_registry.components[i];
 		Entity entity = dash_registry.entities[i];
 		Motion& motion = motion_registry.get(entity);
 		// check if dashing entity will intersect a wall

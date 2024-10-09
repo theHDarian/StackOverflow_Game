@@ -17,6 +17,7 @@ public:
 	bool init(GLFWwindow* window);
 
     bool isPaused()const;
+    bool isGameOver()const;
 
 private:
 	GLFWwindow* window;

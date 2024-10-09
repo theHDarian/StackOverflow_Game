@@ -240,7 +240,6 @@ struct Homing {
 };
 
 struct Dash {
-    vec2 startPosition;
     float endTimer = 120.0f; //ms
     vec2 dashDirection;
 };
