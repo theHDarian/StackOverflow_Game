@@ -34,6 +34,7 @@ public:
 	ComponentContainer<PolyCollider> polyColliders;
 	ComponentContainer<WallCollider> walls;
 	ComponentContainer<Shoots> shoots;
+    ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
 
 
@@ -64,6 +65,7 @@ public:
 		registry_list.push_back(&walls);
 		registry_list.push_back(&collisionShapes);
 		registry_list.push_back(&shoots);
+        registry_list.push_back(&invisibles);
 		registry_list.push_back(&dashes);
 	}
 
