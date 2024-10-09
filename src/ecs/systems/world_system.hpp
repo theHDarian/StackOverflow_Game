@@ -39,14 +39,15 @@ public:
 	bool isOver()const;
 
 	void closeGame();
+	void handleInput();
 private:
 	// restart level
 	void restartGame();
 
 	bool playerIsDead();
 	void handlePlayerHit(Entity& other);
-	void handleInput();
-	void movePlayer(vec2 inputAxis);
+	
+	void movePlayer();
     void dash(vec2 direction, float elapsed_ms_since_last_update);
 
 	void shoot(float elapsed_ms_since_last_update, int cluster = 1);

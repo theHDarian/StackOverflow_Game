@@ -185,6 +185,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
+	movePlayer();
     //check dash related variables
     dash(dashDirection, elapsed_ms_since_last_update);
 
@@ -258,6 +259,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
+	GameState& gameState = registry.gameStates.components[0];
+	gameState.gameOver = false;
+	gameState.gamePaused = false;
+
 	WindowState& wS = registry.windowStates.components[0];
 	printf("Restarting\n");
 
@@ -408,9 +413,6 @@ void WorldSystem::handleInput() {
 		input.shouldRestart = false;
 		restartGame();
 	}
-
-	//game playing
-	movePlayer(input.inputAxis);
 }
 
 void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
@@ -434,7 +436,6 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCharges--;
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
-			dash.startPosition = playerMotion.position;
 		}
 	}
 	// Tick dash timer
@@ -539,7 +540,9 @@ bool WorldSystem::isOver() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
-void WorldSystem::movePlayer(vec2 inputAxis) {
+void WorldSystem::movePlayer() {
+	IOState &input = registry.ioStates.components[0];
+	vec2 inputAxis = input.inputAxis;
 	Motion& player_motion = registry.motions.get(player);
 	if (glm::length(inputAxis) <= 0.0f) {
 		player_motion.velocity = {0,0};
@@ -574,7 +577,10 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	if (registry.enemyBullets.has(other)) {
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
 		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
-			registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+			if (!success) {
+				registry.gameStates.components[0].gameOver = true;
+			}
 		}
 	}
 }

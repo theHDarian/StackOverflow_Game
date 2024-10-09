@@ -298,8 +298,8 @@ void RenderSystem::drawImGui() {
 		}
 	ImGui::EndChild();
 
-	if (ImGui::Button("Toggle Debug (Not Implemented)")) {
-		std::cout << "clicked" << std::endl; // Call the function when the button is clicked
+	if (ImGui::Button("Restart Game")) {
+		registry.ioStates.components[0].shouldRestart = true;
 	}
     ImGui::End();
 	ImGui::Render();
