@@ -440,7 +440,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 
 			// Update Velocity
 			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
-			std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
+			// std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
 		}
 	}
 }

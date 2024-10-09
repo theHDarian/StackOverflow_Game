@@ -30,22 +30,30 @@ void PhysicsSystem::step(float elapsed_ms)
 		// check if dashing entity will intersect a wall
 		vec2 startPosition = motion.position;
 		vec2 endPosition = motion.position + motion.velocity * step_seconds;
+		bool hasCollided = false;
+		vec2 closestIntersection;
 		for (uint i = 0; i < walls.components.size(); i++) {
 			WallCollider& wall = walls.components[i];
 			vec2 intersectionPoint;
 			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
-				//move player to the starting side
-				std::cout << intersectionPoint.x << " " << intersectionPoint.y << std::endl;
+				//get intersection point of the closest wall
 				if (registry.circleColliders.has(entity)) {
-					CircleCollider& circle = registry.circleColliders.get(entity);
-					vec2 bounceBack = glm::normalize(-motion.velocity) * circle.radius;
-					motion.position = intersectionPoint + bounceBack;
+					if (!hasCollided || glm::distance(intersectionPoint,motion.position) < glm::distance(closestIntersection,motion.position)) {
+						closestIntersection = intersectionPoint;
+					}
+					hasCollided = true;
 				} else {
 					std::cout << "Unhandled Dash Component Collision!!" << std::endl;
 				}
-			} else {
-				motion.position += motion.velocity * step_seconds;
 			}
+		}
+
+		if (!hasCollided) {
+			motion.position += motion.velocity * step_seconds;
+		} else { //stop at closest wall
+			CircleCollider& circle = registry.circleColliders.get(entity);
+			vec2 bounceBack = glm::normalize(-motion.velocity) * circle.radius;
+			motion.position = closestIntersection + bounceBack;
 		}
 	}
 
