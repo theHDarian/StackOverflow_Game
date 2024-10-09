@@ -299,6 +299,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
+	bullet.bulletEffects.push_back(sizeUpA);
 
 	auto& spriteComponent = registry.sprites.emplace(entity);
 	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
