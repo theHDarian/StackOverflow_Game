@@ -370,8 +370,8 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 	// temp colour
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
-	color.b = 0.9;
-	color.g = 0.9;
+	color.b = 1.0;
+	color.g = 1.0;
 
 	// attach 1 text render request
 	auto& text = registry.textRenderRequests.emplace(entity);

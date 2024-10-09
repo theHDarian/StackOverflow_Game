@@ -233,9 +233,17 @@ void RenderSystem::draw()
 	drawImGui();
 	#endif
 
+	// Truely render to the screen
+	drawToScreen();
+
+	// should put draw UI here
+	// should also remove show from render request
+	// and add ui here
+	//for (Entity entity : registry.uiRender.entities) {
+	//	auto& textReq = registry.textRenderRequests.get(entity);
+	//}
+
 	// copied above method to draw all text components
-	// note: because current rendering system places last rendered things on top
-	// may end up above old things (like player) but below newer things (like newly spawned enemies)
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
 		auto& textReq = registry.textRenderRequests.get(entity);
@@ -244,9 +252,6 @@ void RenderSystem::draw()
 		if (registry.renderRequests.get(entity).show)
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
-
-	// Truely render to the screen
-	drawToScreen();
 
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
