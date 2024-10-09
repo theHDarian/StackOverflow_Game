@@ -459,7 +459,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
-	Player& pl = registry.players.get(player);
+	Shoots& pl = registry.shoots.get(player);
 	if (!input.shouldShoot) {
 		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
 			pl.currBulletBurst++;

@@ -58,14 +58,7 @@ struct Player
     float currDashCooldown = 0.0f;
     float dashCooldown = baseDashCDR;
 
-    float currFiringInterval = 0.0f;
-    float maxFiringInterval = baseFiringInterval;
-
     int bulletCluster = 1;
-
-    int maxBulletBurst = 1;
-    int currBulletBurst = 1;
-    float bulletBurstCooldown = 0;
 };
 
 // Holds the actual data of currStack
@@ -207,7 +200,7 @@ struct Invisible {
 
 struct Shoots {
     float currFiringInterval = 0.0f;
-    float maxFiringInterval = 1000.0f;
+    float maxFiringInterval = 300.0f;
     float bulletSpeed = 400;
 
     int maxBulletBurst = 1;
