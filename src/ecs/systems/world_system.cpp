@@ -227,6 +227,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
+
+    //check invisibity countdown
+    if (registry.invisibles.entities.size() > 0) {
+        for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
+            Invisible& entity = registry.invisibles.components[i];
+            if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+                registry.invisibles.remove(registry.invisibles.entities[i]);
+            }
+        }
+    }
+
+
 	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
 		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
@@ -448,7 +460,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
-	Player& pl = registry.players.get(player);
+	Shoots& pl = registry.shoots.get(player);
 	if (!input.shouldShoot) {
 		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
 			pl.currBulletBurst++;
@@ -477,7 +489,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 
 		vec2 playerPos = registry.motions.get(player).position;
 		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
-		vec2 bulletPos = playerPos + bulletDir * 100.f;
+		vec2 bulletPos = playerPos + bulletDir;
 
 		if (cluster == 1) {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
