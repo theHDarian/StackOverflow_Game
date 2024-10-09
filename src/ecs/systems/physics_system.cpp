@@ -5,25 +5,54 @@
 
 void PhysicsSystem::step(float elapsed_ms)
 {
-	// Move based on how much time has passed, this is to (partially) avoid
-	// having entities move at different speed based on the machine.
 	auto& motion_registry = registry.motions;
+	float step_seconds = elapsed_ms / 1000.f;
+	Entity player = registry.players.entities[0];
+	auto& dash_registry = registry.dashes;
+	ComponentContainer<WallCollider>& walls = registry.walls;
+
+	// Move motion entities that are not dashing
 	for(uint i = 0; i< motion_registry.size(); i++)
 	{
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
-
-		float step_seconds = elapsed_ms / 1000.f;
+		if (dash_registry.has(entity)) 
+			continue;
 		motion.position += motion.velocity * step_seconds;
+	}
+
+	// Move dashing entities
+	for(uint i = 0; i< dash_registry.size(); i++)
+	{
+		Dash& dash = dash_registry.components[i];
+		Entity entity = dash_registry.entities[i];
+		Motion& motion = motion_registry.get(entity);
+		// check if dashing entity will intersect a wall
+		vec2 startPosition = motion.position;
+		vec2 endPosition = motion.position + motion.velocity * step_seconds;
+		for (uint i = 0; i < walls.components.size(); i++) {
+			WallCollider& wall = walls.components[i];
+			vec2 intersectionPoint;
+			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
+				//move player to the starting side
+				std::cout << intersectionPoint.x << " " << intersectionPoint.y << std::endl;
+				if (registry.circleColliders.has(entity)) {
+					CircleCollider& circle = registry.circleColliders.get(entity);
+					vec2 bounceBack = glm::normalize(-motion.velocity) * circle.radius;
+					motion.position = intersectionPoint + bounceBack;
+				} else {
+					std::cout << "Unhandled Dash Component Collision!!" << std::endl;
+				}
+			} else {
+				motion.position += motion.velocity * step_seconds;
+			}
+		}
 	}
 
 
 	// Collision tests:
 
-	Entity player = registry.players.entities[0];
-
 	// Player  -> Walls			(Circle to Line)
-	ComponentContainer<WallCollider>& walls = registry.walls;
 	for (uint i = 0; i < walls.components.size(); i++) {
 		if (CircleToWall(player, walls.entities[i])) {
 			registry.collisions.emplace_with_duplicates(player, walls.entities[i]);
@@ -168,4 +197,13 @@ bool PhysicsSystem::CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3) {
 	if (glm::distance(p1, p2) < r || glm::distance(p1, p3) < r) return true;
 
 	return false;
+}
+bool PhysicsSystem::LineToLine(vec2 line1Start,vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint) {
+	auto cross = [](const glm::vec2& v1, const glm::vec2& v2) { return v1.x * v2.y - v1.y * v2.x; };
+    glm::vec2 r = line1End - line1Start, s = line2End - line2Start, pq = line2Start - line1Start;
+    float rxs = cross(r, s);
+    if (rxs == 0) return false; // Lines are parallel
+    float t = cross(pq, s) / rxs, u = cross(pq, r) / rxs;
+	intersectionPoint = line1Start + t * r;
+    return (t >= 0 && t <= 1 && u >= 0 && u <= 1);
 }
