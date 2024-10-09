@@ -23,6 +23,8 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2;
 
+    Shoots& shoot = registry.shoots.emplace(entity);
+
 	registry.stackCompile.emplace(entity);
 	registry.sprites.emplace(entity);
 	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
@@ -255,6 +257,10 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 
 	motion.scale = bullet.bulletSize; // Ensure scale is initialized
 
+    Invisible& inv = registry.invisibles.emplace(entity);
+    float vel = sqrt(pow(motion.velocity.x, 2) + pow(motion.velocity.y, 2));
+    inv.countdown = (75.0f/vel) * 1000.0f;
+
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
@@ -293,12 +299,16 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
 
+    Invisible& inv = registry.invisibles.emplace(entity);
+    inv.countdown = (75.0f/bullet.bulletSpeed) * 1000.0f;
+
 
 	motion.scale = bullet.bulletSize; // Ensure scale is initialized
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
+	bullet.bulletEffects.push_back(sizeUpA);
 
 	auto& spriteComponent = registry.sprites.emplace(entity);
 	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
@@ -394,6 +404,9 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 	bullet.bulletSize = getModifiedValue(ProjectileSize,  bullet.bulletSize);
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
 	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
+
+    Invisible& inv = registry.invisibles.emplace(entity);
+    inv.countdown = (75.0f/bullet.bulletSpeed) * 1000.0f;
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);

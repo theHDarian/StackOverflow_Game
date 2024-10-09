@@ -57,7 +57,8 @@ int main()
 		float elapsed_ms =
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
-		if (ioSystem.isPaused()) {
+		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
+			world.handleInput();
 		} else {
 			world.step(elapsed_ms);
 			physics.step(elapsed_ms);

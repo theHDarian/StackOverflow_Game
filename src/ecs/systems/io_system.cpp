@@ -15,8 +15,9 @@ IOSystem::~IOSystem() {
 bool IOSystem::init(GLFWwindow* window) {
     this->window = window;
 
-    Entity ioEntity = Entity();
-    registry.ioStates.emplace(ioEntity);
+    Entity ent = Entity();
+    registry.ioStates.emplace(ent);
+	registry.gameStates.emplace(ent);
 
     auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onKey(_0, _1, _2, _3); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onMouseMove({ _0, _1 }); };
@@ -33,12 +34,13 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	#if IMGUI_ENABLED
 	ImGui_ImplGlfw_KeyCallback(window, key,_,action,mod);
 	#endif
-    IOState& state = registry.ioStates.components[0];
+    IOState& ioState = registry.ioStates.components[0];
+	GameState& gameState = registry.gameStates.components[0];
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		state.gamePaused = !state.gamePaused;
+		gameState.gamePaused = !gameState.gamePaused;
 	}
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-		state.shouldEnd = true;
+		ioState.shouldEnd = true;
 	}
 
 	// Resetting game
@@ -46,23 +48,23 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
 
-        state.shouldRestart = true;
+        ioState.shouldRestart = true;
 	}
 
 	// show/hide dialogue window (temp function)
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E) {
-		if (state.shouldShowDialogue) {
-			state.shouldShowDialogue = false;
+		if (ioState.shouldShowDialogue) {
+			ioState.shouldShowDialogue = false;
 			std::cout << "hiding dialogue box" << std::endl;
 		} 
 		else {
-			state.shouldShowDialogue = true;
+			ioState.shouldShowDialogue = true;
 			std::cout << "showing dialogue box" << std::endl;
 		}
 	}
 
 	//Player movement
-	handleMovementInput(key,action,state);
+	handleMovementInput(key,action,ioState);
 
 }
 
@@ -73,7 +75,7 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 
 	IOState& state = registry.ioStates.components[0];
 	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
-		state.shouldDash = 120.0f;
+		state.shouldDash = true;
 	}
 	if (button == GLFW_MOUSE_BUTTON_1) {
 		state.shouldShoot = (action == GLFW_PRESS  || action == GLFW_REPEAT);
@@ -102,7 +104,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 		}
         if (key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) {
 
-            state.shouldDash = 120.0f;
+            state.shouldDash = true;
         }
 	} else if (action == GLFW_RELEASE) {
 		//on release, reset to last pressed key
@@ -127,6 +129,8 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 }
 
 bool IOSystem::isPaused()const {
-	IOState& state = registry.ioStates.components[0];
-	return state.gamePaused;
+	return registry.gameStates.components[0].gamePaused;
 };
+bool IOSystem::isGameOver()const {
+	return registry.gameStates.components[0].gameOver;
+}

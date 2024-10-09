@@ -53,8 +53,8 @@ struct WallCollider {
 
 // Data structure for toggling debug mode
 struct Debug {
-	bool in_debug_mode = 0;
-	bool in_freeze_mode = 0;
+	bool in_debug_mode = false;
+	bool in_freeze_mode = false;
 };
 extern Debug debugging;
 
@@ -144,8 +144,8 @@ enum class EFFECT_ASSET_ID {
 	EGG = COLOURED + 1,
 	SALMON = EGG + 1,
 	TEXTURED = SALMON + 1,
-	WATER = TEXTURED + 1,
-	EFFECT_COUNT = WATER + 1
+	POSTPROCESS = TEXTURED + 1,
+	EFFECT_COUNT = POSTPROCESS + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

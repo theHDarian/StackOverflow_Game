@@ -34,7 +34,7 @@ struct BulletStackEffect {
     EffectCalculation effectCalc;
     float value;
 
-    // For UI
+    // For UIq
     std::string name;
     std::string tooltip;
 
@@ -58,14 +58,7 @@ struct Player
     float currDashCooldown = 0.0f;
     float dashCooldown = baseDashCDR;
 
-    float currFiringInterval = 0.0f;
-    float maxFiringInterval = baseFiringInterval;
-
     int bulletCluster = 1;
-
-    int maxBulletBurst = 1;
-    int currBulletBurst = 1;
-    float bulletBurstCooldown = 0;
 };
 
 // Holds the actual data of currStack
@@ -74,7 +67,7 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize;
+    int baseStackSize = 10;
     std::vector<BulletStackEffect> currStack;
 
     std::map<BulletEffectType, float> additives = {
@@ -201,9 +194,13 @@ struct Invincible {
     float countdown = 1000;
 };
 
+struct Invisible {
+    float countdown = 1000;
+};
+
 struct Shoots {
     float currFiringInterval = 0.0f;
-    float maxFiringInterval = 1000.0f;
+    float maxFiringInterval = 300.0f;
     float bulletSpeed = 400;
 
     int maxBulletBurst = 1;
@@ -228,6 +225,7 @@ struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0
     float bulletRange = 1000;
+    float initialRange = 0;
     // Enemy bullet can scale x,y independently?
     vec2 bulletSize =  vec2(20, 10);
     int bulletBounce;
@@ -237,6 +235,11 @@ struct EnemyBullet {
 struct Homing {
     Entity target;
     float homingIntensity; // How quickly it can turn towards the target
+};
+
+struct Dash {
+    float endTimer = 120.0f; //ms
+    vec2 dashDirection;
 };
 
 // All data relevant to the shape and motion of entities
