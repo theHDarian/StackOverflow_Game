@@ -48,8 +48,7 @@ private:
 	void handleInput();
 	void movePlayer(vec2 inputAxis);
     void dash(vec2 direction, float elapsed_ms_since_last_update);
-
-	void shoot(float elapsed_ms_since_last_update, int cluster = 1);
+    void shoot(float elapsed_ms_since_last_update, int cluster = 1);
 
 	float getModifiedValue(BulletEffectType bf, float value);
 
