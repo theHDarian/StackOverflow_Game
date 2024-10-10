@@ -35,8 +35,8 @@ WorldSystem::~WorldSystem() {
 	// destroy music components
 	if (backgroundMusic != nullptr)
 		Mix_FreeMusic(backgroundMusic);
-	if (salmonDeadSound != nullptr)
-		Mix_FreeChunk(salmonDeadSound);
+	if (playerHurtSound != nullptr)
+		Mix_FreeChunk(playerHurtSound);
 	if (salmonEatSound != nullptr)
 		Mix_FreeChunk(salmonEatSound);
 
@@ -109,13 +109,13 @@ GLFWwindow* WorldSystem::createWindow() {
 	}
 
 	backgroundMusic = Mix_LoadMUS(audio_path("music.wav").c_str());
-	salmonDeadSound = Mix_LoadWAV(audio_path("death_sound.wav").c_str());
+	playerHurtSound = Mix_LoadWAV(audio_path("player_hurtv1.wav").c_str());
 	salmonEatSound = Mix_LoadWAV(audio_path("eat_sound.wav").c_str());
 
-	if (backgroundMusic == nullptr || salmonDeadSound == nullptr || salmonEatSound == nullptr) {
+	if (backgroundMusic == nullptr || playerHurtSound == nullptr || salmonEatSound == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
-			audio_path("death_sound.wav").c_str(),
+			audio_path("player_hurtv1.wav").c_str(),
 			audio_path("eat_sound.wav").c_str());
 		return nullptr;
 	}	
@@ -593,7 +593,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		}
 	}
 	//play hit sound
-	Mix_PlayChannel(-1, salmonDeadSound, 0);
+	Mix_PlayChannel(-1, playerHurtSound, 0);
 	//add player invincibility frames
 	if (!registry.invincibles.has(player))
 		registry.invincibles.emplace(player);
