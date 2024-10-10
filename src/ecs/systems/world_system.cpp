@@ -500,6 +500,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
 	Shoots& pl = registry.shoots.get(player);
+    Motion& player_motion = registry.motions.get(player);
+    vec2 playerPos = player_motion.position;
+    vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);
+    player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
 	if (!input.shouldShoot) {
 		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
 			pl.currBulletBurst++;
@@ -525,9 +529,6 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				BulletBurst, pl.maxBulletBurst)
 		);
 		// create bullet
-
-		vec2 playerPos = registry.motions.get(player).position;
-		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
 		vec2 bulletPos = playerPos + bulletDir;
 
 		if (cluster == 1) {
