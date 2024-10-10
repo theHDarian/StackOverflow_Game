@@ -459,6 +459,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
+	Shoots& pl = registry.shoots.get(player);
 	Player& pl = registry.players.get(player);
     Motion& player_motion = registry.motions.get(player);
     vec2 playerPos = player_motion.position;
