@@ -235,9 +235,9 @@ void RenderSystem::draw()
 	// should be affected too
 	drawToScreen();
 
-	// should put draw UI here
+	// should put draw UI here (ideally using its own rendering system,
+	// and own projection matrix)
 	// should also remove show from render request
-	// and add ui here
 	for (Entity entity : registry.uis.entities) {
 		if (!registry.renderRequests.get(entity).show)
 			continue;

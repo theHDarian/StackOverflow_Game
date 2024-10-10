@@ -274,6 +274,7 @@ void WorldSystem::restartGame() {
 	GameState& gameState = registry.gameStates.components[0];
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
+	gameState.dialogueScene = false;
 
 	WindowState& wS = registry.windowStates.components[0];
 	printf("Restarting\n");
@@ -314,6 +315,8 @@ void WorldSystem::restartGame() {
 	// this feels very bad, put as temp fix for getting window size for now
 	WindowState& windowState = registry.windowStates.components[0];
 	dialogueBox = createDialogueBox(vec2(windowState.width /2, windowState.height - windowState.height /8), vec2(windowState.width, windowState.height /4));
+	pauseMenu = createPauseMenu(vec2(windowState.width / 2, windowState.height / 2), vec2(windowState.width, windowState.height / 4));
+	gameOverMenu = createGameOverMenu(vec2(windowState.width / 2, windowState.height / 2), vec2(windowState.width, windowState.height / 4));
 }
 
 // Compute collisions between entities
@@ -409,8 +412,6 @@ void WorldSystem::handleCollisions() {
 				}
 			}
 		}
-
-
 	}
 
 	// Remove all collisions from this simulation step
@@ -429,7 +430,28 @@ void WorldSystem::handleInput() {
 		restartGame();
 	}
 
-	registry.renderRequests.get(dialogueBox).show = input.shouldShowDialogue;
+	GameState& gameState = registry.gameStates.components[0];
+	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
+
+	if (!gameState.gameOver) {
+		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
+		if (input.shouldShowDialogue && input.nextDialogue && !gameState.gamePaused) {
+			input.nextDialogue = false;
+			std::string nextLine = registry.dialogueLines.get(dialogueBox).next();
+			std::cout << " dialogue line " << nextLine << std::endl;
+			if (strcmp(nextLine.c_str(), "<end>") != 0) {
+				registry.renderRequests.get(dialogueBox).show = true;
+				registry.textRenderRequests.get(dialogueBox).text = nextLine;
+			}
+			// no more lines of dialogue
+			else {
+				input.shouldShowDialogue = false;
+				registry.renderRequests.get(dialogueBox).show = false;
+				gameState.dialogueScene = false;
+			}
+		}
+	}
+
 }
 
 void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {

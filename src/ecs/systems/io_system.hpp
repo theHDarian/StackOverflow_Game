@@ -18,6 +18,7 @@ public:
 
     bool isPaused()const;
     bool isGameOver()const;
+    bool isDialogue()const;
 
 private:
 	GLFWwindow* window;
