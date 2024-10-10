@@ -3,6 +3,17 @@
 #include <SDL.h>
 
 #include "tiny_ecs_registry.hpp"
+#include "../utils/enum_string_mapping.hpp"
+
+
+#if IMGUI_ENABLED
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#endif
+
+#include "text_system.hpp"
 
 void RenderSystem::drawTexturedMesh(Entity entity,
 									const mat3 &projection)
@@ -32,6 +43,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
 
 	// Setting vertex and index buffers
+	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
@@ -129,7 +141,8 @@ void RenderSystem::drawToScreen()
 {
 	// Setting shaders
 	// get the water texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WATER]);
+	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS]);
+	glBindVertexArray(vao);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -153,17 +166,18 @@ void RenderSystem::drawToScreen()
 		index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
 																	 // indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
-	const GLuint water_program = effects[(GLuint)EFFECT_ASSET_ID::WATER];
+	const GLuint postprocess_program = effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS];
 	// Set clock
-	GLuint time_uloc = glGetUniformLocation(water_program, "time");
-	GLuint dead_timer_uloc = glGetUniformLocation(water_program, "darken_screen_factor");
+	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
+	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-	ScreenState &screen = registry.screenStates.get(screen_state_entity);
-	glUniform1f(dead_timer_uloc, screen.darken_screen_factor);
+	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
+	float intensity = (float)stack.currStack.size() / ((stack.baseStackSize + stack.additives[PlayerStackSize]) * stack.multiplicatives[PlayerStackSize]);
+	glUniform1f(chrom_abb_intensity_uloc, intensity);
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
-	GLint in_position_loc = glGetAttribLocation(water_program, "in_position");
+	GLint in_position_loc = glGetAttribLocation(postprocess_program, "in_position");
 	glEnableVertexAttribArray(in_position_loc);
 	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
 	gl_has_errors();
@@ -195,7 +209,7 @@ void RenderSystem::draw()
 	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
-	glClearColor(GLfloat(172 / 255), GLfloat(216 / 255), GLfloat(255 / 255), 1.0);
+	glClearColor(GLfloat(32/ 255), GLfloat(43 / 255), GLfloat(81 / 255), 1.0);
 	glClearDepth(10.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -208,7 +222,7 @@ void RenderSystem::draw()
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.motions.has(entity))
+		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
@@ -216,7 +230,34 @@ void RenderSystem::draw()
 	}
 
 	// Truely render to the screen
+	// since post-processing happens here
+	// consider moving post-processing later if UI elements (like dialogue)
+	// should be affected too
 	drawToScreen();
+
+	// should put draw UI here
+	// should also remove show from render request
+	// and add ui here
+	for (Entity entity : registry.uis.entities) {
+		if (!registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+
+	// copied above method to draw all text components
+	for (Entity entity : registry.textRenderRequests.entities)
+	{
+		auto& textReq = registry.textRenderRequests.get(entity);
+		// for now, tie text visibility to entitie's render visibility
+		// but assumption may not always hold
+		if (registry.renderRequests.get(entity).show)
+			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
+	}
+
+	#if IMGUI_ENABLED
+		//draw Imgui
+		drawImGui();
+	#endif
 
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
@@ -230,8 +271,9 @@ mat3 RenderSystem::createProjectionMatrix()
 	float top = 0.f;
 
 	gl_has_errors();
-	float right = (float) window_width_px;
-	float bottom = (float) window_height_px;
+	WindowState& windowState = registry.windowStates.components[0];
+	float right = (float) windowState.width;
+	float bottom = (float) windowState.height;
 
 	float sx = 2.f / (right - left);
 	float sy = 2.f / (top - bottom);
@@ -239,3 +281,53 @@ mat3 RenderSystem::createProjectionMatrix()
 	float ty = -(top + bottom) / (top - bottom);
 	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
 }
+
+#if IMGUI_ENABLED
+void RenderSystem::drawImGui() {
+	int menuWidth = 200;
+	IOState& ioState = registry.ioStates.components[0];
+	WindowState& windowState = registry.windowStates.components[0];
+	// std::cout << windowState.width << " " << windowState.height << std::endl;
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	const ImVec2& size = ImVec2(menuWidth,windowState.height);
+	ImGui::SetNextWindowSize(size);
+	ImGui::SetNextWindowPos(ImVec2(windowState.width - menuWidth, 0));
+	ImGui::Begin("Debug window");
+
+	// BASIC INFORMATION
+    ImGui::Text("Enemy Bullet Count: %lu",registry.enemyBullets.size());
+	ImGui::Text("Viewport Size: (%d, %d)",windowState.width,windowState.height);
+	ImGui::Text("Mouse Pos: (%.2f, %.2f)",ioState.mousePosition.x,ioState.mousePosition.y);
+	
+	// STACK INFORMATION
+	StackCompile& sc = registry.stackCompile.components[0];
+	ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
+	ImGui::BeginChild("AdditiveContent",ImVec2(180,250),true);
+		std::map<BulletEffectType, float>::iterator it;
+		for (it = sc.additives.begin(); it != sc.additives.end(); it++) {
+			// if (it->second == 0) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	ImGui::TextColored(ImVec4(1,1,0,1), "Multiplicatives");
+	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,250),true);
+		for (it = sc.multiplicatives.begin(); it != sc.multiplicatives.end(); it++) {
+			// if (it->second == 1) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	if (ImGui::Button("Restart Game")) {
+		registry.ioStates.components[0].shouldRestart = true;
+	}
+    ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui::UpdatePlatformWindows();
+}
+#endif

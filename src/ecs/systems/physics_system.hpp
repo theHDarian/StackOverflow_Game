@@ -18,5 +18,7 @@ private:
 	bool CircleToCircle(Entity circleA, Entity circleB);
 	bool CircleToWall(Entity circle, Entity wall);
 	bool CircleToPoly(Entity circle, Entity sat);
+	bool PolyToWall(Entity poly, Entity wall);
 	bool CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3);
+	bool LineToLine(vec2 line1Start,vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint);
 };

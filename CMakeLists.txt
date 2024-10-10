@@ -55,6 +55,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 0)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/stb_image/)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/gl3w)
 
+include_directories(ext/glfw/include)
+
+add_subdirectory(ext/imgui-docking)
+set(IMGUI_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ext/imgui-docking/imgui")
+file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
+target_include_directories("imgui" PUBLIC ${IMGUI_PATH} ext/glfw/include)
+
 # Find OpenGL
 find_package(OpenGL REQUIRED)
 
@@ -72,10 +79,19 @@ if (IS_OS_LINUX OR IS_OS_MAC)
     # Since we're on OSX or Linux, we can just use pkgconfig.
     find_package(PkgConfig REQUIRED)
 
+    # Freetype
+    find_package(Freetype REQUIRED)
+    set(FREETYPE_INCLUDE_DIRS "/opt/homebrew/include/freetype2")
+    set(FREETYPE_LIBRARIES "/opt/homebrew/lib/libfreetype.dylib")
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FREETYPE_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${FREETYPE_LIBRARIES})
+
     pkg_search_module(GLFW REQUIRED glfw3)
 
     pkg_search_module(SDL2 REQUIRED sdl2)
     pkg_search_module(SDL2MIXER REQUIRED SDL2_mixer)
+    pkg_search_module(freetype REQUIRED) # not sure what should search for
+    # or maybe pkg_search_module(freetype REQUIRED) instead?
 
     # Link Frameworks on OSX
     if (IS_OS_MAC)
@@ -93,6 +109,7 @@ elseif (IS_OS_WINDOWS)
 
     set(GLFW_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/include")
     set(SDL2_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ext/sdl/include/SDL")
+    set(FREETYPE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/include")
 
     if (${CMAKE_SIZEOF_VOID_P} MATCHES "8")
         set(GLFW_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/lib/glfw3dll-x64.lib")
@@ -110,7 +127,11 @@ elseif (IS_OS_WINDOWS)
 	set(GLFW_DLL "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/lib/glfw3-x86.dll")
 	set(SDL2_DLL "${CMAKE_CURRENT_SOURCE_DIR}/ext/sdl/lib/SDL2-x86.dll")
 	set(SDL2MIXER_DLL "${CMAKE_CURRENT_SOURCE_DIR}/ext/sdl/lib/SDL2_mixer-x86.dll")
+
     endif()
+
+    set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/lib/freetype.lib")
+    set(FREETYPE_DLL "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/lib/freetype.dll")
 
     # Copy and rename dlls
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -125,6 +146,10 @@ elseif (IS_OS_WINDOWS)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${SDL2MIXER_DLL}"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/SDL2_mixer.dll")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${FREETYPE_DLL}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/freetype.dll")
 
     target_compile_options(${PROJECT_NAME} PUBLIC
         # increase warning level
@@ -155,10 +180,13 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${GLFW_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${FREETYPE_INCLUDE_DIRS})
+target_include_directories(imgui PUBLIC ${IMGUI_PATH}/backends)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${GLFW_LIBRARIES} ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} glm::glm)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${GLFW_LIBRARIES} ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${FREETYPE_LIBRARIES} glm::glm imgui)
 
 # Needed to add this
+
 if(IS_OS_LINUX)
   target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${CMAKE_DL_LIBS})
 endif()

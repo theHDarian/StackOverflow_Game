@@ -16,21 +16,25 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 100.f;
+	motion.scale = mesh.original_size * 50.f;
 
 	Player& player = registry.players.emplace(entity);
 	player.baseSpeed = 200;
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2;
 
+    Shoots& shoot = registry.shoots.emplace(entity);
+
 	registry.stackCompile.emplace(entity);
-	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
-	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
+
+	//add player sprite
+	Sprites& playerSprites = registry.sprites.emplace(entity);
+	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
+	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
 	registry.renderRequests.insert(
 		entity,
 		{
-			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+			playerSprites.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -41,7 +45,23 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 	return entity;
 }
-
+Entity createAimIndicator(RenderSystem* renderer) {
+	//add aim indicator
+	auto aimIndicator = Entity();
+	Motion& aimMotion = registry.motions.emplace(aimIndicator);
+	aimMotion.scale = {50,50};
+	Sprites& indicatorSprites =  registry.sprites.emplace(aimIndicator);
+	indicatorSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::AIM_INDICATOR;
+	registry.renderRequests.insert(
+		aimIndicator,
+		{
+			indicatorSprites.sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		}
+	);
+	return aimIndicator;
+}
 // circle outline for circle collision
 Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float radius) {
 	auto entity = Entity();
@@ -168,6 +188,12 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	enemy.state = 10;
 	enemy.attackPattern = EnemyAttackPattern::SINGLE_SHOT;
 
+	Shoots &shoot = registry.shoots.emplace(entity);
+	shoot.maxBulletBurst = 3;
+	shoot.maxFiringInterval = 3000.0f;
+	shoot.bulletSpeed = 300;
+
+
 	registry.sprites.emplace(entity);
 	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::EEL;
 	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
@@ -192,19 +218,25 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.position = pos;
 	motion.velocity = velocity;
 	motion.scale = vec2({ -EEL_BB_WIDTH, EEL_BB_HEIGHT });
 
-	Enemy & enemy = registry.enemies.emplace(entity);
+	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 1000;
+	enemy.maxHealth = 100;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
+
+	Shoots &shoot = registry.shoots.emplace(entity);
+	shoot.maxBulletBurst = 3;
+	shoot.maxFiringInterval = 3000.0f;
+	shoot.bulletSpeed = 200;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x)/2;
@@ -231,23 +263,78 @@ Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float 
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	bullet.bulletSpeed = 1.f;
-	bullet.bulletRange = 500.f;
+	bullet.bulletSpeed = 1.0f;
+	bullet.bulletRange = 50000.f;
 	bullet.bulletBounce = 3;
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = angle;
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
-	motion.scale = vec2({ -FISH_BB_WIDTH, FISH_BB_HEIGHT });
+
+
+	motion.scale = bullet.bulletSize; // Ensure scale is initialized
+
+    Invisible& inv = registry.invisibles.emplace(entity);
+    float vel = sqrt(pow(motion.velocity.x, 2) + pow(motion.velocity.y, 2));
+    inv.countdown = (75.0f/vel) * 1000.0f;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = abs(motion.scale.x)/2;
+	cc.radius = motion.scale.x / 2;
+
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			TEXTURE_ASSET_ID::FISH,
+			spriteComponent.sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
+	auto& shapes = registry.collisionShapes.emplace(entity);
+	shapes.shapes.push_back(c);
+
+	return entity;
+}
+
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed) {
+	auto entity = Entity();
+
+	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = speed;
+	bullet.bulletRange = 50000.f;
+	bullet.bulletBounce = 3;
+
+	Motion &motion = registry.motions.emplace(entity);
+	motion.angle = atan2(velocity.y, velocity.x);
+	motion.position = pos;
+	motion.velocity = velocity * bullet.bulletSpeed;
+
+    Invisible& inv = registry.invisibles.emplace(entity);
+    inv.countdown = (75.0f/bullet.bulletSpeed) * 1000.0f;
+
+
+	motion.scale = bullet.bulletSize; // Ensure scale is initialized
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x / 2;
+
+	bullet.bulletEffects.push_back(sizeUpA);
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::FISH;
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			spriteComponent.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -280,6 +367,48 @@ Entity createLine(vec2 position, vec2 scale)
 	return entity;
 }
 
+// draws dialogue box
+// may end up setting globals for box position later?
+Entity createDialogueBox(vec2 position, vec2 scale) {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	// consider doing a check of "should I render now"? Or hide entity?
+	registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	registry.uis.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = scale;
+
+	// temp colour
+	auto& color = registry.colors.emplace(entity);
+	color.r = 0.0;
+	color.b = 1.0;
+	color.g = 1.0;
+
+	// attach 1 text render request
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	// want to place at top of dialogue box
+	// with current text projection matrix being "flipped" coords
+	// temp fix for getting window size for now
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = windowState.width - scale.x + 25; // 25 is just some padding
+	text.y = windowState.height - position.y + scale.y/4; // place text slightly above middle of box
+	text.scale = 0.5; // for some reason, scale should be small
+	text.text = "hello this is test dialogue!";
+
+	return entity;
+}
+
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 {
 	auto entity = Entity();
@@ -296,6 +425,9 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 	bullet.bulletSize = getModifiedValue(ProjectileSize,  bullet.bulletSize);
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
 	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
+
+    Invisible& inv = registry.invisibles.emplace(entity);
+    inv.countdown = (75.0f/bullet.bulletSpeed) * 1000.0f;
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);

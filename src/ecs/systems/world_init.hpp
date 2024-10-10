@@ -14,6 +14,8 @@ const float EEL_BB_HEIGHT  = 0.6f * 202.f;	// 870
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
 
+Entity createAimIndicator(RenderSystem* renderer);
+
 // basic enemy
 Entity createBlob(RenderSystem* renderer, vec2 pos);
 
@@ -33,9 +35,14 @@ Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle,
 // the enemy
 Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern);
 
+// Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
 Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed);
 
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
 float getModifiedValue(BulletEffectType bf, float value);
+
+// create dialogue box
+Entity createDialogueBox(vec2 position, vec2 scale);

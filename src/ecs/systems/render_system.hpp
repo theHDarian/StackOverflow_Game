@@ -2,8 +2,12 @@
 
 #include <array>
 #include <utility>
-
 #include "common.hpp"
+
+#if IMGUI_ENABLED
+#include "imgui.h"
+#endif
+
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
@@ -19,6 +23,7 @@ class RenderSystem {
 	 */
 	std::array<GLuint, texture_count> texture_gl_handles;
 	std::array<ivec2, texture_count> texture_dimensions;
+	GLuint vao;
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
@@ -34,7 +39,9 @@ class RenderSystem {
 			textures_path("eel.png"),
 			textures_path("circle.png"),
 			textures_path("mcv1_base.png"), 
-			textures_path("mcv1_hit.png") };
+			textures_path("mcv1_hit.png"),
+			textures_path("aim_indicator.png") 
+	};
 
 	std::array<GLuint, effect_count> effects;
 	// Make sure these paths remain in sync with the associated enumerators.
@@ -43,7 +50,7 @@ class RenderSystem {
 		shader_path("egg"),
 		shader_path("salmon"),
 		shader_path("textured"),
-		shader_path("water") };
+		shader_path("postprocess") };
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
@@ -77,6 +84,9 @@ public:
 
 	mat3 createProjectionMatrix();
 
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
@@ -91,6 +101,14 @@ private:
 	GLuint off_screen_render_buffer_depth;
 
 	Entity screen_state_entity;
+
+	#if IMGUI_ENABLED
+	public:
+		ImGuiContext* imgui_context;
+	private:
+		void initImGui();
+		void drawImGui();
+	#endif
 };
 
 bool loadEffectFromFile(

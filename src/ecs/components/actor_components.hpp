@@ -12,7 +12,8 @@ enum BulletEffectType {
     FireRate,
     BulletRange,
     BulletSpread,
-    BulletNum,
+    BulletNum, // Number of bullets fired in a single shot
+    BulletBurst, // Number of bullets fired in a burst
     Bounce,
     Pierce,
     Homing,
@@ -33,7 +34,7 @@ struct BulletStackEffect {
     EffectCalculation effectCalc;
     float value;
 
-    // For UI
+    // For UIq
     std::string name;
     std::string tooltip;
 
@@ -44,7 +45,7 @@ struct BulletStackEffect {
 struct Player
 {
     float baseSpeed;
-    float baseFiringInterval = 100.0f;
+    float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;
     float baseDashSpeed = 2500.0f;
@@ -57,8 +58,7 @@ struct Player
     float currDashCooldown = 0.0f;
     float dashCooldown = baseDashCDR;
 
-    float currFiringInterval = 0.0f;
-    float maxFiringInterval = baseFiringInterval;
+    int bulletCluster = 1;
 };
 
 // Holds the actual data of currStack
@@ -67,7 +67,7 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize;
+    int baseStackSize = 10;
     std::vector<BulletStackEffect> currStack;
 
     std::map<BulletEffectType, float> additives = {
@@ -78,6 +78,7 @@ struct StackCompile {
         {BulletRange,       0},
         {BulletSpread,      0},
         {BulletNum,         0},
+        {BulletBurst,       0},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -94,6 +95,7 @@ struct StackCompile {
         {BulletRange,       1},
         {BulletSpread,      1},
         {BulletNum,         1},
+        {BulletBurst,       1},
         {Bounce,            1},
         {Pierce,            1},
         {Homing,            1},
@@ -112,6 +114,7 @@ struct StackCompile {
         {BulletRange,       1},
         {BulletSpread,      1},
         {BulletNum,         1},
+        {BulletBurst,       1},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -191,6 +194,20 @@ struct Invincible {
     float countdown = 1000;
 };
 
+struct Invisible {
+    float countdown = 1000;
+};
+
+struct Shoots {
+    float currFiringInterval = 0.0f;
+    float maxFiringInterval = 300.0f;
+    float bulletSpeed = 400;
+
+    int maxBulletBurst = 1;
+    int currBulletBurst = 1;
+    float bulletBurstCooldown = 50;
+};
+
 // TODO Add a way to use parametric equations for bullet path
 
 struct PlayerBullet {
@@ -207,9 +224,10 @@ struct PlayerBullet {
 struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange;
+    float bulletRange = 1000;
+    float initialRange = 0;
     // Enemy bullet can scale x,y independently?
-    vec2 bulletSize;
+    vec2 bulletSize =  vec2(20, 10);
     int bulletBounce;
     std::vector<BulletStackEffect> bulletEffects;
 };
@@ -217,6 +235,11 @@ struct EnemyBullet {
 struct Homing {
     Entity target;
     float homingIntensity; // How quickly it can turn towards the target
+};
+
+struct Dash {
+    float endTimer = 120.0f; //ms
+    vec2 dashDirection;
 };
 
 // All data relevant to the shape and motion of entities

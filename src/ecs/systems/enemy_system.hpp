@@ -18,6 +18,8 @@ public:
     ~EnemySystem();
     void step(float elapsed_ms);
 private:
-    void shoot(Enemy& enemy, vec2 pos, float angle);
+    void shoot(vec2 velocity, vec2 pos, float angle);
+    // void shoot(Enemy& enemy, vec2 pos, float angle);
+    void shoot(::Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread);
     RenderSystem* render;
 };

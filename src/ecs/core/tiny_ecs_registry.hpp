@@ -18,12 +18,16 @@ public:
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<IOState> ioStates;
+	ComponentContainer<GameState> gameStates;
+	ComponentContainer<WindowState> windowStates;
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
 	ComponentContainer<Sprites> sprites;
 	ComponentContainer<CollisionShape> collisionShapes;
 	ComponentContainer<SpriteTimer> spriteTimers;
+	ComponentContainer<TextRenderRequest> textRenderRequests;
+	ComponentContainer<UI> uis;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -32,7 +36,9 @@ public:
 	ComponentContainer<EnemyBullet> enemyBullets;
 	ComponentContainer<PolyCollider> polyColliders;
 	ComponentContainer<WallCollider> walls;
-
+	ComponentContainer<Shoots> shoots;
+    ComponentContainer<Invisible> invisibles;
+	ComponentContainer<Dash> dashes;
 
 
 	// constructor that adds all containers for looping over them
@@ -46,11 +52,15 @@ public:
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&ioStates);
+		registry_list.push_back(&gameStates);
+		registry_list.push_back(&windowStates);
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
 		registry_list.push_back(&sprites);
 		registry_list.push_back(&spriteTimers);
+		registry_list.push_back(&textRenderRequests);
+		registry_list.push_back(&uis);
 
 		registry_list.push_back(&stackCompile);
 		registry_list.push_back(&invincibles);
@@ -60,6 +70,9 @@ public:
 		registry_list.push_back(&polyColliders);
 		registry_list.push_back(&walls);
 		registry_list.push_back(&collisionShapes);
+		registry_list.push_back(&shoots);
+        registry_list.push_back(&invisibles);
+		registry_list.push_back(&dashes);
 	}
 
 	void clear_all_components() {
@@ -84,6 +97,18 @@ public:
 	void remove_all_components_of(Entity e) {
 		for (ContainerInterface* reg : registry_list)
 			reg->remove(e);
+	}
+
+	// deletes all entities associated with entities
+	void deleteEntityAndRelatedEntities(Entity& entity) {
+		// remove all other entities associated with this entity
+		// notably, check collision outlines
+		if (collisionShapes.has(entity)) {
+			for (Entity shape : collisionShapes.get(entity).shapes) {
+				remove_all_components_of(shape);
+			}
+		}
+		remove_all_components_of(entity);
 	}
 };
 

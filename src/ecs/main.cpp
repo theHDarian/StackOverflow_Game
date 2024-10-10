@@ -14,6 +14,13 @@
 
 using Clock = std::chrono::high_resolution_clock;
 
+#if IMGUI_ENABLED
+	#include "imgui.h"
+	#include "backends/imgui_impl_glfw.h"
+	#include "backends/imgui_impl_opengl3.h"
+	#include "imguiThemes.h"
+#endif
+
 // Entry point
 int main()
 {
@@ -50,11 +57,15 @@ int main()
 		float elapsed_ms =
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
+		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
+			world.handleInput();
+		} else {
+			world.step(elapsed_ms);
+			physics.step(elapsed_ms);
+			enemySystem.step(elapsed_ms);
+			world.handleCollisions();
+		}
 
-		world.step(elapsed_ms);
-		physics.step(elapsed_ms);
-		enemySystem.step(elapsed_ms);
-		world.handleCollisions();
 
 		renderer.draw();
 	}
