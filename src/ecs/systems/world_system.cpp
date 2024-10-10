@@ -219,7 +219,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
 			PlayerBullet& bullet = registry.playerBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				registry.remove_all_components_of(registry.playerBullets.entities[i]);
+				registry.deleteEntityAndRelatedEntities(registry.playerBullets.entities[i]);
 			}
 		}
 	}
@@ -235,7 +235,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
 				// remove enemy bullet
-				registry.remove_all_components_of(registry.enemyBullets.entities[i]);
+				registry.deleteEntityAndRelatedEntities(registry.enemyBullets.entities[i]);
 			}
 		}
 	}

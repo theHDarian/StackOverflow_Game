@@ -227,7 +227,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 100;
+	enemy.maxHealth = 1;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;

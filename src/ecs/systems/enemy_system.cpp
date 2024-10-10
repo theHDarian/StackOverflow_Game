@@ -72,6 +72,7 @@ void EnemySystem::step(float elapsed_ms)
                 std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
                 if (enemyStat.currHealth <= 0)
                 {
+                    std::cout << "enemy is dead" << std::endl;
                     registry.deleteEntityAndRelatedEntities(entity);
                 }
 
