@@ -49,8 +49,7 @@ private:
 	
 	void movePlayer();
     void dash(vec2 direction, float elapsed_ms_since_last_update);
-
-	void shoot(float elapsed_ms_since_last_update, int cluster = 1);
+    void shoot(float elapsed_ms_since_last_update, int cluster = 1);
 
 	float getModifiedValue(BulletEffectType bf, float value);
 
@@ -64,6 +63,8 @@ private:
 	RenderSystem* renderer;
 	float currentSpeed;
 	Entity dialogueBox;
+	Entity pauseMenu;
+	Entity gameOverMenu;
 
 	// Player Controls
 	Entity player;

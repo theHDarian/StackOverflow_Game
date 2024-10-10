@@ -214,3 +214,17 @@ struct TextRenderRequest {
 	float scale; 
 	glm::vec3 color;
 };
+
+struct DialogueLines {
+	std::vector<std::string> lines;
+	int current = 0;
+
+	std::string next() {
+		if (current < lines.size()) {
+			return lines[current++];
+		}
+		else {
+			return "<end>"; // maybe end of str constant
+		}
+	}
+};

@@ -57,7 +57,7 @@ int main()
 		float elapsed_ms =
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
-		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
+		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isDialogue()) {
 			world.handleInput();
 		} else {
 			world.step(elapsed_ms);
