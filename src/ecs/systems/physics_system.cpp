@@ -141,11 +141,11 @@ bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
 }
 
 bool PhysicsSystem::PolyToWall(Entity poly, Entity wall) {
+	
 	//if (!registry.circleColliders.has(circle) || !registry.walls.has(wall)) return false;
 	Motion& m = registry.motions.get(poly);
 
 	WallCollider& w = registry.walls.get(wall);
-	
 	// Assumes a small circle around the center of the polygon as the collision point for walls
 	return CircleToLine(m.position, registry.polyColliders.get(poly).minLength , w.startPosition, w.endPosition);
 }

@@ -42,6 +42,10 @@ class RenderSystem {
 			textures_path("mcv1_hit.png"),
 			textures_path("aim_indicator.png"),
 			textures_path("blankFloor.png"),
+			textures_path("player_bullet.png"),
+			textures_path("enemy_bullet_square.png"),
+			textures_path("enemy_bullet_circle.png"),
+			textures_path("enemy_bullet_triangle.png")
 	};
 
 	std::array<GLuint, effect_count> effects;

@@ -221,6 +221,12 @@ struct PlayerBullet {
     int bulletBounce = 0;
 };
 
+enum EnemyBulletShape {
+    RECTANGLE,
+    TRIANGLE,
+    CIRCLE
+};
+
 struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0

@@ -124,7 +124,7 @@ void EnemySystem::step(float elapsed_ms)
 
 void EnemySystem::shoot(vec2 velocity, vec2 pos, float angle) {
     // SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
-    createBulletEnemy(render, pos, velocity, angle + PLACEHOLDER_FOR_ANGLE);
+    createEnemyBullet(render, pos, glm::normalize(velocity), { 20,40 }, glm::length(velocity), TRIANGLE);
 }
 
 void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread) {
@@ -152,7 +152,7 @@ void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_m
         vec2 bulletPos = pos;
 
         if (cluster == 1) {
-            createEnemyBullet(render, bulletPos, bulletDir, pl.bulletSpeed);
+            createEnemyBullet(render, bulletPos, bulletDir, {20,20}, pl.bulletSpeed, CIRCLE);
             return;
         }
 
@@ -167,14 +167,14 @@ void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_m
 
 
         if (cluster == 2) {
-            createEnemyBullet(render, bulletPos, bulletDir*rotationMatrix, pl.bulletSpeed);
-            createEnemyBullet(render, bulletPos, bulletDir*glm::transpose(rotationMatrix), pl.bulletSpeed);
+            createEnemyBullet(render, bulletPos, bulletDir*rotationMatrix, { 20,20 }, pl.bulletSpeed, CIRCLE);
+            createEnemyBullet(render, bulletPos, bulletDir*glm::transpose(rotationMatrix), { 20,20 }, pl.bulletSpeed, CIRCLE);
             return;
         }
 
         for (int i = 0; i < cluster; i++) {
             if (i == 0) {
-                createEnemyBullet(render, bulletPos, bulletDir, pl.bulletSpeed);
+                createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
                 continue;
             }
             for (int j = 0; j < i; j++) {
@@ -185,7 +185,7 @@ void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_m
                     bulletDir = bulletDir * glm::transpose(rotationMatrix);
                 }
             }
-            createEnemyBullet(render, bulletPos, bulletDir, pl.bulletSpeed);
+            createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
         }
     }
 }

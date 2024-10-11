@@ -32,7 +32,7 @@ struct PolyCollider {
 
 	// Call this function after creating offsetVertices please
 	// Bit pricey though, so if you know the max and min length just hardcode them in!
-	void setMaxLength() {
+	void setPolyLengths() {
 		maxLength = glm::distance(offsetVertices[0], { 0,0 });
 		minLength = glm::distance(offsetVertices[0], { 0,0 });
 		for (uint i = 1; i < offsetVertices.size(); i++) {
@@ -40,7 +40,7 @@ struct PolyCollider {
 			vec2 a = -offsetVertices[i];
 			vec2 b = offsetVertices[i-1] - offsetVertices[i];
 			vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
-			if (glm::distance(a - c, { 0,0 }) < minLength) minLength = glm::distance(a - c, { 0,0 });
+			if (glm::distance(a - c + offsetVertices[i], { 0,0 }) < minLength) minLength = glm::distance(a - c + offsetVertices[i], { 0,0 });
 			if (glm::distance(offsetVertices[i], { 0,0 }) < minLength) minLength = glm::distance(offsetVertices[i], { 0,0 });
 		}
 	}
@@ -138,7 +138,11 @@ enum class TEXTURE_ASSET_ID {
 	MC_HIT = MC_BASE + 1,
 	AIM_INDICATOR = MC_HIT + 1,
 	FLOOR = AIM_INDICATOR + 1,
-	TEXTURE_COUNT = FLOOR + 1
+	MC_BULLET = FLOOR + 1,
+	ENEMY_BULLET_SQUARE = MC_BULLET + 1,
+	ENEMY_BULLET_CIRCLE = ENEMY_BULLET_SQUARE + 1,
+	ENEMY_BULLET_TRIANGLE = ENEMY_BULLET_CIRCLE + 1,
+	TEXTURE_COUNT = ENEMY_BULLET_TRIANGLE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
