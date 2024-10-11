@@ -212,6 +212,27 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	return entity;
 }
 
+Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ 2880 /2, 1584 /2 });
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			TEXTURE_ASSET_ID::FLOOR,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	return entity;
+};
+
 Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern) {
 	auto entity = Entity();
 

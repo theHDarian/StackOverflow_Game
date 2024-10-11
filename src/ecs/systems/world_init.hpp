@@ -21,6 +21,9 @@ Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPositi
 // Poly for testing
 Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle);
 
+// Floor testing
+Entity createTestFloor(RenderSystem* renderer, vec2 pos);
+
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
