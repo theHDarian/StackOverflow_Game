@@ -8,6 +8,7 @@
 #include "map_components.hpp"
 #include "actor_components.hpp"
 #include "io_components.hpp"
+#include "ui_components.hpp"
 
 
 // Stucture to store collision information
@@ -212,4 +213,18 @@ struct TextRenderRequest {
 	// from experience, this is often a small number < 10, not sure why
 	float scale; 
 	glm::vec3 color;
+};
+
+struct DialogueLines {
+	std::vector<std::string> lines;
+	int current = 0;
+
+	std::string next() {
+		if (current < lines.size()) {
+			return lines[current++];
+		}
+		else {
+			return "<end>"; // maybe end of str constant
+		}
+	}
 };

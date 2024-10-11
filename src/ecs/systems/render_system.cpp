@@ -222,20 +222,29 @@ void RenderSystem::draw()
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity))
+		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
 	}
-	#if IMGUI_ENABLED
-	//draw Imgui
-	drawImGui();
-	#endif
+
+	// Truely render to the screen
+	// since post-processing happens here
+	// consider moving post-processing later if UI elements (like dialogue)
+	// should be affected too
+	drawToScreen();
+
+	// should put draw UI here (ideally using its own rendering system,
+	// and own projection matrix)
+	// should also remove show from render request
+	for (Entity entity : registry.uis.entities) {
+		if (!registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
 
 	// copied above method to draw all text components
-	// note: because current rendering system places last rendered things on top
-	// may end up above old things (like player) but below newer things (like newly spawned enemies)
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
 		auto& textReq = registry.textRenderRequests.get(entity);
@@ -245,8 +254,10 @@ void RenderSystem::draw()
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
 
-	// Truely render to the screen
-	drawToScreen();
+	#if IMGUI_ENABLED
+		//draw Imgui
+		drawImGui();
+	#endif
 
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
@@ -258,7 +269,6 @@ mat3 RenderSystem::createProjectionMatrix()
 	// Fake projection matrix, scales with respect to window coordinates
 	float left = 0.f;
 	float top = 0.f;
-	
 
 	gl_has_errors();
 	WindowState& windowState = registry.windowStates.components[0];

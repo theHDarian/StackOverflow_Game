@@ -51,16 +51,13 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
         ioState.shouldRestart = true;
 	}
 
-	// show/hide dialogue window (temp function)
+	// show dialogue window and play dialogue sequence (temp function)
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E) {
-		if (ioState.shouldShowDialogue) {
-			ioState.shouldShowDialogue = false;
-			std::cout << "hiding dialogue box" << std::endl;
-		} 
-		else {
-			ioState.shouldShowDialogue = true;
-			std::cout << "showing dialogue box" << std::endl;
-		}
+		// pause game when dialogue plays for now
+		if (!ioState.shouldShowDialogue)
+			gameState.dialogueScene = true;
+		ioState.shouldShowDialogue = true;
+		ioState.nextDialogue = true;
 	}
 
 	//Player movement
@@ -133,4 +130,10 @@ bool IOSystem::isPaused()const {
 };
 bool IOSystem::isGameOver()const {
 	return registry.gameStates.components[0].gameOver;
+}
+
+// snce dialogue triggers on keypress for now
+// move it here for now
+bool IOSystem::isDialogue()const {
+	return registry.gameStates.components[0].dialogueScene;
 }

@@ -16,6 +16,7 @@ struct IOState {
 	vec2 lastInputAxis = {1,1};
 	vec2 mousePosition;
 	bool shouldShowDialogue = false;
+	bool nextDialogue = false;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
@@ -24,4 +25,5 @@ struct IOState {
 struct GameState {
 	bool gamePaused;
 	bool gameOver;
+	bool dialogueScene = false;
 };

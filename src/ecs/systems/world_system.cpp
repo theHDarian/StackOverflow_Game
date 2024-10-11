@@ -219,7 +219,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
 			PlayerBullet& bullet = registry.playerBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				registry.remove_all_components_of(registry.playerBullets.entities[i]);
+				registry.deleteEntityAndRelatedEntities(registry.playerBullets.entities[i]);
 			}
 		}
 	}
@@ -234,7 +234,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				registry.remove_all_components_of(registry.enemyBullets.entities[i]);
+				// remove enemy bullet
+				registry.deleteEntityAndRelatedEntities(registry.enemyBullets.entities[i]);
 			}
 		}
 	}
@@ -273,6 +274,7 @@ void WorldSystem::restartGame() {
 	GameState& gameState = registry.gameStates.components[0];
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
+	gameState.dialogueScene = false;
 
 	WindowState& wS = registry.windowStates.components[0];
 	printf("Restarting\n");
@@ -313,6 +315,8 @@ void WorldSystem::restartGame() {
 	// this feels very bad, put as temp fix for getting window size for now
 	WindowState& windowState = registry.windowStates.components[0];
 	dialogueBox = createDialogueBox(vec2(windowState.width /2, windowState.height - windowState.height /8), vec2(windowState.width, windowState.height /4));
+	pauseMenu = createPauseMenu(vec2(windowState.width / 2, windowState.height / 2), vec2(windowState.width, windowState.height / 4));
+	gameOverMenu = createGameOverMenu(vec2(windowState.width / 2, windowState.height / 2), vec2(windowState.width, windowState.height / 4));
 }
 
 // Compute collisions between entities
@@ -378,7 +382,7 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.remove_all_components_of(entity);
+					registry.deleteEntityAndRelatedEntities(entity);
 				}
 			}
 		}
@@ -404,12 +408,10 @@ void WorldSystem::handleCollisions() {
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.remove_all_components_of(entity);
+					registry.deleteEntityAndRelatedEntities(entity);
 				}
 			}
 		}
-
-
 	}
 
 	// Remove all collisions from this simulation step
@@ -428,7 +430,28 @@ void WorldSystem::handleInput() {
 		restartGame();
 	}
 
-	registry.renderRequests.get(dialogueBox).show = input.shouldShowDialogue;
+	GameState& gameState = registry.gameStates.components[0];
+	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
+
+	if (!gameState.gameOver) {
+		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
+		if (input.shouldShowDialogue && input.nextDialogue && !gameState.gamePaused) {
+			input.nextDialogue = false;
+			std::string nextLine = registry.dialogueLines.get(dialogueBox).next();
+			std::cout << " dialogue line " << nextLine << std::endl;
+			if (strcmp(nextLine.c_str(), "<end>") != 0) {
+				registry.renderRequests.get(dialogueBox).show = true;
+				registry.textRenderRequests.get(dialogueBox).text = nextLine;
+			}
+			// no more lines of dialogue
+			else {
+				input.shouldShowDialogue = false;
+				registry.renderRequests.get(dialogueBox).show = false;
+				gameState.dialogueScene = false;
+			}
+		}
+	}
+
 }
 
 void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
@@ -477,6 +500,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
 	Shoots& pl = registry.shoots.get(player);
+    Motion& player_motion = registry.motions.get(player);
+    vec2 playerPos = player_motion.position;
+    vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);
+    player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
 	if (!input.shouldShoot) {
 		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
 			pl.currBulletBurst++;
@@ -502,9 +529,6 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				BulletBurst, pl.maxBulletBurst)
 		);
 		// create bullet
-
-		vec2 playerPos = registry.motions.get(player).position;
-		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
 		vec2 bulletPos = playerPos + bulletDir;
 
 		if (cluster == 1) {

@@ -79,7 +79,7 @@ void EnemySystem::step(float elapsed_ms)
                     delete_queue.push_back(entity);
                 }
 
-                registry.remove_all_components_of(other_entity);
+                registry.deleteEntityAndRelatedEntities(other_entity);
             }
         }
 
@@ -117,7 +117,7 @@ void EnemySystem::step(float elapsed_ms)
         
     }
     for (Entity entity: delete_queue) {
-        registry.remove_all_components_of(entity);
+        registry.deleteEntityAndRelatedEntities(entity);
     }
 }
 

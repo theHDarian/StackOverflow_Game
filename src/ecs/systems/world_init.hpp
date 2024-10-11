@@ -42,3 +42,7 @@ float getModifiedValue(BulletEffectType bf, float value);
 
 // create dialogue box
 Entity createDialogueBox(vec2 position, vec2 scale);
+
+Entity createPauseMenu(vec2 position, vec2 scale);
+
+Entity createGameOverMenu(vec2 position, vec2 scale);

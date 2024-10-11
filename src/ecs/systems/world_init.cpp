@@ -226,7 +226,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 100;
+	enemy.maxHealth = 1;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
@@ -373,10 +373,13 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 
 	// copies code from draw line as a box for now
 	// consider doing a check of "should I render now"? Or hide entity?
-	registry.renderRequests.insert(
+	auto& rr = registry.renderRequests.insert(
 		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
 				 EFFECT_ASSET_ID::EGG,
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+	rr.show = false;
+
+	registry.uis.emplace(entity);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -387,20 +390,107 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 	// temp colour
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
-	color.b = 0.9;
-	color.g = 0.9;
+	color.b = 1.0;
+	color.g = 1.0;
 
 	// attach 1 text render request
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
+
 	// want to place at top of dialogue box
 	// with current text projection matrix being "flipped" coords
 	// temp fix for getting window size for now
 	WindowState& windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 25; // 25 is just some padding
-	text.y = windowState.height - position.y + scale.y/4; // place text slightly above middle of box
+	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
 	text.scale = 0.5; // for some reason, scale should be small
 	text.text = "hello this is test dialogue!";
+
+	// attach list of dialogue lines
+	// probably shouldn't be attached to box, but to some dialogue state entity?
+	auto& lines = registry.dialogueLines.emplace(entity);
+	lines.lines.push_back("hello, this is a dialogue box.\npress e to go to next dialogue");
+	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\n as a temp fix for that, the game is paused while dialogue is happening");
+	lines.lines.push_back("but also note the dialogue \"paused \" state is separate from the game paused state!");
+	lines.lines.push_back("oh hey there's no more dialogue after this, so pressing e again won't open another dialogue box\ngoodbye");
+
+	return entity;
+}
+
+// not a real menu right now; just to show the game is paused
+Entity createPauseMenu(vec2 position, vec2 scale) {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	auto& rr = registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+	rr.show = false;
+
+	registry.uis.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = scale;
+
+	// temp colour
+	auto& color = registry.colors.emplace(entity);
+	color.r = 0.0;
+	color.b = 0.0;
+	color.g = 0.9;
+
+	// attach 1 text render request
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	// note: position is not center, but start of text rendering
+	// need a mechanism to figure out text line size
+	text.x = position.x / 2.5;
+	text.y = position.y; 
+	text.scale = 1.5; 
+	text.text = "Game Paused";
+
+	return entity;
+}
+
+// not a real menu right now; just to show the game is over
+Entity createGameOverMenu(vec2 position, vec2 scale) {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	auto& rr = registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+	rr.show = false;
+
+	registry.uis.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = scale;
+
+	// temp colour
+	auto& color = registry.colors.emplace(entity);
+	color.r = 0.0;
+	color.b = 0.0;
+	color.g = 0.0;
+
+	// attach 1 text render request
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = windowState.width - scale.x + 25;
+	text.y = windowState.height - position.y + scale.y / 4;
+	text.scale = 1.5;
+	text.text = "Game Over \npress R to restart";
 
 	return entity;
 }
