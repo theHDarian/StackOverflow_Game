@@ -195,7 +195,7 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 
 
 	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::EEL;
+	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::PUFFERFISH;
 	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
 	registry.renderRequests.insert(
 		entity,
@@ -218,12 +218,11 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.position = pos;
 	motion.velocity = velocity;
-	motion.scale = vec2({ -EEL_BB_WIDTH, EEL_BB_HEIGHT });
+	motion.scale = vec2({ 140.0f, 140.0f });
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
@@ -244,7 +243,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	registry.renderRequests.insert(
 		entity,
 		{
-			TEXTURE_ASSET_ID::EEL,
+			TEXTURE_ASSET_ID::PUFFERFISH,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});

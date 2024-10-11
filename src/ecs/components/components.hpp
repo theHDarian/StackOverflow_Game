@@ -132,8 +132,8 @@ struct Mesh
 // maybe a universal map would be easier to load + manage files with...
 enum class TEXTURE_ASSET_ID {
 	FISH = 0,
-	EEL = FISH + 1,
-	CIRCLE = EEL + 1,
+	PUFFERFISH = FISH + 1,
+	CIRCLE = PUFFERFISH + 1,
 	MC_BASE = CIRCLE + 1,
 	MC_HIT = MC_BASE + 1,
 	AIM_INDICATOR = MC_HIT + 1,
