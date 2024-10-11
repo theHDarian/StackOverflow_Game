@@ -7,6 +7,7 @@
 #include "world_init.hpp"
 #include "actor_components.hpp"
 #include <thread>
+#include <vector>
 #include <chrono>
 
 #include "ai_system.hpp"
@@ -31,6 +32,8 @@ void EnemySystem::step(float elapsed_ms)
     auto &enemy_registry = registry.enemies;
     auto &motion_registry = registry.motions;
     auto &collision_registry = registry.collisions;
+    std::vector<Entity> delete_queue;
+    
     for (uint i = 0; i < enemy_registry.components.size(); i++) {
         Enemy &enemy = enemy_registry.components[i];
         Entity &entity = enemy_registry.entities[i];
@@ -58,8 +61,9 @@ void EnemySystem::step(float elapsed_ms)
         }
 
         // HANDLING DAMGE FROM COLLISION
-        for (auto &entity : collision_registry.entities)
+        for (int i = collision_registry.entities.size() - 1; i >= 0; i--)
         {
+            Entity& entity = collision_registry.entities[i];
             const Collision &collision = registry.collisions.get(entity);
             Entity other_entity = collision.other;
 
@@ -72,7 +76,7 @@ void EnemySystem::step(float elapsed_ms)
                 std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
                 if (enemyStat.currHealth <= 0)
                 {
-                    registry.remove_all_components_of(entity);
+                    delete_queue.push_back(entity);
                 }
 
                 registry.remove_all_components_of(other_entity);
@@ -110,6 +114,10 @@ void EnemySystem::step(float elapsed_ms)
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
         }
+        
+    }
+    for (Entity entity: delete_queue) {
+        registry.remove_all_components_of(entity);
     }
 }
 
