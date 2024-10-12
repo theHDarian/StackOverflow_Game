@@ -157,14 +157,15 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
     }
     if (enemy.curBurst == atkData.maxBurst)
     {
-        enemy.burstDirection = atan2(glm::normalize(velocity).x , glm::normalize(velocity).y);
+        enemy.burstDirection = atan2(glm::normalize(velocity).y , glm::normalize(velocity).x);
     }
     if (enemy.attackPattern == EnemyAttackPattern::SPRAY)
     {
         double range = atkData.angleOffset;
 
         // Generate a random offset within the range
-        double offset = (static_cast<double>(rand()) / RAND_MAX) * 2 * range - range;
+        double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
+        std::cout << "offset: " << offset << std::endl;
         offset = enemy.burstDirection + offset;
         createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData);
     } else {
@@ -177,7 +178,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
             angleDifference += 2 * M_PI;
         }
 
-        float maxDifference = M_PI / 16;
+        float maxDifference = M_PI / 32;
         if (abs(angleDifference) > maxDifference) {
             if (angleDifference > 0) {
                 currentAngle = enemy.burstDirection + maxDifference;
