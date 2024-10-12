@@ -17,10 +17,11 @@ class ParticleSystem {
 public:
     ParticleSystem();
     ~ParticleSystem();
-    void init();
+    void init(GLFWwindow* window);
     void step(float elapsed_ms);
     void emit(const ParticleProps& particleProps);
     void render();
+    bool initScreenTexture();
 
     ParticleProps createParticle();
 private:
@@ -42,6 +43,11 @@ private:
     
     GLuint vao;
 	GLuint shaderProgram;
+    GLuint frame_buffer;
+    GLuint off_screen_render_buffer_color;
+	GLuint off_screen_render_buffer_depth;
+    
     glm::mat4 projection;
+    GLFWwindow* window;
 	GLint m_ParticleShaderViewProj, m_ParticleShaderTransform, m_ParticleShaderColor;
 };

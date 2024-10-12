@@ -249,14 +249,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
 	}
 
-	// Processing the salmon state
-	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
-
-    float min_counter_ms = 3000.f;
-	// reduce window brightness if the salmon is dying
-	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
-
 	return true;
 }
 

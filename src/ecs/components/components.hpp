@@ -59,12 +59,6 @@ struct Debug {
 };
 extern Debug debugging;
 
-// Sets the brightness of the screen
-struct ScreenState
-{
-	float darken_screen_factor = -1;
-};
-
 // Struct for dash
 
 // A struct to refer to debugging graphics in the ECS

@@ -33,6 +33,7 @@ int main()
 	ParticleSystem particleSystem;
 	EnemySystem enemySystem(&renderer);
 
+
 	// Initializing window
 	GLFWwindow* window = world.createWindow();
 	if (!window) {
@@ -44,7 +45,7 @@ int main()
 
 	// initialize the main systems
 	renderer.init(window);
-	particleSystem.init();
+	particleSystem.init(window);
 	ioSystem.init(window);
 	world.init(&renderer);
 
@@ -68,13 +69,14 @@ int main()
 			enemySystem.step(elapsed_ms);
 			particleSystem.step(elapsed_ms);
 			world.handleCollisions();
-
-			particleSystem.emit(particleSystem.createParticle());
 		}
-
+		renderer.drawSetupFrame();
+		renderer.drawGameElements();
+		renderer.drawToScreen(); //postprocessing
+		renderer.drawUI();
 		
-		renderer.draw();
-		particleSystem.render();
+		// particleSystem.render();
+		glfwSwapBuffers(window);
 		
 	}
 

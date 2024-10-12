@@ -186,11 +186,7 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
-// Render our game world
-// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
-void RenderSystem::draw()
-{
-	// Getting size of window
+void RenderSystem::drawSetupFrame(){
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
 
@@ -208,6 +204,13 @@ void RenderSystem::draw()
 	glDisable(GL_DEPTH_TEST); // native OpenGL does not work with a depth buffer
 							  // and alpha blending, one would have to sort
 							  // sprites back to front
+}
+
+// Render our game world
+// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
+void RenderSystem::drawGameElements()
+{
+	// Getting size of window
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
 	// Draw all textured meshes that have a position and size component
@@ -220,11 +223,12 @@ void RenderSystem::draw()
 		drawTexturedMesh(entity, projection_2D);
 	}
 
-	// Truely render to the screen
-	// since post-processing happens here
-	// consider moving post-processing later if UI elements (like dialogue)
-	// should be affected too
-	drawToScreen();
+	// flicker-free display with a double buffer
+	glfwSwapBuffers(window);
+	gl_has_errors();
+}
+void RenderSystem::drawUI() {
+	mat3 projection_2D = createProjectionMatrix();
 
 	// should put draw UI here (ideally using its own rendering system,
 	// and own projection matrix)
@@ -251,10 +255,6 @@ void RenderSystem::draw()
 		//draw Imgui
 		drawImGui();
 	#endif
-
-	// flicker-free display with a double buffer
-	glfwSwapBuffers(window);
-	gl_has_errors();
 }
 
 mat3 RenderSystem::createProjectionMatrix()

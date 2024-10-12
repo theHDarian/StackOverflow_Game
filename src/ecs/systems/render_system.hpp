@@ -85,7 +85,10 @@ public:
 	~RenderSystem();
 
 	// Draw all entities
-	void draw();
+	void drawSetupFrame();
+	void drawGameElements();
+	void drawUI();
+	void drawToScreen();
 
 	mat3 createProjectionMatrix();
 
@@ -95,7 +98,6 @@ public:
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
-	void drawToScreen();
 
 	// Window handle
 	GLFWwindow* window;

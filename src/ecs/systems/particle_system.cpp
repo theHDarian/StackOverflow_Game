@@ -8,9 +8,44 @@
 
 ParticleSystem::ParticleSystem() {
     particlePool.resize(1000);
+    for (int i = 0; i < 100; i++) {
+        emit(createParticle());
+    }
 }
 
-void ParticleSystem::init() {
+bool ParticleSystem::initScreenTexture()
+{
+	int framebuffer_width, framebuffer_height;
+	glfwGetFramebufferSize(const_cast<GLFWwindow*>(window), &framebuffer_width, &framebuffer_height);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
+
+	glGenTextures(1, &off_screen_render_buffer_color);
+	glBindTexture(GL_TEXTURE_2D, off_screen_render_buffer_color);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, framebuffer_width, framebuffer_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl_has_errors();
+
+	glGenRenderbuffers(1, &off_screen_render_buffer_depth);
+	glBindRenderbuffer(GL_RENDERBUFFER, off_screen_render_buffer_depth);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, off_screen_render_buffer_color, 0);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, framebuffer_width, framebuffer_height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, off_screen_render_buffer_depth);
+	gl_has_errors();
+
+	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	return true;
+}
+
+void ParticleSystem::init(GLFWwindow* window) {
+    this->window = window;
+    glfwMakeContextCurrent(window);
+
+    frame_buffer = 0;
+	glGenFramebuffers(1, &frame_buffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+	gl_has_errors();
+
     //setup projection matrix
     int window_width_px,window_height_px;
 	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -50,6 +85,8 @@ void ParticleSystem::init() {
     bool is_valid = loadEffectFromFile(shader_path("text.vs.glsl").c_str(), shader_path("text.fs.glsl").c_str(), shaderProgram);
     assert(is_valid && (GLuint)shaderProgram != 0);
     gl_has_errors();
+
+    initScreenTexture();
 
     //Clean up ib and vbo
     glDeleteBuffers(1,&vbo);
@@ -106,8 +143,24 @@ void ParticleSystem::emit(const ParticleProps& props) {
 }
 
 void ParticleSystem::render() {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    // Getting size of window
+	int w, h;
+	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
+
+	// First render to the custom framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+	gl_has_errors();
+	// Clearing backbuffer
+	glViewport(0, 0, w, h);
+	glDepthRange(0.00001, 10);
+	glClearColor(GLfloat(32/ 255), GLfloat(43 / 255), GLfloat(81 / 255), 1.0);
+	glClearDepth(10.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	gl_has_errors();
+    
     glUseProgram(shaderProgram);
     gl_has_errors();
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram,"projection");

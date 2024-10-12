@@ -16,7 +16,6 @@ public:
 	ComponentContainer<Player> players;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
-	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<IOState> ioStates;
 	ComponentContainer<GameState> gameStates;
 	ComponentContainer<WindowState> windowStates;
@@ -51,7 +50,6 @@ public:
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&renderRequests);
-		registry_list.push_back(&screenStates);
 		registry_list.push_back(&ioStates);
 		registry_list.push_back(&gameStates);
 		registry_list.push_back(&windowStates);
