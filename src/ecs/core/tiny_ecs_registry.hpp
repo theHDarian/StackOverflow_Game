@@ -42,6 +42,7 @@ public:
     ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
 	ComponentContainer<AttackData> attackDatas;
+	ComponentContainer<Burst> bursts;
 	ComponentContainer<HomingBullet> homes;
 
 
@@ -81,6 +82,7 @@ public:
 		registry_list.push_back(&dashes);
 		registry_list.push_back(&attackDatas);
 		registry_list.push_back(&homes);
+		registry_list.push_back(&bursts);
 	}
 
 	void clear_all_components() {

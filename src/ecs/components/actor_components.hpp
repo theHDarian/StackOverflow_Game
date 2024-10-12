@@ -171,6 +171,7 @@ enum class EnemyAttackPattern {
     SHOTGUN,
     ALL_DIRECTION, 
     BURST,
+    SPRAY,
     NONE
 };
 
@@ -241,6 +242,7 @@ struct AttackData {
     int bulletPierce = 0;
     int bulletBounce = 0;
     float homing = 0;
+    int maxBurst = 1;
 };
 
 struct EnemyBullet {
@@ -251,6 +253,12 @@ struct EnemyBullet {
     // Enemy bullet can scale x,y independently?
     int bulletBounce;
     std::vector<BulletStackEffect> bulletEffects;
+};
+
+struct Burst {
+    int curBurst = 0;
+    float burstCooldown = 0;
+    float burstDirection = 0;
 };
 
 struct HomingBullet {

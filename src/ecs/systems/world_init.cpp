@@ -215,6 +215,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
+	if (atkPattern == EnemyAttackPattern::SPRAY || atkPattern == EnemyAttackPattern::BURST) {
+		registry.bursts.emplace(entity);
+	}
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = twelveSpiralShot;
@@ -260,7 +263,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 
 	Invisible& inv = registry.invisibles.emplace(entity);
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
-	
+
 	auto& spriteComponent = registry.sprites.emplace(entity);
 
 	if (atkData.shape == RECTANGLE) {

@@ -185,3 +185,54 @@ AttackData threeHomingShot{
 	0,
 	0.01
 };
+
+AttackData threeBurst{
+	EnemyAttackPattern::BURST,
+	CIRCLE,
+	{},
+	blunt,
+	1,
+	M_PI/6,
+	{20,20},
+	200,
+	3000,
+	{0,0},
+	0,
+	1,
+	0,
+	3
+};
+
+AttackData fiveBurst{
+	EnemyAttackPattern::BURST,
+	CIRCLE,
+	{},
+	blunt,
+	1,
+	M_PI / 6,
+	{20,20},
+	200,
+	3000,
+	{0,0},
+	0,
+	1,
+	0,
+	5
+};
+
+AttackData threeSpray{
+	EnemyAttackPattern::SPRAY,
+	CIRCLE,
+	{},
+	blunt,
+	1,
+	M_PI / 16,
+	{20,20},
+	200,
+	3000,
+	{0,0},
+	0,
+	1,
+	0,
+	3
+};
