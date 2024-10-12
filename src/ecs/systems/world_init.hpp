@@ -33,10 +33,7 @@ Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b);
 Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern);
 
 // Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
-Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData);
-Entity createEnemyBulletSquare(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData);
-Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData);
-Entity createEnemyBulletTriangle(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData);
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData);
 
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);

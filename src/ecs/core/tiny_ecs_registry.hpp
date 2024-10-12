@@ -42,6 +42,7 @@ public:
     ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
 	ComponentContainer<AttackData> attackDatas;
+	ComponentContainer<HomingBullet> homes;
 
 
 	// constructor that adds all containers for looping over them
@@ -79,6 +80,7 @@ public:
         registry_list.push_back(&invisibles);
 		registry_list.push_back(&dashes);
 		registry_list.push_back(&attackDatas);
+		registry_list.push_back(&homes);
 	}
 
 	void clear_all_components() {

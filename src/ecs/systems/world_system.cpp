@@ -354,9 +354,10 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
 
 					// Assumes bullet flies towards facing direction
-					motion.angle = atan(motion.velocity.y / motion.velocity.x);
+					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
@@ -380,9 +381,9 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
-
+					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
 					// Assumes bullet flies towards facing direction
-					motion.angle = atan(motion.velocity.y/motion.velocity.x);
+					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}

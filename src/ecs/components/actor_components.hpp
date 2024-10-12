@@ -253,7 +253,7 @@ struct EnemyBullet {
     std::vector<BulletStackEffect> bulletEffects;
 };
 
-struct Homing {
+struct HomingBullet {
     Entity target;
     float homingIntensity; // How quickly it can turn towards the target
 };
@@ -269,4 +269,5 @@ struct Motion {
 	float angle = 0;
 	vec2 velocity = { 0, 0 };
 	vec2 scale = { 10, 10 };
+    vec2 veer = { 0,0 };
 };
