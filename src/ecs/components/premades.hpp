@@ -82,7 +82,7 @@ struct AttackData {
 	vec2 size = { 20,20 };
 	float speed = 200;
 	float bulletRange = 3000;
-	vec2 veer = { 0,0 };
+	vec2 veer = { 0,0 }; // {magnitude, angle}
 	int bulletPierce = 0;
 	int bulletBounce = 0;
 	float homing = 0;
@@ -136,6 +136,54 @@ AttackData fourAllAround{
 	0,
 	1,
 	0
+};
+
+AttackData twoPincerShot{
+	EnemyAttackPattern::SHOTGUN,
+	CIRCLE,
+	{},
+	blunt,
+	2,
+	M_PI / 1.0,
+	{20,20},
+	200,
+	3000,
+	{200,-2*M_PI/3.0},
+	0,
+	1,
+	0
+};
+
+AttackData twelveSpiralShot{
+	EnemyAttackPattern::ALL_DIRECTION,
+	TRIANGLE,
+	{},
+	blunt,
+	12,
+	0.0,
+	{20,20},
+	200,
+	3000,
+	{200,-2 * M_PI / 3.0},
+	0,
+	0,
+	0
+};
+
+AttackData threeHomingShot{
+	EnemyAttackPattern::SHOTGUN,
+	TRIANGLE,
+	{},
+	blunt,
+	3,
+	M_PI / 4.0,
+	{20,20},
+	200,
+	6000,
+	{0.0,0.0},
+	0,
+	0,
+	0.01
 };
 
 AttackData threeBurst{

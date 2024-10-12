@@ -133,18 +133,17 @@ void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData) {
         for (uint i = 0; i < atkData.numBullets / 2; i++) {
             float a1 = angle + (i + 0.5) * atkData.angleOffset;
             float a2 = angle - (i + 0.5) * atkData.angleOffset;
-            createEnemyBullet(render, pos, {cos(a1), sin(a1)}, atkData);
-            createEnemyBullet(render, pos, {cos(a2), sin(a2)}, atkData);
+            createEnemyBullet(render, pos, {cos(a1), sin(a1)}, atkData.veer.x * vec2(cos(a1 + atkData.veer.y), sin(a1 + atkData.veer.y)), atkData);
+            createEnemyBullet(render, pos, {cos(a2), sin(a2)}, atkData.veer.x * vec2(cos(a2 - atkData.veer.y), sin(a2 - atkData.veer.y)), atkData);
         }
     }
     else {
-        createEnemyBullet(render, pos, { cos(angle), sin(angle) }, atkData);
+        createEnemyBullet(render, pos, { cos(angle), sin(angle) }, atkData.veer.x * vec2(cos(angle), sin(angle)), atkData);
         for (uint i = 0; i < (atkData.numBullets - 1) / 2; i++) {
             float a1 = angle + (i + 1) * atkData.angleOffset;
             float a2 = angle - (i + 1) * atkData.angleOffset;
-            std::cout << a1 << ", " << a2 << std::endl;
-            createEnemyBullet(render, pos, { cos(a1), sin(a1) }, atkData);
-            createEnemyBullet(render, pos, { cos(a2), sin(a2) }, atkData);
+            createEnemyBullet(render, pos, { cos(a1), sin(a1) }, atkData.veer.x * vec2(cos(a1 + atkData.veer.y), sin(a1 + atkData.veer.y)), atkData);
+            createEnemyBullet(render, pos, { cos(a2), sin(a2) }, atkData.veer.x * vec2(cos(a2 - atkData.veer.y), sin(a2 - atkData.veer.y)), atkData);
         }
     }
 }
@@ -152,7 +151,7 @@ void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData) {
 void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData) {
     for (uint i = 0; i < atkData.numBullets; i++) {
         float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
-        createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData);
+        createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
     }
 }
 

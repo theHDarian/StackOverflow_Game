@@ -19,6 +19,18 @@ void PhysicsSystem::step(float elapsed_ms)
 		if (dash_registry.has(entity)) 
 			continue;
 		motion.position += motion.velocity * step_seconds;
+		motion.velocity += motion.veer * step_seconds;
+
+		//slightly broken
+		if (registry.enemyBullets.has(entity) || registry.playerBullets.has(entity)) motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+
+		if (registry.homes.has(entity) && registry.motions.has(registry.homes.get(entity).target)) {
+			vec2 target = registry.motions.get(registry.homes.get(entity).target).position;
+			float intensity = registry.homes.get(entity).homingIntensity;
+			target -= motion.position;
+			float mag = glm::length(motion.velocity);
+			motion.velocity = mag * (intensity * glm::normalize(target) + (1 - intensity) * glm::normalize(motion.velocity));
+		}
 	}
 
 	// Move dashing entities

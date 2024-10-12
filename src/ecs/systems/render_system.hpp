@@ -96,6 +96,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void drawCircleCollider(Entity entity, const mat3& projection);
 
 	// Window handle
 	GLFWwindow* window;

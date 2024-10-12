@@ -29,6 +29,7 @@ public:
 	ComponentContainer<TextRenderRequest> textRenderRequests;
 	ComponentContainer<UI> uis;
 	ComponentContainer<DialogueLines> dialogueLines;
+	ComponentContainer<BG> backgrounds;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -42,6 +43,7 @@ public:
 	ComponentContainer<Dash> dashes;
 	ComponentContainer<AttackData> attackDatas;
 	ComponentContainer<Burst> bursts;
+	ComponentContainer<HomingBullet> homes;
 
 
 	// constructor that adds all containers for looping over them
@@ -65,6 +67,7 @@ public:
 		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&uis);
 		registry_list.push_back(&dialogueLines);
+		registry_list.push_back(&backgrounds);
 
 		registry_list.push_back(&stackCompile);
 		registry_list.push_back(&invincibles);
@@ -78,6 +81,7 @@ public:
         registry_list.push_back(&invisibles);
 		registry_list.push_back(&dashes);
 		registry_list.push_back(&attackDatas);
+		registry_list.push_back(&homes);
 		registry_list.push_back(&bursts);
 	}
 

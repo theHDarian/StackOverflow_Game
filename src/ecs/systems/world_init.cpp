@@ -39,10 +39,6 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
-	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
-
 	return entity;
 }
 Entity createAimIndicator(RenderSystem* renderer) {
@@ -61,30 +57,6 @@ Entity createAimIndicator(RenderSystem* renderer) {
 		}
 	);
 	return aimIndicator;
-}
-// circle outline for circle collision
-Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float radius) {
-	auto entity = Entity();
-
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = angle;
-	motion.velocity = velocity;
-	motion.position = position;
-	motion.scale = vec2(radius * 2, radius * 2);
-
-	registry.renderRequests.insert(
-		entity,
-		{
-			TEXTURE_ASSET_ID::CIRCLE,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		});
-
-	return entity;
 }
 
 // Purely for testing walls, puts 2 fish at either end of the line segment
@@ -198,10 +170,6 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
-	Entity c = createCollisionCircle(renderer, position, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
-
 	return entity;
 }
 
@@ -214,6 +182,8 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.position = pos;
 	motion.scale = vec2({ 2880 /2, 1584 /2 });
+
+	registry.backgrounds.emplace(entity);
 
 	registry.renderRequests.insert(
 		entity,
@@ -251,6 +221,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = threeSpray;
+	atk = twelveSpiralShot;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x)/2;
@@ -263,22 +234,10 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
-	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
-
 	return entity;
 };
 
-Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
-	if (atkData.shape == EnemyBulletShape::CIRCLE) return createEnemyBulletCircle(renderer, pos, velocity, atkData);
-	if (atkData.shape == EnemyBulletShape::RECTANGLE) return createEnemyBulletSquare(renderer, pos, velocity, atkData);
-	if (atkData.shape == EnemyBulletShape::TRIANGLE) return createEnemyBulletTriangle(renderer, pos, velocity, atkData);
-		
-	return createEnemyBulletCircle(renderer, pos, velocity, atkData);
-}
-
-Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -288,126 +247,56 @@ Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, 
 	bullet.bulletSpeed = atkData.speed;
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
+	bullet.bulletEffects.push_back(atkData.defaultEffect);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
+	motion.scale = atkData.size; // Ensure scale is initialized
+	motion.veer = veer;
+
+	if (atkData.homing > 0.0) {
+		HomingBullet& homing = registry.homes.emplace(entity);
+		homing.homingIntensity = atkData.homing;
+		homing.target = registry.players.entities[0];
+	}
 
 	Invisible& inv = registry.invisibles.emplace(entity);
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
-
-	motion.scale = atkData.size; // Ensure scale is initialized
-
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x / 2;
-
-	bullet.bulletEffects.push_back(sizeUpA);
-
 	auto& spriteComponent = registry.sprites.emplace(entity);
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
 
-	registry.renderRequests.insert(
-		entity,
-		{
-			spriteComponent.sprites[SPRITE_STATE::BASE],
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		});
-
-	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
-
-	return entity;
-}
-
-Entity createEnemyBulletSquare(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
-	auto entity = Entity();
-
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	bullet.bulletSpeed = atkData.speed;
-	bullet.bulletRange = atkData.bulletRange;
-	bullet.bulletBounce = atkData.bulletBounce;
-
-	Motion& motion = registry.motions.emplace(entity);
-	motion.angle = atan2(velocity.y, velocity.x);
-	motion.position = pos;
-	motion.velocity = velocity * bullet.bulletSpeed;
-
-	Invisible& inv = registry.invisibles.emplace(entity);
-	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
-
-
-	motion.scale = atkData.size; // Ensure scale is initialized
-
-	PolyCollider& pc = registry.polyColliders.emplace(entity);
-	pc.offsetVertices = {
-		{motion.scale.x / 2,motion.scale.y / 2},
-		{motion.scale.x / 2,-motion.scale.y / 2},
-		{-motion.scale.x / 2,motion.scale.y / 2},
-		{-motion.scale.x / 2,-motion.scale.y / 2}
-	};
-	pc.maxLength = glm::length(vec2( motion.scale.x / 2,motion.scale.y / 2 ));
-	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-	//pc.setPolyLengths();
-
-	bullet.bulletEffects.push_back(sizeUpA);
-
-	auto& spriteComponent = registry.sprites.emplace(entity);
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
-
-	registry.renderRequests.insert(
-		entity,
-		{
-			spriteComponent.sprites[SPRITE_STATE::BASE],
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		});
-
-	return entity;
-}
-
-Entity createEnemyBulletTriangle(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
-	auto entity = Entity();
-
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	bullet.bulletSpeed = atkData.speed;
-	bullet.bulletRange = atkData.bulletRange;
-	bullet.bulletBounce = atkData.bulletBounce;
-
-	Motion& motion = registry.motions.emplace(entity);
-	motion.angle = atan2(velocity.y, velocity.x);
-	motion.position = pos;
-	motion.velocity = velocity * bullet.bulletSpeed;
-
-	Invisible& inv = registry.invisibles.emplace(entity);
-	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
-
-
-	motion.scale = atkData.size; // Ensure scale is initialized
-
-	PolyCollider& pc = registry.polyColliders.emplace(entity);
-	pc.offsetVertices = {
-		{motion.scale.x / 2, 0},
-		{-motion.scale.x / 2,-motion.scale.y / 2},
-		{-motion.scale.x / 2, motion.scale.y / 2}
-	};
-	pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
-	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-	//pc.setPolyLengths();
-
-	bullet.bulletEffects.push_back(sizeUpA);
-
-	auto& spriteComponent = registry.sprites.emplace(entity);
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
+	if (atkData.shape == RECTANGLE) {
+		PolyCollider& pc = registry.polyColliders.emplace(entity);
+		pc.offsetVertices = {
+			{motion.scale.x / 2,motion.scale.y / 2},
+			{motion.scale.x / 2,-motion.scale.y / 2},
+			{-motion.scale.x / 2,motion.scale.y / 2},
+			{-motion.scale.x / 2,-motion.scale.y / 2}
+		};
+		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		//pc.setPolyLengths();
+		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
+	}
+	else if (atkData.shape == TRIANGLE) {
+		PolyCollider& pc = registry.polyColliders.emplace(entity);
+		pc.offsetVertices = {
+			{motion.scale.x / 2, 0},
+			{-motion.scale.x / 2,-motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2}
+		};
+		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
+		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		//pc.setPolyLengths();
+		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
+	}
+	else {
+		CircleCollider& cc = registry.circleColliders.emplace(entity);
+		cc.radius = motion.scale.x / 2;
+		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
+	}
 
 	registry.renderRequests.insert(
 		entity,
