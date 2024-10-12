@@ -11,6 +11,7 @@
 #include "world_system.hpp"
 #include "io_system.hpp"
 #include "enemy_system.hpp"
+#include "ai_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -30,6 +31,7 @@ int main()
 	PhysicsSystem physics;
 	IOSystem ioSystem;
 	EnemySystem enemySystem(&renderer);
+	AISystem aiSystem;
 
 	// Initializing window
 	GLFWwindow* window = world.createWindow();
@@ -60,8 +62,10 @@ int main()
 		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isDialogue()) {
 			world.handleInput();
 		} else {
+
 			world.step(elapsed_ms);
 			physics.step(elapsed_ms);
+			aiSystem.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
 			world.handleCollisions();
 		}

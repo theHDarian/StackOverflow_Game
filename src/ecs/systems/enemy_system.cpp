@@ -33,8 +33,9 @@ void EnemySystem::step(float elapsed_ms)
     auto &motion_registry = registry.motions;
     auto &collision_registry = registry.collisions;
     std::vector<Entity> delete_queue;
-    
-    for (uint i = 0; i < enemy_registry.components.size(); i++) {
+
+    for (uint i = 0; i < enemy_registry.components.size(); i++)
+    {
         Enemy &enemy = enemy_registry.components[i];
         Entity &entity = enemy_registry.entities[i];
 
@@ -43,17 +44,18 @@ void EnemySystem::step(float elapsed_ms)
         float angle = motion.angle;
 
         /*
-      * Sky's AI logic: firing cooldown is handled by the shoot function, so no need to worry about that here
-      * The number of bursts and the interval between bursts is stored in the Shoots component
-      * change them per enemy type in createEnemy function in world_init.cpp
-      * pass render and elapsed_ms directly
-      * instead of an angle, pass a normalized vector. in the example, it's a vector pointing towards the player
-      * after that, pass the number of shots in a spread (think shotgun) and the spread angle (angle from the leftmost to the rightmost bullet)
-      * !! careful with the enemy death logic, this may crash if the enemy is removed before the function runs.
-      * the check for shoots component is there to prevent that, still best to put it before the damage handling
-      */
+         * Sky's AI logic: firing cooldown is handled by the shoot function, so no need to worry about that here
+         * The number of bursts and the interval between bursts is stored in the Shoots component
+         * change them per enemy type in createEnemy function in world_init.cpp
+         * pass render and elapsed_ms directly
+         * instead of an angle, pass a normalized vector. in the example, it's a vector pointing towards the player
+         * after that, pass the number of shots in a spread (think shotgun) and the spread angle (angle from the leftmost to the rightmost bullet)
+         * !! careful with the enemy death logic, this may crash if the enemy is removed before the function runs.
+         * the check for shoots component is there to prevent that, still best to put it before the damage handling
+         */
 
-        if (registry.shoots.has(entity)) {
+        if (registry.shoots.has(entity))
+        {
             vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
             vec2 playerDir = playerPos - pos;
             playerDir = glm::normalize(playerDir);
@@ -63,7 +65,7 @@ void EnemySystem::step(float elapsed_ms)
         // HANDLING DAMGE FROM COLLISION
         for (int i = collision_registry.entities.size() - 1; i >= 0; i--)
         {
-            Entity& entity = collision_registry.entities[i];
+            Entity &entity = collision_registry.entities[i];
             const Collision &collision = registry.collisions.get(entity);
             Entity other_entity = collision.other;
 
@@ -114,45 +116,71 @@ void EnemySystem::step(float elapsed_ms)
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
         }
-        
+
+        // ENEMY MOVEMENT HERE
+        auto &movement_registry = registry.enemyMovement;
+        for (int i = 0; i < movement_registry.size(); ++i)
+        {
+
+            Entity &entity = movement_registry.entities[i];
+            EnemyMovement &movement = movement_registry.get(entity);
+            Motion &motion = motion_registry.get(entity);
+
+            movement.t += movement.speed * elapsed_ms / 1000.f;
+            if (movement.t >= 1.0f)
+            {
+                movement.t = 1.0f;
+            }
+            float interX = movement.posA[0] + movement.t * (movement.posB[0] - movement.posA[0]);
+            float interY = movement.posA[1] + movement.t * (movement.posB[1] - movement.posA[1]);
+            motion.position[0] = interX;
+            motion.position[1] = interY;
+        }
+
     }
-    for (Entity entity: delete_queue) {
+    for (Entity entity : delete_queue)
+    {
         registry.deleteEntityAndRelatedEntities(entity);
     }
 }
 
-
-void EnemySystem::shoot(vec2 velocity, vec2 pos, float angle) {
+void EnemySystem::shoot(vec2 velocity, vec2 pos, float angle)
+{
     // SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
-    createEnemyBullet(render, pos, glm::normalize(velocity), { 20,40 }, glm::length(velocity), TRIANGLE);
+    createEnemyBullet(render, pos, glm::normalize(velocity), {20, 40}, glm::length(velocity), TRIANGLE);
 }
 
-void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread) {
-    //SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
-    // createBulletEnemy(render, pos, vec2(-100, 0), angle + PLACEHOLDER_FOR_ANGLE);
-    Shoots& pl = registry.shoots.get(enemy);
-    if (pl.currFiringInterval > 0) {
+void EnemySystem::shoot(Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread)
+{
+    // SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
+    //  createBulletEnemy(render, pos, vec2(-100, 0), angle + PLACEHOLDER_FOR_ANGLE);
+    Shoots &pl = registry.shoots.get(enemy);
+    if (pl.currFiringInterval > 0)
+    {
         pl.currFiringInterval -= elapsed_ms_since_last_update;
     }
-    if (pl.bulletBurstCooldown > 0) {
+    if (pl.bulletBurstCooldown > 0)
+    {
         pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
     }
-    if (pl.currFiringInterval <= 0) {
+    if (pl.currFiringInterval <= 0)
+    {
         pl.currBulletBurst = pl.maxBulletBurst;
         pl.currFiringInterval = pl.maxFiringInterval;
     }
-    if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
-        //convert interval from ms to rounds per second for getModifiedValue, then back to ms
+    if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0)
+    {
+        // convert interval from ms to rounds per second for getModifiedValue, then back to ms
         pl.currBulletBurst--;
         pl.bulletBurstCooldown = min(
             50.0f,
-            (pl.maxFiringInterval / pl.maxBulletBurst)
-        );
+            (pl.maxFiringInterval / pl.maxBulletBurst));
         // create bullet
         vec2 bulletPos = pos;
 
-        if (cluster == 1) {
-            createEnemyBullet(render, bulletPos, bulletDir, {20,20}, pl.bulletSpeed, CIRCLE);
+        if (cluster == 1)
+        {
+            createEnemyBullet(render, bulletPos, bulletDir, {20, 20}, pl.bulletSpeed, CIRCLE);
             return;
         }
 
@@ -162,35 +190,34 @@ void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_m
         // Create a rotation matrix
         glm::mat2 rotationMatrix = glm::mat2(
             glm::cos(offSet), -glm::sin(offSet),
-            glm::sin(offSet),  glm::cos(offSet)
-        );
+            glm::sin(offSet), glm::cos(offSet));
 
-
-        if (cluster == 2) {
-            createEnemyBullet(render, bulletPos, bulletDir*rotationMatrix, { 20,20 }, pl.bulletSpeed, CIRCLE);
-            createEnemyBullet(render, bulletPos, bulletDir*glm::transpose(rotationMatrix), { 20,20 }, pl.bulletSpeed, CIRCLE);
+        if (cluster == 2)
+        {
+            createEnemyBullet(render, bulletPos, bulletDir * rotationMatrix, {20, 20}, pl.bulletSpeed, CIRCLE);
+            createEnemyBullet(render, bulletPos, bulletDir * glm::transpose(rotationMatrix), {20, 20}, pl.bulletSpeed, CIRCLE);
             return;
         }
 
-        for (int i = 0; i < cluster; i++) {
-            if (i == 0) {
-                createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
+        for (int i = 0; i < cluster; i++)
+        {
+            if (i == 0)
+            {
+                createEnemyBullet(render, bulletPos, bulletDir, {20, 20}, pl.bulletSpeed, CIRCLE);
                 continue;
             }
-            for (int j = 0; j < i; j++) {
-                if (i % 2 == 0) {
+            for (int j = 0; j < i; j++)
+            {
+                if (i % 2 == 0)
+                {
                     bulletDir = bulletDir * rotationMatrix;
                 }
-                else {
+                else
+                {
                     bulletDir = bulletDir * glm::transpose(rotationMatrix);
                 }
             }
-            createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
+            createEnemyBullet(render, bulletPos, bulletDir, {20, 20}, pl.bulletSpeed, CIRCLE);
         }
     }
 }
-
-
-
-
-

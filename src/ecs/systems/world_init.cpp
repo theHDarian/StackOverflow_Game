@@ -2,6 +2,7 @@
 #include "tiny_ecs_registry.hpp"
 #include <glm/trigonometric.hpp>
 #include "bullet_effects.hpp"
+#include "ai_system.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
@@ -233,7 +234,7 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern, EnemyBehavior behavior) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -247,11 +248,19 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 1;
+	enemy.maxHealth = 20;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
+	enemy.behavior = behavior;
+
+	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
+	movement.posA = pos;
+	movement.posB = pos;
+	movement.speed = 0.1f;
+	movement.firstMove = true;
+	movement.t = 0.0f;
 
 	Shoots &shoot = registry.shoots.emplace(entity);
 	shoot.maxBulletBurst = 3;

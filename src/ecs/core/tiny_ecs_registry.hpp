@@ -29,6 +29,7 @@ public:
 	ComponentContainer<TextRenderRequest> textRenderRequests;
 	ComponentContainer<UI> uis;
 	ComponentContainer<DialogueLines> dialogueLines;
+	ComponentContainer<EnemyMovement> enemyMovement;
 
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
@@ -63,7 +64,8 @@ public:
 		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&uis);
 		registry_list.push_back(&dialogueLines);
-
+		registry_list.push_back(&enemyMovement);
+		
 		registry_list.push_back(&stackCompile);
 		registry_list.push_back(&invincibles);
 		registry_list.push_back(&circleColliders);

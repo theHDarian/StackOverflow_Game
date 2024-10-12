@@ -32,7 +32,7 @@ Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b);
 Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float rad);
 
 // the enemy
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern);
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern, EnemyBehavior behavior);
 
 // Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
 Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 size, float speed, EnemyBulletShape shape);
