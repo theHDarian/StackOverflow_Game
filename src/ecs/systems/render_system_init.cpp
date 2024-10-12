@@ -45,6 +45,11 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // vsync
 
+	if (registry.frames.components.size() <= 0) {
+		auto ent = Entity();
+		registry.frames.emplace(ent);
+	}
+
 	// Load OpenGL function pointers
 	const int is_fine = gl3w_init();
 	assert(is_fine == 0);

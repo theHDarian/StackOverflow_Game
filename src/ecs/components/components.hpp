@@ -67,6 +67,11 @@ struct DebugComponent
 	// Note, an empty struct has size 1
 };
 
+struct Frame {
+	GLuint prevTexture;
+	GLuint prevFrameBuffer;
+};
+
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType { Background, SFX };
 struct Sound {

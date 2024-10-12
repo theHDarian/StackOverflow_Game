@@ -70,12 +70,13 @@ int main()
 			particleSystem.step(elapsed_ms);
 			world.handleCollisions();
 		}
+		registry.frames.components[0].prevFrameBuffer = 0;
 		renderer.drawSetupFrame();
 		renderer.drawGameElements();
+		particleSystem.render();
 		renderer.drawToScreen(); //postprocessing
 		renderer.drawUI();
 		
-		// particleSystem.render();
 		glfwSwapBuffers(window);
 		
 	}

@@ -160,6 +160,18 @@ void ParticleSystem::render() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 	gl_has_errors();
+    Frame& frame = registry.frames.components[0];
+    if(frame.prevFrameBuffer != 0) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+
+		//copy contents of previous buffer to current
+		glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		gl_has_errors();
+		glBindFramebuffer(GL_FRAMEBUFFER,frame_buffer);
+	}
+    frame.prevFrameBuffer = frame_buffer;
+    frame.prevTexture = off_screen_render_buffer_color;
     
     glUseProgram(shaderProgram);
     gl_has_errors();
@@ -178,10 +190,8 @@ void ParticleSystem::render() {
         glm::vec4 color = glm::lerp(particle.colorBegin,particle.colorEnd,lifePassed);
         float size = glm::lerp(particle.sizeBegin,particle.sizeEnd,lifePassed);
 
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), { particle.position.x, particle.position.y, 0.0f })
-            * glm::rotate(glm::mat4(1.0f), particle.rotation, { 0.0f, 0.0f, 1.0f })
-            * glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
-
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), { particle.position.x, particle.position.y, 0.0f }) * glm::rotate(glm::mat4(1.0f), particle.rotation, { 0.0f, 0.0f, 1.0f }) * glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
+    
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
         glUniform4fv(colorLoc, 1, glm::value_ptr(color));
         glBindVertexArray(vao);
@@ -197,9 +207,9 @@ ParticleProps ParticleSystem::createParticle() {
     props.velocityVariation = { 3.0f,1.0f};
     props.colorBegin = {254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f};	
     props.colorEnd = {254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f};
-    props.sizeBegin = 0.5f;
+    props.sizeBegin = 10.0f;
     props.sizeVariation = 0.3f;
-    props.sizeEnd = 0.0f;		
+    props.sizeEnd = 100.0f;		
     props.lifetime = 10000.0f;
     return props;
 }

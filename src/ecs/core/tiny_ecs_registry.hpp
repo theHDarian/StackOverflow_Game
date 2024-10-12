@@ -39,6 +39,7 @@ public:
 	ComponentContainer<Shoots> shoots;
     ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
+	ComponentContainer <Frame> frames;
 
 
 	// constructor that adds all containers for looping over them
@@ -60,6 +61,7 @@ public:
 		registry_list.push_back(&spriteTimers);
 		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&uis);
+		registry_list.push_back(&frames);
 		registry_list.push_back(&dialogueLines);
 
 		registry_list.push_back(&stackCompile);

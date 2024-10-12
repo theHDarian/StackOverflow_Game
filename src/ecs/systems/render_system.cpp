@@ -175,8 +175,8 @@ void RenderSystem::drawToScreen()
 
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
-
-	glBindTexture(GL_TEXTURE_2D, off_screen_render_buffer_color);
+	Frame& frame = registry.frames.components[0];
+	glBindTexture(GL_TEXTURE_2D, frame.prevTexture);
 	gl_has_errors();
 	// Draw
 	glDrawElements(
@@ -188,12 +188,10 @@ void RenderSystem::drawToScreen()
 
 void RenderSystem::drawSetupFrame(){
 	int w, h;
-	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
+	glfwGetFramebufferSize(window, &w, &h);
+	Frame& frame = registry.frames.components[0];
 
-	// First render to the custom framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-	gl_has_errors();
-	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
 	glClearColor(GLfloat(32/ 255), GLfloat(43 / 255), GLfloat(81 / 255), 1.0);
@@ -201,9 +199,19 @@ void RenderSystem::drawSetupFrame(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_DEPTH_TEST); // native OpenGL does not work with a depth buffer
-							  // and alpha blending, one would have to sort
-							  // sprites back to front
+	glDisable(GL_DEPTH_TEST);
+
+	if(frame.prevFrameBuffer != 0) {
+		std::cout << "copying" << std::endl;
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+
+		//copy contents of previous buffer to current
+		glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		gl_has_errors();
+		glBindFramebuffer(GL_FRAMEBUFFER,frame_buffer);
+	}
+	frame.prevFrameBuffer = frame_buffer;
 }
 
 // Render our game world
@@ -222,10 +230,6 @@ void RenderSystem::drawGameElements()
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
 	}
-
-	// flicker-free display with a double buffer
-	glfwSwapBuffers(window);
-	gl_has_errors();
 }
 void RenderSystem::drawUI() {
 	mat3 projection_2D = createProjectionMatrix();
