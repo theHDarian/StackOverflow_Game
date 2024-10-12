@@ -10,11 +10,6 @@
 #include <vector>
 #include <chrono>
 
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-
 float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
 float PLACEHOLDER_FOR_ANGLE = 0.f;

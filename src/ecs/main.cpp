@@ -10,6 +10,7 @@
 #include "render_system.hpp"
 #include "world_system.hpp"
 #include "io_system.hpp"
+#include "particle_system.hpp"
 #include "enemy_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
@@ -29,6 +30,7 @@ int main()
 	RenderSystem renderer;
 	PhysicsSystem physics;
 	IOSystem ioSystem;
+	ParticleSystem particleSystem;
 	EnemySystem enemySystem(&renderer);
 
 	// Initializing window
@@ -42,6 +44,7 @@ int main()
 
 	// initialize the main systems
 	renderer.init(window);
+	particleSystem.init();
 	ioSystem.init(window);
 	world.init(&renderer);
 
@@ -63,11 +66,16 @@ int main()
 			world.step(elapsed_ms);
 			physics.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
+			particleSystem.step(elapsed_ms);
 			world.handleCollisions();
+
+			particleSystem.emit(particleSystem.createParticle());
 		}
 
-
+		
 		renderer.draw();
+		particleSystem.render();
+		
 	}
 
 	return EXIT_SUCCESS;
