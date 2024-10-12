@@ -175,7 +175,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
         std::cout << "offset: " << offset << std::endl;
         offset = burst.burstDirection + offset;
-        createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData);
+        createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData.veer.x * vec2(cos(offset + atkData.veer.y)),atkData);
     } else {
         float currentAngle = atan2(glm::normalize(velocity).y, glm::normalize(velocity).x);
         float angleDifference = currentAngle - burst.burstDirection;
@@ -196,7 +196,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         }
 
         float angle = currentAngle;
-        createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData);
+        createEnemyBullet(render, pos, {cos(angle), sin(angle)},atkData.veer.x * vec2(cos(angle + atkData.veer.y)), atkData);
     }
     burst.curBurst--;
     burst.burstCooldown = 150;

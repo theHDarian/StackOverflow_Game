@@ -220,7 +220,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	}
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = threeSpray;
 	atk = twelveSpiralShot;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
