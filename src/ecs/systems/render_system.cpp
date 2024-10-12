@@ -236,6 +236,20 @@ void RenderSystem::draw()
 	// save where text should be drawn
 	vec2 stackTextPos = drawBulletStack(projection_2D);
 
+	// Truely render to the screen
+	// also where post-processing occurs
+	drawToScreen();
+
+	glBindVertexArray(0);
+
+	// draw stack text here for now
+	// (want it to show under most ui
+	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+	std::string text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+	RenderText(text, stackTextPos.x, stackTextPos.y, 0.25, vec3(1, 1, 1));
+
+	glBindVertexArray(vao);
+
 	// should put draw UI here (ideally using its own rendering system, and own projection matrix)
 	// should also remove show from render request
 	for (Entity entity : registry.uis.entities) {
@@ -243,10 +257,6 @@ void RenderSystem::draw()
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 	}
-
-	// Truely render to the screen
-	// also where post-processing occurs
-	drawToScreen();
 
 	glBindVertexArray(0);
 
@@ -259,11 +269,6 @@ void RenderSystem::draw()
 		if (registry.renderRequests.get(entity).show)
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
-
-	// draw stack text here for now
-	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-	std::string text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
-	RenderText(text, stackTextPos.x, stackTextPos.y, 0.25, vec3(1, 1, 1));
 
 	#if IMGUI_ENABLED
 		//draw Imgui

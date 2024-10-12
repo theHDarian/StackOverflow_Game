@@ -48,8 +48,9 @@ vec2 AISystem::getMove(EnemyBehavior behavior) {
 		
 		case EnemyBehavior::PATHFINDING:
 			return vec2{0, 0};
+		default:
+			return vec2{ 0, 0 };
 	}
-
 }
 
 vec2 AISystem::generateRandomPos() {
