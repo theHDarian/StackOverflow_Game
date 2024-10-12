@@ -61,6 +61,26 @@ class RenderSystem {
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
 
+	// may even consider mapping colours to pallete colour names
+	std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
+			{BulletDamage,      {1, 1, 1}},
+			{ProjectileSpeed,   {1, 1, 1}},
+			{ProjectileSize,    {1, 1, 1}},
+			{FireRate,          {1, 1, 1}},
+			{BulletRange,       {1, 1, 1}},
+			{BulletSpread,      {1, 1, 1}},
+			{BulletNum,         {1, 1, 1}},
+			{BulletBurst,       {1, 1, 1}},
+			{Bounce,            {1, 1, 1}},
+			{Pierce,            {1, 1, 1}},
+			{Homing,            {1, 1, 1}},
+			{PlayerSpeed,       {1, 1, 1}},
+			{PlayerNumDash,     {1, 1, 1}},
+			{PlayerStackSize,   {1, 1, 1}},
+			{PlayerDashCDR,     {1, 1, 1}},
+			{Inert,             {91 / 255.f, 99 / 255.f, 128 / 255.f}}
+	};
+
 public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
@@ -97,6 +117,8 @@ private:
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 	void drawCircleCollider(Entity entity, const mat3& projection);
+	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
+	vec2 drawBulletStack(const mat3& projection);
 
 	// Window handle
 	GLFWwindow* window;

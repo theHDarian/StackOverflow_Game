@@ -374,7 +374,7 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 	auto& lines = registry.dialogueLines.emplace(entity);
 	lines.lines.push_back("hello, this is a dialogue box.\npress e to go to next dialogue");
 	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\n as a temp fix for that, the game is paused while dialogue is happening");
-	lines.lines.push_back("but also note the dialogue \"paused \" state is separate from the game paused state!");
+	lines.lines.push_back("but also note the dialogue \"paused \" state is separate from the game paused state!\n(press esc to pause the game right now and see)");
 	lines.lines.push_back("oh hey there's no more dialogue after this, so pressing e again won't open another dialogue box\ngoodbye");
 
 	return entity;

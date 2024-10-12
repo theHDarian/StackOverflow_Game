@@ -43,7 +43,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
 
 	// Setting vertex and index buffers
-	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
@@ -103,6 +102,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
 	glUniform3fv(color_uloc, 1, (float *)&color);
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 0);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -133,7 +134,6 @@ void RenderSystem::drawToScreen()
 	// Setting shaders
 	// get the water texture, sprite mesh, and program
 	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS]);
-	glBindVertexArray(vao);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -208,6 +208,9 @@ void RenderSystem::draw()
 	glDisable(GL_DEPTH_TEST); // native OpenGL does not work with a depth buffer
 							  // and alpha blending, one would have to sort
 							  // sprites back to front
+	// assume the entire render system uses 1 vao for now
+	glBindVertexArray(vao);
+
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
 
@@ -230,14 +233,10 @@ void RenderSystem::draw()
 			drawCircleCollider(entity, projection_2D);
 	}
 
-	// Truely render to the screen
-	// since post-processing happens here
-	// consider moving post-processing later if UI elements (like dialogue)
-	// should be affected too
-	drawToScreen();
+	// save where text should be drawn
+	vec2 stackTextPos = drawBulletStack(projection_2D);
 
-	// should put draw UI here (ideally using its own rendering system,
-	// and own projection matrix)
+	// should put draw UI here (ideally using its own rendering system, and own projection matrix)
 	// should also remove show from render request
 	for (Entity entity : registry.uis.entities) {
 		if (!registry.renderRequests.get(entity).show)
@@ -245,7 +244,13 @@ void RenderSystem::draw()
 		drawTexturedMesh(entity, projection_2D);
 	}
 
-	// copied above method to draw all text components
+	// Truely render to the screen
+	// also where post-processing occurs
+	drawToScreen();
+
+	glBindVertexArray(0);
+
+	// draw all text components
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
 		auto& textReq = registry.textRenderRequests.get(entity);
@@ -255,7 +260,10 @@ void RenderSystem::draw()
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
 
-	glBindVertexArray(0);
+	// draw stack text here for now
+	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+	std::string text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+	RenderText(text, stackTextPos.x, stackTextPos.y, 0.25, vec3(1, 1, 1));
 
 	#if IMGUI_ENABLED
 		//draw Imgui
@@ -267,20 +275,193 @@ void RenderSystem::draw()
 	gl_has_errors();
 }
 
+// should really consider making a draw textured mesh function without relying on an entity/for UI
+// currently just draws a box as a container
+vec2 RenderSystem::drawBulletStack(const mat3& projection) {
+	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+	WindowState& windowState = registry.windowStates.components[0];
+	vec2 bulletStartPos = { 75, windowState.height - 200 };
+	vec2 bulletSize = { 50, 50 };
+	float bulletOffset = 10; // space between bullets
+
+	vec2 stackSize = vec2(bulletSize.x + 2 * bulletOffset, stack.baseStackSize * bulletSize.y + stack.baseStackSize * bulletOffset +  2 * bulletOffset);
+	vec2 stackPos = vec2(bulletStartPos.x, bulletStartPos.y - stackSize.y / 2 + bulletSize.y - bulletOffset);
+	Transform transform;
+	transform.translate(stackPos);
+	transform.scale(stackSize);
+
+	vec3 color = { 11/255.f, 84/255.f, 87/255.f };
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	// want to overwrite the colour with given; could also use a separate shader program
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 1);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+
+	// draw bullet stack here for now, based on bullet effects
+	for (int i = 0; i < stack.currStack.size(); i++) {
+		// no variance on shape for now
+		TEXTURE_ASSET_ID bulletShape = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
+		// start from bottom to top
+		drawUIBullet(vec2(bulletStartPos.x, bulletStartPos.y - i * bulletSize.y - i * bulletOffset), bulletSize,
+			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
+	}
+
+	// very lazy implementation
+	// rendering text in the middle of this causes weird artifacts, so save text position info for later
+	return vec2(stackPos.x - bulletSize.x, (bulletStartPos.y - windowState.height) * -1 - 2 * bulletOffset - bulletSize.y);
+}
+
+// draws bullet ui based on stack info
+// not sure how bullets should look, so took a rectangle for now
+void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection) {
+	// Consider: using stack ui's position to draw bullets
+	Transform transform;
+	transform.translate(position);
+	transform.scale(bullet_size);
+
+	// for now, draw bullets using textures
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)shape];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	// want to overwrite the colour with given; could also use a separate shader program
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 1);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
+// draws outlines for collision circles; considering just passing in circle data
 void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 	Motion& motion = registry.motions.get(entity);
-	// Transformation code, see Rendering and Transformation in the template
-	// specification for more info Incrementally updates transformation matrix,
-	// thus ORDER IS IMPORTANT
 	auto& circle = registry.circleColliders.get(entity);
 
 	Transform transform;
 	transform.translate(motion.position);
 	transform.rotate(motion.angle);
 	transform.scale({ circle.radius * 2, circle.radius * 2});
-
-	assert(registry.renderRequests.has(entity));
-	const RenderRequest& render_request = registry.renderRequests.get(entity);
 
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
 	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
@@ -290,12 +471,10 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 	glUseProgram(program);
 	gl_has_errors();
 
-	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
 
 	// Setting vertex and index buffers
-	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
@@ -327,12 +506,6 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();
 
-	// Getting uniform locations for glUniform* calls
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float*)&color);
-	gl_has_errors();
-
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -352,8 +525,6 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
-
-	glBindVertexArray(0);
 }
 
 mat3 RenderSystem::createProjectionMatrix()
