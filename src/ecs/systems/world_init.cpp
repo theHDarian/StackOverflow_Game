@@ -206,7 +206,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity) {
 	motion.angle = 0.f;
 	motion.position = pos;
 	motion.velocity = velocity;
-	motion.scale = vec2({ 140.0f, 140.0f });
+	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 2000;
@@ -223,7 +223,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity) {
 	}
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = abs(motion.scale.x)/2;
+	cc.radius = abs(min(motion.scale.x, motion.scale.y))/2.5;
 
 	registry.renderRequests.insert(
 		entity,
