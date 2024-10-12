@@ -39,10 +39,6 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
-	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
-
 	return entity;
 }
 Entity createAimIndicator(RenderSystem* renderer) {
@@ -61,30 +57,6 @@ Entity createAimIndicator(RenderSystem* renderer) {
 		}
 	);
 	return aimIndicator;
-}
-// circle outline for circle collision
-Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float radius) {
-	auto entity = Entity();
-
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = angle;
-	motion.velocity = velocity;
-	motion.position = position;
-	motion.scale = vec2(radius * 2, radius * 2);
-
-	registry.renderRequests.insert(
-		entity,
-		{
-			TEXTURE_ASSET_ID::CIRCLE,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		});
-
-	return entity;
 }
 
 // Purely for testing walls, puts 2 fish at either end of the line segment
@@ -198,10 +170,6 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
-	Entity c = createCollisionCircle(renderer, position, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
-
 	return entity;
 }
 
@@ -214,6 +182,8 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.position = pos;
 	motion.scale = vec2({ 2880 /2, 1584 /2 });
+
+	registry.backgrounds.emplace(entity);
 
 	registry.renderRequests.insert(
 		entity,
@@ -259,10 +229,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
-
-	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
 
 	return entity;
 };
@@ -313,10 +279,6 @@ Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, 
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
-	Entity c = createCollisionCircle(renderer, pos, motion.angle, motion.velocity, cc.radius);
-	auto& shapes = registry.collisionShapes.emplace(entity);
-	shapes.shapes.push_back(c);
-
 	return entity;
 }
 
@@ -365,6 +327,7 @@ Entity createEnemyBulletSquare(RenderSystem* renderer, vec2 pos, vec2 velocity, 
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+
 
 	return entity;
 }

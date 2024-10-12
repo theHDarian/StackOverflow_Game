@@ -233,3 +233,7 @@ struct DialogueLines {
 		}
 	}
 };
+
+struct BG {
+
+};
