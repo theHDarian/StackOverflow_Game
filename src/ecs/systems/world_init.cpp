@@ -196,7 +196,7 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern, EnemyBehavior behavior) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -209,11 +209,20 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity) {
 	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
 	Enemy& enemy = registry.enemies.emplace(entity);
-	enemy.attackCooldown = 2000;
-	enemy.maxHealth = 1;
+	enemy.attackCooldown = 5000;
+	enemy.maxHealth = 20;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
+	enemy.attackPattern = atkPattern;
+	enemy.behavior = behavior;
+
+	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
+	movement.posA = pos;
+	movement.posB = pos;
+	movement.speed = 0.1f;
+	movement.firstMove = true;
+	movement.t = 0.0f;
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = threeBurst;

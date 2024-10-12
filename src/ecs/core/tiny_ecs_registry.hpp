@@ -30,7 +30,7 @@ public:
 	ComponentContainer<UI> uis;
 	ComponentContainer<DialogueLines> dialogueLines;
 	ComponentContainer<BG> backgrounds;
-
+	ComponentContainer<EnemyMovement> enemyMovement;
 	ComponentContainer<StackCompile> stackCompile;
 	ComponentContainer<Invincible> invincibles;
 	ComponentContainer<CircleCollider> circleColliders;
@@ -67,8 +67,8 @@ public:
 		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&uis);
 		registry_list.push_back(&dialogueLines);
+		registry_list.push_back(&enemyMovement);
 		registry_list.push_back(&backgrounds);
-
 		registry_list.push_back(&stackCompile);
 		registry_list.push_back(&invincibles);
 		registry_list.push_back(&circleColliders);

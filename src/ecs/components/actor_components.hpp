@@ -175,17 +175,33 @@ enum class EnemyAttackPattern {
     NONE
 };
 
+enum class EnemyBehavior {
+    // this is the basic
+    RANDOM,
+    FOLLOW_PLAYER,
+    PATHFINDING,
+};
+
 // anything that is deadly to the player
 struct Enemy {
 	int state; //TODO: can change to enum once state determined
     int maxHealth;
     int currHealth;
     float speed;
-
     // TODO add attack pattern data?
     float attackCooldown;
-    //std::vector<AttackData> attacks;
+    EnemyAttackPattern attackPattern;
+    EnemyBehavior behavior;
+    float veer;
 
+};
+
+struct EnemyMovement {
+    vec2 posA;
+    vec2 posB;
+    float t;
+    float speed;
+    bool firstMove;
 };
 
 struct BossEnemy {
