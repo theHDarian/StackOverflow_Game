@@ -245,6 +245,8 @@ void RenderSystem::draw()
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
 
+	glBindVertexArray(0);
+
 	#if IMGUI_ENABLED
 		//draw Imgui
 		drawImGui();
