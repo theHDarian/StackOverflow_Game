@@ -192,7 +192,7 @@ AttackData threeBurst{
 	CIRCLE,
 	{},
 	blunt,
-	1,
+	4,
 	M_PI/6,
 	{20,20},
 	200,
@@ -200,8 +200,7 @@ AttackData threeBurst{
 	{0,0},
 	0,
 	1,
-	0,
-	10
+	0
 };
 
 AttackData fiveBurst{
@@ -209,7 +208,7 @@ AttackData fiveBurst{
 	CIRCLE,
 	{},
 	blunt,
-	1,
+	6,
 	M_PI / 6,
 	{20,20},
 	200,
@@ -218,7 +217,6 @@ AttackData fiveBurst{
 	0,
 	1,
 	0,
-	5
 };
 
 AttackData threeSpray{
@@ -226,7 +224,7 @@ AttackData threeSpray{
 	CIRCLE,
 	{},
 	blunt,
-	1,
+	3,
 	M_PI / 16,
 	{20,20},
 	200,
@@ -234,6 +232,5 @@ AttackData threeSpray{
 	{0,0},
 	0,
 	1,
-	0,
-	3
+	0
 };

@@ -118,7 +118,7 @@ void EnemySystem::step(float elapsed_ms)
                 if (burst.curBurst <= 0)
                 {
                     enemy.attackCooldown = COOLDOWN_SHOOT_MS;
-                    burst.curBurst = atkData.maxBurst;
+                    burst.curBurst = atkData.numBullets;
                 }
             }
         }
@@ -170,7 +170,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
         offset = burst.burstDirection + offset;
         createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData.veer.x * vec2(cos(offset + atkData.veer.y)),atkData);
-    } else if (burst.curBurst != atkData.maxBurst) {
+    } else if (burst.curBurst != atkData.numBullets) {
         float currentAngle = atan2(velocity.y, velocity.x);
         float angleDifference = currentAngle - burst.burstDirection;
 

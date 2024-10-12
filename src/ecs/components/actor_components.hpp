@@ -243,7 +243,6 @@ struct AttackData {
     int bulletPierce = 0;
     int bulletBounce = 0;
     float homing = 0;
-    int maxBurst = 1;
 };
 
 struct EnemyBullet {
