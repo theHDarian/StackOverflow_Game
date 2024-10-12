@@ -122,6 +122,25 @@ void EnemySystem::step(float elapsed_ms)
                 }
             }
         }
+
+        auto &movement_registry = registry.enemyMovement;
+        for (int i = 0; i < movement_registry.size(); ++i)
+        {
+
+            Entity &entity = movement_registry.entities[i];
+            EnemyMovement &movement = movement_registry.get(entity);
+            Motion &motion = motion_registry.get(entity);
+
+            movement.t += movement.speed * elapsed_ms / 1000.f;
+            if (movement.t >= 1.0f)
+            {
+                movement.t = 1.0f;
+            }
+            float interX = movement.posA[0] + movement.t * (movement.posB[0] - movement.posA[0]);
+            float interY = movement.posA[1] + movement.t * (movement.posB[1] - movement.posA[1]);
+            motion.position[0] = interX;
+            motion.position[1] = interY;
+        }
         
     }
     for (Entity entity: delete_queue) {

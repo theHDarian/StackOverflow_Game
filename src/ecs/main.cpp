@@ -11,6 +11,7 @@
 #include "world_system.hpp"
 #include "io_system.hpp"
 #include "enemy_system.hpp"
+#include "ai_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -29,6 +30,7 @@ int main()
 	RenderSystem renderer;
 	PhysicsSystem physics;
 	IOSystem ioSystem;
+	AISystem aiSystem;
 	EnemySystem enemySystem(&renderer);
 
 	// Initializing window
@@ -62,6 +64,7 @@ int main()
 		} else {
 			world.step(elapsed_ms);
 			physics.step(elapsed_ms);
+			aiSystem.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
 			world.handleCollisions();
 		}
