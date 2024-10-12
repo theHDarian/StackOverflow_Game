@@ -104,15 +104,17 @@ void EnemySystem::step(float elapsed_ms)
                 shootShotgun(playerMotion.position - pos, pos, atkData);
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
-            else if (enemy.attackPattern == EnemyAttackPattern::ALL_DIRECTION)
+            else if (atkData.attackType == EnemyAttackPattern::ALL_DIRECTION)
             {
                 shootAllDirection(pos, atkData);
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
-            else if (enemy.attackPattern == EnemyAttackPattern::BURST || enemy.attackPattern == EnemyAttackPattern::SPRAY)
+            else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
             {
                 Burst& burst = registry.bursts.get(entity);
+                vec2 velocity = playerMotion.position - pos;
                 shootBurst(playerMotion.position - pos, pos, atkData, elapsed_ms, burst, enemy);
+                burst.burstDirection = atan2(velocity.y, velocity.x);
                 if (burst.curBurst <= 0)
                 {
                     enemy.attackCooldown = COOLDOWN_SHOOT_MS;
@@ -156,35 +158,21 @@ void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData) {
 }
 
 void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst, Enemy& enemy) {
+    if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0) {
+        return;
+    }
 
-    if (burst.curBurst <= 0) {
-        return;
-    }
-    if ((burst.burstCooldown -= elapsed_ms) > 0) {
-        return;
-    }
-    if (burst.curBurst == atkData.maxBurst)
-    {
-        burst.burstDirection = atan2(glm::normalize(velocity).y , glm::normalize(velocity).x);
-    }
-    if (enemy.attackPattern == EnemyAttackPattern::SPRAY)
+    if (atkData.attackType == EnemyAttackPattern::SPRAY)
     {
         double range = atkData.angleOffset;
 
         // Generate a random offset within the range
         double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
-        std::cout << "offset: " << offset << std::endl;
         offset = burst.burstDirection + offset;
         createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData.veer.x * vec2(cos(offset + atkData.veer.y)),atkData);
-    } else {
-        float currentAngle = atan2(glm::normalize(velocity).y, glm::normalize(velocity).x);
+    } else if (burst.curBurst != atkData.maxBurst) {
+        float currentAngle = atan2(velocity.y, velocity.x);
         float angleDifference = currentAngle - burst.burstDirection;
-
-        if (angleDifference > M_PI) {
-            angleDifference -= 2 * M_PI;
-        } else if (angleDifference < -M_PI) {
-            angleDifference += 2 * M_PI;
-        }
 
         float maxDifference = M_PI / 32;
         if (abs(angleDifference) > maxDifference) {
@@ -196,76 +184,14 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         }
 
         float angle = currentAngle;
-        createEnemyBullet(render, pos, {cos(angle), sin(angle)},atkData.veer.x * vec2(cos(angle + atkData.veer.y)), atkData);
+        std::cout << angle << std::endl;
+        createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData.veer.x * vec2(cos(angle + atkData.veer.y)), atkData);
     }
     burst.curBurst--;
     burst.burstCooldown = 150;
 
 
 }
-
-//void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread) {
-//    //SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
-//    // createBulletEnemy(render, pos, vec2(-100, 0), angle + PLACEHOLDER_FOR_ANGLE);
-//    PlayerAttackData& pl = registry.shoots.get(enemy);
-//    if (pl.currFiringInterval > 0) {
-//        pl.currFiringInterval -= elapsed_ms_since_last_update;
-//    }
-//    if (pl.bulletBurstCooldown > 0) {
-//        pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
-//    }
-//    if (pl.currFiringInterval <= 0) {
-//        pl.currBulletBurst = pl.maxBulletBurst;
-//        pl.currFiringInterval = pl.maxFiringInterval;
-//    }
-//    if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
-//        //convert interval from ms to rounds per second for getModifiedValue, then back to ms
-//        pl.currBulletBurst--;
-//        pl.bulletBurstCooldown = min(
-//            50.0f,
-//            (pl.maxFiringInterval / pl.maxBulletBurst)
-//        );
-//        // create bullet
-//        vec2 bulletPos = pos;
-//
-//        if (cluster == 1) {
-//            createEnemyBullet(render, bulletPos, bulletDir, {20,20}, pl.bulletSpeed, CIRCLE);
-//            return;
-//        }
-//
-//        // Calculate the offset between bullets for cluster shots
-//
-//        float offSet = radians(BulletSpread) / cluster;
-//        // Create a rotation matrix
-//        glm::mat2 rotationMatrix = glm::mat2(
-//            glm::cos(offSet), -glm::sin(offSet),
-//            glm::sin(offSet),  glm::cos(offSet)
-//        );
-//
-//
-//        if (cluster == 2) {
-//            createEnemyBullet(render, bulletPos, bulletDir*rotationMatrix, { 20,20 }, pl.bulletSpeed, CIRCLE);
-//            createEnemyBullet(render, bulletPos, bulletDir*glm::transpose(rotationMatrix), { 20,20 }, pl.bulletSpeed, CIRCLE);
-//            return;
-//        }
-//
-//        for (int i = 0; i < cluster; i++) {
-//            if (i == 0) {
-//                createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
-//                continue;
-//            }
-//            for (int j = 0; j < i; j++) {
-//                if (i % 2 == 0) {
-//                    bulletDir = bulletDir * rotationMatrix;
-//                }
-//                else {
-//                    bulletDir = bulletDir * glm::transpose(rotationMatrix);
-//                }
-//            }
-//            createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
-//        }
-//    }
-//}
 
 
 

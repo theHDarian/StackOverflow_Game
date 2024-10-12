@@ -86,6 +86,7 @@ struct AttackData {
 	int bulletPierce = 0;
 	int bulletBounce = 0;
 	float homing = 0;
+	int burstMax = 0; // always add 1 to the end
 };
 */
 
@@ -200,7 +201,7 @@ AttackData threeBurst{
 	0,
 	1,
 	0,
-	3
+	10
 };
 
 AttackData fiveBurst{

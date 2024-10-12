@@ -19,9 +19,9 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.scale = mesh.original_size * 50.f;
 
 	Player& player = registry.players.emplace(entity);
-	player.baseSpeed = 200;
+	player.baseSpeed = 400;
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x/2;
+	cc.radius = motion.scale.x/2.5;
 
     PlayerAttackData& shoot = registry.shoots.emplace(entity);
 
@@ -196,7 +196,7 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -214,13 +214,13 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
-	enemy.attackPattern = atkPattern;
-	if (atkPattern == EnemyAttackPattern::SPRAY || atkPattern == EnemyAttackPattern::BURST) {
-		registry.bursts.emplace(entity);
-	}
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = twelveSpiralShot;
+	atk = threeBurst;
+
+	if (atk.attackType == EnemyAttackPattern::BURST || atk.attackType == EnemyAttackPattern::SPRAY) {
+		Burst& atk = registry.bursts.emplace(entity);
+	}
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x)/2;

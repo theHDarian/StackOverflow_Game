@@ -181,9 +181,10 @@ struct Enemy {
     int maxHealth;
     int currHealth;
     float speed;
+
     // TODO add attack pattern data?
     float attackCooldown;
-    EnemyAttackPattern attackPattern;
+    //std::vector<AttackData> attacks;
 
 };
 
