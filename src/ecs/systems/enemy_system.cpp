@@ -14,6 +14,14 @@
 #include "ai_system.hpp"
 #include "ai_system.hpp"
 #include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
 
 float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
@@ -103,11 +111,12 @@ void EnemySystem::step(float elapsed_ms)
             }
             else if (enemy.attackPattern == EnemyAttackPattern::BURST || enemy.attackPattern == EnemyAttackPattern::SPRAY)
             {
-                shootBurst(playerMotion.position - pos, pos, atkData, elapsed_ms, enemy);
-                if (enemy.curBurst <= 0)
+                Burst& burst = registry.bursts.get(entity);
+                shootBurst(playerMotion.position - pos, pos, atkData, elapsed_ms, burst, enemy);
+                if (burst.curBurst <= 0)
                 {
                     enemy.attackCooldown = COOLDOWN_SHOOT_MS;
-                    enemy.curBurst = atkData.maxBurst;
+                    burst.curBurst = atkData.maxBurst;
                 }
             }
         }
@@ -147,17 +156,17 @@ void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData) {
     }
 }
 
-void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Enemy& enemy) {
+void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst, Enemy& enemy) {
 
-    if (enemy.curBurst <= 0) {
+    if (burst.curBurst <= 0) {
         return;
     }
-    if ((enemy.burstCooldown -= elapsed_ms) > 0) {
+    if ((burst.burstCooldown -= elapsed_ms) > 0) {
         return;
     }
-    if (enemy.curBurst == atkData.maxBurst)
+    if (burst.curBurst == atkData.maxBurst)
     {
-        enemy.burstDirection = atan2(glm::normalize(velocity).y , glm::normalize(velocity).x);
+        burst.burstDirection = atan2(glm::normalize(velocity).y , glm::normalize(velocity).x);
     }
     if (enemy.attackPattern == EnemyAttackPattern::SPRAY)
     {
@@ -166,11 +175,11 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         // Generate a random offset within the range
         double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
         std::cout << "offset: " << offset << std::endl;
-        offset = enemy.burstDirection + offset;
+        offset = burst.burstDirection + offset;
         createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData);
     } else {
         float currentAngle = atan2(glm::normalize(velocity).y, glm::normalize(velocity).x);
-        float angleDifference = currentAngle - enemy.burstDirection;
+        float angleDifference = currentAngle - burst.burstDirection;
 
         if (angleDifference > M_PI) {
             angleDifference -= 2 * M_PI;
@@ -181,17 +190,17 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         float maxDifference = M_PI / 32;
         if (abs(angleDifference) > maxDifference) {
             if (angleDifference > 0) {
-                currentAngle = enemy.burstDirection + maxDifference;
+                currentAngle = burst.burstDirection + maxDifference;
             } else {
-                currentAngle = enemy.burstDirection - maxDifference;
+                currentAngle = burst.burstDirection - maxDifference;
             }
         }
 
         float angle = currentAngle;
         createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData);
     }
-    enemy.curBurst--;
-    enemy.burstCooldown = 150;
+    burst.curBurst--;
+    burst.burstCooldown = 150;
 
 
 }

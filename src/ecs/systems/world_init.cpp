@@ -245,6 +245,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
+	if (atkPattern == EnemyAttackPattern::SPRAY || atkPattern == EnemyAttackPattern::BURST) {
+		registry.bursts.emplace(entity);
+	}
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = threeSpray;

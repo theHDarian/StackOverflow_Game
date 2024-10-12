@@ -185,10 +185,6 @@ struct Enemy {
     float attackCooldown;
     EnemyAttackPattern attackPattern;
 
-    int curBurst = 0;
-    float burstCooldown = 150;
-    float burstDirection;
-
 };
 
 struct BossEnemy {
@@ -257,6 +253,12 @@ struct EnemyBullet {
     // Enemy bullet can scale x,y independently?
     int bulletBounce;
     std::vector<BulletStackEffect> bulletEffects;
+};
+
+struct Burst {
+    int curBurst = 0;
+    float burstCooldown = 0;
+    float burstDirection = 0;
 };
 
 struct Homing {
