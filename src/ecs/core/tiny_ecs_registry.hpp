@@ -37,9 +37,10 @@ public:
 	ComponentContainer<EnemyBullet> enemyBullets;
 	ComponentContainer<PolyCollider> polyColliders;
 	ComponentContainer<WallCollider> walls;
-	ComponentContainer<Shoots> shoots;
+	ComponentContainer<PlayerAttackData> shoots;
     ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
+	ComponentContainer<AttackData> attackDatas;
 
 
 	// constructor that adds all containers for looping over them
@@ -75,6 +76,7 @@ public:
 		registry_list.push_back(&shoots);
         registry_list.push_back(&invisibles);
 		registry_list.push_back(&dashes);
+		registry_list.push_back(&attackDatas);
 	}
 
 	void clear_all_components() {

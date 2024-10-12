@@ -1,7 +1,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
 #include <glm/trigonometric.hpp>
-#include "bullet_effects.hpp"
+#include "premades.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
@@ -23,7 +23,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2;
 
-    Shoots& shoot = registry.shoots.emplace(entity);
+    PlayerAttackData& shoot = registry.shoots.emplace(entity);
 
 	registry.stackCompile.emplace(entity);
 
@@ -186,13 +186,6 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
-	enemy.attackPattern = EnemyAttackPattern::SINGLE_SHOT;
-
-	Shoots &shoot = registry.shoots.emplace(entity);
-	shoot.maxBulletBurst = 3;
-	shoot.maxFiringInterval = 3000.0f;
-	shoot.bulletSpeed = 300;
-
 
 	registry.sprites.emplace(entity);
 	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::PUFFERFISH;
@@ -246,17 +239,15 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	motion.scale = vec2({ 140.0f, 140.0f });
 
 	Enemy& enemy = registry.enemies.emplace(entity);
-	enemy.attackCooldown = 5000;
+	enemy.attackCooldown = 2000;
 	enemy.maxHealth = 1;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
 
-	Shoots &shoot = registry.shoots.emplace(entity);
-	shoot.maxBulletBurst = 3;
-	shoot.maxFiringInterval = 3000.0f;
-	shoot.bulletSpeed = 200;
+	AttackData& atk = registry.attackDatas.emplace(entity);
+	atk = sixShot;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x)/2;
@@ -276,24 +267,24 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	return entity;
 };
 
-Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 size, float speed, EnemyBulletShape shape) {
-	if (shape == EnemyBulletShape::CIRCLE) return createEnemyBulletCircle(renderer, pos, velocity, size, speed);
-	if (shape == EnemyBulletShape::RECTANGLE) return createEnemyBulletSquare(renderer, pos, velocity, size, speed);
-	if (shape == EnemyBulletShape::TRIANGLE) return createEnemyBulletTriangle(renderer, pos, velocity, size, speed);
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
+	if (atkData.shape == EnemyBulletShape::CIRCLE) return createEnemyBulletCircle(renderer, pos, velocity, atkData);
+	if (atkData.shape == EnemyBulletShape::RECTANGLE) return createEnemyBulletSquare(renderer, pos, velocity, atkData);
+	if (atkData.shape == EnemyBulletShape::TRIANGLE) return createEnemyBulletTriangle(renderer, pos, velocity, atkData);
 		
-	return createEnemyBulletCircle(renderer, pos, velocity, size, speed);
+	return createEnemyBulletCircle(renderer, pos, velocity, atkData);
 }
 
-Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 size, float speed) {
+Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	bullet.bulletSpeed = speed;
-	bullet.bulletRange = 5000.f;
-	bullet.bulletBounce = 3;
+	bullet.bulletSpeed = atkData.speed;
+	bullet.bulletRange = atkData.bulletRange;
+	bullet.bulletBounce = atkData.bulletBounce;
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
@@ -304,7 +295,7 @@ Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, 
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
 
-	motion.scale = size; // Ensure scale is initialized
+	motion.scale = atkData.size; // Ensure scale is initialized
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
@@ -329,16 +320,16 @@ Entity createEnemyBulletCircle(RenderSystem* renderer, vec2 pos, vec2 velocity, 
 	return entity;
 }
 
-Entity createEnemyBulletSquare(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 size, float speed) {
+Entity createEnemyBulletSquare(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	bullet.bulletSpeed = speed;
-	bullet.bulletRange = 5000.f;
-	bullet.bulletBounce = 3;
+	bullet.bulletSpeed = atkData.speed;
+	bullet.bulletRange = atkData.bulletRange;
+	bullet.bulletBounce = atkData.bulletBounce;
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
@@ -349,7 +340,7 @@ Entity createEnemyBulletSquare(RenderSystem* renderer, vec2 pos, vec2 velocity, 
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
 
-	motion.scale = size; // Ensure scale is initialized
+	motion.scale = atkData.size; // Ensure scale is initialized
 
 	PolyCollider& pc = registry.polyColliders.emplace(entity);
 	pc.offsetVertices = {
@@ -378,16 +369,16 @@ Entity createEnemyBulletSquare(RenderSystem* renderer, vec2 pos, vec2 velocity, 
 	return entity;
 }
 
-Entity createEnemyBulletTriangle(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 size, float speed) {
+Entity createEnemyBulletTriangle(RenderSystem* renderer, vec2 pos, vec2 velocity, AttackData atkData) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	bullet.bulletSpeed = speed;
-	bullet.bulletRange = 5000.f;
-	bullet.bulletBounce = 3;
+	bullet.bulletSpeed = atkData.speed;
+	bullet.bulletRange = atkData.bulletRange;
+	bullet.bulletBounce = atkData.bulletBounce;
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
@@ -398,7 +389,7 @@ Entity createEnemyBulletTriangle(RenderSystem* renderer, vec2 pos, vec2 velocity
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
 
-	motion.scale = size; // Ensure scale is initialized
+	motion.scale = atkData.size; // Ensure scale is initialized
 
 	PolyCollider& pc = registry.polyColliders.emplace(entity);
 	pc.offsetVertices = {
