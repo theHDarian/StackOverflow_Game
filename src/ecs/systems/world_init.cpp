@@ -247,7 +247,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.attackPattern = atkPattern;
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = sixShot;
+	atk = threeBurst;
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(motion.scale.x)/2;

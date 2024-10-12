@@ -171,6 +171,7 @@ enum class EnemyAttackPattern {
     SHOTGUN,
     ALL_DIRECTION, 
     BURST,
+    SPRAY,
     NONE
 };
 
@@ -183,6 +184,10 @@ struct Enemy {
     // TODO add attack pattern data?
     float attackCooldown;
     EnemyAttackPattern attackPattern;
+
+    int curBurst = 0;
+    float burstCooldown = 150;
+    float burstDirection;
 
 };
 
@@ -241,6 +246,7 @@ struct AttackData {
     int bulletPierce = 0;
     int bulletBounce = 0;
     float homing = 0;
+    int maxBurst = 1;
 };
 
 struct EnemyBullet {

@@ -101,6 +101,15 @@ void EnemySystem::step(float elapsed_ms)
                 shootAllDirection(pos, atkData);
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
+            else if (enemy.attackPattern == EnemyAttackPattern::BURST || enemy.attackPattern == EnemyAttackPattern::SPRAY)
+            {
+                shootBurst(playerMotion.position - pos, pos, atkData, elapsed_ms, enemy);
+                if (enemy.curBurst <= 0)
+                {
+                    enemy.attackCooldown = COOLDOWN_SHOOT_MS;
+                    enemy.curBurst = atkData.maxBurst;
+                }
+            }
         }
         
     }
@@ -136,6 +145,54 @@ void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData) {
         float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
         createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData);
     }
+}
+
+void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Enemy& enemy) {
+
+    if (enemy.curBurst <= 0) {
+        return;
+    }
+    if ((enemy.burstCooldown -= elapsed_ms) > 0) {
+        return;
+    }
+    if (enemy.curBurst == atkData.maxBurst)
+    {
+        enemy.burstDirection = atan2(glm::normalize(velocity).x , glm::normalize(velocity).y);
+    }
+    if (enemy.attackPattern == EnemyAttackPattern::SPRAY)
+    {
+        double range = atkData.angleOffset;
+
+        // Generate a random offset within the range
+        double offset = (static_cast<double>(rand()) / RAND_MAX) * 2 * range - range;
+        offset = enemy.burstDirection + offset;
+        createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData);
+    } else {
+        float currentAngle = atan2(glm::normalize(velocity).y, glm::normalize(velocity).x);
+        float angleDifference = currentAngle - enemy.burstDirection;
+
+        if (angleDifference > M_PI) {
+            angleDifference -= 2 * M_PI;
+        } else if (angleDifference < -M_PI) {
+            angleDifference += 2 * M_PI;
+        }
+
+        float maxDifference = M_PI / 16;
+        if (abs(angleDifference) > maxDifference) {
+            if (angleDifference > 0) {
+                currentAngle = enemy.burstDirection + maxDifference;
+            } else {
+                currentAngle = enemy.burstDirection - maxDifference;
+            }
+        }
+
+        float angle = currentAngle;
+        createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData);
+    }
+    enemy.curBurst--;
+    enemy.burstCooldown = 150;
+
+
 }
 
 //void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread) {
