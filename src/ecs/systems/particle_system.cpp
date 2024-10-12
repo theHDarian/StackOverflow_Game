@@ -8,9 +8,6 @@
 
 ParticleSystem::ParticleSystem() {
     particlePool.resize(1000);
-    for (int i = 0; i < 100; i++) {
-        emit(createParticle());
-    }
 }
 
 bool ParticleSystem::initScreenTexture()
@@ -27,8 +24,8 @@ bool ParticleSystem::initScreenTexture()
 
 	glGenRenderbuffers(1, &off_screen_render_buffer_depth);
 	glBindRenderbuffer(GL_RENDERBUFFER, off_screen_render_buffer_depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, framebuffer_width, framebuffer_height);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, off_screen_render_buffer_color, 0);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, framebuffer_width, framebuffer_height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, off_screen_render_buffer_depth);
 	gl_has_errors();
 
@@ -53,6 +50,10 @@ void ParticleSystem::init(GLFWwindow* window) {
 	window_height_px = vidMode->height;    
     projection = glm::ortho(0.0f,static_cast<float>(window_width_px),0.0f,static_cast<float>(window_height_px));
 
+    for (int i = 0; i < 100; i++) {
+        emit(createParticle());
+    }
+
     float vertices[] = {
         -0.5f, -0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
@@ -67,8 +68,8 @@ void ParticleSystem::init(GLFWwindow* window) {
     glGenBuffers(1,&vbo);
     glBindBuffer(GL_ARRAY_BUFFER,vbo);
     glBufferData(GL_ARRAY_BUFFER,sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
     glVertexAttribPointer(0,3, GL_FLOAT,GL_FALSE,3*sizeof(float),0);
+    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER,0);
     gl_has_errors();
     
@@ -82,8 +83,24 @@ void ParticleSystem::init(GLFWwindow* window) {
     glBindVertexArray(0);
     gl_has_errors();
 
-    bool is_valid = loadEffectFromFile(shader_path("text.vs.glsl").c_str(), shader_path("text.fs.glsl").c_str(), shaderProgram);
+    bool is_valid = loadEffectFromFile(shader_path("particle.vs.glsl").c_str(), shader_path("particle.fs.glsl").c_str(), shaderProgram);
     assert(is_valid && (GLuint)shaderProgram != 0);
+
+    int success;
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
+    glValidateProgram(shaderProgram);
+    glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+        std::cerr << "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n" << infoLog << std::endl;
+    }
     gl_has_errors();
 
     initScreenTexture();
@@ -174,10 +191,14 @@ void ParticleSystem::render() {
     frame.prevTexture = off_screen_render_buffer_color;
     
     glUseProgram(shaderProgram);
+    glBindVertexArray(vao);
     gl_has_errors();
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram,"projection");
     unsigned int transformLoc = glGetUniformLocation(shaderProgram,"transform");
     unsigned int colorLoc = glGetUniformLocation(shaderProgram,"fcolor");
+    if (projectionLoc == -1 || transformLoc == -1 || colorLoc == -1) {
+        std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
+    }
     glUniformMatrix4fv(projectionLoc,1,GL_FALSE,glm::value_ptr(projection));
     gl_has_errors();
 
@@ -201,8 +222,11 @@ void ParticleSystem::render() {
 }
 
 ParticleProps ParticleSystem::createParticle() {
+    int window_width_px,window_height_px;
+	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
     ParticleProps props;
-    props.position = {0,0};
+    props.position = {window_width_px / 2,window_height_px / 2};
     props.velocity = {0,0};
     props.velocityVariation = { 3.0f,1.0f};
     props.colorBegin = {254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f};	
