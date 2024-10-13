@@ -192,6 +192,7 @@ void RenderSystem::drawSetupFrame(){
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
 	Frame& frame = registry.frames.components[0];
+	if (frame.prevFrameBuffer == frame_buffer) return;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	glViewport(0, 0, w, h);
@@ -217,6 +218,7 @@ void RenderSystem::drawSetupFrame(){
 }
 
 void RenderSystem::drawBackgroundElements() {
+	drawSetupFrame();
 	mat3 projection_2D = createProjectionMatrix();
 	glBindVertexArray(vao);
 	for (Entity entity : registry.backgrounds.entities) {
@@ -232,7 +234,7 @@ void RenderSystem::drawBackgroundElements() {
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::drawGameElements()
 {
-	// Getting size of window
+	drawSetupFrame();
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
 	// Draw all textured meshes that have a position and size component
@@ -251,6 +253,7 @@ void RenderSystem::drawGameElements()
 
 }
 void RenderSystem::drawUI() {
+	drawSetupFrame();
 	mat3 projection_2D = createProjectionMatrix();
 
 	vec2 stackTextPos = drawBulletStack(projection_2D);

@@ -74,10 +74,8 @@ int main()
 			world.handleCollisions();
 		}
 		registry.frames.components[0].prevFrameBuffer = 0;
-		renderer.drawSetupFrame();
 		renderer.drawBackgroundElements();
 		particleSystem.render();
-		renderer.drawSetupFrame();
 		renderer.drawGameElements();
 		renderer.drawToScreen(); //postprocessing
 		renderer.drawUI();
