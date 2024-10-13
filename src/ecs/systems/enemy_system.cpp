@@ -11,17 +11,6 @@
 #include <chrono>
 
 #include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
 
 float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
@@ -73,9 +62,8 @@ void EnemySystem::step(float elapsed_ms)
         //}
 
         // HANDLING DAMGE FROM COLLISION
-        for (int i = collision_registry.entities.size() - 1; i >= 0; i--)
+        for (auto& entity : collision_registry.entities)
         {
-            Entity& entity = collision_registry.entities[i];
             const Collision &collision = registry.collisions.get(entity);
             Entity other_entity = collision.other;
 

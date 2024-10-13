@@ -10,6 +10,7 @@
 #include "render_system.hpp"
 #include "world_system.hpp"
 #include "io_system.hpp"
+#include "particle_system.hpp"
 #include "enemy_system.hpp"
 #include "ai_system.hpp"
 
@@ -30,8 +31,10 @@ int main()
 	RenderSystem renderer;
 	PhysicsSystem physics;
 	IOSystem ioSystem;
+	ParticleSystem particleSystem;
 	AISystem aiSystem;
 	EnemySystem enemySystem(&renderer);
+
 
 	// Initializing window
 	GLFWwindow* window = world.createWindow();
@@ -44,6 +47,7 @@ int main()
 
 	// initialize the main systems
 	renderer.init(window);
+	particleSystem.init(window);
 	ioSystem.init(window);
 	world.init(&renderer);
 
@@ -66,11 +70,18 @@ int main()
 			physics.step(elapsed_ms);
 			aiSystem.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
+			particleSystem.step(elapsed_ms);
 			world.handleCollisions();
 		}
-
-
-		renderer.draw();
+		registry.frames.components[0].prevFrameBuffer = 0;
+		renderer.drawBackgroundElements();
+		particleSystem.render();
+		renderer.drawGameElements();
+		renderer.drawToScreen(); //postprocessing
+		renderer.drawUI();
+		
+		glfwSwapBuffers(window);
+		
 	}
 
 	return EXIT_SUCCESS;

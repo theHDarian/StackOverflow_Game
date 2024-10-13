@@ -61,7 +61,6 @@ class RenderSystem {
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
 
-	// may even consider mapping colours to pallete colour names
 	std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{BulletDamage,      {1, 1, 1}},
 			{ProjectileSpeed,   {1, 1, 1}},
@@ -105,7 +104,11 @@ public:
 	~RenderSystem();
 
 	// Draw all entities
-	void draw();
+	void drawSetupFrame();
+	void drawGameElements();
+	void drawUI();
+	void drawBackgroundElements();
+	void drawToScreen();
 
 	mat3 createProjectionMatrix();
 
@@ -115,7 +118,6 @@ public:
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
-	void drawToScreen();
 	void drawCircleCollider(Entity entity, const mat3& projection);
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
 	vec2 drawBulletStack(const mat3& projection);

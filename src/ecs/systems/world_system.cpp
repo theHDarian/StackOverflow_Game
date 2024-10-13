@@ -234,14 +234,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION, EnemyBehavior::FOLLOW_PLAYER);
 	}
 
-	// Processing the salmon state
-	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
-
-    float min_counter_ms = 3000.f;
-	// reduce window brightness if the salmon is dying
-	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
-
 	return true;
 }
 
@@ -473,6 +465,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			// Update Velocity
 			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
 			// std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
+
+			//emit particles at player position
+			EmitParticle& p = registry.emitParticles.emplace(Entity());
+			p.position = playerMotion.position + vec2(0.0f,playerMotion.scale.y / 2);
 		}
 	}
 }

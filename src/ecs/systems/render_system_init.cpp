@@ -45,6 +45,11 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // vsync
 
+	if (registry.frames.components.size() <= 0) {
+		auto ent = Entity();
+		registry.frames.emplace(ent);
+	}
+
 	// Load OpenGL function pointers
 	const int is_fine = gl3w_init();
 	assert(is_fine == 0);
@@ -300,8 +305,6 @@ RenderSystem::~RenderSystem()
 // Initialize the screen texture from a standard sprite
 bool RenderSystem::initScreenTexture()
 {
-	registry.screenStates.emplace(screen_state_entity);
-
 	int framebuffer_width, framebuffer_height;
 	glfwGetFramebufferSize(const_cast<GLFWwindow*>(window), &framebuffer_width, &framebuffer_height);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
 

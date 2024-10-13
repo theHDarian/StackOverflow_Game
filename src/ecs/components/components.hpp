@@ -59,18 +59,21 @@ struct Debug {
 };
 extern Debug debugging;
 
-// Sets the brightness of the screen
-struct ScreenState
-{
-	float darken_screen_factor = -1;
-};
-
 // Struct for dash
 
 // A struct to refer to debugging graphics in the ECS
 struct DebugComponent
 {
 	// Note, an empty struct has size 1
+};
+
+struct Frame {
+	GLuint prevTexture;
+	GLuint prevFrameBuffer;
+};
+struct EmitParticle {
+	vec2 position;
+	
 };
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean

@@ -16,7 +16,6 @@ public:
 	ComponentContainer<Player> players;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
-	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<IOState> ioStates;
 	ComponentContainer<GameState> gameStates;
 	ComponentContainer<WindowState> windowStates;
@@ -41,6 +40,8 @@ public:
 	ComponentContainer<PlayerAttackData> shoots;
     ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
+	ComponentContainer <Frame> frames;
+	ComponentContainer<EmitParticle> emitParticles;
 	ComponentContainer<AttackData> attackDatas;
 	ComponentContainer<Burst> bursts;
 	ComponentContainer<HomingBullet> homes;
@@ -55,7 +56,6 @@ public:
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&renderRequests);
-		registry_list.push_back(&screenStates);
 		registry_list.push_back(&ioStates);
 		registry_list.push_back(&gameStates);
 		registry_list.push_back(&windowStates);
@@ -66,6 +66,8 @@ public:
 		registry_list.push_back(&spriteTimers);
 		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&uis);
+		registry_list.push_back(&frames);
+		registry_list.push_back(&emitParticles);
 		registry_list.push_back(&dialogueLines);
 		registry_list.push_back(&enemyMovement);
 		registry_list.push_back(&backgrounds);

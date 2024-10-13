@@ -43,6 +43,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
 
 	// Setting vertex and index buffers
+	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
@@ -134,6 +135,7 @@ void RenderSystem::drawToScreen()
 	// Setting shaders
 	// get the water texture, sprite mesh, and program
 	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS]);
+	glBindVertexArray(vao);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -175,8 +177,8 @@ void RenderSystem::drawToScreen()
 
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
-
-	glBindTexture(GL_TEXTURE_2D, off_screen_render_buffer_color);
+	Frame& frame = registry.frames.components[0];
+	glBindTexture(GL_TEXTURE_2D, frame.prevTexture);
 	gl_has_errors();
 	// Draw
 	glDrawElements(
@@ -186,18 +188,13 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
-// Render our game world
-// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
-void RenderSystem::draw()
-{
-	// Getting size of window
+void RenderSystem::drawSetupFrame(){
 	int w, h;
-	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
+	glfwGetFramebufferSize(window, &w, &h);
+	Frame& frame = registry.frames.components[0];
+	if (frame.prevFrameBuffer == frame_buffer) return;
 
-	// First render to the custom framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-	gl_has_errors();
-	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
 	glClearColor(GLfloat(32/ 255), GLfloat(43 / 255), GLfloat(81 / 255), 1.0);
@@ -205,52 +202,68 @@ void RenderSystem::draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_DEPTH_TEST); // native OpenGL does not work with a depth buffer
-							  // and alpha blending, one would have to sort
-							  // sprites back to front
-	// assume the entire render system uses 1 vao for now
-	glBindVertexArray(vao);
+	glDisable(GL_DEPTH_TEST);
 
-	gl_has_errors();
+	if(frame.prevFrameBuffer != 0) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+
+		//copy contents of previous buffer to current
+		glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		gl_has_errors();
+		glBindFramebuffer(GL_FRAMEBUFFER,frame_buffer);
+	}
+	frame.prevFrameBuffer = frame_buffer;
+	frame.prevTexture = off_screen_render_buffer_color;
+}
+
+void RenderSystem::drawBackgroundElements() {
+	drawSetupFrame();
 	mat3 projection_2D = createProjectionMatrix();
-
+	glBindVertexArray(vao);
 	for (Entity entity : registry.backgrounds.entities) {
 		if (!registry.renderRequests.get(entity).show)
 			continue;
+		
 		drawTexturedMesh(entity, projection_2D);
 	}
+	glBindVertexArray(0);
+}
 
+// Render our game world
+// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
+void RenderSystem::drawGameElements()
+{
+	drawSetupFrame();
+	gl_has_errors();
+	mat3 projection_2D = createProjectionMatrix();
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) 
-			|| registry.uis.has(entity) || registry.backgrounds.has(entity))
+		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity) ||  registry.backgrounds.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
+		glBindVertexArray(vao);
 		drawTexturedMesh(entity, projection_2D);
 		if (registry.circleColliders.has(entity)) // has collision circle, let's draw it
 			drawCircleCollider(entity, projection_2D);
 	}
-
-	// save where text should be drawn
-	vec2 stackTextPos = drawBulletStack(projection_2D);
-
-	// Truely render to the screen
-	// also where post-processing occurs
-	drawToScreen();
-
 	glBindVertexArray(0);
 
-	// draw stack text here for now
-	// (want it to show under most ui
+}
+void RenderSystem::drawUI() {
+	drawSetupFrame();
+	mat3 projection_2D = createProjectionMatrix();
+
+	vec2 stackTextPos = drawBulletStack(projection_2D);
+
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	std::string text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
 	RenderText(text, stackTextPos.x, stackTextPos.y, 0.25, vec3(1, 1, 1));
 
-	glBindVertexArray(vao);
-
-	// should put draw UI here (ideally using its own rendering system, and own projection matrix)
+	// should put draw UI here (ideally using its own rendering system,
+	// and own projection matrix)
 	// should also remove show from render request
 	for (Entity entity : registry.uis.entities) {
 		if (!registry.renderRequests.get(entity).show)
@@ -258,9 +271,7 @@ void RenderSystem::draw()
 		drawTexturedMesh(entity, projection_2D);
 	}
 
-	glBindVertexArray(0);
-
-	// draw all text components
+	// copied above method to draw all text components
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
 		auto& textReq = registry.textRenderRequests.get(entity);
@@ -270,19 +281,87 @@ void RenderSystem::draw()
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
 
+	glBindVertexArray(0);
+
 	#if IMGUI_ENABLED
 		//draw Imgui
 		drawImGui();
 	#endif
-
-	// flicker-free display with a double buffer
-	glfwSwapBuffers(window);
-	gl_has_errors();
 }
+
+mat3 RenderSystem::createProjectionMatrix()
+{
+	// Fake projection matrix, scales with respect to window coordinates
+	float left = 0.f;
+	float top = 0.f;
+
+	gl_has_errors();
+	WindowState& windowState = registry.windowStates.components[0];
+	float right = (float) windowState.width;
+	float bottom = (float) windowState.height;
+
+	float sx = 2.f / (right - left);
+	float sy = 2.f / (top - bottom);
+	float tx = -(right + left) / (right - left);
+	float ty = -(top + bottom) / (top - bottom);
+	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
+}
+
+#if IMGUI_ENABLED
+void RenderSystem::drawImGui() {
+	int menuWidth = 200;
+	IOState& ioState = registry.ioStates.components[0];
+	WindowState& windowState = registry.windowStates.components[0];
+	// std::cout << windowState.width << " " << windowState.height << std::endl;
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	const ImVec2& size = ImVec2(menuWidth,windowState.height);
+	ImGui::SetNextWindowSize(size);
+	ImGui::SetNextWindowPos(ImVec2(windowState.width - menuWidth, 0));
+	ImGui::Begin("Debug window");
+
+	// BASIC INFORMATION
+    ImGui::Text("Enemy Bullet Count: %lu",registry.enemyBullets.size());
+	ImGui::Text("Viewport Size: (%d, %d)",windowState.width,windowState.height);
+	ImGui::Text("Mouse Pos: (%.2f, %.2f)",ioState.mousePosition.x,ioState.mousePosition.y);
+	
+	// STACK INFORMATION
+	StackCompile& sc = registry.stackCompile.components[0];
+	ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
+	ImGui::BeginChild("AdditiveContent",ImVec2(180,250),true);
+		std::map<BulletEffectType, float>::iterator it;
+		for (it = sc.additives.begin(); it != sc.additives.end(); it++) {
+			// if (it->second == 0) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	ImGui::TextColored(ImVec4(1,1,0,1), "Multiplicatives");
+	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,250),true);
+		for (it = sc.multiplicatives.begin(); it != sc.multiplicatives.end(); it++) {
+			// if (it->second == 1) continue;
+			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
+		}
+	ImGui::EndChild();
+
+	if (ImGui::Button("Restart Game")) {
+		registry.ioStates.components[0].shouldRestart = true;
+	}
+    ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui::UpdatePlatformWindows();
+}
+#endif
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI
 // currently just draws a box as a container
 vec2 RenderSystem::drawBulletStack(const mat3& projection) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	WindowState& windowState = registry.windowStates.components[0];
 	vec2 bulletStartPos = { 75, windowState.height - 200 };
@@ -307,6 +386,7 @@ vec2 RenderSystem::drawBulletStack(const mat3& projection) {
 	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
 
 	// Setting vertex and index buffers
+	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
@@ -379,8 +459,6 @@ vec2 RenderSystem::drawBulletStack(const mat3& projection) {
 	return vec2(stackPos.x - bulletSize.x, (bulletStartPos.y - windowState.height) * -1 - 2 * bulletOffset - bulletSize.y);
 }
 
-// draws bullet ui based on stack info
-// not sure how bullets should look, so took a rectangle for now
 void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection) {
 	// Consider: using stack ui's position to draw bullets
 	Transform transform;
@@ -531,71 +609,3 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 }
-
-mat3 RenderSystem::createProjectionMatrix()
-{
-	// Fake projection matrix, scales with respect to window coordinates
-	float left = 0.f;
-	float top = 0.f;
-
-	gl_has_errors();
-	WindowState& windowState = registry.windowStates.components[0];
-	float right = (float) windowState.width;
-	float bottom = (float) windowState.height;
-
-	float sx = 2.f / (right - left);
-	float sy = 2.f / (top - bottom);
-	float tx = -(right + left) / (right - left);
-	float ty = -(top + bottom) / (top - bottom);
-	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
-}
-
-#if IMGUI_ENABLED
-void RenderSystem::drawImGui() {
-	int menuWidth = 200;
-	IOState& ioState = registry.ioStates.components[0];
-	WindowState& windowState = registry.windowStates.components[0];
-	// std::cout << windowState.width << " " << windowState.height << std::endl;
-
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-	const ImVec2& size = ImVec2(menuWidth,windowState.height);
-	ImGui::SetNextWindowSize(size);
-	ImGui::SetNextWindowPos(ImVec2(windowState.width - menuWidth, 0));
-	ImGui::Begin("Debug window");
-
-	// BASIC INFORMATION
-    ImGui::Text("Enemy Bullet Count: %lu",registry.enemyBullets.size());
-	ImGui::Text("Viewport Size: (%d, %d)",windowState.width,windowState.height);
-	ImGui::Text("Mouse Pos: (%.2f, %.2f)",ioState.mousePosition.x,ioState.mousePosition.y);
-	
-	// STACK INFORMATION
-	StackCompile& sc = registry.stackCompile.components[0];
-	ImGui::Text("Stack Size: %lu", sc.currStack.size());
-	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
-	ImGui::BeginChild("AdditiveContent",ImVec2(180,250),true);
-		std::map<BulletEffectType, float>::iterator it;
-		for (it = sc.additives.begin(); it != sc.additives.end(); it++) {
-			// if (it->second == 0) continue;
-			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
-		}
-	ImGui::EndChild();
-
-	ImGui::TextColored(ImVec4(1,1,0,1), "Multiplicatives");
-	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,250),true);
-		for (it = sc.multiplicatives.begin(); it != sc.multiplicatives.end(); it++) {
-			// if (it->second == 1) continue;
-			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
-		}
-	ImGui::EndChild();
-
-	if (ImGui::Button("Restart Game")) {
-		registry.ioStates.components[0].shouldRestart = true;
-	}
-    ImGui::End();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	ImGui::UpdatePlatformWindows();
-}
-#endif
