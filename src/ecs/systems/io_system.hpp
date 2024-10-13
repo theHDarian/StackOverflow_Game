@@ -28,5 +28,5 @@ private:
 
     void onMouseMove(vec2 mousePosition);
 
-    void handleMovementInput(int key, int action, IOState& state);
+    void handleMovementInput(int key, int action, IOState &state, GameState &gameState);
 };
