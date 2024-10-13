@@ -20,6 +20,9 @@ public:
     void init(GLFWwindow* window);
     void step(float elapsed_ms);
     void emit(const ParticleProps& particleProps);
+
+    void explode(const ::ParticleProps &props, vec2 origin);
+
     void render();
     bool initScreenTexture();
 
