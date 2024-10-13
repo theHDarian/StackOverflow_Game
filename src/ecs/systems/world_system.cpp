@@ -232,7 +232,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
 		EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION, behavior);
+		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
 	}
 
 	return true;
@@ -615,6 +615,13 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			if (!success) {
 				registry.gameStates.components[0].gameOver = true;
 			}
+		}
+	}
+	else if (registry.enemies.has(other)) {
+		Enemy& e = registry.enemies.get(other);
+		bool success = registry.stackCompile.get(player).add(e.blunt);
+		if (!success) {
+			registry.gameStates.components[0].gameOver = true;
 		}
 	}
 }

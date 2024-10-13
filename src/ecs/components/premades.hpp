@@ -159,7 +159,7 @@ AttackData twelveSpiralShot{
 	EnemyAttackPattern::ALL_DIRECTION,
 	TRIANGLE,
 	{},
-	blunt,
+	sizeUpA,
 	12,
 	0.0,
 	{20,20},

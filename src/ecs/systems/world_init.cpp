@@ -196,7 +196,7 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern, EnemyBehavior behavior) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavior behavior) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -213,7 +213,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.maxHealth = 20;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
-	enemy.attackPattern = atkPattern;
 	enemy.behavior = behavior;
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
@@ -224,7 +223,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	movement.distanceTraveled = 0.0f;
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = threeBurst;
+	atk = twelveSpiralShot;
 
 	if (atk.attackType == EnemyAttackPattern::BURST || atk.attackType == EnemyAttackPattern::SPRAY) {
 		Burst& atk = registry.bursts.emplace(entity);
