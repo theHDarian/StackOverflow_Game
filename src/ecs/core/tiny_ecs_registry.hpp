@@ -40,6 +40,7 @@ public:
     ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
 	ComponentContainer <Frame> frames;
+	ComponentContainer<EmitParticle> emitParticles;
 
 
 	// constructor that adds all containers for looping over them
@@ -62,6 +63,7 @@ public:
 		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&uis);
 		registry_list.push_back(&frames);
+		registry_list.push_back(&emitParticles);
 		registry_list.push_back(&dialogueLines);
 
 		registry_list.push_back(&stackCompile);

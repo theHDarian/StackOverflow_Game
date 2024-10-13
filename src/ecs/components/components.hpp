@@ -71,6 +71,9 @@ struct Frame {
 	GLuint prevTexture;
 	GLuint prevFrameBuffer;
 };
+struct EmitParticle {
+
+};
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType { Background, SFX };

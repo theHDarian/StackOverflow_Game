@@ -23,7 +23,7 @@ public:
     void render();
     bool initScreenTexture();
 
-    ParticleProps createParticle();
+    ParticleProps createParticle(vec2 pos);
 private:
     struct Particle {
         vec2 position;
@@ -41,7 +41,7 @@ private:
     std::vector<Particle> particlePool;
     uint poolIndex = 999;
     
-    GLuint vao;
+    GLuint vao, vbo, ib;
 	GLuint shaderProgram;
     GLuint frame_buffer;
     GLuint off_screen_render_buffer_color;
@@ -49,5 +49,4 @@ private:
     
     glm::mat4 projection;
     GLFWwindow* window;
-	GLint m_ParticleShaderViewProj, m_ParticleShaderTransform, m_ParticleShaderColor;
 };

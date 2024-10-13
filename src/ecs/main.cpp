@@ -71,9 +71,9 @@ int main()
 			world.handleCollisions();
 		}
 		registry.frames.components[0].prevFrameBuffer = 0;
+		particleSystem.render();
 		renderer.drawSetupFrame();
 		renderer.drawGameElements();
-		particleSystem.render();
 		renderer.drawToScreen(); //postprocessing
 		renderer.drawUI();
 		

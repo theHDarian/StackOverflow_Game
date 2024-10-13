@@ -202,7 +202,6 @@ void RenderSystem::drawSetupFrame(){
 	glDisable(GL_DEPTH_TEST);
 
 	if(frame.prevFrameBuffer != 0) {
-		std::cout << "copying" << std::endl;
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
 
@@ -212,6 +211,7 @@ void RenderSystem::drawSetupFrame(){
 		glBindFramebuffer(GL_FRAMEBUFFER,frame_buffer);
 	}
 	frame.prevFrameBuffer = frame_buffer;
+	frame.prevTexture = off_screen_render_buffer_color;
 }
 
 // Render our game world
