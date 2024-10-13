@@ -29,7 +29,6 @@ void EnemySystem::step(float elapsed_ms)
     auto &enemy_registry = registry.enemies;
     auto &motion_registry = registry.motions;
     auto &collision_registry = registry.collisions;
-    std::vector<Entity> delete_queue;
 
     Entity& player = registry.players.entities[0];
     Motion& playerMotion = motion_registry.get(player);
@@ -76,6 +75,16 @@ void EnemySystem::step(float elapsed_ms)
                 std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
                 if (enemyStat.currHealth <= 0)
                 {
+                    if (!registry.fades.has(entity))
+                        registry.fades.emplace(entity);
+                    if (!registry.emitParticles.has(entity)) {
+                        for (int i = 0; i < (rand() % 50 + 10); i++) {
+                            EmitParticle& p = registry.emitParticles.emplace(Entity());
+                            Motion& motion = motion_registry.get(entity);
+                            p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5 };
+                        }
+                    }
+                    std::cout << "enemy " << entity << "has died" << std::endl;
                     delete_queue.push_back(entity);
                 }
 
@@ -139,14 +148,13 @@ void EnemySystem::step(float elapsed_ms)
         }
         
     }
-    for (Entity entity: delete_queue) {
-        for (int i = 0; i < (rand() % 50 + 10); i++) {
-            EmitParticle& p = registry.emitParticles.emplace(Entity());
-            Motion &motion = motion_registry.get(entity);
-            p.position = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5};
-        }
 
-        registry.deleteEntityAndRelatedEntities(entity);
+}
+
+void EnemySystem::clearDeleteQueue() {
+    for (Entity entity : delete_queue) {
+        if (!registry.fades.has(entity))
+            registry.deleteEntityAndRelatedEntities(entity);
     }
 }
 

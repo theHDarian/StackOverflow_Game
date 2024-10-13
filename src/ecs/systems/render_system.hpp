@@ -109,6 +109,7 @@ public:
 	void drawUI();
 	void drawBackgroundElements();
 	void drawToScreen();
+	void step(float elapsed_ms);
 
 	mat3 createProjectionMatrix();
 

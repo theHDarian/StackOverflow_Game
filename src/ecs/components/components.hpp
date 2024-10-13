@@ -240,3 +240,8 @@ struct DialogueLines {
 struct BG {
 
 };
+
+struct Fade {
+	float max = 500;
+	float time = max;
+};
