@@ -360,6 +360,8 @@ void RenderSystem::drawImGui() {
 // should really consider making a draw textured mesh function without relying on an entity/for UI
 // currently just draws a box as a container
 vec2 RenderSystem::drawBulletStack(const mat3& projection) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	WindowState& windowState = registry.windowStates.components[0];
 	vec2 bulletStartPos = { 75, windowState.height - 200 };
