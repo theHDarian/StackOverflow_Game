@@ -10,6 +10,8 @@
 #include <vector>
 #include <chrono>
 
+#include "ai_system.hpp"
+
 float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
 float PLACEHOLDER_FOR_ANGLE = 0.f;
@@ -28,18 +30,22 @@ void EnemySystem::step(float elapsed_ms)
     auto &motion_registry = registry.motions;
     auto &collision_registry = registry.collisions;
     std::vector<Entity> delete_queue;
+
+    Entity& player = registry.players.entities[0];
+    Motion& playerMotion = motion_registry.get(player);
     
     for (uint i = 0; i < enemy_registry.components.size(); i++) {
         Enemy &enemy = enemy_registry.components[i];
         Entity &entity = enemy_registry.entities[i];
 
         Motion &motion = motion_registry.get(entity);
+        AttackData& atkData = registry.attackDatas.get(entity);
         vec2 pos = motion.position;
         float angle = motion.angle;
 
         /*
       * Sky's AI logic: firing cooldown is handled by the shoot function, so no need to worry about that here
-      * The number of bursts and the interval between bursts is stored in the Shoots component
+      * The number of bursts and the interval between bursts is stored in the PlayerAttackData component
       * change them per enemy type in createEnemy function in world_init.cpp
       * pass render and elapsed_ms directly
       * instead of an angle, pass a normalized vector. in the example, it's a vector pointing towards the player
@@ -48,12 +54,12 @@ void EnemySystem::step(float elapsed_ms)
       * the check for shoots component is there to prevent that, still best to put it before the damage handling
       */
 
-        if (registry.shoots.has(entity)) {
-            vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
-            vec2 playerDir = playerPos - pos;
-            playerDir = glm::normalize(playerDir);
-            shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
-        }
+        //if (registry.shoots.has(entity)) {
+        //    vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+        //    vec2 playerDir = playerPos - pos;
+        //    playerDir = glm::normalize(playerDir);
+        //    shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
+        //}
 
         // HANDLING DAMGE FROM COLLISION
         for (auto& entity : collision_registry.entities)
@@ -81,32 +87,47 @@ void EnemySystem::step(float elapsed_ms)
         // std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
         if (enemy.attackCooldown < 0.f)
         {
-            if (enemy.attackPattern == EnemyAttackPattern::SINGLE_SHOT)
+            if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
             {
-                shoot(vec2(-100, 0), pos, angle);
+                shootShotgun(playerMotion.position - pos, pos, atkData);
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
-            else if (enemy.attackPattern == EnemyAttackPattern::DOUBLE_SHOT)
+            else if (atkData.attackType == EnemyAttackPattern::ALL_DIRECTION)
             {
-
-                shoot(vec2(-100, -30), pos, angle);
-                shoot(vec2(-100, 30), pos, angle);
+                shootAllDirection(pos, atkData);
                 enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
-            else if (enemy.attackPattern == EnemyAttackPattern::ALL_DIRECTION)
+            else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
             {
-                const int numShots = 12;
-                const float angleIncrement = 30.f;
-                const float velocity = 100.f;
-                for (uint j = 0; j < numShots; ++j)
+                Burst& burst = registry.bursts.get(entity);
+                vec2 velocity = playerMotion.position - pos;
+                shootBurst(playerMotion.position - pos, pos, atkData, elapsed_ms, burst, enemy);
+                burst.burstDirection = atan2(velocity.y, velocity.x);
+                if (burst.curBurst <= 0)
                 {
-                    float currAngle = j * angleIncrement;
-                    float radians = currAngle * M_PI / 180.f;
-                    vec2 direction = vec2(cos(radians) * velocity, sin(radians) * velocity);
-                    shoot(direction, pos, angle);
+                    enemy.attackCooldown = COOLDOWN_SHOOT_MS;
+                    burst.curBurst = atkData.numBullets;
                 }
-                enemy.attackCooldown = COOLDOWN_SHOOT_MS;
             }
+        }
+
+        auto &movement_registry = registry.enemyMovement;
+        for (int i = 0; i < movement_registry.size(); ++i)
+        {
+
+            Entity &entity = movement_registry.entities[i];
+            EnemyMovement &movement = movement_registry.get(entity);
+            Motion &motion = motion_registry.get(entity);
+
+            movement.t += movement.speed * elapsed_ms / 1000.f;
+            if (movement.t >= 1.0f)
+            {
+                movement.t = 1.0f;
+            }
+            float interX = movement.posA[0] + movement.t * (movement.posB[0] - movement.posA[0]);
+            float interY = movement.posA[1] + movement.t * (movement.posB[1] - movement.posA[1]);
+            motion.position[0] = interX;
+            motion.position[1] = interY;
         }
         
     }
@@ -115,73 +136,68 @@ void EnemySystem::step(float elapsed_ms)
     }
 }
 
-
-void EnemySystem::shoot(vec2 velocity, vec2 pos, float angle) {
-    // SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
-    createEnemyBullet(render, pos, glm::normalize(velocity), { 20,40 }, glm::length(velocity), TRIANGLE);
+void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData) {
+    float angle = atan2(velocity.y, velocity.x);
+    if (atkData.numBullets % 2 == 0) {
+        for (uint i = 0; i < atkData.numBullets / 2; i++) {
+            float a1 = angle + (i + 0.5) * atkData.angleOffset;
+            float a2 = angle - (i + 0.5) * atkData.angleOffset;
+            createEnemyBullet(render, pos, {cos(a1), sin(a1)}, atkData.veer.x * vec2(cos(a1 + atkData.veer.y), sin(a1 + atkData.veer.y)), atkData);
+            createEnemyBullet(render, pos, {cos(a2), sin(a2)}, atkData.veer.x * vec2(cos(a2 - atkData.veer.y), sin(a2 - atkData.veer.y)), atkData);
+        }
+    }
+    else {
+        createEnemyBullet(render, pos, { cos(angle), sin(angle) }, atkData.veer.x * vec2(cos(angle), sin(angle)), atkData);
+        for (uint i = 0; i < (atkData.numBullets - 1) / 2; i++) {
+            float a1 = angle + (i + 1) * atkData.angleOffset;
+            float a2 = angle - (i + 1) * atkData.angleOffset;
+            createEnemyBullet(render, pos, { cos(a1), sin(a1) }, atkData.veer.x * vec2(cos(a1 + atkData.veer.y), sin(a1 + atkData.veer.y)), atkData);
+            createEnemyBullet(render, pos, { cos(a2), sin(a2) }, atkData.veer.x * vec2(cos(a2 - atkData.veer.y), sin(a2 - atkData.veer.y)), atkData);
+        }
+    }
 }
 
-void EnemySystem::shoot(Entity& enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread) {
-    //SHOOT STRAIGHT BASED ON ENEMIES DIRECTION
-    // createBulletEnemy(render, pos, vec2(-100, 0), angle + PLACEHOLDER_FOR_ANGLE);
-    Shoots& pl = registry.shoots.get(enemy);
-    if (pl.currFiringInterval > 0) {
-        pl.currFiringInterval -= elapsed_ms_since_last_update;
+void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData) {
+    for (uint i = 0; i < atkData.numBullets; i++) {
+        float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
+        createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
     }
-    if (pl.bulletBurstCooldown > 0) {
-        pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
+}
+
+void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst, Enemy& enemy) {
+    if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0) {
+        return;
     }
-    if (pl.currFiringInterval <= 0) {
-        pl.currBulletBurst = pl.maxBulletBurst;
-        pl.currFiringInterval = pl.maxFiringInterval;
-    }
-    if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
-        //convert interval from ms to rounds per second for getModifiedValue, then back to ms
-        pl.currBulletBurst--;
-        pl.bulletBurstCooldown = min(
-            50.0f,
-            (pl.maxFiringInterval / pl.maxBulletBurst)
-        );
-        // create bullet
-        vec2 bulletPos = pos;
 
-        if (cluster == 1) {
-            createEnemyBullet(render, bulletPos, bulletDir, {20,20}, pl.bulletSpeed, CIRCLE);
-            return;
-        }
+    if (atkData.attackType == EnemyAttackPattern::SPRAY)
+    {
+        double range = atkData.angleOffset;
 
-        // Calculate the offset between bullets for cluster shots
+        // Generate a random offset within the range
+        double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
+        offset = burst.burstDirection + offset;
+        createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData.veer.x * vec2(cos(offset + atkData.veer.y)),atkData);
+    } else if (burst.curBurst != atkData.numBullets) {
+        float currentAngle = atan2(velocity.y, velocity.x);
+        float angleDifference = currentAngle - burst.burstDirection;
 
-        float offSet = radians(BulletSpread) / cluster;
-        // Create a rotation matrix
-        glm::mat2 rotationMatrix = glm::mat2(
-            glm::cos(offSet), -glm::sin(offSet),
-            glm::sin(offSet),  glm::cos(offSet)
-        );
-
-
-        if (cluster == 2) {
-            createEnemyBullet(render, bulletPos, bulletDir*rotationMatrix, { 20,20 }, pl.bulletSpeed, CIRCLE);
-            createEnemyBullet(render, bulletPos, bulletDir*glm::transpose(rotationMatrix), { 20,20 }, pl.bulletSpeed, CIRCLE);
-            return;
-        }
-
-        for (int i = 0; i < cluster; i++) {
-            if (i == 0) {
-                createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
-                continue;
+        float maxDifference = M_PI / 32;
+        if (abs(angleDifference) > maxDifference) {
+            if (angleDifference > 0) {
+                currentAngle = burst.burstDirection + maxDifference;
+            } else {
+                currentAngle = burst.burstDirection - maxDifference;
             }
-            for (int j = 0; j < i; j++) {
-                if (i % 2 == 0) {
-                    bulletDir = bulletDir * rotationMatrix;
-                }
-                else {
-                    bulletDir = bulletDir * glm::transpose(rotationMatrix);
-                }
-            }
-            createEnemyBullet(render, bulletPos, bulletDir, { 20,20 }, pl.bulletSpeed, CIRCLE);
         }
+
+        float angle = currentAngle;
+        std::cout << angle << std::endl;
+        createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData.veer.x * vec2(cos(angle + atkData.veer.y)), atkData);
     }
+    burst.curBurst--;
+    burst.burstCooldown = 150;
+
+
 }
 
 

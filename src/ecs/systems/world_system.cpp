@@ -169,21 +169,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// simplistic way to have collision outlines follow their "owner" when the owner moves
-	// potentially buggy implementation with poly outlines, but currently works with circles
-	//for (auto& owner : registry.collisionShapes.entities) {
-	//	for (auto& shape : registry.collisionShapes.get(owner).shapes) {
-	//		// very rough check to see if owner has moved (has velocity)
-	//		// but doesn't account for change in angle, etc
-	//		if ((registry.motions.get(owner).velocity.x > 0 || registry.motions.get(owner).velocity.y > 0) || owner == player) {
-	//			auto& motion = registry.motions.get(shape);
-	//			motion.angle = registry.motions.get(owner).angle;
-	//			motion.position = registry.motions.get(owner).position;
-	//			motion.velocity = registry.motions.get(owner).velocity;
-	//		}
-	//	}
-	//}
-
 	// place sprite timer progression here for now
 	for (auto& entity : registry.spriteTimers.entities) {
 		auto& spriteTimer = registry.spriteTimers.get(entity);
@@ -246,7 +231,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
-		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION, EnemyBehavior::FOLLOW_PLAYER);
 	}
 
 	return true;
@@ -290,7 +275,7 @@ void WorldSystem::restartGame() {
 	createTestWall(renderer, {0, wS.height}, {0,0});
 	//createBlob(renderer, vec2(600, 300));
 
-	//createTestFloor(renderer, { 1920/2,1080/2 });
+	createTestFloor(renderer, { wS.width /2, wS.height/2 });
 
 	//createTestPoly(renderer, { 500,500 }, {
 	//	{100, 0},
@@ -300,10 +285,9 @@ void WorldSystem::restartGame() {
 	//	, 90);
 
 	// this feels very bad, put as temp fix for getting window size for now
-	WindowState& windowState = registry.windowStates.components[0];
-	dialogueBox = createDialogueBox(vec2(windowState.width /2, windowState.height - windowState.height /8), vec2(windowState.width, windowState.height /4));
-	pauseMenu = createPauseMenu(vec2(windowState.width / 2, windowState.height / 2), vec2(windowState.width, windowState.height / 4));
-	gameOverMenu = createGameOverMenu(vec2(windowState.width / 2, windowState.height / 2), vec2(windowState.width, windowState.height / 4));
+	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
+	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 }
 
 // Compute collisions between entities
@@ -362,9 +346,10 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
 
 					// Assumes bullet flies towards facing direction
-					motion.angle = atan(motion.velocity.y / motion.velocity.x);
+					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
@@ -388,9 +373,9 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
-
+					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
 					// Assumes bullet flies towards facing direction
-					motion.angle = atan(motion.velocity.y/motion.velocity.x);
+					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}
@@ -490,7 +475,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
-	Shoots& pl = registry.shoots.get(player);
+	PlayerAttackData& pl = registry.shoots.get(player);
     Motion& player_motion = registry.motions.get(player);
     vec2 playerPos = player_motion.position;
     vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "common.hpp"
 #include "../utils/extended_stack.hpp"
 

@@ -37,7 +37,7 @@ struct BulletStackEffect {
     // For UIq
     std::string name;
     std::string tooltip;
-
+    vec3 color;
 
 };
 
@@ -168,9 +168,18 @@ struct StackCompile {
 
 enum class EnemyAttackPattern {
     // this is the attack pattern 
-    SINGLE_SHOT,
-    DOUBLE_SHOT,
+    SHOTGUN,
     ALL_DIRECTION, 
+    BURST,
+    SPRAY,
+    NONE
+};
+
+enum class EnemyBehavior {
+    // this is the basic
+    RANDOM,
+    FOLLOW_PLAYER,
+    PATHFINDING,
 };
 
 // anything that is deadly to the player
@@ -182,7 +191,17 @@ struct Enemy {
     // TODO add attack pattern data?
     float attackCooldown;
     EnemyAttackPattern attackPattern;
+    EnemyBehavior behavior;
+    float veer;
 
+};
+
+struct EnemyMovement {
+    vec2 posA;
+    vec2 posB;
+    float t;
+    float speed;
+    bool firstMove;
 };
 
 struct BossEnemy {
@@ -198,7 +217,7 @@ struct Invisible {
     float countdown = 1000;
 };
 
-struct Shoots {
+struct PlayerAttackData {
     float currFiringInterval = 0.0f;
     float maxFiringInterval = 300.0f;
     float bulletSpeed = 400;
@@ -207,8 +226,6 @@ struct Shoots {
     int currBulletBurst = 1;
     float bulletBurstCooldown = 50;
 };
-
-// TODO Add a way to use parametric equations for bullet path
 
 struct PlayerBullet {
     float damage = 10;
@@ -227,18 +244,40 @@ enum EnemyBulletShape {
     CIRCLE
 };
 
+struct AttackData {
+    EnemyAttackPattern attackType;
+
+    EnemyBulletShape shape = EnemyBulletShape::CIRCLE;
+    std::vector<BulletStackEffect> rareBulletEffects;
+    BulletStackEffect defaultEffect;
+    int numBullets = 1;
+    float angleOffset = 0;
+    vec2 size = {20,20};
+    float speed = 200;
+    float bulletRange = 3000;
+    vec2 veer = {0,0};
+    int bulletPierce = 0;
+    int bulletBounce = 0;
+    float homing = 0;
+};
+
 struct EnemyBullet {
     float bulletSpeed;
     // Number than counts down every step, delete bullet when <0
     float bulletRange = 1000;
     float initialRange = 0;
     // Enemy bullet can scale x,y independently?
-    vec2 bulletSize =  vec2(20, 10);
     int bulletBounce;
     std::vector<BulletStackEffect> bulletEffects;
 };
 
-struct Homing {
+struct Burst {
+    int curBurst = 0;
+    float burstCooldown = 0;
+    float burstDirection = 0;
+};
+
+struct HomingBullet {
     Entity target;
     float homingIntensity; // How quickly it can turn towards the target
 };
@@ -254,4 +293,5 @@ struct Motion {
 	float angle = 0;
 	vec2 velocity = { 0, 0 };
 	vec2 scale = { 10, 10 };
+    vec2 veer = { 0,0 };
 };

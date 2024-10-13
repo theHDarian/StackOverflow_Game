@@ -88,6 +88,7 @@ public:
 	void drawSetupFrame();
 	void drawGameElements();
 	void drawUI();
+	void drawBackgroundElements();
 	void drawToScreen();
 
 	mat3 createProjectionMatrix();

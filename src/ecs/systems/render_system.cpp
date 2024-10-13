@@ -214,6 +214,15 @@ void RenderSystem::drawSetupFrame(){
 	frame.prevTexture = off_screen_render_buffer_color;
 }
 
+void RenderSystem::drawBackgroundElements() {
+	mat3 projection_2D = createProjectionMatrix();
+	for (Entity entity : registry.backgrounds.entities) {
+		if (!registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+}
+
 // Render our game world
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::drawGameElements()
@@ -224,7 +233,7 @@ void RenderSystem::drawGameElements()
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity))
+		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity) ||  registry.backgrounds.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize

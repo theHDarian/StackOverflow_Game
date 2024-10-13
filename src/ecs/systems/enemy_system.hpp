@@ -18,8 +18,9 @@ public:
     ~EnemySystem();
     void step(float elapsed_ms);
 private:
-    void shoot(vec2 velocity, vec2 pos, float angle);
-    // void shoot(Enemy& enemy, vec2 pos, float angle);
-    void shoot(::Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread);
+    //void shoot(::Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread);
+    void shootShotgun(vec2 velocity, vec2 pos, AttackData atkData);
+    void shootAllDirection(vec2 pos, AttackData atkData);
+    void shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst, Enemy &enemy);
     RenderSystem* render;
 };
