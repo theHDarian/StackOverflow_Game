@@ -37,9 +37,11 @@ vec2 AISystem::getMove(EnemyBehavior behavior) {
 	// path finding hasnt been implemented
 	switch(behavior) {
 		case EnemyBehavior::RANDOM:
+			//std::cout << "random!" << std::endl;
 			return generateRandomPos();
 		
 		case EnemyBehavior::FOLLOW_PLAYER:
+			//std::cout << "follow!" << std::endl;
 			return getPlayerPos();
 		
 		case EnemyBehavior::PATHFINDING:
@@ -54,6 +56,8 @@ vec2 AISystem::generateRandomPos() {
 	WindowState& windowState = window_registry.components[0];
 	int width = windowState.width;
 	int height = windowState.height;
+	std::cout << "width " << windowState.width << std::endl;
+	std::cout << "height " << windowState.height << std::endl;
 
 	float pos_x = rand() % width;
 	float pos_y = rand() % height;

@@ -84,15 +84,6 @@ void EnemySystem::step(float elapsed_ms) {
                 {
                     if (!registry.fades.has(entity))
                         registry.fades.emplace(entity);
-                    if (!registry.emitParticles.has(entity)) {
-                        for (int i = 0; i < (rand() % 50 + 10); i++) {
-                            EmitParticle& p = registry.emitParticles.emplace(Entity());
-                            p.requestType = RequestType::Explosion;
-                            Motion& motion = motion_registry.get(entity);
-                            p.requestOrigin = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5 };
-                            p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5 };
-                        }
-                    }
                     std::cout << "enemy " << entity << "has died" << std::endl;
                     delete_queue.push_back(entity);
                 }
@@ -132,20 +123,23 @@ void EnemySystem::step(float elapsed_ms) {
         if (registry.enemyMovement.has(entity)) {
             EnemyMovement& movement = registry.enemyMovement.get(entity);
             vec2 direction = movement.posB - movement.posA;
-            float targetAngle = atan2(direction.y, direction.x);
-            float deltaAngle = targetAngle - motion.angle;
-            float angularSpeedRad =  movement.angularSpeed * 2*M_PI/360.0f;
-            float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
-            if (deltaAngle > M_PI) deltaAngle -= 2*M_PI;
-            if (deltaAngle < -M_PI) deltaAngle += 2*M_PI;
-            if (deltaAngle > maxChange) deltaAngle = maxChange;
-            if (deltaAngle < -maxChange) deltaAngle = -maxChange;
+            if (direction != vec2(0, 0)) {
+                float targetAngle = atan2(direction.y, direction.x);
+                float deltaAngle = targetAngle - motion.angle;
+                float angularSpeedRad = movement.angularSpeed * 2 * M_PI / 360.0f;
+                float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
+                if (deltaAngle > M_PI) deltaAngle -= 2 * M_PI;
+                if (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
+                if (deltaAngle > maxChange) deltaAngle = maxChange;
+                if (deltaAngle < -maxChange) deltaAngle = -maxChange;
 
-            motion.angle += deltaAngle;
-            
-            float totalDistance = glm::distance(movement.posA,movement.posB);
-            movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA,movement.posB));
-            motion.position = glm::lerp(movement.posA,movement.posB,movement.distanceTraveled / totalDistance);
+                motion.angle += deltaAngle;
+
+                float totalDistance = glm::distance(movement.posA, movement.posB);
+                movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
+                motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
+            }
+
         }        
     }
     for (Entity entity: delete_queue) {
