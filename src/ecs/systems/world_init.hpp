@@ -6,13 +6,11 @@
 
 // These are hardcoded to the dimensions of the entity texture
 // BB = bounding box
-const float FISH_BB_WIDTH  = 0.6f * 165.f;
-const float FISH_BB_HEIGHT = 0.6f * 165.f;
-const float EEL_BB_WIDTH   = 0.6f * 300.f;	// 1001
-const float EEL_BB_HEIGHT  = 0.6f * 202.f;	// 870
 
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
+
+Entity createAimIndicator(RenderSystem* renderer);
 
 // basic enemy
 Entity createBlob(RenderSystem* renderer, vec2 pos);
@@ -23,22 +21,28 @@ Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPositi
 // Poly for testing
 Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle);
 
+// Floor testing
+Entity createTestFloor(RenderSystem* renderer, vec2 pos);
+
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
 Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b);
 
-Entity createCollisionCircle(RenderSystem* renderer, vec2 position, float angle, vec2 velocity, float rad);
-
 // the enemy
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern);
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackPattern atkPattern, EnemyBehavior behavior);
 
 // Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
-Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
-Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, float speed);
+Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData);
 
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
-
 float getModifiedValue(BulletEffectType bf, float value);
+
+// create dialogue box
+Entity createDialogueBox(vec2 position, vec2 scale);
+
+Entity createPauseMenu(vec2 position, vec2 scale);
+
+Entity createGameOverMenu(vec2 position, vec2 scale);

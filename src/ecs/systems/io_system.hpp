@@ -16,6 +16,10 @@ public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
 
+    bool isPaused()const;
+    bool isGameOver()const;
+    bool isDialogue()const;
+
 private:
 	GLFWwindow* window;
     void onKey(int key, int, int action, int mod);
@@ -24,5 +28,5 @@ private:
 
     void onMouseMove(vec2 mousePosition);
 
-    void handleMovementInput(int key, int action, IOState& state);
+    void handleMovementInput(int key, int action, IOState &state, GameState &gameState);
 };

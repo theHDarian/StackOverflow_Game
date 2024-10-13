@@ -7,7 +7,8 @@
 
 #include "map_components.hpp"
 #include "actor_components.hpp"
-#include "../utils/extended_stack.hpp"
+#include "io_components.hpp"
+#include "ui_components.hpp"
 
 
 // Stucture to store collision information
@@ -27,12 +28,20 @@ struct PolyCollider {
 	// Points are in order around the polygon
 	std::vector<vec2> offsetVertices;
 	float maxLength;
+	float minLength;
 
 	// Call this function after creating offsetVertices please
-	void setMaxLength() {
-		maxLength = 0;
-		for (uint i = 0; i < offsetVertices.size(); i++) {
+	// Bit pricey though, so if you know the max and min length just hardcode them in!
+	void setPolyLengths() {
+		maxLength = glm::distance(offsetVertices[0], { 0,0 });
+		minLength = glm::distance(offsetVertices[0], { 0,0 });
+		for (uint i = 1; i < offsetVertices.size(); i++) {
 			if (glm::distance(offsetVertices[i], { 0,0 }) > maxLength) maxLength = glm::distance(offsetVertices[i], { 0,0 });
+			vec2 a = -offsetVertices[i];
+			vec2 b = offsetVertices[i-1] - offsetVertices[i];
+			vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+			if (glm::distance(a - c + offsetVertices[i], { 0,0 }) < minLength) minLength = glm::distance(a - c + offsetVertices[i], { 0,0 });
+			if (glm::distance(offsetVertices[i], { 0,0 }) < minLength) minLength = glm::distance(offsetVertices[i], { 0,0 });
 		}
 	}
 };
@@ -45,30 +54,10 @@ struct WallCollider {
 
 // Data structure for toggling debug mode
 struct Debug {
-	bool in_debug_mode = 0;
-	bool in_freeze_mode = 0;
+	bool in_debug_mode = false;
+	bool in_freeze_mode = false;
 };
 extern Debug debugging;
-
-// Sets the brightness of the screen
-struct ScreenState
-{
-	float darken_screen_factor = -1;
-};
-
-struct IOState {
-	bool shouldEnd;
-	bool shouldRestart;
-    float shouldDash;
-	bool shouldShoot;
-	vec2 inputAxis;
-	vec2 lastInputAxis = {1,1};
-	vec2 mousePosition;
-
-
-	ExtendedStack<int> pressedHorizontal;
-	ExtendedStack<int> pressedVertical;
-};
 
 // Struct for dash
 
@@ -76,6 +65,15 @@ struct IOState {
 struct DebugComponent
 {
 	// Note, an empty struct has size 1
+};
+
+struct Frame {
+	GLuint prevTexture;
+	GLuint prevFrameBuffer;
+};
+struct EmitParticle {
+	vec2 position;
+	
 };
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
@@ -137,11 +135,17 @@ struct Mesh
 // maybe a universal map would be easier to load + manage files with...
 enum class TEXTURE_ASSET_ID {
 	FISH = 0,
-	EEL = FISH + 1,
-	CIRCLE = EEL + 1,
+	PUFFERFISH = FISH + 1,
+	CIRCLE = PUFFERFISH + 1,
 	MC_BASE = CIRCLE + 1,
 	MC_HIT = MC_BASE + 1,
-	TEXTURE_COUNT = MC_HIT + 1
+	AIM_INDICATOR = MC_HIT + 1,
+	FLOOR = AIM_INDICATOR + 1,
+	MC_BULLET = FLOOR + 1,
+	ENEMY_BULLET_SQUARE = MC_BULLET + 1,
+	ENEMY_BULLET_CIRCLE = ENEMY_BULLET_SQUARE + 1,
+	ENEMY_BULLET_TRIANGLE = ENEMY_BULLET_CIRCLE + 1,
+	TEXTURE_COUNT = ENEMY_BULLET_TRIANGLE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -150,8 +154,8 @@ enum class EFFECT_ASSET_ID {
 	EGG = COLOURED + 1,
 	SALMON = EGG + 1,
 	TEXTURED = SALMON + 1,
-	WATER = TEXTURED + 1,
-	EFFECT_COUNT = WATER + 1
+	POSTPROCESS = TEXTURED + 1,
+	EFFECT_COUNT = POSTPROCESS + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -169,6 +173,7 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+	bool show = true;
 };
 
 // Expected sprite states other systems can use
@@ -202,3 +207,36 @@ struct SpriteTimer {
 	TEXTURE_ASSET_ID nextSprite;
 };
 
+// used to store info of what text needs to be rendered
+// currently, 1 request per entity (like how render requests work)
+// but may consider changing (eg: emplace with duplicates)
+// for things like menus that may have many text sections
+struct TextRenderRequest {
+	std::string text;
+
+	// maybe position should be vec2 to match with rest of game?
+	float x;
+	float y;
+
+	// from experience, this is often a small number < 10, not sure why
+	float scale; 
+	glm::vec3 color;
+};
+
+struct DialogueLines {
+	std::vector<std::string> lines;
+	int current = 0;
+
+	std::string next() {
+		if (current < lines.size()) {
+			return lines[current++];
+		}
+		else {
+			return "<end>"; // maybe end of str constant
+		}
+	}
+};
+
+struct BG {
+
+};

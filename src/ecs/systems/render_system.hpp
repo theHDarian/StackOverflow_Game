@@ -2,8 +2,12 @@
 
 #include <array>
 #include <utility>
-
 #include "common.hpp"
+
+#if IMGUI_ENABLED
+#include "imgui.h"
+#endif
+
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
@@ -19,6 +23,7 @@ class RenderSystem {
 	 */
 	std::array<GLuint, texture_count> texture_gl_handles;
 	std::array<ivec2, texture_count> texture_dimensions;
+	GLuint vao;
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
@@ -31,10 +36,17 @@ class RenderSystem {
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, texture_count> texture_paths = {
 			textures_path("green_fish.png"),
-			textures_path("eel.png"),
+			textures_path("enemy_Pufferfish.png"),
 			textures_path("circle.png"),
 			textures_path("mcv1_base.png"), 
-			textures_path("mcv1_hit.png") };
+			textures_path("mcv1_hit.png"),
+			textures_path("aim_indicator.png"),
+			textures_path("blankFloor.png"),
+			textures_path("player_bullet.png"),
+			textures_path("enemy_bullet_square.png"),
+			textures_path("enemy_bullet_circle.png"),
+			textures_path("enemy_bullet_triangle.png")
+	};
 
 	std::array<GLuint, effect_count> effects;
 	// Make sure these paths remain in sync with the associated enumerators.
@@ -43,11 +55,30 @@ class RenderSystem {
 		shader_path("egg"),
 		shader_path("salmon"),
 		shader_path("textured"),
-		shader_path("water") };
+		shader_path("postprocess") };
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
+
+	std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
+			{BulletDamage,      {1, 1, 1}},
+			{ProjectileSpeed,   {1, 1, 1}},
+			{ProjectileSize,    {1, 1, 1}},
+			{FireRate,          {1, 1, 1}},
+			{BulletRange,       {1, 1, 1}},
+			{BulletSpread,      {1, 1, 1}},
+			{BulletNum,         {1, 1, 1}},
+			{BulletBurst,       {1, 1, 1}},
+			{Bounce,            {1, 1, 1}},
+			{Pierce,            {1, 1, 1}},
+			{Homing,            {1, 1, 1}},
+			{PlayerSpeed,       {1, 1, 1}},
+			{PlayerNumDash,     {1, 1, 1}},
+			{PlayerStackSize,   {1, 1, 1}},
+			{PlayerDashCDR,     {1, 1, 1}},
+			{Inert,             {91 / 255.f, 99 / 255.f, 128 / 255.f}}
+	};
 
 public:
 	// Initialize the window
@@ -73,14 +104,23 @@ public:
 	~RenderSystem();
 
 	// Draw all entities
-	void draw();
+	void drawSetupFrame();
+	void drawGameElements();
+	void drawUI();
+	void drawBackgroundElements();
+	void drawToScreen();
 
 	mat3 createProjectionMatrix();
+
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
 
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
-	void drawToScreen();
+	void drawCircleCollider(Entity entity, const mat3& projection);
+	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
+	vec2 drawBulletStack(const mat3& projection);
 
 	// Window handle
 	GLFWwindow* window;
@@ -91,6 +131,14 @@ private:
 	GLuint off_screen_render_buffer_depth;
 
 	Entity screen_state_entity;
+
+	#if IMGUI_ENABLED
+	public:
+		ImGuiContext* imgui_context;
+	private:
+		void initImGui();
+		void drawImGui();
+	#endif
 };
 
 bool loadEffectFromFile(
