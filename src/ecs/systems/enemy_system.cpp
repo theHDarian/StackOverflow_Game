@@ -25,8 +25,7 @@ EnemySystem::EnemySystem(RenderSystem *renderer)
 EnemySystem::~EnemySystem() {
 };
 
-void EnemySystem::step(float elapsed_ms)
-{
+void EnemySystem::step(float elapsed_ms) {
     auto &enemy_registry = registry.enemies;
     auto &motion_registry = registry.motions;
     auto &collision_registry = registry.collisions;
@@ -150,7 +149,10 @@ void EnemySystem::step(float elapsed_ms)
         }        
     }
     for (Entity entity: delete_queue) {
-        for (int i = 0; i < (rand() % 50 + 10); i++) {
+        // delete entity here when timer goes down to respect queue
+        if (!registry.fades.has(entity) || registry.fades.get(entity).time <= 0) {
+            registry.deleteEntityAndRelatedEntities(entity);
+        } else {
             EmitParticle& p = registry.emitParticles.emplace(Entity());
             p.requestType = RequestType::Explosion;
             Motion &motion = motion_registry.get(entity);
@@ -158,11 +160,6 @@ void EnemySystem::step(float elapsed_ms)
             p.position = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0};
         }
 
-        registry.deleteEntityAndRelatedEntities(entity);
-    for (Entity entity : delete_queue) {
-        // delete entity here when timer goes down to respect queue
-        if (!registry.fades.has(entity) || registry.fades.get(entity).time <= 0)
-            registry.deleteEntityAndRelatedEntities(entity);
     }
 }
 
