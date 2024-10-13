@@ -124,6 +124,14 @@ void EnemySystem::step(float elapsed_ms)
             {
                 movement.t = 1.0f;
             }
+            //ROTATION INTERPOLATION
+            vec2 direction = movement.posB - movement.posA;
+            float length = sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
+            vec2 normalizedDirection = vec2(direction[0] / length, direction[1] / length);
+            float angle = atan2(normalizedDirection[1], normalizedDirection[0]);
+            float lerpSpeed = 0.1f;
+            motion.angle = motion.angle + lerpSpeed * (angle - motion.angle);
+            //MOVEMENT INTERPOLATION
             float interX = movement.posA[0] + movement.t * (movement.posB[0] - movement.posA[0]);
             float interY = movement.posA[1] + movement.t * (movement.posB[1] - movement.posA[1]);
             motion.position[0] = interX;
