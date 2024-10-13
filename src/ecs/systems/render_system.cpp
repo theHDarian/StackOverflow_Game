@@ -1,6 +1,7 @@
 // internal
 #include "render_system.hpp"
 #include <SDL.h>
+#include <glm/gtx/compatibility.hpp>
 
 #include "tiny_ecs_registry.hpp"
 #include "../utils/enum_string_mapping.hpp"
@@ -14,6 +15,15 @@
 #endif
 
 #include "text_system.hpp"
+
+void RenderSystem::step(float elapsed_ms) {
+	if (registry.fades.entities.size() > 0) {
+		for (auto& fadeEntity : registry.fades.entities) {
+			auto& fade = registry.fades.get(fadeEntity);
+			fade.time -= elapsed_ms;
+		}
+	}
+}
 
 void RenderSystem::drawTexturedMesh(Entity entity,
 									const mat3 &projection)
@@ -99,12 +109,23 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		assert(false && "Type of render request not supported");
 	}
 
+	float alpha = 1;
+
+	// fade out entity if needed
+	if (registry.fades.has(entity)) {
+		Fade& fade = registry.fades.get(entity);
+		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
+
+	}
+
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
 	glUniform3fv(color_uloc, 1, (float *)&color);
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, alpha);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -423,6 +444,8 @@ vec2 RenderSystem::drawBulletStack(const mat3& projection) {
 	// want to overwrite the colour with given; could also use a separate shader program
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 1);
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -513,6 +536,8 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEX
 	// want to overwrite the colour with given; could also use a separate shader program
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 1);
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
