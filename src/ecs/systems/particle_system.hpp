@@ -23,7 +23,7 @@ public:
     void render();
     bool initScreenTexture();
 
-    ParticleProps createParticle(vec2 pos);
+    ParticleProps createDashParticle(vec2 pos);
 private:
     struct Particle {
         vec2 position;

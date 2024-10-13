@@ -72,7 +72,8 @@ struct Frame {
 	GLuint prevFrameBuffer;
 };
 struct EmitParticle {
-
+	vec2 position;
+	
 };
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean

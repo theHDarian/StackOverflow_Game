@@ -130,9 +130,10 @@ void ParticleSystem::step(float elapsed_ms) {
 
     //check emit requests
     for (auto& request : registry.emitParticles.components) {
-        vec2 mousePos = registry.ioStates.components[0].mousePosition;
-        emit(createParticle(mousePos));
+        emit(createDashParticle(request.position));
     }
+    //test emission on mouse position
+    // emit(createDashParticle(registry.ioStates.components[0].mousePosition));
     registry.emitParticles.clear();
 }
 
@@ -237,15 +238,15 @@ void ParticleSystem::render() {
     }
 }
 
-ParticleProps ParticleSystem::createParticle(vec2 pos) {
+ParticleProps ParticleSystem::createDashParticle(vec2 pos) {
     ParticleProps props;
-    props.position = pos;
-    props.velocity = { 0, 0 };
-    props.velocityVariation = { 3.0f, 1.0f };
+    props.position = {pos.x + Random::Float(-5,5),pos.y + Random::Float(-5,5)};
+    props.velocity = { -5.0f, -5.0f };
+    props.velocityVariation = { 10.0f, 10.0f };
     props.colorBegin = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };	
     props.colorEnd = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
     props.sizeBegin = 10.0f;
-    props.sizeVariation = 0.3f;
+    props.sizeVariation = 3.0f;
     props.sizeEnd = 2.0f;		
     props.lifetime = 1000.0f;
     return props;

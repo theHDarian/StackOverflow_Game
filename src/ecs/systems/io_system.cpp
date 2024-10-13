@@ -42,11 +42,6 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
 		ioState.shouldEnd = true;
 	}
-	//create particle
-	if (key == GLFW_KEY_P) {
-		auto ent = Entity();
-		registry.emitParticles.emplace(ent);
-	}
 
 	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
