@@ -71,10 +71,18 @@ struct Frame {
 	GLuint prevTexture;
 	GLuint prevFrameBuffer;
 };
+
+enum class RequestType {
+	EmitParticle,
+	Explosion,
+};
+
 struct EmitParticle {
 	vec2 position;
-	
+	vec2 requestOrigin;
+	RequestType requestType;
 };
+
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType { Background, SFX };

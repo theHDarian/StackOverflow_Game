@@ -2,6 +2,7 @@
 #include "tiny_ecs_registry.hpp"
 #include <glm/trigonometric.hpp>
 #include "premades.hpp"
+#include "ai_system.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
@@ -156,7 +157,6 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	enemy.attackCooldown = 5000;
 	enemy.maxHealth = 1000;
 	enemy.currHealth = enemy.maxHealth;
-	enemy.speed = 100;
 	enemy.state = 10;
 
 	registry.sprites.emplace(entity);
@@ -212,17 +212,16 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyAttackP
 	enemy.attackCooldown = 5000;
 	enemy.maxHealth = 20;
 	enemy.currHealth = enemy.maxHealth;
-	enemy.speed = 100;
 	enemy.state = 10;
 	enemy.attackPattern = atkPattern;
 	enemy.behavior = behavior;
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
 	movement.posA = pos;
-	movement.posB = pos;
-	movement.speed = 0.1f;
-	movement.firstMove = true;
-	movement.t = 0.0f;
+	movement.posB = AISystem::getMove(behavior);
+	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+	movement.speed = 100.0f;
+	movement.distanceTraveled = 0.0f;
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = threeBurst;

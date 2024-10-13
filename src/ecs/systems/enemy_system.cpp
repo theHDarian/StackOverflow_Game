@@ -8,6 +8,7 @@
 #include "actor_components.hpp"
 #include <thread>
 #include <vector>
+#include <glm/gtx/compatibility.hpp>
 #include <chrono>
 
 #include "ai_system.hpp"
@@ -80,7 +81,9 @@ void EnemySystem::step(float elapsed_ms)
                     if (!registry.emitParticles.has(entity)) {
                         for (int i = 0; i < (rand() % 50 + 10); i++) {
                             EmitParticle& p = registry.emitParticles.emplace(Entity());
+                            p.requestType = RequestType::Explosion;
                             Motion& motion = motion_registry.get(entity);
+                            p.requestOrigin = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5 };
                             p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5 };
                         }
                     }
@@ -119,40 +122,31 @@ void EnemySystem::step(float elapsed_ms)
                 }
             }
         }
-
-        auto &movement_registry = registry.enemyMovement;
-        for (int i = 0; i < movement_registry.size(); ++i)
-        {
-
-            Entity &entity = movement_registry.entities[i];
-            EnemyMovement &movement = movement_registry.get(entity);
-            Motion &motion = motion_registry.get(entity);
-
-            movement.t += movement.speed * elapsed_ms / 1000.f;
-            if (movement.t >= 1.0f)
-            {
-                movement.t = 1.0f;
-            }
-            //ROTATION INTERPOLATION
+        // move enemy using lerp
+        if (registry.enemyMovement.has(entity)) {
+            EnemyMovement& movement = registry.enemyMovement.get(entity);
             vec2 direction = movement.posB - movement.posA;
-            float length = sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
-            vec2 normalizedDirection = vec2(direction[0] / length, direction[1] / length);
-            float angle = atan2(normalizedDirection[1], normalizedDirection[0]);
-            float lerpSpeed = 0.1f;
-            motion.angle = motion.angle + lerpSpeed * (angle - motion.angle);
-            //MOVEMENT INTERPOLATION
-            float interX = movement.posA[0] + movement.t * (movement.posB[0] - movement.posA[0]);
-            float interY = movement.posA[1] + movement.t * (movement.posB[1] - movement.posA[1]);
-            motion.position[0] = interX;
-            motion.position[1] = interY;
-        }
-        
-        for (Entity entity : delete_queue) {
-            if(!registry.fades.has(entity) || registry.fades.get(entity).time <= 0)
-                registry.deleteEntityAndRelatedEntities(entity);
-        }
-    }
+            float targetAngle = atan2(direction.y, direction.x);
+            float deltaAngle = targetAngle - motion.angle;
+            float angularSpeedRad =  movement.angularSpeed * 2*M_PI/360.0f;
+            float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
+            if (deltaAngle > M_PI) deltaAngle -= 2*M_PI;
+            if (deltaAngle < -M_PI) deltaAngle += 2*M_PI;
+            if (deltaAngle > maxChange) deltaAngle = maxChange;
+            if (deltaAngle < -maxChange) deltaAngle = -maxChange;
 
+            motion.angle += deltaAngle;
+            
+            float totalDistance = glm::distance(movement.posA,movement.posB);
+            movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA,movement.posB));
+            motion.position = glm::lerp(movement.posA,movement.posB,movement.distanceTraveled / totalDistance);
+        }        
+    }
+    for (Entity entity : delete_queue) {
+        // delete entity here when timer goes down to respect queue
+        if (!registry.fades.has(entity) || registry.fades.get(entity).time <= 0)
+            registry.deleteEntityAndRelatedEntities(entity);
+    }
 }
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData) {
