@@ -134,7 +134,9 @@ void EnemySystem::step(float elapsed_ms)
     for (Entity entity: delete_queue) {
         for (int i = 0; i < (rand() % 50 + 10); i++) {
             EmitParticle& p = registry.emitParticles.emplace(Entity());
+            p.requestType = RequestType::Explosion;
             Motion &motion = motion_registry.get(entity);
+            p.requestOrigin = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5};
             p.position = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5};
         }
 

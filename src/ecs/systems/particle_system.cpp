@@ -4,6 +4,9 @@
 #include "../utils/random.hpp"
 #include "tiny_ecs_registry.hpp"
 #include <glm/gtc/type_ptr.hpp>
+
+#include "ai_system.hpp"
+#include "ai_system.hpp"
 #include "render_system.hpp"
 
 ParticleSystem::ParticleSystem() {
@@ -130,7 +133,12 @@ void ParticleSystem::step(float elapsed_ms) {
 
     //check emit requests
     for (auto& request : registry.emitParticles.components) {
-        emit(createDashParticle(request.position));
+        if (request.requestType == RequestType::EmitParticle) {
+            emit(createDashParticle(request.position));
+        }
+        else if (request.requestType == RequestType::Explosion) {
+            explode(createDashParticle(request.position), request.requestOrigin);
+        }
     }
     //test emission on mouse position
     // emit(createDashParticle(registry.ioStates.components[0].mousePosition));
@@ -158,6 +166,32 @@ void ParticleSystem::emit(const ParticleProps& props) {
     particle.sizeEnd = props.sizeEnd;
 
     poolIndex = --poolIndex % particlePool.size();
+}
+
+void ParticleSystem::explode(const ParticleProps& props, vec2 origin) {
+    Particle& particle = particlePool[poolIndex];
+    particle.active = true;
+    particle.position = props.position;
+    particle.rotation = Random::Float() * 2.0f * glm::pi<float>();
+
+    vec2 offset = origin - props.position;
+    vec2 direction = normalize(offset);
+    float length = offset.length();
+
+    particle.velocity = -(direction * length) * 70.0f + props.velocity ;
+    particle.velocity.x += props.velocityVariation.x * (Random::Float() - 0.5f);
+    particle.velocity.y += props.velocityVariation.y * (Random::Float() - 0.5f);
+
+    particle.colorBegin = props.colorBegin;
+    particle.colorEnd = props.colorEnd;
+
+    particle.lifetime = props.lifetime;
+    particle.lifeRemaining = props.lifetime;
+    particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
+    particle.sizeEnd = props.sizeEnd;
+
+    poolIndex = --poolIndex % particlePool.size();
+
 }
 
 void ParticleSystem::render() {
