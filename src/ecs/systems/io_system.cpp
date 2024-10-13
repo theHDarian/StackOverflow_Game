@@ -61,7 +61,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	}
 
 	//Player movement
-	handleMovementInput(key,action,ioState);
+	handleMovementInput(key,action,ioState, gameState);
 
 }
 
@@ -88,7 +88,7 @@ void IOSystem::onMouseMove(vec2 mousePosition) {
     state.mousePosition = mousePosition;
 }
 
-void IOSystem::handleMovementInput(int key, int action, IOState& state) {
+void IOSystem::handleMovementInput(int key, int action, IOState& state, GameState& gameState) {
 	if (action == GLFW_PRESS) {
 		if (key == GLFW_KEY_A) {
 			state.pressedHorizontal.push(-1.0f);
@@ -99,7 +99,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state) {
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
-        if (key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) {
+        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused) {
 
             state.shouldDash = true;
         }
