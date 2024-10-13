@@ -187,7 +187,7 @@ struct Enemy {
 	int state; //TODO: can change to enum once state determined
     int maxHealth;
     int currHealth;
-    BulletStackEffect blunt = blunt;
+    BulletStackEffect blunt;
     // TODO add attack pattern data?
     float attackCooldown;
     EnemyBehavior behavior;

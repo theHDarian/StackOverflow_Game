@@ -214,6 +214,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 	enemy.behavior = behavior;
+	enemy.blunt = blunt;
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
 	movement.posA = pos;

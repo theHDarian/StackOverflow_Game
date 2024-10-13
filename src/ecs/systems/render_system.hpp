@@ -62,21 +62,21 @@ class RenderSystem {
 	std::array<Mesh, geometry_count> meshes;
 
 	std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
-			{BulletDamage,      {1, 1, 1}},
-			{ProjectileSpeed,   {1, 1, 1}},
-			{ProjectileSize,    {1, 1, 1}},
-			{FireRate,          {1, 1, 1}},
-			{BulletRange,       {1, 1, 1}},
-			{BulletSpread,      {1, 1, 1}},
-			{BulletNum,         {1, 1, 1}},
-			{BulletBurst,       {1, 1, 1}},
-			{Bounce,            {1, 1, 1}},
-			{Pierce,            {1, 1, 1}},
-			{Homing,            {1, 1, 1}},
-			{PlayerSpeed,       {1, 1, 1}},
-			{PlayerNumDash,     {1, 1, 1}},
-			{PlayerStackSize,   {1, 1, 1}},
-			{PlayerDashCDR,     {1, 1, 1}},
+			{BulletDamage,      {1.f, 0.f, 1.f}},
+			{ProjectileSpeed,   {1.f, 0.f, 0.f}},
+			{ProjectileSize,    {173 / 255.f, 49 / 255.f, 75 / 255.f}},
+			{FireRate,          {1.f, 1.f, 1.f}},
+			{BulletRange,       {0.f, 0.f, 1.f}},
+			{BulletSpread,      {1.f, 0.f, 0.f}},
+			{BulletNum,         {0.f, 0.f, 1.f}},
+			{BulletBurst,       {0.f, 0.f, 0.f}},
+			{Bounce,            {0.f, 1.f, 0.f}},
+			{Pierce,            {1.f, 0.f, 0.f}},
+			{Homing,            {1.f, 0.f, 0.f}},
+			{PlayerSpeed,       {0.f, 0.f, 1.f}},
+			{PlayerNumDash,     {0.f, 0.f, 1.f}},
+			{PlayerStackSize,   {0.f, 1.f, 0.f}},
+			{PlayerDashCDR,     {1.f, 0.f, 0.f}},
 			{Inert,             {91 / 255.f, 99 / 255.f, 128 / 255.f}}
 	};
 
