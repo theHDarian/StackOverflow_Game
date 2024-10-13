@@ -21,9 +21,6 @@ void RenderSystem::step(float elapsed_ms) {
 		for (auto& fadeEntity : registry.fades.entities) {
 			auto& fade = registry.fades.get(fadeEntity);
 			fade.time -= elapsed_ms;
-			if (fade.time <= 0) {
-				registry.fades.remove(fadeEntity);
-			}
 		}
 	}
 }
@@ -117,7 +114,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	// fade out entity if needed
 	if (registry.fades.has(entity)) {
 		Fade& fade = registry.fades.get(entity);
-		alpha = glm::lerp(1.f, 0.01f, (fade.max - fade.time) / fade.max);
+		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
 
 	}
 

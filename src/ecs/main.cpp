@@ -72,9 +72,7 @@ int main()
 			enemySystem.step(elapsed_ms);
 			particleSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
-			enemySystem.clearDeleteQueue();
 			world.handleCollisions();
-			
 		}
 		registry.frames.components[0].prevFrameBuffer = 0;
 		renderer.drawBackgroundElements();

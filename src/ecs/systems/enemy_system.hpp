@@ -17,7 +17,6 @@ public:
     EnemySystem(RenderSystem* renderer);
     ~EnemySystem();
     void step(float elapsed_ms);
-    void clearDeleteQueue();
 private:
     std::vector<Entity> delete_queue;
 

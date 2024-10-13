@@ -147,15 +147,12 @@ void EnemySystem::step(float elapsed_ms)
             motion.position[1] = interY;
         }
         
+        for (Entity entity : delete_queue) {
+            if(!registry.fades.has(entity) || registry.fades.get(entity).time <= 0)
+                registry.deleteEntityAndRelatedEntities(entity);
+        }
     }
 
-}
-
-void EnemySystem::clearDeleteQueue() {
-    for (Entity entity : delete_queue) {
-        if (!registry.fades.has(entity))
-            registry.deleteEntityAndRelatedEntities(entity);
-    }
 }
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData) {
