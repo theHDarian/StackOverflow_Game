@@ -362,6 +362,13 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
+			for (int i = 0; i < (rand() % 10 + 3); i++) {
+				EmitParticle& p = registry.emitParticles.emplace(Entity());
+				Motion& motion = registry.motions.get(entity);
+				p.requestType = RequestType::Explosion;
+				p.requestOrigin = motion.position;
+				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+			}
 			if (registry.walls.has(entity_other)) {
 				if (registry.playerBullets.get(entity).bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
@@ -383,6 +390,7 @@ void WorldSystem::handleCollisions() {
 				else {
 					registry.deleteEntityAndRelatedEntities(entity);
 				}
+
 			}
 		}
 	}

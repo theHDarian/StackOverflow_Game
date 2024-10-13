@@ -70,6 +70,13 @@ void EnemySystem::step(float elapsed_ms)
 
             if (enemy_registry.has(entity) && registry.playerBullets.has(other_entity))
             {
+                for (int i = 0; i < (rand() % 10 + 3); i++) {
+                    EmitParticle& p = registry.emitParticles.emplace(Entity());
+                    Motion& motion = registry.motions.get(entity);
+                    p.requestType = RequestType::Explosion;
+                    p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                    p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                }
                 Enemy &enemyStat = enemy_registry.get(entity);
                 PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
 
@@ -136,8 +143,8 @@ void EnemySystem::step(float elapsed_ms)
             EmitParticle& p = registry.emitParticles.emplace(Entity());
             p.requestType = RequestType::Explosion;
             Motion &motion = motion_registry.get(entity);
-            p.requestOrigin = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5};
-            p.position = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 5};
+            p.requestOrigin = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0};
+            p.position = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0};
         }
 
         registry.deleteEntityAndRelatedEntities(entity);
