@@ -187,7 +187,6 @@ struct Enemy {
 	int state; //TODO: can change to enum once state determined
     int maxHealth;
     int currHealth;
-    float speed;
     // TODO add attack pattern data?
     float attackCooldown;
     EnemyAttackPattern attackPattern;
@@ -199,9 +198,9 @@ struct Enemy {
 struct EnemyMovement {
     vec2 posA;
     vec2 posB;
-    float t;
+    float distanceTraveled;
     float speed;
-    bool firstMove;
+    float angularSpeed = 90.0f;
 };
 
 struct BossEnemy {

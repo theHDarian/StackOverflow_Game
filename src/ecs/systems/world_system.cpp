@@ -231,7 +231,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
-		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION, EnemyBehavior::FOLLOW_PLAYER);
+		EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
+		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION, behavior);
 	}
 
 	return true;

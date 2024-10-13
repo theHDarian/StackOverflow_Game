@@ -17,22 +17,18 @@ void AISystem::step(float elapsed_ms)
         Entity& entity = movement_registry.entities[i];
         EnemyMovement& movement = movement_registry.get(entity);
         Enemy& enemy = enemy_registry.get(entity);
+		Motion& motion = registry.motions.get(entity);
 
-		if(movement.firstMove == true) {
+		if(enemy.behavior == EnemyBehavior::FOLLOW_PLAYER) {
 			movement.posB = getMove(enemy.behavior);
-			movement.firstMove = false;
-			continue;
-		}
-
-        if (movement.t >= 1.0f) {
-            std::cout << "ai first" << std::endl;
-            std::cout << "Reach the Position x = " << movement.posA[0] << " y = " << movement.posA[1] << std::endl;
-			std::cout << "Where destination is x = " << movement.posB[0] << " y = " << movement.posB[1] << std::endl;
+			movement.posA = motion.position;
+			movement.distanceTraveled = 0.0f;
+		} else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB)) {
+			//pick new destination
             movement.posA = movement.posB; 
-			std::cout << "Now start from x = " << movement.posA[0] << " y = " << movement.posA[1] << std::endl;
             movement.posB = getMove(enemy.behavior);
-
-            movement.t = 0.f;
+			std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+            movement.distanceTraveled = 0.f;
         }
     }
 }
