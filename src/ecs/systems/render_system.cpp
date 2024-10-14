@@ -412,7 +412,6 @@ vec2 RenderSystem::drawBulletStack(const mat3& projection) {
 	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
 
 	// Setting vertex and index buffers
-	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
