@@ -87,6 +87,18 @@ GLFWwindow* WorldSystem::createWindow() {
 	window_width_px = vidMode->width;
 	window_height_px = vidMode->height;
 	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+
+	// FOR DEBUGGING AT SMALLER WINDOW SIZES
+	// window_width_px = 1280;
+	// window_height_px = 720;
+	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+
+	Entity ent = Entity();
+	WindowState& windowState = registry.windowStates.emplace(ent);
+	windowState.width = window_width_px;
+	windowState.height = window_height_px;
+	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);	
+
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -489,18 +501,19 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
     vec2 playerPos = player_motion.position;
     vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);
     player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
-	if (!input.shouldShoot) {
-		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
-			pl.currBulletBurst++;
-		}
-		return;
-	}
 	if (pl.currFiringInterval > 0) {
 		pl.currFiringInterval -= elapsed_ms_since_last_update;
 	}
 	if (pl.bulletBurstCooldown > 0) {
 		pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
 	}
+	if (!input.shouldShoot) {
+		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
+			pl.currBulletBurst++;
+		}
+		return;
+	}
+	
 	if (pl.currFiringInterval <= 0) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
