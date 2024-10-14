@@ -53,7 +53,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
 
 	// Setting vertex and index buffers
-	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	gl_has_errors();
@@ -206,6 +205,7 @@ void RenderSystem::drawToScreen()
 		GL_TRIANGLES, 3, GL_UNSIGNED_SHORT,
 		nullptr); // one triangle = 3 vertices; nullptr indicates that there is
 				  // no offset from the bound index buffer
+	glBindVertexArray(0);
 	gl_has_errors();
 }
 
@@ -257,7 +257,9 @@ void RenderSystem::drawGameElements()
 {
 	drawSetupFrame();
 	gl_has_errors();
+
 	mat3 projection_2D = createProjectionMatrix();
+	glBindVertexArray(vao);
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
@@ -265,7 +267,6 @@ void RenderSystem::drawGameElements()
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
-		glBindVertexArray(vao);
 		drawTexturedMesh(entity, projection_2D);
 		if (registry.circleColliders.has(entity)) // has collision circle, let's draw it
 			drawCircleCollider(entity, projection_2D);
@@ -275,14 +276,18 @@ void RenderSystem::drawGameElements()
 }
 void RenderSystem::drawUI() {
 	drawSetupFrame();
+	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
 
 	vec2 stackTextPos = drawBulletStack(projection_2D);
+
+	glBindVertexArray(0);
 
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	std::string text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
 	RenderText(text, stackTextPos.x, stackTextPos.y, 0.25, vec3(1, 1, 1));
 
+	glBindVertexArray(vao);
 	// should put draw UI here (ideally using its own rendering system,
 	// and own projection matrix)
 	// should also remove show from render request
@@ -291,6 +296,8 @@ void RenderSystem::drawUI() {
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 	}
+
+	glBindVertexArray(0);
 
 	// copied above method to draw all text components
 	for (Entity entity : registry.textRenderRequests.entities)
@@ -301,8 +308,6 @@ void RenderSystem::drawUI() {
 		if (registry.renderRequests.get(entity).show)
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
-
-	glBindVertexArray(0);
 
 	#if IMGUI_ENABLED
 		//draw Imgui
