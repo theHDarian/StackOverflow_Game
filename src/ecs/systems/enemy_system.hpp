@@ -8,10 +8,6 @@
 #include "render_system.hpp"
 
 
-
-
-
-
 class EnemySystem {
 public:
     EnemySystem(RenderSystem* renderer);
@@ -20,6 +16,7 @@ public:
 private:
     std::vector<Entity> delete_queue;
 
+    static void nextAtkData(Enemy& enemy, Entity& entity);
     //void shoot(::Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread);
     void shootShotgun(vec2 velocity, vec2 pos, AttackData atkData);
     void shootAllDirection(vec2 pos, AttackData atkData);

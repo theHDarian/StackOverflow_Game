@@ -158,7 +158,7 @@ AttackData twoPincerShot{
 AttackData twelveSpiralShot{
 	EnemyAttackPattern::ALL_DIRECTION,
 	TRIANGLE,
-	{},
+	{ spreadUpA, sizeUpA },
 	blunt,
 	12,
 	0.0,
@@ -174,7 +174,7 @@ AttackData twelveSpiralShot{
 AttackData threeHomingShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{},
+	{dmgDownA, dmgDownM},
 	blunt,
 	3,
 	M_PI / 4.0,
@@ -190,8 +190,8 @@ AttackData threeHomingShot{
 AttackData threeBurst{
 	EnemyAttackPattern::BURST,
 	CIRCLE,
-	{},
-	blunt,
+	{ numBulletsUpA},
+	sizeUpA,
 	4,
 	M_PI/6,
 	{20,20},
