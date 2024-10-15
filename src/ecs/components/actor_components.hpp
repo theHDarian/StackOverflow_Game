@@ -166,44 +166,6 @@ struct StackCompile {
     }
 };
 
-enum class EnemyAttackPattern {
-    // this is the attack pattern 
-    SHOTGUN,
-    ALL_DIRECTION, 
-    BURST,
-    SPRAY,
-    NONE
-};
-
-enum class EnemyBehavior {
-    // this is the basic
-    RANDOM,
-    FOLLOW_PLAYER,
-    PATHFINDING,
-};
-
-// anything that is deadly to the player
-struct Enemy {
-	int state; //TODO: can change to enum once state determined
-    int maxHealth;
-    int currHealth;
-    BulletStackEffect blunt;
-    // TODO add attack pattern data?
-    float attackCooldown;
-    EnemyBehavior behavior;
-};
-
-struct EnemyMovement {
-    vec2 posA;
-    vec2 posB;
-    float distanceTraveled;
-    float speed;
-    float angularSpeed = 90.0f;
-};
-
-struct BossEnemy {
-};
-
 struct Invincible {
     // Deletes itself when countdown <0
     // Entity can't be hit while has Invincible component
@@ -235,6 +197,22 @@ struct PlayerBullet {
     int bulletBounce = 0;
 };
 
+enum class EnemyAttackPattern {
+    // this is the attack pattern
+    SHOTGUN,
+    ALL_DIRECTION,
+    BURST,
+    SPRAY,
+    NONE
+};
+
+enum class EnemyBehavior {
+    // this is the basic
+    RANDOM,
+    FOLLOW_PLAYER,
+    PATHFINDING,
+};
+
 enum EnemyBulletShape {
     RECTANGLE,
     TRIANGLE,
@@ -257,6 +235,30 @@ struct AttackData {
     int bulletBounce = 0;
     float homing = 0;
 };
+
+// anything that is deadly to the player
+struct Enemy {
+    int state; //TODO: can change to enum once state determined
+    int maxHealth;
+    int currHealth;
+    // TODO add attack pattern data?
+    float attackCooldown;
+    EnemyBehavior behavior;
+    std::vector<AttackData> attackData;
+    BulletStackEffect blunt;
+};
+
+struct EnemyMovement {
+    vec2 posA;
+    vec2 posB;
+    float distanceTraveled;
+    float speed;
+    float angularSpeed = 90.0f;
+};
+
+struct BossEnemy {
+};
+
 
 struct EnemyBullet {
     float bulletSpeed;
