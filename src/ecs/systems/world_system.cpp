@@ -369,7 +369,9 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.deleteEntityAndRelatedEntities(entity);
+					//registry.deleteEntityAndRelatedEntities(entity);
+					if (!registry.deleteds.has(entity))
+						registry.deleteds.emplace(entity);
 					// ERR: segfault in line above, esp when bullet is big and collides with enemy and wall simultaneously?
 				}
 			}
@@ -628,6 +630,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
 		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+			// ERR: memory read access violation here; why?
 			if (!success) {
 				registry.gameStates.components[0].gameOver = true;
 			}
@@ -643,7 +646,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 }
 
 void WorldSystem::clearDeleteQueue() {
-	for (auto& e : registry.deleteds.entities) {
+	for (auto e : registry.deleteds.entities) {
 		registry.deleteEntityAndRelatedEntities(e);
 	}
 }

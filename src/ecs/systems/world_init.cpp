@@ -251,6 +251,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	// ERR: this causes memory read violation
 	bullet.bulletSpeed = atkData.speed;
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
