@@ -11,15 +11,15 @@
 // Unique identifyer for all entities
 class Entity
 {
-	static unsigned int id_count; // starts from 1, entit 0 is the default initialization
-	unsigned int id;
+	static unsigned long id_count; // starts from 1, entit 0 is the default initialization
+	unsigned long id;
 public:
 	Entity()
 	{
 		id = id_count++;
 		// Note, indices of already deleted entities arent re-used in this simple implementation.
 	}
-	operator unsigned int() { return id; } // this enables automatic casting to int
+	operator unsigned long() { return id; } // this enables automatic casting to int
 };
 
 // Common interface to refer to all containers in the ECS registry
@@ -37,7 +37,7 @@ class ComponentContainer : public ContainerInterface
 {
 private:
 	// The hash map from Entity -> array index.
-	std::unordered_map<unsigned int, unsigned int> map_entity_componentID; // the entity is cast to uint to be hashable.
+	std::unordered_map<unsigned long, unsigned int> map_entity_componentID; // the entity is cast to uint to be hashable.
 	bool registered = false;
 public:
 	// Container of all components of type 'Component'
