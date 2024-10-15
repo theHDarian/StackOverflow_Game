@@ -123,8 +123,10 @@ void EnemySystem::step(float elapsed_ms) {
                 {
                     enemy.attackCooldown = COOLDOWN_SHOOT_MS;
                     burst.curBurst = atkData.numBullets;
+                    burst.burstCooldown = 0;
                 }
             }
+            nextAtkData(enemy, entity);
         }
         // move enemy using lerp
         if (registry.enemyMovement.has(entity)) {
@@ -150,6 +152,22 @@ void EnemySystem::step(float elapsed_ms) {
         }        
     }
 }
+
+//Make sure the enemy and the entity are the same entity
+void EnemySystem::nextAtkData(Enemy& enemy, Entity& entity) {
+    AttackData& atkData = registry.attackDatas.get(entity);
+    std::vector<AttackData> atkDatas = enemy.attackData;
+    if (atkDatas.size() == 0 || atkDatas.size() == 1) {
+        return;
+    }
+    if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
+        if (enemy.attackCooldown != COOLDOWN_SHOOT_MS) {
+            return;
+        }
+    }
+    atkData = atkDatas[rand()% atkDatas.size()];
+}
+
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData) {
     float angle = atan2(velocity.y, velocity.x);

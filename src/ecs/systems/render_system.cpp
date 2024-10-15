@@ -52,6 +52,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		if (registry.enemies.has(entity))
 			std::cout << "enemy";
 		std::cout << std::endl;
+		std::cout << "IS this entity deleted? " << (registry.deleteds.has(entity) ? "yes " : "no") << std::endl;
 	}
 	assert(used_effect_enum < (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
 	const GLuint program = (GLuint)effects[used_effect_enum];

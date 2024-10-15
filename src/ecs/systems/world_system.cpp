@@ -97,7 +97,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	WindowState& windowState = registry.windowStates.emplace(ent);
 	windowState.width = window_width_px;
 	windowState.height = window_height_px;
-	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);	
+	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
 
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
@@ -244,9 +244,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() < 10) {
-		EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
+	if (registry.enemies.size() < 20) {
+		for (int i = 0; i < rand()%10 + 1; i++) {
+			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
+			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
+		}
 	}
 
 	return true;
@@ -518,7 +520,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		}
 		return;
 	}
-	
+
 	if (pl.currFiringInterval <= 0) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
@@ -646,8 +648,8 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 }
 
 void WorldSystem::clearDeleteQueue() {
-	for (auto e : registry.deleteds.entities) {
-		registry.deleteEntityAndRelatedEntities(e);
+	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
+		registry.deleteEntityAndRelatedEntities(registry.deleteds.entities[i]);
 	}
 }
 
