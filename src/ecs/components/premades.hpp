@@ -158,8 +158,8 @@ AttackData twoPincerShot{
 AttackData twelveSpiralShot{
 	EnemyAttackPattern::ALL_DIRECTION,
 	TRIANGLE,
-	{ spreadUpA, sizeUpA },
-	blunt,
+	{},
+	sizeUpA,
 	12,
 	0.0,
 	{20,20},

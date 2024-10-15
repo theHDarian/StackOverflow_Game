@@ -113,7 +113,7 @@ struct StackCompile {
         {FireRate,          1},
         {BulletRange,       1},
         {BulletSpread,      1},
-        {BulletNum,         1},
+        {BulletNum,         3},
         {BulletBurst,       1},
         {Bounce,            0},
         {Pierce,            0},
@@ -244,8 +244,8 @@ struct Enemy {
     // TODO add attack pattern data?
     float attackCooldown;
     EnemyBehavior behavior;
-    float veer;
     std::vector<AttackData> attackData;
+    BulletStackEffect blunt;
 };
 
 struct EnemyMovement {

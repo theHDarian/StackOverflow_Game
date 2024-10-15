@@ -197,6 +197,5 @@ void RenderText(std::string text, float x, float y, float scale, glm::vec3 color
     gl_has_errors();
     glBindTexture(GL_TEXTURE_2D, 0);
     gl_has_errors();
-
     glDisable(GL_BLEND);
 }

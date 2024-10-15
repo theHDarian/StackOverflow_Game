@@ -214,6 +214,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, std::vector<
 	enemy.state = 10;
 	enemy.behavior = behavior;
 	enemy.attackData = atkData;
+	enemy.blunt = blunt;
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
 	movement.posA = pos;

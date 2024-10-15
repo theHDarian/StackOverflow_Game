@@ -25,6 +25,8 @@
 
 
 void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	if (width == 0 || height == 0)
+		return;
 	WindowState& windowState = registry.windowStates.components[0];
 	if (windowState.isRetinaDisplay) {
 		windowState.width = width / 2;
@@ -63,27 +65,17 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	int frame_buffer_width_px, frame_buffer_height_px;
 	glfwGetFramebufferSize(window, &frame_buffer_width_px, &frame_buffer_height_px);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
 
-	int window_width_px,window_height_px;
-	const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	window_width_px = vidMode->width;
-	window_height_px = vidMode->height;
-	glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, window_width_px, window_height_px, 120);
+	assert(registry.windowStates.components.size() > 0);
+	WindowState& windowState = registry.windowStates.components[0];
 
-	Entity ent = Entity();
-	WindowState& windowState = registry.windowStates.emplace(ent);
-	windowState.width = window_width_px;
-	windowState.height = window_height_px;
-
-	if (frame_buffer_width_px != window_width_px)
+	if (frame_buffer_width_px != windowState.width)
 	{
 		printf("WARNING: retina display! https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value\n");
 		printf("glfwGetFramebufferSize = %d,%d\n", frame_buffer_width_px, frame_buffer_height_px);
-		printf("window width_height = %d,%d\n", window_width_px, window_height_px);
+		printf("window width_height = %d,%d\n", windowState.width, windowState.height);
 		windowState.isRetinaDisplay = true;
 	}
 
-
-	glfwSetWindowAspectRatio(window,window_width_px,window_height_px);
 	// Window resize callback
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 

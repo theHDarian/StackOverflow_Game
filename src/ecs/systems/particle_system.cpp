@@ -51,11 +51,9 @@ void ParticleSystem::init(GLFWwindow* window) {
     gl_has_errors();
 
     // Setup projection matrix
-    int window_width_px, window_height_px;
-    const GLFWvidmode* vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window_width_px = vidMode->width;
-    window_height_px = vidMode->height;    
-    projection = glm::ortho(0.0f, static_cast<float>(window_width_px), static_cast<float>(window_height_px),0.0f);
+    assert(registry.windowStates.components.size() > 0);
+    WindowState& windowState = registry.windowStates.components[0]; 
+    projection = glm::ortho(0.0f, static_cast<float>(windowState.width), static_cast<float>(windowState.height),0.0f);
 
     float vertices[] = {
         -0.5f, -0.5f, 0.0f,
