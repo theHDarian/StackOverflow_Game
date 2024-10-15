@@ -171,7 +171,7 @@ void EnemySystem::nextAtkData(Enemy& enemy, Entity& entity) {
             return;
         }
     }
-    atkData = atkDatas[rand()% (atkDatas.size() - 1)];
+    atkData = atkDatas[rand()% atkDatas.size()];
 }
 
 

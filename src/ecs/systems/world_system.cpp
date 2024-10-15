@@ -2,7 +2,6 @@
 #include "world_system.hpp"
 #include "world_init.hpp"
 #include "text_system.hpp"
-#include "premades.hpp"
 
 // stlib
 #include <cassert>
@@ -244,10 +243,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < rand()%10 + 1; i++) {
 			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-			std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), atkData, behavior);
+			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
 		}
 	}
 

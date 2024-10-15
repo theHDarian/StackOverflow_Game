@@ -2,6 +2,7 @@
 #include "tiny_ecs_registry.hpp"
 #include <glm/trigonometric.hpp>
 #include "ai_system.hpp"
+#include "premades.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
@@ -195,7 +196,7 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, std::vector<AttackData> atkData, EnemyBehavior behavior) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavior behavior) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -207,6 +208,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, std::vector<
 	motion.velocity = velocity;
 	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
+	std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
 	enemy.maxHealth = 50;
