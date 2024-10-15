@@ -74,6 +74,9 @@ int main()
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
 		}
+		// clear delete queue here?
+		world.clearDeleteQueue();
+
 		registry.frames.components[0].prevFrameBuffer = 0;
 		renderer.drawBackgroundElements();
 		particleSystem.render();

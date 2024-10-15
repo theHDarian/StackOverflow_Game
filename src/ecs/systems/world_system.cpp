@@ -86,12 +86,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 	window_width_px = vidMode->width;
 	window_height_px = vidMode->height;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	// window_width_px = 1280;
 	// window_height_px = 720;
-	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -131,6 +131,9 @@ GLFWwindow* WorldSystem::createWindow() {
 			audio_path("eat_sound.wav").c_str());
 		return nullptr;
 	}	
+	std::string title = "StackOverflow";
+
+	glfwSetWindowTitle(window, title.c_str());
 
 	return window;
 }
@@ -156,11 +159,6 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Processing inputs
 	handleInput();
-
-	// Updating window title with points
-	std::stringstream title_ss;
-	title_ss << "Points: " << points;
-	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
 	// comment this out for now
@@ -216,7 +214,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
 			PlayerBullet& bullet = registry.playerBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				registry.deleteEntityAndRelatedEntities(registry.playerBullets.entities[i]);
+				if (!registry.deleteds.has(registry.playerBullets.entities[i]))
+					registry.deleteds.emplace(registry.playerBullets.entities[i]);
+				//registry.deleteEntityAndRelatedEntities(registry.playerBullets.entities[i]);
 			}
 		}
 	}
@@ -225,7 +225,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
 				// remove enemy bullet
-				registry.deleteEntityAndRelatedEntities(registry.enemyBullets.entities[i]);
+				if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+					registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+				//registry.deleteEntityAndRelatedEntities(registry.enemyBullets.entities[i]);
 			}
 		}
 	}
@@ -242,7 +244,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() == 0) {
+	if (registry.enemies.size() < 10) {
 		EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
 		createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
 	}
@@ -368,6 +370,7 @@ void WorldSystem::handleCollisions() {
 				}
 				else {
 					registry.deleteEntityAndRelatedEntities(entity);
+					// ERR: segfault in line above, esp when bullet is big and collides with enemy and wall simultaneously?
 				}
 			}
 		}
@@ -636,6 +639,12 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
 		}
+	}
+}
+
+void WorldSystem::clearDeleteQueue() {
+	for (auto& e : registry.deleteds.entities) {
+		registry.deleteEntityAndRelatedEntities(e);
 	}
 }
 

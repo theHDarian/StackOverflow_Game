@@ -63,6 +63,8 @@ void EnemySystem::step(float elapsed_ms) {
         // HANDLING DAMGE FROM COLLISION
         for (auto& entity : collision_registry.entities)
         {
+            if (!registry.collisions.has(entity)) // if this isn't included, it will cause a get assertion error
+                continue;
             const Collision &collision = registry.collisions.get(entity);
             Entity other_entity = collision.other;
 

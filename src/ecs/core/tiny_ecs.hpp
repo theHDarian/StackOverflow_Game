@@ -96,6 +96,8 @@ public:
 			// Note, components[cID] = components.back() would trigger the copy instead of move operator
 			components[cID] = std::move(components.back());
 			entities[cID] = entities.back(); // the entity is only a single index, copy it.
+			// another out of bounds for line above
+			// when we try to remove an enemy bullet
 			map_entity_componentID[entities.back()] = cID;
 
 			// Erase the old component and free its memory

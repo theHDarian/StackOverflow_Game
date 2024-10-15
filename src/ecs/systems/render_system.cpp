@@ -41,7 +41,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	const RenderRequest &render_request = registry.renderRequests.get(entity);
 
 	const GLuint used_effect_enum = (GLuint)render_request.used_effect;
-	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	std::cout << "used effect enum " << used_effect_enum << std::endl;
+	std::cout << "current max effect enum " << (int)EFFECT_ASSET_ID::EFFECT_COUNT << std::endl;
+	assert(used_effect_enum < (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
 	const GLuint program = (GLuint)effects[used_effect_enum];
 
 	// Setting shaders
