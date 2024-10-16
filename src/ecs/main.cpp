@@ -23,15 +23,11 @@ using Clock = std::chrono::high_resolution_clock;
 	#include "imguiThemes.h"
 #endif
 
-#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
-#include <crtdbg.h>
 
 // Entry point
 int main()
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); // This is used to auto output memory information about leaks before closing the application
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); // Set to output into your IDE's debug window
 
 	// Global systems
 	WorldSystem world;
