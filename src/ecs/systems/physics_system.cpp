@@ -54,7 +54,7 @@ void PhysicsSystem::step(float elapsed_ms)
 					}
 					hasCollided = true;
 				} else {
-					std::cout << "Unhandled Dash Component Collision!!" << std::endl;
+					//std::cout << "Unhandled Dash Component Collision!!" << std::endl;
 				}
 			}
 		}

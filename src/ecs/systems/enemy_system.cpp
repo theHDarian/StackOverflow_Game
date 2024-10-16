@@ -13,7 +13,7 @@
 
 #include "ai_system.hpp"
 
-float COOLDOWN_SHOOT_MS = 2000;
+float COOLDOWN_SHOOT_MS = 5000;
 float BASE_BULLET_SPEED = 1;
 float PLACEHOLDER_FOR_ANGLE = 0.f;
 
@@ -26,18 +26,82 @@ EnemySystem::~EnemySystem() {
 };
 
 void EnemySystem::step(float elapsed_ms) {
-    auto &enemy_registry = registry.enemies;
-    auto &motion_registry = registry.motions;
-    auto &collision_registry = registry.collisions;
 
-    Entity& player = registry.players.entities[0];
-    Motion& playerMotion = motion_registry.get(player);
+    Entity player = registry.players.entities[0];
+    Motion& playerMotion = registry.motions.get(player);
+
+    // HANDLING DAMGE FROM COLLISION
+    for (auto& entity : registry.collisions.entities)
+    {
+        if (!registry.collisions.has(entity)) // if this isn't included, it will cause a get assertion error
+            continue;
+        const Collision& collision = registry.collisions.get(entity);
+        Entity other_entity = collision.other;
+
+        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity))
+        {
+            Enemy& enemyStat = registry.enemies.get(entity);
+            PlayerBullet& bulletStat = registry.playerBullets.get(other_entity);
+
+            enemyStat.currHealth -= bulletStat.damage;
+            //std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
+            if (enemyStat.currHealth <= 0)
+            {
+                if (!registry.fades.has(entity)) {
+                    for (int i = 0; i < (rand() % 50 + 10); i++) {
+                        EmitParticle& p = registry.emitParticles.emplace(Entity());
+                        Motion& motion = registry.motions.get(entity);
+                        p.requestType = RequestType::Explosion;
+                        p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                        p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                    }
+                    registry.fades.emplace(entity);
+                }
+                if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
+                    registry.deleteds.emplace(entity);
+                }
+                if (!registry.deleteds.has(entity)) {
+                    registry.deleteds.emplace(entity);
+                }
+
+                //std::cout << "enemy " << entity << "has died" << std::endl;
+            }
+
+            if (!registry.deleteds.has(other_entity))
+                registry.deleteds.emplace(other_entity);
+        }
+    }
+
+    //for (Entity& entity : registry.renderRequests.entities)
+    //{
+    //    if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
+    //        std::cout << "way to big of an effect b4 step!" << registry.renderRequests.get(entity).used_effect << std::endl;
+    //    if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
+    //        std::cout << "way to big of a geometryin b4 step" << registry.renderRequests.get(entity).used_geometry << std::endl;
+    //    if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
+    //        std::cout << "way to big of a texture in b4 step!" << registry.renderRequests.get(entity).used_texture << std::endl;
+    //}
     
-    for (uint i = 0; i < enemy_registry.components.size(); i++) {
-        Enemy &enemy = enemy_registry.components[i];
-        Entity &entity = enemy_registry.entities[i];
+    //int i = 0;
+    //for (int i = registry.enemies.size() - 1; i >= 0; i--) {
+    for (Entity entity : registry.enemies.entities) {
+        //i++;
+        //for (Entity& entity : registry.renderRequests.entities)
+        //{
+        //    if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
+        //        std::cout << "way to big of an effect in loop! i = " << i << " " << registry.renderRequests.get(entity).used_effect << std::endl;
+        //    if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
+        //        std::cout << "way to big of a geometryin in loop i = " << i << " " << registry.renderRequests.get(entity).used_geometry << std::endl;
+        //    if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
+        //        std::cout << "way to big of a texture in in loop! i = " << i << " " << registry.renderRequests.get(entity).used_texture << std::endl;
+        //}
+        //std::cout << " size of array " << registry.enemies.size() << std::endl;
+        //std::cout << " size of i " << i << std::endl;
+        //int i = registry.deleteds.size() - 1; i >= 0; i--
+        Enemy& enemy = registry.enemies.get(entity);
+        //Entity entity = e;
 
-        Motion &motion = motion_registry.get(entity);
+        Motion& motion = registry.motions.get(entity);
         AttackData& atkData = registry.attackDatas.get(entity);
         vec2 pos = motion.position;
         float angle = motion.angle;
@@ -60,43 +124,37 @@ void EnemySystem::step(float elapsed_ms) {
         //    shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
         //}
 
-        // HANDLING DAMGE FROM COLLISION
-        for (auto& entity : collision_registry.entities)
+        for (Entity& entity : registry.renderRequests.entities)
         {
-            //if (!registry.collisions.has(entity)) // if this isn't included, it will cause a get assertion error
-            //    continue;
-            const Collision &collision = registry.collisions.get(entity);
-            Entity other_entity = collision.other;
+            if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
+                std::cout << "way to big of an effect after collusuib!" << registry.renderRequests.get(entity).used_effect << std::endl;
+            if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
+                std::cout << "way to big of a geometryin after collusuib" << registry.renderRequests.get(entity).used_geometry << std::endl;
+            if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
+                std::cout << "way to big of a texture in after collusuib!" << registry.renderRequests.get(entity).used_texture << std::endl;
+        }
 
-            if (enemy_registry.has(entity) && registry.playerBullets.has(other_entity))
-            {
-                Enemy &enemyStat = enemy_registry.get(entity);
-                PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
+        // move enemy using lerp
+        if (registry.enemyMovement.has(entity)) {
+            EnemyMovement& movement = registry.enemyMovement.get(entity);
+            vec2 direction = movement.posB - movement.posA;
+            if (direction != vec2(0, 0)) {
+                float targetAngle = atan2(direction.y, direction.x);
+                float deltaAngle = targetAngle - motion.angle;
+                float angularSpeedRad = movement.angularSpeed * 2 * M_PI / 360.0f;
+                float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
+                if (deltaAngle > M_PI) deltaAngle -= 2 * M_PI;
+                if (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
+                if (deltaAngle > maxChange) deltaAngle = maxChange;
+                if (deltaAngle < -maxChange) deltaAngle = -maxChange;
 
-                enemyStat.currHealth -= bulletStat.damage;
-                std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
-                if (enemyStat.currHealth <= 0)
-                {
-                    if (!registry.fades.has(entity)) {
-                        for (int i = 0; i < (rand() % 50 + 10); i++) {
-                            EmitParticle& p = registry.emitParticles.emplace(Entity());
-                            Motion& motion = registry.motions.get(entity);
-                            p.requestType = RequestType::Explosion;
-                            p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                            p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                        }
-                        registry.fades.emplace(entity);
-                    }
-                    if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
-                        registry.deleteds.emplace(entity);
-                    }
-              
-                    std::cout << "enemy " << entity << "has died" << std::endl;
-                }
+                motion.angle += deltaAngle;
 
-                if (!registry.deleteds.has(other_entity))
-                    registry.deleteds.emplace(other_entity);
+                float totalDistance = glm::distance(movement.posA, movement.posB);
+                movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
+                motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
             }
+
         }
 
         enemy.attackCooldown -= elapsed_ms;
@@ -127,29 +185,8 @@ void EnemySystem::step(float elapsed_ms) {
                 }
             }
             nextAtkData(enemy, entity);
-        }
-        // move enemy using lerp
-        if (registry.enemyMovement.has(entity)) {
-            EnemyMovement& movement = registry.enemyMovement.get(entity);
-            vec2 direction = movement.posB - movement.posA;
-            if (direction != vec2(0, 0)) {
-                float targetAngle = atan2(direction.y, direction.x);
-                float deltaAngle = targetAngle - motion.angle;
-                float angularSpeedRad = movement.angularSpeed * 2 * M_PI / 360.0f;
-                float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
-                if (deltaAngle > M_PI) deltaAngle -= 2 * M_PI;
-                if (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
-                if (deltaAngle > maxChange) deltaAngle = maxChange;
-                if (deltaAngle < -maxChange) deltaAngle = -maxChange;
-
-                motion.angle += deltaAngle;
-
-                float totalDistance = glm::distance(movement.posA, movement.posB);
-                movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
-                motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
-            }
-
-        }        
+        }    
+        
     }
 }
 
@@ -224,7 +261,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         }
 
         float angle = currentAngle;
-        std::cout << angle << std::endl;
+        //std::cout << angle << std::endl;
         createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData.veer.x * vec2(cos(angle + atkData.veer.y)), atkData);
     }
     burst.curBurst--;

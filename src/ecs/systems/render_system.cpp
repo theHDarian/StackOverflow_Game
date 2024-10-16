@@ -40,9 +40,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest &render_request = registry.renderRequests.get(entity);
 
-	const GLuint used_effect_enum = (GLuint)render_request.used_effect;
-	if (used_effect_enum >= (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT) {
+	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
+	if (used_effect_enum >= static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT)) {
 		std::cout << "used effect enum " << used_effect_enum << std::endl;
+		std::cout << "used effect enum b4 cast " << render_request.used_effect << std::endl;
 		std::cout << "current max effect enum " << (int)EFFECT_ASSET_ID::EFFECT_COUNT << std::endl;
 		std::cout << "faulty entity is " << entity << ": ";
 		if (registry.enemyBullets.has(entity))
@@ -54,14 +55,28 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		std::cout << std::endl;
 		std::cout << "IS this entity deleted? " << (registry.deleteds.has(entity) ? "yes " : "no") << std::endl;
 	}
-	assert(used_effect_enum < (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
 	const GLuint program = (GLuint)effects[used_effect_enum];
 
 	// Setting shaders
 	glUseProgram(program);
 	gl_has_errors();
 
-	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	if ((GLuint)render_request.used_geometry >= (GLuint)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT) {
+		std::cout << "used geometry enum " << (GLuint)render_request.used_geometry << std::endl;
+		std::cout << "used geometry enum b4 cast " << render_request.used_geometry << std::endl;
+		std::cout << "current max geometry enum " << (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT << std::endl;
+		std::cout << "faulty entity is " << entity << ": ";
+		if (registry.enemyBullets.has(entity))
+			std::cout << "enemy bullet";
+		if (registry.playerBullets.has(entity))
+			std::cout << "player bullet";
+		if (registry.enemies.has(entity))
+			std::cout << "enemy";
+		std::cout << std::endl;
+		std::cout << "IS this entity deleted? " << (registry.deleteds.has(entity) ? "yes " : "no") << std::endl;
+	}
+	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
 	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
 
@@ -274,15 +289,23 @@ void RenderSystem::drawGameElements()
 	mat3 projection_2D = createProjectionMatrix();
 	glBindVertexArray(vao);
 	// Draw all textured meshes that have a position and size component
-	for (Entity entity : registry.renderRequests.entities)
+	for (Entity& entity : registry.renderRequests.entities)
 	{
 		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity) ||  registry.backgrounds.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
+		if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
+			std::cout << "way to big of an effect!" << registry.renderRequests.get(entity).used_effect << std::endl;
+		if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
+			std::cout << "way to big of a geometry!" << registry.renderRequests.get(entity).used_geometry << std::endl;
+		if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
+			std::cout << "way to big of a texture!" << registry.renderRequests.get(entity).used_texture << std::endl;
+		if (registry.motions.get(entity).scale.x > 3000)
+			std::cout << "way to big of a scale!" << registry.motions.get(entity).scale.x << std::endl;
 		drawTexturedMesh(entity, projection_2D);
-		if (registry.circleColliders.has(entity)) // has collision circle, let's draw it
-			drawCircleCollider(entity, projection_2D);
+		//if (registry.circleColliders.has(entity)) // has collision circle, let's draw it
+		//	drawCircleCollider(entity, projection_2D);
 	}
 	glBindVertexArray(0);
 
@@ -626,7 +649,7 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 
 	assert(registry.renderRequests.has(entity));
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::CIRCLE];
+		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::CIRCLE_SPRITE];
 
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();

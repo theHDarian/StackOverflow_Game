@@ -141,11 +141,11 @@ struct Mesh
  */
 
 // maybe a universal map would be easier to load + manage files with...
-enum class TEXTURE_ASSET_ID {
+enum  TEXTURE_ASSET_ID : unsigned int {
 	FISH = 0,
 	PUFFERFISH = FISH + 1,
-	CIRCLE = PUFFERFISH + 1,
-	MC_BASE = CIRCLE + 1,
+	CIRCLE_SPRITE = PUFFERFISH + 1,
+	MC_BASE = CIRCLE_SPRITE + 1,
 	MC_HIT = MC_BASE + 1,
 	AIM_INDICATOR = MC_HIT + 1,
 	FLOOR = AIM_INDICATOR + 1,
@@ -157,7 +157,7 @@ enum class TEXTURE_ASSET_ID {
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
-enum class EFFECT_ASSET_ID {
+enum  EFFECT_ASSET_ID : unsigned int {
 	COLOURED = 0,
 	EGG = COLOURED + 1,
 	SALMON = EGG + 1,
@@ -167,11 +167,11 @@ enum class EFFECT_ASSET_ID {
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
-enum class GEOMETRY_BUFFER_ID {
-	SALMON = 0,
-	SPRITE = SALMON + 1,
-	EGG = SPRITE + 1,
-	DEBUG_LINE = EGG + 1,
+enum  GEOMETRY_BUFFER_ID : unsigned int {
+	SALMON_GB = 0,
+	SPRITE = SALMON_GB + 1,
+	EGG_GB = SPRITE + 1,
+	DEBUG_LINE = EGG_GB + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	GEOMETRY_COUNT = SCREEN_TRIANGLE + 1
 };

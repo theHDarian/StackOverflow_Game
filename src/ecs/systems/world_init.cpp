@@ -219,7 +219,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
 	movement.posA = pos;
 	movement.posB = AISystem::getMove(behavior);
-	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+	//std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
@@ -240,6 +240,11 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+
+	if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
+		std::cout << "way to big of an effect in create!" << registry.renderRequests.get(entity).used_effect << std::endl;
+	if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
+		std::cout << "way to big of a geometry in create!" << registry.renderRequests.get(entity).used_geometry << std::endl;
 
 	return entity;
 };
@@ -273,7 +278,8 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	Invisible& inv = registry.invisibles.emplace(entity);
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
-	auto& spriteComponent = registry.sprites.emplace(entity);
+	
+	//auto& spriteComponent = registry.sprites.emplace(entity);
 	// ERR: freeze when try to create enemy bullet sprite and it's trying to check if it has it
 	// maybe we need instanced rendering for bullets too after all
 
@@ -288,30 +294,31 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		//pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
+		//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
 	}
 	else if (atkData.shape == TRIANGLE) {
-		PolyCollider& pc = registry.polyColliders.emplace(entity);
-		pc.offsetVertices = {
-			{motion.scale.x / 2, 0},
-			{-motion.scale.x / 2,-motion.scale.y / 2},
-			{-motion.scale.x / 2, motion.scale.y / 2}
-		};
-		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
-		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		//PolyCollider& pc = registry.polyColliders.emplace(entity);
+		//// ERR: line above can also cause bad read
+		//pc.offsetVertices = {
+		//	{motion.scale.x / 2, 0},
+		//	{-motion.scale.x / 2,-motion.scale.y / 2},
+		//	{-motion.scale.x / 2, motion.scale.y / 2}
+		//};
+		//pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
+		//pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		//pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
+		//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
 	}
 	else {
 		CircleCollider& cc = registry.circleColliders.emplace(entity);
 		cc.radius = motion.scale.x / 2;
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
+		//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
 	}
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			spriteComponent.sprites[SPRITE_STATE::BASE],
+			TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -500,13 +507,14 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 	cc.radius = motion.scale.x / 2;
 
 
-	auto& spriteComponent = registry.sprites.emplace(entity);
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BULLET;
+	//auto& spriteComponent = registry.sprites.emplace(entity);
+	//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BULLET;
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			spriteComponent.sprites[SPRITE_STATE::BASE],
+			//spriteComponent.sprites[SPRITE_STATE::BASE],
+			TEXTURE_ASSET_ID::MC_BULLET,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
