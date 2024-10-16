@@ -2,26 +2,37 @@
 
 struct Room;
 
-struct Door {
-	Room* nextRoom; //room the door leads to
-    bool blocked; //blocked to prevent going to previous room
+enum RoomType {
+    Enemy,
+    Treasure,
+    Boss,
+    Rest
 };
 
-enum RoomTypes {
-
+struct Door {
+	RoomType room; //room the door leads to
+    bool isPrev; //if is previous room, block it
 };
 
 struct Room {
-    vec2 dimensions; //probably be fixed for now
-    int type; //change to enum once list of room types has been made ex Resting, Enemy, Boss
-    int layout; //change type once list of layouts is made, layouts store enemy info (position, spawn time), as well as items in the room
-    Door doors[3]; //doors on each side, put null for sides without doors
+    RoomType type;
+    int variant; // the variant within the room type
+    bool cleared;
 
-    float m_timeToNextRoom; //timer for room transitions
-    //TODO perhaps add a pointer to dialogues that appear for certain rooms
+    Door leftDoor;
+    Door rightDoor;
+    Door topDoor;
+    Door bottomDoor;
 };
+
+enum MapRegion {
+    Tutorial,
+    Biology,
+    Final
+};
+
 struct Map {
     Room startingRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
-    int currRegion;
+    MapRegion currRegion;
 };
