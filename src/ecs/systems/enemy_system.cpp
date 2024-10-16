@@ -13,7 +13,7 @@
 
 #include "ai_system.hpp"
 
-float COOLDOWN_SHOOT_MS = 5000;
+float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
 float PLACEHOLDER_FOR_ANGLE = 0.f;
 
@@ -33,8 +33,6 @@ void EnemySystem::step(float elapsed_ms) {
     // HANDLING DAMGE FROM COLLISION
     for (auto& entity : registry.collisions.entities)
     {
-        if (!registry.collisions.has(entity)) // if this isn't included, it will cause a get assertion error
-            continue;
         const Collision& collision = registry.collisions.get(entity);
         Entity other_entity = collision.other;
 
@@ -48,7 +46,7 @@ void EnemySystem::step(float elapsed_ms) {
             if (enemyStat.currHealth <= 0)
             {
                 if (!registry.fades.has(entity)) {
-                    for (int i = 0; i < (rand() % 50 + 10); i++) {
+                    for (int i = 0; i < (rand() % 100 + 30); i++) {
                         EmitParticle& p = registry.emitParticles.emplace(Entity());
                         Motion& motion = registry.motions.get(entity);
                         p.requestType = RequestType::Explosion;
@@ -60,9 +58,6 @@ void EnemySystem::step(float elapsed_ms) {
                 if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
                     registry.deleteds.emplace(entity);
                 }
-                if (!registry.deleteds.has(entity)) {
-                    registry.deleteds.emplace(entity);
-                }
 
                 //std::cout << "enemy " << entity << "has died" << std::endl;
             }
@@ -72,35 +67,9 @@ void EnemySystem::step(float elapsed_ms) {
         }
     }
 
-    //for (Entity& entity : registry.renderRequests.entities)
-    //{
-    //    if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
-    //        std::cout << "way to big of an effect b4 step!" << registry.renderRequests.get(entity).used_effect << std::endl;
-    //    if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
-    //        std::cout << "way to big of a geometryin b4 step" << registry.renderRequests.get(entity).used_geometry << std::endl;
-    //    if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
-    //        std::cout << "way to big of a texture in b4 step!" << registry.renderRequests.get(entity).used_texture << std::endl;
-    //}
-    
-    //int i = 0;
-    //for (int i = registry.enemies.size() - 1; i >= 0; i--) {
+    // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities) {
-        //i++;
-        //for (Entity& entity : registry.renderRequests.entities)
-        //{
-        //    if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
-        //        std::cout << "way to big of an effect in loop! i = " << i << " " << registry.renderRequests.get(entity).used_effect << std::endl;
-        //    if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
-        //        std::cout << "way to big of a geometryin in loop i = " << i << " " << registry.renderRequests.get(entity).used_geometry << std::endl;
-        //    if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
-        //        std::cout << "way to big of a texture in in loop! i = " << i << " " << registry.renderRequests.get(entity).used_texture << std::endl;
-        //}
-        //std::cout << " size of array " << registry.enemies.size() << std::endl;
-        //std::cout << " size of i " << i << std::endl;
-        //int i = registry.deleteds.size() - 1; i >= 0; i--
         Enemy& enemy = registry.enemies.get(entity);
-        //Entity entity = e;
-
         Motion& motion = registry.motions.get(entity);
         AttackData& atkData = registry.attackDatas.get(entity);
         vec2 pos = motion.position;
@@ -123,16 +92,6 @@ void EnemySystem::step(float elapsed_ms) {
         //    playerDir = glm::normalize(playerDir);
         //    shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
         //}
-
-        for (Entity& entity : registry.renderRequests.entities)
-        {
-            if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
-                std::cout << "way to big of an effect after collusuib!" << registry.renderRequests.get(entity).used_effect << std::endl;
-            if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
-                std::cout << "way to big of a geometryin after collusuib" << registry.renderRequests.get(entity).used_geometry << std::endl;
-            if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
-                std::cout << "way to big of a texture in after collusuib!" << registry.renderRequests.get(entity).used_texture << std::endl;
-        }
 
         // move enemy using lerp
         if (registry.enemyMovement.has(entity)) {
@@ -157,6 +116,9 @@ void EnemySystem::step(float elapsed_ms) {
 
         }
 
+        // NOTE: enemy must attack AFTER being moved
+        // or else causes corrupted memory in effect/geometry/texture id and makes it a huge number
+        // no idea why
         enemy.attackCooldown -= elapsed_ms;
         // std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
         if (enemy.attackCooldown < 0.f)

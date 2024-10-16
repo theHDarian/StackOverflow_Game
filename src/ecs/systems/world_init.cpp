@@ -241,11 +241,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
-	if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
-		std::cout << "way to big of an effect in create!" << registry.renderRequests.get(entity).used_effect << std::endl;
-	if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
-		std::cout << "way to big of a geometry in create!" << registry.renderRequests.get(entity).used_geometry << std::endl;
-
 	return entity;
 };
 
@@ -256,7 +251,6 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
-	// ERR: this causes memory read violation
 	bullet.bulletSpeed = atkData.speed;
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
@@ -279,9 +273,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
 	
-	//auto& spriteComponent = registry.sprites.emplace(entity);
-	// ERR: freeze when try to create enemy bullet sprite and it's trying to check if it has it
-	// maybe we need instanced rendering for bullets too after all
+	auto& spriteComponent = registry.sprites.emplace(entity);
 
 	if (atkData.shape == RECTANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
@@ -293,32 +285,31 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		//pc.setPolyLengths();
-		//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
+		pc.setPolyLengths();
+		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
 	}
 	else if (atkData.shape == TRIANGLE) {
-		//PolyCollider& pc = registry.polyColliders.emplace(entity);
-		//// ERR: line above can also cause bad read
-		//pc.offsetVertices = {
-		//	{motion.scale.x / 2, 0},
-		//	{-motion.scale.x / 2,-motion.scale.y / 2},
-		//	{-motion.scale.x / 2, motion.scale.y / 2}
-		//};
-		//pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
-		//pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		//pc.setPolyLengths();
-		//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
+		PolyCollider& pc = registry.polyColliders.emplace(entity);
+		pc.offsetVertices = {
+			{motion.scale.x / 2, 0},
+			{-motion.scale.x / 2,-motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2}
+		};
+		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
+		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		pc.setPolyLengths();
+		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
 	}
 	else {
 		CircleCollider& cc = registry.circleColliders.emplace(entity);
 		cc.radius = motion.scale.x / 2;
-		//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
+		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
 	}
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE,
+			spriteComponent.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -507,14 +498,13 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 	cc.radius = motion.scale.x / 2;
 
 
-	//auto& spriteComponent = registry.sprites.emplace(entity);
-	//spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BULLET;
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BULLET;
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			//spriteComponent.sprites[SPRITE_STATE::BASE],
-			TEXTURE_ASSET_ID::MC_BULLET,
+			spriteComponent.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});

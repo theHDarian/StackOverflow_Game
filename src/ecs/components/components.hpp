@@ -141,6 +141,11 @@ struct Mesh
  */
 
 // maybe a universal map would be easier to load + manage files with...
+
+// NOTE: these were originall enum CLASSES in the template
+// shouldn't matter much, but apparently enum CLASSES don't inherently cast to ints
+// so I've (Amanda) explicitly set them to be ints
+// should ask why that's the case/why it works fine even w/o inherent casting
 enum  TEXTURE_ASSET_ID : unsigned int {
 	FISH = 0,
 	PUFFERFISH = FISH + 1,
