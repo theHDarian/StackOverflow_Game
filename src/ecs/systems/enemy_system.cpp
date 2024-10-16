@@ -30,44 +30,6 @@ void EnemySystem::step(float elapsed_ms) {
     Entity player = registry.players.entities[0];
     Motion& playerMotion = registry.motions.get(player);
 
-    // HANDLING DAMGE FROM COLLISION
-    for (auto& entity : registry.collisions.entities)
-    {
-        const Collision& collision = registry.collisions.get(entity);
-        Entity other_entity = collision.other;
-
-        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity))
-        {
-            Enemy& enemyStat = registry.enemies.get(entity);
-            PlayerBullet& bulletStat = registry.playerBullets.get(other_entity);
-
-            enemyStat.currHealth -= bulletStat.damage;
-            //std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
-            if (enemyStat.currHealth <= 0)
-            {
-                if (!registry.fades.has(entity)) {
-                    for (int i = 0; i < (rand() % 100 + 30); i++) {
-                        EmitParticle& p = registry.emitParticles.emplace(Entity());
-                        Motion& motion = registry.motions.get(entity);
-                        p.requestType = RequestType::Explosion;
-                        p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                        p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                    }
-                    registry.fades.emplace(entity);
-                }
-                // NOTE: perhaps to make it look nicer, fade should be called in clearDeleteQueue() ?
-                if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
-                    registry.deleteds.emplace(entity);
-                }
-
-                //std::cout << "enemy " << entity << "has died" << std::endl;
-            }
-
-            if (!registry.deleteds.has(other_entity))
-                registry.deleteds.emplace(other_entity);
-        }
-    }
-
     // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities) {
         Enemy& enemy = registry.enemies.get(entity);
@@ -150,6 +112,47 @@ void EnemySystem::step(float elapsed_ms) {
             nextAtkData(enemy, entity);
         }    
         
+    }
+
+    // HANDLING DAMGE FROM COLLISION
+    for (auto& entity : registry.collisions.entities)
+    {
+        const Collision& collision = registry.collisions.get(entity);
+        Entity other_entity = collision.other;
+
+        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity))
+        {
+            Enemy& enemyStat = registry.enemies.get(entity);
+            PlayerBullet& bulletStat = registry.playerBullets.get(other_entity);
+
+            enemyStat.currHealth -= bulletStat.damage;
+            //std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
+            if (enemyStat.currHealth <= 0)
+            {
+                if (!registry.deleteds.has(entity)) {
+                    for (int i = 0; i < (rand() % 100 + 30); i++) {
+                        EmitParticle& p = registry.emitParticles.emplace(Entity());
+                        Motion& motion = registry.motions.get(entity);
+                        p.requestType = RequestType::Explosion;
+                        p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                        p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                    }
+                    registry.fades.emplace(entity);
+                    registry.deleteds.emplace(entity);
+                }
+                // NOTE: perhaps to make it look nicer, fade should be called in clearDeleteQueue() ?
+                //if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
+                //    registry.deleteds.emplace(entity);
+                //}
+                //if (!registry.deleteds.has(entity))
+                    
+
+                //std::cout << "enemy " << entity << "has died" << std::endl;
+            }
+
+            if (!registry.deleteds.has(other_entity))
+                registry.deleteds.emplace(other_entity);
+        }
     }
 }
 

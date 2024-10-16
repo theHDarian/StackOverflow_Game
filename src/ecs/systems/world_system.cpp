@@ -242,15 +242,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() < 100) {
-		//for (int i = 0; i < rand()%10 + 1; i++) {
+	if (registry.enemies.size() < 1) {
+		for (int i = 0; i < rand()%10 + 1; i++) {
 			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
 			Entity e = createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
-			if (registry.renderRequests.get(e).used_effect > EFFECT_COUNT)
-				std::cout << "way to big of an effect in world system!" << registry.renderRequests.get(e).used_effect << std::endl;
-			if (registry.renderRequests.get(e).used_geometry > GEOMETRY_COUNT)
-				std::cout << "way to big of a geometry in world system!" << registry.renderRequests.get(e).used_geometry << std::endl;
-		//}
+		}
 	}
 
 	return true;
@@ -649,7 +645,9 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 
 void WorldSystem::clearDeleteQueue() {
 	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
-		registry.deleteEntityAndRelatedEntities(registry.deleteds.entities[i]);
+		Entity e = registry.deleteds.entities[i];
+		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0)
+			registry.deleteEntityAndRelatedEntities(e);
 	}
 }
 

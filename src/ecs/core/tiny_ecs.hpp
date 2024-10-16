@@ -60,7 +60,6 @@ public:
 		map_entity_componentID[e] = (unsigned int)components.size();
 		components.push_back(std::move(c)); // the move enforces move instead of copy constructor
 		entities.push_back(e);
-		// ERR: read access violation above due to adding enemy
 		return components.back();
 	};
 
