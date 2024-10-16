@@ -68,6 +68,10 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	assert(registry.windowStates.components.size() > 0);
 	WindowState& windowState = registry.windowStates.components[0];
 
+	// Tom needs refresh rate to be 120 or he can't see :(
+	// If theres a better way to do this please go ahead
+	glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, windowState.width, windowState.height, 120);
+
 	if (frame_buffer_width_px != windowState.width)
 	{
 		printf("WARNING: retina display! https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value\n");
