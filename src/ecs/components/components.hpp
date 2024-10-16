@@ -141,11 +141,16 @@ struct Mesh
  */
 
 // maybe a universal map would be easier to load + manage files with...
-enum class TEXTURE_ASSET_ID {
+
+// NOTE: these were originall enum CLASSES in the template
+// shouldn't matter much, but apparently enum CLASSES don't inherently cast to ints
+// so I've (Amanda) explicitly set them to be ints
+// should ask why that's the case/why it works fine even w/o inherent casting
+enum  TEXTURE_ASSET_ID : unsigned int {
 	FISH = 0,
 	PUFFERFISH = FISH + 1,
-	CIRCLE = PUFFERFISH + 1,
-	MC_BASE = CIRCLE + 1,
+	CIRCLE_SPRITE = PUFFERFISH + 1,
+	MC_BASE = CIRCLE_SPRITE + 1,
 	MC_HIT = MC_BASE + 1,
 	AIM_INDICATOR = MC_HIT + 1,
 	FLOOR = AIM_INDICATOR + 1,
@@ -157,7 +162,7 @@ enum class TEXTURE_ASSET_ID {
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
-enum class EFFECT_ASSET_ID {
+enum  EFFECT_ASSET_ID : unsigned int {
 	COLOURED = 0,
 	EGG = COLOURED + 1,
 	SALMON = EGG + 1,
@@ -167,11 +172,11 @@ enum class EFFECT_ASSET_ID {
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
-enum class GEOMETRY_BUFFER_ID {
-	SALMON = 0,
-	SPRITE = SALMON + 1,
-	EGG = SPRITE + 1,
-	DEBUG_LINE = EGG + 1,
+enum  GEOMETRY_BUFFER_ID : unsigned int {
+	SALMON_GB = 0,
+	SPRITE = SALMON_GB + 1,
+	EGG_GB = SPRITE + 1,
+	DEBUG_LINE = EGG_GB + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	GEOMETRY_COUNT = SCREEN_TRIANGLE + 1
 };
@@ -182,6 +187,7 @@ struct RenderRequest {
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 	bool show = true;
+	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
 };
 
 // Expected sprite states other systems can use
@@ -197,6 +203,8 @@ enum class SPRITE_STATE {
 };
 
 // all the sprites this entity will use
+// for performance, consider 1 map per entity type
+// as opposed to 1 map per entity
 struct Sprites {
 	// map of sprite type (enum) to sprite texture
 	// eg: when bullet collides w/ enemy in physics system,
@@ -252,4 +260,8 @@ struct BG {
 struct Fade {
 	float max = 500;
 	float time = max;
+};
+
+struct Deleted {
+	// this entity is marked for deletion
 };

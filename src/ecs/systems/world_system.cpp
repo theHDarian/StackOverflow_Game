@@ -91,7 +91,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	// window_width_px = 1280;
 	// window_height_px = 720;
-	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -131,6 +131,9 @@ GLFWwindow* WorldSystem::createWindow() {
 			audio_path("eat_sound.wav").c_str());
 		return nullptr;
 	}	
+	std::string title = "StackOverflow";
+
+	glfwSetWindowTitle(window, title.c_str());
 
 	return window;
 }
@@ -156,11 +159,6 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Processing inputs
 	handleInput();
-
-	// Updating window title with points
-	std::stringstream title_ss;
-	title_ss << "Points: " << points;
-	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
 	// comment this out for now
@@ -216,7 +214,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
 			PlayerBullet& bullet = registry.playerBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				registry.deleteEntityAndRelatedEntities(registry.playerBullets.entities[i]);
+				if (!registry.deleteds.has(registry.playerBullets.entities[i]))
+					registry.deleteds.emplace(registry.playerBullets.entities[i]);
 			}
 		}
 	}
@@ -225,7 +224,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
 				// remove enemy bullet
-				registry.deleteEntityAndRelatedEntities(registry.enemyBullets.entities[i]);
+				if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+					registry.deleteds.emplace(registry.enemyBullets.entities[i]);
 			}
 		}
 	}
@@ -242,10 +242,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() == 0) {
+	if (registry.enemies.size() < 1) {
 		for (int i = 0; i < rand()%10 + 1; i++) {
 			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
+			Entity e = createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
 		}
 	}
 
@@ -368,7 +368,8 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.deleteEntityAndRelatedEntities(entity);
+					if (!registry.deleteds.has(entity))
+						registry.deleteds.emplace(entity);
 				}
 			}
 		}
@@ -401,7 +402,8 @@ void WorldSystem::handleCollisions() {
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.deleteEntityAndRelatedEntities(entity);
+					if (!registry.deleteds.has(entity))
+						registry.deleteds.emplace(entity);
 				}
 
 			}
@@ -636,6 +638,26 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		bool success = registry.stackCompile.get(player).add(e.blunt);
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
+		}
+	}
+}
+
+void WorldSystem::clearDeleteQueue() {
+	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
+		Entity e = registry.deleteds.entities[i];
+		// right now, all our entities that fade will also emit particles (enemies)
+		// but should be generalized for more things in the future
+		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+		else {
+			for (int i = 0; i < (rand() % 5 + 2); i++) { // NOTE: this particle generation is frame-dependent
+				EmitParticle& p = registry.emitParticles.emplace(Entity());
+				Motion& motion = registry.motions.get(e);
+				p.requestType = RequestType::Explosion;
+				p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+			}
 		}
 	}
 }

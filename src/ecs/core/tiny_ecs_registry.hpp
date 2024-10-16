@@ -47,7 +47,7 @@ public:
 	ComponentContainer<HomingBullet> homes;
 	ComponentContainer<Fade> fades;
 	ComponentContainer<Map> maps;
-
+	ComponentContainer<Deleted> deleteds;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -89,6 +89,7 @@ public:
 		registry_list.push_back(&bursts);
 		registry_list.push_back(&fades);
 		registry_list.push_back(&maps);
+		registry_list.push_back(&deleteds);
 	}
 
 	void clear_all_components() {

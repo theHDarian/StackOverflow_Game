@@ -26,18 +26,14 @@ EnemySystem::~EnemySystem() {
 };
 
 void EnemySystem::step(float elapsed_ms) {
-    auto &enemy_registry = registry.enemies;
-    auto &motion_registry = registry.motions;
-    auto &collision_registry = registry.collisions;
 
-    Entity& player = registry.players.entities[0];
-    Motion& playerMotion = motion_registry.get(player);
-    
-    for (uint i = 0; i < enemy_registry.components.size(); i++) {
-        Enemy &enemy = enemy_registry.components[i];
-        Entity &entity = enemy_registry.entities[i];
+    Entity player = registry.players.entities[0];
+    Motion& playerMotion = registry.motions.get(player);
 
-        Motion &motion = motion_registry.get(entity);
+    // handle enemy moving & shooting
+    for (Entity entity : registry.enemies.entities) {
+        Enemy& enemy = registry.enemies.get(entity);
+        Motion& motion = registry.motions.get(entity);
         AttackData& atkData = registry.attackDatas.get(entity);
         vec2 pos = motion.position;
         float angle = motion.angle;
@@ -60,38 +56,32 @@ void EnemySystem::step(float elapsed_ms) {
         //    shoot(entity, pos, playerDir, elapsed_ms, 3, 30.f);
         //}
 
-        // HANDLING DAMGE FROM COLLISION
-        for (auto& entity : collision_registry.entities)
-        {
-            const Collision &collision = registry.collisions.get(entity);
-            Entity other_entity = collision.other;
+        // move enemy using lerp
+        if (registry.enemyMovement.has(entity)) {
+            EnemyMovement& movement = registry.enemyMovement.get(entity);
+            vec2 direction = movement.posB - movement.posA;
+            if (direction != vec2(0, 0)) {
+                float targetAngle = atan2(direction.y, direction.x);
+                float deltaAngle = targetAngle - motion.angle;
+                float angularSpeedRad = movement.angularSpeed * 2 * M_PI / 360.0f;
+                float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
+                if (deltaAngle > M_PI) deltaAngle -= 2 * M_PI;
+                if (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
+                if (deltaAngle > maxChange) deltaAngle = maxChange;
+                if (deltaAngle < -maxChange) deltaAngle = -maxChange;
 
-            if (enemy_registry.has(entity) && registry.playerBullets.has(other_entity))
-            {
-                for (int i = 0; i < (rand() % 10 + 3); i++) {
-                    EmitParticle& p = registry.emitParticles.emplace(Entity());
-                    Motion& motion = registry.motions.get(entity);
-                    p.requestType = RequestType::Explosion;
-                    p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                    p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                }
-                Enemy &enemyStat = enemy_registry.get(entity);
-                PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
+                motion.angle += deltaAngle;
 
-                enemyStat.currHealth -= bulletStat.damage;
-                std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
-                if (enemyStat.currHealth <= 0)
-                {
-                    if (!registry.fades.has(entity))
-                        registry.fades.emplace(entity);
-                    std::cout << "enemy " << entity << "has died" << std::endl;
-                    delete_queue.push_back(entity);
-                }
-
-                registry.deleteEntityAndRelatedEntities(other_entity);
+                float totalDistance = glm::distance(movement.posA, movement.posB);
+                movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
+                motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
             }
+
         }
 
+        // NOTE: enemy must attack AFTER being moved
+        // or else causes corrupted memory in effect/geometry/texture id and makes it a huge number
+        // no idea why
         enemy.attackCooldown -= elapsed_ms;
         // std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
         if (enemy.attackCooldown < 0.f)
@@ -120,42 +110,36 @@ void EnemySystem::step(float elapsed_ms) {
                 }
             }
             nextAtkData(enemy, entity);
-        }
-        // move enemy using lerp
-        if (registry.enemyMovement.has(entity)) {
-            EnemyMovement& movement = registry.enemyMovement.get(entity);
-            vec2 direction = movement.posB - movement.posA;
-            if (direction != vec2(0, 0)) {
-                float targetAngle = atan2(direction.y, direction.x);
-                float deltaAngle = targetAngle - motion.angle;
-                float angularSpeedRad = movement.angularSpeed * 2 * M_PI / 360.0f;
-                float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
-                if (deltaAngle > M_PI) deltaAngle -= 2 * M_PI;
-                if (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
-                if (deltaAngle > maxChange) deltaAngle = maxChange;
-                if (deltaAngle < -maxChange) deltaAngle = -maxChange;
+        }    
+        
+    }
 
-                motion.angle += deltaAngle;
+    // HANDLING DAMGE FROM COLLISION
+    for (auto& entity : registry.collisions.entities)
+    {
+        const Collision& collision = registry.collisions.get(entity);
+        Entity other_entity = collision.other;
 
-                float totalDistance = glm::distance(movement.posA, movement.posB);
-                movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
-                motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
+        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity))
+        {
+            Enemy& enemyStat = registry.enemies.get(entity);
+            PlayerBullet& bulletStat = registry.playerBullets.get(other_entity);
+
+            enemyStat.currHealth -= bulletStat.damage;
+            //std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
+            if (enemyStat.currHealth <= 0)
+            {
+                if (!registry.deleteds.has(entity)) {
+                    registry.fades.emplace(entity);
+                    registry.deleteds.emplace(entity);
+                }
+                 
+                //std::cout << "enemy " << entity << "has died" << std::endl;
             }
 
-        }        
-    }
-    for (Entity entity: delete_queue) {
-        // delete entity here when timer goes down to respect queue
-        if (!registry.fades.has(entity) || registry.fades.get(entity).time <= 0) {
-            registry.deleteEntityAndRelatedEntities(entity);
-        } else {
-            EmitParticle& p = registry.emitParticles.emplace(Entity());
-            p.requestType = RequestType::Explosion;
-            Motion &motion = motion_registry.get(entity);
-            p.requestOrigin = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0};
-            p.position = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0};
+            if (!registry.deleteds.has(other_entity))
+                registry.deleteds.emplace(other_entity);
         }
-
     }
 }
 
@@ -230,7 +214,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         }
 
         float angle = currentAngle;
-        std::cout << angle << std::endl;
+        //std::cout << angle << std::endl;
         createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData.veer.x * vec2(cos(angle + atkData.veer.y)), atkData);
     }
     burst.curBurst--;

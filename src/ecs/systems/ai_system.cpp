@@ -27,7 +27,7 @@ void AISystem::step(float elapsed_ms)
 			//pick new destination
             movement.posA = movement.posB; 
             movement.posB = getMove(enemy.behavior);
-			std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+			//std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
             movement.distanceTraveled = 0.f;
         }
     }
@@ -56,8 +56,8 @@ vec2 AISystem::generateRandomPos() {
 	WindowState& windowState = window_registry.components[0];
 	int width = windowState.width;
 	int height = windowState.height;
-	std::cout << "width " << windowState.width << std::endl;
-	std::cout << "height " << windowState.height << std::endl;
+	//std::cout << "width " << windowState.width << std::endl;
+	//std::cout << "height " << windowState.height << std::endl;
 
 	float pos_x = rand() % width;
 	float pos_y = rand() % height;

@@ -24,9 +24,12 @@ using Clock = std::chrono::high_resolution_clock;
 	#include "imguiThemes.h"
 #endif
 
+#include <stdlib.h>
+
 // Entry point
 int main()
 {
+
 	// Global systems
 	WorldSystem world;
 	RenderSystem renderer;
@@ -77,6 +80,8 @@ int main()
 			particleSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
+			// clear delete queue here
+			world.clearDeleteQueue();
 		}
 		registry.frames.components[0].prevFrameBuffer = 0;
 		renderer.drawBackgroundElements();
@@ -86,7 +91,6 @@ int main()
 		renderer.drawUI();
 		
 		glfwSwapBuffers(window);
-		
 	}
 
 	return EXIT_SUCCESS;

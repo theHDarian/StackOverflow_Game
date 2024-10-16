@@ -1,8 +1,8 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
 #include <glm/trigonometric.hpp>
-#include "ai_system.hpp"
 #include "premades.hpp"
+#include "ai_system.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
@@ -168,29 +168,26 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 	motion.velocity = velocity;
 	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
-	std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 50;
+	enemy.maxHealth = 20;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 	enemy.behavior = behavior;
-	enemy.attackData = atkData;
 	enemy.blunt = blunt;
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
 	movement.posA = pos;
 	movement.posB = AISystem::getMove(behavior);
-	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+	//std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = atkData[0];
-	for (int i = 0; i < atkData.size(); i++) {
-		if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
-			registry.bursts.emplace(entity);
-		}
+	atk = twelveSpiralShot;
+
+	if (atk.attackType == EnemyAttackPattern::BURST || atk.attackType == EnemyAttackPattern::SPRAY) {
+		Burst& atk = registry.bursts.emplace(entity);
 	}
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
@@ -201,7 +198,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 		{
 			TEXTURE_ASSET_ID::PUFFERFISH,
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
+			GEOMETRY_BUFFER_ID::SPRITE,
+			true,
+			vec2(-12, 0) // manually set an offset for now
 		});
 
 	return entity;
@@ -235,6 +234,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	Invisible& inv = registry.invisibles.emplace(entity);
 	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
+	
 	auto& spriteComponent = registry.sprites.emplace(entity);
 
 	if (atkData.shape == RECTANGLE) {
@@ -247,7 +247,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		//pc.setPolyLengths();
+		pc.setPolyLengths();
 		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
 	}
 	else if (atkData.shape == TRIANGLE) {
@@ -259,7 +259,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		};
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		//pc.setPolyLengths();
+		pc.setPolyLengths();
 		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
 	}
 	else {
