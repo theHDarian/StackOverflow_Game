@@ -61,6 +61,13 @@ struct Player
     int bulletCluster = 1;
 };
 
+enum class EnemyType {
+    EasyEnemyFast,
+    //MediumEnemyClusterShot,
+    MediumEnemyCharge,
+    MediumEnemyHoming
+};
+
 // Holds the actual data of currStack
 // Referenced on Player and PlayerBullet steps
 // ie (baseSpeed + PlayerSpeedAdditive ) * PlayerSpeedMultiplicative
@@ -246,6 +253,12 @@ struct Enemy {
     EnemyBehavior behavior;
     std::vector<AttackData> attackData;
     BulletStackEffect blunt;
+        // for debugging
+    void printInfo() const {
+        std::cout << "Health: " << currHealth << "/" << maxHealth
+                  << ", Behavior: " << (behavior == EnemyBehavior::RANDOM ? "RANDOM" : "FOLLOW_PLAYER")
+                  << ", Attack Cooldown: " << attackCooldown << std::endl;
+    }
 };
 
 struct EnemyMovement {
@@ -254,6 +267,7 @@ struct EnemyMovement {
     float distanceTraveled;
     float speed;
     float angularSpeed = 90.0f;
+
 };
 
 struct BossEnemy {
@@ -294,3 +308,4 @@ struct Motion {
 	vec2 scale = { 10, 10 };
     vec2 veer = { 0,0 };
 };
+

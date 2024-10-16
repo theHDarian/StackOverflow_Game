@@ -234,3 +234,47 @@ AttackData threeSpray{
 	1,
 	0
 };
+
+////////////////////////////////////
+//////////// ENEMY TYPE ////////////
+////////////////////////////////////
+
+
+struct EasyEnemyFast {
+    Enemy base;
+
+    EasyEnemyFast() {
+        base.attackData = {twelveSpiralShot};
+        base.maxHealth = 50;
+        base.currHealth = base.maxHealth;
+        base.behavior = EnemyBehavior::RANDOM;
+        base.attackCooldown = 2000;
+        base.state = 10;
+    };
+};
+
+struct MediumEnemyCharge {
+    Enemy base;
+
+    MediumEnemyCharge() {
+        base.attackData = {};
+        base.maxHealth = 200;
+        base.currHealth = base.maxHealth;
+        base.behavior = EnemyBehavior::FOLLOW_PLAYER;
+        base.attackCooldown = 1000;
+        base.state = 10;
+    };
+};
+
+struct MediumEnemyHoming {
+    Enemy base;
+
+    MediumEnemyHoming() {
+        base.attackData = {threeHomingShot};
+        base.maxHealth = 60;
+        base.currHealth = base.maxHealth;
+        base.behavior = EnemyBehavior::RANDOM;
+        base.attackCooldown = 1500;
+        base.state = 10;
+    };
+};

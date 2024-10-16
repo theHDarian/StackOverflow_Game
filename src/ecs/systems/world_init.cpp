@@ -196,7 +196,7 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavior behavior) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavior behavior, EnemyType type) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -208,25 +208,42 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 	motion.velocity = velocity;
 	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
-	std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
-	Enemy& enemy = registry.enemies.emplace(entity);
-	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 50;
-	enemy.currHealth = enemy.maxHealth;
-	enemy.state = 10;
-	enemy.behavior = behavior;
-	enemy.attackData = atkData;
-	enemy.blunt = blunt;
+	//std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
+    Enemy enemy;
+    switch (type) {
+        case EnemyType::EasyEnemyFast: {
+			std::cout << "got here" << std::endl;
+            EasyEnemyFast easyEnemy;
+            enemy = easyEnemy.base;
+            break;
+        }
+        case EnemyType::MediumEnemyCharge: {
+            MediumEnemyCharge mediumEnemy;
+            enemy = mediumEnemy.base;
+            break;
+        }
+        case EnemyType::MediumEnemyHoming: {
+            MediumEnemyHoming mediumEnemy;
+            enemy = mediumEnemy.base;
+            break;
+        }
+
+    }
+	enemy.printInfo();
+    enemy = registry.enemies.emplace(entity);
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
 	movement.posA = pos;
-	movement.posB = AISystem::getMove(behavior);
+	movement.posB = AISystem::getMove(enemy.behavior);
 	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
+	
 	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = atkData[0];
+	std::vector<AttackData> atkData = enemy.attackData;
+	std::cout << "attackData size:" << atkData.size() << std::endl;
+	// atk = atkData[0];
 	for (int i = 0; i < atkData.size(); i++) {
 		if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
 			registry.bursts.emplace(entity);
