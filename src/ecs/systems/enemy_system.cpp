@@ -63,18 +63,13 @@ void EnemySystem::step(float elapsed_ms) {
         // HANDLING DAMGE FROM COLLISION
         for (auto& entity : collision_registry.entities)
         {
+            //if (!registry.collisions.has(entity)) // if this isn't included, it will cause a get assertion error
+            //    continue;
             const Collision &collision = registry.collisions.get(entity);
             Entity other_entity = collision.other;
 
             if (enemy_registry.has(entity) && registry.playerBullets.has(other_entity))
             {
-                for (int i = 0; i < (rand() % 10 + 3); i++) {
-                    EmitParticle& p = registry.emitParticles.emplace(Entity());
-                    Motion& motion = registry.motions.get(entity);
-                    p.requestType = RequestType::Explosion;
-                    p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                    p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                }
                 Enemy &enemyStat = enemy_registry.get(entity);
                 PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
 
@@ -82,13 +77,25 @@ void EnemySystem::step(float elapsed_ms) {
                 std::cout << "current enemy health" << enemyStat.currHealth << std::endl;
                 if (enemyStat.currHealth <= 0)
                 {
-                    if (!registry.fades.has(entity))
+                    if (!registry.fades.has(entity)) {
+                        for (int i = 0; i < (rand() % 50 + 10); i++) {
+                            EmitParticle& p = registry.emitParticles.emplace(Entity());
+                            Motion& motion = registry.motions.get(entity);
+                            p.requestType = RequestType::Explosion;
+                            p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                            p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+                        }
                         registry.fades.emplace(entity);
+                    }
+                    if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
+                        registry.deleteds.emplace(entity);
+                    }
+              
                     std::cout << "enemy " << entity << "has died" << std::endl;
-                    delete_queue.push_back(entity);
                 }
 
-                registry.deleteEntityAndRelatedEntities(other_entity);
+                if (!registry.deleteds.has(other_entity))
+                    registry.deleteds.emplace(other_entity);
             }
         }
 
@@ -116,8 +123,10 @@ void EnemySystem::step(float elapsed_ms) {
                 {
                     enemy.attackCooldown = COOLDOWN_SHOOT_MS;
                     burst.curBurst = atkData.numBullets;
+                    burst.burstCooldown = 0;
                 }
             }
+            nextAtkData(enemy, entity);
         }
         // move enemy using lerp
         if (registry.enemyMovement.has(entity)) {
@@ -142,20 +151,23 @@ void EnemySystem::step(float elapsed_ms) {
 
         }        
     }
-    for (Entity entity: delete_queue) {
-        // delete entity here when timer goes down to respect queue
-        if (!registry.fades.has(entity) || registry.fades.get(entity).time <= 0) {
-            registry.deleteEntityAndRelatedEntities(entity);
-        } else {
-            EmitParticle& p = registry.emitParticles.emplace(Entity());
-            p.requestType = RequestType::Explosion;
-            Motion &motion = motion_registry.get(entity);
-            p.requestOrigin = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0};
-            p.position = motion.position + vec2 {rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0};
-        }
-
-    }
 }
+
+//Make sure the enemy and the entity are the same entity
+void EnemySystem::nextAtkData(Enemy& enemy, Entity& entity) {
+    AttackData& atkData = registry.attackDatas.get(entity);
+    std::vector<AttackData> atkDatas = enemy.attackData;
+    if (atkDatas.size() == 0 || atkDatas.size() == 1) {
+        return;
+    }
+    if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
+        if (enemy.attackCooldown != COOLDOWN_SHOOT_MS) {
+            return;
+        }
+    }
+    atkData = atkDatas[rand()% atkDatas.size()];
+}
+
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData) {
     float angle = atan2(velocity.y, velocity.x);

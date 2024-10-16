@@ -40,6 +40,8 @@ public:
 
 	void closeGame();
 	void handleInput();
+
+	void clearDeleteQueue();
 private:
 	// restart level
 	void restartGame();

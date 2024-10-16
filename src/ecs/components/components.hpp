@@ -253,3 +253,7 @@ struct Fade {
 	float max = 500;
 	float time = max;
 };
+
+struct Deleted {
+	// this entity is marked for deletion
+};
