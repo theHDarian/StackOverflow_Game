@@ -213,18 +213,15 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
     switch (type) {
         case EnemyType::EasyEnemyFast: {
 			std::cout << "got here" << std::endl;
-            EasyEnemyFast easyEnemy;
-            enemy = easyEnemy.base;
+            enemy = EnemyEasyFast();
             break;
         }
         case EnemyType::MediumEnemyCharge: {
-            MediumEnemyCharge mediumEnemy;
-            enemy = mediumEnemy.base;
+            enemy = EnemyMediumCharge();
             break;
         }
         case EnemyType::MediumEnemyHoming: {
-            MediumEnemyHoming mediumEnemy;
-            enemy = mediumEnemy.base;
+            enemy = EnemyMediumHoming();
             break;
         }
 

@@ -240,41 +240,35 @@ AttackData threeSpray{
 ////////////////////////////////////
 
 
-struct EasyEnemyFast {
-    Enemy base;
-
-    EasyEnemyFast() {
-        base.attackData = {twelveSpiralShot};
-        base.maxHealth = 50;
-        base.currHealth = base.maxHealth;
-        base.behavior = EnemyBehavior::RANDOM;
-        base.attackCooldown = 2000;
-        base.state = 10;
+struct EnemyEasyFast : Enemy {
+    EnemyEasyFast() {
+        attackData = {twelveSpiralShot};
+		maxHealth = 50;
+        currHealth = maxHealth;
+        behavior = EnemyBehavior::RANDOM;
+        attackCooldown = 2000;
+        state = 10;
     };
 };
 
-struct MediumEnemyCharge {
-    Enemy base;
-
-    MediumEnemyCharge() {
-        base.attackData = {};
-        base.maxHealth = 200;
-        base.currHealth = base.maxHealth;
-        base.behavior = EnemyBehavior::FOLLOW_PLAYER;
-        base.attackCooldown = 1000;
-        base.state = 10;
+struct EnemyMediumCharge : Enemy {
+    EnemyMediumCharge() {
+        attackData = {};
+        maxHealth = 200;
+        currHealth = maxHealth;
+        behavior = EnemyBehavior::FOLLOW_PLAYER;
+        attackCooldown = 1000;
+        state = 10;
     };
 };
 
-struct MediumEnemyHoming {
-    Enemy base;
-
-    MediumEnemyHoming() {
-        base.attackData = {threeHomingShot};
-        base.maxHealth = 60;
-        base.currHealth = base.maxHealth;
-        base.behavior = EnemyBehavior::RANDOM;
-        base.attackCooldown = 1500;
-        base.state = 10;
+struct EnemyMediumHoming : Enemy {
+    EnemyMediumHoming() {
+        attackData = {threeHomingShot};
+        maxHealth = 60;
+        currHealth = maxHealth;
+        behavior = EnemyBehavior::RANDOM;
+        attackCooldown = 1500;
+        state = 10;
     };
 };

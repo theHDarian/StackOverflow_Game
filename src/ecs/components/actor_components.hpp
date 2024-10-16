@@ -61,7 +61,7 @@ struct Player
     int bulletCluster = 1;
 };
 
-enum class EnemyType {
+enum EnemyType {
     EasyEnemyFast,
     //MediumEnemyClusterShot,
     MediumEnemyCharge,
