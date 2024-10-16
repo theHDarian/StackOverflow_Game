@@ -187,6 +187,7 @@ struct RenderRequest {
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 	bool show = true;
+	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
 };
 
 // Expected sprite states other systems can use
@@ -202,6 +203,8 @@ enum class SPRITE_STATE {
 };
 
 // all the sprites this entity will use
+// for performance, consider 1 map per entity type
+// as opposed to 1 map per entity
 struct Sprites {
 	// map of sprite type (enum) to sprite texture
 	// eg: when bullet collides w/ enemy in physics system,

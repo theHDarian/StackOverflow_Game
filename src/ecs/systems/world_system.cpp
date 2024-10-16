@@ -646,8 +646,20 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 void WorldSystem::clearDeleteQueue() {
 	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
 		Entity e = registry.deleteds.entities[i];
-		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0)
+		// right now, all our entities that fade will also emit particles (enemies)
+		// but should be generalized for more things in the future
+		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
 			registry.deleteEntityAndRelatedEntities(e);
+		}
+		else {
+			for (int i = 0; i < (rand() % 5 + 2); i++) { // NOTE: this particle generation is frame-dependent
+				EmitParticle& p = registry.emitParticles.emplace(Entity());
+				Motion& motion = registry.motions.get(e);
+				p.requestType = RequestType::Explosion;
+				p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+			}
+		}
 	}
 }
 

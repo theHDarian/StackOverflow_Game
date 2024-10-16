@@ -130,23 +130,10 @@ void EnemySystem::step(float elapsed_ms) {
             if (enemyStat.currHealth <= 0)
             {
                 if (!registry.deleteds.has(entity)) {
-                    for (int i = 0; i < (rand() % 100 + 30); i++) {
-                        EmitParticle& p = registry.emitParticles.emplace(Entity());
-                        Motion& motion = registry.motions.get(entity);
-                        p.requestType = RequestType::Explosion;
-                        p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                        p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-                    }
                     registry.fades.emplace(entity);
                     registry.deleteds.emplace(entity);
                 }
-                // NOTE: perhaps to make it look nicer, fade should be called in clearDeleteQueue() ?
-                //if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
-                //    registry.deleteds.emplace(entity);
-                //}
-                //if (!registry.deleteds.has(entity))
-                    
-
+                 
                 //std::cout << "enemy " << entity << "has died" << std::endl;
             }
 
