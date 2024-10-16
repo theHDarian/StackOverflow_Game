@@ -3,10 +3,11 @@
 struct Room;
 
 enum RoomType {
-    Enemy,
-    Treasure,
-    Boss,
-    Rest
+    EnemyRoom,
+    TreasureRoom,
+    BossRoom,
+    RestRoom,
+    None
 };
 
 struct Door {
@@ -23,6 +24,8 @@ struct Room {
     Door rightDoor;
     Door topDoor;
     Door bottomDoor;
+
+    float timeElapsed; //time passed since enter room
 };
 
 enum MapRegion {
@@ -32,7 +35,7 @@ enum MapRegion {
 };
 
 struct Map {
-    Room startingRoom;
+    Room currRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
     MapRegion currRegion;
 };

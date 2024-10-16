@@ -133,46 +133,6 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-// basic enemy that doesn't do anything
-Entity createBlob(RenderSystem* renderer, vec2 position) {
-	auto entity = Entity();
-
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	// Initialize the motion
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = 0;
-	motion.velocity = { 0, 0 };
-	motion.position = position;
-
-	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ 100, 100 });
-
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x/2;
-
-	auto enemy = registry.enemies.emplace(entity);
-	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 1000;
-	enemy.currHealth = enemy.maxHealth;
-	enemy.state = 10;
-
-	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::PUFFERFISH;
-	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
-	registry.renderRequests.insert(
-		entity,
-		{
-			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		});
-
-	return entity;
-}
-
 Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 

@@ -13,6 +13,7 @@
 #include "particle_system.hpp"
 #include "enemy_system.hpp"
 #include "ai_system.hpp"
+#include "map_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -34,6 +35,7 @@ int main()
 	ParticleSystem particleSystem;
 	AISystem aiSystem;
 	EnemySystem enemySystem(&renderer);
+	MapSystem mapSystem;
 
 
 	// Initializing window
@@ -50,6 +52,7 @@ int main()
 	particleSystem.init(window);
 	ioSystem.init(window);
 	world.init(&renderer);
+	mapSystem.init();
 
 
 	// variable timestep loop
@@ -66,6 +69,7 @@ int main()
 		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isDialogue()) {
 			world.handleInput();
 		} else {
+			mapSystem.step(elapsed_ms);
 			world.step(elapsed_ms);
 			physics.step(elapsed_ms);
 			aiSystem.step(elapsed_ms);

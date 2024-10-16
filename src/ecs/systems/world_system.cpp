@@ -288,7 +288,6 @@ void WorldSystem::restartGame() {
 	createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
 	createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
 	createTestWall(renderer, {0, wS.height}, {0,0});
-	//createBlob(renderer, vec2(600, 300));
 
 	createTestFloor(renderer, { wS.width /2, wS.height/2 });
 
