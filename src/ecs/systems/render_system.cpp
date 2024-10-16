@@ -33,8 +33,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
 	Transform transform;
+	vec2 offset = registry.renderRequests.get(entity).offset;;
+
 	transform.translate(motion.position);
 	transform.rotate(motion.angle);
+	transform.translate(offset);
 	transform.scale(motion.scale);
 
 	assert(registry.renderRequests.has(entity));

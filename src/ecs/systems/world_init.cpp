@@ -238,7 +238,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 		{
 			TEXTURE_ASSET_ID::PUFFERFISH,
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
+			GEOMETRY_BUFFER_ID::SPRITE,
+			true,
+			vec2(-12, 0) // manually set an offset for now
 		});
 
 	return entity;
