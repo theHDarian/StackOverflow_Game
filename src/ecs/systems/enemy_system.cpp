@@ -55,6 +55,7 @@ void EnemySystem::step(float elapsed_ms) {
                     }
                     registry.fades.emplace(entity);
                 }
+                // NOTE: perhaps to make it look nicer, fade should be called in clearDeleteQueue() ?
                 if ((registry.fades.get(entity).time <= 0) && (!registry.deleteds.has(entity))) {
                     registry.deleteds.emplace(entity);
                 }

@@ -216,7 +216,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
 				if (!registry.deleteds.has(registry.playerBullets.entities[i]))
 					registry.deleteds.emplace(registry.playerBullets.entities[i]);
-				//registry.deleteEntityAndRelatedEntities(registry.playerBullets.entities[i]);
 			}
 		}
 	}
@@ -227,7 +226,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// remove enemy bullet
 				if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
 					registry.deleteds.emplace(registry.enemyBullets.entities[i]);
-				//registry.deleteEntityAndRelatedEntities(registry.enemyBullets.entities[i]);
 			}
 		}
 	}
@@ -375,10 +373,8 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					//registry.deleteEntityAndRelatedEntities(entity);
 					if (!registry.deleteds.has(entity))
 						registry.deleteds.emplace(entity);
-					// ERR: segfault in line above, esp when bullet is big and collides with enemy and wall simultaneously?
 				}
 			}
 		}
@@ -411,7 +407,8 @@ void WorldSystem::handleCollisions() {
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.deleteEntityAndRelatedEntities(entity);
+					if (!registry.deleteds.has(entity))
+						registry.deleteds.emplace(entity);
 				}
 
 			}
@@ -636,7 +633,6 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
 		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
-			// ERR: memory read access violation here; why?
 			if (!success) {
 				registry.gameStates.components[0].gameOver = true;
 			}
@@ -653,7 +649,6 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 
 void WorldSystem::clearDeleteQueue() {
 	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
-		// ERR: read access violation - reading addres 0xFFFF.....
 		registry.deleteEntityAndRelatedEntities(registry.deleteds.entities[i]);
 	}
 }
