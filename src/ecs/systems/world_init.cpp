@@ -20,9 +20,11 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.scale = mesh.original_size * 50.f;
 
 	Player& player = registry.players.emplace(entity);
-	player.baseSpeed = 400;
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2.5;
+	AABBCollider& aabb = registry.aabbs.emplace(entity);
+	aabb.topLeft = vec2(-motion.scale.x / 3, -motion.scale.y / 2.5);
+	aabb.bottomRight = vec2(motion.scale.x / 3, motion.scale.y / 3);
 
     PlayerAttackData& shoot = registry.shoots.emplace(entity);
 

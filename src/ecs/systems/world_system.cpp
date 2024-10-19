@@ -292,6 +292,23 @@ void WorldSystem::restartGame() {
 
 	createTestFloor(renderer, { wS.width /2, wS.height/2 });
 
+	// Test bullets for polygon collision checks
+	//auto e = createEnemyBullet(renderer, { 500,500 }, 0.001f * glm::normalize(vec2(1,-1)), {0,0}, {
+	//		EnemyAttackPattern::ALL_DIRECTION,
+	//		TRIANGLE,
+	//		{},
+	//		{},
+	//		4,
+	//		M_PI / 4,
+	//		{200,40},
+	//		200,
+	//		3000000,
+	//		{0,0},
+	//		0,
+	//		1,
+	//		0
+	//	});
+
 	//createTestPoly(renderer, { 500,500 }, {
 	//	{100, 0},
 	//	{-50, 50},

@@ -52,6 +52,16 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+struct AABBCollider {
+	// As offsets of motion.position:
+	vec2 topLeft;		//max x, max y
+	vec2 bottomRight;	//min x, min y
+};
+
+struct MeshCollider {
+	// basically just exists for checking
+};
+
 // Data structure for toggling debug mode
 struct Debug {
 	bool in_debug_mode = false;
