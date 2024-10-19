@@ -34,13 +34,15 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	Sprites& playerSprites = registry.sprites.emplace(entity);
 	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
 	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{
 			playerSprites.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+	// can play around with offset to try to align sprite
+	rr.offset = vec2(-5, 0);
 
 	return entity;
 }

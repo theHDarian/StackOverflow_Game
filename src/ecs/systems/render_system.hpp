@@ -45,7 +45,8 @@ class RenderSystem {
 			textures_path("player_bullet.png"),
 			textures_path("enemy_bullet_square.png"),
 			textures_path("enemy_bullet_circle.png"),
-			textures_path("enemy_bullet_triangle.png")
+			textures_path("enemy_bullet_triangle.png"),
+			textures_path("rectangle.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -120,6 +121,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawCircleCollider(Entity entity, const mat3& projection);
+	void drawAABBCollider(Entity entity, const mat3& projection);
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
 	vec2 drawBulletStack(const mat3& projection);
 
