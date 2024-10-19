@@ -650,7 +650,7 @@ void WorldSystem::clearDeleteQueue() {
 				EmitParticle& p = registry.emitParticles.emplace(Entity());
 				Motion& motion = registry.motions.get(e);
 				p.requestType = RequestType::Explosion;
-				p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+				p.requestOrigin = motion.position + vec2{ rand() % (int)(motion.scale.y * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
 				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
 			}
 		}

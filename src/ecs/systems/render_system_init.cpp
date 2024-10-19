@@ -80,6 +80,8 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 		windowState.isRetinaDisplay = true;
 	}
 
+
+
 	// Window resize callback
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 

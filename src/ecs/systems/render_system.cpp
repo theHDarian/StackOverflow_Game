@@ -327,6 +327,8 @@ void RenderSystem::drawGameUI() {
 		}
 	}
 
+	drawDashes(projection_2D);
+
 	glBindVertexArray(0);
 	gl_has_errors();
 }
@@ -444,13 +446,6 @@ void RenderSystem::drawImGui() {
 // currently just draws a box as a container
 void RenderSystem::drawBulletStack(const mat3& projection) {
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-	//WindowState& windowState = registry.windowStates.components[0];
-	//vec2 bulletStartPos = { 75, windowState.height - 200 };
-	//vec2 bulletSize = { 50, 50 };
-	//float bulletOffset = 10; // space between bullets
-
-	//vec2 stackSize = vec2(bulletSize.x + 2 * bulletOffset, stack.baseStackSize * bulletSize.y + stack.baseStackSize * bulletOffset +  2 * bulletOffset);
-	//vec2 stackPos = vec2(bulletStartPos.x, bulletStartPos.y - stackSize.y / 2 + bulletSize.y - bulletOffset);
 	
 	Entity stackEntity = registry.stackUI.entities[0];
 	StackUI& stackui = registry.stackUI.get(stackEntity);
@@ -542,7 +537,6 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 }
 
 void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection) {
-	// Consider: using stack ui's position to draw bullets
 	Transform transform;
 	transform.translate(position);
 	transform.scale(bullet_size);
@@ -693,3 +687,173 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 }
+
+void RenderSystem::drawDashes(const mat3& projection) {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+
+	vec2 pos = { 100,100 };
+	vec2 scale = { 50, 50 };
+	float offset = 10;
+
+    Player& player = registry.players.get(registry.players.entities[0]);
+
+	// draw all filled dash charges first
+    for (int i = 0; i < player.currDashCharges; ++i) {
+        drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, false, 0, 0, projection);
+    }
+
+	// draw currently dashing dash charge, if any
+	if (player.currDashCharges < player.maxDashCharges) {
+		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, player.baseDashCDR, projection);
+	}
+
+    //WindowState& windowState = registry.windowStates.components[0];
+    //vec2 pos = { 100, windowState.height - 100 };
+    //vec2 size = { 50, 50 };
+    //Transform transform;
+    //transform.translate({ 100, 100 });
+    //transform.scale({ 5, 5 });
+
+    //float chargeOffset = 10;
+    //int activeIndex = player.currDashCharges; // Index of the chevron currently recharging
+    //std::vector<bool> chevronStatus(numDashes, false); // Track full/empty status
+    //for (int i = 0; i < player.currDashCharges; i++) {
+    //    chevronStatus[i] = true;
+    //}
+
+    //GLint windowHeightLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "window_height");
+    //glUseProgram(EFFECT_ASSET_ID::DASH);
+    //glUniform1f(windowHeightLocation, (float)windowState.height);
+
+    //for (int i = 0; i < numDashes; ++i) {
+    //    GLint colorLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "color");
+    //    GLint transformLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "transform");
+    //    Transform transform;
+    //    transform.translate(glm::vec2(i * 1.0f, 0.0f)); // Adjust the x offset for each chevron
+
+    //    if (i == activeIndex) {
+    //        float chargeLevel = player.currDashCooldown / player.dashCooldown;
+    //        GLint chargeLevelLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "chargeLevel");
+    //        glUniform1f(chargeLevelLocation, chargeLevel);
+    //        transform.scale(glm::vec2(1.0f, chargeLevel)); // Scale based on the charge level
+    //        glUniform3f(colorLocation, 0.0f, 1.0f, 0.0f); // Recharging (green)
+    //        glUniformMatrix3fv(transformLocation, 1, GL_FALSE, (float*)&transform.mat);
+    //        glBindVertexArray(VAOs[i]);
+    //        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //    } else if (chevronStatus[i]) {
+    //        glUniform3f(colorLocation, 0.0f, 1.0f, 0.0f); // Full (green)
+    //        glUniformMatrix3fv(transformLocation, 1, GL_FALSE, (float*)&transform.mat);
+    //        glBindVertexArray(VAOs[i]);
+    //        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //    } else {
+    //        glUniform3f(colorLocation, 0.0f, 0.0f, 0.0f); // Empty (black)
+    //        glUniformMatrix3fv(transformLocation, 1, GL_FALSE, (float*)&transform.mat);
+    //        glBindVertexArray(VAOs[i]);
+    //        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //    }
+    //}
+
+	glBindVertexArray(0);
+	gl_has_errors();
+    //glfwSwapBuffers(window);
+    //glfwPollEvents();
+}
+
+void RenderSystem::drawDashCharges(vec2 position, vec2 scale, bool isCharging, float cooldown, float max, const mat3& projection) {
+	Transform transform;
+	transform.translate(position);
+	transform.scale(scale);
+
+	// for now, draw bullets using textures
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::DASH;
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::CHEVRON];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	// Getting uniform locations for glUniform* calls
+	if (!isCharging) {
+		vec3 color = { 1, 1, 1 }; 
+		GLint color_uloc = glGetUniformLocation(program, "fcolor");
+		glUniform3fv(color_uloc, 1, (float*)&color);
+		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+		glUniform1i(change_color_uloc, 0);
+		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+		glUniform1f(charge_boundary_uloc, 1.0);
+	}
+	else {
+		vec3 color = { 0.5, 0.5, 0.5 }; // grey
+		GLint color_uloc = glGetUniformLocation(program, "fcolor");
+		glUniform3fv(color_uloc, 1, (float*)&color);
+		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+		glUniform1i(change_color_uloc, 1);
+
+		float chargeBoundary = glm::lerp(0.f, 1.f, (max - cooldown) / max);
+
+		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+		glUniform1f(charge_boundary_uloc, chargeBoundary);
+	}
+	
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+

@@ -98,7 +98,7 @@ int main()
 		renderer.drawToScreen(); //postprocessing
 		renderer.drawMenuUI();
 		textSystem.renderMenuUIText();
-		
+
 		glfwSwapBuffers(window);
 	}
 

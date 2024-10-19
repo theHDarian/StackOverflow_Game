@@ -31,6 +31,7 @@ inline std::string audio_path(const std::string& name) {return data_path() + "/a
 inline std::string mesh_path(const std::string& name) {return data_path() + "/meshes/" + std::string(name);};
 inline std::string font_path(const std::string& name) { return data_path() + "/fonts/" + std::string(name); };
 
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif
@@ -47,6 +48,9 @@ struct Transform {
 	void scale(vec2 scale);
 	void rotate(float radians);
 	void translate(vec2 offset);
+	glm::mat4 getMatrix() {
+		return glm::mat4(mat); // Convert mat3 to mat4
+	}
 };
 
 bool gl_has_errors();
