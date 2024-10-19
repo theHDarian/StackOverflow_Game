@@ -692,7 +692,6 @@ void RenderSystem::drawDashes(const mat3& projection) {
 	drawSetupFrame();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBindVertexArray(vao);
 
 	vec2 pos = { 100,100 };
 	vec2 scale = { 50, 50 };
@@ -705,61 +704,12 @@ void RenderSystem::drawDashes(const mat3& projection) {
         drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, false, 0, 0, projection);
     }
 
-	// draw currently dashing dash charge, if any
+	// draw currently charging dash charge, if any
 	if (player.currDashCharges < player.maxDashCharges) {
 		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, player.baseDashCDR, projection);
 	}
 
-    //WindowState& windowState = registry.windowStates.components[0];
-    //vec2 pos = { 100, windowState.height - 100 };
-    //vec2 size = { 50, 50 };
-    //Transform transform;
-    //transform.translate({ 100, 100 });
-    //transform.scale({ 5, 5 });
-
-    //float chargeOffset = 10;
-    //int activeIndex = player.currDashCharges; // Index of the chevron currently recharging
-    //std::vector<bool> chevronStatus(numDashes, false); // Track full/empty status
-    //for (int i = 0; i < player.currDashCharges; i++) {
-    //    chevronStatus[i] = true;
-    //}
-
-    //GLint windowHeightLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "window_height");
-    //glUseProgram(EFFECT_ASSET_ID::DASH);
-    //glUniform1f(windowHeightLocation, (float)windowState.height);
-
-    //for (int i = 0; i < numDashes; ++i) {
-    //    GLint colorLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "color");
-    //    GLint transformLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "transform");
-    //    Transform transform;
-    //    transform.translate(glm::vec2(i * 1.0f, 0.0f)); // Adjust the x offset for each chevron
-
-    //    if (i == activeIndex) {
-    //        float chargeLevel = player.currDashCooldown / player.dashCooldown;
-    //        GLint chargeLevelLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "chargeLevel");
-    //        glUniform1f(chargeLevelLocation, chargeLevel);
-    //        transform.scale(glm::vec2(1.0f, chargeLevel)); // Scale based on the charge level
-    //        glUniform3f(colorLocation, 0.0f, 1.0f, 0.0f); // Recharging (green)
-    //        glUniformMatrix3fv(transformLocation, 1, GL_FALSE, (float*)&transform.mat);
-    //        glBindVertexArray(VAOs[i]);
-    //        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    //    } else if (chevronStatus[i]) {
-    //        glUniform3f(colorLocation, 0.0f, 1.0f, 0.0f); // Full (green)
-    //        glUniformMatrix3fv(transformLocation, 1, GL_FALSE, (float*)&transform.mat);
-    //        glBindVertexArray(VAOs[i]);
-    //        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    //    } else {
-    //        glUniform3f(colorLocation, 0.0f, 0.0f, 0.0f); // Empty (black)
-    //        glUniformMatrix3fv(transformLocation, 1, GL_FALSE, (float*)&transform.mat);
-    //        glBindVertexArray(VAOs[i]);
-    //        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    //    }
-    //}
-
-	glBindVertexArray(0);
 	gl_has_errors();
-    //glfwSwapBuffers(window);
-    //glfwPollEvents();
 }
 
 void RenderSystem::drawDashCharges(vec2 position, vec2 scale, bool isCharging, float cooldown, float max, const mat3& projection) {
