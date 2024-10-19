@@ -85,6 +85,9 @@ int main()
 		renderer.drawGameElements();
 		renderer.drawToScreen(); //postprocessing
 		renderer.drawUI();
+		renderer.drawDashes();
+
+
 		
 		glfwSwapBuffers(window);
 	}

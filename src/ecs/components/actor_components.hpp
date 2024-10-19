@@ -113,7 +113,7 @@ struct StackCompile {
         {FireRate,          1},
         {BulletRange,       1},
         {BulletSpread,      1},
-        {BulletNum,         3},
+        {BulletNum,         1},
         {BulletBurst,       1},
         {Bounce,            0},
         {Pierce,            0},

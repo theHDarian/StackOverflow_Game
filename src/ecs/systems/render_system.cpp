@@ -297,6 +297,8 @@ void RenderSystem::drawUI() {
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	std::string text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
 	RenderText(text, stackTextPos.x, stackTextPos.y, 0.25, vec3(1, 1, 1));
+	Player& player = registry.players.get(registry.players.entities[0]);
+
 
 	glBindVertexArray(vao);
 	// should put draw UI here (ideally using its own rendering system,
@@ -319,6 +321,7 @@ void RenderSystem::drawUI() {
 		if (registry.renderRequests.get(entity).show)
 			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
 	}
+
 
 	#if IMGUI_ENABLED
 		//draw Imgui
@@ -649,3 +652,116 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 }
+
+void RenderSystem::drawDashes() {
+    std::vector<GLuint> VAOs;
+    std::vector<GLuint> VBOs;
+    std::vector<GLuint> EBOs;
+
+    Player& player = registry.players.get(registry.players.entities[0]);
+    int numDashes = player.maxDashCharges;
+    for (int i = 0; i < numDashes; ++i) {
+        GLuint VAO, VBO, EBO;
+        drawDashCharges(VAO, VBO, EBO);
+        VAOs.push_back(VAO);
+        VBOs.push_back(VBO);
+        EBOs.push_back(EBO);
+    }
+
+    WindowState& windowState = registry.windowStates.components[0];
+    vec2 pos = { 100, windowState.height - 100 };
+    vec2 size = { 50, 50 };
+    Transform transform;
+    transform.translate({ 100, 100 });
+    transform.scale({ 5, 5 });
+
+    float chargeOffset = 10;
+    int activeIndex = player.currDashCharges; // Index of the chevron currently recharging
+    std::vector<bool> chevronStatus(numDashes, false); // Track full/empty status
+    for (int i = 0; i < player.currDashCharges; i++) {
+        chevronStatus[i] = true;
+    }
+
+    GLint windowHeightLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "window_height");
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUseProgram(EFFECT_ASSET_ID::DASH);
+    glUniform1f(windowHeightLocation, (float)windowState.height);
+
+    for (int i = 0; i < numDashes; ++i) {
+        GLint colorLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "color");
+        GLint transformLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "transform");
+        Transform transform;
+        transform.translate(glm::vec2(i * 1.0f, 0.0f)); // Adjust the x offset for each chevron
+
+        if (i == activeIndex) {
+            float chargeLevel = player.currDashCooldown / player.dashCooldown;
+            GLint chargeLevelLocation = glGetUniformLocation(EFFECT_ASSET_ID::DASH, "chargeLevel");
+            glUniform1f(chargeLevelLocation, chargeLevel);
+            transform.scale(glm::vec2(1.0f, chargeLevel)); // Scale based on the charge level
+            glUniform3f(colorLocation, 0.0f, 1.0f, 0.0f); // Recharging (green)
+            glUniformMatrix3fv(transformLocation, 1, GL_FALSE, &transform.getMatrix()[0][0]);
+            glBindVertexArray(VAOs[i]);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        } else if (chevronStatus[i]) {
+            glUniform3f(colorLocation, 0.0f, 1.0f, 0.0f); // Full (green)
+            glUniformMatrix3fv(transformLocation, 1, GL_FALSE, &transform.getMatrix()[0][0]);
+            glBindVertexArray(VAOs[i]);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        } else {
+            glUniform3f(colorLocation, 0.0f, 0.0f, 0.0f); // Empty (black)
+            glUniformMatrix3fv(transformLocation, 1, GL_FALSE, &transform.getMatrix()[0][0]);
+            glBindVertexArray(VAOs[i]);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        }
+    }
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+}
+
+
+void RenderSystem::drawDashCharges(GLuint &VAO, GLuint &VBO, GLuint &EBO) {
+	// Define vertices for a right-pointing chevron shape
+	GLfloat vertices[] = {
+		// positions        // texture coords
+		0.5f,  0.5f, 0.0f,  1.0f, 1.0f,  // Top right
+		0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // Bottom right
+	   -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  // Bottom left
+	   -0.5f,  0.5f, 0.0f,  0.0f, 1.0f   // Top left
+   };
+
+	// Define indices for the right-pointing chevron shape
+	GLuint indices[] = {
+		0, 1, 3, // First triangle
+		1, 2, 3  // Second triangle
+	};
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	glBindVertexArray(VAO);
+
+	// Bind VBO and buffer vertex data
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Bind EBO and buffer index data
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	// Define vertex attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	// Unbind the VBO (but keep the EBO bound)
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	// Unbind the VAO
+	glBindVertexArray(0);
+	gl_has_errors();
+}
+

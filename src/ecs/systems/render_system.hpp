@@ -45,7 +45,8 @@ class RenderSystem {
 			textures_path("player_bullet.png"),
 			textures_path("enemy_bullet_square.png"),
 			textures_path("enemy_bullet_circle.png"),
-			textures_path("enemy_bullet_triangle.png")
+			textures_path("enemy_bullet_triangle.png"),
+			textures_path("chevron.png"),
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -55,7 +56,9 @@ class RenderSystem {
 		shader_path("egg"),
 		shader_path("salmon"),
 		shader_path("textured"),
-		shader_path("postprocess") };
+		shader_path("postprocess"),
+		shader_path("dash"),
+	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
@@ -110,6 +113,7 @@ public:
 	void drawBackgroundElements();
 	void drawToScreen();
 	void step(float elapsed_ms);
+	void drawDashes();
 
 	mat3 createProjectionMatrix();
 
@@ -120,6 +124,11 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawCircleCollider(Entity entity, const mat3& projection);
+	glm::mat4 createTransform(float x, float y, float scaleX, float scaleY);
+
+
+	void drawDashCharges(GLuint &VAO, GLuint &VBO, GLuint &EBO);
+
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
 	vec2 drawBulletStack(const mat3& projection);
 
