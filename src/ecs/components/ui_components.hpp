@@ -1,10 +1,5 @@
 #pragma once
 
-// may remove this struct
-struct UI {
-
-};
-
 // not sure how I feel about struct just for this
 // but is easiest way for text and render system to talk
 struct StackUI {

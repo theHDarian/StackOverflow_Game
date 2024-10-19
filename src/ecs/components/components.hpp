@@ -237,8 +237,6 @@ struct TextRenderRequest {
 	// from experience, this is often a small number < 10, not sure why
 	float scale; 
 	glm::vec3 color;
-
-	bool isUI = true;
 };
 
 struct DialogueLines {
