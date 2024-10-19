@@ -17,9 +17,8 @@ void main()
 	color = vec4(fcolor, alpha) * texture(sampler0, vec2(texcoord.x, texcoord.y));
 	// note: branches are expensive, consider using another shader instead?
 	if (changeColor == 1){
-	// okay this is very costly and slow
-		color.r = (color.r > 0 ? fcolor.r :0 );
-		color.g = (color.g > 0 ? fcolor.g :0 );
-		color.b = (color.b > 0 ? fcolor.b :0 );
+		color.r = fcolor.r;
+		color.g = fcolor.g;
+		color.b = fcolor.b;
 	}
 }

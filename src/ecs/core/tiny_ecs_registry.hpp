@@ -47,7 +47,13 @@ public:
 	ComponentContainer<HomingBullet> homes;
 	ComponentContainer<Fade> fades;
 	ComponentContainer<Deleted> deleteds;
-
+	ComponentContainer<StackUI> stackUI;
+	ComponentContainer<GameUI> gameUIs;
+	ComponentContainer<DialogueUI> dialogueUIs;
+	ComponentContainer<MenuUI> menuUIs;
+	ComponentContainer<GameUIText> gameUITexts;
+	ComponentContainer<DialogueUIText> dialogueUITexts;
+	ComponentContainer<MenuUIText> menuUITexts;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -89,6 +95,13 @@ public:
 		registry_list.push_back(&bursts);
 		registry_list.push_back(&fades);
 		registry_list.push_back(&deleteds);
+		registry_list.push_back(&stackUI);
+		registry_list.push_back(&gameUIs);
+		registry_list.push_back(&dialogueUIs);
+		registry_list.push_back(&menuUIs);
+		registry_list.push_back(&gameUITexts);
+		registry_list.push_back(&dialogueUITexts);
+		registry_list.push_back(&menuUITexts);
 	}
 
 	void clear_all_components() {

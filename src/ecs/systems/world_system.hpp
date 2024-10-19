@@ -67,6 +67,7 @@ private:
 	Entity dialogueBox;
 	Entity pauseMenu;
 	Entity gameOverMenu;
+	Entity stackUI;
 
 	// Player Controls
 	Entity player;

@@ -7,25 +7,21 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "render_system_init.hpp"
-#include "tiny_ecs_registry.hpp"
 
-struct Character {
-    unsigned int TextureID;  // ID handle of the glyph texture
-    glm::ivec2   Size;       // Size of glyph
-    glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
-    unsigned int Advance;    // Offset to advance to next glyph
-};
+TextSystem::TextSystem() {
 
-std::map<GLchar, Character> Characters;
-GLuint text_VAO, VBO;
-GLuint program;
-// projection matrix; may consider using same one as render system instead
-// note: original render system has bottom right be (window width, window height)
-// but this tutorial's projection matrix has top right be (Window width, window height)
-glm::mat4 projection;
+}
 
-int initFreetypeLib() {
+TextSystem::~TextSystem() {
+    if (VAO) {
+        glDeleteVertexArrays(1, &VAO);
+    }
+    if (program) {
+        glDeleteProgram(program);
+    }
+}
+
+int TextSystem::initFreetypeLib() {
     // set up projection matrix
     WindowState& windowState = registry.windowStates.components[0];
     projection = glm::ortho(0.0f, static_cast<float>(windowState.width), 0.0f, static_cast<float>(windowState.height));
@@ -105,9 +101,9 @@ int initFreetypeLib() {
 
     // set up VAO for text rendering specifically
     // but shared VAO with render system might be easier
-    glGenVertexArrays(1, &text_VAO);
+    glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glBindVertexArray(text_VAO);
+    glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
@@ -124,11 +120,8 @@ int initFreetypeLib() {
     return 1;
 }
 
-void RenderText(std::string text, float x, float y, float scale, glm::vec3 color)
+void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color)
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     // activate corresponding render state, hard code to just 1 text rendering program for now
     // (can also pass shader itself as parameter and use that)
     glUseProgram(program);
@@ -139,10 +132,7 @@ void RenderText(std::string text, float x, float y, float scale, glm::vec3 color
     gl_has_errors();
 
     glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
-    gl_has_errors();
     glActiveTexture(GL_TEXTURE0);
-    gl_has_errors();
-    glBindVertexArray(text_VAO);
     gl_has_errors();
 
     float copyX = x;
@@ -193,9 +183,64 @@ void RenderText(std::string text, float x, float y, float scale, glm::vec3 color
         }
        
     }
-    glBindVertexArray(0);
-    gl_has_errors();
     glBindTexture(GL_TEXTURE_2D, 0);
     gl_has_errors();
-    glDisable(GL_BLEND);
+}
+
+void TextSystem::renderMenuUIText() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(VAO);
+
+    for (Entity& entity : registry.menuUITexts.entities)
+    {
+        auto& textReq = registry.textRenderRequests.get(entity);
+        // for now, tie text visibility to entitie's render visibility
+        // but assumption may not always hold
+        if (registry.renderRequests.get(entity).show)
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
+    }
+
+    glBindVertexArray(0);
+    gl_has_errors();
+}
+
+void TextSystem::renderGameUIText() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(VAO);
+
+    for (Entity entity : registry.gameUITexts.entities)
+    {
+        auto& textReq = registry.textRenderRequests.get(entity);
+        if (registry.renderRequests.get(entity).show) {
+            // rendering every frame is slower than render when change happens?
+            std::string textString = textReq.text;
+            if (registry.stackUI.has(entity)) {
+                StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+                textString = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+            }
+            renderText(textString, textReq.x, textReq.y, textReq.scale, textReq.color);
+        }
+    }
+
+    glBindVertexArray(0);
+    gl_has_errors();
+
+}
+
+void TextSystem::renderDialogueUIText() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(VAO);
+
+    for (Entity entity : registry.dialogueUITexts.entities)
+    {
+        auto& textReq = registry.textRenderRequests.get(entity);
+        if (registry.renderRequests.get(entity).show)
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
+    }
+
+    glBindVertexArray(0);
+    gl_has_errors();
 }

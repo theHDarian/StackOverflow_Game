@@ -57,6 +57,7 @@ Entity createAimIndicator(RenderSystem* renderer) {
 			GEOMETRY_BUFFER_ID::SPRITE
 		}
 	);
+	registry.gameUIs.emplace(aimIndicator);
 	return aimIndicator;
 }
 
@@ -353,7 +354,7 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 	rr.show = false;
 
-	registry.uis.emplace(entity);
+	registry.dialogueUIs.emplace(entity);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -368,6 +369,7 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 	color.g = 1.0;
 
 	// attach 1 text render request
+	registry.dialogueUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 
@@ -402,7 +404,7 @@ Entity createPauseMenu(vec2 position, vec2 scale) {
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 	rr.show = false;
 
-	registry.uis.emplace(entity);
+	registry.menuUIs.emplace(entity);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -417,6 +419,7 @@ Entity createPauseMenu(vec2 position, vec2 scale) {
 	color.g = 0.9;
 
 	// attach 1 text render request
+	registry.menuUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 
@@ -442,7 +445,7 @@ Entity createGameOverMenu(vec2 position, vec2 scale) {
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 	rr.show = false;
 
-	registry.uis.emplace(entity);
+	registry.menuUIs.emplace(entity);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -457,6 +460,7 @@ Entity createGameOverMenu(vec2 position, vec2 scale) {
 	color.g = 0.0;
 
 	// attach 1 text render request
+	registry.menuUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 
@@ -510,6 +514,38 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+
+	return entity;
+}
+
+Entity createStackUI(WindowState& windowState, StackCompile& stack) {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	registry.gameUIs.emplace(entity);
+
+	// placeholder component
+	registry.motions.emplace(entity);
+
+	StackUI& stackui = registry.stackUI.emplace(entity);
+
+	stackui.bulletStartPos = { 75, windowState.height - 200 };
+	stackui.bulletSize = { 50, 50 };
+	stackui.bulletOffset = 10; // space between bullets
+
+	stackui.stackSize = vec2(stackui.bulletSize.x + 2 * stackui.bulletOffset, stack.baseStackSize * stackui.bulletSize.y + stack.baseStackSize * stackui.bulletOffset + 2 * stackui.bulletOffset);
+	stackui.stackPos = vec2(stackui.bulletStartPos.x, stackui.bulletStartPos.y - stackui.stackSize.y / 2 + stackui.bulletSize.y - stackui.bulletOffset);
+
+	registry.gameUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.x = stackui.stackPos.x - stackui.bulletSize.x;
+	text.y = (stackui.bulletStartPos.y - windowState.height) * -1 - 2 * stackui.bulletOffset - stackui.bulletSize.y;
+	text.scale = 0.25;
 
 	return entity;
 }

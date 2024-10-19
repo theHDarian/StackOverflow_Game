@@ -13,6 +13,7 @@
 #include "particle_system.hpp"
 #include "enemy_system.hpp"
 #include "ai_system.hpp"
+#include "text_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -37,6 +38,7 @@ int main()
 	ParticleSystem particleSystem;
 	AISystem aiSystem;
 	EnemySystem enemySystem(&renderer);
+	TextSystem textSystem;
 
 
 	// Initializing window
@@ -53,7 +55,7 @@ int main()
 	particleSystem.init(window);
 	ioSystem.init(window);
 	world.init(&renderer);
-
+	textSystem.initFreetypeLib();
 
 	// variable timestep loop
 	auto t = Clock::now();
@@ -76,15 +78,26 @@ int main()
 			particleSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
-			// clear delete queue here
 			world.clearDeleteQueue();
 		}
+		// note: the more complex our drawing is, the more complex the order,
+		// and the more appealing z-buffering...
+		// strong assumption: each of these entities has a renderRequest
+		// OR: make multiple renderRequest type components
+		// (probably easier to avoid entities that could span multiple components)
+		// (or maybe just check each item manually for now...)
+		// Q: what about finer grain order? like where does hover over bullet stack ui go?
 		registry.frames.components[0].prevFrameBuffer = 0;
 		renderer.drawBackgroundElements();
 		particleSystem.render();
 		renderer.drawGameElements();
+		renderer.drawGameUI();
+		textSystem.renderGameUIText();
+		renderer.drawDialogueUI();
+		textSystem.renderDialogueUIText();
 		renderer.drawToScreen(); //postprocessing
-		renderer.drawUI();
+		renderer.drawMenuUI();
+		textSystem.renderMenuUIText();
 		
 		glfwSwapBuffers(window);
 	}

@@ -14,8 +14,6 @@
 #include "imgui_impl_sdl2.h"
 #endif
 
-#include "text_system.hpp"
-
 void RenderSystem::step(float elapsed_ms) {
 	if (registry.fades.entities.size() > 0) {
 		for (auto& fadeEntity : registry.fades.entities) {
@@ -259,66 +257,114 @@ void RenderSystem::drawBackgroundElements() {
 void RenderSystem::drawGameElements()
 {
 	drawSetupFrame();
-	gl_has_errors();
 
 	mat3 projection_2D = createProjectionMatrix();
 	glBindVertexArray(vao);
-	// Draw all textured meshes that have a position and size component
-	for (Entity& entity : registry.renderRequests.entities)
+
+	// this setup requires us know what types of things to render
+	// and won't render all render requests if not given the proper component
+	// Note, its not very efficient to access elements indirectly via the entity
+	// albeit iterating through all Sprites in sequence. A good point to optimize
+	for (Entity& entity : registry.enemyBullets.entities)
 	{
-		if (!registry.motions.has(entity) || !registry.renderRequests.get(entity).show || registry.invisibles.has(entity) || registry.uis.has(entity) ||  registry.backgrounds.has(entity))
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		// Note, its not very efficient to access elements indirectly via the entity
-		// albeit iterating through all Sprites in sequence. A good point to optimize
-		
-		// keep these checks in here just in case memory gets corrupted again
-		//if (registry.renderRequests.get(entity).used_effect > EFFECT_COUNT)
-		//	std::cout << "way to big of an effect!" << registry.renderRequests.get(entity).used_effect << std::endl;
-		//if (registry.renderRequests.get(entity).used_geometry > GEOMETRY_COUNT)
-		//	std::cout << "way to big of a geometry!" << registry.renderRequests.get(entity).used_geometry << std::endl;
-		//if (registry.renderRequests.get(entity).used_texture > TEXTURE_COUNT)
-		//	std::cout << "way to big of a texture!" << registry.renderRequests.get(entity).used_texture << std::endl;
 		drawTexturedMesh(entity, projection_2D);
-		if (registry.circleColliders.has(entity)) // has collision circle, let's draw it
+		if (registry.circleColliders.has(entity))
 			drawCircleCollider(entity, projection_2D);
 	}
+
+	for (Entity& entity : registry.playerBullets.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+		if (registry.circleColliders.has(entity))
+			drawCircleCollider(entity, projection_2D);
+	}
+
+	for (Entity& entity : registry.enemies.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+		if (registry.circleColliders.has(entity))
+			drawCircleCollider(entity, projection_2D);
+	}
+
+	for (Entity& entity : registry.players.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+		if (registry.circleColliders.has(entity))
+			drawCircleCollider(entity, projection_2D);
+	}
+
 	glBindVertexArray(0);
+	gl_has_errors();
 
 }
-void RenderSystem::drawUI() {
+
+void RenderSystem::drawGameUI() {
 	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
 
-	vec2 stackTextPos = drawBulletStack(projection_2D);
+	for (Entity& entity : registry.gameUIs.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
+			continue;
+
+		// figure out how to modularize drawing this later; maybe each bullet is an entity
+		if (registry.stackUI.has(entity)) {
+			drawBulletStack(projection_2D);
+		}
+		else {
+			drawTexturedMesh(entity, projection_2D);
+		}
+	}
 
 	glBindVertexArray(0);
+	gl_has_errors();
+}
 
-	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-	std::string text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
-	RenderText(text, stackTextPos.x, stackTextPos.y, 0.25, vec3(1, 1, 1));
-
+void RenderSystem::drawDialogueUI() {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(vao);
-	// should put draw UI here (ideally using its own rendering system,
-	// and own projection matrix)
-	// should also remove show from render request
-	for (Entity entity : registry.uis.entities) {
-		if (!registry.renderRequests.get(entity).show)
+	mat3 projection_2D = createProjectionMatrix();
+
+	for (Entity& entity : registry.dialogueUIs.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 	}
 
 	glBindVertexArray(0);
+	gl_has_errors();
+}
 
-	// copied above method to draw all text components
-	for (Entity entity : registry.textRenderRequests.entities)
+void RenderSystem::drawMenuUI() {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+	mat3 projection_2D = createProjectionMatrix();
+
+	for (Entity& entity : registry.menuUIs.entities)
 	{
-		auto& textReq = registry.textRenderRequests.get(entity);
-		// for now, tie text visibility to entitie's render visibility
-		// but assumption may not always hold
-		if (registry.renderRequests.get(entity).show)
-			RenderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
 	}
+
+	glBindVertexArray(0);
+	gl_has_errors();
 
 	#if IMGUI_ENABLED
 		//draw Imgui
@@ -396,20 +442,22 @@ void RenderSystem::drawImGui() {
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI
 // currently just draws a box as a container
-vec2 RenderSystem::drawBulletStack(const mat3& projection) {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+void RenderSystem::drawBulletStack(const mat3& projection) {
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-	WindowState& windowState = registry.windowStates.components[0];
-	vec2 bulletStartPos = { 75, windowState.height - 200 };
-	vec2 bulletSize = { 50, 50 };
-	float bulletOffset = 10; // space between bullets
+	//WindowState& windowState = registry.windowStates.components[0];
+	//vec2 bulletStartPos = { 75, windowState.height - 200 };
+	//vec2 bulletSize = { 50, 50 };
+	//float bulletOffset = 10; // space between bullets
 
-	vec2 stackSize = vec2(bulletSize.x + 2 * bulletOffset, stack.baseStackSize * bulletSize.y + stack.baseStackSize * bulletOffset +  2 * bulletOffset);
-	vec2 stackPos = vec2(bulletStartPos.x, bulletStartPos.y - stackSize.y / 2 + bulletSize.y - bulletOffset);
+	//vec2 stackSize = vec2(bulletSize.x + 2 * bulletOffset, stack.baseStackSize * bulletSize.y + stack.baseStackSize * bulletOffset +  2 * bulletOffset);
+	//vec2 stackPos = vec2(bulletStartPos.x, bulletStartPos.y - stackSize.y / 2 + bulletSize.y - bulletOffset);
+	
+	Entity stackEntity = registry.stackUI.entities[0];
+	StackUI& stackui = registry.stackUI.get(stackEntity);
+	
 	Transform transform;
-	transform.translate(stackPos);
-	transform.scale(stackSize);
+	transform.translate(stackui.stackPos);
+	transform.scale(stackui.stackSize);
 
 	vec3 color = { 11/255.f, 84/255.f, 87/255.f };
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
@@ -488,13 +536,9 @@ vec2 RenderSystem::drawBulletStack(const mat3& projection) {
 		// no variance on shape for now
 		TEXTURE_ASSET_ID bulletShape = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
 		// start from bottom to top
-		drawUIBullet(vec2(bulletStartPos.x, bulletStartPos.y - i * bulletSize.y - i * bulletOffset), bulletSize,
+		drawUIBullet(vec2(stackui.bulletStartPos.x, stackui.bulletStartPos.y - i * stackui.bulletSize.y - i * stackui.bulletOffset), stackui.bulletSize,
 			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
 	}
-
-	// very lazy implementation
-	// rendering text in the middle of this causes weird artifacts, so save text position info for later
-	return vec2(stackPos.x - bulletSize.x, (bulletStartPos.y - windowState.height) * -1 - 2 * bulletOffset - bulletSize.y);
 }
 
 void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection) {

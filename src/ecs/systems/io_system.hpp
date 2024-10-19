@@ -7,8 +7,7 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
-// System responsible for setting up OpenGL and for rendering all the
-// visual entities in the game
+// System responsible for handling user input
 class IOSystem {
 public:
     IOSystem();

@@ -1,7 +1,6 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
-#include "text_system.hpp"
 
 // stlib
 #include <cassert>
@@ -143,12 +142,6 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	// Playing background music indefinitely
 	Mix_PlayMusic(backgroundMusic, -1);
 	fprintf(stderr, "Loaded music\n");
-
-	///////////////////////////////////
-	// load text rendering
-	if (initFreetypeLib() > 0) {
-		std::cout << "Freetype loaded!" << std::endl;
-	}
 
 	// Set all states to default
     restartGame();
@@ -299,10 +292,11 @@ void WorldSystem::restartGame() {
 	//	}
 	//	, 90);
 
-	// this feels very bad, put as temp fix for getting window size for now
+	// create all ui here for now
 	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 }
 
 // Compute collisions between entities
