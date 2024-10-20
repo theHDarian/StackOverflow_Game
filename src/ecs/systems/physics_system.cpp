@@ -309,7 +309,7 @@ bool PhysicsSystem::AABBToMesh(Entity aabb, Entity mesh) {
 	vec2 tl = vec2(ab.topLeft.x / mB.scale.x, ab.topLeft.y / mB.scale.y);
 
 	// Quick test to remove obviously not overlapping shapes
-	if (glm::distance(mA.position, mB.position) > max(mA.scale.x / 2, mA.scale.y / 2) + mB.scale.x / 2) return false;
+	if (!CheapCircleToCircle(mA.position, max(mA.scale.x, mA.scale.y), mB.position, max(mB.scale.x/2, mB.scale.y/2))) return false;
 
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
