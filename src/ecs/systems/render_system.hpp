@@ -29,7 +29,7 @@ class RenderSystem {
 	// Associated id with .obj path
 	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths =
 	{
-		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::SALMON_GB, mesh_path("salmon.obj"))
+		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::MESH_GB, mesh_path("BigC.obj"))
 		  // specify meshes of other assets here
 	};
 
@@ -54,7 +54,7 @@ class RenderSystem {
 	const std::array<std::string, effect_count> effect_paths = {
 		shader_path("coloured"),
 		shader_path("egg"),
-		shader_path("salmon"),
+		shader_path("mesh"),
 		shader_path("textured"),
 		shader_path("postprocess") };
 

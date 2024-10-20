@@ -22,9 +22,10 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	Player& player = registry.players.emplace(entity);
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2.5;
+
 	AABBCollider& aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-motion.scale.x / 3, -motion.scale.y / 2.5);
-	aabb.bottomRight = vec2(motion.scale.x / 3, motion.scale.y / 3);
+	aabb.topLeft = vec2(-motion.scale.x / 3.5, -motion.scale.y / 2.5);
+	aabb.bottomRight = vec2(motion.scale.x / 3.5, motion.scale.y / 3);
 
     PlayerAttackData& shoot = registry.shoots.emplace(entity);
 
@@ -142,7 +143,7 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::MESH_GB);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	// Initialize the motion
@@ -152,26 +153,26 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	motion.position = position;
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ 100, 100 });
+	motion.scale = vec2({ 1000, 1000 });
 
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x/2;
+	registry.meshColliders.emplace(entity);
 
 	auto enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 1000;
+	enemy.maxHealth = 20;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 
+	AttackData& atk = registry.attackDatas.emplace(entity);
+	atk = none;
+
 	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::PUFFERFISH;
-	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
 	registry.renderRequests.insert(
 		entity,
 		{
 			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
+			EFFECT_ASSET_ID::MESH,
+			GEOMETRY_BUFFER_ID::MESH_GB
 		});
 
 	return entity;
@@ -284,10 +285,10 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	if (atkData.shape == RECTANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
-			{motion.scale.x / 2,motion.scale.y / 2},
-			{motion.scale.x / 2,-motion.scale.y / 2},
-			{-motion.scale.x / 2,motion.scale.y / 2},
-			{-motion.scale.x / 2,-motion.scale.y / 2}
+			{ motion.scale.x / 2,  motion.scale.y / 2},
+			{ motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2,-motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2}
 		};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
@@ -297,7 +298,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	else if (atkData.shape == TRIANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
-			{motion.scale.x / 2, 0},
+			{ motion.scale.x / 2, 0},
 			{-motion.scale.x / 2,-motion.scale.y / 2},
 			{-motion.scale.x / 2, motion.scale.y / 2}
 		};

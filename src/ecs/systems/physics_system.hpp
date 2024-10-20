@@ -31,4 +31,5 @@ private:
 	int	 PointInAABB(const glm::vec2& p, const glm::vec2& max, const glm::vec2& min);
 	bool PointInTriangle(vec2 p, vec2 p1, vec2 p2, vec2 p3);
 	bool CheapCircleToCircle(vec2 p1, float r1, vec2 p2, float r2);
+	vec2 rotate(vec2 v, float angle);
 };

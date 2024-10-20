@@ -3,6 +3,7 @@
 #include "world_init.hpp"
 #include <glm/trigonometric.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <bitset>
 
 void PhysicsSystem::step(float elapsed_ms)
 {
@@ -205,7 +206,7 @@ bool PhysicsSystem::CircleToPoly(Entity circle, Entity poly) {
 
 	vec2 offset = { mA.position.x - mB.position.x, mA.position.y - mB.position.y };
 	float ang = -(mB.angle);
-	vec2 mArot = { offset.x * cos(ang) - offset.y * sin(ang), offset.x * sin(ang) + offset.y * cos(ang) };
+	vec2 mArot = rotate(offset, ang);
 
 
 	// Quick test to remove obviously not overlapping shapes
@@ -232,7 +233,7 @@ bool PhysicsSystem::CircleToMesh(Entity circle, Entity mesh) {
 	vec2 offset = { mA.position.x - mB.position.x, mA.position.y - mB.position.y };
 	offset = vec2(offset.x / mB.scale.x, offset.y / mB.scale.y);
 	float ang = -(mB.angle);
-	vec2 mArot = { offset.x * cos(ang) - offset.y * sin(ang), offset.x * sin(ang) + offset.y * cos(ang) };
+	vec2 mArot = rotate(offset, ang);
 
 	// Scale radius to match mesh scale
 	float r = c.radius / max(mB.scale.x, mB.scale.y);
@@ -281,8 +282,6 @@ bool PhysicsSystem::AABBToPoly(Entity aabb, Entity poly) {
 	PolyCollider& s = registry.polyColliders.get(poly);
 
 	vec2 offset = { mA.position.x - mB.position.x, mA.position.y - mB.position.y };
-	float ang = -(mB.angle);
-	vec2 mArot = { offset.x * cos(ang) - offset.y * sin(ang), offset.x * sin(ang) + offset.y * cos(ang) };
 
 
 	// Quick test to remove obviously not overlapping shapes
@@ -290,9 +289,9 @@ bool PhysicsSystem::AABBToPoly(Entity aabb, Entity poly) {
 
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
-	if (AABBToLine(mArot + ab.bottomRight, mArot + ab.topLeft, s.offsetVertices[0], s.offsetVertices[s.offsetVertices.size() - 1])) return true;
+	if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[0], mB.angle), rotate(s.offsetVertices[s.offsetVertices.size() - 1], mB.angle))) return true;
 	for (uint i = 1; i < s.offsetVertices.size(); i++) {
-		if (AABBToLine(mArot + ab.bottomRight, mArot + ab.topLeft, s.offsetVertices[i], s.offsetVertices[i - 1])) return true;
+		if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[i], mB.angle), rotate(s.offsetVertices[i-1], mB.angle))) return true;
 	}
 	return false;
 }
@@ -307,24 +306,25 @@ bool PhysicsSystem::AABBToMesh(Entity aabb, Entity mesh) {
 
 	vec2 offset = { mA.position.x - mB.position.x, mA.position.y - mB.position.y };
 	offset = vec2(offset.x / mB.scale.x, offset.y / mB.scale.y);
-	float ang = -(mB.angle);
-	vec2 mArot = { offset.x * cos(ang) - offset.y * sin(ang), offset.x * sin(ang) + offset.y * cos(ang) };
+	vec2 br = vec2(ab.bottomRight.x / mB.scale.x, ab.bottomRight.y / mB.scale.y);
+	vec2 tl = vec2(ab.topLeft.x / mB.scale.x, ab.topLeft.y / mB.scale.y);
 
 	// Quick test to remove obviously not overlapping shapes
-	if (glm::distance(mA.position, mB.position) > max(mA.scale.x, mA.scale.y) + max(mB.scale.x, mB.scale.y)) return false;
+	if (glm::distance(mA.position, mB.position) > max(mA.scale.x / 2, mA.scale.y / 2) + mB.scale.x / 2) return false;
 
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
 	for (uint i = 0; i < m.vertex_indices.size(); i += 3) {
-		if (AABBToTriangle(mArot + ab.bottomRight, mArot + ab.topLeft, 
-			m.vertices[m.vertex_indices[i]].position, 
-			m.vertices[m.vertex_indices[i+1]].position, 
-			m.vertices[m.vertex_indices[i+2]].position)) return true;
+		if (AABBToTriangle(offset + br, offset + tl, 
+			rotate(m.vertices[m.vertex_indices[i+0]].position, mB.angle), 
+			rotate(m.vertices[m.vertex_indices[i+1]].position, mB.angle),
+			rotate(m.vertices[m.vertex_indices[i+2]].position, mB.angle))) return true;
 	}
 	return false;
 }
 
 bool PhysicsSystem::AABBToTriangle(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2, vec2 p3) {
+
 	if (AABBToLine(maxxy, minxy, p1, p2)) return true;
 	if (AABBToLine(maxxy, minxy, p1, p3)) return true;
 	if (AABBToLine(maxxy, minxy, p2, p3)) return true;
@@ -418,6 +418,10 @@ bool PhysicsSystem::PointInTriangle(vec2 p, vec2 p1, vec2 p2, vec2 p3) {
 
 bool PhysicsSystem::CheapCircleToCircle(vec2 p1, float r1, vec2 p2, float r2) {
 	return (glm::dot(p1 - p2, p1 - p2) < (r1 + r2) * (r1 + r2));
+}
+
+vec2 PhysicsSystem::rotate(vec2 v, float angle) {
+	return { v.x * cos(angle) - v.y * sin(angle), v.x * sin(angle) + v.y * cos(angle) };
 }
 
 bool PhysicsSystem::LineToLine(vec2 line1Start,vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint) {

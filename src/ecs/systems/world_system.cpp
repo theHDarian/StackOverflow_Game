@@ -245,7 +245,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (registry.enemies.size() < 1) {
 		for (int i = 0; i < rand()%10 + 1; i++) {
 			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-			Entity e = createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
+			//Entity e = createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
 		}
 	}
 
@@ -288,7 +288,8 @@ void WorldSystem::restartGame() {
 	createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
 	createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
 	createTestWall(renderer, {0, wS.height}, {0,0});
-	//createBlob(renderer, vec2(600, 300));
+	
+	createBlob(renderer, vec2(600, 600));
 
 	createTestFloor(renderer, { wS.width /2, wS.height/2 });
 
