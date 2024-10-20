@@ -14,6 +14,7 @@
 // include these for now
 // but may change to handle like render system does
 #include "text_system.hpp"
+#include "../utils/random.hpp"
 
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
@@ -493,6 +494,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			//emit particles at player position
 			EmitParticle& p = registry.emitParticles.emplace(Entity());
 			p.position = playerMotion.position + vec2(0.0f,playerMotion.scale.y / 2);
+			p.requestOrigin = p.position;
+			p.requestType = RequestType::EmitParticle;
+			p.position.x += Random::Float(-5,5);
+			p.position.y += Random::Float(-5,5);
 		}
 	}
 }
@@ -655,8 +660,13 @@ void WorldSystem::clearDeleteQueue() {
 				EmitParticle& p = registry.emitParticles.emplace(Entity());
 				Motion& motion = registry.motions.get(e);
 				p.requestType = RequestType::Explosion;
-				p.requestOrigin = motion.position + vec2{ 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+				p.requestOrigin = motion.position;
+				vec2 r = motion.scale * 0.8f;
+				r.x *= Random::Float(-0.5f,0.5f);
+				r.y *= Random::Float(-0.5f,0.5f);
+				p.position = motion.position;
+				p.position.x += Random::Float(-5,5);
+				p.position.y += Random::Float(-5,5);
 			}
 		}
 	}

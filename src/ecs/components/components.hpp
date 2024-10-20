@@ -83,6 +83,13 @@ struct EmitParticle {
 	RequestType requestType;
 };
 
+struct ParticleProps {
+    vec2 position;
+    vec2 velocity,velocityVariation;
+    vec4 colorBegin, colorEnd;
+    float sizeBegin, sizeEnd, sizeVariation;
+    float lifetime;
+};
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType { Background, SFX };
