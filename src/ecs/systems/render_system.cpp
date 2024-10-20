@@ -280,9 +280,9 @@ void RenderSystem::drawGameElements()
 		//	std::cout << "way to big of a texture!" << registry.renderRequests.get(entity).used_texture << std::endl;
 		drawTexturedMesh(entity, projection_2D);
 		if (registry.circleColliders.has(entity)) // has collision circle, let's draw it
-			drawCircleCollider(entity, projection_2D);
+			drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
 		if (registry.aabbs.has(entity))
-			drawAABBCollider(entity, projection_2D);
+			drawCollider(entity, TEXTURE_ASSET_ID::RECTANGLE_SPRITE, projection_2D);
 	}
 	glBindVertexArray(0);
 
@@ -578,15 +578,25 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEX
 	gl_has_errors();
 }
 
-// draws outlines for collision circles; considering just passing in circle data
-void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
+// draw collider shape based on shape texture passed
+// only draws circles and boxes for now
+// (more work required to include polygons)
+void RenderSystem::drawCollider(Entity entity, TEXTURE_ASSET_ID shape, const mat3& projection) {
 	Motion& motion = registry.motions.get(entity);
-	auto& circle = registry.circleColliders.get(entity);
 
 	Transform transform;
-	transform.translate(motion.position);
-	transform.rotate(motion.angle);
-	transform.scale({ circle.radius * 2, circle.radius * 2});
+	if (shape == TEXTURE_ASSET_ID::CIRCLE_SPRITE) {
+		auto& circle = registry.circleColliders.get(entity);
+		transform.translate(motion.position);
+		transform.rotate(motion.angle);
+		transform.scale({ circle.radius * 2, circle.radius * 2 });
+	}
+	else if (shape == TEXTURE_ASSET_ID::RECTANGLE_SPRITE) {
+		auto& aabb = registry.aabbs.get(entity);
+		transform.translate(motion.position);
+		transform.rotate(motion.angle);
+		transform.scale({ aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y });
+	}
 
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
 	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
@@ -626,81 +636,7 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 
 	assert(registry.renderRequests.has(entity));
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::CIRCLE_SPRITE];
-
-	glBindTexture(GL_TEXTURE_2D, texture_id);
-	gl_has_errors();
-
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
-	// GLsizei num_triangles = num_indices / 3;
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
-	gl_has_errors();
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-	gl_has_errors();
-}
-
-// maybe these can be generalized to textured ui draw function
-void RenderSystem::drawAABBCollider(Entity entity, const mat3& projection) {
-	Motion& motion = registry.motions.get(entity);
-	auto& aabb = registry.aabbs.get(entity);
-
-	Transform transform;
-	transform.translate(motion.position);
-	transform.rotate(motion.angle);
-	transform.scale({ aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y });
-
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
-	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
-	const GLuint program = (GLuint)effects[used_effect_enum];
-
-	// Setting shaders
-	glUseProgram(program);
-	gl_has_errors();
-
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
-
-	GLint in_position_loc = glGetAttribLocation(program, "in_position");
-	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-		sizeof(TexturedVertex), (void*)0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(
-		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		(void*)sizeof(
-			vec3)); // note the stride to skip the preceeding vertex position
-
-	// Enabling and binding texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-
-	assert(registry.renderRequests.has(entity));
-	GLuint texture_id =
-		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::RECTANGLE_SPRITE];
+		texture_gl_handles[(GLuint)shape];
 
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();

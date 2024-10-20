@@ -121,7 +121,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawCircleCollider(Entity entity, const mat3& projection);
-	void drawAABBCollider(Entity entity, const mat3& projection);
+	void drawCollider(Entity entity, TEXTURE_ASSET_ID shape,  const mat3& projection);
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
 	vec2 drawBulletStack(const mat3& projection);
 
