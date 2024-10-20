@@ -14,7 +14,7 @@
 // include these for now
 // but may change to handle like render system does
 #include "text_system.hpp"
-#include "../utils/random.hpp"
+#include "utils/random.hpp"
 
 // Game configuration
 const size_t MAX_NUM_EELS = 15;

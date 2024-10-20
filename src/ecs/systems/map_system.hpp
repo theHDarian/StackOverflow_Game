@@ -1,5 +1,5 @@
 #pragma once
-#include "../components/map_components.hpp"
+#include "components/map_components.hpp"
 
 class MapSystem {
     public:

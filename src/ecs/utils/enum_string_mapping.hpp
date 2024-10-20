@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "../components/actor_components.hpp"
+#include "components/actor_components.hpp"
 
 //used for debug name mapping
 std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = {

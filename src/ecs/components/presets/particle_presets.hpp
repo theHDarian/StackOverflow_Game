@@ -1,4 +1,4 @@
-#include "../components.hpp"
+#include "components/components.hpp"
 
 ParticleProps DefaultParticle {
 	.velocity = { 0.0f, 0.0f },

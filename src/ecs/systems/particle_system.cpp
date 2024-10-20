@@ -1,7 +1,7 @@
 #include "particle_system.hpp"
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/compatibility.hpp>
-#include "../utils/random.hpp"
+#include "utils/random.hpp"
 #include "tiny_ecs_registry.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
