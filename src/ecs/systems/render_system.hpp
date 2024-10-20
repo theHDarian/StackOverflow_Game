@@ -29,7 +29,7 @@ class RenderSystem {
 	// Associated id with .obj path
 	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths =
 	{
-		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::SALMON_GB, mesh_path("salmon.obj"))
+		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::MESH_GB, mesh_path("BigC.obj"))
 		  // specify meshes of other assets here
 	};
 
@@ -45,7 +45,8 @@ class RenderSystem {
 			textures_path("player_bullet.png"),
 			textures_path("enemy_bullet_square.png"),
 			textures_path("enemy_bullet_circle.png"),
-			textures_path("enemy_bullet_triangle.png")
+			textures_path("enemy_bullet_triangle.png"),
+			textures_path("rectangle.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -53,7 +54,7 @@ class RenderSystem {
 	const std::array<std::string, effect_count> effect_paths = {
 		shader_path("coloured"),
 		shader_path("egg"),
-		shader_path("salmon"),
+		shader_path("mesh"),
 		shader_path("textured"),
 		shader_path("postprocess") };
 
@@ -120,6 +121,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawCircleCollider(Entity entity, const mat3& projection);
+	void drawCollider(Entity entity, TEXTURE_ASSET_ID shape,  const mat3& projection);
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
 	vec2 drawBulletStack(const mat3& projection);
 

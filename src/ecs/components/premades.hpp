@@ -90,6 +90,21 @@ struct AttackData {
 };
 */
 
+AttackData none{
+	EnemyAttackPattern::NONE,
+	CIRCLE,
+	{},
+	blunt,
+	3,
+	M_PI / 6.0,
+	{20,20},
+	200,
+	3000,
+	{0,0},
+	0,
+	1,
+	0
+};
 
 AttackData threeShot{
 	EnemyAttackPattern::SHOTGUN,
