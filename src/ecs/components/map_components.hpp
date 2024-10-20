@@ -1,31 +1,37 @@
 #pragma once
+#include "common.hpp"
 
-struct Room;
+enum Side : char {
+    Left = 'L',Top = 'T',Bottom = 'B',Right = 'R'
+};
 
-enum RoomType {
-    EnemyRoom,
-    TreasureRoom,
-    BossRoom,
-    RestRoom,
-    None
+enum RoomType : char {
+    EnemyRoom = 'E',
+    TreasureRoom = 'T',
+    BossRoom = 'B',
+    RestRoom = 'R',
+    None = 'N'
 };
 
 struct Door {
 	RoomType room; //room the door leads to
     bool isPrev; //if is previous room, block it
+    vec2 startPos, endPos;
 };
 
 struct Room {
     RoomType type;
     int variant; // the variant within the room type
     bool cleared;
-
-    Door leftDoor;
-    Door rightDoor;
-    Door topDoor;
-    Door bottomDoor;
-
-    float timeElapsed; //time passed since enter room
+    float timeElapsed; //time passed since enter room in seconds
+};
+struct ChangeRoomRequest {
+    RoomType type;
+    Side spawnSide;
+    ChangeRoomRequest(RoomType type, Side spawnSide) { 
+        this->type = type; 
+        this->spawnSide = spawnSide;
+    }
 };
 
 enum MapRegion {

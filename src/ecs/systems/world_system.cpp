@@ -80,19 +80,20 @@ GLFWwindow* WorldSystem::createWindow() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_REFRESH_RATE,120);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	window_width_px = vidMode->width;
-	window_height_px = vidMode->height;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	// window_width_px = vidMode->width;
+	// window_height_px = vidMode->height;
+	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
-	// window_width_px = 1280;
-	// window_height_px = 720;
-	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	window_width_px = 1280;
+	window_height_px = 720;
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -275,11 +276,7 @@ void WorldSystem::restartGame() {
 	createTestWall(renderer, {100,200}, {100, 600});
 
 	//bounding walls
-	
-	createTestWall(renderer, {0,0}, {wS.width, 0});
-	createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
-	createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
-	createTestWall(renderer, {0, wS.height}, {0,0});
+	createRoomBounds(renderer);
 
 	createTestFloor(renderer, { wS.width /2, wS.height/2 });
 

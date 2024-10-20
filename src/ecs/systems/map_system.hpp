@@ -8,7 +8,7 @@ class MapSystem {
         ~MapSystem();
         void init(RenderSystem* renderer);
         void step(float elapsed_ms);
-        void changeRoom(RoomType type);
+        void changeRoom(RoomType type,Side playerSpawnSide);
 
     private:
         RenderSystem* renderer;

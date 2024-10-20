@@ -52,6 +52,8 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+struct Bound {}; //room bounds
+
 // Data structure for toggling debug mode
 struct Debug {
 	bool in_debug_mode = false;

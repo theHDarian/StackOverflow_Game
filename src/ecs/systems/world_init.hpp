@@ -15,6 +15,10 @@ Entity createAimIndicator(RenderSystem* renderer);
 // Wall for testing, denoted by 2 blobs
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
+Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);
+
+void createRoomBounds(RenderSystem* renderer);
+
 // Poly for testing
 Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle);
 
