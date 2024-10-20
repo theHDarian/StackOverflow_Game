@@ -232,8 +232,7 @@ bool PhysicsSystem::CircleToMesh(Entity circle, Entity mesh) {
 	// Translate, scale, rotate circle position to match mesh conditions
 	vec2 offset = { mA.position.x - mB.position.x, mA.position.y - mB.position.y };
 	offset = vec2(offset.x / mB.scale.x, offset.y / mB.scale.y);
-	float ang = -(mB.angle);
-	vec2 mArot = rotate(offset, ang);
+	offset = rotate(offset, -mB.angle);
 
 	// Scale radius to match mesh scale
 	float r = c.radius / max(mB.scale.x, mB.scale.y);
@@ -243,13 +242,13 @@ bool PhysicsSystem::CircleToMesh(Entity circle, Entity mesh) {
 	if (!CheapCircleToCircle(mA.position, c.radius, mB.position, max(mB.scale.x, mB.scale.y))) return false;
 
 	for (uint i = 0; i < m.vertex_indices.size(); i += 3) {
-		if (PointInTriangle(mArot, 
+		if (PointInTriangle(offset,
 			m.vertices[m.vertex_indices[i+0]].position, 
 			m.vertices[m.vertex_indices[i+1]].position, 
 			m.vertices[m.vertex_indices[i+2]].position)) return true;
-		if (CircleToLine(mArot, r, m.vertices[m.vertex_indices[i+0]].position, m.vertices[m.vertex_indices[i+1]].position)) return true;
-		if (CircleToLine(mArot, r, m.vertices[m.vertex_indices[i+1]].position, m.vertices[m.vertex_indices[i+2]].position)) return true;
-		if (CircleToLine(mArot, r, m.vertices[m.vertex_indices[i+2]].position, m.vertices[m.vertex_indices[i+0]].position)) return true;
+		if (CircleToLine(offset, r, m.vertices[m.vertex_indices[i+0]].position, m.vertices[m.vertex_indices[i+1]].position)) return true;
+		if (CircleToLine(offset, r, m.vertices[m.vertex_indices[i+1]].position, m.vertices[m.vertex_indices[i+2]].position)) return true;
+		if (CircleToLine(offset, r, m.vertices[m.vertex_indices[i+2]].position, m.vertices[m.vertex_indices[i+0]].position)) return true;
 	}
 	return false;
 }
@@ -412,7 +411,7 @@ bool PhysicsSystem::PointInTriangle(vec2 p, vec2 p1, vec2 p2, vec2 p3) {
 		return 0.5 * abs((v2.x - v1.x) * (v3.y - v1.y) - (v3.x - v1.x) * (v2.y - v1.y));
 	};
 
-	if (abs(area(p, p1, p2) + area(p, p1, p3) + area(p, p2, p3) - area(p1, p2, p3)) < 0.01) return true;
+	if (abs(area(p, p1, p2) + area(p, p1, p3) + area(p, p2, p3) - area(p1, p2, p3)) < 0.0001) return true;
 	return false;
 }
 

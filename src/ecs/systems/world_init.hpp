@@ -13,7 +13,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos);
 Entity createAimIndicator(RenderSystem* renderer);
 
 // basic enemy
-Entity createBlob(RenderSystem* renderer, vec2 pos);
+Entity createBigC(RenderSystem* renderer, vec2 pos);
 
 // Wall for testing, denoted by 2 blobs
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);

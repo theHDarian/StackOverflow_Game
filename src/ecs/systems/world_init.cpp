@@ -138,8 +138,8 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-// basic enemy that doesn't do anything
-Entity createBlob(RenderSystem* renderer, vec2 position) {
+// mesh enemy that doesn't do anything
+Entity createBigC(RenderSystem* renderer, vec2 position) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -153,13 +153,14 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	motion.position = position;
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ 1000, 1000 });
+	motion.scale = vec2({ 700 * (1.923352 / 2.0f), 700});
+	//motion.scale = vec2({ 500, 500 });
 
 	registry.meshColliders.emplace(entity);
 
-	auto enemy = registry.enemies.emplace(entity);
+	auto& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 20;
+	enemy.maxHealth = 1000;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 
