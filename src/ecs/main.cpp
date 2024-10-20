@@ -55,7 +55,7 @@ int main()
 	particleSystem.init(window);
 	ioSystem.init(window);
 	world.init(&renderer);
-	mapSystem.init();
+	mapSystem.init(&renderer);
 
 
 	// variable timestep loop

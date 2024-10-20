@@ -241,15 +241,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
     }
 
-
-	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() < 1) {
-		for (int i = 0; i < rand()%10 + 1; i++) {
-			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-			Entity e = createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
-		}
-	}
-
 	return true;
 }
 
