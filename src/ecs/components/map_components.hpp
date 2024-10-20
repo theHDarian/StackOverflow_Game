@@ -27,10 +27,10 @@ struct Room {
 };
 struct ChangeRoomRequest {
     RoomType type;
-    Side spawnSide;
-    ChangeRoomRequest(RoomType type, Side spawnSide) { 
+    int doorIndex;
+    ChangeRoomRequest(RoomType type, int doorIndex) { 
         this->type = type; 
-        this->spawnSide = spawnSide;
+        this->doorIndex = doorIndex;
     }
 };
 

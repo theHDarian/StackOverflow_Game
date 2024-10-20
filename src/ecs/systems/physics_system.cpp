@@ -135,12 +135,9 @@ void PhysicsSystem::step(float elapsed_ms)
 	Motion& m = registry.motions.get(player);
 	CircleCollider& c = registry.circleColliders.get(player);
 	for (uint i = 0; i < doors.components.size(); i++) {
-		Side spawnSide = i == 0 ? Side::Bottom : i == 1 ? Side::Left : i == 2 ? Side::Top : Side::Right;
 		if (!doors.components[i].isPrev && CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)) {
 			//spawn on side opposite to the door
-			registry.changeRoomRequests.emplace(player,doors.components[i].room,spawnSide);
-		} else if (CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)){
-			printf("Door collide, opposite side is %c\n",spawnSide);
+			registry.changeRoomRequests.emplace(player,doors.components[i].room,i);
 		}
 	}
 }

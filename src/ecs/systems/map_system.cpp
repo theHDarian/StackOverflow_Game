@@ -45,7 +45,7 @@ void MapSystem::step(float elapsed_ms) {
     map.currRoom.timeElapsed += elapsed_ms / 1000.0f;
     //switch rooms if needed
     for (auto& r : registry.changeRoomRequests.components) {
-        changeRoom(r.type,r.spawnSide);
+        changeRoom(r.type,r.doorIndex);
     }
     registry.changeRoomRequests.clear();
 
@@ -59,36 +59,19 @@ void MapSystem::step(float elapsed_ms) {
 	}
 }
 
-vec2 getSpawnPosition(Side side, Motion& motion) {
-    WindowState& ws = registry.windowStates.components[0];
-    vec2 pos = {ws.width / 2, ws.height / 2};
-    switch(side) {
-        case Side::Left:
-            pos.x = motion.scale.x / 2;
-            break;
-        case Side::Top:
-            pos.y = motion.scale.y / 2; // going down is positive coordinates
-            break;
-        case Side::Right:
-            pos.x = ws.width - motion.scale.x / 2;
-            break;
-        case Side::Bottom:
-            pos.y = ws.height - motion.scale.y / 2;
-            break;
-        default: break;
-    }
-    return pos;
-}
+void MapSystem::changeRoom(RoomType type, int doorIndex) {
+    printf("Changing Room %c, Door Side:%d \n", type, doorIndex);
+    int spawnIndex = doorIndex == 0 ? 2 : doorIndex == 1 ? 3 :doorIndex == 2 ? 0 : 1;
 
-void MapSystem::changeRoom(RoomType type, Side playerSpawnSide) {
-    printf("Changing Room %c, Side:%c \n", type, playerSpawnSide);
     //move player to the starting side of the room
     Entity& playerEntity = registry.players.entities[0];
     Motion& playerMotion = registry.motions.get(playerEntity);
     std::vector<Door>& doors = registry.doors.components;
-        
-    playerMotion.position = getSpawnPosition(playerSpawnSide,playerMotion);    
 
+    //index of door to spawn at
+    vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
+    playerMotion.position = spawnPosition;
+    
     //clear enemies and obstacles
     for (Entity ent : registry.enemies.entities) {
         if (!registry.deleteds.has(ent))
@@ -109,20 +92,13 @@ void MapSystem::changeRoom(RoomType type, Side playerSpawnSide) {
         .cleared = false    
     };
     map.roomsTraversed++;
-
-    //replace door objects in registry
-    Door newDoors[4] = {
-        {.room = RoomType::None,.isPrev = false },
-        {.room = RoomType::EnemyRoom,.isPrev = false },
-        {.room = RoomType::None,.isPrev = false },
-        {.room = RoomType::None,.isPrev = false }
-    };
-    for (int i = 0; i < 4; i++) {
-        doors[i] = newDoors[i];
-    }
+    
+    doors[0].room = RoomType::None;
+    doors[1].room = RoomType::EnemyRoom;
+    doors[2].room = RoomType::None;
+    doors[3].room = RoomType::None;
     //block the side where player spawns
-    if (playerSpawnSide == Side::Top) doors[0].isPrev = true;
-    else if (playerSpawnSide == Side::Right) doors[1].isPrev = true;
-    else if (playerSpawnSide == Side::Bottom) doors[2].isPrev = true;
-    else if (playerSpawnSide == Side::Left) doors[3].isPrev = true;
+    for (int i = 0; i < doors.size(); i++) {
+        doors[i].isPrev = spawnIndex == i;
+    }
 }
