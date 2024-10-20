@@ -233,6 +233,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
     }
 
+	//check damage countdown
+	if (registry.damageds.entities.size() > 0) {
+		for (int i = (int)registry.damageds.components.size()-1; i>=0; --i) {
+			Damaged& entity = registry.damageds.components[i];
+			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				registry.damageds.remove(registry.damageds.entities[i]);
+			}
+		}
+	}
+
 
 	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() < 1) {
@@ -477,9 +487,13 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			playerMotion.velocity = {0,0};
 		} else {
 			// Tick IFrame timer
-			if (!registry.invincibles.has(player))
-            	registry.invincibles.emplace(player);
-			registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, dash.endTimer);
+			if (!registry.invincibles.has(player)) {
+				registry.invincibles.emplace(player);
+				registry.invincibles.get(player).countdown = dash.endTimer;
+				registry.invincibles.get(player).max = dash.endTimer;
+			} else {
+				registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, dash.endTimer);
+			}
 
 			// Update Velocity
 			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
@@ -598,7 +612,8 @@ void WorldSystem::movePlayer() {
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 {
-	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
+	Entity& pl = registry.players.entities[0];
+	return max(registry.stackCompile.get(pl).minimums[bf], (value + registry.stackCompile.get(pl).additives[bf]) * registry.stackCompile.get(pl).multiplicatives[bf]);
 }
 
 void WorldSystem::handlePlayerHit(Entity& other) {

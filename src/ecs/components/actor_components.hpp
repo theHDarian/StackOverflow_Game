@@ -94,7 +94,7 @@ struct StackCompile {
         {FireRate,          1},
         {BulletRange,       1},
         {BulletSpread,      1},
-        {BulletNum,         1},
+        {BulletNum,         3},
         {BulletBurst,       1},
         {Bounce,            1},
         {Pierce,            1},
@@ -169,7 +169,8 @@ struct StackCompile {
 struct Invincible {
     // Deletes itself when countdown <0
     // Entity can't be hit while has Invincible component
-    float countdown = 1000;
+    float max = 1000;
+    float countdown = max;
 };
 
 struct Invisible {
@@ -293,4 +294,9 @@ struct Motion {
 	vec2 velocity = { 0, 0 };
 	vec2 scale = { 10, 10 };
     vec2 veer = { 0,0 };
+};
+
+struct Damaged {
+    float max = 200;
+    float countdown = max;
 };

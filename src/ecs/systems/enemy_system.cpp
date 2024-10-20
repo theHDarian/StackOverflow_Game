@@ -139,6 +139,11 @@ void EnemySystem::step(float elapsed_ms) {
 
             if (!registry.deleteds.has(other_entity))
                 registry.deleteds.emplace(other_entity);
+            if (!registry.damageds.has(entity) && enemyStat.currHealth > 0) {
+                registry.damageds.emplace(entity);
+            } else if (registry.damageds.has(entity)) {
+                registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
+            }
         }
     }
 }

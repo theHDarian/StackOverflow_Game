@@ -131,7 +131,7 @@ private:
 
 
 	//void drawDashCharges(GLuint &VAO, GLuint &VBO, GLuint &EBO);
-	void drawDashCharges(vec2 position, vec2 scale, bool isCharging, float cooldown, float max, const mat3& projection);
+	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat3 & projection);
 
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
 	void drawBulletStack(const mat3& projection);

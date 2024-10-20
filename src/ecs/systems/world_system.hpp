@@ -42,6 +42,9 @@ public:
 	void handleInput();
 
 	void clearDeleteQueue();
+
+
+static float getModifiedValue(BulletEffectType bf, float value);
 private:
 	// restart level
 	void restartGame();
@@ -52,8 +55,6 @@ private:
 	void movePlayer();
     void dash(vec2 direction, float elapsed_ms_since_last_update);
     void shoot(float elapsed_ms_since_last_update, int cluster = 1);
-
-	float getModifiedValue(BulletEffectType bf, float value);
 
 	// OpenGL window handle
 	GLFWwindow* window;

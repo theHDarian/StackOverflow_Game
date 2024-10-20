@@ -3,7 +3,14 @@
 #include <SDL.h>
 #include <glm/gtx/compatibility.hpp>
 
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
 #include "tiny_ecs_registry.hpp"
+#include "world_system.hpp"
 #include "../utils/enum_string_mapping.hpp"
 
 
@@ -67,24 +74,19 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		assert(in_texcoord_loc >= 0);
 
 		glEnableVertexAttribArray(in_position_loc);
-		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(TexturedVertex), (void *)0);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
 		gl_has_errors();
 
 		glEnableVertexAttribArray(in_texcoord_loc);
-		glVertexAttribPointer(
-			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-			(void *)sizeof(
-				vec3)); // note the stride to skip the preceeding vertex position
-
-		// Enabling and binding texture to slot 0
-		glActiveTexture(GL_TEXTURE0);
+		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
-		assert(registry.renderRequests.has(entity));
-		GLuint texture_id =
-			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
 
+		// Enable and bind the texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id = texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
@@ -109,24 +111,50 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		assert(false && "Type of render request not supported");
 	}
 
-	float alpha = 1;
-
-	// fade out entity if needed
-	if (registry.fades.has(entity)) {
-		Fade& fade = registry.fades.get(entity);
-		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
-
-	}
-
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
 	glUniform3fv(color_uloc, 1, (float *)&color);
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
+
+	float alpha = 1;
+
+	// fade out entity if needed
+	if (registry.fades.has(entity)) {
+		Fade& fade = registry.fades.get(entity);
+		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
+		vec3 color = { 1.2, 0.5, 0.5 }; // red
+		glUniform3fv(color_uloc, 1, (float*)&color);
+		glUniform1i(change_color_uloc, 1);
+		GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
+		glUniform1f(effectAlpha, alpha);
+	}
+
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, alpha);
 	gl_has_errors();
+
+	// Change color if entity is invincible
+	if (registry.invincibles.has(entity)) {
+		Invincible& invincible = registry.invincibles.get(entity);
+		vec3 color = { 1.2, 1.2, 1.2 }; // grey
+		glUniform3fv(color_uloc, 1, (float*)&color);
+		glUniform1i(change_color_uloc, 1);
+		GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
+		alpha = glm::lerp(0.7f, 0.f, ( invincible.max - invincible.countdown) / invincible.max);
+		glUniform1f(effectAlpha, alpha);
+	}
+
+	if (registry.damageds.has(entity)) {
+		Damaged& damaged = registry.damageds.get(entity);
+		vec3 color = { 1.2, 0.5, 0.5 }; // red
+		glUniform3fv(color_uloc, 1, (float*)&color);
+		glUniform1i(change_color_uloc, 1);
+		GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
+		alpha = glm::lerp(1.f, 0.f, ( damaged.max - damaged.countdown) / damaged.max);
+		glUniform1f(effectAlpha, alpha);
+	}
 
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
@@ -705,14 +733,19 @@ void RenderSystem::drawDashes(const mat3& projection) {
     }
 
 	// draw currently charging dash charge, if any
-	if (player.currDashCharges < player.maxDashCharges) {
-		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, player.baseDashCDR, projection);
+	if (player.currDashCharges < WorldSystem::getModifiedValue(PlayerDashCDR,player.maxDashCharges)) {
+		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, WorldSystem::getModifiedValue(PlayerDashCDR, player.baseDashCDR), projection);
+	}
+
+	// draw empty dash charges last, if any
+	for (int i = player.currDashCharges + 1; i < WorldSystem::getModifiedValue(PlayerDashCDR,player.maxDashCharges); ++i) {
+		drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, -1, 0, 0, projection);
 	}
 
 	gl_has_errors();
 }
 
-void RenderSystem::drawDashCharges(vec2 position, vec2 scale, bool isCharging, float cooldown, float max, const mat3& projection) {
+void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat3& projection) {
 	Transform transform;
 	transform.translate(position);
 	transform.scale(scale);
@@ -768,6 +801,15 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, bool isCharging, f
 		glUniform1i(change_color_uloc, 0);
 		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
 		glUniform1f(charge_boundary_uloc, 1.0);
+	}
+	else if (isCharging == -1) {
+		vec3 color = { 0.5, 0.5, 0.5 }; // grey
+		GLint color_uloc = glGetUniformLocation(program, "fcolor");
+		glUniform3fv(color_uloc, 1, (float*)&color);
+		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+		glUniform1i(change_color_uloc, 1);
+		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+		glUniform1f(charge_boundary_uloc, 0.0);
 	}
 	else {
 		vec3 color = { 0.5, 0.5, 0.5 }; // grey
