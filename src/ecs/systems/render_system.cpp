@@ -4,11 +4,6 @@
 #include <glm/gtx/compatibility.hpp>
 
 #include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
 #include "tiny_ecs_registry.hpp"
 #include "world_system.hpp"
 #include "../utils/enum_string_mapping.hpp"
@@ -532,6 +527,8 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	glUniform1i(change_color_uloc, 1);
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, 1);
+	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
+	glUniform1f(effect_alpha_uloc, 1);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t

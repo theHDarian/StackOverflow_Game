@@ -145,10 +145,10 @@ elseif (IS_OS_WINDOWS)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${SDL2MIXER_DLL}"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/SDL2_mixer.dll")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${FREETYPE_DLL}"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/freetype.dll")
+    # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    # COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        # "${FREETYPE_DLL}"
+        # "$<TARGET_FILE_DIR:${PROJECT_NAME}>/freetype.dll") # this seems to not be needed...
 
     target_compile_options(${PROJECT_NAME} PUBLIC
         # increase warning level
