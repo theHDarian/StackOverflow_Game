@@ -294,6 +294,8 @@ struct EnemyEasySentry : Enemy {
         currHealth = maxHealth;
         behavior = EnemyBehavior::ROTATE_IN_PLACE;
         attackCooldown = 2000;
+		currCooldown = attackCooldown;
+		currCooldown = attackCooldown;
         state = 10;
     };
 };
@@ -305,6 +307,7 @@ struct EnemyMediumCharge : Enemy {
         currHealth = maxHealth;
         behavior = EnemyBehavior::FOLLOW_PLAYER;
         attackCooldown = 1000;
+		currCooldown = attackCooldown;
         state = 10;
     };
 };
@@ -316,6 +319,7 @@ struct EnemyMediumHoming : Enemy {
         currHealth = maxHealth;
         behavior = EnemyBehavior::PATROLLING;
         attackCooldown = 1500;
+		currCooldown = attackCooldown;
         state = 10;
 		patrolIndex = 0;
         patrolPath = std::vector<vec2>{
@@ -334,6 +338,7 @@ struct EnemyEasySniper : Enemy {
 		currHealth = maxHealth;
 		behavior = EnemyBehavior::EVADEBULLET;
 		attackCooldown = 5000;
+		currCooldown = attackCooldown;
 		state = 10;
 	};
 };
