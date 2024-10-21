@@ -89,13 +89,13 @@ GLFWwindow* WorldSystem::createWindow() {
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	 window_width_px = vidMode->width;
-	 window_height_px = vidMode->height;
+	//  window_width_px = vidMode->width;
+	//  window_height_px = vidMode->height;
 	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
-	// window_width_px = 1280;
-	// window_height_px = 720;
+	window_width_px = 1280;
+	window_height_px = 720;
 	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
@@ -201,6 +201,8 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
 	aimIndicator = createAimIndicator(renderer);
+
+	createRoomBounds(renderer);
 
 	// this feels very bad, put as temp fix for getting window size for now
 	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
