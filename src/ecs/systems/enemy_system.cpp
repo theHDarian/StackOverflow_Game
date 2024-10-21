@@ -87,19 +87,19 @@ void EnemySystem::step(float elapsed_ms) {
         // NOTE: enemy must attack AFTER being moved
         // or else causes corrupted memory in effect/geometry/texture id and makes it a huge number
         // no idea why
-        enemy.attackCooldown -= elapsed_ms;
+        enemy.currCooldown -= elapsed_ms;
         // std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
-        if (enemy.attackCooldown < 0.f)
+        if (enemy.currCooldown < 0.f)
         {
             if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
             {
                 shootShotgun(playerMotion.position - pos, pos, atkData);
-                enemy.attackCooldown = COOLDOWN_SHOOT_MS;
+                enemy.currCooldown = enemy.attackCooldown;
             }
             else if (atkData.attackType == EnemyAttackPattern::ALL_DIRECTION)
             {
                 shootAllDirection(pos, atkData);
-                enemy.attackCooldown = COOLDOWN_SHOOT_MS;
+                enemy.currCooldown = enemy.attackCooldown;
             }
             else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
             {
@@ -109,7 +109,7 @@ void EnemySystem::step(float elapsed_ms) {
                 burst.burstDirection = atan2(velocity.y, velocity.x);
                 if (burst.curBurst <= 0)
                 {
-                    enemy.attackCooldown = COOLDOWN_SHOOT_MS;
+                    enemy.currCooldown = enemy.attackCooldown;
                     burst.curBurst = atkData.numBullets;
                     burst.burstCooldown = 0;
                 }
@@ -160,7 +160,7 @@ void EnemySystem::nextAtkData(Enemy& enemy, Entity& entity) {
         return;
     }
     if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
-        if (enemy.attackCooldown != COOLDOWN_SHOOT_MS) {
+        if (enemy.currCooldown != enemy.attackCooldown) {
             return;
         }
     }
