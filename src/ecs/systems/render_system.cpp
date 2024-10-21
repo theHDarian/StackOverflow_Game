@@ -297,8 +297,7 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		if (registry.circleColliders.has(entity))
-			drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
+		drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.playerBullets.entities)
@@ -306,8 +305,7 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		if (registry.circleColliders.has(entity))
-			drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
+		drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.enemies.entities)
@@ -315,8 +313,7 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		if (registry.circleColliders.has(entity))
-			drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
+		drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.players.entities)
@@ -324,8 +321,7 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		if (registry.circleColliders.has(entity))
-			drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
+		drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.wallObjects.entities)
@@ -475,6 +471,14 @@ void RenderSystem::drawImGui() {
 	ImGui::UpdatePlatformWindows();
 }
 #endif
+
+// bandaid fix to draw all colliders an entity has right now
+void RenderSystem::drawAllColliders(Entity entity, const mat3& projection_2D) {
+	if (registry.circleColliders.has(entity))
+		drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
+	if (registry.aabbs.has(entity))
+		drawCollider(entity, TEXTURE_ASSET_ID::RECTANGLE_SPRITE, projection_2D);
+}
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI
 // currently just draws a box as a container
