@@ -196,24 +196,19 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavior behavior, EnemyType type) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	Motion &motion = registry.motions.emplace(entity);
-	motion.angle = 0.f;
-	motion.position = pos;
-	motion.velocity = velocity;
-	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
 	//std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
-    Enemy enemy;
+    Enemy& enemy = registry.enemies.emplace(entity);;
     switch (type) {
-        case EnemyType::EasyEnemyFast: {
+        case EnemyType::EasyEnemySentry: {
 			std::cout << "got here" << std::endl;
-            enemy = EnemyEasyFast();
+            enemy = EnemyEasySentry();
             break;
         }
         case EnemyType::MediumEnemyCharge: {
@@ -224,14 +219,26 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
             enemy = EnemyMediumHoming();
             break;
         }
+		case EnemyType::EasyEnemySniper: {
+			enemy = EnemyEasySniper();
+			break;
+		}
 
     }
-	enemy.printInfo();
-    enemy = registry.enemies.emplace(entity);
+
+	Motion &motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.position = pos;
+	motion.velocity = vec2(0, 0);
+	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
-	movement.posA = pos;
-	movement.posB = AISystem::getMove(enemy.behavior);
+	if (enemy.behavior == EnemyBehavior::PATROLLING) {
+		movement.posA = enemy.patrolPath[0];
+	} else {
+		movement.posA = pos;
+	}
+	movement.posB = AISystem::getMove(enemy.behavior, entity);
 	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
@@ -240,7 +247,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	std::vector<AttackData> atkData = enemy.attackData;
 	std::cout << "attackData size:" << atkData.size() << std::endl;
-	// atk = atkData[0];
+	if (atkData.size() > 0) {
+		atk = atkData[0];
+	}
 	for (int i = 0; i < atkData.size(); i++) {
 		if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
 			registry.bursts.emplace(entity);

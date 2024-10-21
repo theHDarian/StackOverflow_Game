@@ -235,17 +235,49 @@ AttackData threeSpray{
 	0
 };
 
+AttackData SniperShot{
+	EnemyAttackPattern::SHOTGUN,
+	TRIANGLE,
+	{},
+	blunt,
+	1,
+	0,
+	{20, 20},
+	900,
+	3000,
+	{0,0},
+	0,
+	0,
+	0
+};
+
+AttackData NoAttack {
+	EnemyAttackPattern::NONE,
+	CIRCLE,
+	{},
+	blunt,
+	0,
+	0,
+	{0,0},
+	0,
+	0,
+	{0,0},
+	0,
+	0,
+	0
+};
+
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
 ////////////////////////////////////
 
 
-struct EnemyEasyFast : Enemy {
-    EnemyEasyFast() {
+struct EnemyEasySentry : Enemy {
+    EnemyEasySentry() {
         attackData = {twelveSpiralShot};
 		maxHealth = 50;
         currHealth = maxHealth;
-        behavior = EnemyBehavior::RANDOM;
+        behavior = EnemyBehavior::ROTATE_IN_PLACE;
         attackCooldown = 2000;
         state = 10;
     };
@@ -253,7 +285,7 @@ struct EnemyEasyFast : Enemy {
 
 struct EnemyMediumCharge : Enemy {
     EnemyMediumCharge() {
-        attackData = {};
+        attackData = {NoAttack};
         maxHealth = 200;
         currHealth = maxHealth;
         behavior = EnemyBehavior::FOLLOW_PLAYER;
@@ -267,8 +299,26 @@ struct EnemyMediumHoming : Enemy {
         attackData = {threeHomingShot};
         maxHealth = 60;
         currHealth = maxHealth;
-        behavior = EnemyBehavior::RANDOM;
+        behavior = EnemyBehavior::PATROLLING;
         attackCooldown = 1500;
         state = 10;
+		patrolIndex = 0;
+        patrolPath = std::vector<vec2>{
+            {400, 100}, 
+            {1000, 100}, 
+            {1000, 700}, 
+            {400, 700}
+        };
     };
+};
+
+struct EnemyEasySniper : Enemy {
+	EnemyEasySniper() {
+		attackData = {SniperShot};
+		maxHealth = 40;
+		currHealth = maxHealth;
+		behavior = EnemyBehavior::EVADEBULLET;
+		attackCooldown = 5000;
+		state = 10;
+	};
 };

@@ -243,11 +243,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	WindowState& wS = registry.windowStates.components[0];
 	if (registry.enemies.size() == 0) {
-		for (int i = 0; i < rand()%10 + 1; i++) {
-			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-			EnemyType type = uniformDist(rng) < 0.5f ? EnemyType::EasyEnemyFast : EnemyType::MediumEnemyCharge;
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior, EnemyType::EasyEnemyFast);
-		}
+			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySniper);
+			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyHoming);
+			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyCharge);
+			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySentry);
 	}
 
 	return true;
