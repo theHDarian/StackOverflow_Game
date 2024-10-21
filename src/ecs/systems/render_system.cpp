@@ -106,14 +106,16 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		assert(false && "Type of render request not supported");
 	}
 
+	float alpha = 1;
+
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
 	glUniform3fv(color_uloc, 1, (float *)&color);
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
-
-	float alpha = 1;
+	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
+    glUniform1f(effectAlpha, 1);
 
 	// fade out entity if needed
 	if (registry.fades.has(entity)) {
@@ -122,7 +124,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		vec3 color = { 1.2, 0.5, 0.5 }; // red
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		glUniform1i(change_color_uloc, 1);
-		GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
 		glUniform1f(effectAlpha, alpha);
 	}
 
@@ -136,8 +137,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		vec3 color = { 1.2, 1.2, 1.2 }; // grey
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		glUniform1i(change_color_uloc, 1);
-		GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
-		alpha = glm::lerp(0.7f, 0.f, ( invincible.max - invincible.countdown) / invincible.max);
+		alpha = glm::lerp(0.4f, 0.f, ( invincible.max - invincible.countdown) / invincible.max);
 		glUniform1f(effectAlpha, alpha);
 	}
 
@@ -146,8 +146,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		vec3 color = { 1.2, 0.5, 0.5 }; // red
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		glUniform1i(change_color_uloc, 1);
-		GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
-		alpha = glm::lerp(1.f, 0.f, ( damaged.max - damaged.countdown) / damaged.max);
+		alpha = glm::lerp(0.5f, 0.f, ( damaged.max - damaged.countdown) / damaged.max);
 		glUniform1f(effectAlpha, alpha);
 	}
 

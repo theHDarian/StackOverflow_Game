@@ -38,6 +38,10 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(backgroundMusic);
 	if (playerHurtSound != nullptr)
 		Mix_FreeChunk(playerHurtSound);
+	if (playerDashSound != nullptr)
+		Mix_FreeChunk(playerDashSound);
+	if (playerShootSound != nullptr)
+		Mix_FreeChunk(playerShootSound);
 
 	Mix_CloseAudio();
 
@@ -131,24 +135,49 @@ GLFWwindow* WorldSystem::createWindow() {
 		Sound& background = registry.sounds.emplace(Entity());
 		background.type = SoundType::Background;
 		background.path = audio_path("game-music-loop-" + std::to_string(i) + ".wav").c_str();
-		background.volume = 0.4f;
+		background.volume = 0.2f;
 		background.loops = -1;
 		std::cout << "Loaded background music " << background.path << std::endl;
 	}
 
+	Sound& playerHurt = registry.sounds.emplace(Entity());
+	playerHurt.type = SoundType::SFX;
+	playerHurt.path = audio_path("player_hurtv1.wav").c_str();
+	playerHurt.volume = 0.4f;
+	playerHurt.loops = 0;
+	std::cout << "Loaded player hurt sound " << playerHurt.path << std::endl;
 
+	Sound& dash = registry.sounds.emplace(Entity());
+	dash.type = SoundType::SFX;
+	dash.path = audio_path("dash.wav").c_str();
+	dash.volume = 0.4f;
+	dash.loops = 0;
 
-	backgroundMusic = Mix_LoadMUS(registry.sounds.get(registry.sounds.entities[(rand())%3]).path.c_str());
+	Sound& playerShoot = registry.sounds.emplace(Entity());
+	playerShoot.type = SoundType::SFX;
+	playerShoot.path = audio_path("player_shoot.wav").c_str();
+	playerShoot.volume = 0.4f;
+	playerShoot.loops = 0;
+
+	Sound& currentBGM  = registry.sounds.get(registry.sounds.entities[0]);
+
+	backgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
 	if (!backgroundMusic) {
 		fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
 	}
+
+	Mix_VolumeMusic(currentBGM.volume * MIX_MAX_VOLUME);
 
 	playerHurtSound = Mix_LoadWAV(audio_path("player_hurtv1.wav").c_str());
 	if (!playerHurtSound) {
 		fprintf(stderr, "Failed to load player hurt sound: %s\n", Mix_GetError());
 	}
 
-	if (backgroundMusic == nullptr || playerHurtSound == nullptr) {
+	playerDashSound = Mix_LoadWAV(audio_path("dash.wav").c_str());
+
+	playerShootSound = Mix_LoadWAV(audio_path("player_shoot.wav").c_str());
+
+	if (backgroundMusic == nullptr || playerHurtSound == nullptr || playerDashSound == nullptr || playerShootSound == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n make sure the data directory is present",
 				audio_path("game-music-loop-1.mp3").c_str(),
 				audio_path("player_hurtv1.wav").c_str());
@@ -500,6 +529,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCharges--;
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
+			Mix_PlayChannelTimed( 2, playerDashSound, 0, 200);
 		}
 	}
 	// Tick dash timer
@@ -554,6 +584,16 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
 	}
+	int channel = 1;  // Use a specific channel, e.g., channel 1
+
+	if (!Mix_Playing(channel)) {  // Check if the channel is not playing
+		Mix_PlayChannelTimed(channel, playerShootSound, 0, max(250.0f, min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst))));  // Play sound on specified channel
+	}
+	Mix_Volume( 1, MIX_MAX_VOLUME / 6);
+
 	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
 		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
 		pl.currBulletBurst--;
@@ -652,7 +692,8 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		}
 	}
 	//play hit sound
-	Mix_PlayChannel(-1, playerHurtSound, 0);
+	Mix_PlayChannel(1, playerHurtSound, 0);
+	Mix_Volume(1 , MIX_MAX_VOLUME);
 	//add player invincibility frames
 	if (!registry.invincibles.has(player))
 		registry.invincibles.emplace(player);
