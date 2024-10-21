@@ -86,12 +86,11 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
     //change current room in the map
     Map& map = registry.maps.components[0];
     Entity ent = registry.maps.entities[0];
-    map.currRoom = {
-        .type = type,
-        .variant = 0,
-        .cleared = false,
-        .timeElapsed = 0    
-    };
+    map.currRoom.type = type;
+    map.currRoom.variant = 0;
+    map.currRoom.cleared = false;
+    map.currRoom.timeElapsed = 0;
+
     map.roomsTraversed++;
     
     doors[0].room = RoomType::None;
@@ -119,10 +118,9 @@ void MapSystem::resetMap() {
     Map& map = registry.maps.components[0];
     map.currRegion = MapRegion::Tutorial;
     map.roomsTraversed = 0;
-    map.currRoom = {
-        .type = RoomType::EnemyRoom,
-        .variant = 0,
-        .timeElapsed = 0,
-        .cleared = false
-    };
+    
+    map.currRoom.type = RoomType::EnemyRoom;
+    map.currRoom.variant = 0;
+    map.currRoom.cleared = false;
+    map.currRoom.timeElapsed = 0;
 }

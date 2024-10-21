@@ -273,7 +273,7 @@ void ParticleSystem::render() {
 }
 
 ParticleProps ParticleSystem::createParticle(vec2 pos) {
-    ParticleProps p = DefaultParticle;
+    ParticleProps p = DefaultParticle();
     p.position = pos;
     return p;
 }
