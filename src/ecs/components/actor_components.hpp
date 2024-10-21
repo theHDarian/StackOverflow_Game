@@ -256,6 +256,7 @@ struct Enemy {
     vec2 velocity;
     // TODO add attack pattern data?
     float attackCooldown;
+    float currCooldown;
     EnemyBehavior behavior;
     std::vector<AttackData> attackData;
     BulletStackEffect blunt;
