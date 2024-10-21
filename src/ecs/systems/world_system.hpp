@@ -77,7 +77,8 @@ private:
 	// music references
 	Mix_Music* backgroundMusic;
 	Mix_Chunk* playerHurtSound;
-	Mix_Chunk* salmonEatSound;
+	Mix_Chunk* playerShootSound;
+	Mix_Chunk* playerDashSound;
 
 	// C++ random number generator
 	std::default_random_engine rng;
