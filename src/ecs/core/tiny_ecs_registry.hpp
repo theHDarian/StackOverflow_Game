@@ -55,6 +55,7 @@ public:
 	ComponentContainer<MenuUIText> menuUITexts;
 	ComponentContainer<Damaged> damageds;
 	ComponentContainer<Sound> sounds;
+	ComponentContainer<Wall> wallObjects;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -104,6 +105,7 @@ public:
 		registry_list.push_back(&menuUITexts);
 		registry_list.push_back(&damageds);
 		registry_list.push_back(&sounds);
+		registry_list.push_back(&wallObjects);
 	}
 
 	void clear_all_components() {

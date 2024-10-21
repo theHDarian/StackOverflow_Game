@@ -95,6 +95,8 @@ Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b) {
 				 EFFECT_ASSET_ID::EGG,
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
+	registry.wallObjects.emplace(entity);
+
 	//std::cout << "created line from point a(" << a.x << ", " << a.y << ") to b(" << b.x << ", " << b.y << ") at (" << position.x << ", " << position.y << ")" << " angle: " << angle << ", length: " << length << std::endl;
 
 	return entity;

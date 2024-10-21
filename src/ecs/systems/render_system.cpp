@@ -324,6 +324,13 @@ void RenderSystem::drawGameElements()
 			drawCircleCollider(entity, projection_2D);
 	}
 
+	for (Entity& entity : registry.wallObjects.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+
 	glBindVertexArray(0);
 	gl_has_errors();
 
