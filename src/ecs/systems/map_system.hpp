@@ -8,8 +8,8 @@ class MapSystem {
         ~MapSystem();
         void init(RenderSystem* renderer);
         void step(float elapsed_ms);
-        void changeRoom(RoomType type,int doorIndex);
-
     private:
         RenderSystem* renderer;
+        void resetMap();
+        void changeRoom(RoomType type,int doorIndex);
 };

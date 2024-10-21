@@ -25,10 +25,16 @@ struct Room {
     bool cleared;
     float timeElapsed; //time passed since enter room in seconds
 };
-struct ChangeRoomRequest {
+enum MapRequestType {
+    RestartGame = 'R',
+    ChangeRoom = 'C'
+};
+struct MapRequest {
+    MapRequestType requestType;
     RoomType type;
     int doorIndex;
-    ChangeRoomRequest(RoomType type, int doorIndex) { 
+    MapRequest(MapRequestType requestType, RoomType type = RoomType::None, int doorIndex = 0) { 
+        this->requestType = requestType;
         this->type = type; 
         this->doorIndex = doorIndex;
     }

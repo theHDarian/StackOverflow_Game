@@ -10,6 +10,8 @@
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
 
+Entity resetPlayer();
+
 Entity createAimIndicator(RenderSystem* renderer);
 
 // Wall for testing, denoted by 2 blobs

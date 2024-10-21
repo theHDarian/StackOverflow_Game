@@ -42,6 +42,33 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 	return entity;
 }
+
+Entity resetPlayer()
+{
+	// Setting initial motion values
+	assert(registry.players.entities.size() == 1);
+	Entity ent = registry.players.entities[0];
+	Motion& motion = registry.motions.get(ent);
+	WindowState& ws = registry.windowStates.components[0];
+	motion.position = {ws.width / 2, ws.height / 2};
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+
+	Player& player = registry.players.get(ent);
+	player.baseSpeed = 400;
+	CircleCollider& cc = registry.circleColliders.get(ent);
+	cc.radius = motion.scale.x/2.5;
+
+	//reset stack and shoot
+	PlayerAttackData& shoot = registry.shoots.get(ent);
+	shoot = PlayerAttackData();
+
+	StackCompile& sc = registry.stackCompile.get(ent);
+	sc = StackCompile();
+
+	return ent;
+}
+
 Entity createAimIndicator(RenderSystem* renderer) {
 	//add aim indicator
 	auto aimIndicator = Entity();

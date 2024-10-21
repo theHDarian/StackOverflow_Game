@@ -151,9 +151,27 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	if (initFreetypeLib() > 0) {
 		std::cout << "Freetype loaded!" << std::endl;
 	}
+	WindowState& ws = registry.windowStates.components[0];
+	createRoomBounds(renderer);
+	createTestFloor(renderer, { ws.width /2, ws.height/2 });
+
 
 	// Set all states to default
-    restartGame();
+	GameState& gameState = registry.gameStates.components[0];
+	gameState.gameOver = false;
+	gameState.gamePaused = false;
+	gameState.dialogueScene = false;
+
+	WindowState& wS = registry.windowStates.components[0];
+	currentSpeed = 1.f;
+
+	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
+	aimIndicator = createAimIndicator(renderer);
+
+	// this feels very bad, put as temp fix for getting window size for now
+	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
+	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 }
 #pragma endregion
 
@@ -247,6 +265,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 // Reset the world state to its initial state
 void WorldSystem::restartGame() {
+	printf("Restarting\n");
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 	GameState& gameState = registry.gameStates.components[0];
@@ -254,43 +273,15 @@ void WorldSystem::restartGame() {
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
 
-	WindowState& wS = registry.windowStates.components[0];
-	printf("Restarting\n");
-
 	// Reset the game speed
 	currentSpeed = 1.f;
-
-	// Remove all entities that we created
-	// All that have a motion, we could also iterate over all fish, eels, ... but that would be more cumbersome
-	while (registry.motions.entities.size() > 0)
-	    registry.remove_all_components_of(registry.motions.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
-	aimIndicator = createAimIndicator(renderer);
+	Entity player = resetPlayer();
 
-	// Test calls:
-	createTestWall(renderer, {100,200}, {500, 200});
-	createTestWall(renderer, {100,200}, {100, 600});
-
-	//bounding walls
-	createRoomBounds(renderer);
-
-	createTestFloor(renderer, { wS.width /2, wS.height/2 });
-
-	//createTestPoly(renderer, { 500,500 }, {
-	//	{100, 0},
-	//	{-50, 50},
-	//	{-50, -50}
-	//	}
-	//	, 90);
-
-	// this feels very bad, put as temp fix for getting window size for now
-	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
-	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
-	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	registry.mapRequests.emplace(player,MapRequestType::RestartGame);
 }
 
 // Compute collisions between entities

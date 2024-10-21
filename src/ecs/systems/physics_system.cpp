@@ -137,7 +137,7 @@ void PhysicsSystem::step(float elapsed_ms)
 	for (uint i = 0; i < doors.components.size(); i++) {
 		if (!doors.components[i].isPrev && CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)) {
 			//spawn on side opposite to the door
-			registry.changeRoomRequests.emplace(player,doors.components[i].room,i);
+			registry.mapRequests.emplace(player,MapRequestType::ChangeRoom,doors.components[i].room,i);
 		}
 	}
 }
