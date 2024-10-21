@@ -672,8 +672,8 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		}
 	}
 	//play hit sound
-	Mix_PlayChannel(1, playerHurtSound, 0);
-	Mix_Volume(1 , MIX_MAX_VOLUME);
+	Mix_PlayChannel(3, playerHurtSound, 0);
+	Mix_Volume(3, MIX_MAX_VOLUME);
 	//add player invincibility frames
 	if (!registry.invincibles.has(player))
 		registry.invincibles.emplace(player);
