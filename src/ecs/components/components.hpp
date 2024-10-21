@@ -52,7 +52,18 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+
 struct Bound {}; //room bounds
+
+struct AABBCollider {
+	// As offsets of motion.position:
+	vec2 topLeft;		//max x, max y
+	vec2 bottomRight;	//min x, min y
+};
+
+struct MeshCollider {
+	// basically just exists for checking
+};
 
 // Data structure for toggling debug mode
 struct Debug {
@@ -167,23 +178,24 @@ enum  TEXTURE_ASSET_ID : unsigned int {
 	ENEMY_BULLET_SQUARE = MC_BULLET + 1,
 	ENEMY_BULLET_CIRCLE = ENEMY_BULLET_SQUARE + 1,
 	ENEMY_BULLET_TRIANGLE = ENEMY_BULLET_CIRCLE + 1,
-	TEXTURE_COUNT = ENEMY_BULLET_TRIANGLE + 1
+	RECTANGLE_SPRITE = ENEMY_BULLET_TRIANGLE + 1,
+	TEXTURE_COUNT = RECTANGLE_SPRITE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum  EFFECT_ASSET_ID : unsigned int {
 	COLOURED = 0,
 	EGG = COLOURED + 1,
-	SALMON = EGG + 1,
-	TEXTURED = SALMON + 1,
+	MESH = EGG + 1,
+	TEXTURED = MESH + 1,
 	POSTPROCESS = TEXTURED + 1,
 	EFFECT_COUNT = POSTPROCESS + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum  GEOMETRY_BUFFER_ID : unsigned int {
-	SALMON_GB = 0,
-	SPRITE = SALMON_GB + 1,
+	MESH_GB = 0,
+	SPRITE = MESH_GB + 1,
 	EGG_GB = SPRITE + 1,
 	DEBUG_LINE = EGG_GB + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,

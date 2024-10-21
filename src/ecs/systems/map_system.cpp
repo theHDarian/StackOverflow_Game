@@ -118,9 +118,11 @@ void MapSystem::resetMap() {
     Map& map = registry.maps.components[0];
     map.currRegion = MapRegion::Tutorial;
     map.roomsTraversed = 0;
-    
+
     map.currRoom.type = RoomType::EnemyRoom;
     map.currRoom.variant = 0;
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
+
+    createBigC(renderer, vec2(600, 600));
 }

@@ -20,9 +20,12 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.scale = mesh.original_size * 50.f;
 
 	Player& player = registry.players.emplace(entity);
-	player.baseSpeed = 400;
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2.5;
+
+	AABBCollider& aabb = registry.aabbs.emplace(entity);
+	aabb.topLeft = vec2(-motion.scale.x / 3.5, -motion.scale.y / 2.5);
+	aabb.bottomRight = vec2(motion.scale.x / 3.5, motion.scale.y / 3);
 
     PlayerAttackData& shoot = registry.shoots.emplace(entity);
 
@@ -32,13 +35,15 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	Sprites& playerSprites = registry.sprites.emplace(entity);
 	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
 	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{
 			playerSprites.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+	// can play around with offset to try to align sprite
+	rr.offset = vec2(-5, 0);
 
 	return entity;
 }
@@ -202,6 +207,47 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
+// mesh enemy that doesn't do anything
+Entity createBigC(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::MESH_GB);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ 700 * (1.923352 / 2.0f), 700});
+	//motion.scale = vec2({ 500, 500 });
+
+	registry.meshColliders.emplace(entity);
+
+	auto& enemy = registry.enemies.emplace(entity);
+	enemy.attackCooldown = 5000;
+	enemy.maxHealth = 1000;
+	enemy.currHealth = enemy.maxHealth;
+	enemy.state = 10;
+
+	AttackData& atk = registry.attackDatas.emplace(entity);
+	atk = none;
+
+	registry.sprites.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{
+			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+			EFFECT_ASSET_ID::MESH,
+			GEOMETRY_BUFFER_ID::MESH_GB
+		});
+
+	return entity;
+}
+
 Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 
@@ -309,10 +355,10 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	if (atkData.shape == RECTANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
-			{motion.scale.x / 2,motion.scale.y / 2},
-			{motion.scale.x / 2,-motion.scale.y / 2},
-			{-motion.scale.x / 2,motion.scale.y / 2},
-			{-motion.scale.x / 2,-motion.scale.y / 2}
+			{ motion.scale.x / 2,  motion.scale.y / 2},
+			{ motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2,-motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2}
 		};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
@@ -322,7 +368,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	else if (atkData.shape == TRIANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
-			{motion.scale.x / 2, 0},
+			{ motion.scale.x / 2, 0},
 			{-motion.scale.x / 2,-motion.scale.y / 2},
 			{-motion.scale.x / 2, motion.scale.y / 2}
 		};

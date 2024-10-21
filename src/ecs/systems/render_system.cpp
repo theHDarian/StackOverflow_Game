@@ -37,7 +37,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	transform.translate(motion.position);
 	transform.rotate(motion.angle);
-	transform.translate(offset);
+	transform.translate(offset * glm::normalize(motion.scale));
 	transform.scale(motion.scale);
 
 	assert(registry.renderRequests.has(entity));
@@ -90,20 +90,14 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::EGG)
+	else if (render_request.used_effect == EFFECT_ASSET_ID::MESH || render_request.used_effect == EFFECT_ASSET_ID::EGG)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		GLint in_color_loc = glGetAttribLocation(program, "in_color");
 		gl_has_errors();
 
 		glEnableVertexAttribArray(in_position_loc);
 		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
 							  sizeof(ColoredVertex), (void *)0);
-		gl_has_errors();
-
-		glEnableVertexAttribArray(in_color_loc);
-		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(ColoredVertex), (void *)sizeof(vec3));
 		gl_has_errors();
 	}
 	else
@@ -280,7 +274,9 @@ void RenderSystem::drawGameElements()
 		//	std::cout << "way to big of a texture!" << registry.renderRequests.get(entity).used_texture << std::endl;
 		drawTexturedMesh(entity, projection_2D);
 		if (registry.circleColliders.has(entity)) // has collision circle, let's draw it
-			drawCircleCollider(entity, projection_2D);
+			drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
+		if (registry.aabbs.has(entity))
+			drawCollider(entity, TEXTURE_ASSET_ID::RECTANGLE_SPRITE, projection_2D);
 	}
 	glBindVertexArray(0);
 
@@ -576,15 +572,25 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEX
 	gl_has_errors();
 }
 
-// draws outlines for collision circles; considering just passing in circle data
-void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
+// draw collider shape based on shape texture passed
+// only draws circles and boxes for now
+// (more work required to include polygons)
+void RenderSystem::drawCollider(Entity entity, TEXTURE_ASSET_ID shape, const mat3& projection) {
 	Motion& motion = registry.motions.get(entity);
-	auto& circle = registry.circleColliders.get(entity);
 
 	Transform transform;
-	transform.translate(motion.position);
-	transform.rotate(motion.angle);
-	transform.scale({ circle.radius * 2, circle.radius * 2});
+	if (shape == TEXTURE_ASSET_ID::CIRCLE_SPRITE) {
+		auto& circle = registry.circleColliders.get(entity);
+		transform.translate(motion.position);
+		transform.rotate(motion.angle);
+		transform.scale({ circle.radius * 2, circle.radius * 2 });
+	}
+	else if (shape == TEXTURE_ASSET_ID::RECTANGLE_SPRITE) {
+		auto& aabb = registry.aabbs.get(entity);
+		transform.translate(motion.position);
+		transform.rotate(motion.angle);
+		transform.scale({ aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y });
+	}
 
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
 	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
@@ -624,7 +630,7 @@ void RenderSystem::drawCircleCollider(Entity entity, const mat3& projection) {
 
 	assert(registry.renderRequests.has(entity));
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::CIRCLE_SPRITE];
+		texture_gl_handles[(GLuint)shape];
 
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();

@@ -37,6 +37,8 @@ public:
 	ComponentContainer<EnemyBullet> enemyBullets;
 	ComponentContainer<PolyCollider> polyColliders;
 	ComponentContainer<WallCollider> walls;
+	ComponentContainer<AABBCollider> aabbs;
+	ComponentContainer<MeshCollider> meshColliders;
 	ComponentContainer<PlayerAttackData> shoots;
     ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
@@ -83,6 +85,8 @@ public:
 		registry_list.push_back(&enemyBullets);
 		registry_list.push_back(&polyColliders);
 		registry_list.push_back(&walls);
+		registry_list.push_back(&aabbs);
+		registry_list.push_back(&meshColliders);
 		registry_list.push_back(&collisionShapes);
 		registry_list.push_back(&shoots);
         registry_list.push_back(&invisibles);
