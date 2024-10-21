@@ -7,8 +7,14 @@
 #include <sstream>
 #include <iostream>
 #include <glm/detail/func_trigonometric.inl>
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 #include "physics_system.hpp"
+
+// include these for now
+// but may change to handle like render system does
+#include "text_system.hpp"
 
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
@@ -17,6 +23,7 @@ const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
 const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
 
 
+#pragma region init
 // create the underwater world
 WorldSystem::WorldSystem()
 	: points(0) {
@@ -29,8 +36,8 @@ WorldSystem::~WorldSystem() {
 	// destroy music components
 	if (backgroundMusic != nullptr)
 		Mix_FreeMusic(backgroundMusic);
-	if (salmonDeadSound != nullptr)
-		Mix_FreeChunk(salmonDeadSound);
+	if (playerHurtSound != nullptr)
+		Mix_FreeChunk(playerHurtSound);
 	if (salmonEatSound != nullptr)
 		Mix_FreeChunk(salmonEatSound);
 
@@ -72,10 +79,27 @@ GLFWwindow* WorldSystem::createWindow() {
 #if __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-	glfwWindowHint(GLFW_RESIZABLE, 0);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
+	int window_width_px,window_height_px;
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
+	window_width_px = vidMode->width;
+	window_height_px = vidMode->height;
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+
+	// FOR DEBUGGING AT SMALLER WINDOW SIZES
+	// window_width_px = 1280;
+	// window_height_px = 720;
+	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+
+	Entity ent = Entity();
+	WindowState& windowState = registry.windowStates.emplace(ent);
+	windowState.width = window_width_px;
+	windowState.height = window_height_px;
+	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
+
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -86,28 +110,46 @@ GLFWwindow* WorldSystem::createWindow() {
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 
-	//////////////////////////////////////
 	// Loading music and sounds with SDL
 	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-		fprintf(stderr, "Failed to initialize SDL Audio");
+		fprintf(stderr, "Failed to initialize SDL Audio: %s\n", SDL_GetError());
 		return nullptr;
 	}
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
-		fprintf(stderr, "Failed to open audio device");
+		fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
 		return nullptr;
 	}
 
-	backgroundMusic = Mix_LoadMUS(audio_path("music.wav").c_str());
-	salmonDeadSound = Mix_LoadWAV(audio_path("death_sound.wav").c_str());
-	salmonEatSound = Mix_LoadWAV(audio_path("eat_sound.wav").c_str());
+	for (int i = 1; i <= 3; i++) {
+		Sound& background = registry.sounds.emplace(Entity());
+		background.type = SoundType::Background;
+		background.path = audio_path("game-music-loop-" + std::to_string(i) + ".wav").c_str();
+		background.volume = 0.4f;
+		background.loops = -1;
+		std::cout << "Loaded background music " << background.path << std::endl;
+	}
 
-	if (backgroundMusic == nullptr || salmonDeadSound == nullptr || salmonEatSound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
-			audio_path("music.wav").c_str(),
-			audio_path("death_sound.wav").c_str(),
-			audio_path("eat_sound.wav").c_str());
+
+
+	backgroundMusic = Mix_LoadMUS(registry.sounds.get(registry.sounds.entities[(rand())%3]).path.c_str());
+	if (!backgroundMusic) {
+		fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+	}
+
+	playerHurtSound = Mix_LoadWAV(audio_path("player_hurtv1.wav").c_str());
+	if (!playerHurtSound) {
+		fprintf(stderr, "Failed to load player hurt sound: %s\n", Mix_GetError());
+	}
+
+	if (backgroundMusic == nullptr || playerHurtSound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n make sure the data directory is present",
+				audio_path("game-music-loop-1.mp3").c_str(),
+				audio_path("player_hurtv1.wav").c_str());
 		return nullptr;
 	}
+	std::string title = "StackOverflow";
+
+	glfwSetWindowTitle(window, title.c_str());
 
 	return window;
 }
@@ -121,13 +163,12 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	// Set all states to default
     restartGame();
 }
+#pragma endregion
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
-	// Updating window title with points
-	std::stringstream title_ss;
-	title_ss << "Points: " << points;
-	glfwSetWindowTitle(window, title_ss.str().c_str());
+	// Processing inputs
+	handleInput();
 
 	// Remove debug info from the last step
 	// comment this out for now
@@ -148,21 +189,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// simplistic way to have collision outlines follow their "owner" when the owner moves
-	// potentially buggy implementation with poly outlines, but currently works with circles
-	for (auto& owner : registry.collisionShapes.entities) {
-		for (auto& shape : registry.collisionShapes.get(owner).shapes) {
-			// very rough check to see if owner has moved (has velocity)
-			// but doesn't account for change in angle, etc
-			if ((registry.motions.get(owner).velocity.x > 0 || registry.motions.get(owner).velocity.y > 0) || owner == player) {
-				auto& motion = registry.motions.get(shape);
-				motion.angle = registry.motions.get(owner).angle;
-				motion.position = registry.motions.get(owner).position;
-				motion.velocity = registry.motions.get(owner).velocity;
-			}
-		}
-	}
-
 	// place sprite timer progression here for now
 	for (auto& entity : registry.spriteTimers.entities) {
 		auto& spriteTimer = registry.spriteTimers.get(entity);
@@ -173,16 +199,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	vec2 preDashSpeed = registry.motions.get(player).velocity;
-	if (preDashSpeed[0] == 0 && preDashSpeed[1] == 0) {
-		preDashSpeed = registry.ioStates.components[0].lastInputAxis;
-	}
+	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
-	// Processing inputs
-	handleInput();
-
+	movePlayer();
     //check dash related variables
-    dash(preDashSpeed, elapsed_ms_since_last_update);
+    dash(dashDirection, elapsed_ms_since_last_update);
 
 	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
 
@@ -203,36 +224,50 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
 			PlayerBullet& bullet = registry.playerBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				registry.remove_all_components_of(registry.playerBullets.entities[i]);
+				if (!registry.deleteds.has(registry.playerBullets.entities[i]))
+					registry.deleteds.emplace(registry.playerBullets.entities[i]);
 			}
 		}
 	}
 	if (registry.enemyBullets.entities.size() > 0) {
-		// for (Entity& bullet : registry.enemyBullets.entities) {
-		// 	float& range_timer = registry.enemyBullets.get(bullet).bulletRange;
-		// 	range_timer -= elapsed_ms_since_last_update;
-		// 	if (range_timer <= 0) {
-		// 		registry.remove_all_components_of(bullet);
-		// 	}
-		// }
 		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
 			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				registry.remove_all_components_of(registry.enemyBullets.entities[i]);
+				// remove enemy bullet
+				if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+					registry.deleteds.emplace(registry.enemyBullets.entities[i]);
 			}
 		}
 	}
-	if (registry.enemies.size() == 0) {
-		createEnemy(renderer, vec2(1280 * uniformDist(rng),720 * uniformDist(rng)), vec2(0, 0), EnemyAttackPattern::ALL_DIRECTION);
+
+    //check invisibity countdown
+    if (registry.invisibles.entities.size() > 0) {
+        for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
+            Invisible& entity = registry.invisibles.components[i];
+            if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+                registry.invisibles.remove(registry.invisibles.entities[i]);
+            }
+        }
+    }
+
+	//check damage countdown
+	if (registry.damageds.entities.size() > 0) {
+		for (int i = (int)registry.damageds.components.size()-1; i>=0; --i) {
+			Damaged& entity = registry.damageds.components[i];
+			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				registry.damageds.remove(registry.damageds.entities[i]);
+			}
+		}
 	}
 
-	// Processing the salmon state
-	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
 
-    float min_counter_ms = 3000.f;
-	// reduce window brightness if the salmon is dying
-	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
+	WindowState& wS = registry.windowStates.components[0];
+	if (registry.enemies.size() < 1) {
+		for (int i = 0; i < rand()%10 + 1; i++) {
+			EnemyBehavior behavior = uniformDist(rng) < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
+			Entity e = createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), vec2(0, 0), behavior);
+		}
+	}
 
 	return true;
 }
@@ -241,6 +276,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
+	GameState& gameState = registry.gameStates.components[0];
+	gameState.gameOver = false;
+	gameState.gamePaused = false;
+	gameState.dialogueScene = false;
+
+	WindowState& wS = registry.windowStates.components[0];
 	printf("Restarting\n");
 
 	// Reset the game speed
@@ -254,13 +295,22 @@ void WorldSystem::restartGame() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createPlayer(renderer,{0,0});
+	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
+	aimIndicator = createAimIndicator(renderer);
 
 	// Test calls:
-	
-	createTestWall(renderer, {100,200}, {400, 600});
+	createTestWall(renderer, {100,200}, {500, 200});
+	createTestWall(renderer, {100,200}, {100, 600});
 
+	//bounding walls
+	
+	createTestWall(renderer, {0,0}, {wS.width, 0});
+	createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
+	createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
+	createTestWall(renderer, {0, wS.height}, {0,0});
 	//createBlob(renderer, vec2(600, 300));
+
+	createTestFloor(renderer, { wS.width /2, wS.height/2 });
 
 	//createTestPoly(renderer, { 500,500 }, {
 	//	{100, 0},
@@ -269,45 +319,27 @@ void WorldSystem::restartGame() {
 	//	}
 	//	, 90);
 
-	// spawning 1 enemies to test
+	// create all ui here for now
+	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
+	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 }
 
 // Compute collisions between entities
 void WorldSystem::handleCollisions() {
-	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
-		// The entity and its collider
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
 
 		// Player centric collision handling
 		if (registry.players.has(entity)) {
-			//Player& player = registry.players.get(entity);
-
 			// Checking Player - Deadly collisions
-			if (registry.enemies.has(entity_other)) {
-				// initiate death unless already dying
-				if (!registry.invincibles.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
-					registry.invincibles.emplace(entity);
-					Mix_PlayChannel(-1, salmonDeadSound, 0);
-				}
-			}
-
-			// Check Player -> EnemyBullets collision
-			if (registry.enemyBullets.has(entity_other)) {
-				// initiate invincibility unless already invincible
-				if (!registry.invincibles.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
-					registry.invincibles.emplace(entity);
-					Mix_PlayChannel(-1, salmonDeadSound, 0);
-
-					EnemyBullet& eBullet = registry.enemyBullets.get(entity_other);
-					for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
-						registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
-					}
-				}
+			if (!registry.invincibles.has(entity)
+				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))
+			) {
+				handlePlayerHit(entity_other);
 			}
 
 			// Checking Player -> Wall collision
@@ -321,7 +353,18 @@ void WorldSystem::handleCollisions() {
 				vec2 b = wall.endPosition - wall.startPosition;
 				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 				vec2 d = a - c;
-				motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
+				// Player center projects onto the wall;
+				if (abs(glm::length(c) + glm::length(b - c) - glm::length(b)) < 0.01) {
+					motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
+				}
+				// Player circle collides with startPosition
+				else if (glm::length(a) < circle.radius) {
+					motion.position = (wall.startPosition + glm::normalize(a) * (circle.radius));
+				}
+				// Player circle collides with endPosition
+				else if (glm::length(motion.position - wall.endPosition) < circle.radius) {
+					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
+				}
 			}
 		}
 
@@ -339,20 +382,29 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
 
 					// Assumes bullet flies towards facing direction
-					motion.angle = atan(motion.velocity.y / motion.velocity.x);
+					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.remove_all_components_of(entity);
+					if (!registry.deleteds.has(entity))
+						registry.deleteds.emplace(entity);
 				}
 			}
 		}
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
+			for (int i = 0; i < (rand() % 10 + 3); i++) {
+				EmitParticle& p = registry.emitParticles.emplace(Entity());
+				Motion& motion = registry.motions.get(entity);
+				p.requestType = RequestType::Explosion;
+				p.requestOrigin = motion.position;
+				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+			}
 			if (registry.walls.has(entity_other)) {
 				if (registry.playerBullets.get(entity).bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
@@ -365,19 +417,19 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
-
+					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
 					// Assumes bullet flies towards facing direction
-					motion.angle = atan(motion.velocity.y/motion.velocity.x);
+					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					registry.remove_all_components_of(entity);
+					if (!registry.deleteds.has(entity))
+						registry.deleteds.emplace(entity);
 				}
+
 			}
 		}
-
-
 	}
 
 	// Remove all collisions from this simulation step
@@ -395,66 +447,102 @@ void WorldSystem::handleInput() {
 		input.shouldRestart = false;
 		restartGame();
 	}
-	movePlayer(input.inputAxis);
 
-	if(registry.motions.has(player)) {
-		Motion& playerMotion = registry.motions.get(player);
-		vec2 diff = input.mousePosition - playerMotion.position;
-		float angle = atan2(diff[1],diff[0]);
-		//playerMotion.angle = angle;
+	GameState& gameState = registry.gameStates.components[0];
+	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
+
+	if (!gameState.gameOver) {
+		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
+		if (input.shouldShowDialogue && input.nextDialogue && !gameState.gamePaused) {
+			input.nextDialogue = false;
+			std::string nextLine = registry.dialogueLines.get(dialogueBox).next();
+			std::cout << " dialogue line " << nextLine << std::endl;
+			if (strcmp(nextLine.c_str(), "<end>") != 0) {
+				registry.renderRequests.get(dialogueBox).show = true;
+				registry.textRenderRequests.get(dialogueBox).text = nextLine;
+			}
+			// no more lines of dialogue
+			else {
+				input.shouldShowDialogue = false;
+				registry.renderRequests.get(dialogueBox).show = false;
+				gameState.dialogueScene = false;
+			}
+		}
 	}
 
 }
 
-void WorldSystem::dash(vec2 preDashSpeed, float elapsed_ms_since_last_update) {
+void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
+	// Tick Dash Charge Timer
     Player& pl = registry.players.get(player);
     if (pl.currDashCharges < getModifiedValue(PlayerNumDash, pl.maxDashCharges)) {
-        pl.currDashCooldown -= elapsed_ms_since_last_update;
-        if (pl.currDashCooldown <= 0) {
+		if (pl.currDashCooldown > 0) {
+        	pl.currDashCooldown -= elapsed_ms_since_last_update;
+		} else {
             pl.currDashCharges++;
             pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
         }
     }
-    IOState& input = registry.ioStates.components[0];
-    if (!input.shouldDash) {
-        return;
-    }
-    if (pl.currDashCharges <= 0) {
-        input.shouldDash = 0.0f;
-        return;
-    }
-    Motion& player_motion = registry.motions.get(player);
-            // save the current speed and direction
-    if ((input.shouldDash -= elapsed_ms_since_last_update) > 0.0f) {
-        if (!registry.invincibles.has(player))
-            registry.invincibles.emplace(player);
-    	registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, input.shouldDash);
-        player_motion.velocity = pl.dashSpeed * glm::normalize(preDashSpeed);
-    }
-    else if (input.shouldDash <= 0.0f) {
-        // dash is over, remove invincibility and restore speed
-        player_motion.velocity = preDashSpeed;
-        pl.currDashCharges--;
-        input.shouldDash = 0.0f;
-        return;
-    }
+	// Player wants to start a new dash
+	IOState& input = registry.ioStates.components[0];
+	Motion& playerMotion = registry.motions.get(player);
+	if (input.shouldDash) {
+		input.shouldDash = false;
+
+		if (!registry.dashes.has(player) && pl.currDashCharges > 0) {
+			pl.currDashCharges--;
+			Dash& dash = registry.dashes.emplace(player);
+			dash.dashDirection = direction;
+		}
+	}
+	// Tick dash timer
+	if (registry.dashes.has(player)) {
+		Dash& dash = registry.dashes.get(player);
+		dash.endTimer -= elapsed_ms_since_last_update;
+		if (dash.endTimer <= 0) {
+			registry.dashes.remove(player);
+			playerMotion.velocity = {0,0};
+		} else {
+			// Tick IFrame timer
+			if (!registry.invincibles.has(player)) {
+				registry.invincibles.emplace(player);
+				registry.invincibles.get(player).countdown = dash.endTimer;
+				registry.invincibles.get(player).max = dash.endTimer;
+			} else {
+				registry.invincibles.get(player).countdown = max(registry.invincibles.get(player).countdown, dash.endTimer);
+			}
+
+			// Update Velocity
+			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
+			// std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
+
+			//emit particles at player position
+			EmitParticle& p = registry.emitParticles.emplace(Entity());
+			p.position = playerMotion.position + vec2(0.0f,playerMotion.scale.y / 2);
+		}
+	}
 }
 
 void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	IOState& input = registry.ioStates.components[0];
-	Player& pl = registry.players.get(player);
-	if (!input.shouldShoot) {
-		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
-			pl.currBulletBurst++;
-		}
-		return;
-	}
+	PlayerAttackData& pl = registry.shoots.get(player);
+    Motion& player_motion = registry.motions.get(player);
+    vec2 playerPos = player_motion.position;
+    vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);
+    player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
 	if (pl.currFiringInterval > 0) {
 		pl.currFiringInterval -= elapsed_ms_since_last_update;
 	}
 	if (pl.bulletBurstCooldown > 0) {
 		pl.bulletBurstCooldown -= elapsed_ms_since_last_update;
 	}
+	if (!input.shouldShoot) {
+		if (elapsed_ms_since_last_update > 50 && (pl.currBulletBurst < pl.maxBulletBurst)) {
+			pl.currBulletBurst++;
+		}
+		return;
+	}
+
 	if (pl.currFiringInterval <= 0) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
@@ -468,10 +556,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				BulletBurst, pl.maxBulletBurst)
 		);
 		// create bullet
-
-		vec2 playerPos = registry.motions.get(player).position;
-		vec2 bulletDir = glm::normalize(input.mousePosition - registry.motions.get(player).position);
-		vec2 bulletPos = playerPos + bulletDir * 100.f;
+		vec2 bulletPos = playerPos + bulletDir;
 
 		if (cluster == 1) {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
@@ -522,18 +607,86 @@ bool WorldSystem::isOver() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
-void WorldSystem::movePlayer(vec2 inputAxis) {
+void WorldSystem::movePlayer() {
+	IOState &input = registry.ioStates.components[0];
+	vec2 inputAxis = input.inputAxis;
 	Motion& player_motion = registry.motions.get(player);
 	if (glm::length(inputAxis) <= 0.0f) {
 		player_motion.velocity = {0,0};
 	} else {
 		player_motion.velocity = glm::normalize(inputAxis) * getModifiedValue(PlayerSpeed, registry.players.get(player).baseSpeed);
 	}
+
+	//move aim indicator
+	Motion& aimMotion = registry.motions.get(aimIndicator);
+	vec2 mousePos = input.mousePosition;
+	vec2 diff = mousePos - player_motion.position;
+	float range = 50.0f;
+	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
+	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
+	
 }
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 {
-	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
+	Entity& pl = registry.players.entities[0];
+	return max(registry.stackCompile.get(pl).minimums[bf], (value + registry.stackCompile.get(pl).additives[bf]) * registry.stackCompile.get(pl).multiplicatives[bf]);
+}
+
+void WorldSystem::handlePlayerHit(Entity& other) {
+	//change sprite
+	auto& spriteMap = registry.sprites.get(player).sprites;
+	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+		if (!registry.spriteTimers.has(player)) {
+			auto& spriteTimer = registry.spriteTimers.emplace(player);
+			spriteTimer.count_ms = 250;
+			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+		}
+	}
+	//play hit sound
+	Mix_PlayChannel(-1, playerHurtSound, 0);
+	//add player invincibility frames
+	if (!registry.invincibles.has(player))
+		registry.invincibles.emplace(player);
+
+	//add to stack for enemy bullets
+	if (registry.enemyBullets.has(other)) {
+		EnemyBullet& eBullet = registry.enemyBullets.get(other);
+		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
+			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+			if (!success) {
+				registry.gameStates.components[0].gameOver = true;
+			}
+		}
+	}
+	else if (registry.enemies.has(other)) {
+		Enemy& e = registry.enemies.get(other);
+		bool success = registry.stackCompile.get(player).add(e.blunt);
+		if (!success) {
+			registry.gameStates.components[0].gameOver = true;
+		}
+	}
+}
+
+void WorldSystem::clearDeleteQueue() {
+	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
+		Entity e = registry.deleteds.entities[i];
+		// right now, all our entities that fade will also emit particles (enemies)
+		// but should be generalized for more things in the future
+		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+		else {
+			for (int i = 0; i < (rand() % 5 + 2); i++) { // NOTE: this particle generation is frame-dependent
+				EmitParticle& p = registry.emitParticles.emplace(Entity());
+				Motion& motion = registry.motions.get(e);
+				p.requestType = RequestType::Explosion;
+				p.requestOrigin = motion.position + vec2{ rand() % (int)(motion.scale.y * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+			}
+		}
+	}
 }
 
 

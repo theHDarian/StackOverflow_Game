@@ -7,14 +7,17 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
-// System responsible for setting up OpenGL and for rendering all the
-// visual entities in the game
+// System responsible for handling user input
 class IOSystem {
 public:
     IOSystem();
     ~IOSystem();
 	// Initialize the window
 	bool init(GLFWwindow* window);
+
+    bool isPaused()const;
+    bool isGameOver()const;
+    bool isDialogue()const;
 
 private:
 	GLFWwindow* window;
@@ -24,5 +27,5 @@ private:
 
     void onMouseMove(vec2 mousePosition);
 
-    void handleMovementInput(int key, int action, IOState& state);
+    void handleMovementInput(int key, int action, IOState &state, GameState &gameState);
 };
