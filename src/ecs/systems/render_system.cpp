@@ -4,7 +4,7 @@
 #include <glm/gtx/compatibility.hpp>
 
 #include "tiny_ecs_registry.hpp"
-#include "../utils/enum_string_mapping.hpp"
+#include "utils/enum_string_mapping.hpp"
 
 
 #if IMGUI_ENABLED

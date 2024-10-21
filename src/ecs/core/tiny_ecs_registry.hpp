@@ -48,8 +48,11 @@ public:
 	ComponentContainer<Burst> bursts;
 	ComponentContainer<HomingBullet> homes;
 	ComponentContainer<Fade> fades;
+	ComponentContainer<Map> maps;
 	ComponentContainer<Deleted> deleteds;
-
+	ComponentContainer<Door> doors;
+	ComponentContainer<Bound> bounds; //room boundaries
+	ComponentContainer<MapRequest> mapRequests;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -92,7 +95,11 @@ public:
 		registry_list.push_back(&homes);
 		registry_list.push_back(&bursts);
 		registry_list.push_back(&fades);
+		registry_list.push_back(&maps);
 		registry_list.push_back(&deleteds);
+		registry_list.push_back(&doors);
+		registry_list.push_back(&bounds);
+		registry_list.push_back(&mapRequests);
 	}
 
 	void clear_all_components() {

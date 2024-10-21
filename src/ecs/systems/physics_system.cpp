@@ -2,6 +2,7 @@
 #include "physics_system.hpp"
 #include "world_init.hpp"
 #include <glm/trigonometric.hpp>
+#include "components/components.hpp"
 #include <glm/gtx/string_cast.hpp>
 #include <bitset>
 
@@ -130,6 +131,17 @@ void PhysicsSystem::step(float elapsed_ms)
 	for (uint i = 0; i < debug.components.size(); i++) {
 		if (CircleToPoly(player, debug.entities[i])) {
 			registry.collisions.emplace_with_duplicates(player, debug.entities[i]);
+		}
+	}
+
+	//Player -> doors
+	ComponentContainer<Door>& doors = registry.doors;
+	Motion& m = registry.motions.get(player);
+	CircleCollider& c = registry.circleColliders.get(player);
+	for (uint i = 0; i < doors.components.size(); i++) {
+		if (!doors.components[i].isPrev && CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)) {
+			//spawn on side opposite to the door
+			registry.mapRequests.emplace(player,MapRequestType::ChangeRoom,doors.components[i].room,i);
 		}
 	}
 }

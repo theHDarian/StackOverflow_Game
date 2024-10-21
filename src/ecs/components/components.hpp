@@ -52,6 +52,9 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+
+struct Bound {}; //room bounds
+
 struct AABBCollider {
 	// As offsets of motion.position:
 	vec2 topLeft;		//max x, max y
@@ -93,6 +96,13 @@ struct EmitParticle {
 	RequestType requestType;
 };
 
+struct ParticleProps {
+    vec2 position;
+    vec2 velocity,velocityVariation;
+    vec4 colorBegin, colorEnd;
+    float sizeBegin, sizeEnd, sizeVariation;
+    float lifetime;
+};
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType { Background, SFX };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.hpp"
-#include "../utils/extended_stack.hpp"
+#include "utils/extended_stack.hpp"
 
 struct WindowState {
     int width;

@@ -47,6 +47,33 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 	return entity;
 }
+
+Entity resetPlayer()
+{
+	// Setting initial motion values
+	assert(registry.players.entities.size() == 1);
+	Entity ent = registry.players.entities[0];
+	Motion& motion = registry.motions.get(ent);
+	WindowState& ws = registry.windowStates.components[0];
+	motion.position = {ws.width / 2, ws.height / 2};
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+
+	Player& player = registry.players.get(ent);
+	player.baseSpeed = 400;
+	CircleCollider& cc = registry.circleColliders.get(ent);
+	cc.radius = motion.scale.x/2.5;
+
+	//reset stack and shoot
+	PlayerAttackData& shoot = registry.shoots.get(ent);
+	shoot = PlayerAttackData();
+
+	StackCompile& sc = registry.stackCompile.get(ent);
+	sc = StackCompile();
+
+	return ent;
+}
+
 Entity createAimIndicator(RenderSystem* renderer) {
 	//add aim indicator
 	auto aimIndicator = Entity();
@@ -67,14 +94,56 @@ Entity createAimIndicator(RenderSystem* renderer) {
 
 // Purely for testing walls, puts 2 fish at either end of the line segment
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition) {
-	drawLineAtoB(renderer, startPosition, endPosition);
-
 	auto entity = Entity();
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.position = (startPosition + endPosition) / 2.0f;
+	motion.scale = vec2(glm::distance(startPosition,endPosition),5);
+	motion.angle = atan2(endPosition.y - startPosition.y, endPosition.x - startPosition.x);
+
 	auto& wall = registry.walls.emplace(entity);
 	wall.startPosition = startPosition;
 	wall.endPosition = endPosition;
 
+	registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
 	return entity;
+}
+Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos) {
+	auto entity = Entity();
+	auto& motion = registry.motions.emplace(entity);
+	motion.position = (startPos + endPos) / 2.0f;
+	motion.scale = vec2(glm::distance(startPos,endPos),5);
+	motion.angle = atan2(endPos.y - startPos.y, endPos.x - startPos.x);
+
+	auto& door = registry.doors.emplace(entity);
+	door.startPos = startPos;
+	door.endPos = endPos;
+
+	registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	return entity;
+}
+
+void createRoomBounds(RenderSystem* renderer) {
+	WindowState& wS = registry.windowStates.components[0];
+
+	Entity bounds[4];
+	bounds[0] = createTestWall(renderer, {0,0}, {wS.width, 0});
+	bounds[1] = createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
+	bounds[2] = createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
+	bounds[3] = createTestWall(renderer, {0, wS.height}, {0,0});
+
+	for (Entity b : bounds) {
+		registry.bounds.emplace(b);
+	}
+
 }
 
 // draw a line from point A to B
