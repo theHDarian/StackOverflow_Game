@@ -7,6 +7,8 @@
 #include <sstream>
 #include <iostream>
 #include <glm/detail/func_trigonometric.inl>
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 #include "physics_system.hpp"
 
@@ -108,28 +110,43 @@ GLFWwindow* WorldSystem::createWindow() {
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 
-	//////////////////////////////////////
 	// Loading music and sounds with SDL
 	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-		fprintf(stderr, "Failed to initialize SDL Audio");
+		fprintf(stderr, "Failed to initialize SDL Audio: %s\n", SDL_GetError());
 		return nullptr;
 	}
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
-		fprintf(stderr, "Failed to open audio device");
+		fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
 		return nullptr;
 	}
 
-	backgroundMusic = Mix_LoadMUS(audio_path("music.wav").c_str());
-	playerHurtSound = Mix_LoadWAV(audio_path("player_hurtv1.wav").c_str());
-	salmonEatSound = Mix_LoadWAV(audio_path("eat_sound.wav").c_str());
+	for (int i = 1; i <= 3; i++) {
+		Sound& background = registry.sounds.emplace(Entity());
+		background.type = SoundType::Background;
+		background.path = audio_path("game-music-loop-" + std::to_string(i) + ".wav").c_str();
+		background.volume = 0.4f;
+		background.loops = -1;
+		std::cout << "Loaded background music " << background.path << std::endl;
+	}
 
-	if (backgroundMusic == nullptr || playerHurtSound == nullptr || salmonEatSound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
-			audio_path("music.wav").c_str(),
-			audio_path("player_hurtv1.wav").c_str(),
-			audio_path("eat_sound.wav").c_str());
+
+
+	backgroundMusic = Mix_LoadMUS(registry.sounds.get(registry.sounds.entities[(rand())%3]).path.c_str());
+	if (!backgroundMusic) {
+		fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+	}
+
+	playerHurtSound = Mix_LoadWAV(audio_path("player_hurtv1.wav").c_str());
+	if (!playerHurtSound) {
+		fprintf(stderr, "Failed to load player hurt sound: %s\n", Mix_GetError());
+	}
+
+	if (backgroundMusic == nullptr || playerHurtSound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n make sure the data directory is present",
+				audio_path("game-music-loop-1.mp3").c_str(),
+				audio_path("player_hurtv1.wav").c_str());
 		return nullptr;
-	}	
+	}
 	std::string title = "StackOverflow";
 
 	glfwSetWindowTitle(window, title.c_str());

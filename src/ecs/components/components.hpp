@@ -88,8 +88,9 @@ struct EmitParticle {
 enum SoundType { Background, SFX };
 struct Sound {
 	SoundType type;
+	std::string path;
 	float volume; //0 to 1
-	bool isLooped;
+	int loops;
 };
 
 
