@@ -125,7 +125,6 @@ void EnemySystem::step(float elapsed_ms) {
             Enemy& enemyStat = registry.enemies.get(entity);
             PlayerBullet& bulletStat = registry.playerBullets.get(other_entity);
 
-            std::cout << bulletStat.damage << ", " << enemyStat.maxHealth << std::endl;
             enemyStat.currHealth -= bulletStat.damage;
             if (enemyStat.currHealth <= 0)
             {

@@ -86,14 +86,14 @@ GLFWwindow* WorldSystem::createWindow() {
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	// window_width_px = vidMode->width;
-	// window_height_px = vidMode->height;
-	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	 window_width_px = vidMode->width;
+	 window_height_px = vidMode->height;
+	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
-	window_width_px = 1280;
-	window_height_px = 720;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	//window_width_px = 1280;
+	//window_height_px = 720;
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
