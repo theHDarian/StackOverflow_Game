@@ -38,8 +38,6 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(backgroundMusic);
 	if (playerHurtSound != nullptr)
 		Mix_FreeChunk(playerHurtSound);
-	if (salmonEatSound != nullptr)
-		Mix_FreeChunk(salmonEatSound);
 
 	Mix_CloseAudio();
 
@@ -87,12 +85,21 @@ GLFWwindow* WorldSystem::createWindow() {
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 	window_width_px = vidMode->width;
 	window_height_px = vidMode->height;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	
+	// uncomment these for fullscreen mode 
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	
+	// Tom needs refresh rate to be 120 or he can't see :(
+	// If theres a better way to do this please go ahead
+	//glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, window_width_px, window_height_px, 120);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	// window_width_px = 1280;
 	// window_height_px = 720;
-	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+
+	// uncomment these for windowed-ish mode
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	glfwSetWindowMonitor(window, NULL, 0, 0, window_width_px, window_height_px, 120);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
