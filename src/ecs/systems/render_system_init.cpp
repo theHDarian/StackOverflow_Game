@@ -37,7 +37,6 @@ void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int 
 	}
 
 	glViewport(0, 0, windowState.width, windowState.height);
-	// glfwSetWindowSize(window,width,height);
 }
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)

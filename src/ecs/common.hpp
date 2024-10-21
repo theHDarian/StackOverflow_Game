@@ -37,7 +37,7 @@ inline std::string font_path(const std::string& name) { return data_path() + "/f
 #endif
 
 #ifndef IMGUI_ENABLED
-#define IMGUI_ENABLED 1
+#define IMGUI_ENABLED 0
 #endif
 
 // The 'Transform' component handles transformations passed to the Vertex shader

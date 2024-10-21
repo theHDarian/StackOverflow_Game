@@ -44,7 +44,7 @@ struct BulletStackEffect {
 // Player component
 struct Player
 {
-    float baseSpeed;
+    float baseSpeed = 200;
     float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;

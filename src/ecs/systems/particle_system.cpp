@@ -1,13 +1,14 @@
 #include "particle_system.hpp"
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/compatibility.hpp>
-#include "../utils/random.hpp"
+#include "utils/random.hpp"
 #include "tiny_ecs_registry.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ai_system.hpp"
 #include "ai_system.hpp"
 #include "render_system.hpp"
+#include "components/presets/particle_presets.hpp"
 
 ParticleSystem::ParticleSystem() {
     particlePool.resize(1000);
@@ -132,14 +133,15 @@ void ParticleSystem::step(float elapsed_ms) {
     //check emit requests
     for (auto& request : registry.emitParticles.components) {
         if (request.requestType == RequestType::EmitParticle) {
-            emit(createDashParticle(request.position));
+            emit(createParticle(request.position));
         }
         else if (request.requestType == RequestType::Explosion) {
-            explode(createDashParticle(request.position), request.requestOrigin);
+            // printf("%.2f %.2f\n",request.position.x,request.position.y);
+            explode(createParticle(request.position), request.requestOrigin);
         }
     }
     //test emission on mouse position
-    // emit(createDashParticle(registry.ioStates.components[0].mousePosition));
+    // emit(createParticle(registry.ioStates.components[0].mousePosition));
     registry.emitParticles.clear();
 }
 
@@ -270,16 +272,8 @@ void ParticleSystem::render() {
     }
 }
 
-ParticleProps ParticleSystem::createDashParticle(vec2 pos) {
-    ParticleProps props;
-    props.position = {pos.x + Random::Float(-5,5),pos.y + Random::Float(-5,5)};
-    props.velocity = { -5.0f, -5.0f };
-    props.velocityVariation = { 10.0f, 10.0f };
-    props.colorBegin = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };	
-    props.colorEnd = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
-    props.sizeBegin = 10.0f;
-    props.sizeVariation = 3.0f;
-    props.sizeEnd = 2.0f;		
-    props.lifetime = 1000.0f;
-    return props;
+ParticleProps ParticleSystem::createParticle(vec2 pos) {
+    ParticleProps p = DefaultParticle();
+    p.position = pos;
+    return p;
 }

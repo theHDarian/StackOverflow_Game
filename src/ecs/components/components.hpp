@@ -52,6 +52,19 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+
+struct Bound {}; //room bounds
+
+struct AABBCollider {
+	// As offsets of motion.position:
+	vec2 topLeft;		//max x, max y
+	vec2 bottomRight;	//min x, min y
+};
+
+struct MeshCollider {
+	// basically just exists for checking
+};
+
 // Data structure for toggling debug mode
 struct Debug {
 	bool in_debug_mode = false;
@@ -83,6 +96,13 @@ struct EmitParticle {
 	RequestType requestType;
 };
 
+struct ParticleProps {
+    vec2 position;
+    vec2 velocity,velocityVariation;
+    vec4 colorBegin, colorEnd;
+    float sizeBegin, sizeEnd, sizeVariation;
+    float lifetime;
+};
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType { Background, SFX };
@@ -160,15 +180,16 @@ enum  TEXTURE_ASSET_ID : unsigned int {
 	ENEMY_BULLET_CIRCLE = ENEMY_BULLET_SQUARE + 1,
 	ENEMY_BULLET_TRIANGLE = ENEMY_BULLET_CIRCLE + 1,
 	CHEVRON = ENEMY_BULLET_TRIANGLE + 1,
-	TEXTURE_COUNT = CHEVRON + 1,
+	RECTANGLE_SPRITE = CHEVRON + 1,
+	TEXTURE_COUNT = RECTANGLE_SPRITE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum  EFFECT_ASSET_ID : unsigned int {
 	COLOURED = 0,
 	EGG = COLOURED + 1,
-	SALMON = EGG + 1,
-	TEXTURED = SALMON + 1,
+	MESH = EGG + 1,
+	TEXTURED = MESH + 1,
 	POSTPROCESS = TEXTURED + 1,
 	DASH = POSTPROCESS + 1,
 	EFFECT_COUNT = DASH + 1
@@ -176,8 +197,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum  GEOMETRY_BUFFER_ID : unsigned int {
-	SALMON_GB = 0,
-	SPRITE = SALMON_GB + 1,
+	MESH_GB = 0,
+	SPRITE = MESH_GB + 1,
 	EGG_GB = SPRITE + 1,
 	DEBUG_LINE = EGG_GB + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,

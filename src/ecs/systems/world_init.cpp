@@ -20,9 +20,12 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.scale = mesh.original_size * 50.f;
 
 	Player& player = registry.players.emplace(entity);
-	player.baseSpeed = 400;
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x/2.5;
+
+	AABBCollider& aabb = registry.aabbs.emplace(entity);
+	aabb.topLeft = vec2(-motion.scale.x / 3.5, -motion.scale.y / 2.5);
+	aabb.bottomRight = vec2(motion.scale.x / 3.5, motion.scale.y / 3);
 
     PlayerAttackData& shoot = registry.shoots.emplace(entity);
 
@@ -32,16 +35,45 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	Sprites& playerSprites = registry.sprites.emplace(entity);
 	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
 	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{
 			playerSprites.sprites[SPRITE_STATE::BASE],
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
+	// can play around with offset to try to align sprite
+	rr.offset = vec2(-5, 0);
 
 	return entity;
 }
+
+Entity resetPlayer()
+{
+	// Setting initial motion values
+	assert(registry.players.entities.size() == 1);
+	Entity ent = registry.players.entities[0];
+	Motion& motion = registry.motions.get(ent);
+	WindowState& ws = registry.windowStates.components[0];
+	motion.position = {ws.width / 2, ws.height / 2};
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+
+	Player& player = registry.players.get(ent);
+	player.baseSpeed = 400;
+	CircleCollider& cc = registry.circleColliders.get(ent);
+	cc.radius = motion.scale.x/2.5;
+
+	//reset stack and shoot
+	PlayerAttackData& shoot = registry.shoots.get(ent);
+	shoot = PlayerAttackData();
+
+	StackCompile& sc = registry.stackCompile.get(ent);
+	sc = StackCompile();
+
+	return ent;
+}
+
 Entity createAimIndicator(RenderSystem* renderer) {
 	//add aim indicator
 	auto aimIndicator = Entity();
@@ -63,14 +95,56 @@ Entity createAimIndicator(RenderSystem* renderer) {
 
 // Purely for testing walls, puts 2 fish at either end of the line segment
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition) {
-	drawLineAtoB(renderer, startPosition, endPosition);
-
 	auto entity = Entity();
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.position = (startPosition + endPosition) / 2.0f;
+	motion.scale = vec2(glm::distance(startPosition,endPosition),5);
+	motion.angle = atan2(endPosition.y - startPosition.y, endPosition.x - startPosition.x);
+
 	auto& wall = registry.walls.emplace(entity);
 	wall.startPosition = startPosition;
 	wall.endPosition = endPosition;
 
+	registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
 	return entity;
+}
+Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos) {
+	auto entity = Entity();
+	auto& motion = registry.motions.emplace(entity);
+	motion.position = (startPos + endPos) / 2.0f;
+	motion.scale = vec2(glm::distance(startPos,endPos),5);
+	motion.angle = atan2(endPos.y - startPos.y, endPos.x - startPos.x);
+
+	auto& door = registry.doors.emplace(entity);
+	door.startPos = startPos;
+	door.endPos = endPos;
+
+	registry.renderRequests.insert(
+		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	return entity;
+}
+
+void createRoomBounds(RenderSystem* renderer) {
+	WindowState& wS = registry.windowStates.components[0];
+
+	Entity bounds[4];
+	bounds[0] = createTestWall(renderer, {0,0}, {wS.width, 0});
+	bounds[1] = createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
+	bounds[2] = createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
+	bounds[3] = createTestWall(renderer, {0, wS.height}, {0,0});
+
+	for (Entity b : bounds) {
+		registry.bounds.emplace(b);
+	}
+
 }
 
 // draw a line from point A to B
@@ -136,12 +210,12 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-// basic enemy that doesn't do anything
-Entity createBlob(RenderSystem* renderer, vec2 position) {
+// mesh enemy that doesn't do anything
+Entity createBigC(RenderSystem* renderer, vec2 position) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::MESH_GB);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	// Initialize the motion
@@ -151,26 +225,27 @@ Entity createBlob(RenderSystem* renderer, vec2 position) {
 	motion.position = position;
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ 100, 100 });
+	motion.scale = vec2({ 700 * (1.923352 / 2.0f), 700});
+	//motion.scale = vec2({ 500, 500 });
 
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = motion.scale.x/2;
+	registry.meshColliders.emplace(entity);
 
-	auto enemy = registry.enemies.emplace(entity);
+	auto& enemy = registry.enemies.emplace(entity);
 	enemy.attackCooldown = 5000;
 	enemy.maxHealth = 1000;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 
+	AttackData& atk = registry.attackDatas.emplace(entity);
+	atk = none;
+
 	registry.sprites.emplace(entity);
-	registry.sprites.get(entity).sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::PUFFERFISH;
-	registry.sprites.get(entity).sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::FISH;
 	registry.renderRequests.insert(
 		entity,
 		{
 			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
+			EFFECT_ASSET_ID::MESH,
+			GEOMETRY_BUFFER_ID::MESH_GB
 		});
 
 	return entity;
@@ -283,10 +358,10 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	if (atkData.shape == RECTANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
-			{motion.scale.x / 2,motion.scale.y / 2},
-			{motion.scale.x / 2,-motion.scale.y / 2},
-			{-motion.scale.x / 2,motion.scale.y / 2},
-			{-motion.scale.x / 2,-motion.scale.y / 2}
+			{ motion.scale.x / 2,  motion.scale.y / 2},
+			{ motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2,-motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2}
 		};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
@@ -296,7 +371,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	else if (atkData.shape == TRIANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
-			{motion.scale.x / 2, 0},
+			{ motion.scale.x / 2, 0},
 			{-motion.scale.x / 2,-motion.scale.y / 2},
 			{-motion.scale.x / 2, motion.scale.y / 2}
 		};

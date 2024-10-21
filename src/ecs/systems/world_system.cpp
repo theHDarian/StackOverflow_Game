@@ -15,6 +15,7 @@
 // include these for now
 // but may change to handle like render system does
 #include "text_system.hpp"
+#include "utils/random.hpp"
 
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
@@ -78,28 +79,20 @@ GLFWwindow* WorldSystem::createWindow() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_REFRESH_RATE,60);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	window_width_px = vidMode->width;
-	window_height_px = vidMode->height;
-	
-	// uncomment these for fullscreen mode 
-	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
-
-	// Tom needs refresh rate to be 120 or he can't see :(
-	// If theres a better way to do this please go ahead
-	//glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, window_width_px, window_height_px, 120);
+	 window_width_px = vidMode->width;
+	 window_height_px = vidMode->height;
+	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
-	// window_width_px = 1280;
-	// window_height_px = 720;
-
-	// uncomment these for windowed-ish mode
+	//window_width_px = 1280;
+	//window_height_px = 720;
 	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
-	glfwSetWindowMonitor(window, NULL, 20, 20, window_width_px, window_height_px, 120);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -167,8 +160,24 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	Mix_PlayMusic(backgroundMusic, -1);
 	fprintf(stderr, "Loaded music\n");
 
+
 	// Set all states to default
-    restartGame();
+	GameState& gameState = registry.gameStates.components[0];
+	gameState.gameOver = false;
+	gameState.gamePaused = false;
+	gameState.dialogueScene = false;
+
+	WindowState& wS = registry.windowStates.components[0];
+	currentSpeed = 1.f;
+
+	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
+	aimIndicator = createAimIndicator(renderer);
+
+	// this feels very bad, put as temp fix for getting window size for now
+	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
+	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 }
 #pragma endregion
 
@@ -281,6 +290,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 // Reset the world state to its initial state
 void WorldSystem::restartGame() {
+	printf("Restarting\n");
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 	GameState& gameState = registry.gameStates.components[0];
@@ -288,49 +298,15 @@ void WorldSystem::restartGame() {
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
 
-	WindowState& wS = registry.windowStates.components[0];
-	printf("Restarting\n");
-
 	// Reset the game speed
 	currentSpeed = 1.f;
-
-	// Remove all entities that we created
-	// All that have a motion, we could also iterate over all fish, eels, ... but that would be more cumbersome
-	while (registry.motions.entities.size() > 0)
-	    registry.remove_all_components_of(registry.motions.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
-	aimIndicator = createAimIndicator(renderer);
+	Entity player = resetPlayer();
 
-	// Test calls:
-	createTestWall(renderer, {100,200}, {500, 200});
-	createTestWall(renderer, {100,200}, {100, 600});
-
-	//bounding walls
-	
-	createTestWall(renderer, {0,0}, {wS.width, 0});
-	createTestWall(renderer, {wS.width,0}, {wS.width, wS.height});
-	createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
-	createTestWall(renderer, {0, wS.height}, {0,0});
-	//createBlob(renderer, vec2(600, 300));
-
-	createTestFloor(renderer, { wS.width /2, wS.height/2 });
-
-	//createTestPoly(renderer, { 500,500 }, {
-	//	{100, 0},
-	//	{-50, 50},
-	//	{-50, -50}
-	//	}
-	//	, 90);
-
-	// create all ui here for now
-	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
-	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
-	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
-	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
+	registry.mapRequests.emplace(player,MapRequestType::RestartGame);
 }
 
 // Compute collisions between entities
@@ -526,6 +502,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			//emit particles at player position
 			EmitParticle& p = registry.emitParticles.emplace(Entity());
 			p.position = playerMotion.position + vec2(0.0f,playerMotion.scale.y / 2);
+			p.requestOrigin = p.position;
+			p.requestType = RequestType::EmitParticle;
+			p.position.x += Random::Float(-5,5);
+			p.position.y += Random::Float(-5,5);
 		}
 	}
 }
@@ -689,8 +669,13 @@ void WorldSystem::clearDeleteQueue() {
 				EmitParticle& p = registry.emitParticles.emplace(Entity());
 				Motion& motion = registry.motions.get(e);
 				p.requestType = RequestType::Explosion;
-				p.requestOrigin = motion.position + vec2{ rand() % (int)(motion.scale.y * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
-				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+				p.requestOrigin = motion.position;
+				vec2 r = motion.scale * 0.8f;
+				r.x *= Random::Float(-0.5f,0.5f);
+				r.y *= Random::Float(-0.5f,0.5f);
+				p.position = motion.position;
+				p.position.x += Random::Float(-5,5);
+				p.position.y += Random::Float(-5,5);
 			}
 		}
 	}
