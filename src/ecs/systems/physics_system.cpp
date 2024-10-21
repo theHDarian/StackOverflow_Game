@@ -8,6 +8,8 @@
 
 void PhysicsSystem::step(float elapsed_ms)
 {
+	CheapCircleToTriangle({ 50,50 }, 20, { 30,10 }, { 40, 50 }, {10, 40});
+
 	auto& motion_registry = registry.motions;
 	float step_seconds = elapsed_ms / 1000.f;
 	Entity player = registry.players.entities[0];
@@ -113,7 +115,8 @@ void PhysicsSystem::step(float elapsed_ms)
 
 	for (uint i = 0; i < enemies.components.size(); i++) {
 		if ((registry.circleColliders.has(enemies.entities[i]) && CircleToCircle(player, enemies.entities[i])) || 
-			registry.meshColliders.has(enemies.entities[i]) && (AABBToMesh(player, enemies.entities[i]))) {
+			registry.meshColliders.has(enemies.entities[i]) && (AABBToMesh(player, enemies.entities[i])) ||
+			registry.aabbs.has(enemies.entities[i]) && (AABBToAABB(player, enemies.entities[i]))) {
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
 		}
 		for (uint j = 0; j < pBullets.components.size(); j++) {
@@ -254,6 +257,10 @@ bool PhysicsSystem::CircleToMesh(Entity circle, Entity mesh) {
 	if (!CheapCircleToCircle(mA.position, c.radius, mB.position, max(mB.scale.x, mB.scale.y))) return false;
 
 	for (uint i = 0; i < m.vertex_indices.size(); i += 3) {
+		if (!CheapCircleToTriangle(offset, r,
+			m.vertices[m.vertex_indices[i + 0]].position,
+			m.vertices[m.vertex_indices[i + 1]].position,
+			m.vertices[m.vertex_indices[i + 2]].position)) continue;
 		if (PointInTriangle(offset,
 			m.vertices[m.vertex_indices[i+0]].position, 
 			m.vertices[m.vertex_indices[i+1]].position, 
@@ -282,6 +289,21 @@ bool PhysicsSystem::CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3) {
 	}
 
 	return false;
+}
+
+bool PhysicsSystem::AABBToAABB(Entity aabb1, Entity aabb2) {
+	Motion& mA = registry.motions.get(aabb1);
+	Motion& mB = registry.motions.get(aabb2);
+
+	AABBCollider& ab1 = registry.aabbs.get(aabb1);
+	AABBCollider& ab2 = registry.aabbs.get(aabb2);
+
+	vec2 max1 = mA.position + ab1.bottomRight;
+	vec2 max2 = mB.position + ab2.bottomRight;
+	vec2 min1 = mA.position + ab1.topLeft;
+	vec2 min2 = mB.position + ab2.topLeft;
+
+	return ((min1.y < max2.y) && (min2.y < max1.y) && (min1.x < max2.x) && (min2.x < max1.x));
 }
 
 bool PhysicsSystem::AABBToPoly(Entity aabb, Entity poly) {
@@ -326,6 +348,10 @@ bool PhysicsSystem::AABBToMesh(Entity aabb, Entity mesh) {
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
 	for (uint i = 0; i < m.vertex_indices.size(); i += 3) {
+		if (!CheapCircleToTriangle(offset, max(mA.scale.x, mA.scale.y),
+			m.vertices[m.vertex_indices[i + 0]].position,
+			m.vertices[m.vertex_indices[i + 1]].position,
+			m.vertices[m.vertex_indices[i + 2]].position)) continue;
 		if (AABBToTriangle(offset + br, offset + tl, 
 			rotate(m.vertices[m.vertex_indices[i+0]].position, mB.angle), 
 			rotate(m.vertices[m.vertex_indices[i+1]].position, mB.angle),
@@ -428,7 +454,27 @@ bool PhysicsSystem::PointInTriangle(vec2 p, vec2 p1, vec2 p2, vec2 p3) {
 }
 
 bool PhysicsSystem::CheapCircleToCircle(vec2 p1, float r1, vec2 p2, float r2) {
-	return (glm::dot(p1 - p2, p1 - p2) < (r1 + r2) * (r1 + r2));
+	float sum = (r1 + r2);
+	vec2 offset = p1 - p2;
+	return (glm::dot(offset, offset) < sum * sum);
+}
+
+bool PhysicsSystem::CheapCircleToTriangle(vec2 p, float r, vec2 a, vec2 b, vec2 c) {
+	float dotA = glm::dot(a, a);
+	float dotB = glm::dot(b, b);
+	float dotC = glm::dot(c, c);
+
+	float d = 2 * (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
+	float ux = (dotA * (b.y - c.y) + dotB * (c.y - a.y) + dotC * (a.y - b.y)) / d;
+	float uy = (dotA * (c.x - b.x) + dotB * (a.x - c.x) + dotC * (b.x - a.x)) / d;
+	vec2 u = vec2(ux, uy);
+	
+	float tr = glm::distance(u, a);
+
+	//std::cout << glm::to_string(a) << ", " << glm::to_string(b) << ", " << glm::to_string(c) << std::endl;
+	//std::cout << glm::to_string(u) << ", " << tr << std::endl;
+
+	return CheapCircleToCircle(p, r, u, tr);
 }
 
 vec2 PhysicsSystem::rotate(vec2 v, float angle) {

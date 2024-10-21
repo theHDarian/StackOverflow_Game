@@ -23,6 +23,7 @@ private:
 	bool AABBToCircle(Entity aabb, Entity circle);
 	bool AABBToPoly(Entity circle, Entity poly);
 	bool AABBToMesh(Entity circle, Entity poly);
+	bool AABBToAABB(Entity aabb1, Entity aabb2);
 
 	bool CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3);
 	bool AABBToLine(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2);
@@ -31,5 +32,6 @@ private:
 	int	 PointInAABB(const glm::vec2& p, const glm::vec2& max, const glm::vec2& min);
 	bool PointInTriangle(vec2 p, vec2 p1, vec2 p2, vec2 p3);
 	bool CheapCircleToCircle(vec2 p1, float r1, vec2 p2, float r2);
+	bool CheapCircleToTriangle(vec2 p, float r, vec2 a, vec2 b, vec2 c);
 	vec2 rotate(vec2 v, float angle);
 };
