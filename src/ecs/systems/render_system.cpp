@@ -324,7 +324,15 @@ void RenderSystem::drawGameElements()
 		drawAllColliders(entity, projection_2D);
 	}
 
-	for (Entity& entity : registry.wallObjects.entities)
+	for (Entity& entity : registry.walls.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+
+
+	for (Entity& entity : registry.doors.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;

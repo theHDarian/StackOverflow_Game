@@ -291,7 +291,3 @@ struct Fade {
 struct Deleted {
 	// this entity is marked for deletion
 };
-
-struct Wall {
-	// this is a wall
-};
