@@ -80,7 +80,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	glfwWindowHint(GLFW_REFRESH_RATE,120);
+	glfwWindowHint(GLFW_REFRESH_RATE,60);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
