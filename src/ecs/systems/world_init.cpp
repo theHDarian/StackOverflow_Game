@@ -274,38 +274,64 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 };
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavior behavior) {
+Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	auto entity = Entity();
 
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+
+	//std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
+    Enemy& enemy = registry.enemies.emplace(entity);;
+    switch (type) {
+        case EnemyType::EasyEnemySentry: {
+			std::cout << "got here" << std::endl;
+            enemy = EnemyEasySentry();
+            break;
+        }
+        case EnemyType::MediumEnemyCharge: {
+            enemy = EnemyMediumCharge();
+            break;
+        }
+        case EnemyType::MediumEnemyHoming: {
+            enemy = EnemyMediumHoming();
+            break;
+        }
+		case EnemyType::EasyEnemySniper: {
+			enemy = EnemyEasySniper();
+			break;
+		}
+
+    }
+
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.position = pos;
-	motion.velocity = velocity;
+	motion.velocity = vec2(0, 0);
 	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
-	Enemy& enemy = registry.enemies.emplace(entity);
-	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 20;
-	enemy.currHealth = enemy.maxHealth;
-	enemy.state = 10;
-	enemy.behavior = behavior;
-	enemy.blunt = blunt;
-
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
-	movement.posA = pos;
-	movement.posB = AISystem::getMove(behavior);
-	//std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+	if (enemy.behavior == EnemyBehavior::PATROLLING) {
+		movement.posA = enemy.patrolPath[0];
+	} else {
+		movement.posA = pos;
+	}
+	movement.posB = AISystem::getMove(enemy.behavior, entity);
+	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
+	
 	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = twelveSpiralShot;
-
-	if (atk.attackType == EnemyAttackPattern::BURST || atk.attackType == EnemyAttackPattern::SPRAY) {
-		Burst& atk = registry.bursts.emplace(entity);
+	std::vector<AttackData> atkData = enemy.attackData;
+	std::cout << "attackData size:" << atkData.size() << std::endl;
+	if (atkData.size() > 0) {
+		atk = atkData[0];
+	}
+	for (int i = 0; i < atkData.size(); i++) {
+		if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
+			registry.bursts.emplace(entity);
+		}
 	}
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
@@ -316,9 +342,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBehavio
 		{
 			TEXTURE_ASSET_ID::PUFFERFISH,
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE,
-			true,
-			vec2(-12, 0) // manually set an offset for now
+			GEOMETRY_BUFFER_ID::SPRITE
 		});
 
 	return entity;

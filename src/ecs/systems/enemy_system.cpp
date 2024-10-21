@@ -59,6 +59,11 @@ void EnemySystem::step(float elapsed_ms) {
         // move enemy using lerp
         if (registry.enemyMovement.has(entity)) {
             EnemyMovement& movement = registry.enemyMovement.get(entity);
+            if (enemy.behavior == EnemyBehavior::ROTATE_IN_PLACE) {
+                float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
+                float rotationChange = angularSpeed * elapsed_ms / 1000.f;
+                motion.angle += rotationChange;
+            }
             vec2 direction = movement.posB - movement.posA;
             if (direction != vec2(0, 0)) {
                 float targetAngle = atan2(direction.y, direction.x);
@@ -77,7 +82,7 @@ void EnemySystem::step(float elapsed_ms) {
                 motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
             }
 
-        }
+        } 
 
         // NOTE: enemy must attack AFTER being moved
         // or else causes corrupted memory in effect/geometry/texture id and makes it a huge number

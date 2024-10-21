@@ -42,11 +42,12 @@ void MapSystem::step(float elapsed_ms) {
 
     //spawn enemy based on current time 
     WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() < 1) {
-		for (int i = 0; i < rand()%10 + 1; i++) {
-			EnemyBehavior behavior = Random::Float() < 0.5f ? EnemyBehavior::RANDOM : EnemyBehavior::FOLLOW_PLAYER;
-			Entity e = createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), vec2(0, 0), behavior);
-		}
+    std::cout << " enemy size " << registry.enemies.size() << std::endl;
+	if (registry.enemies.size() <= 5) {
+			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySniper);
+			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
+			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
+			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
 	}
 }
 

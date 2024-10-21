@@ -198,6 +198,14 @@ struct PlayerBullet {
     int bulletBounce = 0;
 };
 
+enum EnemyType {
+    EasyEnemySentry,
+    //MediumEnemyClusterShot,
+    MediumEnemyCharge,
+    MediumEnemyHoming,
+    EasyEnemySniper
+};
+
 enum class EnemyAttackPattern {
     // this is the attack pattern
     SHOTGUN,
@@ -211,7 +219,10 @@ enum class EnemyBehavior {
     // this is the basic
     RANDOM,
     FOLLOW_PLAYER,
-    PATHFINDING,
+    PATROLLING,
+    EVADEBULLET,
+    CIRCLINGPLAYER,
+    ROTATE_IN_PLACE
 };
 
 enum EnemyBulletShape {
@@ -242,11 +253,15 @@ struct Enemy {
     int state; //TODO: can change to enum once state determined
     int maxHealth;
     int currHealth;
+    vec2 velocity;
     // TODO add attack pattern data?
     float attackCooldown;
     EnemyBehavior behavior;
     std::vector<AttackData> attackData;
     BulletStackEffect blunt;
+    // for patrolling enemies
+    std::vector<vec2> patrolPath;
+    int patrolIndex = 0;
 };
 
 struct EnemyMovement {
