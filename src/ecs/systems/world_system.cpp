@@ -202,7 +202,10 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
 	aimIndicator = createAimIndicator(renderer);
 
+	WindowState& ws = registry.windowStates.components[0];
 	createRoomBounds(renderer);
+	createTestFloor(renderer, { ws.width /2, ws.height/2 });
+
 
 	// this feels very bad, put as temp fix for getting window size for now
 	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
