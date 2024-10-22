@@ -127,6 +127,11 @@ Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos) {
 				 EFFECT_ASSET_ID::EGG,
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
+	vec3 c = registry.colors.emplace(entity);
+	c.r = 0.0;
+	c.g = 0.0;
+	c.b = 1.0;
+
 	return entity;
 }
 
