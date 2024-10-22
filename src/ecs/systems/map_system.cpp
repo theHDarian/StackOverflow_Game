@@ -42,7 +42,7 @@ void MapSystem::step(float elapsed_ms) {
 
     //spawn enemy based on current time 
     WindowState& wS = registry.windowStates.components[0];
-    std::cout << " enemy size " << registry.enemies.size() << std::endl;
+    // std::cout << " enemy size " << registry.enemies.size() << std::endl;
 	if (registry.enemies.size() <= 5) {
 			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySniper);
 			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
@@ -70,11 +70,15 @@ void clearRoomActors() {
 }
 
 void MapSystem::changeRoom(RoomType type, int doorIndex) {
+    std::vector<Door>& doors = registry.doors.components;
+    Door& door = doors[doorIndex];
+    if (door.room == RoomType::None) return;
+    
     printf("Changing Room %c, Door Side:%d \n", type, doorIndex);
     //move player to the starting side of the room
     Entity& playerEntity = registry.players.entities[0];
     Motion& playerMotion = registry.motions.get(playerEntity);
-    std::vector<Door>& doors = registry.doors.components;
+    
 
     //index of door to spawn at
     int spawnIndex = doorIndex == 0 ? 2 : doorIndex == 1 ? 3 :doorIndex == 2 ? 0 : 1;
