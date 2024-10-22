@@ -136,14 +136,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	glUniform1f(alpha_uloc, alpha);
 	gl_has_errors();
 
-	// Change color if entity is invincible
+	// change opacity of entity if needed
 	if (registry.invincibles.has(entity)) {
 		Invincible& invincible = registry.invincibles.get(entity);
-		vec3 color = { 1.2, 1.2, 1.2 }; // grey
-		glUniform3fv(color_uloc, 1, (float*)&color);
-		glUniform1i(change_color_uloc, 1);
-		alpha = glm::lerp(0.4f, 0.f, ( invincible.max - invincible.countdown) / invincible.max);
-		glUniform1f(effectAlpha, alpha);
+		alpha = 1 - abs(sin(invincible.countdown/ invincible.max * 10 ) * 0.3);
+		glUniform1f(alpha_uloc, alpha);
 	}
 
 	if (registry.damageds.has(entity)) {
@@ -763,12 +760,12 @@ void RenderSystem::drawDashes(const mat3& projection) {
     }
 
 	// draw currently charging dash charge, if any
-	if (player.currDashCharges < WorldSystem::getModifiedValue(PlayerDashCDR,player.maxDashCharges)) {
+	if (player.currDashCharges < WorldSystem::getModifiedValue(PlayerNumDash,player.maxDashCharges)) {
 		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, WorldSystem::getModifiedValue(PlayerDashCDR, player.baseDashCDR), projection);
 	}
 
 	// draw empty dash charges last, if any
-	for (int i = player.currDashCharges + 1; i < WorldSystem::getModifiedValue(PlayerDashCDR,player.maxDashCharges); ++i) {
+	for (int i = player.currDashCharges + 1; i < WorldSystem::getModifiedValue(PlayerNumDash,player.maxDashCharges); ++i) {
 		drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, -1, 0, 0, projection);
 	}
 

@@ -67,6 +67,102 @@ BulletStackEffect spreadUpA = {
 	""
 };
 
+BulletStackEffect bulletSpeedUpA = {
+    ProjectileSpeed,
+    Additive,
+    50,
+    "speedUpA",
+    ""
+};
+
+BulletStackEffect bulletSpeedUpM = {
+    ProjectileSpeed,
+    Multiplicative,
+    1.5,
+    "speedUpM",
+    ""
+};
+
+BulletStackEffect bulletRangeUpA = {
+    BulletRange,
+    Additive,
+    500,
+    "rangeUpA",
+    ""
+};
+
+BulletStackEffect bulletRangeUpM = {
+    BulletRange,
+    Multiplicative,
+    1.5,
+    "rangeUpM",
+    ""
+};
+
+BulletStackEffect bulletBurstUpA = {
+    BulletBurst,
+    Additive,
+    1,
+    "burstUpA",
+    ""
+};
+
+BulletStackEffect bulletBurstUpM = {
+    BulletBurst,
+    Multiplicative,
+    1.5,
+    "burstUpM",
+    ""
+};
+
+BulletStackEffect bulletPierceUpA = {
+    Pierce,
+    Additive,
+    1,
+    "pierceUpA",
+    ""
+};
+
+BulletStackEffect bulletPierceUpM = {
+    Pierce,
+    Multiplicative,
+    1.5,
+    "pierceUpM",
+    ""
+};
+
+BulletStackEffect bulletBounceUpA = {
+    Bounce,
+    Additive,
+    1,
+    "bounceUpA",
+    ""
+};
+
+BulletStackEffect bulletBounceUpM = {
+    Bounce,
+    Multiplicative,
+    1.5,
+    "bounceUpM",
+    ""
+};
+
+BulletStackEffect dashUpA = {
+    PlayerNumDash,
+    Additive,
+    1,
+    "dashUpA",
+    ""
+};
+
+BulletStackEffect dashUpM = {
+    PlayerNumDash,
+    Multiplicative,
+    2,
+    "dashUpM",
+    ""
+};
+
 //////////////////////////////////////////
 ///////////  AttackData  /////////////////
 //////////////////////////////////////////
@@ -173,8 +269,7 @@ AttackData twoPincerShot{
 AttackData twelveSpiralShot{
 	EnemyAttackPattern::ALL_DIRECTION,
 	TRIANGLE,
-	{},
-	sizeUpA,
+	{},dashUpA,
 	12,
 	0.0,
 	{20,20},
