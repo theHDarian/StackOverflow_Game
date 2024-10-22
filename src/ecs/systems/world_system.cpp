@@ -35,8 +35,6 @@ WorldSystem::WorldSystem()
 WorldSystem::~WorldSystem() {
 	
 	// destroy music components
-	if (backgroundMusic != nullptr)
-		Mix_FreeMusic(backgroundMusic);
 	if (playerHurtSound != nullptr)
 		Mix_FreeChunk(playerHurtSound);
 	if (playerDashSound != nullptr)
@@ -124,14 +122,6 @@ GLFWwindow* WorldSystem::createWindow() {
 		return nullptr;
 	}
 
-	for (int i = 1; i <= 3; i++) {
-		Sound& background = registry.sounds.emplace(Entity());
-		background.type = SoundType::Background;
-		background.path = audio_path("game-music-loop-" + std::to_string(i) + ".wav").c_str();
-		background.volume = 0.2f;
-		background.loops = -1;
-		std::cout << "Loaded background music " << background.path << std::endl;
-	}
 
 	Sound& playerHurt = registry.sounds.emplace(Entity());
 	playerHurt.type = SoundType::SFX;
@@ -152,15 +142,6 @@ GLFWwindow* WorldSystem::createWindow() {
 	playerShoot.volume = 0.4f;
 	playerShoot.loops = 0;
 
-	Sound& currentBGM  = registry.sounds.get(registry.sounds.entities[0]);
-
-	backgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
-	if (!backgroundMusic) {
-		fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
-	}
-
-	Mix_VolumeMusic(currentBGM.volume * MIX_MAX_VOLUME);
-
 	playerHurtSound = Mix_LoadWAV(audio_path("player_hurtv1.wav").c_str());
 	if (!playerHurtSound) {
 		fprintf(stderr, "Failed to load player hurt sound: %s\n", Mix_GetError());
@@ -170,9 +151,8 @@ GLFWwindow* WorldSystem::createWindow() {
 
 	playerShootSound = Mix_LoadWAV(audio_path("player_shoot.wav").c_str());
 
-	if (backgroundMusic == nullptr || playerHurtSound == nullptr || playerDashSound == nullptr || playerShootSound == nullptr) {
+	if (playerHurtSound == nullptr || playerDashSound == nullptr || playerShootSound == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n make sure the data directory is present",
-				audio_path("game-music-loop-1.mp3").c_str(),
 				audio_path("player_hurtv1.wav").c_str());
 		return nullptr;
 	}
@@ -186,7 +166,6 @@ GLFWwindow* WorldSystem::createWindow() {
 void WorldSystem::init(RenderSystem* renderer_arg) {
 	this->renderer = renderer_arg;
 	// Playing background music indefinitely
-	Mix_PlayMusic(backgroundMusic, -1);
 	fprintf(stderr, "Loaded music\n");
 
 
@@ -673,7 +652,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
 		if (!registry.spriteTimers.has(player)) {
 			auto& spriteTimer = registry.spriteTimers.emplace(player);
-			spriteTimer.count_ms = 250;
+			spriteTimer.count_ms = 300;
 			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
 		}
 	}

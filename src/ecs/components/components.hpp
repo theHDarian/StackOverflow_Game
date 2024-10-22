@@ -105,7 +105,7 @@ struct ParticleProps {
 };
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
-enum SoundType { Background, SFX };
+enum SoundType { normalBGM,bossBGM, specialBGM, SFX };
 struct Sound {
 	SoundType type;
 	std::string path;

@@ -3,6 +3,8 @@
 #include "tiny_ecs_registry.hpp"
 #include "world_init.hpp"
 #include "utils/random.hpp"
+#include "SDL.h"
+
 
 
 MapSystem::MapSystem() {
@@ -11,12 +13,15 @@ MapSystem::MapSystem() {
     }
 }
 MapSystem::~MapSystem() {
+    if (backgroundMusic != nullptr) {
+        Mix_FreeMusic(backgroundMusic);
+    }
     registry.maps.clear();
 }
 void MapSystem::init(RenderSystem* renderer) {
     this->renderer = renderer;
     assert(registry.maps.components.size() > 0);
-
+    loadMusic();
     WindowState& ws = registry.windowStates.components[0];
     //create door colliders
     float offset = 20;
@@ -28,13 +33,59 @@ void MapSystem::init(RenderSystem* renderer) {
     resetMap();
 }
 
+void MapSystem::loadMusic () {
+    // Loading music and sounds with SDL
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        fprintf(stderr, "Failed to initialize SDL Audio: %s\n", SDL_GetError());
+        throw std::runtime_error("Failed to initialize SDL Audio");
+    }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
+        fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to open audio device");
+    }
+
+    for (int i = 1; i <= 3; i++) {
+        Sound& background = registry.sounds.emplace(Entity());
+        background.type = SoundType::normalBGM;
+        background.path = audio_path("game-music-loop-" + std::to_string(i) + ".wav");
+        background.volume = 0.2f;
+        background.loops = -1;
+        normalRoomMusic.push_back(background);
+        std::cout << "Loaded background music " << background.path << std::endl;
+    }
+    Sound& boss = registry.sounds.emplace(Entity());
+    boss.type = SoundType::bossBGM;
+    boss.path = audio_path("boss-music.wav");
+    boss.volume = 0.2f;
+    boss.loops = -1;
+    bossRoomMusic.push_back(boss);
+
+    Sound& special = registry.sounds.emplace(Entity());
+    special.type = SoundType::specialBGM;
+    special.path = audio_path("special-room.wav");
+    special.volume = 0.2f;
+    special.loops = -1;
+    specialRoomMusic.push_back(special);
+
+    Sound& currentBGM  = normalRoomMusic[0];
+
+    backgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
+    if (!backgroundMusic) {
+        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+    }
+
+    nextMusic();
+}
+
 void MapSystem::step(float elapsed_ms) {
     Map& map = registry.maps.components[0];
     map.currRoom.timeElapsed += elapsed_ms / 1000.0f;
     //switch rooms if needed
     for (auto& r : registry.mapRequests.components) {
-        if (r.requestType == MapRequestType::ChangeRoom)
-            changeRoom(r.type,r.doorIndex);
+        if (r.requestType == MapRequestType::ChangeRoom) {
+            nextMusic();
+            changeRoom(r.type, r.doorIndex);
+        }
         else if (r.requestType == MapRequestType::RestartGame)
             resetMap();
     }
@@ -130,4 +181,16 @@ void MapSystem::resetMap() {
     map.currRoom.timeElapsed = 0;
 
     createBigC(renderer, vec2(600, 600));
+}
+
+void MapSystem::nextMusic() {
+    Sound& currentBGM = normalRoomMusic[rand()%normalRoomMusic.size()];
+    Mix_FreeMusic(backgroundMusic);
+    Mix_Music* newbackgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
+    Mix_FadeInMusic(newbackgroundMusic, -1, 1000);
+    backgroundMusic = newbackgroundMusic;
+    if (!backgroundMusic) {
+        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+    }
+    Mix_VolumeMusic(currentBGM.volume * MIX_MAX_VOLUME);
 }
