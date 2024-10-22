@@ -505,6 +505,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 
 		if (!registry.dashes.has(player) && pl.currDashCharges > 0) {
 			pl.currDashCharges--;
+			pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
 			Mix_PlayChannelTimed( 2, playerDashSound, 0, 200);

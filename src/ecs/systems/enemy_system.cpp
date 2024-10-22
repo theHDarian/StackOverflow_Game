@@ -32,6 +32,7 @@ void EnemySystem::step(float elapsed_ms) {
 
     // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities) {
+        if (registry.fades.has(entity)) continue;
         Enemy& enemy = registry.enemies.get(entity);
         Motion& motion = registry.motions.get(entity);
         AttackData& atkData = registry.attackDatas.get(entity);

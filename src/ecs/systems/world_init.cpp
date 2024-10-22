@@ -60,9 +60,7 @@ Entity resetPlayer()
 	motion.velocity = { 0.f, 0.f };
 
 	Player& player = registry.players.get(ent);
-	player.baseSpeed = 400;
-	CircleCollider& cc = registry.circleColliders.get(ent);
-	cc.radius = motion.scale.x/2.5;
+	player = Player();
 
 	//reset stack and shoot
 	PlayerAttackData& shoot = registry.shoots.get(ent);
