@@ -57,11 +57,18 @@ void ParticleSystem::init(GLFWwindow* window) {
     projection = glm::ortho(0.0f, static_cast<float>(windowState.width), static_cast<float>(windowState.height),0.0f);
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.5f,  0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
+        -0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
+         0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
+         0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
+        -0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
+        
+         1.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
+         2.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
+         2.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
+         1.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
     };
+    uint32_t indices[] = { 0, 1, 2, 2, 3, 0,
+                           4, 5, 6, 6, 7, 4 };
 
     GLuint vbo, ib;
     glGenVertexArrays(1, &vao);
@@ -70,12 +77,12 @@ void ParticleSystem::init(GLFWwindow* window) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (const void*) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     gl_has_errors();
-    
-    uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
 
     glGenBuffers(1, &ib);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
@@ -268,9 +275,8 @@ void ParticleSystem::render() {
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-    unsigned int colorLoc = glGetUniformLocation(shaderProgram, "fcolor");
 
-    if (projectionLoc == -1 || transformLoc == -1 || colorLoc == -1) {
+    if (projectionLoc == -1 || transformLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
         return; // Prevent further execution if uniforms are not found
     }
@@ -284,7 +290,7 @@ void ParticleSystem::render() {
         }
         float lifePassed = (particle.lifetime - particle.lifeRemaining) / particle.lifetime;
 
-        glm::vec4 color = glm::lerp(particle.colorBegin, particle.colorEnd, lifePassed);
+        glm::vec4 color = glm::lerp(particle.colorBegin, particle.colorEnd, lifePassed); //TODO
         float size = glm::lerp(particle.sizeBegin, particle.sizeEnd, lifePassed);
 
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), { particle.position.x, particle.position.y, 0.0f }) *
@@ -292,9 +298,8 @@ void ParticleSystem::render() {
                               glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
 
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        glUniform4fv(colorLoc, 1, glm::value_ptr(color));
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr);
         gl_has_errors();
     }
 }
