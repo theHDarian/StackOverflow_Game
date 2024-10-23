@@ -27,7 +27,7 @@ void AISystem::step(float elapsed_ms)
 			//pick new destination
             movement.posA = movement.posB; 
             movement.posB = getMove(enemy.behavior, entity);
-			std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
+			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
             movement.distanceTraveled = 0.f;
         }
     }
@@ -56,7 +56,7 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity) {
 
 vec2 AISystem::getNextPatrolPos(Entity entity) {
 	Enemy& enemy = registry.enemies.get(entity);
-	std::cout << enemy.patrolPath.size() << std::endl;
+	// std::cout << enemy.patrolPath.size() << std::endl;
 	enemy.patrolIndex += 1;
 	if (enemy.patrolPath.size() - 1 <= enemy.patrolIndex) {
 		enemy.patrolIndex = 0;

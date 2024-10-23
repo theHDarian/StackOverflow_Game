@@ -74,9 +74,7 @@ private:
 	Entity player;
 	Entity aimIndicator;
 
-	// music references
-	Mix_Music* backgroundMusic;
-	Mix_Chunk* playerHurtSound;
+    Mix_Chunk* playerHurtSound;
 	Mix_Chunk* playerShootSound;
 	Mix_Chunk* playerDashSound;
 

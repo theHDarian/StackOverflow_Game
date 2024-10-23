@@ -287,7 +287,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
     Enemy& enemy = registry.enemies.emplace(entity);;
     switch (type) {
         case EnemyType::EasyEnemySentry: {
-			std::cout << "got here" << std::endl;
             enemy = EnemyEasySentry();
             break;
         }
@@ -319,14 +318,14 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 		movement.posA = pos;
 	}
 	movement.posB = AISystem::getMove(enemy.behavior, entity);
-	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
 	
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	std::vector<AttackData> atkData = enemy.attackData;
-	std::cout << "attackData size:" << atkData.size() << std::endl;
+	// std::cout << "attackData size:" << atkData.size() << std::endl;
 	if (atkData.size() > 0) {
 		atk = atkData[0];
 	}

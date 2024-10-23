@@ -57,7 +57,6 @@ public:
 	ComponentContainer<DialogueUIText> dialogueUITexts;
 	ComponentContainer<MenuUIText> menuUITexts;
 	ComponentContainer<Damaged> damageds;
-	ComponentContainer<Sound> sounds;
 	ComponentContainer<Door> doors;
 	ComponentContainer<Bound> bounds; //room boundaries
 	ComponentContainer<MapRequest> mapRequests;
@@ -115,7 +114,6 @@ public:
 		registry_list.push_back(&dialogueUITexts);
 		registry_list.push_back(&menuUITexts);
 		registry_list.push_back(&damageds);
-		registry_list.push_back(&sounds);
 	}
 
 	void clear_all_components() {
