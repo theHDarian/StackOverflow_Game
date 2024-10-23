@@ -20,6 +20,7 @@ class MapSystem {
     std::vector<Sound> normalRoomMusic;
     std::vector<Sound> bossRoomMusic;
     std::vector<Sound> specialRoomMusic;
+    int currMusicIndex;
 
     void nextMusic();
 };

@@ -34,6 +34,13 @@ void MapSystem::init(RenderSystem* renderer) {
 }
 
 void MapSystem::loadMusic () {
+    Sound roomMusic[] = {
+        {SoundType::normalBGM,audio_path("room/game-music-loop-1.wav"),0.1f,-1},
+        {SoundType::normalBGM,audio_path("room/game-music-loop-2.wav"),0.1f,-1},
+        {SoundType::normalBGM,audio_path("room/game-music-loop-3.wav"),0.1f,-1},
+        {SoundType::normalBGM,audio_path("room/game-music-loop-4.wav"),1.0f,-1},
+    };
+
     // Loading music and sounds with SDL
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
         fprintf(stderr, "Failed to initialize SDL Audio: %s\n", SDL_GetError());
@@ -43,28 +50,16 @@ void MapSystem::loadMusic () {
         fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to open audio device");
     }
-
-    for (int i = 1; i <= 4; i++) {
-        Sound& background = registry.sounds.emplace(Entity());
-        background.type = SoundType::normalBGM;
-        background.path = audio_path("game-music-loop-" + std::to_string(i) + ".wav");
-        background.volume = 0.2f;
-        background.loops = -1;
-        normalRoomMusic.push_back(background);
-        std::cout << "Loaded background music " << background.path << std::endl;
+    
+    for (Sound& track : roomMusic) {
+        normalRoomMusic.push_back(track);
+        std::cout << "Loaded background music " << track.path << std::endl;
     }
-    Sound& boss = registry.sounds.emplace(Entity());
-    boss.type = SoundType::bossBGM;
-    boss.path = audio_path("boss-music.wav");
-    boss.volume = 0.2f;
-    boss.loops = -1;
+
+    Sound boss = {SoundType::bossBGM,audio_path("boss/boss-music.wav"),0.2f,-1};
     bossRoomMusic.push_back(boss);
 
-    Sound& special = registry.sounds.emplace(Entity());
-    special.type = SoundType::specialBGM;
-    special.path = audio_path("special-room.wav");
-    special.volume = 0.2f;
-    special.loops = -1;
+    Sound special = {SoundType::specialBGM,audio_path("special/special-room.wav"),0.2f,-1};
     specialRoomMusic.push_back(special);
 
     Sound& currentBGM  = normalRoomMusic[0];
@@ -185,13 +180,20 @@ void MapSystem::resetMap() {
 }
 
 void MapSystem::nextMusic() {
-    Sound& currentBGM = normalRoomMusic[rand()%normalRoomMusic.size()];
+    int nextMusicIndex = rand()%normalRoomMusic.size();
+    if (nextMusicIndex == currMusicIndex) {
+        return;
+    } else {
+        currMusicIndex = nextMusicIndex;
+    }
+    Sound& currentBGM = normalRoomMusic[currMusicIndex];
     Mix_FreeMusic(backgroundMusic);
     Mix_Music* newbackgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
-    Mix_FadeInMusic(newbackgroundMusic, -1, 1000);
+    Mix_FadeInMusic(newbackgroundMusic, currentBGM.loops, 1000);
     backgroundMusic = newbackgroundMusic;
     if (!backgroundMusic) {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic(currentBGM.volume * MIX_MAX_VOLUME);
+    int volume = currentBGM.volume * MIX_MAX_VOLUME;
+    Mix_VolumeMusic(volume);
 }
