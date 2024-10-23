@@ -44,7 +44,7 @@ void MapSystem::loadMusic () {
         throw std::runtime_error("Failed to open audio device");
     }
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= 4; i++) {
         Sound& background = registry.sounds.emplace(Entity());
         background.type = SoundType::normalBGM;
         background.path = audio_path("game-music-loop-" + std::to_string(i) + ".wav");
@@ -83,7 +83,6 @@ void MapSystem::step(float elapsed_ms) {
     //switch rooms if needed
     for (auto& r : registry.mapRequests.components) {
         if (r.requestType == MapRequestType::ChangeRoom) {
-            nextMusic();
             changeRoom(r.type, r.doorIndex);
         }
         else if (r.requestType == MapRequestType::RestartGame)
@@ -124,6 +123,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
     std::vector<Door>& doors = registry.doors.components;
     Door& door = doors[doorIndex];
     if (door.room == RoomType::None) return;
+
+    nextMusic();
     
     printf("Changing Room %c, Door Side:%d \n", type, doorIndex);
     //move player to the starting side of the room
