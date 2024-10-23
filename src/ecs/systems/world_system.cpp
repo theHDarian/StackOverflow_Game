@@ -289,7 +289,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 void WorldSystem::restartGame() {
 	printf("Restarting\n");
 	// Debugging for memory/component leaks
-	registry.list_all_components();
+	// registry.list_all_components();
 	GameState& gameState = registry.gameStates.components[0];
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
@@ -299,7 +299,6 @@ void WorldSystem::restartGame() {
 	currentSpeed = 1.f;
 
 	// Debugging for memory/component leaks
-	registry.list_all_components();
 
 	Entity player = resetPlayer();
 

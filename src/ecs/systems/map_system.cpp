@@ -76,14 +76,16 @@ void MapSystem::step(float elapsed_ms) {
     Map& map = registry.maps.components[0];
     map.currRoom.timeElapsed += elapsed_ms / 1000.0f;
     //switch rooms if needed
-    for (auto& r : registry.mapRequests.components) {
+
+    if (registry.mapRequests.components.size() > 0) {
+        auto& r =registry.mapRequests.components[0];
         if (r.requestType == MapRequestType::ChangeRoom) {
             changeRoom(r.type, r.doorIndex);
         }
         else if (r.requestType == MapRequestType::RestartGame)
             resetMap();
+        registry.mapRequests.clear();
     }
-    registry.mapRequests.clear();
 
     //spawn enemy based on current time 
     WindowState& wS = registry.windowStates.components[0];
@@ -129,7 +131,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
 
     nextMusic();
     
-    printf("Changing Room %c, Door Side:%d \n", type, doorIndex);
     //move player to the starting side of the room
     Entity& playerEntity = registry.players.entities[0];
     Motion& playerMotion = registry.motions.get(playerEntity);
@@ -139,6 +140,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
     int spawnIndex = doorIndex == 0 ? 2 : doorIndex == 1 ? 3 :doorIndex == 2 ? 0 : 1;
     vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
     playerMotion.position = spawnPosition;
+
+    // printf("Changing Room %c, enter door %d spawn at %.1f %.1f\n", type, doorIndex,spawnPosition.x,spawnPosition.y);
+
     
     //clear enemies and obstacles
     clearRoomActors();
@@ -153,7 +157,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
 
     map.roomsTraversed++;
     
-    doors[spawnIndex] = doors[doorIndex]; //copy contents
+    //copy room type
+    doors[spawnIndex].room = doors[doorIndex].room; 
     doors[spawnIndex].isPrev = true;
 
     bool includeNone = true;
