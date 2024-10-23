@@ -68,6 +68,14 @@ void clearRoomActors() {
         if (!registry.deleteds.has(ent)) registry.deleteds.emplace(ent);
     }
 }
+RoomType getRandomRoomType(bool includeNone) {
+    int r = Random::Float() * 4;
+    if (r > 3) return RoomType::TreasureRoom;
+    if (r > 2) return RoomType::RestRoom;
+    if (r > 1) return RoomType::EnemyRoom;
+    
+    return includeNone ? RoomType::None : RoomType::EnemyRoom;
+}
 
 void MapSystem::changeRoom(RoomType type, int doorIndex) {
     printf("Changing Room %c, Door Side:%d \n", type, doorIndex);
@@ -94,23 +102,31 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
 
     map.roomsTraversed++;
     
-    doors[0].room = RoomType::None;
-    doors[1].room = RoomType::EnemyRoom;
-    doors[2].room = RoomType::None;
-    doors[3].room = RoomType::None;
-    //block the side where player spawns
+    doors[spawnIndex] = doors[doorIndex]; //copy contents
+    doors[spawnIndex].isPrev = true;
+
+    bool includeNone = true;
     for (int i = 0; i < doors.size(); i++) {
-        doors[i].isPrev = spawnIndex == i;
+        //reset previous room type 
+        if (i == spawnIndex) continue;
+
+        Door& d = registry.doors.components[i];
+        d.room = getRandomRoomType(includeNone);
+        d.isPrev = false;
+        if (d.room == RoomType::None) 
+            includeNone = false;
     }
 }
 
 void MapSystem::resetMap() {
     clearRoomActors();
 
-    registry.doors.components[0].room = RoomType::None;
-    registry.doors.components[1].room = RoomType::EnemyRoom;
-    registry.doors.components[2].room = RoomType::None;
-    registry.doors.components[3].room = RoomType::None;
+    bool includeNone = true;
+    for (Door& d: registry.doors.components) {
+        d.room = getRandomRoomType(includeNone);
+        if (d.room == RoomType::None) 
+            includeNone = false;
+    }
 
     for (Door& d : registry.doors.components) {
         d.isPrev = false;
