@@ -86,14 +86,24 @@ struct Frame {
 };
 
 enum class RequestType {
-	EmitParticle,
-	Explosion,
+	PlayerDash,
+	EnemyDeath,
+	PlayerBulletCollision
 };
 
 struct EmitParticle {
-	vec2 position;
-	vec2 requestOrigin;
 	RequestType requestType;
+	
+	float timeRemaining; //in seconds
+	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
+
+	vec2 defaultPos; //position to fallback to if attached entity does not have motion
+
+	EmitParticle(RequestType reqType, float duration, int numToEmit) {
+		this->requestType = reqType;
+		this->timeRemaining = duration;
+		this->numToEmit = numToEmit;
+	}
 };
 
 struct ParticleProps {

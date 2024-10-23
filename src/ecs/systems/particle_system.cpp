@@ -131,18 +131,45 @@ void ParticleSystem::step(float elapsed_ms) {
     }
 
     //check emit requests
-    for (auto& request : registry.emitParticles.components) {
-        if (request.requestType == RequestType::EmitParticle) {
-            emit(createParticle(request.position));
+    handleEmitRequests(elapsed_ms);
+}
+
+void ParticleSystem::handleEmitRequests(float elapsed_ms) {
+    std::vector<Entity> removeRequestQueue;
+    for (int i = 0; i < registry.emitParticles.components.size();i++) {
+        //tick request timers
+        Entity& ent = registry.emitParticles.entities[i];
+        EmitParticle& request = registry.emitParticles.components[i];
+        int emitCount = glm::min((int) glm::round(request.numToEmit * (elapsed_ms / request.timeRemaining)),request.numToEmit);
+        request.timeRemaining -= elapsed_ms;
+        if (request.timeRemaining <= 0) {
+            emitCount = request.numToEmit;
+            removeRequestQueue.push_back(ent);
         }
-        else if (request.requestType == RequestType::Explosion) {
-            // printf("%.2f %.2f\n",request.position.x,request.position.y);
-            explode(createParticle(request.position), request.requestOrigin);
+        request.numToEmit -= emitCount;
+        bool hasMotion = registry.motions.has(ent);
+
+        //emit based on type of request
+        for (int i = 0; i < emitCount; i++) {
+            if (request.requestType == RequestType::PlayerDash && hasMotion) {
+                Motion& motion = registry.motions.get(ent);
+                emit(createParticle(motion.position + vec2(0.0f,motion.scale.y / 2) + vec2(Random::Float(-5,5),Random::Float(-5,5))));
+            }
+            else if (request.requestType == RequestType::PlayerBulletCollision) {
+                vec2 pos = request.defaultPos + vec2{ Random::Float(-2,2), Random::Float(-2,2)};
+                explode(createParticle(pos), request.defaultPos);
+            } else if (request.requestType == RequestType::EnemyDeath && hasMotion) {
+                Motion& motion = registry.motions.get(ent);
+                vec2 pos = motion.position + vec2(Random::Float(-5,5),Random::Float(-5,5));
+                explode(createParticle(pos), motion.position);
+            }
         }
     }
     //test emission on mouse position
     // emit(createParticle(registry.ioStates.components[0].mousePosition));
-    registry.emitParticles.clear();
+    for (auto& e : removeRequestQueue) {
+        registry.emitParticles.remove(e);
+    }
 }
 
 void ParticleSystem::emit(const ParticleProps& props) {

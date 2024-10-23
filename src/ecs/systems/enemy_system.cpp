@@ -135,8 +135,10 @@ void EnemySystem::step(float elapsed_ms) {
             if (enemyStat.currHealth <= 0)
             {
                 if (!registry.deleteds.has(entity)) {
-                    registry.fades.emplace(entity);
+                    Fade& f = registry.fades.emplace(entity);
                     registry.deleteds.emplace(entity);
+                    if (!registry.emitParticles.has(entity))
+                        registry.emitParticles.emplace(entity,RequestType::EnemyDeath,f.max,rand() % 10 + 10);
                 }
                  
                 //std::cout << "enemy " << entity << "has died" << std::endl;

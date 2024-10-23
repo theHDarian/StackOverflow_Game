@@ -33,6 +33,7 @@ private:
 
         bool active = false;
     };
+    void handleEmitRequests(float elapsed_ms);
 
     std::vector<Particle> particlePool;
     uint poolIndex = 999;

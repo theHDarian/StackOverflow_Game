@@ -377,12 +377,9 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
-			for (int i = 0; i < (rand() % 10 + 3); i++) {
-				EmitParticle& p = registry.emitParticles.emplace(Entity());
-				Motion& motion = registry.motions.get(entity);
-				p.requestType = RequestType::Explosion;
-				p.requestOrigin = motion.position;
-				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+			if (registry.motions.has(entity)) {
+				EmitParticle& p = registry.emitParticles.emplace(Entity(),RequestType::PlayerBulletCollision,0,rand() % 3 + 3);
+				p.defaultPos = registry.motions.get(entity).position;
 			}
 			if (registry.walls.has(entity_other)) {
 				if (registry.playerBullets.get(entity).bulletBounce > 0) {
@@ -473,6 +470,8 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
+			if (!registry.emitParticles.has(player))
+				registry.emitParticles.emplace(player, RequestType::PlayerDash,dash.endTimer, 7);
 			Mix_PlayChannelTimed( 2, playerDashSound, 0, 200);
 			Mix_Volume(3, playerDashSound->volume * MIX_MAX_VOLUME);
 		}
@@ -497,14 +496,6 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			// Update Velocity
 			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
 			// std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
-
-			//emit particles at player position
-			EmitParticle& p = registry.emitParticles.emplace(Entity());
-			p.position = playerMotion.position + vec2(0.0f,playerMotion.scale.y / 2);
-			p.requestOrigin = p.position;
-			p.requestType = RequestType::EmitParticle;
-			p.position.x += Random::Float(-5,5);
-			p.position.y += Random::Float(-5,5);
 		}
 	}
 }
@@ -673,20 +664,6 @@ void WorldSystem::clearDeleteQueue() {
 		// but should be generalized for more things in the future
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
 			registry.deleteEntityAndRelatedEntities(e);
-		}
-		else {
-			for (int i = 0; i < (rand() % 5 + 2); i++) { // NOTE: this particle generation is frame-dependent
-				EmitParticle& p = registry.emitParticles.emplace(Entity());
-				Motion& motion = registry.motions.get(e);
-				p.requestType = RequestType::Explosion;
-				p.requestOrigin = motion.position;
-				vec2 r = motion.scale * 0.8f;
-				r.x *= Random::Float(-0.5f,0.5f);
-				r.y *= Random::Float(-0.5f,0.5f);
-				p.position = motion.position;
-				p.position.x += Random::Float(-5,5);
-				p.position.y += Random::Float(-5,5);
-			}
 		}
 	}
 }
