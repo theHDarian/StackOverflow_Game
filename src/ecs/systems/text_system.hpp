@@ -36,4 +36,5 @@ private:
     glm::mat4 projection;
 
     void renderText(std::string text, float x, float y, float scale, glm::vec3 color);
+    vec2 renderWord(std::string text, float x, float y, float scale, glm::vec3 color);
 };
