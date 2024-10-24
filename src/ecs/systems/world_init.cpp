@@ -561,7 +561,7 @@ Entity createGameOverMenu(vec2 position, vec2 scale) {
 	color.r = 0.0;
 	color.b = 0.0;
 	color.g = 0.0;
-
+	 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
@@ -572,7 +572,7 @@ Entity createGameOverMenu(vec2 position, vec2 scale) {
 	WindowState& windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
-	text.scale = 1.5;
+	text.scale = 1.2;
 	text.text = "Game Over \npress R to restart";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };

@@ -89,13 +89,13 @@ GLFWwindow* WorldSystem::createWindow() {
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	//  window_width_px = vidMode->width;
-	//  window_height_px = vidMode->height;
+	  window_width_px = vidMode->width;
+	  window_height_px = vidMode->height;
 	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
-	window_width_px = 1280;
-	window_height_px = 720;
+	//window_width_px = 1280;
+	//window_height_px = 720;
 	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
@@ -437,7 +437,7 @@ void WorldSystem::handleInput() {
 		if (input.shouldShowDialogue && input.nextDialogue && !gameState.gamePaused) {
 			input.nextDialogue = false;
 			std::string nextLine = registry.dialogueLines.get(dialogueBox).next();
-			std::cout << " dialogue line " << nextLine << std::endl;
+			//std::cout << " dialogue line " << nextLine << std::endl;
 			if (strcmp(nextLine.c_str(), "<end>") != 0) {
 				registry.renderRequests.get(dialogueBox).show = true;
 				registry.textRenderRequests.get(dialogueBox).text = nextLine;

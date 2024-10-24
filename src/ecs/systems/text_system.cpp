@@ -19,6 +19,8 @@ TextSystem::~TextSystem() {
     if (program) {
         glDeleteProgram(program);
     }
+
+    // need to delete every single glyph here too!
 }
 
 int TextSystem::initFreetypeLib() {
@@ -257,8 +259,6 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
             textPos.x = x;
         }
     }
-
-    std::cout << std::endl;
     
     glBindTexture(GL_TEXTURE_2D, 0);
     gl_has_errors();
