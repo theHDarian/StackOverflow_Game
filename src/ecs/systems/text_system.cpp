@@ -185,7 +185,7 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
     return textEndPos;
 }
 
-void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color)
+void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound)
 {
     // activate corresponding render state, hard code to just 1 text rendering program for now
     // (can also pass shader itself as parameter and use that)
@@ -203,38 +203,26 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
     // tokenize string by space (should maintain \n!)
     // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
     std::vector<std::string> tokenizedText;
-    
-    // note: to delim multiple chars, need to use strtok
-    std::stringstream textStream(text);
-    std::string intermediate;
     std::string space = " ";
     std::string newLine = "\n";
+    // consider adding other delimiters, like \tab, etc
 
-    // Tokenizing w.r.t. space ' '
-    while (getline(textStream, intermediate, ' '))
-    {
-        // assume only one new line (AND to work with wrapping simultaneously, must be at start of word); bad parsing
-        // this is bad and doesn't actually delimit based on newline 
-        // so must have space between newline and words
-        // (or can preprocess and add spaces before)
-        int newLineIndex = intermediate.find('\n');
-        if (newLineIndex != std::string::npos) {
-            intermediate = intermediate.substr(0, newLineIndex) + intermediate.substr(newLineIndex + 1);
-            if (newLineIndex == 0) {
-                tokenizedText.push_back(newLine);
-                tokenizedText.push_back(intermediate + space + space);
-            }
-            else {
-                tokenizedText.push_back(intermediate + space + space);
-                tokenizedText.push_back(newLine);
-            }
-            
+    std::string str = "";
+    for (char c : text) {
+        if (c == ' ' && str.length() > 0) {
+            tokenizedText.push_back(str + space + space); // for some reason, need to add 2 spaces
+            str = "";
+        }
+        else if (c == '\n') {
+            tokenizedText.push_back(str);
+            tokenizedText.push_back(newLine);
+            str = "";
         }
         else {
-            tokenizedText.push_back(intermediate + space + space);
+            str += c;
         }
-        
     }
+    tokenizedText.push_back(str);
 
     vec2 textPos = { x, y };
     for (std::string word : tokenizedText) {
@@ -255,9 +243,12 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
         // may use "text box" borders instead, but use screen for now
         // consider also adding padding
         WindowState& ws = registry.windowStates.components[0];
-        if (xpos > ws.width || ypos > ws.height || xpos < 0 || ypos < 0) {
+        if (xpos > topRightBound.x || xpos < bottomLeftBound.x) {
             textPos.y -= ((Characters[0].Size.y)) * 1.3 * scale;
             textPos.x = x;
+        }
+        if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {
+            // do nothing for now, unless want to write text that goes up and down
         }
 
         textPos = renderWord(word, textPos.x, textPos.y, scale, color);
@@ -284,7 +275,7 @@ void TextSystem::renderMenuUIText() {
         // for now, tie text visibility to entitie's render visibility
         // but assumption may not always hold
         if (registry.renderRequests.get(entity).show)
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
     }
 
     glBindVertexArray(0);
@@ -306,7 +297,7 @@ void TextSystem::renderGameUIText() {
                 StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
                 textString = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
             }
-            renderText(textString, textReq.x, textReq.y, textReq.scale, textReq.color);
+            renderText(textString, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
         }
     }
 
@@ -324,7 +315,7 @@ void TextSystem::renderDialogueUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show)
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color);
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
     }
 
     glBindVertexArray(0);

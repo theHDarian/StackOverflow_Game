@@ -35,6 +35,6 @@ private:
     // but this tutorial's projection matrix has top right be (Window width, window height)
     glm::mat4 projection;
 
-    void renderText(std::string text, float x, float y, float scale, glm::vec3 color);
+    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
     vec2 renderWord(std::string text, float x, float y, float scale, glm::vec3 color);
 };
