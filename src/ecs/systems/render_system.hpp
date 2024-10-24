@@ -11,6 +11,8 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
+//#include <experimental/filesystem>
+
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
 class RenderSystem {
@@ -21,9 +23,11 @@ class RenderSystem {
 	 * Whenever possible, add to these lists instead of creating dynamic state
 	 * it is easier to debug and faster to execute for the computer.
 	 */
-	std::array<GLuint, texture_count> texture_gl_handles;
-	std::array<ivec2, texture_count> texture_dimensions;
+	std::array<GLuint, 100> texture_gl_handles;
+	std::array<ivec2, 100> texture_dimensions;
 	GLuint vao;
+
+	std::map<std::string, int> name_to_texture;
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
@@ -134,8 +138,8 @@ private:
 	//void drawDashCharges(GLuint &VAO, GLuint &VBO, GLuint &EBO);
 	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat3 & projection);
 	void drawAllColliders(Entity entity, const mat3& projection_2D);
-	void drawCollider(Entity entity, TEXTURE_ASSET_ID shape,  const mat3& projection);
-	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection);
+	void drawCollider(Entity entity, std::string shape,  const mat3& projection);
+	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat3& projection);
 	void drawBulletStack(const mat3& projection);
 
 	// Window handle

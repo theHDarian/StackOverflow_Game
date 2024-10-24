@@ -23,6 +23,10 @@
 	#include "imguiThemes.h"
 #endif
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1;
+#include <experimental/filesystem>
+using namespace std::experimental::filesystem;
+
 
 void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	if (width == 0 || height == 0)
@@ -106,11 +110,12 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 
 void RenderSystem::initializeGlTextures()
 {
-    glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());
+	glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());
 
-    for(uint i = 0; i < texture_paths.size(); i++)
-    {
-		const std::string& path = texture_paths[i];
+	uint i = 0;
+	for (const auto& entry : directory_iterator(data_path() + "/textures/")) 
+	{
+		const std::string& path = entry.path().string();
 		ivec2& dimensions = texture_dimensions[i];
 
 		stbi_uc* data;
@@ -122,13 +127,21 @@ void RenderSystem::initializeGlTextures()
 			fprintf(stderr, "%s", message.c_str());
 			assert(false);
 		}
+
+		std::string copy = path;
+		name_to_texture.insert({ copy.substr(copy.find_last_of('\\') + 1), i});
+
+		//std::cout << copy.substr(copy.find_last_of('\\') + 1) << std::endl;
+
 		glBindTexture(GL_TEXTURE_2D, texture_gl_handles[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dimensions.x, dimensions.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		gl_has_errors();
 		stbi_image_free(data);
-    }
+		i++;
+	}
+	name_to_texture.insert({ "none", -1});
 	gl_has_errors();
 }
 
