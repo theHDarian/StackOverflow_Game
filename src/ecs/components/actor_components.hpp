@@ -203,7 +203,8 @@ enum EnemyType {
     //MediumEnemyClusterShot,
     MediumEnemyCharge,
     MediumEnemyHoming,
-    EasyEnemySniper
+    EasyEnemySniper,
+    TestEnemyType
 };
 
 enum class EnemyAttackPattern {
@@ -212,6 +213,7 @@ enum class EnemyAttackPattern {
     ALL_DIRECTION,
     BURST,
     SPRAY,
+    WAVE,
     NONE
 };
 
@@ -299,7 +301,7 @@ struct HomingBullet {
 };
 
 struct Dash {
-    float endTimer = 120.0f; //ms
+    float endTimer = 120.0f; //ms, duration of the dash
     vec2 dashDirection;
 };
 

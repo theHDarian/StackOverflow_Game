@@ -10,8 +10,63 @@
 #include "render_system.hpp"
 #include "components/presets/particle_presets.hpp"
 
+ParticleSystem::Vertex* ParticleSystem::createQuad(Vertex* target, vec4 color, mat4 transform, float texID) {
+    float size = 1.0f;
+    float x = -0.5f;
+    float y = -0.5f;
+
+    vec4 positions[4] = {
+        { x, y, 0.0f, 1.0f },               
+        { x + size, y, 0.0f, 1.0f },        
+        { x + size, y + size, 0.0f, 1.0f }, 
+        { x, y + size, 0.0f, 1.0f }         
+    };
+
+    vec2 texCoords[4] = {
+        { 0.0f, 0.0f }, 
+        { 1.0f, 0.0f }, 
+        { 1.0f, 1.0f }, 
+        { 0.0f, 1.0f }  
+    };
+
+    for (int i = 0; i < 4; i++) {
+        glm::vec4 transformedPos = transform * positions[i];
+        target->position = { transformedPos.x, transformedPos.y, transformedPos.z };
+        target->color = color;
+        target->texCoords = texCoords[i];
+        target->texID = texID;
+        target++;
+    }
+
+    return target;
+}
+
+GLuint ParticleSystem::loadTexture(const std::string& path) {
+    int w,h,bits;
+    stbi_set_flip_vertically_on_load(1);
+    auto* pixels = stbi_load(path.c_str(),&w,&h,&bits,STBI_rgb_alpha);
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D,textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+    stbi_image_free(pixels);
+
+    return textureID;
+}
+
 ParticleSystem::ParticleSystem() {
-    particlePool.resize(1000);
+    particlePool.resize(POOLSIZE);
+}
+
+void ParticleSystem::clearParticles() {
+    for (auto& p : particlePool) {
+        p.active = false;
+    }
 }
 
 bool ParticleSystem::initScreenTexture()
@@ -56,31 +111,46 @@ void ParticleSystem::init(GLFWwindow* window) {
     WindowState& windowState = registry.windowStates.components[0]; 
     projection = glm::ortho(0.0f, static_cast<float>(windowState.width), static_cast<float>(windowState.height),0.0f);
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.5f,  0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
-    };
-
-    GLuint vbo, ib;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 4 * POOLSIZE, nullptr, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,position));
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,color));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,texCoords));
+    glEnableVertexAttribArray(2);
+
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,texID));
+    glEnableVertexAttribArray(3);
+    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     gl_has_errors();
-    
-    uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
+
+    uint32_t indices[6*POOLSIZE];
+    uint32_t offset = 0;
+    for (size_t i = 0; i < 6*POOLSIZE;i+= 6) {
+        indices[i+0] = 0+offset;
+        indices[i+1] = 1+offset;
+        indices[i+2] = 2+offset;
+        indices[i+3] = 2+offset;
+        indices[i+4] = 3+offset;
+        indices[i+5] = 0+offset;
+        offset+=4;
+    }
 
     glGenBuffers(1, &ib);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 6 * POOLSIZE, indices, GL_DYNAMIC_DRAW);
     gl_has_errors();
+
+    texture_handles[0] = loadTexture(textures_path("aim_indicator.png"));
+    texture_handles[1] = loadTexture(textures_path("chevron.png"));
     glBindVertexArray(0);
     gl_has_errors();
 
@@ -102,13 +172,17 @@ void ParticleSystem::init(GLFWwindow* window) {
     }
 
     // Clean up ib and vbo
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ib);
 }
 
 ParticleSystem::~ParticleSystem() {
     if (vao) {
         glDeleteVertexArrays(1, &vao); 
+    }
+    if (vbo) {
+        glDeleteBuffers(1,&vbo);
+    }
+    if (ib) {
+        glDeleteBuffers(1, &ib);
     }
     if (shaderProgram) {
         glDeleteProgram(shaderProgram);
@@ -131,18 +205,55 @@ void ParticleSystem::step(float elapsed_ms) {
     }
 
     //check emit requests
-    for (auto& request : registry.emitParticles.components) {
-        if (request.requestType == RequestType::EmitParticle) {
-            emit(createParticle(request.position));
+    handleEmitRequests(elapsed_ms);
+}
+
+void ParticleSystem::handleEmitRequests(float elapsed_ms) {
+    std::vector<Entity> removeRequestQueue;
+    bool shouldClear = false;
+    for (int i = 0; i < registry.emitParticles.components.size();i++) {
+        //tick request timers
+        Entity& ent = registry.emitParticles.entities[i];
+        EmitParticle& request = registry.emitParticles.components[i];
+
+        if (request.requestType == ParticleRequestType::ClearParticles) {
+            shouldClear = true;
+            break;
         }
-        else if (request.requestType == RequestType::Explosion) {
-            // printf("%.2f %.2f\n",request.position.x,request.position.y);
-            explode(createParticle(request.position), request.requestOrigin);
+        
+        int emitCount = glm::min((int) glm::round(request.numToEmit * (elapsed_ms / request.timeRemaining)),request.numToEmit);
+        request.timeRemaining -= elapsed_ms;
+        if (request.timeRemaining <= 0) {
+            emitCount = request.numToEmit;
+            removeRequestQueue.push_back(ent);
+        }
+        request.numToEmit -= emitCount;
+        bool hasMotion = registry.motions.has(ent);
+
+        //emit based on type of request
+        for (int i = 0; i < emitCount; i++) {
+            if (request.requestType == ParticleRequestType::PlayerDash && hasMotion) {
+                Motion& motion = registry.motions.get(ent);
+                emit(createParticle(motion.position + vec2(0.0f,motion.scale.y / 2) + vec2(Random::Float(-5,5),Random::Float(-5,5))));
+            }
+            else if (request.requestType == ParticleRequestType::PlayerBulletCollision) {
+                vec2 pos = request.defaultPos + vec2{ Random::Float(-2,2), Random::Float(-2,2)};
+                explode(createParticle(pos), request.defaultPos);
+            } else if (request.requestType == ParticleRequestType::EnemyDeath && hasMotion) {
+                Motion& motion = registry.motions.get(ent);
+                vec2 pos = motion.position + vec2(Random::Float(-5,5),Random::Float(-5,5));
+                explode(createParticle(pos), motion.position);
+            }
         }
     }
-    //test emission on mouse position
-    // emit(createParticle(registry.ioStates.components[0].mousePosition));
-    registry.emitParticles.clear();
+    if (shouldClear) {
+        clearParticles();
+        registry.emitParticles.clear();
+    } else {
+        for (auto& e : removeRequestQueue) {
+            registry.emitParticles.remove(e);
+        }
+    }
 }
 
 void ParticleSystem::emit(const ParticleProps& props) {
@@ -229,47 +340,62 @@ void ParticleSystem::render() {
     glUseProgram(shaderProgram);
     glBindVertexArray(vao);
 
-    int success;
-    glValidateProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n" << infoLog << std::endl;
-    }
+    // int success;
+    // glValidateProgram(shaderProgram);
+    // glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
+    // if (!success) {
+    //     char infoLog[512];
+    //     glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+    //     std::cerr << "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n" << infoLog << std::endl;
+    // }
     gl_has_errors();
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-    unsigned int colorLoc = glGetUniformLocation(shaderProgram, "fcolor");
+    unsigned int textureLoc = glGetUniformLocation(shaderProgram,"particle_sampler");
+    int samplers[2] = {0,1};
 
-    if (projectionLoc == -1 || transformLoc == -1 || colorLoc == -1) {
+    if (projectionLoc == -1 || textureLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
         return; // Prevent further execution if uniforms are not found
     }
-
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     gl_has_errors();
 
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,texture_handles[0]);
+     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D,texture_handles[1]);
+    gl_has_errors();
+    
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniform1iv(textureLoc,2,samplers);
+    gl_has_errors();
+
+    uint32_t indexCount = 0;
+    std::array<Vertex,1000> vertices;
+    Vertex* buffer = vertices.data();
     for (auto& particle : particlePool) {
         if (!particle.active) {
             continue;
         }
+
+        gl_has_errors();
         float lifePassed = (particle.lifetime - particle.lifeRemaining) / particle.lifetime;
 
-        glm::vec4 color = glm::lerp(particle.colorBegin, particle.colorEnd, lifePassed);
+        glm::vec4 color = glm::lerp(particle.colorBegin, particle.colorEnd, lifePassed); //TODO
         float size = glm::lerp(particle.sizeBegin, particle.sizeEnd, lifePassed);
 
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), { particle.position.x, particle.position.y, 0.0f }) *
                               glm::rotate(glm::mat4(1.0f), particle.rotation, { 0.0f, 0.0f, 1.0f }) *
                               glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
 
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        glUniform4fv(colorLoc, 1, glm::value_ptr(color));
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        buffer = createQuad(buffer,color,transform,-1); //-1 to use color, or any valid texture_handles index
+        indexCount+=6;
         gl_has_errors();
     }
+    glBindBuffer(GL_ARRAY_BUFFER,vbo);
+    glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(Vertex) * vertices.size(),vertices.data());
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
 ParticleProps ParticleSystem::createParticle(vec2 pos) {

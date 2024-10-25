@@ -5,6 +5,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "components.hpp"
+#define POOLSIZE 1000
 
 class ParticleSystem {
 public:
@@ -18,6 +19,7 @@ public:
 
     void render();
     bool initScreenTexture();
+    void clearParticles();
 
     ParticleProps createParticle(vec2 pos);
 private:
@@ -33,15 +35,27 @@ private:
 
         bool active = false;
     };
+    struct Vertex {
+        vec3 position;
+        vec4 color;
+        vec2 texCoords;
+        float texID;
+    };
+
+    void handleEmitRequests(float elapsed_ms);
+    Vertex* createQuad(Vertex* target, vec4 color, mat4 transform, float texID);
+    GLuint loadTexture(const std::string& path);
 
     std::vector<Particle> particlePool;
     uint poolIndex = 999;
     
-    GLuint vao;
+    GLuint vao, vbo, ib;
 	GLuint shaderProgram;
     GLuint frame_buffer;
     GLuint off_screen_render_buffer_color;
 	GLuint off_screen_render_buffer_depth;
+
+    std::array<GLuint,2> texture_handles;
     
     glm::mat4 projection;
     GLFWwindow* window;

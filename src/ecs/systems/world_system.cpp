@@ -170,7 +170,6 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	createRoomBounds(renderer);
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
 
-
 	// this feels very bad, put as temp fix for getting window size for now
 	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
@@ -204,14 +203,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// }
 	//
 	// place sprite timer progression here for now
-	for (auto& entity : registry.spriteTimers.entities) {
-		auto& spriteTimer = registry.spriteTimers.get(entity);
-		spriteTimer.count_ms -= elapsed_ms_since_last_update;
-		if (spriteTimer.count_ms <= 0) {
-			registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
-			registry.spriteTimers.remove(entity);
-		}
-	}
+	//for (auto& entity : registry.spriteTimers.entities) {
+	//	auto& spriteTimer = registry.spriteTimers.get(entity);
+	//	spriteTimer.count_ms -= elapsed_ms_since_last_update;
+	//	if (spriteTimer.count_ms <= 0) {
+	//		registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
+	//		registry.spriteTimers.remove(entity);
+	//	}
+	//}
 
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
@@ -276,12 +275,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() == 0) {
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySniper);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyHoming);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyCharge);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySentry);
-	}
 
 	return true;
 }
@@ -290,17 +283,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 void WorldSystem::restartGame() {
 	printf("Restarting\n");
 	// Debugging for memory/component leaks
-	registry.list_all_components();
+	// registry.list_all_components();
 	GameState& gameState = registry.gameStates.components[0];
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
 
+	std::cout << ("MyString") << std::endl;
+	std::cout << std::hash<std::string>{}("MyString") << std::endl;
+
 	// Reset the game speed
 	currentSpeed = 1.f;
 
 	// Debugging for memory/component leaks
-	registry.list_all_components();
 
 	Entity player = resetPlayer();
 
@@ -379,12 +374,9 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
-			for (int i = 0; i < (rand() % 10 + 3); i++) {
-				EmitParticle& p = registry.emitParticles.emplace(Entity());
-				Motion& motion = registry.motions.get(entity);
-				p.requestType = RequestType::Explosion;
-				p.requestOrigin = motion.position;
-				p.position = motion.position + vec2{ rand() % (int)(motion.scale.x * 0.8) - 0, rand() % (int)(motion.scale.y * 0.8) - 0 };
+			if (registry.motions.has(entity)) {
+				EmitParticle& p = registry.emitParticles.emplace(Entity(),ParticleRequestType::PlayerBulletCollision,0,rand() % 3 + 3);
+				p.defaultPos = registry.motions.get(entity).position;
 			}
 			if (registry.walls.has(entity_other)) {
 				if (registry.playerBullets.get(entity).bulletBounce > 0) {
@@ -475,6 +467,8 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
+			if (!registry.emitParticles.has(player))
+				registry.emitParticles.emplace(player, ParticleRequestType::PlayerDash,dash.endTimer, 7);
 			Mix_PlayChannelTimed( 2, playerDashSound, 0, 200);
 			Mix_Volume(3, playerDashSound->volume * MIX_MAX_VOLUME);
 		}
@@ -499,14 +493,6 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			// Update Velocity
 			playerMotion.velocity = pl.dashSpeed * glm::normalize(dash.dashDirection);
 			// std::cout << playerMotion.velocity.x << " " << playerMotion.velocity.y << std::endl;
-
-			//emit particles at player position
-			EmitParticle& p = registry.emitParticles.emplace(Entity());
-			p.position = playerMotion.position + vec2(0.0f,playerMotion.scale.y / 2);
-			p.requestOrigin = p.position;
-			p.requestType = RequestType::EmitParticle;
-			p.position.x += Random::Float(-5,5);
-			p.position.y += Random::Float(-5,5);
 		}
 	}
 }
@@ -633,15 +619,15 @@ float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 
 void WorldSystem::handlePlayerHit(Entity& other) {
 	//change sprite
-	auto& spriteMap = registry.sprites.get(player).sprites;
-	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
-		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
-		if (!registry.spriteTimers.has(player)) {
-			auto& spriteTimer = registry.spriteTimers.emplace(player);
-			spriteTimer.count_ms = 300;
-			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
-		}
-	}
+	//auto& spriteMap = registry.sprites.get(player).sprites;
+	//if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+	//	registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+	//	if (!registry.spriteTimers.has(player)) {
+	//		auto& spriteTimer = registry.spriteTimers.emplace(player);
+	//		spriteTimer.count_ms = 300;
+	//		spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+	//	}
+	//}
 	//play hit sound
 	Mix_PlayChannel(3, playerHurtSound, 0);
 	Mix_Volume(3, playerHurtSound->volume * MIX_MAX_VOLUME);
@@ -675,20 +661,6 @@ void WorldSystem::clearDeleteQueue() {
 		// but should be generalized for more things in the future
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
 			registry.deleteEntityAndRelatedEntities(e);
-		}
-		else {
-			for (int i = 0; i < (rand() % 5 + 2); i++) { // NOTE: this particle generation is frame-dependent
-				EmitParticle& p = registry.emitParticles.emplace(Entity());
-				Motion& motion = registry.motions.get(e);
-				p.requestType = RequestType::Explosion;
-				p.requestOrigin = motion.position;
-				vec2 r = motion.scale * 0.8f;
-				r.x *= Random::Float(-0.5f,0.5f);
-				r.y *= Random::Float(-0.5f,0.5f);
-				p.position = motion.position;
-				p.position.x += Random::Float(-5,5);
-				p.position.y += Random::Float(-5,5);
-			}
 		}
 	}
 }

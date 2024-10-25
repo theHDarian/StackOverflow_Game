@@ -81,7 +81,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glActiveTexture(GL_TEXTURE0);
 		gl_has_errors();
 		assert(registry.renderRequests.has(entity));
-		GLuint texture_id = texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
@@ -451,21 +451,27 @@ void RenderSystem::drawImGui() {
 	StackCompile& sc = registry.stackCompile.components[0];
 	ImGui::Text("Stack Size: %lu", sc.currStack.size());
 	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
-	ImGui::BeginChild("AdditiveContent",ImVec2(180,250),true);
+	ImGui::BeginChild("AdditiveContent",ImVec2(180,80),true);
 		std::map<BulletEffectType, float>::iterator it;
 		for (it = sc.additives.begin(); it != sc.additives.end(); it++) {
-			// if (it->second == 0) continue;
+			if (it->second == 0) continue;
 			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
 		}
 	ImGui::EndChild();
 
 	ImGui::TextColored(ImVec4(1,1,0,1), "Multiplicatives");
-	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,250),true);
+	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,80),true);
 		for (it = sc.multiplicatives.begin(); it != sc.multiplicatives.end(); it++) {
-			// if (it->second == 1) continue;
+			if (it->second == 1) continue;
 			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
 		}
 	ImGui::EndChild();
+
+	for (int i = 0; i < registry.doors.components.size();i++) {
+		Door& d = registry.doors.components[i];
+		char type = d.isPrev ? 'P' : d.room;
+		ImGui::Text("Door %d: type %c",i,type);
+	}
 
 	if (ImGui::Button("Restart Game")) {
 		registry.ioStates.components[0].shouldRestart = true;
@@ -480,9 +486,9 @@ void RenderSystem::drawImGui() {
 // bandaid fix to draw all colliders an entity has right now
 void RenderSystem::drawAllColliders(Entity entity, const mat3& projection_2D) {
 	if (registry.circleColliders.has(entity))
-		drawCollider(entity, TEXTURE_ASSET_ID::CIRCLE_SPRITE, projection_2D);
+		drawCollider(entity, "circle.png", projection_2D);
 	if (registry.aabbs.has(entity))
-		drawCollider(entity, TEXTURE_ASSET_ID::RECTANGLE_SPRITE, projection_2D);
+		drawCollider(entity, "rectangle.png", projection_2D);
 }
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI
@@ -534,7 +540,7 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	gl_has_errors();
 
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE];
+		texture_gl_handles[(GLuint)name_to_texture["enemy_bullet_square.png"]];
 
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();
@@ -574,14 +580,14 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++) {
 		// no variance on shape for now
-		TEXTURE_ASSET_ID bulletShape = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
+		std::string bulletShape = "enemy_bullet_circle.png";
 		// start from bottom to top
 		drawUIBullet(vec2(stackui.bulletStartPos.x, stackui.bulletStartPos.y - i * stackui.bulletSize.y - i * stackui.bulletOffset), stackui.bulletSize,
 			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
 	}
 }
 
-void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEXTURE_ASSET_ID shape, const mat3& projection) {
+void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat3& projection) {
 	Transform transform;
 	transform.translate(position);
 	transform.scale(bullet_size);
@@ -623,7 +629,7 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEX
 	gl_has_errors();
 
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)shape];
+		texture_gl_handles[(GLuint)name_to_texture[shape]];
 
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();
@@ -662,17 +668,17 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, TEX
 // draw collider shape based on shape texture passed
 // only draws circles and boxes for now
 // (more work required to include polygons)
-void RenderSystem::drawCollider(Entity entity, TEXTURE_ASSET_ID shape, const mat3& projection) {
+void RenderSystem::drawCollider(Entity entity, std::string shape, const mat3& projection) {
 	Motion& motion = registry.motions.get(entity);
 
 	Transform transform;
-	if (shape == TEXTURE_ASSET_ID::CIRCLE_SPRITE) {
+	if (shape == "circle.png") {
 		auto& circle = registry.circleColliders.get(entity);
 		transform.translate(motion.position);
 		transform.rotate(motion.angle);
 		transform.scale({ circle.radius * 2, circle.radius * 2 });
 	}
-	else if (shape == TEXTURE_ASSET_ID::RECTANGLE_SPRITE) {
+	else if (shape == "rectangle.png") {
 		auto& aabb = registry.aabbs.get(entity);
 		transform.translate(motion.position);
 		transform.rotate(motion.angle);
@@ -717,7 +723,7 @@ void RenderSystem::drawCollider(Entity entity, TEXTURE_ASSET_ID shape, const mat
 
 	assert(registry.renderRequests.has(entity));
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)shape];
+		texture_gl_handles[(GLuint)name_to_texture[shape]];
 
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();
@@ -814,7 +820,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 	gl_has_errors();
 
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::CHEVRON];
+		texture_gl_handles[(GLuint)name_to_texture["chevron.png"]];
 
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();

@@ -76,23 +76,25 @@ void MapSystem::step(float elapsed_ms) {
     Map& map = registry.maps.components[0];
     map.currRoom.timeElapsed += elapsed_ms / 1000.0f;
     //switch rooms if needed
-    for (auto& r : registry.mapRequests.components) {
+
+    if (registry.mapRequests.components.size() > 0) {
+        auto& r =registry.mapRequests.components[0];
         if (r.requestType == MapRequestType::ChangeRoom) {
             changeRoom(r.type, r.doorIndex);
         }
         else if (r.requestType == MapRequestType::RestartGame)
             resetMap();
+        registry.mapRequests.clear();
     }
-    registry.mapRequests.clear();
 
     //spawn enemy based on current time 
     WindowState& wS = registry.windowStates.components[0];
     // std::cout << " enemy size " << registry.enemies.size() << std::endl;
 	if (registry.enemies.size() <= 5) {
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySniper);
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
+			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::TestEnemyType);
+			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
+			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
+			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
 	}
 }
 
@@ -112,6 +114,16 @@ void clearRoomActors() {
     for (Entity ent : registry.enemyBullets.entities) {
         if (!registry.deleteds.has(ent)) registry.deleteds.emplace(ent);
     }
+
+    registry.emitParticles.emplace(Entity(),ParticleRequestType::ClearParticles,0.0f,0);
+}
+RoomType getRandomRoomType(bool includeNone) {
+    int r = Random::Float() * 4;
+    if (r > 3) return RoomType::TreasureRoom;
+    if (r > 2) return RoomType::RestRoom;
+    if (r > 1) return RoomType::EnemyRoom;
+    
+    return includeNone ? RoomType::None : RoomType::EnemyRoom;
 }
 
 void MapSystem::changeRoom(RoomType type, int doorIndex) {
@@ -121,7 +133,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
 
     nextMusic();
     
-    printf("Changing Room %c, Door Side:%d \n", type, doorIndex);
     //move player to the starting side of the room
     Entity& playerEntity = registry.players.entities[0];
     Motion& playerMotion = registry.motions.get(playerEntity);
@@ -131,6 +142,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
     int spawnIndex = doorIndex == 0 ? 2 : doorIndex == 1 ? 3 :doorIndex == 2 ? 0 : 1;
     vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
     playerMotion.position = spawnPosition;
+
+    // printf("Changing Room %c, enter door %d spawn at %.1f %.1f\n", type, doorIndex,spawnPosition.x,spawnPosition.y);
+
     
     //clear enemies and obstacles
     clearRoomActors();
@@ -145,23 +159,32 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
 
     map.roomsTraversed++;
     
-    doors[0].room = RoomType::None;
-    doors[1].room = RoomType::EnemyRoom;
-    doors[2].room = RoomType::None;
-    doors[3].room = RoomType::None;
-    //block the side where player spawns
+    //copy room type
+    doors[spawnIndex].room = doors[doorIndex].room; 
+    doors[spawnIndex].isPrev = true;
+
+    bool includeNone = true;
     for (int i = 0; i < doors.size(); i++) {
-        doors[i].isPrev = spawnIndex == i;
+        //reset previous room type 
+        if (i == spawnIndex) continue;
+
+        Door& d = registry.doors.components[i];
+        d.room = getRandomRoomType(includeNone);
+        d.isPrev = false;
+        if (d.room == RoomType::None) 
+            includeNone = false;
     }
 }
 
 void MapSystem::resetMap() {
     clearRoomActors();
 
-    registry.doors.components[0].room = RoomType::None;
-    registry.doors.components[1].room = RoomType::EnemyRoom;
-    registry.doors.components[2].room = RoomType::None;
-    registry.doors.components[3].room = RoomType::None;
+    bool includeNone = true;
+    for (Door& d: registry.doors.components) {
+        d.room = getRandomRoomType(includeNone);
+        if (d.room == RoomType::None) 
+            includeNone = false;
+    }
 
     for (Door& d : registry.doors.components) {
         d.isPrev = false;

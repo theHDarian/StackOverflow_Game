@@ -38,7 +38,8 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{
-			playerSprites.sprites[SPRITE_STATE::BASE],
+			//playerSprites.sprites[SPRITE_STATE::BASE],
+			"mcv1_base.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -82,7 +83,7 @@ Entity createAimIndicator(RenderSystem* renderer) {
 	registry.renderRequests.insert(
 		aimIndicator,
 		{
-			indicatorSprites.sprites[SPRITE_STATE::BASE],
+			"aim_indicator.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		}
@@ -105,9 +106,12 @@ Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPositi
 	wall.endPosition = endPosition;
 
 	registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		entity,
+		{ 
+			"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE 
+		});
 
 	return entity;
 }
@@ -123,9 +127,16 @@ Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos) {
 	door.endPos = endPos;
 
 	registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		entity, 
+		{ 
+			"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE 
+		});
+	vec3 c = registry.colors.emplace(entity);
+	c.r = 0.0;
+	c.g = 0.0;
+	c.b = 1.0;
 
 	return entity;
 }
@@ -163,9 +174,12 @@ Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b) {
 	motion.scale = vec2(length, 5);
 
 	registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		entity, 
+		{ 
+			"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE 
+		});
 
 
 	//std::cout << "created line from point a(" << a.x << ", " << a.y << ") to b(" << b.x << ", " << b.y << ") at (" << position.x << ", " << position.y << ")" << " angle: " << angle << ", length: " << length << std::endl;
@@ -233,14 +247,16 @@ Entity createBigC(RenderSystem* renderer, vec2 position) {
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 
-	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = none;
+	/*AttackData& atk = registry.attackDatas.emplace(entity);
+	atk = none;*/
+	enemy.attackData.push_back(none);
 
 	registry.sprites.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{
-			registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+			//registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+			"none",
 			EFFECT_ASSET_ID::MESH,
 			GEOMETRY_BUFFER_ID::MESH_GB
 		});
@@ -263,7 +279,7 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 	registry.renderRequests.insert(
 		entity,
 		{
-			TEXTURE_ASSET_ID::FLOOR,
+			"blankFloor.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -297,6 +313,10 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 			enemy = EnemyEasySniper();
 			break;
 		}
+		case EnemyType::TestEnemyType: {
+			enemy = TestEnemy();
+			break;
+		}
 
     }
 
@@ -318,17 +338,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	movement.distanceTraveled = 0.0f;
 
 	
-	AttackData& atk = registry.attackDatas.emplace(entity);
-	std::vector<AttackData> atkData = enemy.attackData;
-	// std::cout << "attackData size:" << atkData.size() << std::endl;
-	if (atkData.size() > 0) {
-		atk = atkData[0];
-	}
-	for (int i = 0; i < atkData.size(); i++) {
-		if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
-			registry.bursts.emplace(entity);
-		}
-	}
+	std::vector<AttackData>& atkData = enemy.attackData;
+	registry.bursts.emplace(entity);
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(min(motion.scale.x, motion.scale.y))/2.5;
@@ -336,7 +347,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	registry.renderRequests.insert(
 		entity,
 		{
-			TEXTURE_ASSET_ID::PUFFERFISH,
+			"enemy_Pufferfish.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			true,
@@ -377,6 +388,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	
 	auto& spriteComponent = registry.sprites.emplace(entity);
 
+	std::string renderShape;
 	if (atkData.shape == RECTANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
@@ -389,6 +401,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
 		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
+		renderShape = "enemy_bullet_square.png";
 	}
 	else if (atkData.shape == TRIANGLE) {
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
@@ -401,17 +414,20 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
 		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
+		renderShape = "enemy_bullet_triangle.png";
 	}
 	else {
 		CircleCollider& cc = registry.circleColliders.emplace(entity);
 		cc.radius = motion.scale.x / 2;
 		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
+		renderShape = "enemy_bullet_circle.png";
 	}
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			spriteComponent.sprites[SPRITE_STATE::BASE],
+			//spriteComponent.sprites[SPRITE_STATE::BASE],
+			renderShape,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -425,9 +441,12 @@ Entity createLine(vec2 position, vec2 scale)
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	registry.renderRequests.insert(
-		entity, {TEXTURE_ASSET_ID::TEXTURE_COUNT,
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE});
+		entity, 
+		{
+			"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE
+		});
 
 	// Create motion
 	Motion &motion = registry.motions.emplace(entity);
@@ -448,9 +467,12 @@ Entity createDialogueBox(vec2 position, vec2 scale) {
 	// copies code from draw line as a box for now
 	// consider doing a check of "should I render now"? Or hide entity?
 	auto& rr = registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		entity, 
+		{ 
+			"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE 
+		});
 	rr.show = false;
 
 	registry.dialogueUIs.emplace(entity);
@@ -498,9 +520,12 @@ Entity createPauseMenu(vec2 position, vec2 scale) {
 
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		entity, 
+		{ 
+			"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE 
+		});
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -539,9 +564,12 @@ Entity createGameOverMenu(vec2 position, vec2 scale) {
 
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		entity, 
+		{ 
+			"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE 
+		});
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -609,7 +637,7 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 	registry.renderRequests.insert(
 		entity,
 		{
-			spriteComponent.sprites[SPRITE_STATE::BASE],
+			"player_bullet.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
@@ -621,7 +649,7 @@ Entity createStackUI(WindowState& windowState, StackCompile& stack) {
 	Entity entity = Entity();
 
 	auto& rr = registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT,
+		entity, { "none",
 				 EFFECT_ASSET_ID::EGG,
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
