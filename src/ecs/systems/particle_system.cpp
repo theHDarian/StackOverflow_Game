@@ -292,29 +292,33 @@ void ParticleSystem::render() {
     glUseProgram(shaderProgram);
     glBindVertexArray(vao);
 
-    int success;
-    glValidateProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n" << infoLog << std::endl;
-    }
+    // int success;
+    // glValidateProgram(shaderProgram);
+    // glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
+    // if (!success) {
+    //     char infoLog[512];
+    //     glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+    //     std::cerr << "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n" << infoLog << std::endl;
+    // }
     gl_has_errors();
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-    // unsigned int textureLoc = glGetUniformLocation(shaderProgram,"textures");
+    unsigned int textureLoc = glGetUniformLocation(shaderProgram,"sampler1");
     // int samplers[2] = {0,1};
 
-    if (projectionLoc == -1 || transformLoc == -1) {
+    if (projectionLoc == -1 || transformLoc == -1 || textureLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
         return; // Prevent further execution if uniforms are not found
     }
+    gl_has_errors();
 
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,texture_handles[0]);
     // glBindTextureUnit(0,texture_handles[0]);
     // glBindTextureUnit(1,texture_handles[1]);
+    gl_has_errors();
     
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     // glUniform1iv(textureLoc,2,samplers);
