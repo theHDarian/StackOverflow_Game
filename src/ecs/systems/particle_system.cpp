@@ -10,6 +10,24 @@
 #include "render_system.hpp"
 #include "components/presets/particle_presets.hpp"
 
+static GLuint loadTexture(const std::string& path) {
+    int w,h,bits;
+    stbi_set_flip_vertically_on_load(1);
+    auto* pixels = stbi_load(path.c_str(),&w,&h,&bits,STBI_rgb);
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D,textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB8, w,h,0, GL_RGB,GL_UNSIGNED_BYTE,pixels);
+
+    stbi_image_free(pixels);
+
+    return textureID;
+}
+
 ParticleSystem::ParticleSystem() {
     particlePool.resize(1000);
 }
@@ -57,15 +75,15 @@ void ParticleSystem::init(GLFWwindow* window) {
     projection = glm::ortho(0.0f, static_cast<float>(windowState.width), static_cast<float>(windowState.height),0.0f);
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
-         0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
-         0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
-        -0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
+        -0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 1.0f, 0.0f,
         
-         1.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
-         2.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
-         2.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
-         1.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
+         1.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,0.0f, 0.0f, 1.0f,
+         2.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,1.0f, 0.0f, 1.0f,
+         2.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f,
+         1.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,0.0f, 1.0f, 1.0f,
     };
     uint32_t indices[] = { 0, 1, 2, 2, 3, 0,
                            4, 5, 6, 6, 7, 4 };
@@ -77,10 +95,18 @@ void ParticleSystem::init(GLFWwindow* window) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (const void*) (3 * sizeof(float)));
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (const void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (const void*) (7 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (const void*) (9 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     gl_has_errors();
 
@@ -88,6 +114,9 @@ void ParticleSystem::init(GLFWwindow* window) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     gl_has_errors();
+
+    texture_handles[0] = loadTexture(textures_path("aim_indicator.png"));
+    texture_handles[1] = loadTexture(textures_path("chevron.png"));
     glBindVertexArray(0);
     gl_has_errors();
 
@@ -275,13 +304,20 @@ void ParticleSystem::render() {
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+    // unsigned int textureLoc = glGetUniformLocation(shaderProgram,"textures");
+    // int samplers[2] = {0,1};
 
     if (projectionLoc == -1 || transformLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
         return; // Prevent further execution if uniforms are not found
     }
 
+
+    // glBindTextureUnit(0,texture_handles[0]);
+    // glBindTextureUnit(1,texture_handles[1]);
+    
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    // glUniform1iv(textureLoc,2,samplers);
     gl_has_errors();
 
     for (auto& particle : particlePool) {

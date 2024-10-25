@@ -43,6 +43,8 @@ private:
     GLuint frame_buffer;
     GLuint off_screen_render_buffer_color;
 	GLuint off_screen_render_buffer_depth;
+
+    std::array<GLuint,2> texture_handles;
     
     glm::mat4 projection;
     GLFWwindow* window;
