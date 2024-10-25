@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 
 // From vertex shader
 in vec2 texcoord;
@@ -11,16 +11,19 @@ uniform float alpha = 1.0;
 uniform float chargeBoundary = 1.0;
 
 // Output color
-layout(location = 0) out  vec4 color;
+layout(location = 0) out vec4 color;
 
-void main()
-{
-	// color = vec4(fcolor, alpha) * texture(sampler0, vec2(texcoord.x, texcoord.y));
-	color = texture(sampler0, vec2(texcoord.x, texcoord.y));
-	// note: branches are expensive, consider using another shader instead?
-	if (texcoord.x >= 1-chargeBoundary){
-		color.r *= fcolor.r;
-		color.g *= fcolor.g;
-		color.b *= fcolor.b;
-	}
+void main() {
+    vec4 texColor = texture(sampler0, texcoord);
+
+    // Create a diagonal boundary
+    float diagonalBoundary = 1.0 - chargeBoundary + (-0.06125 * texcoord.y);
+
+    if (texcoord.x >= diagonalBoundary) {
+        texColor.r *= fcolor.r;
+        texColor.g *= fcolor.g;
+        texColor.b *= fcolor.b;
+    }
+
+    color = texColor;
 }

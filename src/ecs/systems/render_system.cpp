@@ -901,10 +901,10 @@ void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	WindowState& windowState = registry.windowStates.components[0];
 	vec2 position = { windowState.width/2, windowState.height-60.0};
 	if (registry.damageds.has(entity)) {
-		position.x += (rand() % 15) - 5;
-		position.y += (rand() % 15) - 5;
+		position.x += (rand() % 10) - 5;
+		position.y += (rand() % 10) - 5;
 	}
-	vec2 scale = { 600, 270 };
+	vec2 scale = { 600, 30 };
 
 	float max = registry.enemies.get(entity).maxHealth;
 	float current = registry.enemies.get(entity).currHealth;
@@ -960,7 +960,8 @@ void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 1);
 
-	float chargeBoundary = glm::lerp(0.f, 1.f, (max - current) / max);
+	// charge boundary is the percentage of health left, finetuned to account for the shape of the hp bar
+	float chargeBoundary = glm::lerp(0.f, 0.94f, (max - current) / max);
 
 	GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
 	glUniform1f(charge_boundary_uloc, chargeBoundary);
