@@ -10,6 +10,42 @@
 #include "render_system.hpp"
 #include "components/presets/particle_presets.hpp"
 
+struct Vertex {
+    vec3 position;
+    vec4 color;
+    vec2 texCoords;
+    float texID;
+};
+
+static std::array<Vertex,4> createQuad(float x, float y, float texID) {
+    float size = 1.0f;
+    Vertex v0;
+    v0.position = {x,y,0.0f};
+    v0.color = { 0.18f, 0.6f, 0.96f, 1.0f};
+    v0.texCoords = {0.0f,0.0f};
+    v0.texID = texID;
+    
+    Vertex v1;
+    v1.position = {x + size, y,0.0f};
+    v1.color = { 0.18f, 0.6f, 0.96f, 1.0f};
+    v1.texCoords = {1.0f,0.0f};
+    v1.texID = texID;
+
+    Vertex v2;
+    v2.position = {x+size,y+size,0.0f};
+    v2.color = { 0.18f, 0.6f, 0.96f, 1.0f};
+    v2.texCoords = {1.0f,1.0f};
+    v2.texID = texID;
+
+    Vertex v3;
+    v3.position = {x,y+size,0.0f};
+    v3.color = { 0.18f, 0.6f, 0.96f, 1.0f};
+    v3.texCoords = {0.0f,1.0f};
+    v3.texID = texID;
+
+    return {v0,v1,v2,v3};
+}
+
 static GLuint loadTexture(const std::string& path) {
     int w,h,bits;
     stbi_set_flip_vertically_on_load(1);
@@ -29,7 +65,7 @@ static GLuint loadTexture(const std::string& path) {
 }
 
 ParticleSystem::ParticleSystem() {
-    particlePool.resize(1000);
+    particlePool.resize(poolSize);
 }
 
 bool ParticleSystem::initScreenTexture()
@@ -74,37 +110,26 @@ void ParticleSystem::init(GLFWwindow* window) {
     WindowState& windowState = registry.windowStates.components[0]; 
     projection = glm::ortho(0.0f, static_cast<float>(windowState.width), static_cast<float>(windowState.height),0.0f);
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 0.0f, 0.0f,
-         0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 1.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 1.0f, 0.0f,
-        
-         1.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,0.0f, 0.0f, 1.0f,
-         2.5f, -0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,1.0f, 0.0f, 1.0f,
-         2.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f,
-         1.5f,  0.5f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,0.0f, 1.0f, 1.0f,
-    };
     uint32_t indices[] = { 0, 1, 2, 2, 3, 0,
                            4, 5, 6, 6, 7, 4 };
 
-    GLuint vbo, ib;
+    GLuint ib;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), 0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 4 * poolSize, nullptr, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,position));
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (const void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,color));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (const void*) (7 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,texCoords));
     glEnableVertexAttribArray(2);
 
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (const void*) (9 * sizeof(float)));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,texID));
     glEnableVertexAttribArray(3);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -138,13 +163,15 @@ void ParticleSystem::init(GLFWwindow* window) {
     }
 
     // Clean up ib and vbo
-    glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ib);
 }
 
 ParticleSystem::~ParticleSystem() {
     if (vao) {
         glDeleteVertexArrays(1, &vao); 
+    }
+    if (vbo) {
+        glDeleteBuffers(1,&vbo);
     }
     if (shaderProgram) {
         glDeleteProgram(shaderProgram);
@@ -288,6 +315,17 @@ void ParticleSystem::render() {
     }
     frame.prevFrameBuffer = frame_buffer;
     frame.prevTexture = off_screen_render_buffer_color;
+
+    auto q0 = createQuad(-0.5f,-0.5f,0.0f);
+    auto q1 = createQuad(1.5f,-0.5f,1.0f);
+
+    Vertex vertices[8];
+    memcpy(vertices,q0.data(),q0.size() * sizeof(Vertex));
+    memcpy(vertices + q0.size(),q1.data(),q1.size() * sizeof(Vertex));
+   
+    glBindBuffer(GL_ARRAY_BUFFER,vbo);
+    glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(vertices),vertices);
+    gl_has_errors();
 
     glUseProgram(shaderProgram);
     glBindVertexArray(vao);

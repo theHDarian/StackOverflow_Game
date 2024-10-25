@@ -36,9 +36,10 @@ private:
     void handleEmitRequests(float elapsed_ms);
 
     std::vector<Particle> particlePool;
+    uint poolSize = 1000;
     uint poolIndex = 999;
     
-    GLuint vao;
+    GLuint vao, vbo;
 	GLuint shaderProgram;
     GLuint frame_buffer;
     GLuint off_screen_render_buffer_color;
