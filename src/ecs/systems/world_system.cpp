@@ -203,14 +203,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// }
 	//
 	// place sprite timer progression here for now
-	for (auto& entity : registry.spriteTimers.entities) {
-		auto& spriteTimer = registry.spriteTimers.get(entity);
-		spriteTimer.count_ms -= elapsed_ms_since_last_update;
-		if (spriteTimer.count_ms <= 0) {
-			registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
-			registry.spriteTimers.remove(entity);
-		}
-	}
+	//for (auto& entity : registry.spriteTimers.entities) {
+	//	auto& spriteTimer = registry.spriteTimers.get(entity);
+	//	spriteTimer.count_ms -= elapsed_ms_since_last_update;
+	//	if (spriteTimer.count_ms <= 0) {
+	//		registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
+	//		registry.spriteTimers.remove(entity);
+	//	}
+	//}
 
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
@@ -275,12 +275,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() == 0) {
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySniper);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyHoming);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyCharge);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySentry);
-	}
 
 	return true;
 }
@@ -294,6 +288,9 @@ void WorldSystem::restartGame() {
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
+
+	std::cout << ("MyString") << std::endl;
+	std::cout << std::hash<std::string>{}("MyString") << std::endl;
 
 	// Reset the game speed
 	currentSpeed = 1.f;
@@ -622,15 +619,15 @@ float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 
 void WorldSystem::handlePlayerHit(Entity& other) {
 	//change sprite
-	auto& spriteMap = registry.sprites.get(player).sprites;
-	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
-		registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
-		if (!registry.spriteTimers.has(player)) {
-			auto& spriteTimer = registry.spriteTimers.emplace(player);
-			spriteTimer.count_ms = 300;
-			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
-		}
-	}
+	//auto& spriteMap = registry.sprites.get(player).sprites;
+	//if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+	//	registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
+	//	if (!registry.spriteTimers.has(player)) {
+	//		auto& spriteTimer = registry.spriteTimers.emplace(player);
+	//		spriteTimer.count_ms = 300;
+	//		spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+	//	}
+	//}
 	//play hit sound
 	Mix_PlayChannel(3, playerHurtSound, 0);
 	Mix_Volume(3, playerHurtSound->volume * MIX_MAX_VOLUME);

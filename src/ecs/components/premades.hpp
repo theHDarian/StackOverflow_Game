@@ -182,7 +182,6 @@ struct AttackData {
 	int bulletPierce = 0;
 	int bulletBounce = 0;
 	float homing = 0;
-	int burstMax = 0; // always add 1 to the end
 };
 */
 
@@ -199,6 +198,22 @@ AttackData none{
 	{0,0},
 	0,
 	1,
+	0
+};
+
+AttackData wave{
+	EnemyAttackPattern::WAVE,
+	CIRCLE,
+	{},
+	blunt,
+	5,
+	0,
+	{20,20},
+	200,
+	3000,
+	{0,0},
+	0,
+	0,
 	0
 };
 
@@ -432,6 +447,18 @@ struct EnemyEasySniper : Enemy {
 		maxHealth = 40;
 		currHealth = maxHealth;
 		behavior = EnemyBehavior::EVADEBULLET;
+		attackCooldown = 5000;
+		currCooldown = attackCooldown;
+		state = 10;
+	};
+};
+
+struct TestEnemy : Enemy {
+	TestEnemy() {
+		attackData = { wave };
+		maxHealth = 40;
+		currHealth = maxHealth;
+		behavior = EnemyBehavior::ROTATE_IN_PLACE;
 		attackCooldown = 5000;
 		currCooldown = attackCooldown;
 		state = 10;

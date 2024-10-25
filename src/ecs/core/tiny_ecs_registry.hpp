@@ -43,7 +43,6 @@ public:
 	ComponentContainer<Dash> dashes;
 	ComponentContainer <Frame> frames;
 	ComponentContainer<EmitParticle> emitParticles;
-	ComponentContainer<AttackData> attackDatas;
 	ComponentContainer<Burst> bursts;
 	ComponentContainer<HomingBullet> homes;
 	ComponentContainer<Fade> fades;
@@ -97,7 +96,6 @@ public:
 		registry_list.push_back(&shoots);
         registry_list.push_back(&invisibles);
 		registry_list.push_back(&dashes);
-		registry_list.push_back(&attackDatas);
 		registry_list.push_back(&homes);
 		registry_list.push_back(&bursts);
 		registry_list.push_back(&fades);

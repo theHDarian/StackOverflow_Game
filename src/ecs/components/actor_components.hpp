@@ -203,7 +203,8 @@ enum EnemyType {
     //MediumEnemyClusterShot,
     MediumEnemyCharge,
     MediumEnemyHoming,
-    EasyEnemySniper
+    EasyEnemySniper,
+    TestEnemyType
 };
 
 enum class EnemyAttackPattern {
@@ -212,6 +213,7 @@ enum class EnemyAttackPattern {
     ALL_DIRECTION,
     BURST,
     SPRAY,
+    WAVE,
     NONE
 };
 
