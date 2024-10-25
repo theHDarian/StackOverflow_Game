@@ -10,43 +10,38 @@
 #include "render_system.hpp"
 #include "components/presets/particle_presets.hpp"
 
-struct Vertex {
-    vec3 position;
-    vec4 color;
-    vec2 texCoords;
-    float texID;
-};
-
-static Vertex* createQuad(Vertex* target,float x, float y, vec4 color,float texID) {
+ParticleSystem::Vertex* ParticleSystem::createQuad(Vertex* target, vec4 color, mat4 transform, float texID) {
     float size = 1.0f;
-    target->position = {x,y,0.0f};
-    target->color = color;
-    target->texCoords = {0.0f,0.0f};
-    target->texID = texID;
-    target++;
-    
-    target->position = {x + size, y,0.0f};
-    target->color = color;
-    target->texCoords = {1.0f,0.0f};
-    target->texID = texID;
-    target++;
+    float x = -0.5f;
+    float y = -0.5f;
 
-    target->position = {x+size,y+size,0.0f};
-    target->color = color;
-    target->texCoords = {1.0f,1.0f};
-    target->texID = texID;
-    target++;
+    vec4 positions[4] = {
+        { x, y, 0.0f, 1.0f },               
+        { x + size, y, 0.0f, 1.0f },        
+        { x + size, y + size, 0.0f, 1.0f }, 
+        { x, y + size, 0.0f, 1.0f }         
+    };
 
-    target->position = {x,y+size,0.0f};
-    target->color = color;
-    target->texCoords = {0.0f,1.0f};
-    target->texID = texID;
-    target++;
+    vec2 texCoords[4] = {
+        { 0.0f, 0.0f }, 
+        { 1.0f, 0.0f }, 
+        { 1.0f, 1.0f }, 
+        { 0.0f, 1.0f }  
+    };
+
+    for (int i = 0; i < 4; i++) {
+        glm::vec4 transformedPos = transform * positions[i];
+        target->position = { transformedPos.x, transformedPos.y, transformedPos.z };
+        target->color = color;
+        target->texCoords = texCoords[i];
+        target->texID = texID;
+        target++;
+    }
 
     return target;
 }
 
-static GLuint loadTexture(const std::string& path) {
+GLuint ParticleSystem::loadTexture(const std::string& path) {
     int w,h,bits;
     stbi_set_flip_vertically_on_load(1);
     auto* pixels = stbi_load(path.c_str(),&w,&h,&bits,STBI_rgb_alpha);
@@ -326,21 +321,6 @@ void ParticleSystem::render() {
     frame.prevFrameBuffer = frame_buffer;
     frame.prevTexture = off_screen_render_buffer_color;
 
-    uint32_t indexCount = 0;
-    std::array<Vertex,1000> vertices;
-    Vertex* buffer = vertices.data();
-    for( int y=0;y < 5;y++) {
-        for(int x=0;x<5;x++) {
-            buffer = createQuad(buffer,x,y,{ 0.18f, 0.6f, 0.96f, 1.0f},-1);
-            indexCount+=6;
-        }
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER,vbo);
-    glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(Vertex) * vertices.size(),vertices.data());
-
-    gl_has_errors();
-
     glUseProgram(shaderProgram);
     glBindVertexArray(vao);
 
@@ -355,11 +335,10 @@ void ParticleSystem::render() {
     gl_has_errors();
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
     unsigned int textureLoc = glGetUniformLocation(shaderProgram,"particle_sampler");
     int samplers[2] = {0,1};
 
-    if (projectionLoc == -1 || transformLoc == -1 || textureLoc == -1) {
+    if (projectionLoc == -1 || textureLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
         return; // Prevent further execution if uniforms are not found
     }
@@ -376,10 +355,15 @@ void ParticleSystem::render() {
     glUniform1iv(textureLoc,2,samplers);
     gl_has_errors();
 
+    uint32_t indexCount = 0;
+    std::array<Vertex,1000> vertices;
+    Vertex* buffer = vertices.data();
     for (auto& particle : particlePool) {
         if (!particle.active) {
             continue;
         }
+
+        gl_has_errors();
         float lifePassed = (particle.lifetime - particle.lifeRemaining) / particle.lifetime;
 
         glm::vec4 color = glm::lerp(particle.colorBegin, particle.colorEnd, lifePassed); //TODO
@@ -389,10 +373,13 @@ void ParticleSystem::render() {
                               glm::rotate(glm::mat4(1.0f), particle.rotation, { 0.0f, 0.0f, 1.0f }) *
                               glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
 
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+        buffer = createQuad(buffer,color,transform,-1); //-1 to use color, or any valid texture_handles index
+        indexCount+=6;
         gl_has_errors();
     }
+    glBindBuffer(GL_ARRAY_BUFFER,vbo);
+    glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(Vertex) * vertices.size(),vertices.data());
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
 ParticleProps ParticleSystem::createParticle(vec2 pos) {

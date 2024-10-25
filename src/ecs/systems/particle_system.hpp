@@ -33,7 +33,16 @@ private:
 
         bool active = false;
     };
+    struct Vertex {
+        vec3 position;
+        vec4 color;
+        vec2 texCoords;
+        float texID;
+    };
+    
     void handleEmitRequests(float elapsed_ms);
+    Vertex* createQuad(Vertex* target, vec4 color, mat4 transform, float texID);
+    GLuint loadTexture(const std::string& path);
 
     std::vector<Particle> particlePool;
     uint poolSize = 1000;
