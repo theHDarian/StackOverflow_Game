@@ -243,8 +243,9 @@ Entity createBigC(RenderSystem* renderer, vec2 position) {
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 
-	AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = none;
+	/*AttackData& atk = registry.attackDatas.emplace(entity);
+	atk = none;*/
+	enemy.attackData.push_back(none);
 
 	registry.sprites.emplace(entity);
 	registry.renderRequests.insert(
@@ -308,6 +309,10 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 			enemy = EnemyEasySniper();
 			break;
 		}
+		case EnemyType::TestEnemy: {
+			enemy = TestEnemy::TestEnemy();
+			break;
+		}
 
     }
 
@@ -329,17 +334,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	movement.distanceTraveled = 0.0f;
 
 	
-	AttackData& atk = registry.attackDatas.emplace(entity);
-	std::vector<AttackData> atkData = enemy.attackData;
-	// std::cout << "attackData size:" << atkData.size() << std::endl;
-	if (atkData.size() > 0) {
-		atk = atkData[0];
-	}
-	for (int i = 0; i < atkData.size(); i++) {
-		if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
-			registry.bursts.emplace(entity);
-		}
-	}
+	std::vector<AttackData>& atkData = enemy.attackData;
+	registry.bursts.emplace(entity);
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(min(motion.scale.x, motion.scale.y))/2.5;

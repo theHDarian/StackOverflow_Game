@@ -276,12 +276,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	WindowState& wS = registry.windowStates.components[0];
-	if (registry.enemies.size() == 0) {
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySniper);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyHoming);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::MediumEnemyCharge);
-			createEnemy(renderer, vec2(wS.width * uniformDist(rng),wS.height * uniformDist(rng)), EnemyType::EasyEnemySentry);
-	}
 
 	return true;
 }
