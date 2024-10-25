@@ -27,7 +27,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		motion.velocity += motion.veer * step_seconds;
 
 		//slightly broken
-		if (registry.enemyBullets.has(entity) || registry.playerBullets.has(entity)) motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+		if (!registry.lasers.has(entity) && (registry.enemyBullets.has(entity) || registry.playerBullets.has(entity))) motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 		if (registry.homes.has(entity) && registry.motions.has(registry.homes.get(entity).target)) {
 			vec2 target = registry.motions.get(registry.homes.get(entity).target).position;
@@ -35,6 +35,29 @@ void PhysicsSystem::step(float elapsed_ms)
 			target -= motion.position;
 			float mag = glm::length(motion.velocity);
 			motion.velocity = mag * (intensity * glm::normalize(target) + (1 - intensity) * glm::normalize(motion.velocity));
+		}
+
+		if (registry.lasers.has(entity)) {
+			Laser& laser = registry.lasers.get(entity);
+			if (registry.enemies.has(laser.start)) {
+				Motion& start = registry.motions.get(laser.start);
+				motion.angle += laser.rotation;
+				vec2 goal = start.position + vec2(cos(motion.angle), sin(motion.angle)) * (laser.length + laser.growth);
+				laser.length += laser.growth;
+				float currLength = laser.length;
+				for (uint i = 0; i < walls.components.size(); i++) {
+					WallCollider& wall = walls.components[i];
+					vec2 intersectionPoint;
+					if (LineToLine(start.position, goal, wall.startPosition, wall.endPosition, intersectionPoint)) {
+						currLength = glm::distance(intersectionPoint, start.position);
+					}
+				}
+				motion.position = start.position + vec2(cos(motion.angle), sin(motion.angle)) * min(laser.length, currLength);
+				motion.scale.x = min(laser.length, currLength) * 2;
+			} else {
+				registry.deleteds.emplace(entity);
+			}
+
 		}
 	}
 
@@ -88,7 +111,8 @@ void PhysicsSystem::step(float elapsed_ms)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
 		if ((registry.circleColliders.has(eBullets.entities[i]) && AABBToCircle(player, eBullets.entities[i])) || 
-			(registry.polyColliders.has(eBullets.entities[i]) && AABBToPoly(player, eBullets.entities[i]))) {
+			(registry.polyColliders.has(eBullets.entities[i]) && AABBToPoly(player, eBullets.entities[i])) ||
+			(registry.lasers.has(eBullets.entities[i]) && AABBToLaser(player, eBullets.entities[i]))) {
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
 		for (uint j = 0; j < walls.components.size(); j++) {
@@ -367,6 +391,22 @@ bool PhysicsSystem::AABBToTriangle(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2, vec
 	if (AABBToLine(maxxy, minxy, p1, p3)) return true;
 	if (AABBToLine(maxxy, minxy, p2, p3)) return true;
 	return false;
+}
+
+bool PhysicsSystem::AABBToLaser(Entity aabb, Entity laser) {
+	Motion& mA = registry.motions.get(aabb);
+	Motion& mB = registry.motions.get(laser);
+
+	AABBCollider& ab = registry.aabbs.get(aabb);
+	Laser& l = registry.lasers.get(laser);
+	Motion& ls = registry.motions.get(l.start);
+
+	vec2 laserDir = vec2(cos(mB.angle), sin(mB.angle));
+	vec2 leftOffset = vec2(-laserDir.y, laserDir.x) * mB.scale.y / 2.0f;
+	vec2 rightOffset = -leftOffset;
+
+	return AABBToLine(mA.position + ab.bottomRight, mA.position + ab.topLeft, ls.position + leftOffset, ls.position + leftOffset + laserDir * mB.scale.x)
+		|| AABBToLine(mA.position + ab.bottomRight, mA.position + ab.topLeft, ls.position + rightOffset, ls.position + rightOffset + laserDir * mB.scale.x);
 }
 
 // Uses https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm

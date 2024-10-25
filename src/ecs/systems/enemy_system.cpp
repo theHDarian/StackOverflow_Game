@@ -102,6 +102,11 @@ void EnemySystem::step(float elapsed_ms) {
                 shootAllDirection(pos, atkData);
                 enemy.currCooldown = enemy.attackCooldown;
             }
+            else if (atkData.attackType == EnemyAttackPattern::LASER)
+            {
+                shootLaser(pos, entity, atkData);
+                enemy.currCooldown = enemy.attackCooldown;
+            }
             else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
             {
                 Burst& burst = registry.bursts.get(entity);
@@ -247,6 +252,13 @@ void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burs
 
     burst.curBurst--;
     burst.burstCooldown = 150;
+}
+
+void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData) {
+    for (uint i = 0; i < atkData.numBullets; i++) {
+        float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
+        createEnemyLaser(render, pos, a, enemy, atkData);
+    }
 }
 
 

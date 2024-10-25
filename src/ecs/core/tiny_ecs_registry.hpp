@@ -45,6 +45,7 @@ public:
 	ComponentContainer<EmitParticle> emitParticles;
 	ComponentContainer<Burst> bursts;
 	ComponentContainer<HomingBullet> homes;
+	ComponentContainer<Laser> lasers;
 	ComponentContainer<Fade> fades;
 	ComponentContainer<Map> maps;
 	ComponentContainer<Deleted> deleteds;
@@ -60,6 +61,7 @@ public:
 	ComponentContainer<Bound> bounds; //room boundaries
 	ComponentContainer<MapRequest> mapRequests;
 	ComponentContainer<BossEnemy> bosses;
+	
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -98,6 +100,7 @@ public:
         registry_list.push_back(&invisibles);
 		registry_list.push_back(&dashes);
 		registry_list.push_back(&homes);
+		registry_list.push_back(&lasers);
 		registry_list.push_back(&bursts);
 		registry_list.push_back(&fades);
 		registry_list.push_back(&maps);

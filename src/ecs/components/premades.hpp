@@ -217,6 +217,38 @@ AttackData wave{
 	0
 };
 
+AttackData laserNoRotate{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{},
+	blunt,
+	3,
+	0,
+	{20,20},
+	0,
+	30000,
+	{0.5,0},
+	0,
+	0,
+	0
+};
+
+AttackData laserRotate{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{},
+	blunt,
+	3,
+	0,
+	{0,20},
+	0,
+	8000,
+	{0.8,M_PI / 300},
+	0,
+	0,
+	0
+};
+
 AttackData threeShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
@@ -455,7 +487,7 @@ struct EnemyEasySniper : Enemy {
 
 struct TestEnemy : Enemy {
 	TestEnemy() {
-		attackData = { wave };
+		attackData = { laserRotate };
 		maxHealth = 40;
 		currHealth = maxHealth;
 		behavior = EnemyBehavior::ROTATE_IN_PLACE;

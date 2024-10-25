@@ -313,8 +313,7 @@ void WorldSystem::handleCollisions() {
 		if (registry.players.has(entity)) {
 			// Checking Player - Deadly collisions
 			if (!registry.invincibles.has(entity)
-				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))
-			) {
+				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))) {
 				handlePlayerHit(entity_other);
 			}
 
@@ -366,7 +365,7 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					if (!registry.deleteds.has(entity))
+					if (registry.enemyBullets.get(entity).bulletPierce <= 0 && !registry.deleteds.has(entity))
 						registry.deleteds.emplace(entity);
 				}
 			}

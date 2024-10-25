@@ -214,6 +214,7 @@ enum class EnemyAttackPattern {
     BURST,
     SPRAY,
     WAVE,
+    LASER,
     NONE
 };
 
@@ -286,6 +287,7 @@ struct EnemyBullet {
     float initialRange = 0;
     // Enemy bullet can scale x,y independently?
     int bulletBounce;
+    int bulletPierce;
     std::vector<BulletStackEffect> bulletEffects;
 };
 
@@ -298,6 +300,13 @@ struct Burst {
 struct HomingBullet {
     Entity target;
     float homingIntensity; // How quickly it can turn towards the target
+};
+
+struct Laser {
+    Entity start;
+    float length;
+    float growth;
+    float rotation;
 };
 
 struct Dash {

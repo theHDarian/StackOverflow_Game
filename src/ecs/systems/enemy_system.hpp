@@ -20,5 +20,6 @@ private:
     void shootAllDirection(vec2 pos, AttackData atkData);
     void shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst);
     void shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst);
+    void shootLaser(vec2 pos, Entity enemy, AttackData atkData);
     RenderSystem* render;
 };

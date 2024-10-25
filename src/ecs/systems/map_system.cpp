@@ -90,7 +90,7 @@ void MapSystem::step(float elapsed_ms) {
     //spawn enemy based on current time 
     WindowState& wS = registry.windowStates.components[0];
     // std::cout << " enemy size " << registry.enemies.size() << std::endl;
-	if (registry.enemies.size() <= 5) {
+	if (registry.enemies.size() <= 2) {
 			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::TestEnemyType);
 			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
 			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);

@@ -246,6 +246,12 @@ Entity createBigC(RenderSystem* renderer, vec2 position) {
 	enemy.maxHealth = 1000;
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
+	enemy.behavior = EnemyBehavior::ROTATE_IN_PLACE;
+
+	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
+	movement.angularSpeed = 3;
+	movement.posA = position;
+	movement.posB = position;
 
 	auto& boss = registry.bosses.emplace(entity);
 
@@ -369,6 +375,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletSpeed = atkData.speed;
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
+	bullet.bulletPierce = atkData.bulletPierce;
 	bullet.bulletEffects.push_back(atkData.defaultEffect);
 
 	Motion& motion = registry.motions.emplace(entity);
@@ -436,6 +443,46 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 
 	return entity;
 }
+
+Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity start, AttackData atkData) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = 0;
+	bullet.bulletRange = atkData.bulletRange;
+	bullet.bulletBounce = 0;
+	bullet.bulletPierce = 10000;
+	bullet.bulletEffects.push_back(atkData.defaultEffect);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = angle;
+	motion.position = pos;
+	motion.velocity = {0, 0};
+	motion.scale = {0, atkData.size.y}; // Ensure scale is initialized
+	motion.veer = {0, 0};
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+
+	Laser& laser = registry.lasers.emplace(entity);
+	laser.start = start;
+	laser.length = 0;
+	laser.growth = atkData.veer.x;
+	laser.rotation = atkData.veer.y;
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			"enemy_bullet_square.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
+
+	return entity;
+}
+
 
 Entity createLine(vec2 position, vec2 scale)
 {
