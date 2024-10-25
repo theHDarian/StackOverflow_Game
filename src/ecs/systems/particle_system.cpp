@@ -17,33 +17,33 @@ struct Vertex {
     float texID;
 };
 
-static std::array<Vertex,4> createQuad(float x, float y, float texID) {
+static Vertex* createQuad(Vertex* target,float x, float y, vec4 color,float texID) {
     float size = 1.0f;
-    Vertex v0;
-    v0.position = {x,y,0.0f};
-    v0.color = { 0.18f, 0.6f, 0.96f, 1.0f};
-    v0.texCoords = {0.0f,0.0f};
-    v0.texID = texID;
+    target->position = {x,y,0.0f};
+    target->color = color;
+    target->texCoords = {0.0f,0.0f};
+    target->texID = texID;
+    target++;
     
-    Vertex v1;
-    v1.position = {x + size, y,0.0f};
-    v1.color = { 0.18f, 0.6f, 0.96f, 1.0f};
-    v1.texCoords = {1.0f,0.0f};
-    v1.texID = texID;
+    target->position = {x + size, y,0.0f};
+    target->color = color;
+    target->texCoords = {1.0f,0.0f};
+    target->texID = texID;
+    target++;
 
-    Vertex v2;
-    v2.position = {x+size,y+size,0.0f};
-    v2.color = { 0.18f, 0.6f, 0.96f, 1.0f};
-    v2.texCoords = {1.0f,1.0f};
-    v2.texID = texID;
+    target->position = {x+size,y+size,0.0f};
+    target->color = color;
+    target->texCoords = {1.0f,1.0f};
+    target->texID = texID;
+    target++;
 
-    Vertex v3;
-    v3.position = {x,y+size,0.0f};
-    v3.color = { 0.18f, 0.6f, 0.96f, 1.0f};
-    v3.texCoords = {0.0f,1.0f};
-    v3.texID = texID;
+    target->position = {x,y+size,0.0f};
+    target->color = color;
+    target->texCoords = {0.0f,1.0f};
+    target->texID = texID;
+    target++;
 
-    return {v0,v1,v2,v3};
+    return target;
 }
 
 static GLuint loadTexture(const std::string& path) {
@@ -110,16 +110,12 @@ void ParticleSystem::init(GLFWwindow* window) {
     WindowState& windowState = registry.windowStates.components[0]; 
     projection = glm::ortho(0.0f, static_cast<float>(windowState.width), static_cast<float>(windowState.height),0.0f);
 
-    uint32_t indices[] = { 0, 1, 2, 2, 3, 0,
-                           4, 5, 6, 6, 7, 4 };
-
-    GLuint ib;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 4 * poolSize, nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 4 * poolSize, nullptr, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,position));
     glEnableVertexAttribArray(0);
 
@@ -135,9 +131,21 @@ void ParticleSystem::init(GLFWwindow* window) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     gl_has_errors();
 
+    uint32_t indices[6*poolSize];
+    uint32_t offset;
+    for (size_t i = 0; i < 6*poolSize;i+= 6) {
+        indices[i+0] = 0+offset;
+        indices[i+1] = 1+offset;
+        indices[i+2] = 2+offset;
+        indices[i+3] = 2+offset;
+        indices[i+4] = 3+offset;
+        indices[i+5] = 0+offset;
+        offset+=4;
+    }
+
     glGenBuffers(1, &ib);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 6 * poolSize, indices, GL_DYNAMIC_DRAW);
     gl_has_errors();
 
     texture_handles[0] = loadTexture(textures_path("aim_indicator.png"));
@@ -163,7 +171,6 @@ void ParticleSystem::init(GLFWwindow* window) {
     }
 
     // Clean up ib and vbo
-    glDeleteBuffers(1, &ib);
 }
 
 ParticleSystem::~ParticleSystem() {
@@ -172,6 +179,9 @@ ParticleSystem::~ParticleSystem() {
     }
     if (vbo) {
         glDeleteBuffers(1,&vbo);
+    }
+    if (ib) {
+        glDeleteBuffers(1, &ib);
     }
     if (shaderProgram) {
         glDeleteProgram(shaderProgram);
@@ -316,15 +326,19 @@ void ParticleSystem::render() {
     frame.prevFrameBuffer = frame_buffer;
     frame.prevTexture = off_screen_render_buffer_color;
 
-    auto q0 = createQuad(-0.5f,-0.5f,0.0f);
-    auto q1 = createQuad(1.5f,-0.5f,1.0f);
+    uint32_t indexCount = 0;
+    std::array<Vertex,1000> vertices;
+    Vertex* buffer = vertices.data();
+    for( int y=0;y < 5;y++) {
+        for(int x=0;x<5;x++) {
+            buffer = createQuad(buffer,x,y,{ 0.18f, 0.6f, 0.96f, 1.0f},-1);
+            indexCount+=6;
+        }
+    }
 
-    Vertex vertices[8];
-    memcpy(vertices,q0.data(),q0.size() * sizeof(Vertex));
-    memcpy(vertices + q0.size(),q1.data(),q1.size() * sizeof(Vertex));
-   
     glBindBuffer(GL_ARRAY_BUFFER,vbo);
-    glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(vertices),vertices);
+    glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(Vertex) * vertices.size(),vertices.data());
+
     gl_has_errors();
 
     glUseProgram(shaderProgram);
@@ -342,7 +356,7 @@ void ParticleSystem::render() {
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-    unsigned int textureLoc = glGetUniformLocation(shaderProgram,"sampler1");
+    unsigned int textureLoc = glGetUniformLocation(shaderProgram,"particle_sampler");
     int samplers[2] = {0,1};
 
     if (projectionLoc == -1 || transformLoc == -1 || textureLoc == -1) {
@@ -376,7 +390,7 @@ void ParticleSystem::render() {
                               glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
 
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
         gl_has_errors();
     }
 }
