@@ -13,7 +13,7 @@
 static GLuint loadTexture(const std::string& path) {
     int w,h,bits;
     stbi_set_flip_vertically_on_load(1);
-    auto* pixels = stbi_load(path.c_str(),&w,&h,&bits,STBI_rgb);
+    auto* pixels = stbi_load(path.c_str(),&w,&h,&bits,STBI_rgb_alpha);
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D,textureID);
@@ -21,7 +21,7 @@ static GLuint loadTexture(const std::string& path) {
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB8, w,h,0, GL_RGB,GL_UNSIGNED_BYTE,pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     stbi_image_free(pixels);
 
@@ -305,7 +305,7 @@ void ParticleSystem::render() {
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
     unsigned int textureLoc = glGetUniformLocation(shaderProgram,"sampler1");
-    // int samplers[2] = {0,1};
+    int samplers[2] = {0,1};
 
     if (projectionLoc == -1 || transformLoc == -1 || textureLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
@@ -316,12 +316,12 @@ void ParticleSystem::render() {
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D,texture_handles[0]);
-    // glBindTextureUnit(0,texture_handles[0]);
-    // glBindTextureUnit(1,texture_handles[1]);
+     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D,texture_handles[1]);
     gl_has_errors();
     
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    // glUniform1iv(textureLoc,2,samplers);
+    glUniform1iv(textureLoc,2,samplers);
     gl_has_errors();
 
     for (auto& particle : particlePool) {
@@ -338,7 +338,6 @@ void ParticleSystem::render() {
                               glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
 
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr);
         gl_has_errors();
     }
