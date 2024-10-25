@@ -48,7 +48,7 @@ class RenderSystem {
 			textures_path("enemy_bullet_triangle.png"),
 
 			textures_path("chevron.png"),
-			textures_path("rectangle.png")
+            textures_path("rectangle.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
