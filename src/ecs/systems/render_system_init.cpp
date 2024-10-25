@@ -115,8 +115,10 @@ void RenderSystem::initializeGlTextures()
 {
 	glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());
 
+	const std::string base = data_path() + "/textures/";
+
 	uint i = 0;
-	for (const auto& entry : directory_iterator(data_path() + "/textures/")) 
+	for (const auto& entry : directory_iterator(base)) 
 	{
 		const std::string& path = entry.path().string();
 		ivec2& dimensions = texture_dimensions[i];
@@ -132,9 +134,10 @@ void RenderSystem::initializeGlTextures()
 		}
 
 		std::string copy = path;
-		name_to_texture.insert({ copy.substr(copy.find_last_of('\\') + 1), i});
+		//name_to_texture.insert({ copy.substr(copy.find_last_of('\\') + 1), i});
+		name_to_texture.insert({ copy.substr(base.length() - 1), i });
 
-		//std::cout << copy.substr(copy.find_last_of('\\') + 1) << std::endl;
+		//std::cout << copy.substr(base.length()-1) << std::endl;
 
 		glBindTexture(GL_TEXTURE_2D, texture_gl_handles[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dimensions.x, dimensions.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
