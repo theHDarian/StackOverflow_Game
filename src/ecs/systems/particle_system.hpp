@@ -5,6 +5,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "components.hpp"
+#define POOLSIZE 1000
 
 class ParticleSystem {
 public:
@@ -46,7 +47,6 @@ private:
     GLuint loadTexture(const std::string& path);
 
     std::vector<Particle> particlePool;
-    uint poolSize = 1000;
     uint poolIndex = 999;
     
     GLuint vao, vbo, ib;

@@ -60,7 +60,7 @@ GLuint ParticleSystem::loadTexture(const std::string& path) {
 }
 
 ParticleSystem::ParticleSystem() {
-    particlePool.resize(poolSize);
+    particlePool.resize(POOLSIZE);
 }
 
 void ParticleSystem::clearParticles() {
@@ -116,7 +116,7 @@ void ParticleSystem::init(GLFWwindow* window) {
     
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 4 * poolSize, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 4 * POOLSIZE, nullptr, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex,position));
     glEnableVertexAttribArray(0);
 
@@ -132,9 +132,9 @@ void ParticleSystem::init(GLFWwindow* window) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     gl_has_errors();
 
-    uint32_t indices[6*poolSize];
+    uint32_t indices[6*POOLSIZE];
     uint32_t offset = 0;
-    for (size_t i = 0; i < 6*poolSize;i+= 6) {
+    for (size_t i = 0; i < 6*POOLSIZE;i+= 6) {
         indices[i+0] = 0+offset;
         indices[i+1] = 1+offset;
         indices[i+2] = 2+offset;
@@ -146,7 +146,7 @@ void ParticleSystem::init(GLFWwindow* window) {
 
     glGenBuffers(1, &ib);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 6 * poolSize, indices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 6 * POOLSIZE, indices, GL_DYNAMIC_DRAW);
     gl_has_errors();
 
     texture_handles[0] = loadTexture(textures_path("aim_indicator.png"));
