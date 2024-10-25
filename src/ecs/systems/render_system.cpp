@@ -451,21 +451,27 @@ void RenderSystem::drawImGui() {
 	StackCompile& sc = registry.stackCompile.components[0];
 	ImGui::Text("Stack Size: %lu", sc.currStack.size());
 	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
-	ImGui::BeginChild("AdditiveContent",ImVec2(180,250),true);
+	ImGui::BeginChild("AdditiveContent",ImVec2(180,80),true);
 		std::map<BulletEffectType, float>::iterator it;
 		for (it = sc.additives.begin(); it != sc.additives.end(); it++) {
-			// if (it->second == 0) continue;
+			if (it->second == 0) continue;
 			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
 		}
 	ImGui::EndChild();
 
 	ImGui::TextColored(ImVec4(1,1,0,1), "Multiplicatives");
-	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,250),true);
+	ImGui::BeginChild("MultiplicativeContent",ImVec2(180,80),true);
 		for (it = sc.multiplicatives.begin(); it != sc.multiplicatives.end(); it++) {
-			// if (it->second == 1) continue;
+			if (it->second == 1) continue;
 			ImGui::Text("%s: %.1f", bulletEffectTypeNames[it->first].c_str(), it->second);
 		}
 	ImGui::EndChild();
+
+	for (int i = 0; i < registry.doors.components.size();i++) {
+		Door& d = registry.doors.components[i];
+		char type = d.isPrev ? 'P' : d.room;
+		ImGui::Text("Door %d: type %c",i,type);
+	}
 
 	if (ImGui::Button("Restart Game")) {
 		registry.ioStates.components[0].shouldRestart = true;

@@ -85,15 +85,26 @@ struct Frame {
 	GLuint prevFrameBuffer;
 };
 
-enum class RequestType {
-	EmitParticle,
-	Explosion,
+enum ParticleRequestType {
+	PlayerDash,
+	EnemyDeath,
+	PlayerBulletCollision,
+	ClearParticles // special request to clear all current particles
 };
 
 struct EmitParticle {
-	vec2 position;
-	vec2 requestOrigin;
-	RequestType requestType;
+	ParticleRequestType requestType;
+	
+	float timeRemaining; //in seconds
+	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
+
+	vec2 defaultPos; //position to fallback to if attached entity does not have motion
+
+	EmitParticle(ParticleRequestType reqType, float duration = 0.0f, int numToEmit = 0) {
+		this->requestType = reqType;
+		this->timeRemaining = duration;
+		this->numToEmit = numToEmit;
+	}
 };
 
 struct ParticleProps {
