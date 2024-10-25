@@ -15,13 +15,14 @@ layout(location = 0) out  vec4 color;
 
 void main()
 {
-	// color = vec4(fcolor, alpha) * texture(sampler0, vec2(texcoord.x, texcoord.y));
-	color = texture(sampler0, vec2(texcoord.x, texcoord.y));
+	color = vec4(fcolor, texture(sampler0, texcoord).a);
+	// color = texture(sampler0, vec2(texcoord.x, texcoord.y));
 	// note: branches are expensive, consider using another shader instead?
-	if (texcoord.x >= chargeBoundary){
+	if (texcoord.y < 1.0-chargeBoundary){
 		color.r *= fcolor.r;
 		color.g *= fcolor.g;
 		color.b *= fcolor.b;
+		color *= vec4(0.65,0.65,0.65, 1.0);
 	}
 }
 
