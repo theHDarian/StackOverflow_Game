@@ -1,0 +1,39 @@
+#include <ft2build.h>
+#include FT_FREETYPE_H  
+#include <iostream>
+#include <map>
+#include <string>
+#include "common.hpp"
+#include "render_system_init.hpp"
+#include "tiny_ecs_registry.hpp"
+
+
+
+class TextSystem {
+public:
+    TextSystem();
+    ~TextSystem();
+
+    int initFreetypeLib();
+    void renderMenuUIText();
+    void renderGameUIText();
+    void renderDialogueUIText();
+
+private:
+    struct Character {
+        unsigned int TextureID;  // ID handle of the glyph texture
+        glm::ivec2   Size;       // Size of glyph
+        glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
+        unsigned int Advance;    // Offset to advance to next glyph
+    };
+
+    std::map<GLchar, Character> Characters;
+    GLuint VAO, VBO;
+    GLuint program;
+    // projection matrix; may consider using same one as render system instead
+    // note: original render system has bottom right be (window width, window height)
+    // but this tutorial's projection matrix has top right be (Window width, window height)
+    glm::mat4 projection;
+
+    void renderText(std::string text, float x, float y, float scale, glm::vec3 color);
+};

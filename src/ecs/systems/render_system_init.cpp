@@ -13,6 +13,38 @@
 #include <iostream>
 #include <sstream>
 
+#include "render_system_init.hpp"
+
+#if IMGUI_ENABLED
+	#include "imgui.h"
+	#include "backends/imgui_impl_glfw.h"
+	#include "backends/imgui_impl_opengl3.h"
+	#include "backends/imgui_impl_sdl2.h"
+	#include "imguiThemes.h"
+#endif
+
+//#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1;
+//#include <experimental/filesystem>
+//using namespace std::experimental::filesystem;
+
+#include <utils/filesystem.hpp>
+using namespace ghc::filesystem;
+
+
+void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	if (width == 0 || height == 0)
+		return;
+	WindowState& windowState = registry.windowStates.components[0];
+	if (windowState.isRetinaDisplay) {
+		windowState.width = width / 2;
+		windowState.height = height / 2;
+	} else {
+		windowState.width = width;
+		windowState.height = height;
+	}
+
+	glViewport(0, 0, windowState.width, windowState.height);
+}
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)
 {
@@ -20,6 +52,11 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // vsync
+
+	if (registry.frames.components.size() <= 0) {
+		auto ent = Entity();
+		registry.frames.emplace(ent);
+	}
 
 	// Load OpenGL function pointers
 	const int is_fine = gl3w_init();
@@ -31,16 +68,24 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	gl_has_errors();
 
-	// For some high DPI displays (ex. Retina Display on Macbooks)
-	// https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value
 	int frame_buffer_width_px, frame_buffer_height_px;
 	glfwGetFramebufferSize(window, &frame_buffer_width_px, &frame_buffer_height_px);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
-	if (frame_buffer_width_px != window_width_px)
+
+	assert(registry.windowStates.components.size() > 0);
+	WindowState& windowState = registry.windowStates.components[0];
+
+	if (frame_buffer_width_px != windowState.width)
 	{
 		printf("WARNING: retina display! https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value\n");
 		printf("glfwGetFramebufferSize = %d,%d\n", frame_buffer_width_px, frame_buffer_height_px);
-		printf("window width_height = %d,%d\n", window_width_px, window_height_px);
+		printf("window width_height = %d,%d\n", windowState.width, windowState.height);
+		windowState.isRetinaDisplay = true;
 	}
+
+
+
+	// Window resize callback
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// Hint: Ask your TA for how to setup pretty OpenGL error callbacks. 
 	// This can not be done in macOS, so do not enable
@@ -50,7 +95,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 
 	// We are not really using VAO's but without at least one bound we will crash in
 	// some systems.
-	GLuint vao;
+	/*GLuint vao;*/
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	gl_has_errors();
@@ -59,17 +104,23 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	#if IMGUI_ENABLED
+	initImGui();
+	#endif
 
 	return true;
 }
 
 void RenderSystem::initializeGlTextures()
 {
-    glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());
+	glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());
 
-    for(uint i = 0; i < texture_paths.size(); i++)
-    {
-		const std::string& path = texture_paths[i];
+	const std::string base = data_path() + "/textures/";
+
+	uint i = 0;
+	for (const auto& entry : directory_iterator(base)) 
+	{
+		const std::string& path = entry.path().string();
 		ivec2& dimensions = texture_dimensions[i];
 
 		stbi_uc* data;
@@ -81,13 +132,22 @@ void RenderSystem::initializeGlTextures()
 			fprintf(stderr, "%s", message.c_str());
 			assert(false);
 		}
+
+		std::string copy = path;
+		//name_to_texture.insert({ copy.substr(copy.find_last_of('\\') + 1), i});
+		name_to_texture.insert({ copy.substr(base.length() - 1), i });
+
+		//std::cout << copy.substr(base.length()-1) << std::endl;
+
 		glBindTexture(GL_TEXTURE_2D, texture_gl_handles[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dimensions.x, dimensions.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		gl_has_errors();
 		stbi_image_free(data);
-    }
+		i++;
+	}
+	name_to_texture.insert({ "none", -1});
 	gl_has_errors();
 }
 
@@ -184,10 +244,10 @@ void RenderSystem::initializeGlGeometryBuffers()
 		egg_indices.push_back((uint16_t)((i + 1) % NUM_TRIANGLES));
 		egg_indices.push_back((uint16_t)NUM_TRIANGLES);
 	}
-	int geom_index = (int)GEOMETRY_BUFFER_ID::EGG;
+	int geom_index = (int)GEOMETRY_BUFFER_ID::EGG_GB;
 	meshes[geom_index].vertices = egg_vertices;
 	meshes[geom_index].vertex_indices = egg_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::EGG, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::EGG_GB, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 
 	//////////////////////////////////
 	// Initialize debug line
@@ -246,13 +306,17 @@ RenderSystem::~RenderSystem()
 	// remove all entities created by the render system
 	while (registry.renderRequests.entities.size() > 0)
 	    registry.remove_all_components_of(registry.renderRequests.entities.back());
+
+	#if IMGUI_ENABLED
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+	#endif
 }
 
 // Initialize the screen texture from a standard sprite
 bool RenderSystem::initScreenTexture()
 {
-	registry.screenStates.emplace(screen_state_entity);
-
 	int framebuffer_width, framebuffer_height;
 	glfwGetFramebufferSize(const_cast<GLFWwindow*>(window), &framebuffer_width, &framebuffer_height);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
 
@@ -377,3 +441,23 @@ bool loadEffectFromFile(
 	return true;
 }
 
+
+#if IMGUI_ENABLED
+void RenderSystem::initImGui() {
+	IMGUI_CHECKVERSION();
+    imgui_context = ImGui::CreateContext();
+	ImGui::SetCurrentContext(imgui_context);
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+}
+#endif

@@ -1,0 +1,62 @@
+#pragma once
+#include "common.hpp"
+#include <array>
+#include <utility>
+#include <vector>
+#include <glm/glm.hpp>
+#include "components.hpp"
+#define POOLSIZE 1000
+
+class ParticleSystem {
+public:
+    ParticleSystem();
+    ~ParticleSystem();
+    void init(GLFWwindow* window);
+    void step(float elapsed_ms);
+    void emit(const ParticleProps& particleProps);
+
+    void explode(const ::ParticleProps &props, vec2 origin);
+
+    void render();
+    bool initScreenTexture();
+    void clearParticles();
+
+    ParticleProps createParticle(vec2 pos);
+private:
+    struct Particle {
+        vec2 position;
+        vec2 velocity;
+        vec4 colorBegin,colorEnd;
+        float rotation;
+        float sizeBegin, sizeEnd;
+
+        float lifetime = 1000.0f;
+        float lifeRemaining = 0.0f; //in milliseconds
+
+        bool active = false;
+    };
+    struct Vertex {
+        vec3 position;
+        vec4 color;
+        vec2 texCoords;
+        float texID;
+    };
+
+    void handleEmitRequests(float elapsed_ms);
+    Vertex* createQuad(Vertex* target, vec4 color, mat4 transform, float texID);
+    GLuint loadTexture(const std::string& path);
+
+    std::vector<Particle> particlePool;
+    uint poolIndex = 999;
+    
+    GLuint vao, vbo, ib;
+	GLuint shaderProgram;
+    GLuint frame_buffer;
+    GLuint off_screen_render_buffer_color;
+	GLuint off_screen_render_buffer_depth;
+
+    std::array<GLuint,2> texture_handles;
+    
+    glm::mat4 projection;
+    GLFWwindow* window;
+};

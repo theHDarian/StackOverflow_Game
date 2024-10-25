@@ -1,27 +1,53 @@
 #pragma once
+#include "common.hpp"
 
-struct Room;
-
-struct Door {
-	Room* nextRoom; //room the door leads to
-    bool blocked; //blocked to prevent going to previous room
+enum Side : char {
+    Left = 'L',Top = 'T',Bottom = 'B',Right = 'R'
 };
 
-enum RoomTypes {
+enum RoomType : char {
+    EnemyRoom = 'E',
+    TreasureRoom = 'T',
+    BossRoom = 'B',
+    RestRoom = 'R',
+    None = 'N'
+};
 
+struct Door {
+	RoomType room; //room the door leads to
+    bool isPrev; //if is previous room, block it
+    vec2 startPos, endPos;
 };
 
 struct Room {
-    vec2 dimensions; //probably be fixed for now
-    int type; //change to enum once list of room types has been made ex Resting, Enemy, Boss
-    int layout; //change type once list of layouts is made, layouts store enemy info (position, spawn time), as well as items in the room
-    Door doors[3]; //doors on each side, put null for sides without doors
-
-    float m_timeToNextRoom; //timer for room transitions
-    //TODO perhaps add a pointer to dialogues that appear for certain rooms
+    RoomType type;
+    int variant; // the variant within the room type
+    bool cleared;
+    float timeElapsed; //time passed since enter room in seconds
 };
+enum MapRequestType {
+    RestartGame = 'R',
+    ChangeRoom = 'C'
+};
+struct MapRequest {
+    MapRequestType requestType;
+    RoomType type;
+    int doorIndex;
+    MapRequest(MapRequestType requestType, RoomType type = RoomType::None, int doorIndex = 0) { 
+        this->requestType = requestType;
+        this->type = type; 
+        this->doorIndex = doorIndex;
+    }
+};
+
+enum MapRegion {
+    Tutorial,
+    Biology,
+    Final
+};
+
 struct Map {
-    Room startingRoom;
+    Room currRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
-    int currRegion;
+    MapRegion currRegion;
 };

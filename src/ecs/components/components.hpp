@@ -7,7 +7,8 @@
 
 #include "map_components.hpp"
 #include "actor_components.hpp"
-#include "../utils/extended_stack.hpp"
+#include "io_components.hpp"
+#include "ui_components.hpp"
 
 
 // Stucture to store collision information
@@ -27,12 +28,20 @@ struct PolyCollider {
 	// Points are in order around the polygon
 	std::vector<vec2> offsetVertices;
 	float maxLength;
+	float minLength;
 
 	// Call this function after creating offsetVertices please
-	void setMaxLength() {
-		maxLength = 0;
-		for (uint i = 0; i < offsetVertices.size(); i++) {
+	// Bit pricey though, so if you know the max and min length just hardcode them in!
+	void setPolyLengths() {
+		maxLength = glm::distance(offsetVertices[0], { 0,0 });
+		minLength = glm::distance(offsetVertices[0], { 0,0 });
+		for (uint i = 1; i < offsetVertices.size(); i++) {
 			if (glm::distance(offsetVertices[i], { 0,0 }) > maxLength) maxLength = glm::distance(offsetVertices[i], { 0,0 });
+			vec2 a = -offsetVertices[i];
+			vec2 b = offsetVertices[i-1] - offsetVertices[i];
+			vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+			if (glm::distance(a - c + offsetVertices[i], { 0,0 }) < minLength) minLength = glm::distance(a - c + offsetVertices[i], { 0,0 });
+			if (glm::distance(offsetVertices[i], { 0,0 }) < minLength) minLength = glm::distance(offsetVertices[i], { 0,0 });
 		}
 	}
 };
@@ -43,32 +52,25 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+
+struct Bound {}; //room bounds
+
+struct AABBCollider {
+	// As offsets of motion.position:
+	vec2 topLeft;		//max x, max y
+	vec2 bottomRight;	//min x, min y
+};
+
+struct MeshCollider {
+	// basically just exists for checking
+};
+
 // Data structure for toggling debug mode
 struct Debug {
-	bool in_debug_mode = 0;
-	bool in_freeze_mode = 0;
+	bool in_debug_mode = false;
+	bool in_freeze_mode = false;
 };
 extern Debug debugging;
-
-// Sets the brightness of the screen
-struct ScreenState
-{
-	float darken_screen_factor = -1;
-};
-
-struct IOState {
-	bool shouldEnd;
-	bool shouldRestart;
-    float shouldDash;
-	bool shouldShoot;
-	vec2 inputAxis;
-	vec2 lastInputAxis = {1,1};
-	vec2 mousePosition;
-
-
-	ExtendedStack<int> pressedHorizontal;
-	ExtendedStack<int> pressedVertical;
-};
 
 // Struct for dash
 
@@ -78,12 +80,48 @@ struct DebugComponent
 	// Note, an empty struct has size 1
 };
 
+struct Frame {
+	GLuint prevTexture;
+	GLuint prevFrameBuffer;
+};
+
+enum ParticleRequestType {
+	PlayerDash,
+	EnemyDeath,
+	PlayerBulletCollision,
+	ClearParticles // special request to clear all current particles
+};
+
+struct EmitParticle {
+	ParticleRequestType requestType;
+	
+	float timeRemaining; //in seconds
+	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
+
+	vec2 defaultPos; //position to fallback to if attached entity does not have motion
+
+	EmitParticle(ParticleRequestType reqType, float duration = 0.0f, int numToEmit = 0) {
+		this->requestType = reqType;
+		this->timeRemaining = duration;
+		this->numToEmit = numToEmit;
+	}
+};
+
+struct ParticleProps {
+    vec2 position;
+    vec2 velocity,velocityVariation;
+    vec4 colorBegin, colorEnd;
+    float sizeBegin, sizeEnd, sizeVariation;
+    float lifetime;
+};
+
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
-enum SoundType { Background, SFX };
+enum SoundType { normalBGM,bossBGM, specialBGM, SFX };
 struct Sound {
 	SoundType type;
+	std::string path;
 	float volume; //0 to 1
-	bool isLooped;
+	int loops;
 };
 
 
@@ -135,40 +173,56 @@ struct Mesh
  */
 
 // maybe a universal map would be easier to load + manage files with...
-enum class TEXTURE_ASSET_ID {
+
+// NOTE: these were originall enum CLASSES in the template
+// shouldn't matter much, but apparently enum CLASSES don't inherently cast to ints
+// so I've (Amanda) explicitly set them to be ints
+// should ask why that's the case/why it works fine even w/o inherent casting
+enum  TEXTURE_ASSET_ID : unsigned int {
 	FISH = 0,
-	EEL = FISH + 1,
-	CIRCLE = EEL + 1,
-	MC_BASE = CIRCLE + 1,
+	PUFFERFISH = FISH + 1,
+	CIRCLE_SPRITE = PUFFERFISH + 1,
+	MC_BASE = CIRCLE_SPRITE + 1,
 	MC_HIT = MC_BASE + 1,
-	TEXTURE_COUNT = MC_HIT + 1
+	AIM_INDICATOR = MC_HIT + 1,
+	FLOOR = AIM_INDICATOR + 1,
+	MC_BULLET = FLOOR + 1,
+	ENEMY_BULLET_SQUARE = MC_BULLET + 1,
+	ENEMY_BULLET_CIRCLE = ENEMY_BULLET_SQUARE + 1,
+	ENEMY_BULLET_TRIANGLE = ENEMY_BULLET_CIRCLE + 1,
+	CHEVRON = ENEMY_BULLET_TRIANGLE + 1,
+	RECTANGLE_SPRITE = CHEVRON + 1,
+	TEXTURE_COUNT = RECTANGLE_SPRITE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
-enum class EFFECT_ASSET_ID {
+enum  EFFECT_ASSET_ID : unsigned int {
 	COLOURED = 0,
 	EGG = COLOURED + 1,
-	SALMON = EGG + 1,
-	TEXTURED = SALMON + 1,
-	WATER = TEXTURED + 1,
-	EFFECT_COUNT = WATER + 1
+	MESH = EGG + 1,
+	TEXTURED = MESH + 1,
+	POSTPROCESS = TEXTURED + 1,
+	DASH = POSTPROCESS + 1,
+	EFFECT_COUNT = DASH + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
-enum class GEOMETRY_BUFFER_ID {
-	SALMON = 0,
-	SPRITE = SALMON + 1,
-	EGG = SPRITE + 1,
-	DEBUG_LINE = EGG + 1,
+enum  GEOMETRY_BUFFER_ID : unsigned int {
+	MESH_GB = 0,
+	SPRITE = MESH_GB + 1,
+	EGG_GB = SPRITE + 1,
+	DEBUG_LINE = EGG_GB + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	GEOMETRY_COUNT = SCREEN_TRIANGLE + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
 struct RenderRequest {
-	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
+	std::string texture_name;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+	bool show = true;
+	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
 };
 
 // Expected sprite states other systems can use
@@ -184,6 +238,8 @@ enum class SPRITE_STATE {
 };
 
 // all the sprites this entity will use
+// for performance, consider 1 map per entity type
+// as opposed to 1 map per entity
 struct Sprites {
 	// map of sprite type (enum) to sprite texture
 	// eg: when bullet collides w/ enemy in physics system,
@@ -202,3 +258,47 @@ struct SpriteTimer {
 	TEXTURE_ASSET_ID nextSprite;
 };
 
+// used to store info of what text needs to be rendered
+// currently, 1 request per entity (like how render requests work)
+// but may consider changing (eg: emplace with duplicates)
+// for things like menus that may have many text sections
+struct TextRenderRequest {
+	std::string text;
+
+	// maybe position should be vec2 to match with rest of game?
+	float x;
+	float y;
+
+	// from experience, this is often a small number < 10, not sure why
+	float scale; 
+	glm::vec3 color;
+};
+
+struct DialogueLines {
+	std::vector<std::string> lines;
+	int current = 0;
+
+	std::string next() {
+		if (current < lines.size()) {
+			return lines[current++];
+		}
+		else {
+			return "<end>"; // maybe end of str constant
+		}
+	}
+};
+
+struct BG {
+	// is BG
+};
+
+
+
+struct Fade {
+	float max = 500;
+	float time = max;
+};
+
+struct Deleted {
+	// this entity is marked for deletion
+};
