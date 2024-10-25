@@ -901,8 +901,8 @@ void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	WindowState& windowState = registry.windowStates.components[0];
 	vec2 position = { windowState.width/2, windowState.height-60.0};
 	if (registry.damageds.has(entity)) {
-		position.x += (rand() % 10) - 5;
-		position.y += (rand() % 10) - 5;
+		position.x += (rand() % 15) - 5;
+		position.y += (rand() % 15) - 5;
 	}
 	vec2 scale = { 600, 270 };
 
