@@ -50,9 +50,10 @@ class RenderSystem {
 			textures_path("enemy_bullet_square.png"),
 			textures_path("enemy_bullet_circle.png"),
 			textures_path("enemy_bullet_triangle.png"),
-
 			textures_path("chevron.png"),
-            textures_path("rectangle.png")
+            textures_path("rectangle.png"),
+			textures_path("parallelogram.png")
+
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -64,6 +65,7 @@ class RenderSystem {
 		shader_path("textured"),
 		shader_path("postprocess"),
 		shader_path("dash"),
+		shader_path("healthbar"),
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -132,6 +134,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawDashes(const mat3& projection);
+	void drawHPbar(::Entity &entity, const mat3 & projection);
 	//glm::mat4 createTransform(float x, float y, float scaleX, float scaleY);
 
 

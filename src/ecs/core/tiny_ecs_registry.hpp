@@ -59,6 +59,7 @@ public:
 	ComponentContainer<Door> doors;
 	ComponentContainer<Bound> bounds; //room boundaries
 	ComponentContainer<MapRequest> mapRequests;
+	ComponentContainer<BossEnemy> bosses;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -112,6 +113,7 @@ public:
 		registry_list.push_back(&dialogueUITexts);
 		registry_list.push_back(&menuUITexts);
 		registry_list.push_back(&damageds);
+		registry_list.push_back(&bosses);
 	}
 
 	void clear_all_components() {

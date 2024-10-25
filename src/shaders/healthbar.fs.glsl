@@ -18,7 +18,7 @@ void main()
 	// color = vec4(fcolor, alpha) * texture(sampler0, vec2(texcoord.x, texcoord.y));
 	color = texture(sampler0, vec2(texcoord.x, texcoord.y));
 	// note: branches are expensive, consider using another shader instead?
-	if (texcoord.x >= chargeBoundary){
+	if (texcoord.x >= 1-chargeBoundary){
 		color.r *= fcolor.r;
 		color.g *= fcolor.g;
 		color.b *= fcolor.b;

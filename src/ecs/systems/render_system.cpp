@@ -4,6 +4,12 @@
 #include <glm/gtx/compatibility.hpp>
 
 #include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
+#include "ai_system.hpp"
 #include "tiny_ecs_registry.hpp"
 #include "world_system.hpp"
 #include "utils/enum_string_mapping.hpp"
@@ -311,6 +317,9 @@ void RenderSystem::drawGameElements()
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 		drawAllColliders(entity, projection_2D);
+		if(registry.bosses.has(entity)) {
+			drawHPbar(entity, projection_2D);
+		}
 	}
 
 	for (Entity& entity : registry.players.entities)
@@ -779,6 +788,7 @@ void RenderSystem::drawDashes(const mat3& projection) {
 }
 
 void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat3& projection) {
+
 	Transform transform;
 	transform.translate(position);
 	transform.scale(scale);
@@ -883,3 +893,100 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 	gl_has_errors();
 }
 
+void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	vec2 position = { windowState.width/2, windowState.height-60.0};
+	if (registry.damageds.has(entity)) {
+		position.x += (rand() % 10) - 5;
+		position.y += (rand() % 10) - 5;
+	}
+	vec2 scale = { 600, 270 };
+
+	float max = registry.enemies.get(entity).maxHealth;
+	float current = registry.enemies.get(entity).currHealth;
+	Transform transform;
+	transform.translate(position);
+	transform.scale(scale);
+
+	// for now, draw bullets using textures
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::HP_BAR;
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)name_to_texture["parallelogram.png"]];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	vec3 color = { 11.50, 0.0, 0.0 }; // red
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 1);
+
+	float chargeBoundary = glm::lerp(0.f, 1.f, (max - current) / max);
+
+	GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+	glUniform1f(charge_boundary_uloc, chargeBoundary);
+
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+
+}

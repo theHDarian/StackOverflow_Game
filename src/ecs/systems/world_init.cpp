@@ -247,6 +247,8 @@ Entity createBigC(RenderSystem* renderer, vec2 position) {
 	enemy.currHealth = enemy.maxHealth;
 	enemy.state = 10;
 
+	auto& boss = registry.bosses.emplace(entity);
+
 	/*AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = none;*/
 	enemy.attackData.push_back(none);
