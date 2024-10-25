@@ -63,6 +63,12 @@ ParticleSystem::ParticleSystem() {
     particlePool.resize(poolSize);
 }
 
+void ParticleSystem::clearParticles() {
+    for (auto& p : particlePool) {
+        p.active = false;
+    }
+}
+
 bool ParticleSystem::initScreenTexture()
 {
     int framebuffer_width, framebuffer_height;
@@ -127,7 +133,7 @@ void ParticleSystem::init(GLFWwindow* window) {
     gl_has_errors();
 
     uint32_t indices[6*poolSize];
-    uint32_t offset;
+    uint32_t offset = 0;
     for (size_t i = 0; i < 6*poolSize;i+= 6) {
         indices[i+0] = 0+offset;
         indices[i+1] = 1+offset;
@@ -204,10 +210,17 @@ void ParticleSystem::step(float elapsed_ms) {
 
 void ParticleSystem::handleEmitRequests(float elapsed_ms) {
     std::vector<Entity> removeRequestQueue;
+    bool shouldClear = false;
     for (int i = 0; i < registry.emitParticles.components.size();i++) {
         //tick request timers
         Entity& ent = registry.emitParticles.entities[i];
         EmitParticle& request = registry.emitParticles.components[i];
+
+        if (request.requestType == ParticleRequestType::ClearParticles) {
+            shouldClear = true;
+            break;
+        }
+        
         int emitCount = glm::min((int) glm::round(request.numToEmit * (elapsed_ms / request.timeRemaining)),request.numToEmit);
         request.timeRemaining -= elapsed_ms;
         if (request.timeRemaining <= 0) {
@@ -219,24 +232,27 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
 
         //emit based on type of request
         for (int i = 0; i < emitCount; i++) {
-            if (request.requestType == RequestType::PlayerDash && hasMotion) {
+            if (request.requestType == ParticleRequestType::PlayerDash && hasMotion) {
                 Motion& motion = registry.motions.get(ent);
                 emit(createParticle(motion.position + vec2(0.0f,motion.scale.y / 2) + vec2(Random::Float(-5,5),Random::Float(-5,5))));
             }
-            else if (request.requestType == RequestType::PlayerBulletCollision) {
+            else if (request.requestType == ParticleRequestType::PlayerBulletCollision) {
                 vec2 pos = request.defaultPos + vec2{ Random::Float(-2,2), Random::Float(-2,2)};
                 explode(createParticle(pos), request.defaultPos);
-            } else if (request.requestType == RequestType::EnemyDeath && hasMotion) {
+            } else if (request.requestType == ParticleRequestType::EnemyDeath && hasMotion) {
                 Motion& motion = registry.motions.get(ent);
                 vec2 pos = motion.position + vec2(Random::Float(-5,5),Random::Float(-5,5));
                 explode(createParticle(pos), motion.position);
             }
         }
     }
-    //test emission on mouse position
-    // emit(createParticle(registry.ioStates.components[0].mousePosition));
-    for (auto& e : removeRequestQueue) {
-        registry.emitParticles.remove(e);
+    if (shouldClear) {
+        clearParticles();
+        registry.emitParticles.clear();
+    } else {
+        for (auto& e : removeRequestQueue) {
+            registry.emitParticles.remove(e);
+        }
     }
 }
 

@@ -115,7 +115,7 @@ void clearRoomActors() {
         if (!registry.deleteds.has(ent)) registry.deleteds.emplace(ent);
     }
 
-    registry.emitParticles.clear();
+    registry.emitParticles.emplace(Entity(),ParticleRequestType::ClearParticles,0.0f,0);
 }
 RoomType getRandomRoomType(bool includeNone) {
     int r = Random::Float() * 4;
