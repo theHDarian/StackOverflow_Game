@@ -199,7 +199,7 @@ struct PlayerBullet {
 };
 
 enum EnemyType {
-    // EasyEnemySentry,
+    EasyEnemySentry,
     // //MediumEnemyClusterShot,
     // MediumEnemyCharge,
     // MediumEnemyHoming,

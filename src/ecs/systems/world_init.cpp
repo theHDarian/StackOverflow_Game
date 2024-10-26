@@ -281,10 +281,13 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
     switch (type) {
 	
         case EnemyType::TestRevampedEnemy: {
-			std::cout << "got here" << std::endl;
             enemy = TestEnemy();
             break;
         }
+		case EnemyType::EasyEnemySentry: {
+			enemy = EnemyEasySentry();
+			break;
+		}
         // case EnemyType::MediumEnemyCharge: {
         //     enemy = EnemyMediumCharge();
         //     break;
@@ -313,6 +316,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	// } else {
 	// 	movement.posA = pos;
 	// }
+	std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
