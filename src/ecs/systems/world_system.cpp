@@ -315,6 +315,11 @@ void WorldSystem::handleCollisions() {
 			if (!registry.invincibles.has(entity)
 				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))) {
 				handlePlayerHit(entity_other);
+				if (registry.enemyBullets.has(entity_other) 
+					&& (!registry.deleteds.has(entity_other))
+					&& (registry.enemyBullets.get(entity_other).bulletPierce -= 1) < 0) {
+					registry.deleteds.emplace(entity_other);
+				}
 			}
 
 			// Checking Player -> Wall collision
@@ -365,7 +370,7 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					if (registry.enemyBullets.get(entity).bulletPierce <= 0 && !registry.deleteds.has(entity))
+					if (!registry.deleteds.has(entity))
 						registry.deleteds.emplace(entity);
 				}
 			}

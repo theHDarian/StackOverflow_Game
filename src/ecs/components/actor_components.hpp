@@ -215,6 +215,7 @@ enum class EnemyAttackPattern {
     SPRAY,
     WAVE,
     LASER,
+    TRAIL,
     NONE
 };
 

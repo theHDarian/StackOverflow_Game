@@ -392,7 +392,8 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	}
 
 	Invisible& inv = registry.invisibles.emplace(entity);
-	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
+	//inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;
+	inv.countdown = 200.0f;
 
 	
 	auto& spriteComponent = registry.sprites.emplace(entity);

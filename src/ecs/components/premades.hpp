@@ -201,6 +201,22 @@ AttackData none{
 	0
 };
 
+AttackData trail{
+	EnemyAttackPattern::TRAIL,
+	CIRCLE,
+	{},
+	blunt,
+	1,
+	0,
+	{20,20},
+	0,
+	10000,
+	{0,0},
+	0,
+	0,
+	0
+};
+
 AttackData wave{
 	EnemyAttackPattern::WAVE,
 	CIRCLE,
@@ -436,8 +452,7 @@ struct EnemyEasySentry : Enemy {
         currHealth = maxHealth;
         behavior = EnemyBehavior::ROTATE_IN_PLACE;
         attackCooldown = 2000;
-		currCooldown = attackCooldown;
-		currCooldown = attackCooldown;
+		currCooldown = 0;
         state = 10;
     };
 };
@@ -449,7 +464,7 @@ struct EnemyMediumCharge : Enemy {
         currHealth = maxHealth;
         behavior = EnemyBehavior::FOLLOW_PLAYER;
         attackCooldown = 1000;
-		currCooldown = attackCooldown;
+		currCooldown = 0;
         state = 10;
     };
 };
@@ -461,7 +476,7 @@ struct EnemyMediumHoming : Enemy {
         currHealth = maxHealth;
         behavior = EnemyBehavior::PATROLLING;
         attackCooldown = 1500;
-		currCooldown = attackCooldown;
+		currCooldown = 0;
         state = 10;
 		patrolIndex = 0;
         patrolPath = std::vector<vec2>{
@@ -480,19 +495,19 @@ struct EnemyEasySniper : Enemy {
 		currHealth = maxHealth;
 		behavior = EnemyBehavior::EVADEBULLET;
 		attackCooldown = 5000;
-		currCooldown = attackCooldown;
+		currCooldown = 0;
 		state = 10;
 	};
 };
 
 struct TestEnemy : Enemy {
 	TestEnemy() {
-		attackData = { laserRotate };
+		attackData = { wave };
 		maxHealth = 40;
 		currHealth = maxHealth;
-		behavior = EnemyBehavior::ROTATE_IN_PLACE;
-		attackCooldown = 5000;
-		currCooldown = attackCooldown;
+		behavior = EnemyBehavior::FOLLOW_PLAYER;
+		attackCooldown = 3000;
+		currCooldown = 0;
 		state = 10;
 	};
 };

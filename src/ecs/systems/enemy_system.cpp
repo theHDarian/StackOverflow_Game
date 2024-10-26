@@ -92,9 +92,10 @@ void EnemySystem::step(float elapsed_ms) {
         // std::cout << "enemy attack in:" << enemy.attackCooldown << std::endl;
         if (enemy.currCooldown < 0.f)
         {
+            vec2 velocity = (playerMotion.position + playerMotion.velocity/2.0f) - pos;
             if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
             {
-                shootShotgun(playerMotion.position - pos, pos, atkData);
+                shootShotgun(velocity, pos, atkData);
                 enemy.currCooldown = enemy.attackCooldown;
             }
             else if (atkData.attackType == EnemyAttackPattern::ALL_DIRECTION)
@@ -107,10 +108,14 @@ void EnemySystem::step(float elapsed_ms) {
                 shootLaser(pos, entity, atkData);
                 enemy.currCooldown = enemy.attackCooldown;
             }
+            else if (atkData.attackType == EnemyAttackPattern::TRAIL)
+            {
+                shootShotgun(velocity, pos, atkData);
+                enemy.currCooldown = 400;
+            }
             else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
             {
                 Burst& burst = registry.bursts.get(entity);
-                vec2 velocity = playerMotion.position - pos;
                 shootBurst(velocity, pos, atkData, elapsed_ms, burst);
                 burst.burstDirection = atan2(velocity.y, velocity.x);
                 if (burst.curBurst <= 0)
@@ -122,11 +127,12 @@ void EnemySystem::step(float elapsed_ms) {
             }
             else if (atkData.attackType == EnemyAttackPattern::WAVE) {
                 Burst& burst = registry.bursts.get(entity);
-                vec2 velocity = playerMotion.position - pos;
+                if (burst.curBurst == atkData.numBullets) {
+                    burst.burstDirection = atan2(velocity.y, velocity.x);
+                }
                 shootWave(pos, atkData, elapsed_ms, burst);
                 if (burst.curBurst <= 0)
                 {
-                    burst.burstDirection = atan2(velocity.y, velocity.x);
                     enemy.currCooldown = enemy.attackCooldown;
                     burst.curBurst = atkData.numBullets;
                     burst.burstCooldown = 0;
