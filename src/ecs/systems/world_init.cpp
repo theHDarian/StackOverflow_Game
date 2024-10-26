@@ -272,7 +272,6 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 
 Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	auto entity = Entity();
-	std::cout << "GOTJNRNEKRBGKEBRGBEKRJG" << std::endl;
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
@@ -308,19 +307,18 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
-	std::cout << registry.enemyMovement.entities.size() << " is the size of movement entity in init" << std::endl;
 	movement.posA = pos;
 	// if (enemy.behavior == EnemyBehavior::PATROLLING) {
 	// 	movement.posA = enemy.patrolPath[0];
 	// } else {
 	// 	movement.posA = pos;
 	// }
-	movement.posB = AISystem::getMove(enemy.currEnemyPattern.type, entity);
+	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
-	if ((enemy.currEnemyPattern.atkData.attackType == EnemyAttackPattern::BURST || enemy.currEnemyPattern.atkData.attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
+	if ((enemy.currEnemyPattern().atkData.attackType == EnemyAttackPattern::BURST || enemy.currEnemyPattern().atkData.attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
 		registry.bursts.emplace(entity);
 	}
 	

@@ -40,7 +40,7 @@ void EnemySystem::step(float elapsed_ms)
         vec2 pos = motion.position;
         float angle = motion.angle;
 
-        EnemyPattern pattern = enemy.currEnemyPattern;
+        EnemyPattern& pattern = enemy.currEnemyPattern();
 
         // move enemy using lerp
         if (registry.enemyMovement.has(entity))
@@ -87,7 +87,7 @@ void EnemySystem::step(float elapsed_ms)
             pattern.currAtkCD -= elapsed_ms;
             if (pattern.currAtkCD < 0) {
                 AttackData atkData = pattern.atkData;
-                attack(entity, playerMotion, pos, atkData, elapsed_ms);
+                attack(entity,pattern, playerMotion, pos, atkData, elapsed_ms);
             }
         }
     }
@@ -129,10 +129,9 @@ void EnemySystem::step(float elapsed_ms)
     }
 }
 
-void EnemySystem::attack(Entity entity,Motion playerMotion, vec2 pos, AttackData atkData,float elapsed_ms)
+void EnemySystem::attack(Entity entity, EnemyPattern& currPattern, Motion playerMotion, vec2 pos, AttackData atkData,float elapsed_ms)
 {
     Enemy& enemy = registry.enemies.get(entity);
-    EnemyPattern currPattern = enemy.currEnemyPattern;
     if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
     {
         shootShotgun(playerMotion.position - pos, pos, atkData);
@@ -142,6 +141,7 @@ void EnemySystem::attack(Entity entity,Motion playerMotion, vec2 pos, AttackData
     {
         shootAllDirection(pos, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
+        std::cout << " Got here current atkCD" << currPattern.currAtkCD << std::endl;
     }
     else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
     {

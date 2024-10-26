@@ -272,8 +272,10 @@ AttackData NoAttack{
 //
 // struct EnemyPattern {
 //     // type is just like state
+//	   std::string name;
 //     EnemyBehavior type;
 //     std::vector<vec2> path;
+//     int pathIndex;
 //     float curDuration;
 //     float maxDuration;
 //     // all possible reactions in current behavior state
@@ -304,11 +306,11 @@ struct TestEnemy : Enemy
 		currHealth = maxHealth;
 
 		enemyPatterns = {
-			{EnemyBehavior::IDLE, {}, 0, 0.f, 3000.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
-			{EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 0, 10000, {reactionPlayerClose, reactionPatrol}, 0, true, 0, 2000.f, twelveSpiralShot},
-			{EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionIdle}, 0, true, 0, 5000.f, SniperShot}};
+			{"IDLE", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
+			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionPatrol}, 0, true, 0, 2000.f, twelveSpiralShot},
+			{"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionIdle}, 0, true,0.f,  5000.f, SniperShot}};
 		
-		currEnemyPattern = enemyPatterns[0];
+		patternIndex = 0;
 	};
 };
 

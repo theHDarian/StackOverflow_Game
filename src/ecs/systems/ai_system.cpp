@@ -15,13 +15,15 @@ void AISystem::step(float elapsed_ms)
 	// std::cout << enemy_registry.entities.size() << " is the size of enemy entity" << std::endl;
 	for (Entity entity : enemy_registry.entities) {
 		Enemy& enemy = enemy_registry.get(entity);
-		EnemyPattern& currPattern = enemy.currEnemyPattern;
+		EnemyPattern& currPattern = enemy.currEnemyPattern();
 		// std::cout << movement_registry.entities.size() << " is the size of movement entity" << std::endl;
+		std::cout << currPattern.name << " initial" << std::endl;
 		EnemyMovement& movement = movement_registry.get(entity);
 		Motion& motion = registry.motions.get(entity);
-
+		currPattern.curDuration -= elapsed_ms;
 		// SENSING 
 		updateState(enemy, movement);
+		std::cout << currPattern.name << "after update" << std::endl;
 
 		// THINKING 
 		if(currPattern.type == EnemyBehavior::FOLLOW_PLAYER) {
@@ -31,6 +33,7 @@ void AISystem::step(float elapsed_ms)
 		} else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB)) {
             movement.posA = movement.posB;
 			//ACTING 
+			std::cout << currPattern.name << "before getmove" << std::endl;
             movement.posB = getMove(currPattern.type, entity);
 			//std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
             movement.distanceTraveled = 0.f;
@@ -56,34 +59,42 @@ void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
 	float distance = glm::distance(playerPos, EnemyPos);
 	float closeDistance = 300.f;
 	float hpPercent = enemy.currHealth / enemy.maxHealth;
-	EnemyPattern& currPattern = enemy.currEnemyPattern;
+	EnemyPattern& currPattern = enemy.currEnemyPattern();
 	if (hpPercent < 0.25f) {
 		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTYFIVE_HEALTH);
 		if (reaction) {
-			currPattern = enemy.enemyPatterns[reaction->index];
+			enemy.patternIndex = reaction->index;
 		}
 		return;
 	} else if (hpPercent < 0.5f) {
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FIFTY_HEALTH);
 		if (reaction) {
-			currPattern = enemy.enemyPatterns[reaction->index];
+			enemy.patternIndex = reaction->index;
 		}
 		return;
 	} else if (distance < closeDistance) {
 		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
 		if (reaction) {
-			currPattern = enemy.enemyPatterns[reaction->index];
+			enemy.patternIndex = reaction->index;
 		}
 		return;
 	} else if (hpPercent < 0.75f) {
 		auto reaction = getReactions(currPattern.reactions, ReactionType::SEVENTYFIVE_HEALTH);
 		if (reaction) {
-			currPattern = enemy.enemyPatterns[reaction->index];
+			enemy.patternIndex = reaction->index;
 		}
 		return;
 	// PLAYER BULLET CLOSE TO BE IMPELMENTED..
+	// DEFAULT STATE (CHANGE BY DURATION)
 	} else {
-		currPattern = enemy.enemyPatterns[enemy.currEnemyPattern.next];
+		std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
+		if (currPattern.curDuration < 0.f) {
+			enemy.patternIndex = currPattern.next;
+			std::cout <<currPattern.next << " index currPattern.next" <<std::endl;
+			currPattern.curDuration = currPattern.maxDuration;
+			std::cout << "change to " << enemy.currEnemyPattern().name << std:: endl;
+		}
+
 		return;
 	}
 }
@@ -105,14 +116,22 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity) {
 			return evadeBullet(entity);
 		case EnemyBehavior::ROTATE_IN_PLACE:
 			return registry.motions.get(entity).position;
+		case EnemyBehavior::IDLE:
+			return getCurrentPos(entity);
 		default:
 			return vec2{ 0, 0 };
-	}
+	};
+};
+
+vec2 AISystem::getCurrentPos(Entity entity) {
+	EnemyMovement movement = registry.enemyMovement.get(entity);
+	return movement.posA;
 }
 
 vec2 AISystem::getNextPatrolPos(Entity entity) {
 	Enemy& enemy = registry.enemies.get(entity);
-	EnemyPattern pattern = enemy.currEnemyPattern;
+	EnemyPattern& pattern = enemy.currEnemyPattern();
+	std::cout << "current state: " << pattern.name << std::endl;
 	pattern.pathIndex += 1;
 	if (pattern.path.size() - 1 <= pattern.pathIndex) {
 		pattern.pathIndex = 0;

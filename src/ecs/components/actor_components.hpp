@@ -274,6 +274,8 @@ struct Reaction {
 // act like a state that can move depending on enemies reactions
 struct EnemyPattern {
     // type is just like state
+    std::string name;
+    // behv
     EnemyBehavior type;
     std::vector<vec2> path;
     int pathIndex;
@@ -295,7 +297,10 @@ struct Enemy {
     vec2 velocity;
     BulletStackEffect blunt;
     std::vector<EnemyPattern> enemyPatterns;
-    EnemyPattern currEnemyPattern;
+    int patternIndex;
+    EnemyPattern& currEnemyPattern() {
+        return enemyPatterns[patternIndex];
+    };
 };
 
 
