@@ -43,11 +43,11 @@ void MapSystem::step(float elapsed_ms) {
     //spawn enemy based on current time 
     WindowState& wS = registry.windowStates.components[0];
     std::cout << " enemy size " << registry.enemies.size() << std::endl;
-	if (registry.enemies.size() <= 5) {
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySniper);
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
+	if (registry.enemies.size() == 0) {
+			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::TestRevampedEnemy);
+			// createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
+			// createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
+			// createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
 	}
 }
 
@@ -125,5 +125,5 @@ void MapSystem::resetMap() {
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
 
-    createBigC(renderer, vec2(600, 600));
+    //createBigC(renderer, vec2(600, 600));
 }

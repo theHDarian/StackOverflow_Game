@@ -199,11 +199,13 @@ struct PlayerBullet {
 };
 
 enum EnemyType {
-    EasyEnemySentry,
-    //MediumEnemyClusterShot,
-    MediumEnemyCharge,
-    MediumEnemyHoming,
-    EasyEnemySniper
+    // EasyEnemySentry,
+    // //MediumEnemyClusterShot,
+    // MediumEnemyCharge,
+    // MediumEnemyHoming,
+    // EasyEnemySniper,
+    // HardEnemyBehavior
+    TestRevampedEnemy
 };
 
 enum class EnemyAttackPattern {
@@ -215,15 +217,7 @@ enum class EnemyAttackPattern {
     NONE
 };
 
-enum class EnemyBehavior {
-    // this is the basic
-    RANDOM,
-    FOLLOW_PLAYER,
-    PATROLLING,
-    EVADEBULLET,
-    CIRCLINGPLAYER,
-    ROTATE_IN_PLACE
-};
+
 
 enum EnemyBulletShape {
     RECTANGLE,
@@ -248,22 +242,64 @@ struct AttackData {
     float homing = 0;
 };
 
+enum class EnemyBehavior {
+    // this is the basic
+    RANDOM,
+    FOLLOW_PLAYER,
+    PATROLLING,
+    EVADEBULLET,
+    CIRCLINGPLAYER,
+    ROTATE_IN_PLACE,
+    TELEPORT,
+    IDLE,
+
+};
+
+
+enum class ReactionType {
+    DURATION,
+    PLAYER_CLOSE,
+    PLAYER_BULLET_CLOSE,
+    FINISH_PATROL,
+    SEVENTYFIVE_HEALTH,
+    FIFTY_HEALTH,
+    TWENTYFIVE_HEALTH
+};
+
+struct Reaction {
+    ReactionType React;
+    int index;
+};
+
+// act like a state that can move depending on enemies reactions
+struct EnemyPattern {
+    // type is just like state
+    EnemyBehavior type;
+    std::vector<vec2> path;
+    int pathIndex;
+    float curDuration;
+    float maxDuration;
+    // all possible reactions in current behavior state
+    std::vector<Reaction> reactions;
+    int next;
+    bool canAttack;
+    float currAtkCD;
+    float maxAtkCD;
+    AttackData atkData;
+};
+
 // anything that is deadly to the player
 struct Enemy {
-    int state; //TODO: can change to enum once state determined
     int maxHealth;
     int currHealth;
     vec2 velocity;
-    // TODO add attack pattern data?
-    float attackCooldown;
-    float currCooldown;
-    EnemyBehavior behavior;
-    std::vector<AttackData> attackData;
     BulletStackEffect blunt;
-    // for patrolling enemies
-    std::vector<vec2> patrolPath;
-    int patrolIndex = 0;
+    std::vector<EnemyPattern> enemyPatterns;
+    EnemyPattern currEnemyPattern;
 };
+
+
+
 
 struct EnemyMovement {
     vec2 posA;

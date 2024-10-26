@@ -18,54 +18,47 @@ struct BulletStackEffect {
 };
 */
 
-
 BulletStackEffect blunt = {
 	Inert,
 	Additive,
 	0,
 	"blunt",
-	""
-};
+	""};
 
 BulletStackEffect dmgDownA = {
 	BulletDamage,
 	Additive,
 	-2.0,
 	"dmgDownA",
-	""
-};
+	""};
 
 BulletStackEffect dmgDownM = {
 	BulletDamage,
 	Multiplicative,
 	0.7,
 	"dmgDownM",
-	""
-};
+	""};
 
 BulletStackEffect numBulletsUpA = {
 	BulletNum,
 	Additive,
 	1,
 	"numBulletsUpA",
-	""
-};
+	""};
 
 BulletStackEffect sizeUpA = {
 	ProjectileSize,
 	Additive,
 	10,
 	"sizeUpA",
-	""
-};
+	""};
 
 BulletStackEffect spreadUpA = {
 	BulletSpread,
 	Additive,
 	15,
 	"spreadUpA",
-	""
-};
+	""};
 
 //////////////////////////////////////////
 ///////////  AttackData  /////////////////
@@ -97,14 +90,13 @@ AttackData none{
 	blunt,
 	3,
 	M_PI / 6.0,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData threeShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -112,15 +104,14 @@ AttackData threeShot{
 	{},
 	blunt,
 	3,
-	M_PI/6.0,
-	{20,20},
+	M_PI / 6.0,
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData sixShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -129,14 +120,13 @@ AttackData sixShot{
 	blunt,
 	6,
 	M_PI / 8,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData fourAllAround{
 	EnemyAttackPattern::ALL_DIRECTION,
@@ -144,15 +134,14 @@ AttackData fourAllAround{
 	{},
 	blunt,
 	4,
-	M_PI/4,
-	{20,20},
+	M_PI / 4,
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData twoPincerShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -161,14 +150,13 @@ AttackData twoPincerShot{
 	blunt,
 	2,
 	M_PI / 1.0,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{200,-2*M_PI/3.0},
+	{200, -2 * M_PI / 3.0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData twelveSpiralShot{
 	EnemyAttackPattern::ALL_DIRECTION,
@@ -177,14 +165,13 @@ AttackData twelveSpiralShot{
 	sizeUpA,
 	12,
 	0.0,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{200,-2 * M_PI / 3.0},
+	{200, -2 * M_PI / 3.0},
 	0,
 	0,
-	0
-};
+	0};
 
 AttackData threeHomingShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -193,30 +180,28 @@ AttackData threeHomingShot{
 	blunt,
 	3,
 	M_PI / 4.0,
-	{20,20},
+	{20, 20},
 	200,
 	6000,
-	{0.0,0.0},
+	{0.0, 0.0},
 	0,
 	0,
-	0.01
-};
+	0.01};
 
 AttackData threeBurst{
 	EnemyAttackPattern::BURST,
 	CIRCLE,
-	{ numBulletsUpA},
+	{numBulletsUpA},
 	sizeUpA,
 	4,
-	M_PI/6,
-	{20,20},
+	M_PI / 6,
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData fiveBurst{
 	EnemyAttackPattern::BURST,
@@ -225,10 +210,10 @@ AttackData fiveBurst{
 	blunt,
 	6,
 	M_PI / 6,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
 	0,
@@ -241,14 +226,13 @@ AttackData threeSpray{
 	blunt,
 	3,
 	M_PI / 16,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData SniperShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -260,85 +244,127 @@ AttackData SniperShot{
 	{20, 20},
 	900,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	0
-};
+	0};
 
-AttackData NoAttack {
+AttackData NoAttack{
 	EnemyAttackPattern::NONE,
 	CIRCLE,
 	{},
 	blunt,
 	0,
 	0,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	0
-};
+	0};
 
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
 ////////////////////////////////////
 
+//////////////////////////////////
+//
+// struct EnemyPattern {
+//     // type is just like state
+//     EnemyBehavior type;
+//     std::vector<vec2> path;
+//     float curDuration;
+//     float maxDuration;
+//     // all possible reactions in current behavior state
+//     std::vector<Reaction> reactions;
+//     int next;
+//     bool canAttack;
+//     float currAtkCD;
+//     float maxAtkCD;
+//     AttackData atkData;
+// };
+/////////////////////////////////
 
-struct EnemyEasySentry : Enemy {
-    EnemyEasySentry() {
-        attackData = {twelveSpiralShot};
+struct TestEnemy : Enemy
+{
+	Reaction reactionPatrol = {
+		ReactionType::DURATION,
+		1};
+
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0};
+	Reaction reactionPlayerClose = {
+		ReactionType::PLAYER_CLOSE,
+		2};
+	TestEnemy()
+	{
 		maxHealth = 50;
-        currHealth = maxHealth;
-        behavior = EnemyBehavior::ROTATE_IN_PLACE;
-        attackCooldown = 2000;
-		currCooldown = attackCooldown;
-		currCooldown = attackCooldown;
-        state = 10;
-    };
-};
-
-struct EnemyMediumCharge : Enemy {
-    EnemyMediumCharge() {
-        attackData = {NoAttack};
-        maxHealth = 200;
-        currHealth = maxHealth;
-        behavior = EnemyBehavior::FOLLOW_PLAYER;
-        attackCooldown = 1000;
-		currCooldown = attackCooldown;
-        state = 10;
-    };
-};
-
-struct EnemyMediumHoming : Enemy {
-    EnemyMediumHoming() {
-        attackData = {threeHomingShot};
-        maxHealth = 60;
-        currHealth = maxHealth;
-        behavior = EnemyBehavior::PATROLLING;
-        attackCooldown = 1500;
-		currCooldown = attackCooldown;
-        state = 10;
-		patrolIndex = 0;
-        patrolPath = std::vector<vec2>{
-            {400, 100}, 
-            {1000, 100}, 
-            {1000, 700}, 
-            {400, 700}
-        };
-    };
-};
-
-struct EnemyEasySniper : Enemy {
-	EnemyEasySniper() {
-		attackData = {SniperShot};
-		maxHealth = 40;
 		currHealth = maxHealth;
-		behavior = EnemyBehavior::EVADEBULLET;
-		attackCooldown = 5000;
-		currCooldown = attackCooldown;
-		state = 10;
+
+		enemyPatterns = {
+			{EnemyBehavior::IDLE, {}, 0, 0.f, 3000.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
+			{EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 0, 10000, {reactionPlayerClose, reactionPatrol}, 0, true, 0, 2000.f, twelveSpiralShot},
+			{EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionIdle}, 0, true, 0, 5000.f, SniperShot}};
+		
+		currEnemyPattern = enemyPatterns[0];
 	};
 };
+
+// struct EnemyEasySentry : Enemy {
+//     EnemyEasySentry() {
+//         attackData = {twelveSpiralShot};
+// 		maxHealth = 50;
+//         currHealth = maxHealth;
+//         behavior = EnemyBehavior::ROTATE_IN_PLACE;
+//         attackCooldown = 2000;
+// 		currCooldown = attackCooldown;
+// 		currCooldown = attackCooldown;
+//         state = 10;
+// 		std::vector<EnemyPattern> patterns;
+//     };
+// };
+
+// struct EnemyMediumCharge : Enemy {
+//     EnemyMediumCharge() {
+//         attackData = {NoAttack};
+//         maxHealth = 200;
+//         currHealth = maxHealth;
+//         behavior = EnemyBehavior::FOLLOW_PLAYER;
+//         attackCooldown = 1000;
+// 		currCooldown = attackCooldown;
+//         state = 10;
+//     };
+// };
+
+// struct EnemyMediumHoming : Enemy {
+//     EnemyMediumHoming() {
+//         attackData = {threeHomingShot};
+//         maxHealth = 60;
+//         currHealth = maxHealth;
+//         behavior = EnemyBehavior::PATROLLING;
+//         attackCooldown = 1500;
+// 		currCooldown = attackCooldown;
+//         state = 10;
+// 		patrolIndex = 0;
+//         patrolPath = std::vector<vec2>{
+//             {400, 100},
+//             {1000, 100},
+//             {1000, 700},
+//             {400, 700}
+//         };
+//     };
+// };
+
+// struct EnemyEasySniper : Enemy {
+// 	EnemyEasySniper() {
+// 		attackData = {SniperShot};
+// 		maxHealth = 40;
+// 		currHealth = maxHealth;
+// 		behavior = EnemyBehavior::EVADEBULLET;
+// 		attackCooldown = 5000;
+// 		currCooldown = attackCooldown;
+// 		state = 10;
+// 	};
+// };

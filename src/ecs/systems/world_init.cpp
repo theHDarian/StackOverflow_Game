@@ -231,10 +231,6 @@ Entity createBigC(RenderSystem* renderer, vec2 position) {
 	registry.meshColliders.emplace(entity);
 
 	auto& enemy = registry.enemies.emplace(entity);
-	enemy.attackCooldown = 5000;
-	enemy.maxHealth = 1000;
-	enemy.currHealth = enemy.maxHealth;
-	enemy.state = 10;
 
 	AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = none;
@@ -276,31 +272,32 @@ Entity createTestFloor(RenderSystem* renderer, vec2 pos) {
 
 Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	auto entity = Entity();
-
+	std::cout << "GOTJNRNEKRBGKEBRGBEKRJG" << std::endl;
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 
 	//std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
-    Enemy& enemy = registry.enemies.emplace(entity);;
+    Enemy& enemy = registry.enemies.emplace(entity);
     switch (type) {
-        case EnemyType::EasyEnemySentry: {
+	
+        case EnemyType::TestRevampedEnemy: {
 			std::cout << "got here" << std::endl;
-            enemy = EnemyEasySentry();
+            enemy = TestEnemy();
             break;
         }
-        case EnemyType::MediumEnemyCharge: {
-            enemy = EnemyMediumCharge();
-            break;
-        }
-        case EnemyType::MediumEnemyHoming: {
-            enemy = EnemyMediumHoming();
-            break;
-        }
-		case EnemyType::EasyEnemySniper: {
-			enemy = EnemyEasySniper();
-			break;
-		}
+        // case EnemyType::MediumEnemyCharge: {
+        //     enemy = EnemyMediumCharge();
+        //     break;
+        // }
+        // case EnemyType::MediumEnemyHoming: {
+        //     enemy = EnemyMediumHoming();
+        //     break;
+        // }
+		// case EnemyType::EasyEnemySniper: {
+		// 	enemy = EnemyEasySniper();
+		// 	break;
+		//}
 
     }
 
@@ -311,28 +308,33 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type) {
 	motion.scale = vec2({ 288.0f/2, 240.0f/2 });
 
 	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
-	if (enemy.behavior == EnemyBehavior::PATROLLING) {
-		movement.posA = enemy.patrolPath[0];
-	} else {
-		movement.posA = pos;
-	}
-	movement.posB = AISystem::getMove(enemy.behavior, entity);
-	std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
+	std::cout << registry.enemyMovement.entities.size() << " is the size of movement entity in init" << std::endl;
+	movement.posA = pos;
+	// if (enemy.behavior == EnemyBehavior::PATROLLING) {
+	// 	movement.posA = enemy.patrolPath[0];
+	// } else {
+	// 	movement.posA = pos;
+	// }
+	movement.posB = AISystem::getMove(enemy.currEnemyPattern.type, entity);
+	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
+	if ((enemy.currEnemyPattern.atkData.attackType == EnemyAttackPattern::BURST || enemy.currEnemyPattern.atkData.attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
+		registry.bursts.emplace(entity);
+	}
 	
-	AttackData& atk = registry.attackDatas.emplace(entity);
-	std::vector<AttackData> atkData = enemy.attackData;
-	std::cout << "attackData size:" << atkData.size() << std::endl;
-	if (atkData.size() > 0) {
-		atk = atkData[0];
-	}
-	for (int i = 0; i < atkData.size(); i++) {
-		if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
-			registry.bursts.emplace(entity);
-		}
-	}
+	// AttackData& atk = registry.attackDatas.emplace(entity);
+	// std::vector<AttackData> atkData = enemy.attackData;
+	// std::cout << "attackData size:" << atkData.size() << std::endl;
+	// if (atkData.size() > 0) {
+	// 	atk = atkData[0];
+	// }
+	// for (int i = 0; i < atkData.size(); i++) {
+	// 	if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
+	// 		registry.bursts.emplace(entity);
+	// 	}
+	// }
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = abs(min(motion.scale.x, motion.scale.y))/2.5;
