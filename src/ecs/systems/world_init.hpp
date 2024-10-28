@@ -47,6 +47,8 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 
 float getModifiedValue(BulletEffectType bf, float value);
 
+std::vector<BulletStackEffect> getBulletEffects(AttackData atkData);
+
 // create dialogue box
 Entity createDialogueBox(vec2 position, vec2 scale);
 

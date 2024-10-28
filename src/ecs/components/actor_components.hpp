@@ -210,8 +210,9 @@ enum EnemyType {
 enum class EnemyAttackPattern {
     // this is the attack pattern
     SHOTGUN,
-    ALL_DIRECTION,
+    RADIAL,
     BURST,
+    BURST_RADIAL,
     SPRAY,
     WAVE,
     LASER,

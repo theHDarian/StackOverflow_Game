@@ -98,7 +98,7 @@ void EnemySystem::step(float elapsed_ms) {
                 shootShotgun(velocity, pos, atkData);
                 enemy.currCooldown = enemy.attackCooldown;
             }
-            else if (atkData.attackType == EnemyAttackPattern::ALL_DIRECTION)
+            else if (atkData.attackType == EnemyAttackPattern::RADIAL)
             {
                 shootAllDirection(pos, atkData);
                 enemy.currCooldown = enemy.attackCooldown;
@@ -131,6 +131,17 @@ void EnemySystem::step(float elapsed_ms) {
                     burst.burstDirection = atan2(velocity.y, velocity.x);
                 }
                 shootWave(pos, atkData, elapsed_ms, burst);
+                if (burst.curBurst <= 0)
+                {
+                    enemy.currCooldown = enemy.attackCooldown;
+                    burst.curBurst = atkData.numBullets;
+                    burst.burstCooldown = 0;
+                }
+            }
+            else if (atkData.attackType == EnemyAttackPattern::BURST_RADIAL) {
+                Burst& burst = registry.bursts.get(entity);
+                shootRadialBurst(pos, atkData, elapsed_ms, burst);
+                burst.burstDirection = atan2(velocity.y, velocity.x);
                 if (burst.curBurst <= 0)
                 {
                     enemy.currCooldown = enemy.attackCooldown;
@@ -251,14 +262,27 @@ void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burs
         createEnemyBullet(render, pos, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
     }
     else {
-        vec2 perp = vec2(-velocity.y, velocity.x) * 20.f * (float)(atkData.numBullets - burst.curBurst);
+        vec2 perp = vec2(-velocity.y, velocity.x) * 30.f * (float)(atkData.numBullets - burst.curBurst);
         createEnemyBullet(render, pos + perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
         createEnemyBullet(render, pos - perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
     }
-
     burst.curBurst--;
-    burst.burstCooldown = 150;
+    burst.burstCooldown = 200;
 }
+
+void EnemySystem::shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst) {
+    // std::cout << burst.curBurst << std::endl;
+    if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0) {
+        return;
+    }
+    for (uint i = 0; i < atkData.veer.x; i++) {
+        float a = atkData.angleOffset * (float)(atkData.numBullets - burst.curBurst) + i * (2 * M_PI / atkData.veer.x);
+        createEnemyBullet(render, pos, { cos(a), sin(a) }, {0,0}, atkData);
+    }
+    burst.curBurst--;
+    burst.burstCooldown = atkData.veer.y;
+}
+
 
 void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData) {
     for (uint i = 0; i < atkData.numBullets; i++) {

@@ -178,7 +178,7 @@ struct AttackData {
 	vec2 size = { 20,20 };
 	float speed = 200;
 	float bulletRange = 3000;
-	vec2 veer = { 0,0 }; // {magnitude, angle}
+	vec2 veer = { 0,0 }; // {magnitude, angle}, {growth, rotation} lasers, {#bullets per shot, burst CD} radial burst
 	int bulletPierce = 0;
 	int bulletBounce = 0;
 	float homing = 0;
@@ -297,8 +297,24 @@ AttackData sixShot{
 	0
 };
 
+AttackData radial{
+	EnemyAttackPattern::BURST_RADIAL,
+	CIRCLE,
+	{numBulletsUpA, sizeUpA},
+	blunt,
+	40,
+	M_PI / 40,
+	{20,20},
+	150,
+	3000,
+	{4,200},
+	0,
+	0,
+	0
+};
+
 AttackData fourAllAround{
-	EnemyAttackPattern::ALL_DIRECTION,
+	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
 	{},
 	blunt,
@@ -330,7 +346,7 @@ AttackData twoPincerShot{
 };
 
 AttackData twelveSpiralShot{
-	EnemyAttackPattern::ALL_DIRECTION,
+	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
 	{},dashUpA,
 	12,
@@ -502,10 +518,10 @@ struct EnemyEasySniper : Enemy {
 
 struct TestEnemy : Enemy {
 	TestEnemy() {
-		attackData = { wave };
+		attackData = { radial };
 		maxHealth = 40;
 		currHealth = maxHealth;
-		behavior = EnemyBehavior::FOLLOW_PLAYER;
+		behavior = EnemyBehavior::ROTATE_IN_PLACE;
 		attackCooldown = 3000;
 		currCooldown = 0;
 		state = 10;

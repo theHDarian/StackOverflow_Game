@@ -376,7 +376,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
 	bullet.bulletPierce = atkData.bulletPierce;
-	bullet.bulletEffects.push_back(atkData.defaultEffect);
+	bullet.bulletEffects = getBulletEffects(atkData);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
@@ -456,7 +456,7 @@ Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity st
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
-	bullet.bulletEffects.push_back(atkData.defaultEffect);
+	bullet.bulletEffects = getBulletEffects(atkData);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = angle;
@@ -733,4 +733,11 @@ float getModifiedValue(BulletEffectType bf, float value)
 	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
 }
 
+std::vector<BulletStackEffect> getBulletEffects(AttackData atkData) {
+	// TODO add logic from room data about whether a bullet should be default effect or special effects
+	if (atkData.rareBulletEffects.size() > 0) {
+		return atkData.rareBulletEffects;
+	}
+	return { atkData.defaultEffect };
+}
 
