@@ -297,12 +297,28 @@ AttackData sixShot{
 	0
 };
 
-AttackData radial{
+AttackData radialBurst{
 	EnemyAttackPattern::BURST_RADIAL,
 	CIRCLE,
 	{numBulletsUpA, sizeUpA},
 	blunt,
 	40,
+	M_PI / 40,
+	{20,20},
+	150,
+	3000,
+	{4,200},
+	0,
+	0,
+	0
+};
+
+AttackData radialPolygon{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	CIRCLE,
+	{numBulletsUpA, sizeUpA},
+	blunt,
+	5,
 	M_PI / 40,
 	{20,20},
 	150,
@@ -518,7 +534,7 @@ struct EnemyEasySniper : Enemy {
 
 struct TestEnemy : Enemy {
 	TestEnemy() {
-		attackData = { radial };
+		attackData = { radialPolygon };
 		maxHealth = 40;
 		currHealth = maxHealth;
 		behavior = EnemyBehavior::ROTATE_IN_PLACE;

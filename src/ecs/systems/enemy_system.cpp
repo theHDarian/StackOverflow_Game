@@ -103,6 +103,11 @@ void EnemySystem::step(float elapsed_ms) {
                 shootAllDirection(pos, atkData);
                 enemy.currCooldown = enemy.attackCooldown;
             }
+            else if (atkData.attackType == EnemyAttackPattern::RADIAL_POLYGON)
+            {
+                shootRadialPolygon(pos, atkData);
+                enemy.currCooldown = enemy.attackCooldown;
+            }
             else if (atkData.attackType == EnemyAttackPattern::LASER)
             {
                 shootLaser(pos, entity, atkData);
@@ -214,6 +219,17 @@ void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData) {
     for (uint i = 0; i < atkData.numBullets; i++) {
         float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
         createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
+    }
+}
+
+void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData) {
+    AttackData atkData2 = atkData;
+    atkData2.speed = atkData.speed * sin(M_PI / atkData.numBullets + M_PI / 2.0f);
+    float offset = M_PI / atkData.numBullets;
+    for (uint i = 0; i < atkData.numBullets; i++) {
+        float a = atkData.angleOffset + i * (2.0f * M_PI / atkData.numBullets);
+        createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
+        createEnemyBullet(render, pos, { cos(a + offset), sin(a + offset) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData2);
     }
 }
 
