@@ -272,7 +272,7 @@ AttackData sixShot{
 	1,
 	0};
 
-AttackData radial{
+AttackData radialBurst{
 	EnemyAttackPattern::BURST_RADIAL,
 	CIRCLE,
 	{numBulletsUpA, sizeUpA},
@@ -286,6 +286,22 @@ AttackData radial{
 	0,
 	0,
 	0};
+
+AttackData radialPolygon{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	CIRCLE,
+	{numBulletsUpA, sizeUpA},
+	blunt,
+	5,
+	M_PI / 40,
+	{20,20},
+	150,
+	3000,
+	{4,200},
+	0,
+	0,
+	0
+};
 
 AttackData fourAllAround{
 	EnemyAttackPattern::RADIAL,
@@ -519,6 +535,7 @@ struct EnemyBigC : Enemy
 	EnemyBigC()
 	{
 		maxHealth = 5000;
+
 		currHealth = maxHealth;
 
 		enemyPatterns = {

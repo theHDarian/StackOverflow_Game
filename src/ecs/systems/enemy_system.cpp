@@ -163,10 +163,20 @@ void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData)
     }
 }
 
-void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
-{
-    if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0)
-    {
+
+void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData) {
+    AttackData atkData2 = atkData;
+    atkData2.speed = atkData.speed * sin(M_PI / atkData.numBullets + M_PI / 2.0f);
+    float offset = M_PI / atkData.numBullets;
+    for (uint i = 0; i < atkData.numBullets; i++) {
+        float a = atkData.angleOffset + i * (2.0f * M_PI / atkData.numBullets);
+        createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
+        createEnemyBullet(render, pos, { cos(a + offset), sin(a + offset) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData2);
+    }
+}
+
+void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst) {
+    if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0) {
         return;
     }
 
