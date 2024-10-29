@@ -4,7 +4,6 @@
 #include "world_init.hpp"
 #include "utils/random.hpp"
 #include "SDL.h"
-
 #include "components/presets/room_presets.hpp"
 
 MapSystem::MapSystem()
