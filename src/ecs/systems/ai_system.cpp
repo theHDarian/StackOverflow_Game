@@ -12,26 +12,97 @@ void AISystem::step(float elapsed_ms)
 {
     auto &movement_registry = registry.enemyMovement;
     auto &enemy_registry = registry.enemies;
-
-    for (int i = 0; i < movement_registry.size(); i++) {
-        Entity& entity = movement_registry.entities[i];
-        EnemyMovement& movement = movement_registry.get(entity);
-        Enemy& enemy = enemy_registry.get(entity);
+	// std::cout << enemy_registry.entities.size() << " is the size of enemy entity" << std::endl;
+	for (Entity entity : enemy_registry.entities) {
+		Enemy& enemy = enemy_registry.get(entity);
+		EnemyPattern& currPattern = enemy.currEnemyPattern();
+		// std::cout << movement_registry.entities.size() << " is the size of movement entity" << std::endl;
+		// std::cout << currPattern.name << " initial" << std::endl;
+		EnemyMovement& movement = movement_registry.get(entity);
 		Motion& motion = registry.motions.get(entity);
+		currPattern.curDuration -= elapsed_ms;
+		// SENSING 
+		updateState(enemy, movement);
+		std::cout << currPattern.name << "after update" << std::endl;
 
-		if(enemy.behavior == EnemyBehavior::FOLLOW_PLAYER) {
-			movement.posB = getMove(enemy.behavior, entity);
+		// THINKING 
+		if(currPattern.type == EnemyBehavior::FOLLOW_PLAYER) {
+			movement.posB = getMove(currPattern.type, entity);
 			movement.posA = motion.position;
 			movement.distanceTraveled = 0.0f;
 		} else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB)) {
-			//pick new destination
-            movement.posA = movement.posB; 
-            movement.posB = getMove(enemy.behavior, entity);
-			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
+            movement.posA = movement.posB;
+			//ACTING 
+			std::cout << currPattern.name << "before getmove" << std::endl;
+            movement.posB = getMove(currPattern.type, entity);
+			//std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
             movement.distanceTraveled = 0.f;
+        }
+
+
+	}
+
+}
+
+Reaction* getReactions(std::vector<Reaction>& list, ReactionType target) {
+	for (Reaction& reaction : list) {
+		if (reaction.React == target) {
+			return &reaction;
+		}
+	}
+	return nullptr;
+}
+
+void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
+	vec2 playerPos = getPlayerPos();
+	vec2 EnemyPos = movement.posA;
+	float distance = glm::distance(playerPos, EnemyPos);
+	float closeDistance = 400.f;
+	float hpPercent = enemy.currHealth / enemy.maxHealth;
+	EnemyPattern& currPattern = enemy.currEnemyPattern();
+	bool reaction_found = false;
+	if (hpPercent < 0.25f) {
+		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTYFIVE_HEALTH);
+        if (reaction) {
+            enemy.patternIndex = reaction->index;
+            reaction_found = true;
+        }
+
+	} else if (hpPercent < 0.5f) {
+		auto reaction = getReactions(currPattern.reactions, ReactionType::FIFTY_HEALTH);
+        if (reaction) {
+            enemy.patternIndex = reaction->index;
+            reaction_found = true;
+        }
+
+	} else if (distance < closeDistance) {
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
+        if (reaction) {
+			std::cout << "got reaction for follow player" << std::endl;
+            enemy.patternIndex = reaction->index;
+            reaction_found = true;
+        }
+
+	} else if (hpPercent < 0.75f) {
+		auto reaction = getReactions(currPattern.reactions, ReactionType::SEVENTYFIVE_HEALTH);
+        if (reaction) {
+            enemy.patternIndex = reaction->index;
+            reaction_found = true;
+        }
+	// PLAYER BULLET CLOSE TO BE IMPELMENTED..
+	// DEFAULT STATE (CHANGE BY DURATION)
+	}
+    if (!reaction_found) {
+        std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
+        if (currPattern.curDuration < 0.f) {
+            enemy.patternIndex = currPattern.next;
+            std::cout << currPattern.next << " index currPattern.next" << std::endl;
+            currPattern.curDuration = currPattern.maxDuration;
+            std::cout << "change to " << enemy.currEnemyPattern().name << std::endl;
         }
     }
 }
+
 
 vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity) {
 	// path finding hasnt been implemented
@@ -48,20 +119,28 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity) {
 			// std::cout << "evade!" << std::endl;
 			return evadeBullet(entity);
 		case EnemyBehavior::ROTATE_IN_PLACE:
-			return registry.motions.get(entity).position;
+			return getCurrentPos(entity);
+		case EnemyBehavior::IDLE:
+			return getCurrentPos(entity);
 		default:
 			return vec2{ 0, 0 };
-	}
+	};
+};
+
+vec2 AISystem::getCurrentPos(Entity entity) {
+	EnemyMovement movement = registry.enemyMovement.get(entity);
+	return movement.posA;
 }
 
 vec2 AISystem::getNextPatrolPos(Entity entity) {
 	Enemy& enemy = registry.enemies.get(entity);
-	// std::cout << enemy.patrolPath.size() << std::endl;
-	enemy.patrolIndex += 1;
-	if (enemy.patrolPath.size() - 1 <= enemy.patrolIndex) {
-		enemy.patrolIndex = 0;
+	EnemyPattern& pattern = enemy.currEnemyPattern();
+	std::cout << "current state: " << pattern.name << std::endl;
+	pattern.pathIndex += 1;
+	if (pattern.path.size() - 1 <= pattern.pathIndex) {
+		pattern.pathIndex = 0;
 	}
-	return enemy.patrolPath[enemy.patrolIndex];
+	return pattern.path[pattern.pathIndex];
 	
 }
 

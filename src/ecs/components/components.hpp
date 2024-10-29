@@ -209,6 +209,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
+
+
 enum  GEOMETRY_BUFFER_ID : unsigned int {
 	MESH_GB = 0,
 	SPRITE = MESH_GB + 1,
@@ -217,6 +219,9 @@ enum  GEOMETRY_BUFFER_ID : unsigned int {
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	GEOMETRY_COUNT = SCREEN_TRIANGLE + 1
 };
+
+
+
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
 struct RenderRequest {

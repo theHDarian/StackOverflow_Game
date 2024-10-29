@@ -22,5 +22,6 @@ private:
     void shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst);
     void shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst);
     void shootLaser(vec2 pos, Entity enemy, AttackData atkData);
+    void attack(Entity entity, EnemyPattern& currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms);
     RenderSystem* render;
 };
