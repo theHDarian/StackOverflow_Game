@@ -1,5 +1,6 @@
 #pragma once
 #include "actor_components.hpp"
+#include "render_system.hpp"
 
 //////////////////////////////////////////
 ///////////  BulletEffects  //////////////
@@ -18,150 +19,131 @@ struct BulletStackEffect {
 };
 */
 
-
 BulletStackEffect blunt = {
 	Inert,
 	Additive,
 	0,
 	"blunt",
-	""
-};
+	""};
 
 BulletStackEffect dmgDownA = {
 	BulletDamage,
 	Additive,
 	-2.0,
 	"dmgDownA",
-	""
-};
+	""};
 
 BulletStackEffect dmgDownM = {
 	BulletDamage,
 	Multiplicative,
 	0.7,
 	"dmgDownM",
-	""
-};
+	""};
 
 BulletStackEffect numBulletsUpA = {
 	BulletNum,
 	Additive,
 	1,
 	"numBulletsUpA",
-	""
-};
+	""};
 
 BulletStackEffect sizeUpA = {
 	ProjectileSize,
 	Additive,
 	10,
 	"sizeUpA",
-	""
-};
+	""};
 
 BulletStackEffect spreadUpA = {
 	BulletSpread,
 	Additive,
 	15,
 	"spreadUpA",
-	""
-};
+	""};
 
 BulletStackEffect bulletSpeedUpA = {
-    ProjectileSpeed,
-    Additive,
-    50,
-    "speedUpA",
-    ""
-};
+	ProjectileSpeed,
+	Additive,
+	50,
+	"speedUpA",
+	""};
 
 BulletStackEffect bulletSpeedUpM = {
-    ProjectileSpeed,
-    Multiplicative,
-    1.5,
-    "speedUpM",
-    ""
-};
+	ProjectileSpeed,
+	Multiplicative,
+	1.5,
+	"speedUpM",
+	""};
 
 BulletStackEffect bulletRangeUpA = {
-    BulletRange,
-    Additive,
-    500,
-    "rangeUpA",
-    ""
-};
+	BulletRange,
+	Additive,
+	500,
+	"rangeUpA",
+	""};
 
 BulletStackEffect bulletRangeUpM = {
-    BulletRange,
-    Multiplicative,
-    1.5,
-    "rangeUpM",
-    ""
-};
+	BulletRange,
+	Multiplicative,
+	1.5,
+	"rangeUpM",
+	""};
 
 BulletStackEffect bulletBurstUpA = {
-    BulletBurst,
-    Additive,
-    1,
-    "burstUpA",
-    ""
-};
+	BulletBurst,
+	Additive,
+	1,
+	"burstUpA",
+	""};
 
 BulletStackEffect bulletBurstUpM = {
-    BulletBurst,
-    Multiplicative,
-    1.5,
-    "burstUpM",
-    ""
-};
+	BulletBurst,
+	Multiplicative,
+	1.5,
+	"burstUpM",
+	""};
 
 BulletStackEffect bulletPierceUpA = {
-    Pierce,
-    Additive,
-    1,
-    "pierceUpA",
-    ""
-};
+	Pierce,
+	Additive,
+	1,
+	"pierceUpA",
+	""};
 
 BulletStackEffect bulletPierceUpM = {
-    Pierce,
-    Multiplicative,
-    1.5,
-    "pierceUpM",
-    ""
-};
+	Pierce,
+	Multiplicative,
+	1.5,
+	"pierceUpM",
+	""};
 
 BulletStackEffect bulletBounceUpA = {
-    Bounce,
-    Additive,
-    1,
-    "bounceUpA",
-    ""
-};
+	Bounce,
+	Additive,
+	1,
+	"bounceUpA",
+	""};
 
 BulletStackEffect bulletBounceUpM = {
-    Bounce,
-    Multiplicative,
-    1.5,
-    "bounceUpM",
-    ""
-};
+	Bounce,
+	Multiplicative,
+	1.5,
+	"bounceUpM",
+	""};
 
 BulletStackEffect dashUpA = {
-    PlayerNumDash,
-    Additive,
-    1,
-    "dashUpA",
-    ""
-};
+	PlayerNumDash,
+	Additive,
+	1,
+	"dashUpA",
+	""};
 
 BulletStackEffect dashUpM = {
-    PlayerNumDash,
-    Multiplicative,
-    2,
-    "dashUpM",
-    ""
-};
+	PlayerNumDash,
+	Multiplicative,
+	2,
+	"dashUpM",
+	""};
 
 //////////////////////////////////////////
 ///////////  AttackData  /////////////////
@@ -192,14 +174,13 @@ AttackData none{
 	blunt,
 	3,
 	M_PI / 6.0,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData trail{
 	EnemyAttackPattern::TRAIL,
@@ -208,14 +189,13 @@ AttackData trail{
 	blunt,
 	1,
 	0,
-	{20,20},
+	{20, 20},
 	0,
 	10000,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	0
-};
+	0};
 
 AttackData wave{
 	EnemyAttackPattern::WAVE,
@@ -224,14 +204,13 @@ AttackData wave{
 	blunt,
 	5,
 	0,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	0
-};
+	0};
 
 AttackData laserNoRotate{
 	EnemyAttackPattern::LASER,
@@ -240,14 +219,13 @@ AttackData laserNoRotate{
 	blunt,
 	3,
 	0,
-	{20,20},
+	{20, 20},
 	0,
 	30000,
-	{0.5,0},
+	{0.5, 0},
 	0,
 	0,
-	0
-};
+	0};
 
 AttackData laserRotate{
 	EnemyAttackPattern::LASER,
@@ -256,14 +234,13 @@ AttackData laserRotate{
 	blunt,
 	3,
 	0,
-	{0,20},
+	{0, 20},
 	0,
 	8000,
-	{0.8,M_PI / 300},
+	{0.8, M_PI / 300},
 	0,
 	0,
-	0
-};
+	0};
 
 AttackData threeShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -271,15 +248,14 @@ AttackData threeShot{
 	{},
 	blunt,
 	3,
-	M_PI/6.0,
-	{20,20},
+	M_PI / 6.0,
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData sixShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -288,14 +264,13 @@ AttackData sixShot{
 	blunt,
 	6,
 	M_PI / 8,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData radial{
 	EnemyAttackPattern::BURST_RADIAL,
@@ -304,14 +279,13 @@ AttackData radial{
 	blunt,
 	40,
 	M_PI / 40,
-	{20,20},
+	{20, 20},
 	150,
 	3000,
-	{4,200},
+	{4, 200},
 	0,
 	0,
-	0
-};
+	0};
 
 AttackData fourAllAround{
 	EnemyAttackPattern::RADIAL,
@@ -319,15 +293,14 @@ AttackData fourAllAround{
 	{},
 	blunt,
 	4,
-	M_PI/4,
-	{20,20},
+	M_PI / 4,
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData twoPincerShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -336,29 +309,28 @@ AttackData twoPincerShot{
 	blunt,
 	2,
 	M_PI / 1.0,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{200,-2*M_PI/3.0},
+	{200, -2 * M_PI / 3.0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData twelveSpiralShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{},dashUpA,
+	{},
+	dashUpA,
 	12,
 	0.0,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{200,-2 * M_PI / 3.0},
+	{200, -2 * M_PI / 3.0},
 	0,
 	0,
-	0
-};
+	0};
 
 AttackData threeHomingShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -367,30 +339,28 @@ AttackData threeHomingShot{
 	blunt,
 	3,
 	M_PI / 4.0,
-	{20,20},
+	{20, 20},
 	200,
 	6000,
-	{0.0,0.0},
+	{0.0, 0.0},
 	0,
 	0,
-	0.01
-};
+	0.01};
 
 AttackData threeBurst{
 	EnemyAttackPattern::BURST,
 	CIRCLE,
-	{ numBulletsUpA},
+	{numBulletsUpA},
 	sizeUpA,
 	4,
-	M_PI/6,
-	{20,20},
+	M_PI / 6,
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData fiveBurst{
 	EnemyAttackPattern::BURST,
@@ -399,10 +369,10 @@ AttackData fiveBurst{
 	blunt,
 	6,
 	M_PI / 6,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
 	0,
@@ -415,14 +385,13 @@ AttackData threeSpray{
 	blunt,
 	3,
 	M_PI / 16,
-	{20,20},
+	{20, 20},
 	200,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	1,
-	0
-};
+	0};
 
 AttackData SniperShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -434,96 +403,126 @@ AttackData SniperShot{
 	{20, 20},
 	900,
 	3000,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	0
-};
+	0};
 
-AttackData NoAttack {
+AttackData NoAttack{
 	EnemyAttackPattern::NONE,
 	CIRCLE,
 	{},
 	blunt,
 	0,
 	0,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	{0,0},
+	{0, 0},
 	0,
 	0,
-	0
+	0};
+
+////////////////////////////////////
+//////// ENEMY SPRITE //////////////
+////////////////////////////////////
+struct SpriteData
+{
+	std::string texturePath;
+	EFFECT_ASSET_ID effectId;
+	GEOMETRY_BUFFER_ID geometryId;
+	vec2 offset;
 };
+
+SpriteData pufferFish{
+	"enemy_Pufferfish.png",
+	EFFECT_ASSET_ID::TEXTURED,
+	GEOMETRY_BUFFER_ID::SPRITE,
+	vec2(-12, 0)};
+
+SpriteData BigC 		{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+		 "none",
+		 EFFECT_ASSET_ID::MESH,
+		 GEOMETRY_BUFFER_ID::MESH_GB
+};
+
+SpriteData turret {
+	"enemy_Pufferfish.png",
+	EFFECT_ASSET_ID::TEXTURED,
+	GEOMETRY_BUFFER_ID::SPRITE,
+	vec2(-12, 0)};
 
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
 ////////////////////////////////////
 
+//////////////////////////////////
+//
+// struct EnemyPattern {
+//     // type is just like state
+//	   std::string name;
+//     EnemyBehavior type;
+//     std::vector<vec2> path;
+//     int pathIndex;
+//     float curDuration;
+//     float maxDuration;
+//     // all possible reactions in current behavior state
+//     std::vector<Reaction> reactions;
+//     int next;
+//     bool canAttack;
+//     float currAtkCD;
+//     float maxAtkCD;
+//     AttackData atkData;
+// };
+/////////////////////////////////
 
-struct EnemyEasySentry : Enemy {
-    EnemyEasySentry() {
-        attackData = {twelveSpiralShot};
+struct TestEnemy : Enemy
+{
+	Reaction reactionPatrol = {
+		ReactionType::DURATION,
+		1};
+
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0};
+	Reaction reactionPlayerClose = {
+		ReactionType::PLAYER_CLOSE,
+		2};
+	TestEnemy()
+	{
 		maxHealth = 50;
-        currHealth = maxHealth;
-        behavior = EnemyBehavior::ROTATE_IN_PLACE;
-        attackCooldown = 2000;
-		currCooldown = 0;
-        state = 10;
-    };
-};
-
-struct EnemyMediumCharge : Enemy {
-    EnemyMediumCharge() {
-        attackData = {NoAttack};
-        maxHealth = 200;
-        currHealth = maxHealth;
-        behavior = EnemyBehavior::FOLLOW_PLAYER;
-        attackCooldown = 1000;
-		currCooldown = 0;
-        state = 10;
-    };
-};
-
-struct EnemyMediumHoming : Enemy {
-    EnemyMediumHoming() {
-        attackData = {threeHomingShot};
-        maxHealth = 60;
-        currHealth = maxHealth;
-        behavior = EnemyBehavior::PATROLLING;
-        attackCooldown = 1500;
-		currCooldown = 0;
-        state = 10;
-		patrolIndex = 0;
-        patrolPath = std::vector<vec2>{
-            {400, 100}, 
-            {1000, 100}, 
-            {1000, 700}, 
-            {400, 700}
-        };
-    };
-};
-
-struct EnemyEasySniper : Enemy {
-	EnemyEasySniper() {
-		attackData = {SniperShot};
-		maxHealth = 40;
 		currHealth = maxHealth;
-		behavior = EnemyBehavior::EVADEBULLET;
-		attackCooldown = 5000;
-		currCooldown = 0;
-		state = 10;
+		enemyPatterns = {
+			{"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
+			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot},
+			{"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot}};
+		patternIndex = 0;
 	};
 };
 
-struct TestEnemy : Enemy {
-	TestEnemy() {
-		attackData = { radial };
-		maxHealth = 40;
+struct EnemyEasySentry : Enemy
+{
+	EnemyEasySentry()
+	{
+		maxHealth = 100;
 		currHealth = maxHealth;
-		behavior = EnemyBehavior::ROTATE_IN_PLACE;
-		attackCooldown = 3000;
-		currCooldown = 0;
-		state = 10;
+
+		enemyPatterns = {
+			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
+
+		patternIndex = 0;
+	};
+};
+
+struct EnemyBigC : Enemy
+{
+	EnemyBigC()
+	{
+		maxHealth = 5000;
+		currHealth = maxHealth;
+
+		enemyPatterns = {
+			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
+		patternIndex = 0;
 	};
 };
