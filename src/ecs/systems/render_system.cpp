@@ -478,8 +478,8 @@ void RenderSystem::drawImGui() {
 
 	for (int i = 0; i < registry.doors.components.size();i++) {
 		Door& d = registry.doors.components[i];
-		char type = d.isPrev ? 'P' : d.room;
-		ImGui::Text("Door %d: type %c",i,type);
+		int type = d.isPrev ? -1 : d.room;
+		ImGui::Text("Door %d: type %d",i,type);
 	}
 
 	if (ImGui::Button("Restart Game")) {

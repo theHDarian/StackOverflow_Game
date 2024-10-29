@@ -13,6 +13,7 @@ class MapSystem {
         RenderSystem* renderer;
         void resetMap();
         void changeRoom(RoomType type,int doorIndex);
+        void handleMapRequests();
 
     void loadMusic();
 

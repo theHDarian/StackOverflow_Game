@@ -1,16 +1,44 @@
 #pragma once
 #include "common.hpp"
+#include "components/actor_components.hpp"
 
 enum Side : char {
     Left = 'L',Top = 'T',Bottom = 'B',Right = 'R'
 };
 
 enum RoomType : char {
-    EnemyRoom = 'E',
-    TreasureRoom = 'T',
-    BossRoom = 'B',
-    RestRoom = 'R',
-    None = 'N'
+    EnemyRoomDash,
+    EnemyRoomBulletSize,
+    EnemyRoomDmg,
+    EnemyRoomSpeed,
+    TreasureRoom,
+    RestRoom,
+    BossBigC,
+    None //Keep None at the end of the list to be compatible with existing get random function
+};
+
+enum SpecialEvent { BouncingDisc };
+enum RoomProp { Plant1 };
+enum BossType { BigC };
+
+struct EnemyRoomPreset {
+    std::vector<std::tuple<EnemyType,vec2>> enemies;
+    float spawnDelay; //in seconds
+    std::vector<SpecialEvent> specialEvents;
+    std::vector<std::tuple<RoomProp,vec2>> roomProps;
+    int numSpecialBulletsToSpawn = 5;
+};
+
+struct RestingRoomPreset {
+    vec2 rebootStationLocation;
+};
+struct TreasureRoomPreset { 
+    BulletStackEffect effect;
+};
+struct BossRoomPreset {
+    vec2 spawnLocation;
+    BossType boss;
+    float spawnDelay;
 };
 
 struct Door {
@@ -19,9 +47,16 @@ struct Door {
     vec2 startPos, endPos;
 };
 
+enum RoomFormatType {EnemyFT,RestingFT,TreasureFT,BossFT};
 struct Room {
-    RoomType type;
-    int variant; // the variant within the room type
+    RoomFormatType formatType;
+    union Preset { //the room preset can be one of 3 formats
+        EnemyRoomPreset* enemy;
+        RestingRoomPreset* resting;
+        TreasureRoomPreset* treasure;
+        BossRoomPreset* boss;
+        Preset(){}
+    } preset;
     bool cleared;
     float timeElapsed; //time passed since enter room in seconds
 };

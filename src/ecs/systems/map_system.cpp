@@ -5,6 +5,8 @@
 #include "utils/random.hpp"
 #include "SDL.h"
 
+#include "components/presets/room_presets.hpp"
+
 
 
 MapSystem::MapSystem() {
@@ -75,8 +77,47 @@ void MapSystem::loadMusic () {
 void MapSystem::step(float elapsed_ms) {
     Map& map = registry.maps.components[0];
     map.currRoom.timeElapsed += elapsed_ms / 1000.0f;
-    //switch rooms if needed
 
+    handleMapRequests();
+
+    //spawn enemy based on current time 
+    WindowState& wS = registry.windowStates.components[0];
+    switch(map.currRoom.formatType) {
+        case RoomFormatType::EnemyFT: {
+            //spawn enemies
+            if (map.currRoom.preset.enemy != nullptr && map.currRoom.timeElapsed > map.currRoom.preset.enemy->spawnDelay) {
+                for (auto& e : map.currRoom.preset.enemy->enemies) {
+                    createEnemy(renderer,std::get<vec2>(e) * vec2(wS.width,wS.height),std::get<EnemyType>(e));
+                }
+                map.currRoom.preset.enemy = nullptr;
+            }
+            //handle special events
+            map.currRoom.preset.enemy->specialEvents;
+            break;
+        }
+        case RoomFormatType::BossFT: {
+            if (map.currRoom.preset.boss != nullptr  && map.currRoom.timeElapsed > map.currRoom.preset.boss->spawnDelay) {
+                createBoss(renderer, map.currRoom.preset.boss->spawnLocation * vec2(wS.width,wS.height),map.currRoom.preset.boss->boss);
+                map.currRoom.preset.boss = nullptr;
+            }
+            break;
+        }
+        case RoomFormatType::RestingFT:
+        case RoomFormatType::TreasureFT:
+            break;
+        default: {
+            throw 'invalid format';
+        }
+    }
+
+    //set room to cleared if all enemies are defeated
+    if ((map.currRoom.formatType != RoomFormatType::EnemyFT|| (map.currRoom.preset.enemy == nullptr && registry.enemies.entities.empty()))
+    && (map.currRoom.formatType != RoomFormatType::BossFT || (map.currRoom.preset.boss == nullptr && registry.enemies.entities.empty()))) {
+        map.currRoom.cleared = true;
+    }
+}
+
+void MapSystem::handleMapRequests() {
     if (registry.mapRequests.components.size() > 0) {
         auto& r =registry.mapRequests.components[0];
         if (r.requestType == MapRequestType::ChangeRoom) {
@@ -86,16 +127,6 @@ void MapSystem::step(float elapsed_ms) {
             resetMap();
         registry.mapRequests.clear();
     }
-
-    //spawn enemy based on current time 
-    WindowState& wS = registry.windowStates.components[0];
-    // std::cout << " enemy size " << registry.enemies.size() << std::endl;
-	if (registry.enemies.size() <= 0) {
-			createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::TestEnemyType);
-			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
-			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
-			//createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
-	}
 }
 
 void clearRoomActors() {
@@ -117,19 +148,24 @@ void clearRoomActors() {
 
     registry.emitParticles.emplace(Entity(),ParticleRequestType::ClearParticles,0.0f,0);
 }
-RoomType getRandomRoomType(bool includeNone) {
-    int r = Random::Float() * 4;
-    if (r > 3) return RoomType::TreasureRoom;
-    if (r > 2) return RoomType::RestRoom;
-    if (r > 1) return RoomType::EnemyRoom;
-    
-    return includeNone ? RoomType::None : RoomType::EnemyRoom;
+
+RoomType randomRoomType(bool excludeNone) {
+    return RoomType::BossBigC;
+    return static_cast<RoomType>(rand() % (excludeNone ? RoomType::None - 1 : RoomType::None));
+}
+RoomFormatType getFormatTypeFromRoomType(RoomType rt) {
+    if (rt == RoomType::BossBigC) return RoomFormatType::BossFT;
+    if (rt == RoomType::None) assert(false);
+    if (rt == RoomType::RestRoom) return RoomFormatType::TreasureFT;
+    if (rt == RoomType::RestRoom) return RoomFormatType::RestingFT;
+    return RoomFormatType::EnemyFT;
 }
 
 void MapSystem::changeRoom(RoomType type, int doorIndex) {
     std::vector<Door>& doors = registry.doors.components;
+    Map& map = registry.maps.components[0];
     Door& door = doors[doorIndex];
-    if (door.room == RoomType::None) return;
+    if (door.room == RoomType::None || !map.currRoom.cleared) return;
 
     nextMusic();
     
@@ -150,40 +186,50 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
     clearRoomActors();
 
     //change current room in the map
-    Map& map = registry.maps.components[0];
     Entity ent = registry.maps.entities[0];
-    map.currRoom.type = type;
-    map.currRoom.variant = 0;
+    map.currRoom.formatType = getFormatTypeFromRoomType(door.room);
+    map.currRoom.preset.enemy = nullptr;
+    map.currRoom.preset.resting = nullptr;
+    map.currRoom.preset.treasure = nullptr;
+    if (map.currRoom.formatType == RoomFormatType::EnemyFT) {
+        map.currRoom.preset.enemy = getEnemyRoom(door.room);
+    } else if (map.currRoom.formatType == RoomFormatType::BossFT) {
+        map.currRoom.preset.boss = getBossRoom(door.room);
+    } else if (map.currRoom.formatType == RoomFormatType::RestingFT) { 
+        map.currRoom.preset.resting = getRestingRoom(); 
+    } else {
+        map.currRoom.preset.treasure = getTreasureRoom(); 
+    }
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
 
     map.roomsTraversed++;
     
-    //copy room type
+    //randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room; 
     doors[spawnIndex].isPrev = true;
 
-    bool includeNone = true;
+    bool excludeNone = false;
     for (int i = 0; i < doors.size(); i++) {
         //reset previous room type 
         if (i == spawnIndex) continue;
 
         Door& d = registry.doors.components[i];
-        d.room = getRandomRoomType(includeNone);
+        d.room = randomRoomType(excludeNone);
         d.isPrev = false;
         if (d.room == RoomType::None) 
-            includeNone = false;
+            excludeNone = true;
     }
 }
 
 void MapSystem::resetMap() {
     clearRoomActors();
 
-    bool includeNone = true;
+    bool excludeNone = false;
     for (Door& d: registry.doors.components) {
-        d.room = getRandomRoomType(includeNone);
+        d.room = randomRoomType(excludeNone);
         if (d.room == RoomType::None) 
-            includeNone = false;
+            excludeNone = true;
     }
 
     for (Door& d : registry.doors.components) {
@@ -194,12 +240,11 @@ void MapSystem::resetMap() {
     map.currRegion = MapRegion::Tutorial;
     map.roomsTraversed = 0;
 
-    map.currRoom.type = RoomType::EnemyRoom;
-    map.currRoom.variant = 0;
+    //set initial room to enemy
+    map.currRoom.formatType = RoomFormatType::EnemyFT;
+    map.currRoom.preset.enemy = getEnemyRoom(RoomType::EnemyRoomDash);
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
-
-    createBigC(renderer, vec2(600, 600));
 }
 
 void MapSystem::nextMusic() {

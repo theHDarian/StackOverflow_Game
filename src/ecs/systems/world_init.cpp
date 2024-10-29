@@ -220,6 +220,14 @@ Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> p
 
 	return entity;
 }
+Entity createBoss(RenderSystem* renderer, vec2 position,BossType boss) {
+	switch(boss) {
+		case BossType::BigC:
+			return createBigC(renderer,position);
+		default:
+			throw "invalid boss";
+	}
+}
 
 // mesh enemy that doesn't do anything
 Entity createBigC(RenderSystem* renderer, vec2 position) {

@@ -3,6 +3,7 @@
 #include "common.hpp"
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
+#include "map_components.hpp"
 
 // These are hardcoded to the dimensions of the entity texture
 // BB = bounding box
@@ -15,6 +16,8 @@ Entity resetPlayer();
 Entity createAimIndicator(RenderSystem* renderer);
 // basic enemy
 Entity createBigC(RenderSystem* renderer, vec2 pos);
+
+Entity createBoss(RenderSystem* renderer, vec2 pos, BossType boss);
 
 // Wall for testing, denoted by 2 blobs
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);

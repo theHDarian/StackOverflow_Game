@@ -19,7 +19,7 @@ struct BulletStackEffect {
 */
 
 
-BulletStackEffect blunt = {
+const BulletStackEffect blunt = {
 	Inert,
 	Additive,
 	0,
@@ -27,7 +27,7 @@ BulletStackEffect blunt = {
 	""
 };
 
-BulletStackEffect dmgDownA = {
+const BulletStackEffect dmgDownA = {
 	BulletDamage,
 	Additive,
 	-2.0,
@@ -35,7 +35,7 @@ BulletStackEffect dmgDownA = {
 	""
 };
 
-BulletStackEffect dmgDownM = {
+const BulletStackEffect dmgDownM = {
 	BulletDamage,
 	Multiplicative,
 	0.7,
@@ -43,7 +43,7 @@ BulletStackEffect dmgDownM = {
 	""
 };
 
-BulletStackEffect numBulletsUpA = {
+const BulletStackEffect numBulletsUpA = {
 	BulletNum,
 	Additive,
 	1,
@@ -51,7 +51,7 @@ BulletStackEffect numBulletsUpA = {
 	""
 };
 
-BulletStackEffect sizeUpA = {
+const BulletStackEffect sizeUpA = {
 	ProjectileSize,
 	Additive,
 	10,
@@ -59,7 +59,7 @@ BulletStackEffect sizeUpA = {
 	""
 };
 
-BulletStackEffect spreadUpA = {
+const BulletStackEffect spreadUpA = {
 	BulletSpread,
 	Additive,
 	15,
@@ -67,7 +67,7 @@ BulletStackEffect spreadUpA = {
 	""
 };
 
-BulletStackEffect bulletSpeedUpA = {
+const BulletStackEffect bulletSpeedUpA = {
     ProjectileSpeed,
     Additive,
     50,
@@ -75,7 +75,7 @@ BulletStackEffect bulletSpeedUpA = {
     ""
 };
 
-BulletStackEffect bulletSpeedUpM = {
+const BulletStackEffect bulletSpeedUpM = {
     ProjectileSpeed,
     Multiplicative,
     1.5,
@@ -83,7 +83,7 @@ BulletStackEffect bulletSpeedUpM = {
     ""
 };
 
-BulletStackEffect bulletRangeUpA = {
+const BulletStackEffect bulletRangeUpA = {
     BulletRange,
     Additive,
     500,
@@ -91,7 +91,7 @@ BulletStackEffect bulletRangeUpA = {
     ""
 };
 
-BulletStackEffect bulletRangeUpM = {
+const BulletStackEffect bulletRangeUpM = {
     BulletRange,
     Multiplicative,
     1.5,
@@ -99,7 +99,7 @@ BulletStackEffect bulletRangeUpM = {
     ""
 };
 
-BulletStackEffect bulletBurstUpA = {
+const BulletStackEffect bulletBurstUpA = {
     BulletBurst,
     Additive,
     1,
@@ -107,7 +107,7 @@ BulletStackEffect bulletBurstUpA = {
     ""
 };
 
-BulletStackEffect bulletBurstUpM = {
+const BulletStackEffect bulletBurstUpM = {
     BulletBurst,
     Multiplicative,
     1.5,
@@ -115,7 +115,7 @@ BulletStackEffect bulletBurstUpM = {
     ""
 };
 
-BulletStackEffect bulletPierceUpA = {
+const BulletStackEffect bulletPierceUpA = {
     Pierce,
     Additive,
     1,
@@ -123,7 +123,7 @@ BulletStackEffect bulletPierceUpA = {
     ""
 };
 
-BulletStackEffect bulletPierceUpM = {
+const BulletStackEffect bulletPierceUpM = {
     Pierce,
     Multiplicative,
     1.5,
@@ -131,7 +131,7 @@ BulletStackEffect bulletPierceUpM = {
     ""
 };
 
-BulletStackEffect bulletBounceUpA = {
+const BulletStackEffect bulletBounceUpA = {
     Bounce,
     Additive,
     1,
@@ -139,7 +139,7 @@ BulletStackEffect bulletBounceUpA = {
     ""
 };
 
-BulletStackEffect bulletBounceUpM = {
+const BulletStackEffect bulletBounceUpM = {
     Bounce,
     Multiplicative,
     1.5,
@@ -147,7 +147,7 @@ BulletStackEffect bulletBounceUpM = {
     ""
 };
 
-BulletStackEffect dashUpA = {
+const BulletStackEffect dashUpA = {
     PlayerNumDash,
     Additive,
     1,
@@ -155,7 +155,7 @@ BulletStackEffect dashUpA = {
     ""
 };
 
-BulletStackEffect dashUpM = {
+const BulletStackEffect dashUpM = {
     PlayerNumDash,
     Multiplicative,
     2,
@@ -185,7 +185,7 @@ struct AttackData {
 };
 */
 
-AttackData none{
+const AttackData  none{
 	EnemyAttackPattern::NONE,
 	CIRCLE,
 	{},
@@ -201,7 +201,7 @@ AttackData none{
 	0
 };
 
-AttackData trail{
+const AttackData  trail{
 	EnemyAttackPattern::TRAIL,
 	CIRCLE,
 	{},
@@ -217,7 +217,7 @@ AttackData trail{
 	0
 };
 
-AttackData wave{
+const AttackData  wave{
 	EnemyAttackPattern::WAVE,
 	CIRCLE,
 	{},
@@ -233,7 +233,7 @@ AttackData wave{
 	0
 };
 
-AttackData laserNoRotate{
+const AttackData  laserNoRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
 	{},
@@ -249,7 +249,7 @@ AttackData laserNoRotate{
 	0
 };
 
-AttackData laserRotate{
+const AttackData  laserRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
 	{},
@@ -265,7 +265,7 @@ AttackData laserRotate{
 	0
 };
 
-AttackData threeShot{
+const AttackData  threeShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
 	{},
@@ -281,7 +281,7 @@ AttackData threeShot{
 	0
 };
 
-AttackData sixShot{
+const AttackData  sixShot{
 	EnemyAttackPattern::SHOTGUN,
 	RECTANGLE,
 	{},
@@ -297,7 +297,7 @@ AttackData sixShot{
 	0
 };
 
-AttackData radial{
+const AttackData  radial{
 	EnemyAttackPattern::BURST_RADIAL,
 	CIRCLE,
 	{numBulletsUpA, sizeUpA},
@@ -313,7 +313,7 @@ AttackData radial{
 	0
 };
 
-AttackData fourAllAround{
+const AttackData  fourAllAround{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
 	{},
@@ -329,7 +329,7 @@ AttackData fourAllAround{
 	0
 };
 
-AttackData twoPincerShot{
+const AttackData  twoPincerShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
 	{},
@@ -345,7 +345,7 @@ AttackData twoPincerShot{
 	0
 };
 
-AttackData twelveSpiralShot{
+const AttackData  twelveSpiralShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
 	{},dashUpA,
@@ -360,7 +360,7 @@ AttackData twelveSpiralShot{
 	0
 };
 
-AttackData threeHomingShot{
+const AttackData  threeHomingShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
 	{dmgDownA, dmgDownM},
@@ -376,7 +376,7 @@ AttackData threeHomingShot{
 	0.01
 };
 
-AttackData threeBurst{
+const AttackData  threeBurst{
 	EnemyAttackPattern::BURST,
 	CIRCLE,
 	{ numBulletsUpA},
@@ -392,7 +392,7 @@ AttackData threeBurst{
 	0
 };
 
-AttackData fiveBurst{
+const AttackData  fiveBurst{
 	EnemyAttackPattern::BURST,
 	CIRCLE,
 	{},
@@ -408,7 +408,7 @@ AttackData fiveBurst{
 	0,
 };
 
-AttackData threeSpray{
+const AttackData  threeSpray{
 	EnemyAttackPattern::SPRAY,
 	CIRCLE,
 	{},
@@ -424,7 +424,7 @@ AttackData threeSpray{
 	0
 };
 
-AttackData SniperShot{
+const AttackData  SniperShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
 	{},
@@ -440,7 +440,7 @@ AttackData SniperShot{
 	0
 };
 
-AttackData NoAttack {
+const AttackData  NoAttack {
 	EnemyAttackPattern::NONE,
 	CIRCLE,
 	{},
