@@ -744,7 +744,7 @@ float getModifiedValue(BulletEffectType bf, float value)
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData) {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
-	float prob = 0.1f;
+	float prob = 0.1f * (1.0f / registry.enemies.components.size()); //reduce probability to spawn if there are more enemies
 	Map& map = registry.maps.components[0];
 
 	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.numSpecialBulletsLeft > 0) {
