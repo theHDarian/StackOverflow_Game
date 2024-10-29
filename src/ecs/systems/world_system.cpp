@@ -9,6 +9,7 @@
 #include <glm/detail/func_trigonometric.inl>
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include <time.h>
 
 #include "physics_system.hpp"
 
@@ -161,6 +162,7 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	gameState.dialogueScene = false;
 
 	WindowState& wS = registry.windowStates.components[0];
+	wS.currUnixTime = time(NULL);
 	currentSpeed = 1.f;
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
@@ -180,6 +182,18 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	WindowState& ws = registry.windowStates.components[0];
+	if (time(NULL) - ws.currUnixTime > 1.0f) {
+		ws.fps = ws.numFramesThisSecond;
+		ws.numFramesThisSecond = 0;
+		ws.currUnixTime = time(NULL);
+
+		char title[256]; // Buffer for the title string
+    	snprintf(title, sizeof(title), "StackOverflow (FPS: %.0f)", ws.fps);
+		glfwSetWindowTitle(window,title);
+	} else {
+		ws.numFramesThisSecond++;
+	}
 	// Processing inputs
 	handleInput();
 
