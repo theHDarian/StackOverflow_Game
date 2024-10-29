@@ -193,8 +193,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex) {
     map.currRoom.preset.treasure = nullptr;
     if (map.currRoom.formatType == RoomFormatType::EnemyFT) {
         map.currRoom.preset.enemy = getEnemyRoom(door.room);
+        map.currRoom.numSpecialBulletsLeft = map.currRoom.preset.enemy->numSpecialBulletsToSpawn;
     } else if (map.currRoom.formatType == RoomFormatType::BossFT) {
         map.currRoom.preset.boss = getBossRoom(door.room);
+        map.currRoom.numSpecialBulletsLeft = map.currRoom.preset.boss->numSpecialBulletsToSpawn;
     } else if (map.currRoom.formatType == RoomFormatType::RestingFT) { 
         map.currRoom.preset.resting = getRestingRoom(); 
     } else {
@@ -245,6 +247,7 @@ void MapSystem::resetMap() {
     map.currRoom.preset.enemy = getEnemyRoom(RoomType::EnemyRoomDash);
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
+    map.currRoom.numSpecialBulletsLeft = map.currRoom.preset.enemy->numSpecialBulletsToSpawn;
 }
 
 void MapSystem::nextMusic() {

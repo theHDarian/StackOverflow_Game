@@ -3,6 +3,7 @@
 #include <glm/trigonometric.hpp>
 #include "premades.hpp"
 #include "ai_system.hpp"
+#include "utils/random.hpp"
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos)
 {
@@ -743,7 +744,11 @@ float getModifiedValue(BulletEffectType bf, float value)
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData) {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
-	if (atkData.rareBulletEffects.size() > 0) {
+	float prob = 0.1f;
+	Map& map = registry.maps.components[0];
+
+	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.numSpecialBulletsLeft > 0) {
+		registry.maps.components[0].currRoom.numSpecialBulletsLeft--;
 		return atkData.rareBulletEffects;
 	}
 	return { atkData.defaultEffect };

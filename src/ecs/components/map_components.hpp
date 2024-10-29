@@ -39,6 +39,7 @@ struct BossRoomPreset {
     vec2 spawnLocation;
     BossType boss;
     float spawnDelay;
+    int numSpecialBulletsToSpawn = 2;
 };
 
 struct Door {
@@ -59,6 +60,7 @@ struct Room {
     } preset;
     bool cleared;
     float timeElapsed; //time passed since enter room in seconds
+    int numSpecialBulletsLeft;
 };
 enum MapRequestType {
     RestartGame = 'R',

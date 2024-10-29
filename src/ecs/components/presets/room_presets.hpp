@@ -29,9 +29,10 @@ const TreasureRoomPreset TreasureRoom1 {
     sizeUpA
 };
 const BossRoomPreset BossRoomBigC {
-    {0.5,0.5},
+    {0.5,0.5}, //position
     BossType::BigC,
-    5.0f
+    5.0f, //delay
+    0 //special bullet count
 };
 
 const std::vector<EnemyRoomPreset> enemyRoomDashList = { EnemyRoomDash1 };

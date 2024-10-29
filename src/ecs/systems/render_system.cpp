@@ -441,6 +441,7 @@ void RenderSystem::drawImGui() {
 	int menuWidth = 200;
 	IOState& ioState = registry.ioStates.components[0];
 	WindowState& windowState = registry.windowStates.components[0];
+	Map& map = registry.maps.components[0];
 	// std::cout << windowState.width << " " << windowState.height << std::endl;
 
 	ImGui_ImplOpenGL3_NewFrame();
@@ -458,7 +459,8 @@ void RenderSystem::drawImGui() {
 	
 	// STACK INFORMATION
 	StackCompile& sc = registry.stackCompile.components[0];
-	ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	// ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	ImGui::Text("S. Bullets Left: %d",map.currRoom.numSpecialBulletsLeft);
 	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
 	ImGui::BeginChild("AdditiveContent",ImVec2(180,80),true);
 		std::map<BulletEffectType, float>::iterator it;
