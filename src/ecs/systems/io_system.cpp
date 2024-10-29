@@ -36,10 +36,10 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	#endif
     IOState& ioState = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
 		gameState.gamePaused = !gameState.gamePaused;
 	}
-	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		ioState.shouldEnd = true;
 	}
 
