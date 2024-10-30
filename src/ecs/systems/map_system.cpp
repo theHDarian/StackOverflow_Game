@@ -103,8 +103,8 @@ void MapSystem::step(float elapsed_ms)
     if (registry.enemies.size() == 0)
     {
         createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::TestRevampedEnemy);
-        // createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyHoming);
-        // createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
+        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
+        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::BossBigC);
         // createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
     }
 }

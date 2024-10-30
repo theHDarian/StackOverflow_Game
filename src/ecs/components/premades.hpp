@@ -444,6 +444,7 @@ AttackData NoAttack{
 ////////////////////////////////////
 struct SpriteData
 {
+	
 	std::string texturePath;
 	EFFECT_ASSET_ID effectId;
 	GEOMETRY_BUFFER_ID geometryId;
@@ -456,14 +457,14 @@ SpriteData pufferFish{
 	GEOMETRY_BUFFER_ID::SPRITE,
 	vec2(-12, 0)};
 
-SpriteData BigC 		{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+SpriteData bigC 		{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
 		 "none",
 		 EFFECT_ASSET_ID::MESH,
 		 GEOMETRY_BUFFER_ID::MESH_GB
 };
 
 SpriteData turret {
-	"enemy_Pufferfish.png",
+	"enemy_Turret.png",
 	EFFECT_ASSET_ID::TEXTURED,
 	GEOMETRY_BUFFER_ID::SPRITE,
 	vec2(-12, 0)};
@@ -513,6 +514,8 @@ struct TestEnemy : Enemy
 			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot},
 			{"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot}};
 		patternIndex = 0;
+		sprite = SpriteName::PUFFERFISHSPRITE;
+		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
 
@@ -527,6 +530,8 @@ struct EnemyEasySentry : Enemy
 			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
 
 		patternIndex = 0;
+		sprite = SpriteName::TURRETSPRITE;
+		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
 
@@ -541,5 +546,7 @@ struct EnemyBigC : Enemy
 		enemyPatterns = {
 			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
 		patternIndex = 0;
+		sprite = SpriteName::BIGCSPRITE;
+		scale = vec2({700 * (1.923352 / 2.f), 700});
 	};
 };

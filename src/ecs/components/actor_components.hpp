@@ -207,7 +207,8 @@ enum EnemyType {
     // MediumEnemyHoming,
     // EasyEnemySniper,
     // HardEnemyBehavior
-    TestRevampedEnemy
+    TestRevampedEnemy,
+    BossBigC
 };
 
 enum class EnemyAttackPattern {
@@ -252,6 +253,8 @@ enum class EnemyBehavior {
     // this is the basic
     RANDOM,
     FOLLOW_PLAYER,
+    RETREAT,
+    ANGRY,
     PATROLLING,
     EVADEBULLET,
     CIRCLINGPLAYER,
@@ -296,6 +299,20 @@ struct EnemyPattern {
     AttackData atkData;
 };
 
+enum SpriteName {
+    PUFFERFISHSPRITE,
+    TURRETSPRITE,
+    BIGCSPRITE,
+    CRABSPRITE,
+    ANGELSPRITE,
+    WIZARDSPRITE,
+    TANKSPRITE,
+    SWORDSPRITE,
+    SKULLSPRITE,
+    QUADSHOOTERSPRITE,
+    MAGNETSPRITE
+};
+
 
 
 // anything that is deadly to the player
@@ -309,6 +326,8 @@ struct Enemy {
     EnemyPattern& currEnemyPattern() {
         return enemyPatterns[patternIndex];
     };
+    vec2 scale;
+    SpriteName sprite;
 };
 
 struct EnemyMovement {

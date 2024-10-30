@@ -243,7 +243,6 @@ Entity createBigC(RenderSystem *renderer, vec2 position)
 	enemy.maxHealth = 1000;
 	enemy.currHealth = enemy.maxHealth;
 
-
 	EnemyMovement &movement = registry.enemyMovement.emplace(entity);
 	movement.angularSpeed = 3;
 	movement.posA = position;
@@ -287,11 +286,28 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 	return entity;
 };
 
+SpriteData getSprite(SpriteName name)
+{
+	switch (name)
+	{
+	case SpriteName::PUFFERFISHSPRITE:
+	{
+		return pufferFish;
+	}
+	case SpriteName::TURRETSPRITE:
+	{
+		return turret;
+	}
+	case SpriteName::BIGCSPRITE:
+	{
+		return bigC;
+	}
+	}
+}
+
 Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 {
 	auto entity = Entity();
-	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
 
 	// std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
 	Enemy &enemy = registry.enemies.emplace(entity);
@@ -308,6 +324,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyEasySentry();
 		break;
 	}
+	case EnemyType::BossBigC:
+	{
+		enemy = EnemyBigC();
+		break;
+	}
+
 		// case EnemyType::MediumEnemyCharge: {
 		//     enemy = EnemyMediumCharge();
 		//     break;
@@ -326,7 +348,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	motion.angle = 0.f;
 	motion.position = pos;
 	motion.velocity = vec2(0, 0);
-	motion.scale = vec2({288.0f / 2, 240.0f / 2});
+	motion.scale = enemy.scale;
 
 	EnemyMovement &movement = registry.enemyMovement.emplace(entity);
 	movement.posA = pos;
@@ -357,18 +379,30 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	// 		registry.bursts.emplace(entity);
 	// 	}
 	// }
-
-	CircleCollider &cc = registry.circleColliders.emplace(entity);
-	cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
+	SpriteData sprite = getSprite(enemy.sprite);
+	if (sprite.effectId == EFFECT_ASSET_ID::TEXTURED)
+	{
+		CircleCollider &cc = registry.circleColliders.emplace(entity);
+		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
+		Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+		registry.meshPtrs.emplace(entity, &mesh);
+	}
+	else
+	{
+		// std::cout << "should have create bigC, the png is:" << sprite.texturePath << std::endl;
+		registry.meshColliders.emplace(entity);
+		Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::MESH_GB);
+		registry.meshPtrs.emplace(entity, &mesh);
+	}
 
 	registry.renderRequests.insert(
 		entity,
 		{
-			"enemy_Pufferfish.png",
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE,
-			true,
-			vec2(-12, 0) // manually set an offset for now
+			sprite.texturePath,
+			sprite.effectId,
+			sprite.geometryId,
+			// true,
+			// vec2(-12, 0) // manually set an offset for now
 		});
 
 	return entity;
