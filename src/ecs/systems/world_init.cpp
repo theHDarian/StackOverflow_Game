@@ -39,12 +39,15 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 		entity,
 		{
 			//playerSprites.sprites[SPRITE_STATE::BASE],
-			"mcv1_base.png",
-			EFFECT_ASSET_ID::TEXTURED,
+			//"mcv1_base.png",
+			"mc_walkv1_0000 (2).png",
+			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 	// can play around with offset to try to align sprite
 	rr.offset = vec2(-5, 0);
+
+	registry.animations.emplace(entity);
 
 	return entity;
 }

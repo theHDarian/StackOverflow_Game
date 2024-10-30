@@ -149,6 +149,62 @@ void RenderSystem::initializeGlTextures()
 	}
 	name_to_texture.insert({ "none", -1});
 	gl_has_errors();
+
+	// hard code 1 animation texture array for now
+	std::cout << " the value of i is " << i << std::endl;
+	glGenTextures(1, &texture_gl_handles.data()[i]);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_gl_handles.data()[i]); // append to end for now
+
+	// start by loading all images
+	const std::string base2 = data_path() + "/animations/";
+	uint image_index = 0;
+	uint image_count = 0;
+	int width = 1;
+	int height = 1;
+
+	// too lazy, just count images first
+	for (const auto& entry : directory_iterator(base2)) {
+		image_count++;
+	}
+
+	for (const auto& entry : directory_iterator(base2))
+	{
+		const std::string& path = entry.path().string();
+
+		stbi_uc* data;
+		data = stbi_load(path.c_str(), &width, &height, NULL, 4);
+
+		if (data == NULL)
+		{
+			const std::string message = "Could not load the file " + path + ".";
+			fprintf(stderr, "%s", message.c_str());
+			assert(false);
+		}
+
+		if (image_index == 0) {
+			std::string copy = path;
+			name_to_texture.insert({ copy.substr(base2.length() - 1), i });
+			//std::cout << "this is what the name is! " << copy.substr(base2.length() - 1) << std::endl;
+			texture_dimensions[i] = ivec2(width, height);
+			// initialize texture array
+			glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, image_count);
+		}
+
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, image_index, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		stbi_image_free(data);
+		
+		gl_has_errors();
+		image_index++;
+	}
+	gl_has_errors();
+	
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
+	gl_has_errors();
+
 }
 
 void RenderSystem::initializeGlEffects()
