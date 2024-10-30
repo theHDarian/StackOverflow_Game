@@ -57,7 +57,7 @@ struct Player
 
     int maxDashCharges = baseDashNum;
 
-    float currDashCooldown = 0.0f;
+    float currDashCooldown = baseDashCDR;
     float dashCooldown = baseDashCDR;
 
     int bulletCluster = 1;

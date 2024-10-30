@@ -19,7 +19,7 @@ enum RoomType : char {
 
 enum SpecialEvent { BouncingDisc };
 enum RoomProp { Plant1 };
-enum BossType { BigC };
+enum BossType { BigCBoss };
 
 struct EnemyRoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;

@@ -222,7 +222,7 @@ Entity createBoss(RenderSystem *renderer, vec2 position, BossType boss)
 {
 	switch (boss)
 	{
-	case BossType::BigC:
+	case BossType::BigCBoss:
 		return createBigC(renderer, position);
 	default:
 		throw "invalid boss";

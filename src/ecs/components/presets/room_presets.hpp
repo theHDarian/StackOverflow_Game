@@ -30,7 +30,7 @@ const TreasureRoomPreset TreasureRoom1 {
 };
 const BossRoomPreset BossRoomBigC {
     {0.5,0.5}, //position
-    BossType::BigC,
+    BossType::BigCBoss,
     5.0f, //delay
     0 //special bullet count
 };
