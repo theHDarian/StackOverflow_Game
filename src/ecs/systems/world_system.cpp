@@ -205,27 +205,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
 
-	// Remove entities that leave the screen on the left side
-	// Iterate backwards to be able to remove without unterfering with the next object to visit
-	// (the containers exchange the last element with the current)
-	// for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
-	//     Motion& motion = motions_registry.components[i];
-	// 	if (motion.position.x + abs(motion.scale.x) < 0.f) {
-	// 		if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
-	// 			registry.remove_all_components_of(motions_registry.entities[i]);
-	// 	}
-	// }
-	//
-	// place sprite timer progression here for now
-	//for (auto& entity : registry.spriteTimers.entities) {
-	//	auto& spriteTimer = registry.spriteTimers.get(entity);
-	//	spriteTimer.count_ms -= elapsed_ms_since_last_update;
-	//	if (spriteTimer.count_ms <= 0) {
-	//		registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
-	//		registry.spriteTimers.remove(entity);
-	//	}
-	//}
-
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
 	movePlayer();
@@ -635,16 +614,6 @@ float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 }
 
 void WorldSystem::handlePlayerHit(Entity& other) {
-	//change sprite
-	//auto& spriteMap = registry.sprites.get(player).sprites;
-	//if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
-	//	registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
-	//	if (!registry.spriteTimers.has(player)) {
-	//		auto& spriteTimer = registry.spriteTimers.emplace(player);
-	//		spriteTimer.count_ms = 300;
-	//		spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
-	//	}
-	//}
 	//play hit sound
 	Mix_PlayChannel(3, playerHurtSound, 0);
 	Mix_Volume(3, playerHurtSound->volume * MIX_MAX_VOLUME);

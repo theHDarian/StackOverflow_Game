@@ -33,12 +33,9 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	registry.stackCompile.emplace(entity);
 
 	// add player sprite
-	Sprites &playerSprites = registry.sprites.emplace(entity);
-	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
-	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
 	RenderRequest &rr = registry.renderRequests.insert(
 		entity,
-		{// playerSprites.sprites[SPRITE_STATE::BASE],
+		{
 		 "mcv1_base.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
@@ -78,8 +75,6 @@ Entity createAimIndicator(RenderSystem *renderer)
 	auto aimIndicator = Entity();
 	Motion &aimMotion = registry.motions.emplace(aimIndicator);
 	aimMotion.scale = {30, 30};
-	Sprites &indicatorSprites = registry.sprites.emplace(aimIndicator);
-	indicatorSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::AIM_INDICATOR;
 	registry.renderRequests.insert(
 		aimIndicator,
 		{"aim_indicator.png",
@@ -141,14 +136,33 @@ void createRoomBounds(RenderSystem *renderer)
 	WindowState &wS = registry.windowStates.components[0];
 
 	Entity bounds[4];
-	bounds[0] = createTestWall(renderer, {0, 0}, {wS.width, 0});
-	bounds[1] = createTestWall(renderer, {wS.width, 0}, {wS.width, wS.height});
-	bounds[2] = createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
-	bounds[3] = createTestWall(renderer, {0, wS.height}, {0, 0});
+	std::vector<std::array<vec2,2>> wallPositions = {
+		{vec2(0, 0), vec2(wS.width, 0)},
+		{vec2(wS.width, 0), vec2(wS.width, wS.height)},
+		{vec2(wS.width, wS.height), vec2(0, wS.height)},
+		{vec2(0, wS.height), vec2(0, 0)}
+	};
+	for (auto& p : wallPositions) {
+		vec2 startPosition = p[0];
+		vec2 endPosition = p[1];
+		auto entity = Entity();
 
-	for (Entity b : bounds)
-	{
-		registry.bounds.emplace(b);
+		auto &motion = registry.motions.emplace(entity);
+		motion.position = (startPosition + endPosition) / 2.0f;
+		motion.scale = vec2(glm::distance(startPosition, endPosition), 5);
+		motion.angle = atan2(endPosition.y - startPosition.y, endPosition.x - startPosition.x);
+
+		auto &wall = registry.walls.emplace(entity);
+		wall.startPosition = startPosition;
+		wall.endPosition = endPosition;
+
+		RenderRequest &rr = registry.renderRequests.insert(
+			entity,
+			{"none",
+			EFFECT_ASSET_ID::EGG,
+			GEOMETRY_BUFFER_ID::DEBUG_LINE});
+		rr.offset = vec2(100,100);
+		registry.bounds.emplace(entity);
 	}
 }
 
@@ -265,10 +279,9 @@ Entity createBigC(RenderSystem *renderer, vec2 position)
 	/*AttackData& atk = registry.attackDatas.emplace(entity);
 	atk = none;*/
 
-	registry.sprites.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+		{
 		 "none",
 		 EFFECT_ASSET_ID::MESH,
 		 GEOMETRY_BUFFER_ID::MESH_GB});
@@ -417,8 +430,6 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	// inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;
 	inv.countdown = 200.0f;
 
-	auto &spriteComponent = registry.sprites.emplace(entity);
-
 	std::string renderShape;
 	if (atkData.shape == RECTANGLE)
 	{
@@ -431,7 +442,6 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
 		renderShape = "enemy_bullet_square.png";
 	}
 	else if (atkData.shape == TRIANGLE)
@@ -444,20 +454,18 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
 		renderShape = "enemy_bullet_triangle.png";
 	}
 	else
 	{
 		CircleCollider &cc = registry.circleColliders.emplace(entity);
 		cc.radius = motion.scale.x / 2;
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
 		renderShape = "enemy_bullet_circle.png";
 	}
 
 	registry.renderRequests.insert(
 		entity,
-		{// spriteComponent.sprites[SPRITE_STATE::BASE],
+		{
 		 renderShape,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
@@ -485,8 +493,6 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	motion.velocity = {0, 0};
 	motion.scale = {0, atkData.size.y}; // Ensure scale is initialized
 	motion.veer = {0, 0};
-
-	auto &spriteComponent = registry.sprites.emplace(entity);
 
 	Laser &laser = registry.lasers.emplace(entity);
 	laser.start = start;
@@ -692,9 +698,6 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
-
-	auto &spriteComponent = registry.sprites.emplace(entity);
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BULLET;
 
 	registry.renderRequests.insert(
 		entity,

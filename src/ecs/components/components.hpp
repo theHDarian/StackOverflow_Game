@@ -178,24 +178,6 @@ struct Mesh
 // shouldn't matter much, but apparently enum CLASSES don't inherently cast to ints
 // so I've (Amanda) explicitly set them to be ints
 // should ask why that's the case/why it works fine even w/o inherent casting
-enum  TEXTURE_ASSET_ID : unsigned int {
-	FISH = 0,
-	PUFFERFISH = FISH + 1,
-	CIRCLE_SPRITE = PUFFERFISH + 1,
-	MC_BASE = CIRCLE_SPRITE + 1,
-	MC_HIT = MC_BASE + 1,
-	AIM_INDICATOR = MC_HIT + 1,
-	FLOOR = AIM_INDICATOR + 1,
-	MC_BULLET = FLOOR + 1,
-	ENEMY_BULLET_SQUARE = MC_BULLET + 1,
-	ENEMY_BULLET_CIRCLE = ENEMY_BULLET_SQUARE + 1,
-	ENEMY_BULLET_TRIANGLE = ENEMY_BULLET_CIRCLE + 1,
-	CHEVRON = ENEMY_BULLET_TRIANGLE + 1,
-	RECTANGLE_SPRITE = CHEVRON + 1,
-	PARALLELOGRAM = RECTANGLE_SPRITE + 1,
-	TEXTURE_COUNT = PARALLELOGRAM + 1,
-};
-const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum  EFFECT_ASSET_ID : unsigned int {
 	COLOURED = 0,
@@ -247,22 +229,10 @@ enum class SPRITE_STATE {
 // all the sprites this entity will use
 // for performance, consider 1 map per entity type
 // as opposed to 1 map per entity
-struct Sprites {
-	// map of sprite type (enum) to sprite texture
-	// eg: when bullet collides w/ enemy in physics system,
-	// physics system will change the sprite to "DAMAGED_SPRITE"
-	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
-};
 
 struct CollisionShape {
 	// not sure if we need to draw that many
 	std::vector<Entity> shapes;
-};
-
-// if a sprite should switch after a certain amount of time
-struct SpriteTimer {
-	float count_ms = 1000;
-	TEXTURE_ASSET_ID nextSprite;
 };
 
 // used to store info of what text needs to be rendered
