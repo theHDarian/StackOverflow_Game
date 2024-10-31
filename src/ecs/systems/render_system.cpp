@@ -32,7 +32,9 @@ void RenderSystem::step(float elapsed_ms) {
 
 	for (Entity player : registry.players.entities) {
 		Animation& anim = registry.animations.get(player);
-		anim.animation_countdown -= elapsed_ms;
+		if (registry.renderRequests.get(player).used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			anim.animation_countdown -= elapsed_ms;
+		}
 		if (anim.animation_countdown <= 0) {
 			anim.animation_countdown = anim.animation_countdown_base;
 			anim.frame = (anim.frame + 1) % 5;
@@ -180,8 +182,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 		assert(registry.renderRequests.has(entity));
 		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
+
 		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
 			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+			gl_has_errors();
 		}
 		else {
 			glBindTexture(GL_TEXTURE_2D, texture_id);

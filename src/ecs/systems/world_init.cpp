@@ -17,7 +17,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 50.f;
+	motion.scale = mesh.original_size * 80.f;
 
 	Player& player = registry.players.emplace(entity);
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
@@ -33,15 +33,14 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos)
 
 	//add player sprite
 	Sprites& playerSprites = registry.sprites.emplace(entity);
-	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
-	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
+	playerSprites.sprites[SPRITE_STATE::BASE] = "mcv1_base.png";
+	playerSprites.sprites[SPRITE_STATE::DAMAGED] = "mcv1_hit.png";
+	playerSprites.sprites[SPRITE_STATE::MOVING] = "mc_walkv1_0000 (2).png";
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{
-			//playerSprites.sprites[SPRITE_STATE::BASE],
-			//"mcv1_base.png",
-			"mc_walkv1_0000 (2).png",
-			EFFECT_ASSET_ID::ANIMATE,
+			"mcv1_base.png",
+			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 	// can play around with offset to try to align sprite
@@ -82,7 +81,7 @@ Entity createAimIndicator(RenderSystem* renderer) {
 	Motion& aimMotion = registry.motions.emplace(aimIndicator);
 	aimMotion.scale = {30,30};
 	Sprites& indicatorSprites =  registry.sprites.emplace(aimIndicator);
-	indicatorSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::AIM_INDICATOR;
+	indicatorSprites.sprites[SPRITE_STATE::BASE] = "aim_indicator.png";
 	registry.renderRequests.insert(
 		aimIndicator,
 		{
@@ -413,7 +412,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
+		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_square.png";
 		renderShape = "enemy_bullet_square.png";
 	}
 	else if (atkData.shape == TRIANGLE) {
@@ -426,7 +425,7 @@ Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
+		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_triangle.png";
 		renderShape = "enemy_bullet_triangle.png";
 	}
 	else {
@@ -685,7 +684,7 @@ Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
 
 
 	auto& spriteComponent = registry.sprites.emplace(entity);
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BULLET;
+	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
 
 	registry.renderRequests.insert(
 		entity,

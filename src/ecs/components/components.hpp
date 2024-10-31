@@ -252,7 +252,7 @@ struct Sprites {
 	// map of sprite type (enum) to sprite texture
 	// eg: when bullet collides w/ enemy in physics system,
 	// physics system will change the sprite to "DAMAGED_SPRITE"
-	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
+	std::unordered_map<SPRITE_STATE, std::string> sprites;
 };
 
 struct CollisionShape {
@@ -263,7 +263,8 @@ struct CollisionShape {
 // if a sprite should switch after a certain amount of time
 struct SpriteTimer {
 	float count_ms = 1000;
-	TEXTURE_ASSET_ID nextSprite;
+	std::string nextSprite;
+	EFFECT_ASSET_ID nextEffect;
 };
 
 // used to store info of what text needs to be rendered
