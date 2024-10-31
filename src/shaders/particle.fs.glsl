@@ -16,6 +16,10 @@ void main()
     } else if (index >= 2) {
         out_color = vec4(1.0, 0.0, 0.0, 1.0); 
     } else {
-        out_color = texture(particle_sampler[index], texcoord);
+        if (index == 0) {
+            out_color = texture(particle_sampler[0], texcoord);
+        } else {
+            out_color = texture(particle_sampler[1], texcoord);
+        }
     }
 }
