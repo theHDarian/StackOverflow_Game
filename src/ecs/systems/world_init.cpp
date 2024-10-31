@@ -142,13 +142,14 @@ void createRoomBounds(RenderSystem *renderer)
 		vec2 end;
 		float angle;
 		vec3 axis;
+		vec2 offset;
 	};
 	float angle = 90.0f;
 	std::vector<WallPos> wallPositions = {
-		{vec2(0, 0), vec2(wS.width, 0),-angle,vec3(1,0,0)},
-		{vec2(wS.width, 0), vec2(wS.width, wS.height),-angle,vec3(0,1,0)},
-		{vec2(wS.width, wS.height), vec2(0, wS.height),angle,vec3(1,0,0)},
-		{vec2(0, wS.height), vec2(0, 0),angle,vec3(0,1,0)}
+		{vec2(0, 0), vec2(wS.width, 0),-angle,vec3(1,0,0),vec2(0,-3000.f)},
+		{vec2(wS.width, 0), vec2(wS.width, wS.height),-angle,vec3(1,0,0)},
+		{vec2(wS.width, wS.height), vec2(0, wS.height),-angle,vec3(1,0,0),vec2(0,-3000.f)},
+		{vec2(0, wS.height), vec2(0, 0),-angle,vec3(1,0,0)}
 	};
 	for (auto& p : wallPositions) {
 		auto entity = Entity();
@@ -167,7 +168,7 @@ void createRoomBounds(RenderSystem *renderer)
 			{"wall_horizontal.png",
 			EFFECT_ASSET_ID::ROOM_BOUND,
 			GEOMETRY_BUFFER_ID::SPRITE});
-		rr.offset = vec2(0,0);
+		rr.offset = p.offset;
 		Bound& b = registry.bounds.emplace(entity);
 		b.angle = p.angle;
 		b.axis = p.axis;

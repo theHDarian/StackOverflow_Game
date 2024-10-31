@@ -138,10 +138,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		WindowState &ws = registry.windowStates.components[0];
 		vec3 cameraPosition = vec3(ws.width/2.0f,ws.height/2.0f,-10.0f);
 		
-		mat4 model = glm::translate(glm::mat4(1.0f),
+		mat4 model = 	glm::translate(glm::mat4(1.0f),
 						vec3(motion.position.x,motion.position.y,0.0f))
-						* glm::rotate(glm::mat4(1.0f),radians(b.angle),b.axis)  
 						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))  
+						* glm::translate(glm::mat4(1.0f),vec3(offset,1.0f) * glm::normalize(vec3(motion.scale,1.0f)))
+						* glm::rotate(glm::mat4(1.0f),radians(b.angle),b.axis) //rotate to be vertical on z axis
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f)
 					);
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
