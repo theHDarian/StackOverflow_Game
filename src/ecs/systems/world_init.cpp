@@ -16,33 +16,37 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
 	motion.angle = 0.f;
-	motion.velocity = {0.f, 0.f};
-	motion.scale = mesh.original_size * 50.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = mesh.original_size * 70.f;
 
 	Player &player = registry.players.emplace(entity);
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2.5;
 
 	AABBCollider &aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-motion.scale.x / 3.5, -motion.scale.y / 2.5);
-	aabb.bottomRight = vec2(motion.scale.x / 3.5, motion.scale.y / 3);
+	aabb.topLeft = vec2(-motion.scale.x / 4.25, -motion.scale.y / 5);
+	aabb.bottomRight = vec2(motion.scale.x / 4.25, motion.scale.y / 3.25);
 
 	PlayerAttackData &shoot = registry.shoots.emplace(entity);
 
 	registry.stackCompile.emplace(entity);
 
-	// add player sprite
-	Sprites &playerSprites = registry.sprites.emplace(entity);
-	playerSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BASE;
-	playerSprites.sprites[SPRITE_STATE::DAMAGED] = TEXTURE_ASSET_ID::MC_HIT;
-	RenderRequest &rr = registry.renderRequests.insert(
+	//add player sprite
+	Sprites& playerSprites = registry.sprites.emplace(entity);
+	playerSprites.sprites[SPRITE_STATE::BASE] = "mcv1_base.png";
+	playerSprites.sprites[SPRITE_STATE::DAMAGED] = "mcv1_hit.png";
+	playerSprites.sprites[SPRITE_STATE::MOVING] = "mc_walk_0000.png";
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
-		{// playerSprites.sprites[SPRITE_STATE::BASE],
-		 "mcv1_base.png",
-		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE});
+		{
+			"mcv1_base.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		});
 	// can play around with offset to try to align sprite
-	rr.offset = vec2(-5, 0);
+	rr.offset = vec2(-5, -5);
+
+	registry.animations.emplace(entity);
 
 	return entity;
 }
@@ -75,10 +79,10 @@ Entity createAimIndicator(RenderSystem *renderer)
 {
 	// add aim indicator
 	auto aimIndicator = Entity();
-	Motion &aimMotion = registry.motions.emplace(aimIndicator);
-	aimMotion.scale = {30, 30};
-	Sprites &indicatorSprites = registry.sprites.emplace(aimIndicator);
-	indicatorSprites.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::AIM_INDICATOR;
+	Motion& aimMotion = registry.motions.emplace(aimIndicator);
+	aimMotion.scale = {30,30};
+	Sprites& indicatorSprites =  registry.sprites.emplace(aimIndicator);
+	indicatorSprites.sprites[SPRITE_STATE::BASE] = "aim_indicator.png";
 	registry.renderRequests.insert(
 		aimIndicator,
 		{"aim_indicator.png",
@@ -306,6 +310,8 @@ SpriteData getSprite(SpriteName name)
 	{
 		return magnet;
 	}
+	default:
+		return pufferFish;
 	}
 }
 
@@ -331,6 +337,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBigC:
 	{
 		enemy = EnemyBigC();
+		registry.bosses.emplace(entity);
 		break;
 	}
 	case EnemyType::MediumEnemyCharge:
@@ -366,7 +373,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	// } else {
 	// 	movement.posA = pos;
 	// }
-	std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
+	//std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
@@ -463,7 +470,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_SQUARE;
+		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_square.png";
 		renderShape = "enemy_bullet_square.png";
 	}
 	else if (atkData.shape == TRIANGLE)
@@ -476,7 +483,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_TRIANGLE;
+		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_triangle.png";
 		renderShape = "enemy_bullet_triangle.png";
 	}
 	else
@@ -599,12 +606,14 @@ Entity createDialogueBox(vec2 position, vec2 scale)
 	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
 	text.scale = 0.5;										// for some reason, scale should be small
 	text.text = "hello this is test dialogue!";
+	text.topRightBound = { scale.x - 25, scale.y - 25};
+	text.bottomLeftBound = { text.x, 0 + 25};
 
 	// attach list of dialogue lines
 	// probably shouldn't be attached to box, but to some dialogue state entity?
-	auto &lines = registry.dialogueLines.emplace(entity);
-	lines.lines.push_back("hello, this is a dialogue box.\npress e to go to next dialogue");
-	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\n as a temp fix for that, the game is paused while dialogue is happening");
+	auto& lines = registry.dialogueLines.emplace(entity);
+	lines.lines.push_back("hello, this is a dialogue box. \npress e to go to next dialogue");
+	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\nas a temp fix for that, the game is paused while dialogue is happening");
 	lines.lines.push_back("but also note the dialogue \"paused \" state is separate from the game paused state!\n(press esc to pause the game right now and see)");
 	lines.lines.push_back("oh hey there's no more dialogue after this, so pressing e again won't open another dialogue box\ngoodbye");
 
@@ -643,13 +652,15 @@ Entity createPauseMenu(vec2 position, vec2 scale)
 	auto &text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 
-	WindowState &windowState = registry.windowStates.components[0];
 	// note: position is not center, but start of text rendering
 	// need a mechanism to figure out text line size
-	text.x = position.x / 2.5;
-	text.y = position.y;
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = windowState.width - scale.x + 25;
+	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 1.5;
 	text.text = "Game Paused";
+	text.topRightBound = { scale.x - 25, scale.y - 25 };
+	text.bottomLeftBound = { text.x, 0 + 25 };
 
 	return entity;
 }
@@ -680,17 +691,21 @@ Entity createGameOverMenu(vec2 position, vec2 scale)
 	color.r = 0.0;
 	color.b = 0.0;
 	color.g = 0.0;
-
+	 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
 	auto &text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
+	text.topRightBound = { scale.x, scale.y };
+	text.bottomLeftBound = { 0, 0 };
 
 	WindowState &windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
-	text.scale = 1.5;
+	text.scale = 1.2;
 	text.text = "Game Over \npress R to restart";
+	text.topRightBound = { scale.x - 25, scale.y - 25 };
+	text.bottomLeftBound = { text.x, 0 + 25 };
 
 	return entity;
 }
@@ -725,8 +740,9 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
-	auto &spriteComponent = registry.sprites.emplace(entity);
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::MC_BULLET;
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
 
 	registry.renderRequests.insert(
 		entity,
@@ -766,6 +782,10 @@ Entity createStackUI(WindowState &windowState, StackCompile &stack)
 	text.x = stackui.stackPos.x - stackui.bulletSize.x;
 	text.y = (stackui.bulletStartPos.y - windowState.height) * -1 - 2 * stackui.bulletOffset - stackui.bulletSize.y;
 	text.scale = 0.25;
+	// too lazy to calculate fitting text box size, and it prob won't overflow
+	// so just set it to some big number
+	text.topRightBound = { 1000, 1000 };
+	text.bottomLeftBound = { 0, 0 };
 
 	return entity;
 }

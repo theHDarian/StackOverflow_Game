@@ -89,13 +89,13 @@ GLFWwindow* WorldSystem::createWindow() {
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	//  window_width_px = vidMode->width;
-	//  window_height_px = vidMode->height;
+	  window_width_px = vidMode->width;
+	  window_height_px = vidMode->height;
 	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
-	window_width_px = 1280;
-	window_height_px = 720;
+	//window_width_px = 1280;
+	//window_height_px = 720;
 	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
@@ -201,16 +201,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// 			registry.remove_all_components_of(motions_registry.entities[i]);
 	// 	}
 	// }
-	//
-	// place sprite timer progression here for now
-	//for (auto& entity : registry.spriteTimers.entities) {
-	//	auto& spriteTimer = registry.spriteTimers.get(entity);
-	//	spriteTimer.count_ms -= elapsed_ms_since_last_update;
-	//	if (spriteTimer.count_ms <= 0) {
-	//		registry.renderRequests.get(entity).used_texture = spriteTimer.nextSprite;
-	//		registry.spriteTimers.remove(entity);
-	//	}
-	//}
 
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
@@ -273,6 +263,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// place sprite timer progression here for now
+	for (auto& entity : registry.spriteTimers.entities) {
+		auto& spriteTimer = registry.spriteTimers.get(entity);
+		spriteTimer.count_ms -= elapsed_ms_since_last_update;
+		if (spriteTimer.count_ms <= 0) {
+			//std::cout << " got hit, switch back to normal " << std::endl;
+			registry.renderRequests.get(entity).texture_name = spriteTimer.nextSprite;
+			registry.renderRequests.get(entity).used_effect = spriteTimer.nextEffect;
+			registry.spriteTimers.remove(entity);
+		}
+	}
 
 	WindowState& wS = registry.windowStates.components[0];
 
@@ -433,7 +434,7 @@ void WorldSystem::handleInput() {
 		if (input.shouldShowDialogue && input.nextDialogue && !gameState.gamePaused) {
 			input.nextDialogue = false;
 			std::string nextLine = registry.dialogueLines.get(dialogueBox).next();
-			std::cout << " dialogue line " << nextLine << std::endl;
+			//std::cout << " dialogue line " << nextLine << std::endl;
 			if (strcmp(nextLine.c_str(), "<end>") != 0) {
 				registry.renderRequests.get(dialogueBox).show = true;
 				registry.textRenderRequests.get(dialogueBox).text = nextLine;
@@ -599,9 +600,18 @@ void WorldSystem::movePlayer() {
 	IOState &input = registry.ioStates.components[0];
 	vec2 inputAxis = input.inputAxis;
 	Motion& player_motion = registry.motions.get(player);
+	RenderRequest& rr = registry.renderRequests.get(player);
 	if (glm::length(inputAxis) <= 0.0f) {
+		if (!registry.spriteTimers.has(player)) {
+			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+			rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::BASE];
+		}
 		player_motion.velocity = {0,0};
 	} else {
+		if (!registry.spriteTimers.has(player)) {
+			rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
+			rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::MOVING];
+		}
 		player_motion.velocity = glm::normalize(inputAxis) * getModifiedValue(PlayerSpeed, registry.players.get(player).baseSpeed);
 	}
 
@@ -623,15 +633,18 @@ float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 
 void WorldSystem::handlePlayerHit(Entity& other) {
 	//change sprite
-	//auto& spriteMap = registry.sprites.get(player).sprites;
-	//if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
-	//	registry.renderRequests.get(player).used_texture = spriteMap[SPRITE_STATE::DAMAGED];
-	//	if (!registry.spriteTimers.has(player)) {
-	//		auto& spriteTimer = registry.spriteTimers.emplace(player);
-	//		spriteTimer.count_ms = 300;
-	//		spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
-	//	}
-	//}
+	auto& spriteMap = registry.sprites.get(player).sprites;
+	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
+		registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
+		registry.renderRequests.get(player).used_effect = EFFECT_ASSET_ID::TEXTURED;
+		if (!registry.spriteTimers.has(player)) {
+			auto& spriteTimer = registry.spriteTimers.emplace(player);
+			spriteTimer.count_ms = 250;
+			spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+			spriteTimer.nextEffect = EFFECT_ASSET_ID::TEXTURED;
+		}
+	}
+
 	//play hit sound
 	Mix_PlayChannel(3, playerHurtSound, 0);
 	Mix_Volume(3, playerHurtSound->volume * MIX_MAX_VOLUME);

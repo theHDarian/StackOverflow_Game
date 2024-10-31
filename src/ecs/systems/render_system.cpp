@@ -29,12 +29,101 @@ void RenderSystem::step(float elapsed_ms) {
 			fade.time -= elapsed_ms;
 		}
 	}
+
+	for (Entity player : registry.players.entities) {
+		Animation& anim = registry.animations.get(player);
+		if (registry.renderRequests.get(player).used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			anim.animation_countdown -= elapsed_ms;
+		}
+		if (anim.animation_countdown <= 0) {
+			anim.animation_countdown = anim.animation_countdown_base;
+			anim.frame = (anim.frame + 1) % 5;
+			//std::cout << "time to change frame to frame " << anim.frame << std::endl;
+		}
+	}
+}
+
+// keep it to just the player for now
+void RenderSystem::animatePlayer(Entity entity, const mat3& projection) {
+	Motion& motion = registry.motions.get(entity);
+	// need to store frame info elsewhere
+	unsigned int frame = 0;
+
+	Transform transform;
+	vec2 offset = registry.renderRequests.get(entity).offset;;
+	transform.translate(motion.position);
+	transform.rotate(motion.angle);
+	transform.translate(offset * glm::normalize(motion.scale));
+	transform.scale(motion.scale);
+
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::ANIMATE;
+	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+GLint in_position_loc = glGetAttribLocation(program, "in_position");
+GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+gl_has_errors();
+assert(in_texcoord_loc >= 0);
+
+glEnableVertexAttribArray(in_position_loc);
+glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+	sizeof(TexturedVertex), (void*)0);
+gl_has_errors();
+
+glEnableVertexAttribArray(in_texcoord_loc);
+glVertexAttribPointer(
+	in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+	(void*)sizeof(
+		vec3)); // note the stride to skip the preceeding vertex position
+
+// Enabling and binding texture to slot 0
+glActiveTexture(GL_TEXTURE0);
+gl_has_errors();
+
+assert(registry.renderRequests.has(entity));
+GLuint texture_id =
+texture_gl_handles[(GLuint)name_to_texture["mc_walkv1_0000 (2).png"]];
+
+glBindTexture(GL_TEXTURE_2D, texture_id);
+gl_has_errors();
+
+// Get number of indices from index buffer, which has elements uint16_t
+GLint size = 0;
+glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+gl_has_errors();
+
+GLsizei num_indices = size / sizeof(uint16_t);
+// GLsizei num_triangles = num_indices / 3;
+
+GLint currProgram;
+glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+// Setting uniform values to the currently bound program
+GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+gl_has_errors();
+// Drawing of num_indices/3 triangles specified in the index buffer
+glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+gl_has_errors();
 }
 
 void RenderSystem::drawTexturedMesh(Entity entity,
-									const mat3 &projection)
+	const mat3& projection)
 {
-	Motion &motion = registry.motions.get(entity);
+	Motion& motion = registry.motions.get(entity);
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
@@ -47,7 +136,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	transform.scale(motion.scale);
 
 	assert(registry.renderRequests.has(entity));
-	const RenderRequest &render_request = registry.renderRequests.get(entity);
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
 
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
@@ -67,7 +156,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED)
+	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
@@ -82,13 +171,25 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
+		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			GLint frame_uloc = glGetUniformLocation(program, "frame");
+			glUniform1i(frame_uloc, registry.animations.get(entity).frame);
+			gl_has_errors();
+		}
 
 		// Enable and bind the texture to slot 0
 		glActiveTexture(GL_TEXTURE0);
 		gl_has_errors();
 		assert(registry.renderRequests.has(entity));
 		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
-		glBindTexture(GL_TEXTURE_2D, texture_id);
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+			gl_has_errors();
+		}
+		else {
+			glBindTexture(GL_TEXTURE_2D, texture_id);
+		}
 		gl_has_errors();
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::MESH || render_request.used_effect == EFFECT_ASSET_ID::EGG)
@@ -317,9 +418,7 @@ void RenderSystem::drawGameElements()
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 		drawAllColliders(entity, projection_2D);
-		if(registry.bosses.has(entity)) {
-			drawHPbar(entity, projection_2D);
-		}
+		drawHPbar(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.players.entities)
@@ -895,16 +994,20 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	drawSetupFrame();
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	WindowState& windowState = registry.windowStates.components[0];
 	vec2 position = { windowState.width/2, windowState.height-60.0};
+	vec2 scale = { 600, 30 };
+	Motion& motion = registry.motions.get(entity);
+
+	if (!registry.bosses.has(entity)) {
+		position = motion.position + vec2(0, motion.scale.y / 2 + 10);
+		scale = { 100, 10 };
+	}
+
 	if (registry.damageds.has(entity)) {
 		position.x += (rand() % 10) - 5;
 		position.y += (rand() % 10) - 5;
 	}
-	vec2 scale = { 600, 30 };
 
 	float max = registry.enemies.get(entity).maxHealth;
 	float current = registry.enemies.get(entity).currHealth;
