@@ -302,6 +302,8 @@ SpriteData getSprite(SpriteName name)
 	{
 		return bigC;
 	}
+	default:
+		return pufferFish;
 	}
 }
 
