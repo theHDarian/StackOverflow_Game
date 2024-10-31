@@ -302,6 +302,10 @@ SpriteData getSprite(SpriteName name)
 	{
 		return bigC;
 	}
+	case SpriteName::MAGNETSPRITE:
+	{
+		return magnet;
+	}
 	}
 }
 
@@ -327,6 +331,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBigC:
 	{
 		enemy = EnemyBigC();
+		break;
+	}
+	case EnemyType::MediumEnemyCharge:
+	{
+		enemy = EnemyMediumCharge();
 		break;
 	}
 
