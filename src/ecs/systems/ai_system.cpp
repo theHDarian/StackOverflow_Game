@@ -22,7 +22,7 @@ void AISystem::step(float elapsed_ms)
 		Motion& motion = registry.motions.get(entity);
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING 
-		updateState(enemy, movement);
+		updateState(enemy, movement, entity);
 		//std::cout << currPattern.name << "after update" << std::endl;
 
 		// THINKING 
@@ -37,9 +37,26 @@ void AISystem::step(float elapsed_ms)
             movement.posB = getMove(currPattern.type, entity);
 			//std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
             movement.distanceTraveled = 0.f;
-        }
+		}
+	}
 
-
+	for (Entity bee : registry.bees.entities) {
+		Enemy& enemy = enemy_registry.get(bee);
+		EnemyPattern& currPattern = enemy.currEnemyPattern();
+		if (currPattern.type == EnemyBehavior::MERGE_BEE) {
+			for (Entity otherBee : registry.bees.get(bee).nearbyBees) {
+				if (!registry.deleteds.has(otherBee)) {
+					registry.deleteds.emplace(otherBee);
+					registry.bees.remove(otherBee);
+				}
+			}
+			std::cout << " time to merge bees with other bees: " << registry.bees.get(bee).nearbyBees.size() << std::endl;
+			registry.bees.get(bee).mergeCount += registry.bees.get(bee).nearbyBees.size();
+			registry.bees.get(bee).nearbyBees.clear();
+			if (registry.bees.get(bee).mergeCount >= 1) {
+				registry.renderRequests.get(bee).texture_name = "bee_fly_2";
+			}
+		}
 	}
 
 }
@@ -53,7 +70,7 @@ Reaction* getReactions(std::vector<Reaction>& list, ReactionType target) {
 	return nullptr;
 }
 
-void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
+void AISystem::updateState(Enemy& enemy, EnemyMovement movement, Entity entity) { // append and entity for more info on enemy for now
 	vec2 playerPos = getPlayerPos();
 	vec2 EnemyPos = movement.posA;
 	float distance = glm::distance(playerPos, EnemyPos);
@@ -61,6 +78,25 @@ void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
 	float hpPercent = enemy.currHealth / enemy.maxHealth;
 	EnemyPattern& currPattern = enemy.currEnemyPattern();
 	bool reaction_found = false;
+
+	// this is potentially VERY costly, but idk where to put this
+	float closeToBeeDistance = 100.f;
+	bool closeToBee = false;
+
+	if (registry.bees.has(entity)) {
+		for (Entity bee : registry.bees.entities) {
+			if (registry.bees.get(entity).nearbyBees.size() == registry.bees.get(entity).maxMerge) {
+				break;
+			}
+			if (bee != entity) {
+				closeToBee = (glm::distance(EnemyPos, registry.motions.get(bee).position) < closeToBeeDistance);
+				if (closeToBee) {
+					registry.bees.get(entity).nearbyBees.insert(bee);
+				}
+			}
+		}
+	}
+
 	if (hpPercent < 0.25f) {
 		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTYFIVE_HEALTH);
         if (reaction) {
@@ -91,6 +127,14 @@ void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
         }
 	// PLAYER BULLET CLOSE TO BE IMPELMENTED..
 	// DEFAULT STATE (CHANGE BY DURATION)
+	}
+	else if (closeToBee) {
+		auto reaction = getReactions(currPattern.reactions, ReactionType::BEE_CLOSE);
+		if (reaction) {
+			enemy.patternIndex = reaction->index;
+			reaction_found = true;
+			std::cout << "bee close!" << std::endl;
+		}
 	}
     if (!reaction_found) {
         //std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;

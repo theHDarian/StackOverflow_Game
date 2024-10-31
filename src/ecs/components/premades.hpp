@@ -534,17 +534,17 @@ struct Bee : Enemy
 	Reaction reactionIdle = {
 		ReactionType::DURATION,
 		0 };
-	Reaction reactionPlayerClose = {
-		ReactionType::PLAYER_CLOSE,
+	Reaction reactionBeeClose = {
+		ReactionType::BEE_CLOSE,
 		2 };
 	Bee()
 	{
 		maxHealth = 10;
 		currHealth = maxHealth;
 		enemyPatterns = {
-			{"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
-			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot},
-			{"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot} };
+			{"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack},
+			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, SniperShot},
+			{"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose}, 0, true, 0.f, 5000.f, SniperShot} };
 		patternIndex = 0;
 		sprite = SpriteName::BEESPRITE;
 		scale = vec2({ 864 / 8.f, 480 / 8.f });

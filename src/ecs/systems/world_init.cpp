@@ -356,6 +356,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			//}
 		case EnemyType::TypeBee: { // why must these be different names??
 			enemy = Bee();
+			registry.bees.emplace(entity);
 			break;
 		}
 	}

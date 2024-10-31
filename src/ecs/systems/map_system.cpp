@@ -105,7 +105,10 @@ void MapSystem::step(float elapsed_ms)
         createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::TestRevampedEnemy);
         createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
         createEnemy(renderer, vec2(wS.width / 2,wS.height / 2), EnemyType::BossBigC);
-        createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::TypeBee);
+        // spawn a few bees
+        for (int i = 0; i < 3; i++) {
+            createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::TypeBee);
+        }
         // createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
     }
 }
