@@ -35,7 +35,7 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	Sprites& playerSprites = registry.sprites.emplace(entity);
 	playerSprites.sprites[SPRITE_STATE::BASE] = "mcv1_base.png";
 	playerSprites.sprites[SPRITE_STATE::DAMAGED] = "mcv1_hit.png";
-	playerSprites.sprites[SPRITE_STATE::MOVING] = "mc_walk_0000.png";
+	playerSprites.sprites[SPRITE_STATE::MOVING] = "mc_walk";
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{
@@ -46,7 +46,8 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	// can play around with offset to try to align sprite
 	rr.offset = vec2(-5, -5);
 
-	registry.animations.emplace(entity);
+	auto& animate = registry.animations.emplace(entity);
+	animate.max_frames = 6;
 
 	return entity;
 }
@@ -306,6 +307,10 @@ SpriteData getSprite(SpriteName name)
 	{
 		return bigC;
 	}
+	case SpriteName::BEESPRITE:
+	{
+		return bee;
+	}
 	default:
 		return pufferFish;
 	}
@@ -320,35 +325,39 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	switch (type)
 	{
 
-	case EnemyType::TestRevampedEnemy:
-	{
-		enemy = TestEnemy();
-		break;
-	}
-	case EnemyType::EasyEnemySentry:
-	{
-		enemy = EnemyEasySentry();
-		break;
-	}
-	case EnemyType::BossBigC:
-	{
-		enemy = EnemyBigC();
-		registry.bosses.emplace(entity);
-		break;
-	}
+		case EnemyType::TestRevampedEnemy:
+		{
+			enemy = TestEnemy();
+			break;
+		}
+		case EnemyType::EasyEnemySentry:
+		{
+			enemy = EnemyEasySentry();
+			break;
+		}
+		case EnemyType::BossBigC:
+		{
+			enemy = EnemyBigC();
+			registry.bosses.emplace(entity);
+			break;
+		}
 
-		// case EnemyType::MediumEnemyCharge: {
-		//     enemy = EnemyMediumCharge();
-		//     break;
-		// }
-		// case EnemyType::MediumEnemyHoming: {
-		//     enemy = EnemyMediumHoming();
-		//     break;
-		// }
-		// case EnemyType::EasyEnemySniper: {
-		// 	enemy = EnemyEasySniper();
-		// 	break;
-		//}
+			// case EnemyType::MediumEnemyCharge: {
+			//     enemy = EnemyMediumCharge();
+			//     break;
+			// }
+			// case EnemyType::MediumEnemyHoming: {
+			//     enemy = EnemyMediumHoming();
+			//     break;
+			// }
+			// case EnemyType::EasyEnemySniper: {
+			// 	enemy = EnemyEasySniper();
+			// 	break;
+			//}
+		case EnemyType::TypeBee: { // why must these be different names??
+			enemy = Bee();
+			break;
+		}
 	}
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -387,7 +396,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	// 	}
 	// }
 	SpriteData sprite = getSprite(enemy.sprite);
-	if (sprite.effectId == EFFECT_ASSET_ID::TEXTURED)
+	if (sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
 	{
 		CircleCollider &cc = registry.circleColliders.emplace(entity);
 		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
@@ -411,6 +420,14 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			// true,
 			// vec2(-12, 0) // manually set an offset for now
 		});
+
+	// need to also add an animate component
+	if (sprite.effectId == EFFECT_ASSET_ID::ANIMATE) {
+		auto& animate = registry.animations.emplace(entity);
+		animate.max_frames = 5; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
+		animate.animation_countdown = 20;
+		animate.animation_countdown_base = animate.animation_countdown;
+	}
 
 	return entity;
 };

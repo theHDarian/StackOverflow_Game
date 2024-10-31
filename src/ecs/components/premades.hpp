@@ -444,7 +444,6 @@ const AttackData NoAttack{
 ////////////////////////////////////
 struct SpriteData
 {
-	
 	std::string texturePath;
 	EFFECT_ASSET_ID effectId;
 	GEOMETRY_BUFFER_ID geometryId;
@@ -458,9 +457,9 @@ const SpriteData pufferFish{
 	vec2(-12, 0)};
 
 const SpriteData bigC 		{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-		 "none",
-		 EFFECT_ASSET_ID::MESH,
-		 GEOMETRY_BUFFER_ID::MESH_GB
+	"none",
+	EFFECT_ASSET_ID::MESH,
+	GEOMETRY_BUFFER_ID::MESH_GB
 };
 
 const SpriteData turret {
@@ -468,6 +467,13 @@ const SpriteData turret {
 	EFFECT_ASSET_ID::TEXTURED,
 	GEOMETRY_BUFFER_ID::SPRITE,
 	vec2(-12, 0)};
+
+const SpriteData bee{
+	"bee_fly",
+	EFFECT_ASSET_ID::ANIMATE,
+	GEOMETRY_BUFFER_ID::SPRITE,
+	vec2(0,0)
+};
 
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
@@ -516,6 +522,32 @@ struct TestEnemy : Enemy
 		patternIndex = 0;
 		sprite = SpriteName::PUFFERFISHSPRITE;
 		scale = vec2({288.0f / 2, 240.f / 2});
+	};
+};
+
+struct Bee : Enemy
+{
+	Reaction reactionPatrol = {
+		ReactionType::DURATION,
+		1 };
+
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0 };
+	Reaction reactionPlayerClose = {
+		ReactionType::PLAYER_CLOSE,
+		2 };
+	Bee()
+	{
+		maxHealth = 10;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			{"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
+			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot},
+			{"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot} };
+		patternIndex = 0;
+		sprite = SpriteName::BEESPRITE;
+		scale = vec2({ 864 / 8.f, 480 / 8.f });
 	};
 };
 

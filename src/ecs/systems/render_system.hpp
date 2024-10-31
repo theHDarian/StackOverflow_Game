@@ -138,8 +138,6 @@ private:
 	void drawHPbar(::Entity &entity, const mat3 & projection);
 	//glm::mat4 createTransform(float x, float y, float scaleX, float scaleY);
 
-	void RenderSystem::animatePlayer(Entity entity, const mat3& projection);
-
 	//void drawDashCharges(GLuint &VAO, GLuint &VBO, GLuint &EBO);
 	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat3 & projection);
 	void drawAllColliders(Entity entity, const mat3& projection_2D);

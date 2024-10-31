@@ -234,6 +234,7 @@ struct RenderRequest {
 
 struct Animation {
 	int frame = 0; // stick in animation info to here for now
+	int max_frames = 5; // this type of info should be known by render/sprite system?
 	float animation_countdown = 100;
 	float animation_countdown_base = animation_countdown;
 };
