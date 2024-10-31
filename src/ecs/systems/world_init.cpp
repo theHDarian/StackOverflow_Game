@@ -17,15 +17,15 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 80.f;
+	motion.scale = mesh.original_size * 70.f;
 
 	Player &player = registry.players.emplace(entity);
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2.5;
 
 	AABBCollider &aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-motion.scale.x / 3.5, -motion.scale.y / 2.5);
-	aabb.bottomRight = vec2(motion.scale.x / 3.5, motion.scale.y / 3);
+	aabb.topLeft = vec2(-motion.scale.x / 4.25, -motion.scale.y / 5);
+	aabb.bottomRight = vec2(motion.scale.x / 4.25, motion.scale.y / 3.25);
 
 	PlayerAttackData &shoot = registry.shoots.emplace(entity);
 
@@ -35,7 +35,7 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	Sprites& playerSprites = registry.sprites.emplace(entity);
 	playerSprites.sprites[SPRITE_STATE::BASE] = "mcv1_base.png";
 	playerSprites.sprites[SPRITE_STATE::DAMAGED] = "mcv1_hit.png";
-	playerSprites.sprites[SPRITE_STATE::MOVING] = "mc_walkv1_0000 (2).png";
+	playerSprites.sprites[SPRITE_STATE::MOVING] = "mc_walk_0000.png";
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{
@@ -44,7 +44,7 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 			GEOMETRY_BUFFER_ID::SPRITE
 		});
 	// can play around with offset to try to align sprite
-	rr.offset = vec2(-5, 0);
+	rr.offset = vec2(-5, -5);
 
 	registry.animations.emplace(entity);
 
@@ -364,7 +364,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	// } else {
 	// 	movement.posA = pos;
 	// }
-	std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
+	//std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;

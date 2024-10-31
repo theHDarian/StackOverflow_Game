@@ -268,7 +268,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		auto& spriteTimer = registry.spriteTimers.get(entity);
 		spriteTimer.count_ms -= elapsed_ms_since_last_update;
 		if (spriteTimer.count_ms <= 0) {
-			std::cout << " got hit, switch back to normal " << std::endl;
+			//std::cout << " got hit, switch back to normal " << std::endl;
 			registry.renderRequests.get(entity).texture_name = spriteTimer.nextSprite;
 			registry.renderRequests.get(entity).used_effect = spriteTimer.nextEffect;
 			registry.spriteTimers.remove(entity);

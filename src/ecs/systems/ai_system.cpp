@@ -136,10 +136,10 @@ vec2 AISystem::getNextPatrolPos(Entity entity) {
 	Enemy& enemy = registry.enemies.get(entity);
 	EnemyPattern& pattern = enemy.currEnemyPattern();
 	if (pattern.type != EnemyBehavior::PATROLLING) {
-		std::cout << "Different EnemyBehavior!" << std::endl;
+		//std::cout << "Different EnemyBehavior!" << std::endl;
 		return getCurrentPos(entity);
 	}
-	std::cout << "current state: " << pattern.name << std::endl;
+	//std::cout << "current state: " << pattern.name << std::endl;
 	pattern.pathIndex += 1;
 	if (pattern.path.size() - 1 <= pattern.pathIndex) {
 		pattern.pathIndex = 0;
