@@ -172,7 +172,6 @@ struct Mesh
  * enums there are, and as a default value to represent uninitialized fields.
  */
 
-// maybe a universal map would be easier to load + manage files with...
 
 // NOTE: these were originall enum CLASSES in the template
 // shouldn't matter much, but apparently enum CLASSES don't inherently cast to ints
@@ -205,7 +204,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	POSTPROCESS = TEXTURED + 1,
 	DASH = POSTPROCESS + 1,
 	HP_BAR = DASH + 1,
-	EFFECT_COUNT = HP_BAR + 1,
+	ANIMATE = HP_BAR + 1,
+	EFFECT_COUNT = ANIMATE + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -232,6 +232,12 @@ struct RenderRequest {
 	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
 };
 
+struct Animation {
+	int frame = 0; // stick in animation info to here for now
+	float animation_countdown = 100;
+	float animation_countdown_base = animation_countdown;
+};
+
 // Expected sprite states other systems can use
 // eg: physics system sets object's sprite to DAMAGED upon collision
 // not all entities may have all these sprites, so should check
@@ -251,7 +257,7 @@ struct Sprites {
 	// map of sprite type (enum) to sprite texture
 	// eg: when bullet collides w/ enemy in physics system,
 	// physics system will change the sprite to "DAMAGED_SPRITE"
-	std::unordered_map<SPRITE_STATE, TEXTURE_ASSET_ID> sprites;
+	std::unordered_map<SPRITE_STATE, std::string> sprites;
 };
 
 struct CollisionShape {
@@ -262,7 +268,8 @@ struct CollisionShape {
 // if a sprite should switch after a certain amount of time
 struct SpriteTimer {
 	float count_ms = 1000;
-	TEXTURE_ASSET_ID nextSprite;
+	std::string nextSprite;
+	EFFECT_ASSET_ID nextEffect;
 };
 
 // used to store info of what text needs to be rendered
