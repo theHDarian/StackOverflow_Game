@@ -329,6 +329,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBigC:
 	{
 		enemy = EnemyBigC();
+		registry.bosses.emplace(entity);
 		break;
 	}
 
@@ -592,12 +593,14 @@ Entity createDialogueBox(vec2 position, vec2 scale)
 	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
 	text.scale = 0.5;										// for some reason, scale should be small
 	text.text = "hello this is test dialogue!";
+	text.topRightBound = { scale.x - 25, scale.y - 25};
+	text.bottomLeftBound = { text.x, 0 + 25};
 
 	// attach list of dialogue lines
 	// probably shouldn't be attached to box, but to some dialogue state entity?
-	auto &lines = registry.dialogueLines.emplace(entity);
-	lines.lines.push_back("hello, this is a dialogue box.\npress e to go to next dialogue");
-	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\n as a temp fix for that, the game is paused while dialogue is happening");
+	auto& lines = registry.dialogueLines.emplace(entity);
+	lines.lines.push_back("hello, this is a dialogue box. \npress e to go to next dialogue");
+	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\nas a temp fix for that, the game is paused while dialogue is happening");
 	lines.lines.push_back("but also note the dialogue \"paused \" state is separate from the game paused state!\n(press esc to pause the game right now and see)");
 	lines.lines.push_back("oh hey there's no more dialogue after this, so pressing e again won't open another dialogue box\ngoodbye");
 
@@ -636,13 +639,15 @@ Entity createPauseMenu(vec2 position, vec2 scale)
 	auto &text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 
-	WindowState &windowState = registry.windowStates.components[0];
 	// note: position is not center, but start of text rendering
 	// need a mechanism to figure out text line size
-	text.x = position.x / 2.5;
-	text.y = position.y;
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = windowState.width - scale.x + 25;
+	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 1.5;
 	text.text = "Game Paused";
+	text.topRightBound = { scale.x - 25, scale.y - 25 };
+	text.bottomLeftBound = { text.x, 0 + 25 };
 
 	return entity;
 }
@@ -673,17 +678,21 @@ Entity createGameOverMenu(vec2 position, vec2 scale)
 	color.r = 0.0;
 	color.b = 0.0;
 	color.g = 0.0;
-
+	 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
 	auto &text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
+	text.topRightBound = { scale.x, scale.y };
+	text.bottomLeftBound = { 0, 0 };
 
 	WindowState &windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
-	text.scale = 1.5;
+	text.scale = 1.2;
 	text.text = "Game Over \npress R to restart";
+	text.topRightBound = { scale.x - 25, scale.y - 25 };
+	text.bottomLeftBound = { text.x, 0 + 25 };
 
 	return entity;
 }
@@ -759,6 +768,10 @@ Entity createStackUI(WindowState &windowState, StackCompile &stack)
 	text.x = stackui.stackPos.x - stackui.bulletSize.x;
 	text.y = (stackui.bulletStartPos.y - windowState.height) * -1 - 2 * stackui.bulletOffset - stackui.bulletSize.y;
 	text.scale = 0.25;
+	// too lazy to calculate fitting text box size, and it prob won't overflow
+	// so just set it to some big number
+	text.topRightBound = { 1000, 1000 };
+	text.bottomLeftBound = { 0, 0 };
 
 	return entity;
 }

@@ -276,9 +276,13 @@ struct TextRenderRequest {
 	float x;
 	float y;
 
-	// from experience, this is often a small number < 10, not sure why
+	// text size = defualt loaded in font size * scale, default is 48 pixels
 	float scale; 
 	glm::vec3 color;
+
+	// size of text box
+	vec2 topRightBound;
+	vec2 bottomLeftBound;
 };
 
 struct DialogueLines {
