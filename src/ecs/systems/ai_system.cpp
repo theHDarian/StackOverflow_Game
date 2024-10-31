@@ -135,6 +135,10 @@ vec2 AISystem::getCurrentPos(Entity entity) {
 vec2 AISystem::getNextPatrolPos(Entity entity) {
 	Enemy& enemy = registry.enemies.get(entity);
 	EnemyPattern& pattern = enemy.currEnemyPattern();
+	if (pattern.type != EnemyBehavior::PATROLLING) {
+		std::cout << "Different EnemyBehavior!" << std::endl;
+		return getCurrentPos(entity);
+	}
 	std::cout << "current state: " << pattern.name << std::endl;
 	pattern.pathIndex += 1;
 	if (pattern.path.size() - 1 <= pattern.pathIndex) {
@@ -214,4 +218,8 @@ vec2 AISystem::evadeBullet(Entity entity) {
 	bestEscapePos[0] = glm::clamp(bestEscapePos[0], 0.f + scale[0], static_cast<float>(windowState.width) - scale[0]);
 	bestEscapePos[1] = glm::clamp(bestEscapePos[1], 0.f + scale[1], static_cast<float>(windowState.height) - scale[1]);
 	return bestEscapePos;
+}
+
+void AISystem::angryMode(Entity entity) {
+	
 }
