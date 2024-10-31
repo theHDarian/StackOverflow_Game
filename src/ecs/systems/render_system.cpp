@@ -112,6 +112,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			gl_has_errors();
 		}
 	} else if (render_request.used_effect == EFFECT_ASSET_ID::ROOM_BOUND) {
+		Bound& b = registry.bounds.get(entity);
+
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
 		gl_has_errors();
@@ -132,6 +134,29 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
+
+		WindowState &ws = registry.windowStates.components[0];
+		vec3 cameraPosition = vec3(ws.width/2.0f,ws.height/2.0f,-10.0f);
+		
+		mat4 model = glm::translate(glm::mat4(1.0f),
+						vec3(motion.position.x,motion.position.y,0.0f))
+						* glm::rotate(glm::mat4(1.0f),radians(b.angle),b.axis)  
+						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))  
+						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f)
+					);
+		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
+		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, 400.0f); // Position above the XY plane
+		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f); // Looking towards the origin
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Y-axis up vector
+
+		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
+		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
+		float fov = 120.0f;
+		float aspectRatio = ws.width / ws.height;
+		float near = 0.1f;
+		float far = 10000.0f;
+		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near, far);
+		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float *)&proj4);
 	} 
 	else
 	{
@@ -190,11 +215,14 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float *)&transform.mat);
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float *)&projection);
-	gl_has_errors();
+	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
+		GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+		glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float *)&transform.mat);
+		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+		glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float *)&projection);
+		gl_has_errors();
+	}
+
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();

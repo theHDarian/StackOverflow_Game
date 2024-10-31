@@ -8,22 +8,13 @@ in vec2 in_texcoord;
 out vec2 texcoord;
 
 // Application data
-uniform mat3 transform;
-uniform mat3 projection;
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
 void main()
 {
-    
-   float angle;
-
-   // Create a transform that will skew our texture coords
-   mat3 trans = mat3(
-      1.0       , 0.0       , 0.0,
-      0.0,      cos(angle),        -sin(angle),
-      0.0       , sin(angle),        -cos(angle)
-   );
+   vec4 pos = projection * view * model * vec4(in_position, 1.0);
+   gl_Position = pos;
    texcoord = in_texcoord;
-    //scare according to percentage 
-    vec3 pos = projection * transform * vec3(in_position.xy, 1.0);
-	gl_Position = vec4(pos.xy, in_position.z, 1.0);
 }

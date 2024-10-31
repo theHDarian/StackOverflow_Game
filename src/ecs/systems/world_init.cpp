@@ -136,25 +136,31 @@ void createRoomBounds(RenderSystem *renderer)
 	WindowState &wS = registry.windowStates.components[0];
 
 	Entity bounds[4];
-	std::vector<std::array<vec2,2>> wallPositions = {
-		{vec2(0, 0), vec2(wS.width, 0)},
-		{vec2(wS.width, 0), vec2(wS.width, wS.height)},
-		{vec2(wS.width, wS.height), vec2(0, wS.height)},
-		{vec2(0, wS.height), vec2(0, 0)}
+
+	struct WallPos {
+		vec2 start;
+		vec2 end;
+		float angle;
+		vec3 axis;
+	};
+	float angle = 90.0f;
+	std::vector<WallPos> wallPositions = {
+		{vec2(0, 0), vec2(wS.width, 0),-angle,vec3(1,0,0)},
+		{vec2(wS.width, 0), vec2(wS.width, wS.height),-angle,vec3(0,1,0)},
+		{vec2(wS.width, wS.height), vec2(0, wS.height),angle,vec3(1,0,0)},
+		{vec2(0, wS.height), vec2(0, 0),angle,vec3(0,1,0)}
 	};
 	for (auto& p : wallPositions) {
-		vec2 startPosition = p[0];
-		vec2 endPosition = p[1];
 		auto entity = Entity();
 
 		auto &motion = registry.motions.emplace(entity);
-		motion.position = (startPosition + endPosition) / 2.0f;
-		motion.scale = vec2(2880.0f,240.0f) / 5.0f;
-		motion.angle = atan2(endPosition.y - startPosition.y, endPosition.x - startPosition.x);
+		motion.position = (p.start + p.end) / 2.0f;
+		motion.scale = vec2(2880.0f,240.0f) / 2.0f;
+		motion.angle = atan2(p.end.y - p.start.y, p.end.x - p.start.x);
 
 		auto &wall = registry.walls.emplace(entity);
-		wall.startPosition = startPosition;
-		wall.endPosition = endPosition;
+		wall.startPosition = p.start;
+		wall.endPosition = p.end;
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
@@ -163,6 +169,8 @@ void createRoomBounds(RenderSystem *renderer)
 			GEOMETRY_BUFFER_ID::SPRITE});
 		rr.offset = vec2(0,0);
 		Bound& b = registry.bounds.emplace(entity);
+		b.angle = p.angle;
+		b.axis = p.axis;
 	}
 }
 
