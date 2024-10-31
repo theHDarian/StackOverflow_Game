@@ -46,7 +46,7 @@ struct BulletStackEffect {
 // Player component
 struct Player
 {
-    float baseSpeed = 200;
+    float baseSpeed = 250;
     float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;
@@ -227,9 +227,9 @@ enum class EnemyAttackPattern {
 
 
 enum EnemyBulletShape {
-    RECTANGLE,
-    TRIANGLE,
-    CIRCLE
+    RECTANGLE   = 0,
+    TRIANGLE    = 1,
+    CIRCLE      = 2
 };
 
 struct AttackData {
@@ -351,6 +351,7 @@ struct EnemyBullet {
     int bulletBounce;
     int bulletPierce;
     std::vector<BulletStackEffect> bulletEffects;
+    EnemyBulletShape shape;
 };
 
 struct Burst {

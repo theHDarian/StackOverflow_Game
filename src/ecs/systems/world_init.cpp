@@ -323,41 +323,27 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	Enemy &enemy = registry.enemies.emplace(entity);
 	switch (type)
 	{
-
-	case EnemyType::TestRevampedEnemy:
-	{
-		enemy = TestEnemy();
-		break;
-	}
-	case EnemyType::EasyEnemySentry:
-	{
-		enemy = EnemyEasySentry();
-		break;
-	}
-	case EnemyType::BossBigC:
-	{
-		enemy = EnemyBigC();
-		registry.bosses.emplace(entity);
-		break;
-	}
-	case EnemyType::MediumEnemyCharge:
-	{
-		enemy = EnemyMediumCharge();
-		break;
-	}
-
-		// case EnemyType::MediumEnemyCharge: {
-		//     enemy = EnemyMediumCharge();
-		//     break;
-		// }
-		// case EnemyType::MediumEnemyHoming: {
-		//     enemy = EnemyMediumHoming();
-		//     break;
-		// }
-		// case EnemyType::EasyEnemySniper: {
-		// 	enemy = EnemyEasySniper();
-		// 	break;
-		//}
+		case EnemyType::TestRevampedEnemy:
+		{
+			enemy = TestEnemy();
+			break;
+		}
+		case EnemyType::EasyEnemySentry:
+		{
+			enemy = EnemyEasySentry();
+			break;
+		}
+		case EnemyType::BossBigC:
+		{
+			enemy = EnemyBigC();
+			registry.bosses.emplace(entity);
+			break;
+		}
+		case EnemyType::MediumEnemyCharge:
+		{
+			enemy = EnemyMediumCharge();
+			break;
+		}
 	}
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -379,22 +365,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	movement.speed = 100.0f;
 	movement.distanceTraveled = 0.0f;
 
-	if ((enemy.currEnemyPattern().atkData.attackType == EnemyAttackPattern::BURST || enemy.currEnemyPattern().atkData.attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity))
-	{
-		registry.bursts.emplace(entity);
-	}
+	registry.bursts.emplace(entity);
 
-	// AttackData& atk = registry.attackDatas.emplace(entity);
-	// std::vector<AttackData> atkData = enemy.attackData;
-	// std::cout << "attackData size:" << atkData.size() << std::endl;
-	// if (atkData.size() > 0) {
-	// 	atk = atkData[0];
-	// }
-	// for (int i = 0; i < atkData.size(); i++) {
-	// 	if ((atkData[i].attackType == EnemyAttackPattern::BURST || atkData[i].attackType == EnemyAttackPattern::SPRAY) && !registry.bursts.has(entity)) {
-	// 		registry.bursts.emplace(entity);
-	// 	}
-	// }
 	SpriteData sprite = getSprite(enemy.sprite);
 	if (sprite.effectId == EFFECT_ASSET_ID::TEXTURED)
 	{
@@ -437,6 +409,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletBounce = atkData.bulletBounce;
 	bullet.bulletPierce = atkData.bulletPierce;
 	bullet.bulletEffects = getBulletEffects(atkData);
+	bullet.shape = atkData.shape;
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
@@ -498,7 +471,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		entity,
 		{// spriteComponent.sprites[SPRITE_STATE::BASE],
 		 renderShape,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	return entity;
@@ -517,6 +490,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
 	bullet.bulletEffects = getBulletEffects(atkData);
+	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = angle;
@@ -536,7 +510,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	registry.renderRequests.insert(
 		entity,
 		{"enemy_bullet_square.png",
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	return entity;

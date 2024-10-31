@@ -66,7 +66,8 @@ class RenderSystem {
 		shader_path("postprocess"),
 		shader_path("dash"),
 		shader_path("healthbar"),
-		shader_path("animate")
+		shader_path("animate"),
+		shader_path("bullet")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -76,7 +77,7 @@ class RenderSystem {
 	std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{BulletDamage,      {1.f, 0.f, 1.f}},
 			{ProjectileSpeed,   {1.f, 0.f, 0.f}},
-			{ProjectileSize,    {173 / 255.f, 49 / 255.f, 75 / 255.f}},
+			{ProjectileSize,    {173.f / 255.f, 49.f / 255.f, 75.f / 255.f}},
 			{FireRate,          {1.f, 1.f, 1.f}},
 			{BulletRange,       {0.f, 0.f, 1.f}},
 			{BulletSpread,      {1.f, 0.f, 0.f}},
@@ -86,10 +87,10 @@ class RenderSystem {
 			{Pierce,            {1.f, 0.f, 0.f}},
 			{Homing,            {1.f, 0.f, 0.f}},
 			{PlayerSpeed,       {0.f, 0.f, 1.f}},
-			{PlayerNumDash,     {0.f, 0.f, 1.f}},
+			{PlayerNumDash,     {0.f, 1.f, 1.f}},
 			{PlayerStackSize,   {0.f, 1.f, 0.f}},
 			{PlayerDashCDR,     {1.f, 0.f, 0.f}},
-			{Inert,             {91 / 255.f, 99 / 255.f, 128 / 255.f}}
+			{Inert,             {91.f / 255.f, 99.f / 255.f, 128.f / 255.f}}
 	};
 
 public:

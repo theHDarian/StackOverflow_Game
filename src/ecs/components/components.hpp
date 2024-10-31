@@ -205,7 +205,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	DASH = POSTPROCESS + 1,
 	HP_BAR = DASH + 1,
 	ANIMATE = HP_BAR + 1,
-	EFFECT_COUNT = ANIMATE + 1
+	BULLET = ANIMATE + 1,
+	EFFECT_COUNT = BULLET + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

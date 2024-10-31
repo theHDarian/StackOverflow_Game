@@ -156,7 +156,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
+	if (render_request.used_effect == EFFECT_ASSET_ID::BULLET || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
@@ -174,6 +174,39 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
 			GLint frame_uloc = glGetUniformLocation(program, "frame");
 			glUniform1i(frame_uloc, registry.animations.get(entity).frame);
+			gl_has_errors();
+		}
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::BULLET) {
+			GLint laser_uloc = glGetUniformLocation(program, "laser");
+			glUniform1i(laser_uloc, registry.lasers.has(entity));
+
+			int size = registry.enemyBullets.get(entity).bulletEffects.size();
+			std::vector<BulletStackEffect> bse = registry.enemyBullets.get(entity).bulletEffects;
+			GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
+			glUniform1i(effect_size_uloc, size);
+
+			GLint shape_uloc = glGetUniformLocation(program, "shape");
+			glUniform1i(shape_uloc, registry.enemyBullets.get(entity).shape);
+			
+			vec3 c1, c2, c3, c4, c5;
+			c1 = (size > 0) ? bulletEffectColors[bse[0].type] : vec3(-1.0);
+			c2 = (size > 1) ? bulletEffectColors[bse[1].type] : vec3(-1.0);
+			c3 = (size > 2) ? bulletEffectColors[bse[2].type] : vec3(-1.0);
+			c4 = (size > 3) ? bulletEffectColors[bse[3].type] : vec3(-1.0);
+			c5 = (size > 4) ? bulletEffectColors[bse[4].type] : vec3(-1.0);
+
+			GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
+			glUniform3fv(bcolor1_uloc, 1, (float*)&c1);
+			GLint bcolor2_uloc = glGetUniformLocation(program, "bcolor2");
+			glUniform3fv(bcolor2_uloc, 1, (float*)&c2);
+			GLint bcolor3_uloc = glGetUniformLocation(program, "bcolor3");
+			glUniform3fv(bcolor3_uloc, 1, (float*)&c3);
+			GLint bcolor4_uloc = glGetUniformLocation(program, "bcolor4");
+			glUniform3fv(bcolor4_uloc, 1, (float*)&c4);
+			GLint bcolor5_uloc = glGetUniformLocation(program, "bcolor5");
+			glUniform3fv(bcolor5_uloc, 1, (float*)&c5);
+
 			gl_has_errors();
 		}
 

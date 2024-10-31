@@ -215,7 +215,7 @@ const AttackData wave{
 const AttackData laserNoRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{},
+	{bulletBounceUpA},
 	blunt,
 	3,
 	0,
@@ -379,8 +379,8 @@ const AttackData threeBurst{
 
 const AttackData fiveBurst{
 	EnemyAttackPattern::BURST,
-	CIRCLE,
-	{},
+	RECTANGLE,
+	{numBulletsUpA, sizeUpA, dashUpA},
 	blunt,
 	6,
 	M_PI / 6,
