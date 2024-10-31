@@ -998,8 +998,9 @@ void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	vec2 position = { windowState.width/2, windowState.height-60.0};
 	vec2 scale = { 600, 30 };
 	Motion& motion = registry.motions.get(entity);
+
 	if (!registry.bosses.has(entity)) {
-		position = motion.position + vec2(0, motion.scale.y / 2);
+		position = motion.position + vec2(0, motion.scale.y / 2 + 10);
 		scale = { 100, 10 };
 	}
 
