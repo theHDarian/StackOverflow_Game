@@ -53,7 +53,8 @@ struct WallCollider {
 };
 
 
-struct Bound {}; //room bounds
+struct Bound {
+}; //room bounds
 
 struct AABBCollider {
 	// As offsets of motion.position:
@@ -187,7 +188,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	POSTPROCESS = TEXTURED + 1,
 	DASH = POSTPROCESS + 1,
 	HP_BAR = DASH + 1,
-	EFFECT_COUNT = HP_BAR + 1,
+	ROOM_BOUND = HP_BAR + 1,
+	EFFECT_COUNT = ROOM_BOUND + 1,
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

@@ -149,7 +149,7 @@ void createRoomBounds(RenderSystem *renderer)
 
 		auto &motion = registry.motions.emplace(entity);
 		motion.position = (startPosition + endPosition) / 2.0f;
-		motion.scale = vec2(glm::distance(startPosition, endPosition), 5);
+		motion.scale = vec2(2880.0f,240.0f) / 5.0f;
 		motion.angle = atan2(endPosition.y - startPosition.y, endPosition.x - startPosition.x);
 
 		auto &wall = registry.walls.emplace(entity);
@@ -158,11 +158,11 @@ void createRoomBounds(RenderSystem *renderer)
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
-			{"none",
-			EFFECT_ASSET_ID::EGG,
-			GEOMETRY_BUFFER_ID::DEBUG_LINE});
-		rr.offset = vec2(100,100);
-		registry.bounds.emplace(entity);
+			{"wall_horizontal.png",
+			EFFECT_ASSET_ID::ROOM_BOUND,
+			GEOMETRY_BUFFER_ID::SPRITE});
+		rr.offset = vec2(0,0);
+		Bound& b = registry.bounds.emplace(entity);
 	}
 }
 

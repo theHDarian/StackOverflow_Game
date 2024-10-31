@@ -47,6 +47,7 @@ class RenderSystem {
 		shader_path("postprocess"),
 		shader_path("dash"),
 		shader_path("healthbar"),
+		shader_path("roombound"),
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
