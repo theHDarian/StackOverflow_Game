@@ -306,6 +306,10 @@ SpriteData getSprite(SpriteName name)
 	{
 		return bigC;
 	}
+	case SpriteName::MAGNETSPRITE:
+	{
+		return magnet;
+	}
 	default:
 		return pufferFish;
 	}
@@ -334,6 +338,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = EnemyBigC();
 		registry.bosses.emplace(entity);
+		break;
+	}
+	case EnemyType::MediumEnemyCharge:
+	{
+		enemy = EnemyMediumCharge();
 		break;
 	}
 
