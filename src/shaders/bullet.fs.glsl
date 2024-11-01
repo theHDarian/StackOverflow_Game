@@ -53,27 +53,31 @@ vec3 rectangle() {
 }
 
 vec3 tri() {
+	float targetA = 2.67795;
+	float range	  =	0.92729;
+	float a = (atan(texcoord.y - 0.5, texcoord.x - 1.0));
+	if (a < 0) a += 2 * PI;
 	switch (effectSize) {
 	case 2:
-		if (texcoord.x < 0.29289) return bcolor1;
+		if (a > targetA + range * (1.0 / 2.0)) return bcolor1;
 		return bcolor2;
 		break;
 	case 3:
-		if (texcoord.x < 0.1835) return bcolor1;
-		if (texcoord.x < 0.577) return bcolor2;
+		if (a > targetA + range * (2.0 / 3.0)) return bcolor1;
+		if (a > targetA + range * (1.0 / 3.0)) return bcolor2;
 		return bcolor3;
 		break;
 	case 4:
-		if (texcoord.x < 0.12) return bcolor1;
-		if (texcoord.x < 0.45) return bcolor2;
-		if (texcoord.x < 0.6) return bcolor3;
+		if (a > targetA + range * (3.0 / 4.0)) return bcolor1;
+		if (a > targetA + range * (2.0 / 4.0)) return bcolor2;
+		if (a > targetA + range * (1.0 / 4.0)) return bcolor3;
 		return bcolor4;
 		break;
 	case 5:
-		if (texcoord.x < 0.2) return bcolor1;
-		if (texcoord.x < 0.4) return bcolor2;
-		if (texcoord.x < 0.6) return bcolor3;
-		if (texcoord.x < 0.8) return bcolor4;
+		if (a > targetA + range * (4.0 / 5.0)) return bcolor1;
+		if (a > targetA + range * (3.0 / 5.0)) return bcolor2;
+		if (a > targetA + range * (2.0 / 5.0)) return bcolor3;
+		if (a > targetA + range * (1.0 / 5.0)) return bcolor4;
 		return bcolor5;
 		break;
 	}

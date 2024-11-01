@@ -380,11 +380,11 @@ const AttackData threeBurst{
 const AttackData fiveBurst{
 	EnemyAttackPattern::BURST,
 	TRIANGLE,
-	{numBulletsUpA, sizeUpA, dmgDownA},
+	{numBulletsUpA, sizeUpA},
 	blunt,
 	6,
 	M_PI / 6,
-	{20, 20},
+	{30, 30},
 	200,
 	3000,
 	{0, 0},
