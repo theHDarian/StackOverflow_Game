@@ -208,7 +208,8 @@ enum EnemyType {
     // EasyEnemySniper,
     // HardEnemyBehavior
     TestRevampedEnemy,
-    BossBigC
+    BossBigC,
+    TypeBee
 };
 
 enum class EnemyAttackPattern {
@@ -310,7 +311,8 @@ enum SpriteName {
     SWORDSPRITE,
     SKULLSPRITE,
     QUADSHOOTERSPRITE,
-    MAGNETSPRITE
+    MAGNETSPRITE,
+    BEESPRITE
 };
 
 

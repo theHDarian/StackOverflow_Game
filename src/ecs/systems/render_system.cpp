@@ -30,113 +30,50 @@ void RenderSystem::step(float elapsed_ms) {
 		}
 	}
 
-	for (Entity player : registry.players.entities) {
-		Animation& anim = registry.animations.get(player);
-		if (registry.renderRequests.get(player).used_effect == EFFECT_ASSET_ID::ANIMATE) {
+	for (Entity entity : registry.animations.entities) {
+		Animation& anim = registry.animations.get(entity);
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE) {
 			anim.animation_countdown -= elapsed_ms;
 		}
 		if (anim.animation_countdown <= 0) {
 			anim.animation_countdown = anim.animation_countdown_base;
-			anim.frame = (anim.frame + 1) % 5;
+			anim.frame = (anim.frame + 1) % anim.max_frames;
 			//std::cout << "time to change frame to frame " << anim.frame << std::endl;
 		}
 	}
 }
 
-// keep it to just the player for now
-void RenderSystem::animatePlayer(Entity entity, const mat3& projection) {
-	Motion& motion = registry.motions.get(entity);
-	// need to store frame info elsewhere
-	unsigned int frame = 0;
-
-	Transform transform;
-	vec2 offset = registry.renderRequests.get(entity).offset;;
-	transform.translate(motion.position);
-	transform.rotate(motion.angle);
-	transform.translate(offset * glm::normalize(motion.scale));
-	transform.scale(motion.scale);
-
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::ANIMATE;
-	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
-	const GLuint program = (GLuint)effects[used_effect_enum];
-
-	// Setting shaders
-	glUseProgram(program);
-	gl_has_errors();
-
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
-
-GLint in_position_loc = glGetAttribLocation(program, "in_position");
-GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-gl_has_errors();
-assert(in_texcoord_loc >= 0);
-
-glEnableVertexAttribArray(in_position_loc);
-glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-	sizeof(TexturedVertex), (void*)0);
-gl_has_errors();
-
-glEnableVertexAttribArray(in_texcoord_loc);
-glVertexAttribPointer(
-	in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-	(void*)sizeof(
-		vec3)); // note the stride to skip the preceeding vertex position
-
-// Enabling and binding texture to slot 0
-glActiveTexture(GL_TEXTURE0);
-gl_has_errors();
-
-assert(registry.renderRequests.has(entity));
-GLuint texture_id =
-texture_gl_handles[(GLuint)name_to_texture["mc_walkv1_0000 (2).png"]];
-
-glBindTexture(GL_TEXTURE_2D, texture_id);
-gl_has_errors();
-
-// Get number of indices from index buffer, which has elements uint16_t
-GLint size = 0;
-glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-gl_has_errors();
-
-GLsizei num_indices = size / sizeof(uint16_t);
-// GLsizei num_triangles = num_indices / 3;
-
-GLint currProgram;
-glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-// Setting uniform values to the currently bound program
-GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
-GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
-gl_has_errors();
-// Drawing of num_indices/3 triangles specified in the index buffer
-glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-gl_has_errors();
-}
-
 void RenderSystem::drawTexturedMesh(Entity entity,
 	const mat3& projection)
 {
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
 	Motion& motion = registry.motions.get(entity);
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
 	Transform transform;
-	vec2 offset = registry.renderRequests.get(entity).offset;;
+	vec2 offset = registry.renderRequests.get(entity).offset;
 
 	transform.translate(motion.position);
 	transform.rotate(motion.angle);
 	transform.translate(offset * glm::normalize(motion.scale));
 	transform.scale(motion.scale);
 
-	assert(registry.renderRequests.has(entity));
-	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	/*
+		// cheat a bit to test bee specifically
+	if (render_request.texture_name.compare("bee_fly") == 0) {
+		vec2 scale = texture_dimensions[name_to_texture[render_request.texture_name]];
+		transform.translate(offset * glm::normalize(scale) * motion.scale);
+		transform.scale(scale * motion.scale);
+		// this doesn't work well, other stuff still need to know the scale :(
+	}
+	else {
+		transform.translate(offset * glm::normalize(motion.scale));
+		transform.scale(motion.scale);
+	}
+	*/
+
 
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
