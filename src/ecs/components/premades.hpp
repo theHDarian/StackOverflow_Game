@@ -568,3 +568,68 @@ struct EnemyMediumCharge : Enemy
 		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
+
+
+struct Bee1 : Enemy
+{
+	Reaction reactionPatrol = {
+		ReactionType::DURATION,
+		1};
+
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0};
+	Reaction reactionBeeClose = {
+		ReactionType::BEE_CLOSE,
+		2};
+
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
+	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, NoAttack};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose}, 0, true, 0.f, 5000.f, NoAttack};
+	Bee1()
+	{
+		maxHealth = 20;
+		currHealth = maxHealth;
+		enemyPatterns = {idleBee, randomBee, mergeBee};
+		patternIndex = 0;
+		sprite = {
+			"bee_fly",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2({864 / 8.f, 480 / 8.f});
+	};
+};
+
+struct Bee2 : Enemy
+{
+	Reaction reactionPatrol = {
+		ReactionType::DURATION,
+		1};
+
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0};
+
+	Reaction reactionBeeClose = {
+		ReactionType::BEE_CLOSE,
+		2};
+
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, SniperShot};
+	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, SniperShot};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose}, 0, true, 0.f, 5000.f, NoAttack};
+
+	Bee2()
+	{
+		maxHealth = 60;
+		currHealth = maxHealth;
+		enemyPatterns = {idleBee, randomBee, mergeBee};
+		patternIndex = 0;
+		sprite = {
+			"bee_fly_2",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({864 / 8.f, 480 / 8.f});
+	};
+};
