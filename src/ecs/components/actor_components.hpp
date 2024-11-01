@@ -4,6 +4,7 @@
 #include <map>
 #include <iostream>
 #include <any>
+#include <components.hpp>
 
 
 
@@ -46,7 +47,7 @@ struct BulletStackEffect {
 // Player component
 struct Player
 {
-    float baseSpeed = 200;
+    float baseSpeed = 250;
     float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;
@@ -203,13 +204,14 @@ struct PlayerBullet {
 enum EnemyType {
     EasyEnemySentry,
     // //MediumEnemyClusterShot,
-    // MediumEnemyCharge,
+    MediumEnemyCharge,
     // MediumEnemyHoming,
     // EasyEnemySniper,
     // HardEnemyBehavior
     TestRevampedEnemy,
     BossBigC,
-    TypeBee
+    OneBee,
+    TwoBee
 };
 
 enum class EnemyAttackPattern {
@@ -228,9 +230,9 @@ enum class EnemyAttackPattern {
 
 
 enum EnemyBulletShape {
-    RECTANGLE,
-    TRIANGLE,
-    CIRCLE
+    RECTANGLE   = 0,
+    TRIANGLE    = 1,
+    CIRCLE      = 2
 };
 
 struct AttackData {
@@ -263,6 +265,7 @@ enum class EnemyBehavior {
     TELEPORT,
     IDLE,
     MERGE_BEE
+
 };
 
 
@@ -301,19 +304,14 @@ struct EnemyPattern {
     AttackData atkData;
 };
 
-enum SpriteName {
-    PUFFERFISHSPRITE,
-    TURRETSPRITE,
-    BIGCSPRITE,
-    CRABSPRITE,
-    ANGELSPRITE,
-    WIZARDSPRITE,
-    TANKSPRITE,
-    SWORDSPRITE,
-    SKULLSPRITE,
-    QUADSHOOTERSPRITE,
-    MAGNETSPRITE,
-    BEESPRITE
+
+struct SpriteData
+{
+
+	std::string texturePath;
+	EFFECT_ASSET_ID effectId;
+	GEOMETRY_BUFFER_ID geometryId;
+	vec2 offset;
 };
 
 
@@ -330,7 +328,7 @@ struct Enemy {
         return enemyPatterns[patternIndex];
     };
     vec2 scale;
-    SpriteName sprite;
+    SpriteData sprite;
 };
 
 struct EnemyMovement {
@@ -354,6 +352,7 @@ struct EnemyBullet {
     int bulletBounce;
     int bulletPierce;
     std::vector<BulletStackEffect> bulletEffects;
+    EnemyBulletShape shape;
 };
 
 struct Burst {
@@ -395,6 +394,7 @@ struct Damaged {
 
 struct BeeEnemy {
     std::set<Entity> nearbyBees;
-    int mergeCount = 0;
-    int maxMerge = 6;
+    int mergeCount = 1;
+    int maxMerge = 2;
+    bool merge = false;
 };
