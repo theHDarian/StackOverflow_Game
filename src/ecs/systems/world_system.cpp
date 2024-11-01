@@ -91,12 +91,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 	  window_width_px = vidMode->width;
 	  window_height_px = vidMode->height;
-	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -108,6 +108,8 @@ GLFWwindow* WorldSystem::createWindow() {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+
+
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -144,6 +146,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	std::string title = "StackOverflow";
 
 	glfwSetWindowTitle(window, title.c_str());
+
 
 	return window;
 }
@@ -622,7 +625,7 @@ void WorldSystem::movePlayer() {
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
-	
+
 }
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)

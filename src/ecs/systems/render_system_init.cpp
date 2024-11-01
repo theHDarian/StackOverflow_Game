@@ -510,7 +510,6 @@ bool loadEffectFromFile(
 	return true;
 }
 
-
 #if IMGUI_ENABLED
 void RenderSystem::initImGui() {
 	IMGUI_CHECKVERSION();
