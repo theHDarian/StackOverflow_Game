@@ -291,30 +291,6 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 	return entity;
 };
 
-SpriteData getSprite(SpriteName name)
-{
-	switch (name)
-	{
-	case SpriteName::PUFFERFISHSPRITE:
-	{
-		return pufferFish;
-	}
-	case SpriteName::TURRETSPRITE:
-	{
-		return turret;
-	}
-	case SpriteName::BIGCSPRITE:
-	{
-		return bigC;
-	}
-	case SpriteName::MAGNETSPRITE:
-	{
-		return magnet;
-	}
-	default:
-		return pufferFish;
-	}
-}
 
 Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 {
@@ -368,8 +344,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 
 	registry.bursts.emplace(entity);
 
-	SpriteData sprite = getSprite(enemy.sprite);
-	if (sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
+	if (enemy.sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
 	{
 		CircleCollider &cc = registry.circleColliders.emplace(entity);
 		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
@@ -387,15 +362,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	registry.renderRequests.insert(
 		entity,
 		{
-			sprite.texturePath,
-			sprite.effectId,
-			sprite.geometryId,
+			enemy.sprite.texturePath,
+			enemy.sprite.effectId,
+			enemy.sprite.geometryId,
 			// true,
 			// vec2(-12, 0) // manually set an offset for now
 		});
 
 	// need to also add an animate component
-	if (sprite.effectId == EFFECT_ASSET_ID::ANIMATE) {
+	if (enemy.sprite.effectId == EFFECT_ASSET_ID::ANIMATE) {
 		auto& animate = registry.animations.emplace(entity);
 		animate.max_frames = 5; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
 		animate.animation_countdown = 20;

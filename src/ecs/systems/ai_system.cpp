@@ -58,7 +58,7 @@ void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
 	vec2 EnemyPos = movement.posA;
 	float distance = glm::distance(playerPos, EnemyPos);
 	float closeDistance = 400.f;
-	float hpPercent = enemy.currHealth / enemy.maxHealth;
+	float hpPercent = static_cast<float>(enemy.currHealth) / static_cast<float>(enemy.maxHealth);
 	EnemyPattern& currPattern = enemy.currEnemyPattern();
 	bool reaction_found = false;
 	if (hpPercent < 0.25f) {

@@ -6,7 +6,6 @@
 #include "../ext/stb_image/stb_image.h"
 
 #include "map_components.hpp"
-#include "actor_components.hpp"
 #include "io_components.hpp"
 #include "ui_components.hpp"
 
