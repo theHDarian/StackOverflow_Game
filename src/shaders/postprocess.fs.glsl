@@ -1,5 +1,32 @@
 #version 330
 
+/*
+    
+    This shader is a heavily modified version of the shader found here:
+    https://github.com/libretro/glsl-shaders/blob/master/crt/shaders/crt-lottes.glsl
+
+    Original comment on use of the shader:
+        // PUBLIC DOMAIN CRT STYLED SCAN-LINE SHADER
+        //
+        //   by Timothy Lottes
+        //
+        // This is more along the style of a really good CGA arcade monitor.
+        // With RGB inputs instead of NTSC.
+        // The shadow mask example has the mask rotated 90 degrees for less chromatic aberration.
+        //
+        // Left it unoptimized to show the theory behind the algorithm.
+        //
+        // It is an example what I personally would want as a display option for pixel art games.
+        // Please take and use, change, or whatever.
+
+    Changes include:
+        Removal of unnecessary / unused parts
+        Rotation of the scanlines
+        Custom values
+        Addition of a chromatic abberation effect
+
+*/
+
 out vec4 FragColor;
 
 precision mediump float;
