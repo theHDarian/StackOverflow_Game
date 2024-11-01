@@ -3,6 +3,7 @@
 
 #include "tiny_ecs.hpp"
 #include "components.hpp"
+#include "actor_components.hpp"
 
 class ECSRegistry
 {

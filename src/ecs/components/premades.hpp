@@ -438,40 +438,7 @@ const AttackData NoAttack{
 	0,
 	0};
 
-////////////////////////////////////
-//////// ENEMY SPRITE //////////////
-////////////////////////////////////
-struct SpriteData
-{
 
-	std::string texturePath;
-	EFFECT_ASSET_ID effectId;
-	GEOMETRY_BUFFER_ID geometryId;
-	vec2 offset;
-};
-
-const SpriteData pufferFish{
-	"enemy_Pufferfish.png",
-	EFFECT_ASSET_ID::TEXTURED,
-	GEOMETRY_BUFFER_ID::SPRITE,
-	vec2(-12, 0)};
-
-const SpriteData bigC{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-					  "none",
-					  EFFECT_ASSET_ID::MESH,
-					  GEOMETRY_BUFFER_ID::MESH_GB};
-
-const SpriteData turret{
-	"enemy_QuadShooter.png",
-	EFFECT_ASSET_ID::TEXTURED,
-	GEOMETRY_BUFFER_ID::SPRITE,
-	vec2(-12, 0)};
-
-const SpriteData magnet{
-	"enemy_Magnet.png",
-	EFFECT_ASSET_ID::TEXTURED,
-	GEOMETRY_BUFFER_ID::SPRITE,
-};
 
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
@@ -521,36 +488,15 @@ struct TestEnemy : Enemy
 			patrolState,
 			followState};
 		patternIndex = 0;
-		sprite = SpriteName::PUFFERFISHSPRITE;
+		sprite = {
+			"enemy_Pufferfish.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(-12, 0)};
 		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
 
-struct Bee : Enemy
-{
-	Reaction reactionPatrol = {
-		ReactionType::DURATION,
-		1 };
-
-	Reaction reactionIdle = {
-		ReactionType::DURATION,
-		0 };
-	Reaction reactionPlayerClose = {
-		ReactionType::PLAYER_CLOSE,
-		2 };
-	Bee()
-	{
-		maxHealth = 10;
-		currHealth = maxHealth;
-		enemyPatterns = {
-			{"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
-			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot},
-			{"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot} };
-		patternIndex = 0;
-		sprite = SpriteName::BEESPRITE;
-		scale = vec2({ 864 / 8.f, 480 / 8.f });
-	};
-};
 
 struct EnemyEasySentry : Enemy
 {
@@ -560,11 +506,14 @@ struct EnemyEasySentry : Enemy
 		maxHealth = 100;
 		currHealth = maxHealth;
 
-		enemyPatterns = {rotateState
-			};
+		enemyPatterns = {rotateState};
 
 		patternIndex = 0;
-		sprite = SpriteName::TURRETSPRITE;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(-12, 0)};
 		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
@@ -581,7 +530,10 @@ struct EnemyBigC : Enemy
 		enemyPatterns = {
 			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
 		patternIndex = 0;
-		sprite = SpriteName::BIGCSPRITE;
+		sprite = {// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+				  "none",
+				  EFFECT_ASSET_ID::MESH,
+				  GEOMETRY_BUFFER_ID::MESH_GB};
 		scale = vec2({700 * (1.923352 / 2.f), 700});
 	};
 };
@@ -606,9 +558,13 @@ struct EnemyMediumCharge : Enemy
 		maxHealth = 500;
 		currHealth = maxHealth;
 		enemyPatterns = {
-			idleState,followState};
+			idleState, followState};
 		patternIndex = 1;
-		sprite = SpriteName::MAGNETSPRITE;
+		sprite = {
+			"enemy_Magnet.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
 		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };

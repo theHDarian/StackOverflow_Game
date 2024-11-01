@@ -4,6 +4,7 @@
 #include <map>
 #include <iostream>
 #include <any>
+#include <components.hpp>
 
 
 
@@ -300,19 +301,14 @@ struct EnemyPattern {
     AttackData atkData;
 };
 
-enum SpriteName {
-    PUFFERFISHSPRITE,
-    TURRETSPRITE,
-    BIGCSPRITE,
-    CRABSPRITE,
-    ANGELSPRITE,
-    WIZARDSPRITE,
-    TANKSPRITE,
-    SWORDSPRITE,
-    SKULLSPRITE,
-    QUADSHOOTERSPRITE,
-    MAGNETSPRITE,
-    BEESPRITE
+
+struct SpriteData
+{
+
+	std::string texturePath;
+	EFFECT_ASSET_ID effectId;
+	GEOMETRY_BUFFER_ID geometryId;
+	vec2 offset;
 };
 
 
@@ -329,7 +325,7 @@ struct Enemy {
         return enemyPatterns[patternIndex];
     };
     vec2 scale;
-    SpriteName sprite;
+    SpriteData sprite;
 };
 
 struct EnemyMovement {

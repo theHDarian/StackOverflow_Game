@@ -9,6 +9,7 @@
 #endif
 
 #include "components.hpp"
+#include "actor_components.hpp"
 #include "tiny_ecs.hpp"
 
 //#include <experimental/filesystem>
