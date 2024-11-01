@@ -64,20 +64,14 @@ int main() {
     if (cursorImg.pixels == nullptr) {
         fprintf(stderr, "Failed to load cursor image\n");
         return EXIT_FAILURE;
-    } else {
-        fprintf(stderr, "Cursor image loaded: %dx%d\n", cursorImg.width, cursorImg.height);
     }
-
-    GLFWcursor* customCursor = glfwCreateCursor(&cursorImg, 16, 16);
+    GLFWcursor* customCursor = glfwCreateCursor(&cursorImg, cursorImg.width/2, cursorImg.height/2);
     if (customCursor == nullptr) {
         fprintf(stderr, "Failed to create custom cursor\n");
         return EXIT_FAILURE;
-    } else {
-        fprintf(stderr, "Custom cursor created\n");
     }
     glfwSetCursor(window, customCursor);
     fprintf(stderr, "Custom cursor set\n");
-    stbi_image_free(cursorImg.pixels);
 
 
     // Variable timestep loop
