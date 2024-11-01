@@ -52,6 +52,34 @@ vec3 rectangle() {
 	return bcolor1;
 }
 
+vec3 tri() {
+	switch (effectSize) {
+	case 2:
+		if (texcoord.x < 0.29289) return bcolor1;
+		return bcolor2;
+		break;
+	case 3:
+		if (texcoord.x < 0.1835) return bcolor1;
+		if (texcoord.x < 0.577) return bcolor2;
+		return bcolor3;
+		break;
+	case 4:
+		if (texcoord.x < 0.12) return bcolor1;
+		if (texcoord.x < 0.45) return bcolor2;
+		if (texcoord.x < 0.6) return bcolor3;
+		return bcolor4;
+		break;
+	case 5:
+		if (texcoord.x < 0.2) return bcolor1;
+		if (texcoord.x < 0.4) return bcolor2;
+		if (texcoord.x < 0.6) return bcolor3;
+		if (texcoord.x < 0.8) return bcolor4;
+		return bcolor5;
+		break;
+	}
+	return bcolor1;
+}
+
 vec3 circle() {
 	float a = (atan(texcoord.y-0.5, texcoord.x-0.5) + PI) / (2 * PI);
 	switch (effectSize) {
@@ -95,7 +123,7 @@ void main()
 		color = vec4(rectangle(), 1.0);
 		break;
 	case 1:
-		color = vec4(rectangle(), 1.0);
+		color = vec4(tri(), 1.0);
 		break;
 	case 2:
 		color = vec4(circle(), 1.0);

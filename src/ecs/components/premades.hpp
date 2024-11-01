@@ -379,8 +379,8 @@ const AttackData threeBurst{
 
 const AttackData fiveBurst{
 	EnemyAttackPattern::BURST,
-	RECTANGLE,
-	{numBulletsUpA, sizeUpA, dashUpA},
+	TRIANGLE,
+	{numBulletsUpA, sizeUpA, dmgDownA},
 	blunt,
 	6,
 	M_PI / 6,
@@ -555,7 +555,7 @@ struct EnemyMediumCharge : Enemy
 	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyMediumCharge()
 	{
-		maxHealth = 500;
+		maxHealth = 50;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			idleState, followState};
