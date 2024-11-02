@@ -209,17 +209,33 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             excludeNone = true;
     }
 }
-
+std::string getSymbol(RoomType type) {
+    if (type == RoomType::BossBigCRoom) {
+        return "door_symbol_boss.png";
+    } else if (type == RoomType::TreasureRoom) {
+        return "door_symbol_treasure.png";
+    } else if (type == RoomType::RestRoom) {
+        return "door_symbol_resting.png";
+    } else if (type == RoomType::None) {
+        return "none"; 
+    }else {
+        return "door_symbol_enemy.png";
+    }
+}
 void MapSystem::resetMap()
 {
     clearRoomActors();
 
     bool excludeNone = false;
+    int index = 0;
     for (Door &d : registry.doors.components)
     {
         d.room = randomRoomType(excludeNone);
         if (d.room == RoomType::None)
             excludeNone = true;
+
+        registry.renderRequests.get(registry.doorSymbols.entities[index]).texture_name = getSymbol(d.room);
+        index++;
     }
 
     for (Door &d : registry.doors.components)

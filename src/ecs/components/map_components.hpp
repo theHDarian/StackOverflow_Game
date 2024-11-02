@@ -39,6 +39,7 @@ struct Door {
 struct DoorSymbol {
     float angle;
     vec3 axis;
+    vec3 offset;
 };
 
 struct Room {

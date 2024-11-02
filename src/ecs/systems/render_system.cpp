@@ -217,6 +217,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			DoorSymbol& d = registry.doorSymbols.get(entity);
 			angle = d.angle;
 			axis = d.axis;
+			offset = d.offset;
 		} else {
 			assert(false);
 		}
@@ -225,15 +226,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 						* glm::translate(glm::mat4(1.0f),offset)
 						* glm::rotate(glm::mat4(1.0f),angle,axis) //rotate to be vertical on z axis
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
-		glm::vec3 position = glm::vec3(motion.position.x, motion.position.y, 0.0f);
-		float angle1 = motion.angle;
-		float angle2 = angle; // Second rotation angle
-		glm::vec3 scale = glm::vec3(motion.scale, 1.0f);
-
-		std::cout << "Position: (" << position.x << ", " << position.y << ", " << position.z << ") "
-				<< "Angle 1: " << angle1 << " radians "
-				<< "Angle 2: " << angle2 << " radians "
-				<< "Scale: (" << scale.x << ", " << scale.y << ", " << scale.z << ")\n";
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
 		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, 400.0f); // Position above the XY plane
 		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f);
