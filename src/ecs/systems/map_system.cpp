@@ -120,7 +120,6 @@ void MapSystem::step(float elapsed_ms)
         // this part is to just mockup dialogue keypress until proper system is setup
         IOState& iostate = registry.ioStates.components[0];
         GameState& gameState = registry.gameStates.components[0];
-        iostate.shouldShowDialogue = true; // will remove in future?
         iostate.nextDialogue = true; // why are there so many parts to be turned on
         gameState.dialogueScene = true;
         map.currRoom.cleared = true;
@@ -271,8 +270,6 @@ void MapSystem::resetMap()
     lines = DialogueLines();
     gameState.dialogueScene = false;
     IOState& iostate = registry.ioStates.components[0];
-    iostate.shouldShowDialogue = false; // will remove in future?
-    iostate.nextDialogue = true;
 
     // createBigC(renderer, vec2(600, 600));
 }

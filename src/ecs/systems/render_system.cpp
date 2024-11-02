@@ -56,7 +56,6 @@ void RenderSystem::step(float elapsed_ms) {
 			// this part is to just mockup dialogue keypress until proper system is setup
 			IOState& iostate = registry.ioStates.components[0];
 			GameState& gameState = registry.gameStates.components[0];
-			iostate.shouldShowDialogue = true; // will remove in future?
 			iostate.nextDialogue = true; // why are there so many parts to be turned on
 			gameState.dialogueScene = true;
 		}
@@ -382,6 +381,8 @@ void RenderSystem::drawGameElements()
 	mat3 projection_2D = createProjectionMatrix();
 	glBindVertexArray(vao);
 
+	IOState& ioState = registry.ioStates.components[0];
+
 	// this setup requires us know what types of things to render
 	// and won't render all render requests if not given the proper component
 	// Note, its not very efficient to access elements indirectly via the entity
@@ -391,7 +392,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.playerBullets.entities)
@@ -407,8 +409,9 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
 		drawHPbar(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.players.entities)
@@ -416,7 +419,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.walls.entities)

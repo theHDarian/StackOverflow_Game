@@ -34,7 +34,7 @@ void UISystem::playDialogue() {
 	IOState& input = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];
 
-	if (input.shouldShowDialogue && input.nextDialogue) {
+	if (gameState.dialogueScene && input.nextDialogue) {
 		input.nextDialogue = false;
 		std::string nextLine = registry.dialogueLines.get(dialogueBox).next(); // don't know how to sort system ahhh
 		//std::cout << " dialogue line " << nextLine << std::endl;
@@ -44,7 +44,6 @@ void UISystem::playDialogue() {
 		}
 		// no more lines of dialogue
 		else {
-			input.shouldShowDialogue = false;
 			registry.renderRequests.get(dialogueBox).show = false;
 			gameState.dialogueScene = false;
 		}

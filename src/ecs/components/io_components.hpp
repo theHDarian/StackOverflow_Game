@@ -17,8 +17,8 @@ struct IOState {
 	vec2 inputAxis;
 	vec2 lastInputAxis = {1,1};
 	vec2 mousePosition;
-	bool shouldShowDialogue = false;
 	bool nextDialogue = false;
+	bool debugMode = false;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;

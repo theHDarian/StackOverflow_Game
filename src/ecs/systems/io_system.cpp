@@ -51,12 +51,14 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
         ioState.shouldRestart = true;
 	}
 
+	// Debug toggle for colliders
+	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+		ioState.debugMode = !ioState.debugMode;
+	}
+
 	// show dialogue window and play dialogue sequence (temp function)
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused) {
 		// pause game when dialogue plays for now
-		if (!ioState.shouldShowDialogue)
-			gameState.dialogueScene = true;
-		ioState.shouldShowDialogue = true;
 		ioState.nextDialogue = true;
 	}
 
