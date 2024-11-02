@@ -34,7 +34,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			float intensity = registry.homes.get(entity).homingIntensity;
 			target -= motion.position;
 			float mag = glm::length(motion.velocity);
-			motion.velocity = mag * (intensity * glm::normalize(target) + (1 - intensity) * glm::normalize(motion.velocity));
+			motion.velocity = mag * glm::normalize(intensity * glm::normalize(target) + (1 - intensity) * glm::normalize(motion.velocity));
 		}
 
 		if (registry.lasers.has(entity)) {
@@ -219,6 +219,9 @@ bool PhysicsSystem::CircleToWall(Entity circle, Entity wall) {
 	CircleCollider& c = registry.circleColliders.get(circle);
 
 	WallCollider& w = registry.walls.get(wall);
+
+	// Check to stop explosions from being deleted too soon
+	if (m.velocity == vec2(0)) return false;
 
 	return CircleToLine(m.position, c.radius, w.startPosition, w.endPosition);
 }

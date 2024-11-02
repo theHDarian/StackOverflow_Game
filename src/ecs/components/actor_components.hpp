@@ -227,6 +227,12 @@ enum class EnemyAttackPattern {
     NONE
 };
 
+enum class EnemyBulletDeath {
+    NONE,
+    EXPLODE,
+    CLUSTER
+};
+
 
 enum EnemyBulletShape {
     RECTANGLE   = 0,
@@ -249,6 +255,7 @@ struct AttackData {
     int bulletPierce = 0;
     int bulletBounce = 0;
     float homing = 0;
+    EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
 };
 
 enum class EnemyBehavior {
@@ -350,6 +357,7 @@ struct EnemyBullet {
     int bulletPierce;
     std::vector<BulletStackEffect> bulletEffects;
     EnemyBulletShape shape;
+    EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
 };
 
 struct Burst {

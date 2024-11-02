@@ -43,6 +43,8 @@ public:
 
 	void clearDeleteQueue();
 
+	void enemyBulletDeath(Entity e);
+
 
 static float getModifiedValue(BulletEffectType bf, float value);
 private:

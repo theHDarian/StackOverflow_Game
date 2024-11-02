@@ -115,8 +115,14 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		}
 
 		if (render_request.used_effect == EFFECT_ASSET_ID::BULLET) {
+			GLuint time_uloc = glGetUniformLocation(program, "time");
+			glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
 			GLint laser_uloc = glGetUniformLocation(program, "laser");
 			glUniform1i(laser_uloc, registry.lasers.has(entity));
+
+			GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
+			glUniform1i(onDeath_uloc, registry.enemyBullets.get(entity).onDeath != EnemyBulletDeath::NONE);
 
 			int size = registry.enemyBullets.get(entity).bulletEffects.size();
 			std::vector<BulletStackEffect> bse = registry.enemyBullets.get(entity).bulletEffects;
@@ -125,6 +131,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 			GLint shape_uloc = glGetUniformLocation(program, "shape");
 			glUniform1i(shape_uloc, registry.enemyBullets.get(entity).shape);
+
+			GLint scale_uloc = glGetUniformLocation(program, "scale");
+			glUniform2fv(scale_uloc, 1, (float*)&registry.motions.get(entity).scale);
 			
 			vec3 c1, c2, c3, c4, c5;
 			c1 = (size > 0) ? bulletEffectColors[bse[0].type] : vec3(-1.0);
@@ -284,10 +293,10 @@ void RenderSystem::drawToScreen()
 	const GLuint postprocess_program = effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS];
 	// Set clock
 	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
-	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
 	float intensity = (float)stack.currStack.size() / ((stack.baseStackSize + stack.additives[PlayerStackSize]) * stack.multiplicatives[PlayerStackSize]);
+	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
 	glUniform1f(chrom_abb_intensity_uloc, intensity);
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the

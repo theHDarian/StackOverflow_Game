@@ -677,8 +677,28 @@ void WorldSystem::clearDeleteQueue() {
 		// right now, all our entities that fade will also emit particles (enemies)
 		// but should be generalized for more things in the future
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
+			if (registry.enemyBullets.has(e)) {
+				enemyBulletDeath(e);
+			}
 			registry.deleteEntityAndRelatedEntities(e);
 		}
+	}
+}
+
+void WorldSystem::enemyBulletDeath(Entity e) {
+	auto& eb = registry.enemyBullets.get(e);
+	auto& ebm = registry.motions.get(e);
+	if (eb.onDeath == EnemyBulletDeath::NONE) return;
+	if (eb.onDeath == EnemyBulletDeath::EXPLODE) {
+		createEnemyBulletDeath(renderer, ebm.position, vec2(0), EnemyBulletDeath::EXPLODE);
+		return;
+	}
+	else if (eb.onDeath == EnemyBulletDeath::CLUSTER) {
+		createEnemyBulletDeath(renderer, ebm.position, vec2( 1, 1), EnemyBulletDeath::CLUSTER);
+		createEnemyBulletDeath(renderer, ebm.position, vec2( 1,-1), EnemyBulletDeath::CLUSTER);
+		createEnemyBulletDeath(renderer, ebm.position, vec2(-1, 1), EnemyBulletDeath::CLUSTER);
+		createEnemyBulletDeath(renderer, ebm.position, vec2(-1,-1), EnemyBulletDeath::CLUSTER);
+		return;
 	}
 }
 

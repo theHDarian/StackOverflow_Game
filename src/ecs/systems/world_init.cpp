@@ -394,6 +394,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletPierce = atkData.bulletPierce;
 	bullet.bulletEffects = getBulletEffects(atkData);
 	bullet.shape = atkData.shape;
+	if (atkData.onDeath != EnemyBulletDeath::NONE) bullet.onDeath = atkData.onDeath;
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
@@ -457,6 +458,52 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		 renderShape,
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	return entity;
+}
+
+Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBulletDeath onDeath)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletBounce = 0;
+	bullet.bulletPierce = 0;
+	bullet.bulletEffects = { blunt };
+	bullet.shape = CIRCLE;
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+
+	if (onDeath == EnemyBulletDeath::EXPLODE) {
+		bullet.bulletSpeed = 0;
+		bullet.bulletRange = 200;
+		motion.velocity = velocity * bullet.bulletSpeed;
+		motion.scale = {240,240}; // Ensure scale is initialized
+	}
+	else if (onDeath == EnemyBulletDeath::CLUSTER) {
+		bullet.bulletSpeed = 200;
+		bullet.bulletRange = 1000;
+		motion.velocity = velocity * bullet.bulletSpeed;
+		motion.scale = {30, 30}; // Ensure scale is initialized
+		motion.veer = -motion.velocity * 0.8f;
+	}
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x / 2;
+	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
+
+	registry.renderRequests.insert(
+		entity,
+		{// spriteComponent.sprites[SPRITE_STATE::BASE],
+		 "enemy_bullet_circle.png",
+		 EFFECT_ASSET_ID::BULLET,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }

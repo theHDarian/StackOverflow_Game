@@ -257,6 +257,23 @@ const AttackData threeShot{
 	1,
 	0};
 
+const AttackData missile{
+	EnemyAttackPattern::SHOTGUN,
+	TRIANGLE,
+	{},
+	blunt,
+	1,
+	0,
+	{50, 30},
+	400,
+	8000,
+	{0, 0},
+	0,
+	0,
+	0.01,
+	EnemyBulletDeath::CLUSTER
+};
+
 const AttackData sixShot{
 	EnemyAttackPattern::SHOTGUN,
 	RECTANGLE,
@@ -551,7 +568,7 @@ struct EnemyMediumCharge : Enemy
 	Reaction durationIdle = {
 		ReactionType::DURATION,
 		0};
-	EnemyPattern idleState = {"IDLE ATTACKING", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {durationIdle}, 0, true, 0.f, 2000.f, fiveBurst};
+	EnemyPattern idleState = {"IDLE ATTACKING", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {durationIdle}, 0, true, 0.f, 2000.f, missile};
 	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyMediumCharge()
 	{
