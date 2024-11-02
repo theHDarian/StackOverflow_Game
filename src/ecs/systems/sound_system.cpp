@@ -107,6 +107,16 @@ void SoundSystem::loadSoundEffects() {
         throw std::runtime_error("Failed to load player shoot sound");
     }
     playerShootSound->volume = 0.8f * MIX_MAX_VOLUME;
+
+    for (int i = 0; i < 4; i++) {
+        enemyShootSounds.push_back(Mix_LoadWAV(audio_path("sfx/Shoot_0" + std::to_string(i) + ".wav").c_str()));
+        if (!enemyShootSounds[i]) {
+            fprintf(stderr, "Failed to load enemy death sound: %s\n", Mix_GetError());
+            throw std::runtime_error("Failed to load enemy death sound");
+        }
+        enemyShootSounds[i]->volume = 0.8f * MIX_MAX_VOLUME;
+    }
+
 }
 
 void SoundSystem::nextMusic()
@@ -145,6 +155,16 @@ void SoundSystem::playPlayerShootSound(float ticks) {
         Mix_Volume(1, playerShootSound->volume * volume);
     }
 }
+void SoundSystem::playEnemyShootSound(int sfxNumber, int loops) {
+    if (!Mix_Playing(4)) {
+        // Check if the channel is not playing
+        int i = sfxNumber % 4;
+        Mix_PlayChannel(4, enemyShootSounds[i], loops);
+        Mix_Volume(4, enemyShootSounds[i]->volume * volume);
+    }
+}
+
+
 bool SoundSystem::increaseVolume() {
     std::cout << "Volume increased" << std::endl;
     if (this->volume < 1.0f) {
@@ -152,9 +172,9 @@ bool SoundSystem::increaseVolume() {
         this->volume += 0.1f;
         std::cout << "Volume: " << volume << std::endl;
         Mix_VolumeMusic(volume * MIX_MAX_VOLUME * 0.3);
-        // Mix_Volume(1, playerShootSound->volume * volume);
-        // Mix_Volume(2, playerDashSound->volume * volume);
-        // Mix_Volume(3, playerHurtSound->volume * volume);
+        Mix_Volume(1, playerShootSound->volume * volume);
+        Mix_Volume(2, playerDashSound->volume * volume);
+        Mix_Volume(3, playerHurtSound->volume * volume);
         return true;
     }
     return false;
@@ -188,3 +208,6 @@ bool SoundSystem::setVolume(float volume) {
     }
     return false;
 }
+
+
+

@@ -9,6 +9,7 @@
 #include <thread>
 #include <vector>
 #include <glm/gtx/compatibility.hpp>
+#include "sound_system.hpp"
 #include <chrono>
 
 #include "ai_system.hpp"
@@ -17,9 +18,10 @@ float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
 float PLACEHOLDER_FOR_ANGLE = 0.f;
 
-EnemySystem::EnemySystem(RenderSystem *renderer)
+EnemySystem::EnemySystem(RenderSystem *renderer, SoundSystem *sound)
 {
     render = renderer;
+    this->sound = sound;
 };
 
 EnemySystem::~EnemySystem() {
@@ -323,6 +325,28 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
             currPattern.currAtkCD = currPattern.maxAtkCD;
             burst.curBurst = atkData.numBullets;
             burst.burstCooldown = 0;
+        }
+    }
+    //play shoot sound
+    if ( atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
+        if (atkData.shape == EnemyBulletShape::CIRCLE) {
+            sound->playEnemyShootSound(0, atkData.numBullets);
+        }
+        else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
+            sound->playEnemyShootSound(1, atkData.numBullets);
+        }
+        else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
+            sound->playEnemyShootSound(2, atkData.numBullets);
+        }
+    } else {
+        if (atkData.shape == EnemyBulletShape::CIRCLE) {
+            sound->playEnemyShootSound(0, 0);
+        }
+        else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
+            sound->playEnemyShootSound(1, 0);
+        }
+        else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
+            sound->playEnemyShootSound(2, 0);
         }
     }
 }

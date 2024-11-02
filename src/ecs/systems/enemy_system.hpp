@@ -7,10 +7,10 @@
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
 
-
+class SoundSystem;
 class EnemySystem {
 public:
-    EnemySystem(RenderSystem* renderer);
+    EnemySystem(RenderSystem* renderer, SoundSystem* sound);
     ~EnemySystem();
     void step(float elapsed_ms);
 private:
@@ -24,4 +24,5 @@ private:
     void shootLaser(vec2 pos, Entity enemy, AttackData atkData);
     void attack(Entity entity, EnemyPattern& currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms);
     RenderSystem* render;
+    SoundSystem* sound;
 };

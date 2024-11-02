@@ -37,10 +37,10 @@ int main() {
     IOSystem ioSystem;
     ParticleSystem particleSystem;
     AISystem aiSystem;
-    EnemySystem enemySystem(&renderer);
+    SoundSystem soundSystem;
+    EnemySystem enemySystem(&renderer, &soundSystem);
     MapSystem mapSystem;
     TextSystem textSystem;
-    SoundSystem soundSystem;
 
     // Initialize window
     GLFWwindow* window = world.createWindow();

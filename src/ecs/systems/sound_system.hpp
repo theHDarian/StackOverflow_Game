@@ -25,6 +25,9 @@ public:
     void playPlayerDashSound();
 
     void playPlayerShootSound(float ticks);
+
+    void playEnemyShootSound(int sfxNumber, int loops);
+
     float volume;
 
 private:
@@ -36,6 +39,13 @@ private:
     Mix_Chunk* playerHurtSound;
     Mix_Chunk* playerShootSound;
     Mix_Chunk* playerDashSound;
+
+    // Mix_Chunk* playerDeathSound;
+    // Mix_Chunk* enemyHurtSound;
+    // Mix_Chunk* enemyDeathSound;
+    std::vector<Mix_Chunk*> enemyShootSounds;
+
+    Mix_Chunk* doorOpenSound;
 
     void loadMusic();
     void loadSoundEffects();

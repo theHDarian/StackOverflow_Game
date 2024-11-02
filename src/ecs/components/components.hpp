@@ -1,4 +1,6 @@
 #pragma once
+#include <SDL_mixer.h>
+
 #include "common.hpp"
 #include <vector>
 #include <stack>
