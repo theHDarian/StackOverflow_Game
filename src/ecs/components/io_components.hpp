@@ -28,4 +28,5 @@ struct GameState {
 	bool gamePaused;
 	bool gameOver;
 	bool dialogueScene = false;
+	bool cutScene = false;
 };

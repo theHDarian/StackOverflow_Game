@@ -99,7 +99,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state, GameStat
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
-        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused) {
+        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused && !gameState.dialogueScene) {
 
             state.shouldDash = true;
         }
@@ -136,4 +136,9 @@ bool IOSystem::isGameOver()const {
 // move it here for now
 bool IOSystem::isDialogue()const {
 	return registry.gameStates.components[0].dialogueScene;
+}
+
+// temporary!
+bool IOSystem::isCutscene()const {
+	return registry.gameStates.components[0].cutScene;
 }

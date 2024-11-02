@@ -15,6 +15,7 @@
 #include "ai_system.hpp"
 #include "map_system.hpp"
 #include "text_system.hpp"
+#include "ui_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -41,7 +42,7 @@ int main()
 	EnemySystem enemySystem(&renderer);
 	MapSystem mapSystem;
 	TextSystem textSystem;
-
+	UISystem uiSystem;
 
 	// Initializing window
 	GLFWwindow* window = world.createWindow();
@@ -57,8 +58,10 @@ int main()
 	particleSystem.init(window);
 	ioSystem.init(window);
 	world.init(&renderer);
+	uiSystem.init(window);
 	textSystem.initFreetypeLib();
 	mapSystem.init(&renderer);
+	
 
 	// variable timestep loop
 	auto t = Clock::now();
@@ -71,8 +74,16 @@ int main()
 		float elapsed_ms =
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
-		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isDialogue()) {
+		uiSystem.step(elapsed_ms);
+		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
+
+		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
 			world.handleInput();
+		} else if (ioSystem.isCutscene()) { // should be in separate system, but lazy
+			renderer.step(elapsed_ms); // duplication
+			world.playCutscene();
+		} else if (ioSystem.isDialogue()) {
+			uiSystem.playDialogue();
 		} else {
 			mapSystem.step(elapsed_ms);
 			world.step(elapsed_ms);

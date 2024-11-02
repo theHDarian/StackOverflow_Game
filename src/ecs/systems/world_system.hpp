@@ -40,6 +40,7 @@ public:
 
 	void closeGame();
 	void handleInput();
+	void playCutscene();
 
 	void clearDeleteQueue();
 
@@ -65,10 +66,6 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	float currentSpeed;
-	Entity dialogueBox;
-	Entity pauseMenu;
-	Entity gameOverMenu;
-	Entity stackUI;
 
 	// Player Controls
 	Entity player;

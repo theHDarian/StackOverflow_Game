@@ -37,8 +37,28 @@ void RenderSystem::step(float elapsed_ms) {
 		}
 		if (anim.animation_countdown <= 0) {
 			anim.animation_countdown = anim.animation_countdown_base;
-			anim.frame = (anim.frame + 1) % anim.max_frames;
-			//std::cout << "time to change frame to frame " << anim.frame << std::endl;
+			anim.frame = (anim.frame + 1) % anim.max_frames;  
+		}
+		if (registry.animationSequences.has(entity) && anim.frame >= anim.max_frames - 1) {
+			AnimationSequence& as = registry.animationSequences.get(entity);
+			RenderRequest& rr = registry.renderRequests.get(entity);
+			rr.texture_name = as.nextSprite;
+			rr.used_effect = as.nextEffect;
+			registry.animationSequences.remove(entity);
+
+			// hardcode here for now, b/c only have 1 sequence - player startup
+			
+			// beginning dialogue
+			DialogueLines& lines = registry.dialogueLines.components[0];
+			lines = DialogueLines();
+			lines.lines.push_back("Welcome to the tutorial room!");
+
+			// this part is to just mockup dialogue keypress until proper system is setup
+			IOState& iostate = registry.ioStates.components[0];
+			GameState& gameState = registry.gameStates.components[0];
+			iostate.shouldShowDialogue = true; // will remove in future?
+			iostate.nextDialogue = true; // why are there so many parts to be turned on
+			gameState.dialogueScene = true;
 		}
 	}
 }

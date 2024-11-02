@@ -235,7 +235,7 @@ struct RenderRequest {
 struct Animation {
 	int frame = 0; // stick in animation info to here for now
 	int max_frames = 5; // this type of info should be known by render/sprite system?
-	float animation_countdown = 100;
+	float animation_countdown = 85;
 	float animation_countdown_base = animation_countdown;
 };
 
@@ -269,6 +269,12 @@ struct CollisionShape {
 // if a sprite should switch after a certain amount of time
 struct SpriteTimer {
 	float count_ms = 1000;
+	std::string nextSprite;
+	EFFECT_ASSET_ID nextEffect;
+};
+
+// play an animation sequence for the entity
+struct AnimationSequence {
 	std::string nextSprite;
 	EFFECT_ASSET_ID nextEffect;
 };

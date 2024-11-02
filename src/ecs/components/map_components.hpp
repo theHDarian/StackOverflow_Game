@@ -10,7 +10,8 @@ enum RoomType : char {
     TreasureRoom = 'T',
     BossRoom = 'B',
     RestRoom = 'R',
-    None = 'N'
+    None = 'N',
+    TutorialRoom = 'S' // S for start
 };
 
 struct Door {

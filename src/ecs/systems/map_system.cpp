@@ -91,7 +91,11 @@ void MapSystem::step(float elapsed_ms)
         auto &r = registry.mapRequests.components[0];
         if (r.requestType == MapRequestType::ChangeRoom)
         {
-            changeRoom(r.type, r.doorIndex);
+            // prevent player from progressing if they haven't cleared tutorial room
+            if (map.currRoom.type != RoomType::TutorialRoom || map.currRoom.cleared) {
+                //std::cout << "switching to type " << r.type << std::endl;
+                changeRoom(r.type, r.doorIndex);
+            }
         }
         else if (r.requestType == MapRequestType::RestartGame)
             resetMap();
@@ -100,12 +104,26 @@ void MapSystem::step(float elapsed_ms)
 
     WindowState &wS = registry.windowStates.components[0];
     // std::cout << " enemy size " << registry.enemies.size() << std::endl;
-    if (registry.enemies.size() == 0)
+    if (map.currRoom.type == RoomType::EnemyRoom && registry.enemies.size() == 0)
     {
         //createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::TestRevampedEnemy);
         //createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
         //createEnemy(renderer, vec2(wS.width / 2,wS.height / 2), EnemyType::BossBigC);
         createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
+    }
+
+    if (map.currRoom.type == RoomType::TutorialRoom && !map.currRoom.cleared && registry.enemies.size() == 0) { // tutorial room cleared!
+        DialogueLines& lines = registry.dialogueLines.components[0];
+        lines = DialogueLines(); // reset instead of properly making new dialogue req to be processed
+        lines.lines.push_back("Congrats on clearing tutorial room!");
+        
+        // this part is to just mockup dialogue keypress until proper system is setup
+        IOState& iostate = registry.ioStates.components[0];
+        GameState& gameState = registry.gameStates.components[0];
+        iostate.shouldShowDialogue = true; // will remove in future?
+        iostate.nextDialogue = true; // why are there so many parts to be turned on
+        gameState.dialogueScene = true;
+        map.currRoom.cleared = true;
     }
 }
 
@@ -224,10 +242,37 @@ void MapSystem::resetMap()
     map.currRegion = MapRegion::Tutorial;
     map.roomsTraversed = 0;
 
-    map.currRoom.type = RoomType::EnemyRoom;
+    //map.currRoom.type = RoomType::EnemyRoom;
+    map.currRoom.type = RoomType::TutorialRoom;
     map.currRoom.variant = 0;
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
+
+    // for tutorial, spawn 1 enemy to start with
+    WindowState& wS = registry.windowStates.components[0];
+    createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
+
+    // beginning animation sequence - mc wakes up
+    Entity player = registry.players.entities[0];
+    AnimationSequence& as = registry.animationSequences.emplace(player);
+    as.nextEffect = EFFECT_ASSET_ID::TEXTURED;
+    as.nextSprite = "mcv1_base.png";
+    RenderRequest& rr = registry.renderRequests.get(player);
+    rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
+    rr.texture_name = "mc_startup";
+    registry.animations.get(player).max_frames = 40; // hard code for now
+
+    // play cutscene
+    GameState& gameState = registry.gameStates.components[0];
+    gameState.cutScene = true;
+
+    // clear ongoing dialogue to prepare for next
+    DialogueLines& lines = registry.dialogueLines.components[0];
+    lines = DialogueLines();
+    gameState.dialogueScene = false;
+    IOState& iostate = registry.ioStates.components[0];
+    iostate.shouldShowDialogue = false; // will remove in future?
+    iostate.nextDialogue = true;
 
     // createBigC(renderer, vec2(600, 600));
 }

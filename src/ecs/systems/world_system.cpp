@@ -169,12 +169,6 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	WindowState& ws = registry.windowStates.components[0];
 	createRoomBounds(renderer);
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
-
-	// this feels very bad, put as temp fix for getting window size for now
-	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
-	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
-	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
-	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 }
 #pragma endregion
 
@@ -414,6 +408,14 @@ void WorldSystem::handleCollisions() {
 	registry.collisions.clear();
 }
 
+void WorldSystem::playCutscene() {
+	// idea: wait until all animation sequences are done
+	if (registry.animationSequences.components.size() == 0) {
+		GameState& gameState = registry.gameStates.components[0];
+		gameState.cutScene = false;
+	}
+}
+
 void WorldSystem::handleInput() {
 	assert(registry.ioStates.components.size() <= 1);
     IOState &input = registry.ioStates.components[0];
@@ -425,29 +427,6 @@ void WorldSystem::handleInput() {
 		input.shouldRestart = false;
 		restartGame();
 	}
-
-	GameState& gameState = registry.gameStates.components[0];
-	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
-
-	if (!gameState.gameOver) {
-		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
-		if (input.shouldShowDialogue && input.nextDialogue && !gameState.gamePaused) {
-			input.nextDialogue = false;
-			std::string nextLine = registry.dialogueLines.get(dialogueBox).next();
-			//std::cout << " dialogue line " << nextLine << std::endl;
-			if (strcmp(nextLine.c_str(), "<end>") != 0) {
-				registry.renderRequests.get(dialogueBox).show = true;
-				registry.textRenderRequests.get(dialogueBox).text = nextLine;
-			}
-			// no more lines of dialogue
-			else {
-				input.shouldShowDialogue = false;
-				registry.renderRequests.get(dialogueBox).show = false;
-				gameState.dialogueScene = false;
-			}
-		}
-	}
-
 }
 
 void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
@@ -602,15 +581,17 @@ void WorldSystem::movePlayer() {
 	Motion& player_motion = registry.motions.get(player);
 	RenderRequest& rr = registry.renderRequests.get(player);
 	if (glm::length(inputAxis) <= 0.0f) {
-		if (!registry.spriteTimers.has(player)) {
+		if (!registry.spriteTimers.has(player) && !registry.animationSequences.has(player)) {
 			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::BASE];
 		}
 		player_motion.velocity = {0,0};
 	} else {
-		if (!registry.spriteTimers.has(player)) {
+		if (!registry.spriteTimers.has(player) && !registry.animationSequences.has(player)) {
 			rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
 			rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::MOVING];
+			// hard code this for now -- annoying
+			registry.animations.get(player).max_frames = 6;
 		}
 		player_motion.velocity = glm::normalize(inputAxis) * getModifiedValue(PlayerSpeed, registry.players.get(player).baseSpeed);
 	}
