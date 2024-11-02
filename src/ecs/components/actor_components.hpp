@@ -210,7 +210,9 @@ enum EnemyType {
     // HardEnemyBehavior
     TestRevampedEnemy,
     BossBigC,
-    TypeBee
+    OneBee,
+    TwoBee,
+    ThreeBee
 };
 
 enum class EnemyAttackPattern {
@@ -270,6 +272,7 @@ enum class EnemyBehavior {
     ROTATE_IN_PLACE,
     TELEPORT,
     IDLE,
+    MERGE_BEE
 
 };
 
@@ -281,7 +284,9 @@ enum class ReactionType {
     FINISH_PATROL,
     SEVENTYFIVE_HEALTH,
     FIFTY_HEALTH,
-    TWENTYFIVE_HEALTH
+    TWENTYFIVE_HEALTH,
+    BEE_CLOSE,
+    NO_BEES
 };
 
 struct Reaction {
@@ -395,4 +400,12 @@ struct Motion {
 struct Damaged {
     float max = 200;
     float countdown = max;
+};
+
+struct BeeEnemy {
+    std::set<Entity> nearbyBees;
+    int mergeCount = 1;
+    int maxMerge = 3;
+    bool canMerge = true;
+    bool merge = false;
 };

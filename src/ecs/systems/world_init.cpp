@@ -16,7 +16,7 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
 	motion.angle = 0.f;
-	motion.velocity = { 0.f, 0.f };
+	motion.velocity = {0.f, 0.f};
 	motion.scale = mesh.original_size * 70.f;
 
 	Player &player = registry.players.emplace(entity);
@@ -31,22 +31,20 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 
 	registry.stackCompile.emplace(entity);
 
-	//add player sprite
-	Sprites& playerSprites = registry.sprites.emplace(entity);
+	// add player sprite
+	Sprites &playerSprites = registry.sprites.emplace(entity);
 	playerSprites.sprites[SPRITE_STATE::BASE] = "mcv1_base.png";
 	playerSprites.sprites[SPRITE_STATE::DAMAGED] = "mcv1_hit.png";
 	playerSprites.sprites[SPRITE_STATE::MOVING] = "mc_walk";
-	RenderRequest& rr = registry.renderRequests.insert(
+	RenderRequest &rr = registry.renderRequests.insert(
 		entity,
-		{
-			"mcv1_base.png",
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		});
+		{"mcv1_base.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE});
 	// can play around with offset to try to align sprite
 	rr.offset = vec2(-5, -5);
 
-	auto& animate = registry.animations.emplace(entity);
+	auto &animate = registry.animations.emplace(entity);
 	animate.max_frames = 6;
 
 	return entity;
@@ -80,9 +78,9 @@ Entity createAimIndicator(RenderSystem *renderer)
 {
 	// add aim indicator
 	auto aimIndicator = Entity();
-	Motion& aimMotion = registry.motions.emplace(aimIndicator);
-	aimMotion.scale = {30,30};
-	Sprites& indicatorSprites =  registry.sprites.emplace(aimIndicator);
+	Motion &aimMotion = registry.motions.emplace(aimIndicator);
+	aimMotion.scale = {30, 30};
+	Sprites &indicatorSprites = registry.sprites.emplace(aimIndicator);
 	indicatorSprites.sprites[SPRITE_STATE::BASE] = "aim_indicator.png";
 	registry.renderRequests.insert(
 		aimIndicator,
@@ -291,7 +289,6 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 	return entity;
 };
 
-
 Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 {
 	auto entity = Entity();
@@ -300,27 +297,48 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	Enemy &enemy = registry.enemies.emplace(entity);
 	switch (type)
 	{
-		case EnemyType::TestRevampedEnemy:
-		{
-			enemy = TestEnemy();
-			break;
-		}
-		case EnemyType::EasyEnemySentry:
-		{
-			enemy = EnemyEasySentry();
-			break;
-		}
-		case EnemyType::BossBigC:
-		{
-			enemy = EnemyBigC();
-			registry.bosses.emplace(entity);
-			break;
-		}
-		case EnemyType::MediumEnemyCharge:
-		{
-			enemy = EnemyMediumCharge();
-			break;
-		}
+	case EnemyType::TestRevampedEnemy:
+	{
+		enemy = TestEnemy();
+		break;
+	}
+	case EnemyType::EasyEnemySentry:
+	{
+		enemy = EnemyEasySentry();
+		break;
+	}
+	case EnemyType::BossBigC:
+	{
+		enemy = EnemyBigC();
+		registry.bosses.emplace(entity);
+		break;
+	}
+	case EnemyType::MediumEnemyCharge:
+	{
+		enemy = EnemyMediumCharge();
+		break;
+	}
+	case EnemyType::OneBee:
+	{
+
+		enemy = Bee1();
+		registry.bees.emplace(entity);
+		break;
+	}
+	case EnemyType::TwoBee:
+	{
+		enemy = Bee2();
+		BeeEnemy& bee = registry.bees.emplace(entity);
+		bee.mergeCount = 2;
+
+		break;
+	}
+	case EnemyType::ThreeBee:
+	{
+		enemy = Bee3();
+		BeeEnemy& bee = registry.bees.emplace(entity);
+		bee.mergeCount = 3;
+	}
 	}
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -336,7 +354,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	// } else {
 	// 	movement.posA = pos;
 	// }
-	//std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
+	// std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f;
@@ -370,8 +388,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		});
 
 	// need to also add an animate component
-	if (enemy.sprite.effectId == EFFECT_ASSET_ID::ANIMATE) {
-		auto& animate = registry.animations.emplace(entity);
+	if (enemy.sprite.effectId == EFFECT_ASSET_ID::ANIMATE)
+	{
+		auto &animate = registry.animations.emplace(entity);
 		animate.max_frames = 5; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
 		animate.animation_countdown = 20;
 		animate.animation_countdown_base = animate.animation_countdown;
@@ -611,12 +630,12 @@ Entity createDialogueBox(vec2 position, vec2 scale)
 	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
 	text.scale = 0.5;										// for some reason, scale should be small
 	text.text = "hello this is test dialogue!";
-	text.topRightBound = { scale.x - 25, scale.y - 25};
-	text.bottomLeftBound = { text.x, 0 + 25};
+	text.topRightBound = {scale.x - 25, scale.y - 25};
+	text.bottomLeftBound = {text.x, 0 + 25};
 
 	// attach list of dialogue lines
 	// probably shouldn't be attached to box, but to some dialogue state entity?
-	auto& lines = registry.dialogueLines.emplace(entity);
+	auto &lines = registry.dialogueLines.emplace(entity);
 	lines.lines.push_back("hello, this is a dialogue box. \npress e to go to next dialogue");
 	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\nas a temp fix for that, the game is paused while dialogue is happening");
 	lines.lines.push_back("but also note the dialogue \"paused \" state is separate from the game paused state!\n(press esc to pause the game right now and see)");
@@ -659,13 +678,13 @@ Entity createPauseMenu(vec2 position, vec2 scale)
 
 	// note: position is not center, but start of text rendering
 	// need a mechanism to figure out text line size
-	WindowState& windowState = registry.windowStates.components[0];
+	WindowState &windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 1.5;
 	text.text = "Game Paused";
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
-	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.topRightBound = {scale.x - 25, scale.y - 25};
+	text.bottomLeftBound = {text.x, 0 + 25};
 
 	return entity;
 }
@@ -696,21 +715,21 @@ Entity createGameOverMenu(vec2 position, vec2 scale)
 	color.r = 0.0;
 	color.b = 0.0;
 	color.g = 0.0;
-	 
+
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
 	auto &text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
-	text.topRightBound = { scale.x, scale.y };
-	text.bottomLeftBound = { 0, 0 };
+	text.topRightBound = {scale.x, scale.y};
+	text.bottomLeftBound = {0, 0};
 
 	WindowState &windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 1.2;
 	text.text = "Game Over \npress R to restart";
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
-	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.topRightBound = {scale.x - 25, scale.y - 25};
+	text.bottomLeftBound = {text.x, 0 + 25};
 
 	return entity;
 }
@@ -745,8 +764,7 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
-
-	auto& spriteComponent = registry.sprites.emplace(entity);
+	auto &spriteComponent = registry.sprites.emplace(entity);
 	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
 
 	registry.renderRequests.insert(
@@ -789,8 +807,8 @@ Entity createStackUI(WindowState &windowState, StackCompile &stack)
 	text.scale = 0.25;
 	// too lazy to calculate fitting text box size, and it prob won't overflow
 	// so just set it to some big number
-	text.topRightBound = { 1000, 1000 };
-	text.bottomLeftBound = { 0, 0 };
+	text.topRightBound = {1000, 1000};
+	text.bottomLeftBound = {0, 0};
 
 	return entity;
 }
