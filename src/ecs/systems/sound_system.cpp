@@ -116,6 +116,11 @@ void SoundSystem::loadSoundEffects() {
         }
         enemyShootSounds[i]->volume = 0.8f * MIX_MAX_VOLUME;
     }
+    doorOpenSound = Mix_LoadWAV(audio_path("sfx/door_open.wav").c_str());
+    if (!doorOpenSound) {
+        fprintf(stderr, "Failed to load door open sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load door open sound");
+    }
 
 }
 
@@ -161,6 +166,13 @@ void SoundSystem::playEnemyShootSound(int sfxNumber, int loops) {
         int i = sfxNumber % 4;
         Mix_PlayChannel(4, enemyShootSounds[i], loops);
         Mix_Volume(4, enemyShootSounds[i]->volume * volume);
+    }
+}
+
+void SoundSystem::playDoorOpenSound() {
+    if (!Mix_Playing(5)) {
+        Mix_PlayChannel(5, doorOpenSound, 0);
+        Mix_Volume(5, doorOpenSound->volume * volume);
     }
 }
 

@@ -28,6 +28,8 @@ public:
 
     void playEnemyShootSound(int sfxNumber, int loops);
 
+    void playDoorOpenSound();
+
     float volume;
 
 private:
