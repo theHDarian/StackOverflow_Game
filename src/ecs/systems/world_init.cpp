@@ -277,61 +277,7 @@ Entity createTestPoly(RenderSystem *renderer, vec2 position, std::vector<vec2> p
 
 	return entity;
 }
-Entity createBoss(RenderSystem *renderer, vec2 position, BossType boss)
-{
-	switch (boss)
-	{
-	case BossType::BigCBoss:
-		return createBigC(renderer, position);
-	default:
-		throw "invalid boss";
-	}
-}
 
-// mesh enemy that doesn't do anything
-Entity createBigC(RenderSystem *renderer, vec2 position)
-{
-	auto entity = Entity();
-
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::MESH_GB);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	// Initialize the motion
-	auto &motion = registry.motions.emplace(entity);
-	motion.angle = 0;
-	motion.velocity = {0, 0};
-	motion.position = position;
-
-	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({700 * (1.923352 / 2.0f), 700});
-	// motion.scale = vec2({ 500, 500 });
-
-	registry.meshColliders.emplace(entity);
-
-	auto &enemy = registry.enemies.emplace(entity);
-	enemy.maxHealth = 1000;
-	enemy.currHealth = enemy.maxHealth;
-
-	EnemyMovement &movement = registry.enemyMovement.emplace(entity);
-	movement.angularSpeed = 3;
-	movement.posA = position;
-	movement.posB = position;
-
-	auto &boss = registry.bosses.emplace(entity);
-
-	/*AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = none;*/
-	registry.sprites.emplace(entity);
-	registry.renderRequests.insert(
-		entity,
-		{
-		 "none",
-		 EFFECT_ASSET_ID::MESH,
-		 GEOMETRY_BUFFER_ID::MESH_GB});
-
-	return entity;
-}
 
 Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 {

@@ -14,7 +14,7 @@ enum RoomType : char {
     // EnemyRoomSpeed,
     TreasureRoom,
     RestRoom,
-    // BossBigCRoom, //remove for now to prevent bug
+    BossBigCRoom, //remove for now to prevent bug
     None //Keep None at the end of the list to be compatible with existing get random function
 };
 
@@ -26,7 +26,6 @@ struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
     std::vector<std::tuple<BulletStackEffect,vec2>> treasures; //for treasure rooms
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
-    std::vector<std::tuple<BossType,vec2>> bosses;
     std::vector<SpecialEvent> specialEvents; 
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;

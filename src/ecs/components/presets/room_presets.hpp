@@ -13,7 +13,6 @@
 //     std::vector<std::tuple<EnemyType,vec2>> enemies;
 //     std::vector<std::tuple<BulletStackEffect,vec2>> treasures; //for treasure rooms
 //     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
-//     std::vector<std::tuple<BossType,vec2>> bosses;
 //     std::vector<SpecialEvent> specialEvents; 
 //     float spawnDelay; //in seconds - for enemies and bosses
 //     int numSpecialBulletsToSpawn = 5;
@@ -29,7 +28,6 @@ const RoomPreset EnemyRoomDash1 {
     {},
     {},
     {},
-    {},
     5.0f,
     5
 };
@@ -42,12 +40,10 @@ const RoomPreset EnemyRoomTripleBuff1 {
     {},
     {},
     {},
-    {},
     5.0f,
     5
 };
 const RoomPreset RestingRoom1 {
-    {},
     {},
     {},
     {},
@@ -60,14 +56,25 @@ const RoomPreset TreasureRoom1 {
     },
     {},
     {},
+};
+
+const RoomPreset BossRoom1 {
+    {
+        {EnemyType::BossBigC,{0.5f,0.5f}}
+    },
     {},
+    {},
+    {},
+    5.0f,
+    2
 };
 
 const std::map<RoomType,std::vector<RoomPreset>> roomDirectory = {
     {RoomType::EnemyRoomDash,{EnemyRoomDash1}},
     {RoomType::EnemyRoomTripleBuff,{EnemyRoomTripleBuff1}},
     {RoomType::RestRoom,{RestingRoom1}},
-    {RoomType::TreasureRoom,{TreasureRoom1}}
+    {RoomType::TreasureRoom,{TreasureRoom1}},
+    {RoomType::BossBigCRoom,{BossRoom1}}
 };
 
 

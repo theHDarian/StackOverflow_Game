@@ -14,10 +14,6 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos);
 Entity resetPlayer();
 
 Entity createAimIndicator(RenderSystem* renderer);
-// basic enemy
-Entity createBigC(RenderSystem* renderer, vec2 pos);
-
-Entity createBoss(RenderSystem* renderer, vec2 pos, BossType boss);
 
 // Wall for testing, denoted by 2 blobs
 Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);

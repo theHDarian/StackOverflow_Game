@@ -100,11 +100,6 @@ void MapSystem::step(float elapsed_ms)
             createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
         }
         map.currRoom.preset.enemies = {};
-
-        for (auto& b : map.currRoom.preset.bosses) {
-            createBoss(renderer, std::get<vec2>(b) * vec2(wS.width, wS.height), std::get<BossType>(b));
-        }
-        map.currRoom.preset.bosses = {};
     }
 
     // set room to cleared if all enemies are defeated
