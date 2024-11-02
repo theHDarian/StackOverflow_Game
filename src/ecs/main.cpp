@@ -15,6 +15,7 @@
 #include "ai_system.hpp"
 #include "map_system.hpp"
 #include "text_system.hpp"
+#include "sound_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -39,6 +40,7 @@ int main() {
     EnemySystem enemySystem(&renderer);
     MapSystem mapSystem;
     TextSystem textSystem;
+    SoundSystem soundSystem;
 
     // Initialize window
     GLFWwindow* window = world.createWindow();
@@ -55,9 +57,9 @@ int main() {
     renderer.init(window);
     particleSystem.init(window);
     ioSystem.init(window);
-    world.init(&renderer);
+    world.init(&renderer, &soundSystem);
     textSystem.initFreetypeLib();
-    mapSystem.init(&renderer);
+    mapSystem.init(&renderer, &soundSystem);
 
     // Load and set the custom cursor
     GLFWimage cursorImg = renderer.loadCursorImage(textures_path("cursor.png").c_str());
