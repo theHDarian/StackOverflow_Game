@@ -45,19 +45,6 @@ void RenderSystem::step(float elapsed_ms) {
 			rr.texture_name = as.nextSprite;
 			rr.used_effect = as.nextEffect;
 			registry.animationSequences.remove(entity);
-
-			// hardcode here for now, b/c only have 1 sequence - player startup
-			
-			// beginning dialogue
-			DialogueLines& lines = registry.dialogueLines.components[0];
-			lines = DialogueLines();
-			lines.lines.push_back("Welcome to the tutorial room!");
-
-			// this part is to just mockup dialogue keypress until proper system is setup
-			IOState& iostate = registry.ioStates.components[0];
-			GameState& gameState = registry.gameStates.components[0];
-			iostate.nextDialogue = true; // why are there so many parts to be turned on
-			gameState.dialogueScene = true;
 		}
 	}
 }

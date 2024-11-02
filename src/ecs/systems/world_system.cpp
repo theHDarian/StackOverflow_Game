@@ -413,6 +413,21 @@ void WorldSystem::playCutscene() {
 	if (registry.animationSequences.components.size() == 0) {
 		GameState& gameState = registry.gameStates.components[0];
 		gameState.cutScene = false;
+
+		// idea: play relevant dialogue connected to cutscenes based on room progression
+		// (but that should be handled by overall dialogue system instead, not here?)
+		Map& map = registry.maps.components[0];
+		if (map.currRoom.type == RoomType::TutorialRoom && !map.currRoom.cleared) {
+			DialogueLines& lines = registry.dialogueLines.components[0];
+			lines = DialogueLines();
+			lines.lines.push_back("Welcome to the tutorial room!");
+
+			// this part is to just mockup dialogue keypress until proper system is setup
+			IOState& iostate = registry.ioStates.components[0];
+			GameState& gameState = registry.gameStates.components[0];
+			iostate.nextDialogue = true; // why are there so many parts to be turned on
+			gameState.dialogueScene = true;
+		}
 	}
 }
 

@@ -52,7 +52,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	}
 
 	// Debug toggle for colliders
-	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
 		ioState.debugMode = !ioState.debugMode;
 	}
 
