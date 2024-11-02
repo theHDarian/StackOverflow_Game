@@ -74,9 +74,13 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	{
 		for (Entity bee : registry.bees.entities)
 		{
-			if (registry.bees.get(entity).nearbyBees.size() == registry.bees.get(entity).maxMerge)
+			if (registry.bees.get(entity).maxMerge == registry.bees.get(entity).mergeCount)
 			{
 				break;
+			}
+			if (registry.bees.get(bee).maxMerge == registry.bees.get(bee).mergeCount)
+			{
+				continue;
 			}
 			if (bee != entity)
 			{
@@ -93,11 +97,22 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 						enemy.patternIndex = reaction->index;
 						reaction_found = true;
 						std::cout << "bee close!" << enemy.currEnemyPattern().name << std::endl;
-						BeeEnemy& beeComponent = registry.bees.get(entity);
-						BeeEnemy& otherBeeComponent = registry.bees.get(bee);
+						BeeEnemy &beeComponent = registry.bees.get(entity);
+						BeeEnemy &otherBeeComponent = registry.bees.get(bee);
 						beeComponent.mergeReady = true;
 						otherBeeComponent.mergeReady = true;
-
+					}
+					if (registry.bees.get(entity).nearbyBees.size() == 0)
+					{
+						auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
+					}
+					break;
+				} else
+				{
+					registry.bees.get(entity).nearbyBees.erase(bee);
+					if (registry.bees.get(entity).nearbyBees.size() == 0)
+					{
+						auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
 					}
 				}
 			}

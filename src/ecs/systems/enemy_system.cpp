@@ -51,7 +51,7 @@ void EnemySystem::step(float elapsed_ms)
         float angle = motion.angle;
 
         EnemyPattern &pattern = enemy.currEnemyPattern();
-        if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE)
+        if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
         {
             std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
              merge(entity, pattern, pendingDeletion);
@@ -363,6 +363,9 @@ void EnemySystem::creatingMergeBee(int count, vec2 pos)
         std::cout << "CREATING" << std::endl;
         createEnemy(render, pos, EnemyType::TwoBee);
         break;
+    case 3:
+        createEnemy(render, pos, EnemyType::ThreeBee);
+        break;
     default:
         std::cout << "CREATING 1" << std::endl;
         createEnemy(render, pos, EnemyType::TwoBee);
@@ -386,12 +389,11 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
                 BeeEnemy &otherBee = registry.bees.get(otherBeeEntity);
                 int mergeTotal = otherBee.mergeCount + bee.mergeCount;
                 Motion &motion = registry.motions.get(entity);
-                std::cout << mergeTotal << "merge Total" << std::endl;
+                std::cout << mergeTotal << "merge Total" << "max bee" << bee.maxMerge << std::endl;
                 if (mergeTotal > bee.maxMerge)
                 {
                     return;
-                }
-                if (otherBee.merge == false && bee.merge == false)
+                }else if(otherBee.merge == false && bee.merge == false)
                 {
                     creatingMergeBee(mergeTotal, motion.position);
                 }

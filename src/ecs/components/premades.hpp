@@ -582,10 +582,14 @@ struct Bee1 : Enemy
 	Reaction reactionBeeClose = {
 		ReactionType::BEE_CLOSE,
 		2};
+	Reaction reactionNoBees = {
+		ReactionType::NO_BEES,
+		0
+	};
 
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, NoAttack};
-	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose}, 0, true, 0.f, 5000.f, NoAttack};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, true, 0.f, 5000.f, NoAttack};
 	Bee1()
 	{
 		maxHealth = 20;
@@ -614,10 +618,14 @@ struct Bee2 : Enemy
 	Reaction reactionBeeClose = {
 		ReactionType::BEE_CLOSE,
 		2};
+	Reaction reactionNoBees = {
+		ReactionType::NO_BEES,
+		0
+	};
 
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, SniperShot};
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, SniperShot};
-	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose}, 0, true, 0.f, 5000.f, NoAttack};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, true, 0.f, 5000.f, NoAttack};
 
 	Bee2()
 	{
@@ -636,7 +644,7 @@ struct Bee2 : Enemy
 
 struct Bee3 : Enemy
 {
-	Reaction reactionPatrol = {
+	Reaction reactionFollow = {
 		ReactionType::DURATION,
 		1};
 
@@ -644,19 +652,15 @@ struct Bee3 : Enemy
 		ReactionType::DURATION,
 		0};
 
-	Reaction reactionBeeClose = {
-		ReactionType::BEE_CLOSE,
-		2};
 
-	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, threeSpray};
-	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, threeSpray};
-	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose}, 0, true, 0.f, 5000.f, NoAttack};
 
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionFollow}, 1, false, 0, 0, threeSpray};
+	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {reactionIdle}, 0, true, 0, 2000.f, threeSpray};
 	Bee3()
 	{
 		maxHealth = 100;
 		currHealth = maxHealth;
-		enemyPatterns = {idleBee, randomBee, mergeBee};
+		enemyPatterns = {idleBee, randomBee};
 		patternIndex = 0;
 		sprite = {
 			"bee_fly_3",

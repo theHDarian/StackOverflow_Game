@@ -112,8 +112,7 @@ void MapSystem::step(float elapsed_ms)
         createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
         createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
         createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
+
         
     }
 }

@@ -278,7 +278,8 @@ enum class ReactionType {
     SEVENTYFIVE_HEALTH,
     FIFTY_HEALTH,
     TWENTYFIVE_HEALTH,
-    BEE_CLOSE
+    BEE_CLOSE,
+    NO_BEES
 };
 
 struct Reaction {
