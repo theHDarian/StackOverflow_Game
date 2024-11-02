@@ -29,25 +29,51 @@ void RenderSystem::step(float elapsed_ms) {
 			fade.time -= elapsed_ms;
 		}
 	}
+
+	for (Entity entity : registry.animations.entities) {
+		Animation& anim = registry.animations.get(entity);
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			anim.animation_countdown -= elapsed_ms;
+		}
+		if (anim.animation_countdown <= 0) {
+			anim.animation_countdown = anim.animation_countdown_base;
+			anim.frame = (anim.frame + 1) % anim.max_frames;
+			//std::cout << "time to change frame to frame " << anim.frame << std::endl;
+		}
+	}
 }
 
 void RenderSystem::drawTexturedMesh(Entity entity,
-									const mat3 &projection)
+	const mat3& projection)
 {
-	Motion &motion = registry.motions.get(entity);
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	Motion& motion = registry.motions.get(entity);
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
 	Transform transform;
-	vec2 offset = registry.renderRequests.get(entity).offset;;
+	vec2 offset = registry.renderRequests.get(entity).offset;
 
 	transform.translate(motion.position);
 	transform.rotate(motion.angle);
 	transform.translate(offset * glm::normalize(motion.scale));
 	transform.scale(motion.scale);
 
-	assert(registry.renderRequests.has(entity));
-	const RenderRequest &render_request = registry.renderRequests.get(entity);
+	/*
+		// cheat a bit to test bee specifically
+	if (render_request.texture_name.compare("bee_fly") == 0) {
+		vec2 scale = texture_dimensions[name_to_texture[render_request.texture_name]];
+		transform.translate(offset * glm::normalize(scale) * motion.scale);
+		transform.scale(scale * motion.scale);
+		// this doesn't work well, other stuff still need to know the scale :(
+	}
+	else {
+		transform.translate(offset * glm::normalize(motion.scale));
+		transform.scale(motion.scale);
+	}
+	*/
+
 
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
@@ -67,7 +93,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED)
+	if (render_request.used_effect == EFFECT_ASSET_ID::BULLET || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
@@ -82,13 +108,58 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
+		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			GLint frame_uloc = glGetUniformLocation(program, "frame");
+			glUniform1i(frame_uloc, registry.animations.get(entity).frame);
+			gl_has_errors();
+		}
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::BULLET) {
+			GLint laser_uloc = glGetUniformLocation(program, "laser");
+			glUniform1i(laser_uloc, registry.lasers.has(entity));
+
+			int size = registry.enemyBullets.get(entity).bulletEffects.size();
+			std::vector<BulletStackEffect> bse = registry.enemyBullets.get(entity).bulletEffects;
+			GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
+			glUniform1i(effect_size_uloc, size);
+
+			GLint shape_uloc = glGetUniformLocation(program, "shape");
+			glUniform1i(shape_uloc, registry.enemyBullets.get(entity).shape);
+			
+			vec3 c1, c2, c3, c4, c5;
+			c1 = (size > 0) ? bulletEffectColors[bse[0].type] : vec3(-1.0);
+			c2 = (size > 1) ? bulletEffectColors[bse[1].type] : vec3(-1.0);
+			c3 = (size > 2) ? bulletEffectColors[bse[2].type] : vec3(-1.0);
+			c4 = (size > 3) ? bulletEffectColors[bse[3].type] : vec3(-1.0);
+			c5 = (size > 4) ? bulletEffectColors[bse[4].type] : vec3(-1.0);
+
+			GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
+			glUniform3fv(bcolor1_uloc, 1, (float*)&c1);
+			GLint bcolor2_uloc = glGetUniformLocation(program, "bcolor2");
+			glUniform3fv(bcolor2_uloc, 1, (float*)&c2);
+			GLint bcolor3_uloc = glGetUniformLocation(program, "bcolor3");
+			glUniform3fv(bcolor3_uloc, 1, (float*)&c3);
+			GLint bcolor4_uloc = glGetUniformLocation(program, "bcolor4");
+			glUniform3fv(bcolor4_uloc, 1, (float*)&c4);
+			GLint bcolor5_uloc = glGetUniformLocation(program, "bcolor5");
+			glUniform3fv(bcolor5_uloc, 1, (float*)&c5);
+
+			gl_has_errors();
+		}
 
 		// Enable and bind the texture to slot 0
 		glActiveTexture(GL_TEXTURE0);
 		gl_has_errors();
 		assert(registry.renderRequests.has(entity));
 		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
-		glBindTexture(GL_TEXTURE_2D, texture_id);
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+			gl_has_errors();
+		}
+		else {
+			glBindTexture(GL_TEXTURE_2D, texture_id);
+		}
 		gl_has_errors();
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::MESH || render_request.used_effect == EFFECT_ASSET_ID::EGG)
@@ -365,9 +436,7 @@ void RenderSystem::drawGameElements()
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 		drawAllColliders(entity, projection_2D);
-		if(registry.bosses.has(entity)) {
-			drawHPbar(entity, projection_2D);
-		}
+		drawHPbar(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.players.entities)
@@ -945,16 +1014,20 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	drawSetupFrame();
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	WindowState& windowState = registry.windowStates.components[0];
 	vec2 position = { windowState.width/2, windowState.height-60.0};
+	vec2 scale = { 600, 30 };
+	Motion& motion = registry.motions.get(entity);
+
+	if (!registry.bosses.has(entity)) {
+		position = motion.position + vec2(0, motion.scale.y / 2 + 10);
+		scale = { 100, 10 };
+	}
+
 	if (registry.damageds.has(entity)) {
 		position.x += (rand() % 10) - 5;
 		position.y += (rand() % 10) - 5;
 	}
-	vec2 scale = { 600, 30 };
 
 	float max = registry.enemies.get(entity).maxHealth;
 	float current = registry.enemies.get(entity).currHealth;

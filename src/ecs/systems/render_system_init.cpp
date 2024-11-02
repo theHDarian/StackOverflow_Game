@@ -149,6 +149,75 @@ void RenderSystem::initializeGlTextures()
 	}
 	name_to_texture.insert({ "none", -1});
 	gl_has_errors();
+
+	// start by loading all images
+	const std::string base2 = data_path() + "/animations/";
+
+	for (const auto& entry : directory_iterator(base2)) {
+		// for each folder in the animations dir
+		// save folder name as texture name, should be format <entity_name>_<verb>
+
+		const std::string& folder = entry.path().string();
+		glGenTextures(1, &texture_gl_handles.data()[i]);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_gl_handles.data()[i]); // append to end for now
+		//std::cout << "current dir" << folder << std::endl;
+
+		uint image_index = 0;
+		uint image_count = 0;
+		int width = 1;
+		int height = 1;
+
+		// simplest way to get number of images
+		for (const auto& entry : directory_iterator(folder)) {
+			image_count++;
+		}
+
+		for (const auto& entry : directory_iterator(folder))
+		{
+
+			const std::string& path = entry.path().string();
+			//std::cout << "current path" << path << std::endl;
+
+			stbi_uc* data;
+			data = stbi_load(path.c_str(), &width, &height, NULL, 4);
+
+			if (data == NULL)
+			{
+				const std::string message = "Could not load the file " + path + ".";
+				fprintf(stderr, "%s", message.c_str());
+				assert(false);
+			}
+
+			if (image_index == 0) {
+				std::string copy = path;
+				name_to_texture.insert({ copy.substr(base2.length() - 1), i });
+				//std::cout << "this is what the name is! " << copy.substr(base2.length() - 1) << std::endl;
+				texture_dimensions[i] = ivec2(width, height);
+				// initialize texture array
+				glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, image_count);
+			}
+
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, image_index, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+
+			gl_has_errors();
+			image_index++;
+		}
+		gl_has_errors();
+
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		std::string copy = folder;
+		name_to_texture.insert({ copy.substr(base2.length() - 1), i });
+		i++;
+		//std::cout << "loaded " << copy.substr(base2.length() - 1) << "to index " << i << std::endl;
+	}
+
+	gl_has_errors();
+
 }
 
 void RenderSystem::initializeGlEffects()

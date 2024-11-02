@@ -17,5 +17,6 @@ private:
 	static vec2 evadeBullet(Entity entity);
 	static vec2 getNextPatrolPos(Entity entity);
 	static void updateState(Enemy& enemy, EnemyMovement movement);
+	static void angryMode(Entity entity);
 
 };

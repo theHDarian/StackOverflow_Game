@@ -13,7 +13,7 @@ enum RoomType : char {
     EnemyRoomSpeed,
     TreasureRoom,
     RestRoom,
-    BossBigC,
+    BossBigCRoom,
     None //Keep None at the end of the list to be compatible with existing get random function
 };
 

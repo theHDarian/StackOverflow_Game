@@ -56,7 +56,7 @@ TreasureRoomPreset* getTreasureRoom() {
     return Random::ListItem(treasureRoomList);
 }
 BossRoomPreset* getBossRoom(RoomType type) {
-    if (type == RoomType::BossBigC) {
+    if (type == RoomType::BossBigCRoom) {
         return const_cast<BossRoomPreset*>(&BossRoomBigC);
     }
     throw "invalid room type";

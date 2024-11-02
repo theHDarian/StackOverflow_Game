@@ -180,12 +180,11 @@ void clearRoomActors()
 
 RoomType randomRoomType(bool excludeNone)
 {
-    return RoomType::BossBigC;
     return static_cast<RoomType>(rand() % (excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 RoomFormatType getFormatTypeFromRoomType(RoomType rt)
 {
-    if (rt == RoomType::BossBigC)
+    if (rt == RoomType::BossBigCRoom)
         return RoomFormatType::BossFT;
     if (rt == RoomType::None)
         assert(false);

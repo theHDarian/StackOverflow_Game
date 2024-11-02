@@ -215,7 +215,7 @@ const AttackData wave{
 const AttackData laserNoRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{},
+	{bulletBounceUpA},
 	blunt,
 	3,
 	0,
@@ -294,14 +294,13 @@ const AttackData radialPolygon{
 	blunt,
 	5,
 	M_PI / 40,
-	{20,20},
+	{20, 20},
 	150,
 	3000,
-	{4,200},
+	{4, 200},
 	0,
 	0,
-	0
-};
+	0};
 
 const AttackData fourAllAround{
 	EnemyAttackPattern::RADIAL,
@@ -380,12 +379,12 @@ const AttackData threeBurst{
 
 const AttackData fiveBurst{
 	EnemyAttackPattern::BURST,
-	CIRCLE,
-	{},
+	TRIANGLE,
+	{numBulletsUpA, sizeUpA},
 	blunt,
 	6,
 	M_PI / 6,
-	{20, 20},
+	{30, 30},
 	200,
 	3000,
 	{0, 0},
@@ -440,35 +439,6 @@ const AttackData NoAttack{
 	0};
 
 ////////////////////////////////////
-//////// ENEMY SPRITE //////////////
-////////////////////////////////////
-struct SpriteData
-{
-	std::string texturePath;
-	EFFECT_ASSET_ID effectId;
-	GEOMETRY_BUFFER_ID geometryId;
-	vec2 offset;
-};
-
-const SpriteData pufferFish{
-	"enemy_Pufferfish.png",
-	EFFECT_ASSET_ID::TEXTURED,
-	GEOMETRY_BUFFER_ID::SPRITE,
-	vec2(-12, 0)};
-
-const SpriteData BigC 		{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-		 "none",
-		 EFFECT_ASSET_ID::MESH,
-		 GEOMETRY_BUFFER_ID::MESH_GB
-};
-
-const SpriteData turret {
-	"enemy_Pufferfish.png",
-	EFFECT_ASSET_ID::TEXTURED,
-	GEOMETRY_BUFFER_ID::SPRITE,
-	vec2(-12, 0)};
-
-////////////////////////////////////
 //////////// ENEMY TYPE ////////////
 ////////////////////////////////////
 
@@ -504,42 +474,95 @@ struct TestEnemy : Enemy
 	Reaction reactionPlayerClose = {
 		ReactionType::PLAYER_CLOSE,
 		2};
+	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack};
+	EnemyPattern patrolState = {"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot};
+	EnemyPattern followState = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot};
 	TestEnemy()
 	{
 		maxHealth = 50;
 		currHealth = maxHealth;
 		enemyPatterns = {
-			{"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack},
-			{"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot},
-			{"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot}};
+			idleState,
+			patrolState,
+			followState};
 		patternIndex = 0;
+		sprite = {
+			"enemy_Pufferfish.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(-12, 0)};
+		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
 
+
 struct EnemyEasySentry : Enemy
 {
+	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot};
 	EnemyEasySentry()
 	{
 		maxHealth = 100;
 		currHealth = maxHealth;
 
-		enemyPatterns = {
-			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
+		enemyPatterns = {rotateState};
 
 		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(-12, 0)};
+		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
 
 struct EnemyBigC : Enemy
 {
+
 	EnemyBigC()
 	{
-		maxHealth = 5000;
+		maxHealth = 1000;
 
 		currHealth = maxHealth;
 
 		enemyPatterns = {
 			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
 		patternIndex = 0;
+		sprite = {// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
+				  "none",
+				  EFFECT_ASSET_ID::MESH,
+				  GEOMETRY_BUFFER_ID::MESH_GB};
+		scale = vec2({700 * (1.923352 / 2.f), 700});
+	};
+};
+
+struct EnemyMediumCharge : Enemy
+{
+	Reaction lowHealth = {
+		ReactionType::TWENTYFIVE_HEALTH,
+		0};
+
+	Reaction durationFollow = {
+		ReactionType::DURATION,
+		1};
+
+	Reaction durationIdle = {
+		ReactionType::DURATION,
+		0};
+	EnemyPattern idleState = {"IDLE ATTACKING", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {durationIdle}, 0, true, 0.f, 2000.f, fiveBurst};
+	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyMediumCharge()
+	{
+		maxHealth = 50;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			idleState, followState};
+		patternIndex = 1;
+		sprite = {
+			"enemy_Magnet.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };

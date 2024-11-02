@@ -4,6 +4,7 @@
 #include <map>
 #include <iostream>
 #include <any>
+#include "components.hpp"
 
 
 
@@ -46,7 +47,7 @@ struct BulletStackEffect {
 // Player component
 struct Player
 {
-    float baseSpeed = 200;
+    float baseSpeed = 250;
     float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;
@@ -203,11 +204,13 @@ struct PlayerBullet {
 enum EnemyType {
     EasyEnemySentry,
     // //MediumEnemyClusterShot,
-    // MediumEnemyCharge,
+    MediumEnemyCharge,
     // MediumEnemyHoming,
     // EasyEnemySniper,
     // HardEnemyBehavior
-    TestRevampedEnemy
+    TestRevampedEnemy,
+    BossBigC,
+    TypeBee
 };
 
 enum class EnemyAttackPattern {
@@ -226,9 +229,9 @@ enum class EnemyAttackPattern {
 
 
 enum EnemyBulletShape {
-    RECTANGLE,
-    TRIANGLE,
-    CIRCLE
+    RECTANGLE   = 0,
+    TRIANGLE    = 1,
+    CIRCLE      = 2
 };
 
 struct AttackData {
@@ -252,6 +255,8 @@ enum class EnemyBehavior {
     // this is the basic
     RANDOM,
     FOLLOW_PLAYER,
+    RETREAT,
+    ANGRY,
     PATROLLING,
     EVADEBULLET,
     CIRCLINGPLAYER,
@@ -297,6 +302,15 @@ struct EnemyPattern {
 };
 
 
+struct SpriteData
+{
+	std::string texturePath;
+	EFFECT_ASSET_ID effectId;
+	GEOMETRY_BUFFER_ID geometryId;
+	vec2 offset;
+};
+
+
 
 // anything that is deadly to the player
 struct Enemy {
@@ -309,6 +323,8 @@ struct Enemy {
     EnemyPattern& currEnemyPattern() {
         return enemyPatterns[patternIndex];
     };
+    vec2 scale;
+    SpriteData sprite;
 };
 
 struct EnemyMovement {
@@ -332,6 +348,7 @@ struct EnemyBullet {
     int bulletBounce;
     int bulletPierce;
     std::vector<BulletStackEffect> bulletEffects;
+    EnemyBulletShape shape;
 };
 
 struct Burst {

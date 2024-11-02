@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 
-#include "map_components.hpp"
-#include "actor_components.hpp"
 #include "io_components.hpp"
 #include "ui_components.hpp"
 
@@ -175,7 +173,6 @@ struct Mesh
  * enums there are, and as a default value to represent uninitialized fields.
  */
 
-// maybe a universal map would be easier to load + manage files with...
 
 // NOTE: these were originall enum CLASSES in the template
 // shouldn't matter much, but apparently enum CLASSES don't inherently cast to ints
@@ -191,7 +188,9 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	DASH = POSTPROCESS + 1,
 	HP_BAR = DASH + 1,
 	ROOM_BOUND = HP_BAR + 1,
-	EFFECT_COUNT = ROOM_BOUND + 1,
+	ANIMATE = ROOM_BOUND + 1,
+	BULLET = ANIMATE + 1,
+	EFFECT_COUNT = BULLET + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -218,6 +217,13 @@ struct RenderRequest {
 	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
 };
 
+struct Animation {
+	int frame = 0; // stick in animation info to here for now
+	int max_frames = 5; // this type of info should be known by render/sprite system?
+	float animation_countdown = 100;
+	float animation_countdown_base = animation_countdown;
+};
+
 // Expected sprite states other systems can use
 // eg: physics system sets object's sprite to DAMAGED upon collision
 // not all entities may have all these sprites, so should check
@@ -233,10 +239,23 @@ enum class SPRITE_STATE {
 // all the sprites this entity will use
 // for performance, consider 1 map per entity type
 // as opposed to 1 map per entity
+struct Sprites {
+	// map of sprite type (enum) to sprite texture
+	// eg: when bullet collides w/ enemy in physics system,
+	// physics system will change the sprite to "DAMAGED_SPRITE"
+	std::unordered_map<SPRITE_STATE, std::string> sprites;
+};
 
 struct CollisionShape {
 	// not sure if we need to draw that many
 	std::vector<Entity> shapes;
+};
+
+// if a sprite should switch after a certain amount of time
+struct SpriteTimer {
+	float count_ms = 1000;
+	std::string nextSprite;
+	EFFECT_ASSET_ID nextEffect;
 };
 
 // used to store info of what text needs to be rendered
@@ -250,9 +269,13 @@ struct TextRenderRequest {
 	float x;
 	float y;
 
-	// from experience, this is often a small number < 10, not sure why
+	// text size = defualt loaded in font size * scale, default is 48 pixels
 	float scale; 
 	glm::vec3 color;
+
+	// size of text box
+	vec2 topRightBound;
+	vec2 bottomLeftBound;
 };
 
 struct DialogueLines {

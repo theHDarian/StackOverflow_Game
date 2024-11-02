@@ -2,7 +2,7 @@
 #include "physics_system.hpp"
 #include "world_init.hpp"
 #include <glm/trigonometric.hpp>
-#include "components/components.hpp"
+#include "components.hpp"
 #include <glm/gtx/string_cast.hpp>
 #include <bitset>
 

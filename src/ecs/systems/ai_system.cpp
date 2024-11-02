@@ -23,7 +23,7 @@ void AISystem::step(float elapsed_ms)
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING 
 		updateState(enemy, movement);
-		std::cout << currPattern.name << "after update" << std::endl;
+		//std::cout << currPattern.name << "after update" << std::endl;
 
 		// THINKING 
 		if(currPattern.type == EnemyBehavior::FOLLOW_PLAYER) {
@@ -33,7 +33,7 @@ void AISystem::step(float elapsed_ms)
 		} else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB)) {
             movement.posA = movement.posB;
 			//ACTING 
-			std::cout << currPattern.name << "before getmove" << std::endl;
+			//std::cout << currPattern.name << "before getmove" << std::endl;
             movement.posB = getMove(currPattern.type, entity);
 			//std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
             movement.distanceTraveled = 0.f;
@@ -58,7 +58,7 @@ void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
 	vec2 EnemyPos = movement.posA;
 	float distance = glm::distance(playerPos, EnemyPos);
 	float closeDistance = 400.f;
-	float hpPercent = enemy.currHealth / enemy.maxHealth;
+	float hpPercent = static_cast<float>(enemy.currHealth) / static_cast<float>(enemy.maxHealth);
 	EnemyPattern& currPattern = enemy.currEnemyPattern();
 	bool reaction_found = false;
 	if (hpPercent < 0.25f) {
@@ -78,7 +78,7 @@ void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
 	} else if (distance < closeDistance) {
 		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
         if (reaction) {
-			std::cout << "got reaction for follow player" << std::endl;
+			//std::cout << "got reaction for follow player" << std::endl;
             enemy.patternIndex = reaction->index;
             reaction_found = true;
         }
@@ -93,12 +93,12 @@ void AISystem::updateState(Enemy& enemy, EnemyMovement movement) {
 	// DEFAULT STATE (CHANGE BY DURATION)
 	}
     if (!reaction_found) {
-        std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
+        //std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
         if (currPattern.curDuration < 0.f) {
             enemy.patternIndex = currPattern.next;
-            std::cout << currPattern.next << " index currPattern.next" << std::endl;
+            //std::cout << currPattern.next << " index currPattern.next" << std::endl;
             currPattern.curDuration = currPattern.maxDuration;
-            std::cout << "change to " << enemy.currEnemyPattern().name << std::endl;
+            //std::cout << "change to " << enemy.currEnemyPattern().name << std::endl;
         }
     }
 }
@@ -135,7 +135,11 @@ vec2 AISystem::getCurrentPos(Entity entity) {
 vec2 AISystem::getNextPatrolPos(Entity entity) {
 	Enemy& enemy = registry.enemies.get(entity);
 	EnemyPattern& pattern = enemy.currEnemyPattern();
-	std::cout << "current state: " << pattern.name << std::endl;
+	if (pattern.type != EnemyBehavior::PATROLLING) {
+		//std::cout << "Different EnemyBehavior!" << std::endl;
+		return getCurrentPos(entity);
+	}
+	//std::cout << "current state: " << pattern.name << std::endl;
 	pattern.pathIndex += 1;
 	if (pattern.path.size() - 1 <= pattern.pathIndex) {
 		pattern.pathIndex = 0;
@@ -214,4 +218,8 @@ vec2 AISystem::evadeBullet(Entity entity) {
 	bestEscapePos[0] = glm::clamp(bestEscapePos[0], 0.f + scale[0], static_cast<float>(windowState.width) - scale[0]);
 	bestEscapePos[1] = glm::clamp(bestEscapePos[1], 0.f + scale[1], static_cast<float>(windowState.height) - scale[1]);
 	return bestEscapePos;
+}
+
+void AISystem::angryMode(Entity entity) {
+	
 }
