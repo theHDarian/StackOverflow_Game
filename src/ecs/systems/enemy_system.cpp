@@ -356,6 +356,9 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         }
     }
     //play shoot sound
+    if (atkData.attackType == EnemyAttackPattern::NONE )
+        return;
+
     if ( atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
         if (atkData.shape == EnemyBulletShape::CIRCLE) {
             sound->playEnemyShootSound(0, atkData.numBullets);
