@@ -51,9 +51,10 @@ void EnemySystem::step(float elapsed_ms)
         float angle = motion.angle;
 
         EnemyPattern &pattern = enemy.currEnemyPattern();
-        if (registry.bees.has(entity) || pattern.type == EnemyBehavior::MERGE_BEE)
+        if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE)
         {
-            merge(entity, pattern, pendingDeletion);
+            std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
+             merge(entity, pattern, pendingDeletion);
         }
 
         for (Entity deletedBee : pendingDeletion)

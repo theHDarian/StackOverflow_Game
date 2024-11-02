@@ -16,18 +16,13 @@ void AISystem::step(float elapsed_ms)
 		Enemy &enemy = enemy_registry.get(entity);
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
 		// std::cout << movement_registry.entities.size() << " is the size of movement entity" << std::endl;
-		// std::cout << currPattern.name << " initial" << std::endl;
+		std::cout << currPattern.name << " initial" << std::endl;
 		EnemyMovement &movement = movement_registry.get(entity);
 		Motion &motion = registry.motions.get(entity);
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING
-		for (Entity entity : registry.bees.entities)
-		{
-			BeeEnemy &bee = registry.bees.get(entity);
-			bee.nearbyBees.clear();
-		}
 		updateState(enemy, movement, entity);
-		// std::cout << currPattern.name << "after update" << std::endl;
+		std::cout << currPattern.name << "after update" << std::endl;
 
 		// THINKING
 		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
@@ -72,7 +67,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	bool reaction_found = false;
 
 	// this is potentially VERY costly, but idk where to put this
-	float closeToBeeDistance = 100.f;
+	float closeToBeeDistance = 150.f;
 	bool closeToBee = false;
 
 	if (registry.bees.has(entity))
@@ -90,7 +85,20 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 				closeToBee = (glm::distance(EnemyPosMotion, registry.motions.get(bee).position) < closeToBeeDistance);
 				if (closeToBee)
 				{
+					std::cout << "close to bee is true" << std::endl;
 					registry.bees.get(entity).nearbyBees.insert(bee);
+					auto reaction = getReactions(currPattern.reactions, ReactionType::BEE_CLOSE);
+					if (reaction)
+					{
+						enemy.patternIndex = reaction->index;
+						reaction_found = true;
+						std::cout << "bee close!" << enemy.currEnemyPattern().name << std::endl;
+						BeeEnemy& beeComponent = registry.bees.get(entity);
+						BeeEnemy& otherBeeComponent = registry.bees.get(bee);
+						beeComponent.mergeReady = true;
+						otherBeeComponent.mergeReady = true;
+
+					}
 				}
 			}
 		}
@@ -106,6 +114,17 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			reaction_found = true;
 		}
 	}
+	// else if (closeToBee)
+	// {
+
+	// 	auto reaction = getReactions(currPattern.reactions, ReactionType::BEE_CLOSE);
+	// 	if (reaction)
+	// 	{
+	// 		enemy.patternIndex = reaction->index;
+	// 		reaction_found = true;
+	// 		std::cout << "bee close!" << enemy.currEnemyPattern().name << std::endl;
+	// 	}
+	// }
 	else if (hpPercent < 0.5f)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FIFTY_HEALTH);
@@ -136,20 +155,9 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		// PLAYER BULLET CLOSE TO BE IMPELMENTED..
 		// DEFAULT STATE (CHANGE BY DURATION)
 	}
-	else if (closeToBee)
+	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::DURATION))
 	{
-
-		auto reaction = getReactions(currPattern.reactions, ReactionType::BEE_CLOSE);
-		if (reaction)
-		{
-			enemy.patternIndex = reaction->index;
-			reaction_found = true;
-			std::cout << "bee close!" << enemy.currEnemyPattern().name << std::endl;
-		}
-	}
-	if (!reaction_found)
-	{
-		// std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
+		std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
 		if (currPattern.curDuration < 0.f)
 		{
 			enemy.patternIndex = currPattern.next;
@@ -179,6 +187,8 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::ROTATE_IN_PLACE:
 		return getCurrentPos(entity);
 	case EnemyBehavior::IDLE:
+		return getCurrentPos(entity);
+	case EnemyBehavior::MERGE_BEE:
 		return getCurrentPos(entity);
 	default:
 		return vec2{0, 0};

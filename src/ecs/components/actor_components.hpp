@@ -211,7 +211,8 @@ enum EnemyType {
     TestRevampedEnemy,
     BossBigC,
     OneBee,
-    TwoBee
+    TwoBee,
+    ThreeBee
 };
 
 enum class EnemyAttackPattern {
@@ -395,6 +396,7 @@ struct Damaged {
 struct BeeEnemy {
     std::set<Entity> nearbyBees;
     int mergeCount = 1;
-    int maxMerge = 2;
+    int maxMerge = 3;
+    bool mergeReady = false;
     bool merge = false;
 };

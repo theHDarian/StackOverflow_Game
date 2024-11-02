@@ -633,3 +633,36 @@ struct Bee2 : Enemy
 		scale = vec2({864 / 8.f, 480 / 8.f});
 	};
 };
+
+struct Bee3 : Enemy
+{
+	Reaction reactionPatrol = {
+		ReactionType::DURATION,
+		1};
+
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0};
+
+	Reaction reactionBeeClose = {
+		ReactionType::BEE_CLOSE,
+		2};
+
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, threeSpray};
+	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, threeSpray};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose}, 0, true, 0.f, 5000.f, NoAttack};
+
+	Bee3()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = {idleBee, randomBee, mergeBee};
+		patternIndex = 0;
+		sprite = {
+			"bee_fly_3",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({864 / 8.f, 480 / 8.f});
+	};
+};

@@ -333,6 +333,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 
 		break;
 	}
+	case EnemyType::ThreeBee:
+	{
+		enemy = Bee3();
+		BeeEnemy& bee = registry.bees.emplace(entity);
+		bee.mergeCount = 3;
+	}
 	}
 
 	Motion &motion = registry.motions.emplace(entity);
