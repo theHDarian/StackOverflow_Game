@@ -577,7 +577,7 @@ void RenderSystem::drawImGui() {
 	// STACK INFORMATION
 	StackCompile& sc = registry.stackCompile.components[0];
 	// ImGui::Text("Stack Size: %lu", sc.currStack.size());
-	ImGui::Text("S. Bullets Left: %d",map.currRoom.numSpecialBulletsLeft);
+	ImGui::Text("S. Bullets Left: %d",map.currRoom.preset.numSpecialBulletsToSpawn);
 	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
 	ImGui::BeginChild("AdditiveContent",ImVec2(180,80),true);
 		std::map<BulletEffectType, float>::iterator it;

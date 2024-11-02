@@ -93,43 +93,22 @@ void MapSystem::step(float elapsed_ms)
 
     // spawn enemy based on current time
     WindowState &wS = registry.windowStates.components[0];
-    switch (map.currRoom.formatType)
+    if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay)
     {
-    case RoomFormatType::EnemyFT:
-    {
-        // spawn enemies
-        if (map.currRoom.preset.enemy != nullptr && map.currRoom.timeElapsed > map.currRoom.preset.enemy->spawnDelay)
+        for (auto &e : map.currRoom.preset.enemies)
         {
-            for (auto &e : map.currRoom.preset.enemy->enemies)
-            {
-                createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
-            }
-            map.currRoom.preset.enemy = nullptr;
+            createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
         }
-        // handle special events
-        map.currRoom.preset.enemy->specialEvents;
-        break;
-    }
-    case RoomFormatType::BossFT:
-    {
-        if (map.currRoom.preset.boss != nullptr && map.currRoom.timeElapsed > map.currRoom.preset.boss->spawnDelay)
-        {
-            createBoss(renderer, map.currRoom.preset.boss->spawnLocation * vec2(wS.width, wS.height), map.currRoom.preset.boss->boss);
-            map.currRoom.preset.boss = nullptr;
+        map.currRoom.preset.enemies = {};
+
+        for (auto& b : map.currRoom.preset.bosses) {
+            createBoss(renderer, std::get<vec2>(b) * vec2(wS.width, wS.height), std::get<BossType>(b));
         }
-        break;
-    }
-    case RoomFormatType::RestingFT:
-    case RoomFormatType::TreasureFT:
-        break;
-    default:
-    {
-        throw 'invalid format';
-    }
+        map.currRoom.preset.bosses = {};
     }
 
     // set room to cleared if all enemies are defeated
-    if ((map.currRoom.formatType != RoomFormatType::EnemyFT || (map.currRoom.preset.enemy == nullptr && registry.enemies.entities.empty())) && (map.currRoom.formatType != RoomFormatType::BossFT || (map.currRoom.preset.boss == nullptr && registry.enemies.entities.empty())))
+    if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty())
     {
         map.currRoom.cleared = true;
     }
@@ -182,18 +161,6 @@ RoomType randomRoomType(bool excludeNone)
 {
     return static_cast<RoomType>(rand() % (excludeNone ? RoomType::None - 1 : RoomType::None));
 }
-RoomFormatType getFormatTypeFromRoomType(RoomType rt)
-{
-    if (rt == RoomType::BossBigCRoom)
-        return RoomFormatType::BossFT;
-    if (rt == RoomType::None)
-        assert(false);
-    if (rt == RoomType::RestRoom)
-        return RoomFormatType::TreasureFT;
-    if (rt == RoomType::RestRoom)
-        return RoomFormatType::RestingFT;
-    return RoomFormatType::EnemyFT;
-}
 
 void MapSystem::changeRoom(RoomType type, int doorIndex)
 {
@@ -222,32 +189,11 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     clearRoomActors();
 
     // change current room in the map
-    Entity ent = registry.maps.entities[0];
-    map.currRoom.formatType = getFormatTypeFromRoomType(door.room);
-    map.currRoom.preset.enemy = nullptr;
-    map.currRoom.preset.resting = nullptr;
-    map.currRoom.preset.treasure = nullptr;
-    if (map.currRoom.formatType == RoomFormatType::EnemyFT)
-    {
-        map.currRoom.preset.enemy = getEnemyRoom(door.room);
-        map.currRoom.numSpecialBulletsLeft = map.currRoom.preset.enemy->numSpecialBulletsToSpawn;
-    }
-    else if (map.currRoom.formatType == RoomFormatType::BossFT)
-    {
-        map.currRoom.preset.boss = getBossRoom(door.room);
-        map.currRoom.numSpecialBulletsLeft = map.currRoom.preset.boss->numSpecialBulletsToSpawn;
-    }
-    else if (map.currRoom.formatType == RoomFormatType::RestingFT)
-    {
-        map.currRoom.preset.resting = getRestingRoom();
-    }
-    else
-    {
-        map.currRoom.preset.treasure = getTreasureRoom();
-    }
-    map.currRoom.cleared = false;
-    map.currRoom.timeElapsed = 0;
-
+    map.currRoom = Room();
+    assert(door.room != RoomType::None);
+    std::vector<RoomPreset> presets = roomDirectory.at(door.room);
+    RoomPreset randomPreset = Random::ListItem(presets);
+    map.currRoom.preset = randomPreset;
     map.roomsTraversed++;
 
     // randomize the doors other than the one you came from
@@ -291,11 +237,10 @@ void MapSystem::resetMap()
     map.roomsTraversed = 0;
 
     // set initial room to enemy
-    map.currRoom.formatType = RoomFormatType::EnemyFT;
-    map.currRoom.preset.enemy = getEnemyRoom(RoomType::EnemyRoomDash);
-    map.currRoom.cleared = false;
-    map.currRoom.timeElapsed = 0;
-    map.currRoom.numSpecialBulletsLeft = map.currRoom.preset.enemy->numSpecialBulletsToSpawn;
+    map.currRoom = Room();
+    std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomDash);
+    RoomPreset randomPreset = Random::ListItem(presets);
+    map.currRoom.preset = randomPreset;
 }
 
 void MapSystem::nextMusic()

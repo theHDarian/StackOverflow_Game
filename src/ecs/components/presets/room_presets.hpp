@@ -9,58 +9,66 @@
 
 
 //---------- PRESETS-------------------
-const EnemyRoomPreset EnemyRoomDash1 {
+// struct RoomPreset {
+//     std::vector<std::tuple<EnemyType,vec2>> enemies;
+//     std::vector<std::tuple<BulletStackEffect,vec2>> treasures; //for treasure rooms
+//     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
+//     std::vector<std::tuple<BossType,vec2>> bosses;
+//     std::vector<SpecialEvent> specialEvents; 
+//     float spawnDelay; //in seconds - for enemies and bosses
+//     int numSpecialBulletsToSpawn = 5;
+// };
+
+const RoomPreset EnemyRoomDash1 {
     {
         {EnemyType::EasyEnemySentry,{0.2f,0.8f}},
         {EnemyType::EasyEnemySentry,{0.8f,0.8f}},
         {EnemyType::EasyEnemySentry,{0.8f,0.2f}},
         {EnemyType::EasyEnemySentry,{0.2f,0.2f}}
     },
-    5.0f,
-    {  },
     {},
+    {},
+    {},
+    {},
+    5.0f,
     5
 };
 
-const RestingRoomPreset RestingRoom1 {
-    { 0.5f,0.5f}
+const RoomPreset EnemyRoomTripleBuff1 {
+    {
+        {EnemyType::MediumEnemyCharge,{0.2f,0.8f}}, 
+        {EnemyType::MediumEnemyCharge,{0.8f,0.2f}},
+    },
+    {},
+    {},
+    {},
+    {},
+    5.0f,
+    5
 };
-const TreasureRoomPreset TreasureRoom1 {
-    sizeUpA
+const RoomPreset RestingRoom1 {
+    {},
+    {},
+    {},
+    {},
+    {SpecialEvent::RebootStation}
 };
-const BossRoomPreset BossRoomBigC {
-    {0.5,0.5}, //position
-    BossType::BigCBoss,
-    5.0f, //delay
-    0 //special bullet count
+const RoomPreset TreasureRoom1 {
+    {},
+    {
+        {sizeUpA,{0.5f,0.5f}}
+    },
+    {},
+    {},
+    {},
 };
 
-const std::vector<EnemyRoomPreset> enemyRoomDashList = { EnemyRoomDash1 };
-const std::vector<RestingRoomPreset> restingRoomList = { RestingRoom1 };
-const std::vector<TreasureRoomPreset> treasureRoomList = { TreasureRoom1 };
-
-EnemyRoomPreset* getEnemyRoom(RoomType type) {
-    // Map& map = registry.maps.components[0];
-    switch (type) {
-        case RoomType::EnemyRoomDash:
-            return Random::ListItem(enemyRoomDashList);
-        default:
-            printf("WARNING: other roomtypes not yet implemented, returning default enemy room\n");
-            return Random::ListItem(enemyRoomDashList);
-    }       
-}
-RestingRoomPreset* getRestingRoom() {
-    return Random::ListItem(restingRoomList);
-}
-TreasureRoomPreset* getTreasureRoom() {
-    return Random::ListItem(treasureRoomList);
-}
-BossRoomPreset* getBossRoom(RoomType type) {
-    if (type == RoomType::BossBigCRoom) {
-        return const_cast<BossRoomPreset*>(&BossRoomBigC);
-    }
-    throw "invalid room type";
-}
+const std::map<RoomType,std::vector<RoomPreset>> roomDirectory = {
+    {RoomType::EnemyRoomDash,{EnemyRoomDash1}},
+    {RoomType::EnemyRoomTripleBuff,{EnemyRoomTripleBuff1}},
+    {RoomType::RestRoom,{RestingRoom1}},
+    {RoomType::TreasureRoom,{TreasureRoom1}}
+};
 
 
 

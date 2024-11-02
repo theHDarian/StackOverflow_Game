@@ -8,38 +8,28 @@ enum Side : char {
 
 enum RoomType : char {
     EnemyRoomDash,
-    EnemyRoomBulletSize,
-    EnemyRoomDmg,
-    EnemyRoomSpeed,
+    EnemyRoomTripleBuff,
+    // EnemyRoomBulletSize,
+    // EnemyRoomDmg,
+    // EnemyRoomSpeed,
     TreasureRoom,
     RestRoom,
-    BossBigCRoom,
+    // BossBigCRoom, //remove for now to prevent bug
     None //Keep None at the end of the list to be compatible with existing get random function
 };
 
-enum SpecialEvent { BouncingDisc };
+enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
 enum BossType { BigCBoss };
 
-struct EnemyRoomPreset {
+struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
-    float spawnDelay; //in seconds
-    std::vector<SpecialEvent> specialEvents;
-    std::vector<std::tuple<RoomProp,vec2>> roomProps;
+    std::vector<std::tuple<BulletStackEffect,vec2>> treasures; //for treasure rooms
+    std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
+    std::vector<std::tuple<BossType,vec2>> bosses;
+    std::vector<SpecialEvent> specialEvents; 
+    float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
-};
-
-struct RestingRoomPreset {
-    vec2 rebootStationLocation;
-};
-struct TreasureRoomPreset { 
-    BulletStackEffect effect;
-};
-struct BossRoomPreset {
-    vec2 spawnLocation;
-    BossType boss;
-    float spawnDelay;
-    int numSpecialBulletsToSpawn = 2;
 };
 
 struct Door {
@@ -48,19 +38,10 @@ struct Door {
     vec2 startPos, endPos;
 };
 
-enum RoomFormatType {EnemyFT,RestingFT,TreasureFT,BossFT};
 struct Room {
-    RoomFormatType formatType;
-    union Preset { //the room preset can be one of 3 formats
-        EnemyRoomPreset* enemy;
-        RestingRoomPreset* resting;
-        TreasureRoomPreset* treasure;
-        BossRoomPreset* boss;
-        Preset(){}
-    } preset;
+    RoomPreset preset;
     bool cleared;
     float timeElapsed; //time passed since enter room in seconds
-    int numSpecialBulletsLeft;
 };
 enum MapRequestType {
     RestartGame = 'R',

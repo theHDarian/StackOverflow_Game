@@ -821,9 +821,9 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 	float prob = 0.1f * (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
 	Map &map = registry.maps.components[0];
 
-	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.numSpecialBulletsLeft > 0)
+	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
-		registry.maps.components[0].currRoom.numSpecialBulletsLeft--;
+		registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 		return atkData.rareBulletEffects;
 	}
 	return {atkData.defaultEffect};

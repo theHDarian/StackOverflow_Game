@@ -9,10 +9,10 @@ class Random {
             float range = max - min;
             return (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * range + min;
         }
-        
+
         template<typename T>
-        static T* ListItem(const std::vector<T> &list) {
-            if (list.empty()) return nullptr;
-            return const_cast<T*>(&list[(int)floor(Float()*list.size())]);
+        static T ListItem(const std::vector<T> &list) {
+            assert(!list.empty());
+            return list[(int)floor(Float()*list.size())];
         }
 };
