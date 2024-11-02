@@ -18,7 +18,7 @@ Entity createPlayer(RenderSystem *renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = {0.f, 0.f};
-	motion.scale = mesh.original_size * 50.f;
+	motion.scale = vec2(1.0f) * 50.f;
 
 	Player &player = registry.players.emplace(entity);
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
@@ -123,55 +123,81 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 		{"none",
 		 EFFECT_ASSET_ID::EGG,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE});
-	vec3 c = registry.colors.emplace(entity);
-	c.r = 0.0;
-	c.g = 0.0;
-	c.b = 1.0;
 
 	return entity;
 }
 
 void createRoomBounds(RenderSystem *renderer)
 {
+	float angle = 90.0f;
+	float wallThickness = 80.0f;
+	float verticalOffset = 3500.0f;
+	float playerHeight = 80.f;
+
 	WindowState &wS = registry.windowStates.components[0];
 
 	Entity bounds[4];
 
 	struct WallPos {
-		vec2 start;
-		vec2 end;
-		float angle;
-		vec3 axis;
-		vec2 offset;
+		vec2 colliderStart;
+		vec2 colliderEnd;
+		vec2 spriteStart;
+		vec2 spriteEnd;
+		vec2 spriteScale;
 	};
-	float angle = 90.0f;
+	
 	std::vector<WallPos> wallPositions = {
-		{vec2(0, 0), vec2(wS.width, 0),-angle,vec3(1,0,0),vec2(0,-3000.f)},
-		{vec2(wS.width, 0), vec2(wS.width, wS.height),-angle,vec3(1,0,0)},
-		{vec2(wS.width, wS.height), vec2(0, wS.height),-angle,vec3(1,0,0),vec2(0,-3000.f)},
-		{vec2(0, wS.height), vec2(0, 0),-angle,vec3(1,0,0)}
+		{ //top 
+			vec2(0, 45), 
+			vec2(wS.width, 45),
+			vec2(0,-200.0f),
+			vec2(wS.width,-200.0f),
+			vec2(1280.f,98.f),
+		},
+		{ //bottom
+			vec2(wS.width, wS.height-wallThickness), 
+			vec2(0, wS.height-wallThickness),
+			vec2(wS.width,wS.height+200),
+			vec2(0,wS.height+200),
+			vec2(1280.f,98.f)
+		},
+		{ //right
+			vec2(wS.width-90, 0), 
+			vec2(wS.width-90, wS.height), 
+			vec2(50,0),
+			vec2(50,wS.height),
+			vec2(1100.f,85.f)
+		},
+		{ //left
+			vec2(90.f, wS.height), 
+			vec2(90.f, 0),
+			vec2(wS.width-50,wS.height),
+			vec2(wS.width-50,0),
+			vec2(1100.f,85.f)
+		}
 	};
 	for (auto& p : wallPositions) {
 		auto entity = Entity();
 
 		auto &motion = registry.motions.emplace(entity);
-		motion.position = (p.start + p.end) / 2.0f;
-		motion.scale = vec2(2880.0f,240.0f) / 2.0f;
-		motion.angle = atan2(p.end.y - p.start.y, p.end.x - p.start.x);
+		motion.position = (p.spriteStart+ p.spriteEnd) / 2.0f;
+		motion.scale = p.spriteScale;
+		motion.angle = atan2(p.spriteEnd.y - p.spriteStart.y, p.spriteEnd.x - p.spriteStart.x);
 
 		auto &wall = registry.walls.emplace(entity);
-		wall.startPosition = p.start;
-		wall.endPosition = p.end;
+		wall.startPosition = p.colliderStart;
+		wall.endPosition = p.colliderEnd;
+
+		Bound& b = registry.bounds.emplace(entity);
+		b.angle = -90.0f;
+		b.axis = vec3(1,0,0);
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
 			{"wall_horizontal.png",
 			EFFECT_ASSET_ID::ROOM_BOUND,
-			GEOMETRY_BUFFER_ID::SPRITE});
-		rr.offset = p.offset;
-		Bound& b = registry.bounds.emplace(entity);
-		b.angle = p.angle;
-		b.axis = p.axis;
+			GEOMETRY_BUFFER_ID::SPRITE});		
+		registry.backgrounds.emplace(entity);
 	}
 }
 

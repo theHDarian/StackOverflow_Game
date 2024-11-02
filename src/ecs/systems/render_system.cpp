@@ -136,7 +136,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 
 		WindowState &ws = registry.windowStates.components[0];
-		vec3 cameraPosition = vec3(ws.width/2.0f,ws.height/2.0f,-10.0f);
 		
 		mat4 model = 	glm::translate(glm::mat4(1.0f),
 						vec3(motion.position.x,motion.position.y,0.0f))
@@ -147,13 +146,13 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 					);
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
 		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, 400.0f); // Position above the XY plane
-		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f); // Looking towards the origin
-		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Y-axis up vector
+		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f);
+		glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
 
 		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
-		float fov = 120.0f;
-		float aspectRatio = ws.width / ws.height;
+		float fov = 115.0f; //makes walls appear larger the less there is
+		float aspectRatio = (ws.width) / (ws.height);
 		float near = 0.1f;
 		float far = 10000.0f;
 		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near, far);
@@ -326,7 +325,6 @@ void RenderSystem::drawBackgroundElements() {
 	for (Entity entity : registry.backgrounds.entities) {
 		if (!registry.renderRequests.get(entity).show)
 			continue;
-		
 		drawTexturedMesh(entity, projection_2D);
 	}
 	glBindVertexArray(0);
@@ -382,7 +380,7 @@ void RenderSystem::drawGameElements()
 
 	for (Entity& entity : registry.walls.entities)
 	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.backgrounds.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 	}

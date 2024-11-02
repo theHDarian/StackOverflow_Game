@@ -28,12 +28,15 @@ void MapSystem::init(RenderSystem *renderer)
     loadMusic();
     WindowState &ws = registry.windowStates.components[0];
     // create door colliders
-    float offset = 20;
-    float doorWidth = 30;
-    createDoor(renderer, {ws.width / 2 - doorWidth / 2, offset}, {ws.width / 2 + doorWidth / 2, offset});
-    createDoor(renderer, {ws.width - offset, ws.height / 2 - doorWidth / 2}, {ws.width - offset, ws.height / 2 + doorWidth / 2});
-    createDoor(renderer, {ws.width / 2 - doorWidth / 2, ws.height - offset}, {ws.width / 2 + doorWidth / 2, ws.height - offset});
-    createDoor(renderer, {offset, ws.height / 2 - doorWidth / 2}, {offset, ws.height / 2 + doorWidth / 2});
+    float offsetRightLeft = 100;
+    float offsetTop = 60;
+    float offsetBot = 90;
+    float doorWidthX = 200;
+    float doorWidthY = 80.0f;
+    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, offsetTop}, {ws.width / 2 + doorWidthX / 2, offsetTop});
+    createDoor(renderer, {ws.width - offsetRightLeft, ws.height / 2 - doorWidthY / 2}, {ws.width - offsetRightLeft, ws.height / 2 + doorWidthY / 2});
+    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, ws.height - offsetBot}, {ws.width / 2 + doorWidthX / 2, ws.height - offsetBot});
+    createDoor(renderer, {offsetRightLeft, ws.height / 2 - doorWidthY / 2}, {offsetRightLeft, ws.height / 2 + doorWidthY / 2});
     resetMap();
 }
 
