@@ -54,6 +54,7 @@ struct WallCollider {
 struct Bound {
 	float angle; //degrees
 	vec3 axis;
+	vec3 offset;
 }; //room bounds
 
 struct AABBCollider {

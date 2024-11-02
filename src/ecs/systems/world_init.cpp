@@ -160,68 +160,68 @@ Entity createDoorSymbol(RenderSystem * renderer, Entity boundEnt) {
 
 void createRoomBounds(RenderSystem *renderer)
 {
-	float angle = 90.0f;
-	float wallThickness = 80.0f;
-	float verticalOffset = 3500.0f;
-	float playerHeight = 80.f;
-
-	WindowState &wS = registry.windowStates.components[0];
+	WindowState &ws = registry.windowStates.components[0];
 
 	Entity bounds[4];
 
 	struct WallPos {
 		vec2 colliderStart;
 		vec2 colliderEnd;
-		vec2 spriteStart;
-		vec2 spriteEnd;
+		vec2 spritePosition;
 		vec2 spriteScale;
+		float spriteAngle;
+		vec3 offset;
 	};
-	
+	vec2 windowDimensions = {ws.width-80,ws.height+270};
 	std::vector<WallPos> wallPositions = {
 		{ //top 
-			vec2(0, 45), 
-			vec2(wS.width, 45),
-			vec2(0,-200.0f),
-			vec2(wS.width,-200.0f),
-			vec2(1280.f,98.f),
+			vec2(0, 60), 
+			vec2(ws.width, 60),
+			vec2(ws.width / 2.f,ws.height - windowDimensions.y + 98.f/2.f),
+			vec2(windowDimensions.x,98.f),
+			0,
 		},
 		{ //bottom
-			vec2(wS.width, wS.height-wallThickness), 
-			vec2(0, wS.height-wallThickness),
-			vec2(wS.width,wS.height+200),
-			vec2(0,wS.height+200),
-			vec2(1280.f,98.f)
+			vec2(ws.width, ws.height-100.f), 
+			vec2(0, ws.height-100.f),
+			vec2(ws.width/2,windowDimensions.y-98.f/2.f),
+			vec2(windowDimensions.x,98.f),
+			glm::radians(180.f)
 		},
+		//NOTE: left and righ wall require some weird z offset
 		{ //right
-			vec2(wS.width-90, 0), 
-			vec2(wS.width-90, wS.height), 
-			vec2(50,0),
-			vec2(50,wS.height),
-			vec2(1100.f,85.f)
+			vec2(ws.width-150, 0), 
+			vec2(ws.width-150, ws.height), 
+			vec2(windowDimensions.x-98.f/2.f ,ws.height/2),
+			vec2(windowDimensions.y,92.f),
+			glm::radians(270.f),
+			vec3(0,0,49)
 		},
 		{ //left
-			vec2(90.f, wS.height), 
-			vec2(90.f, 0),
-			vec2(wS.width-50,wS.height),
-			vec2(wS.width-50,0),
-			vec2(1100.f,85.f)
+			vec2(150.f, ws.height), 
+			vec2(150.f, 0),
+			vec2(ws.width - windowDimensions.x + 98.f/2.f,ws.height/2),
+			vec2(windowDimensions.y,92.f),
+			glm::radians(90.f),
+			vec3(0,0,49)
 		}
 	};
 	for (auto& p : wallPositions) {
 		auto entity = Entity();
 
 		auto &motion = registry.motions.emplace(entity);
-		motion.position = (p.spriteStart+ p.spriteEnd) / 2.0f;
+		motion.position = p.spritePosition;
 		motion.scale = p.spriteScale;
-		motion.angle = atan2(p.spriteEnd.y - p.spriteStart.y, p.spriteEnd.x - p.spriteStart.x);
+		motion.angle = p.spriteAngle;
 
 		auto &wall = registry.walls.emplace(entity);
 		wall.startPosition = p.colliderStart;
 		wall.endPosition = p.colliderEnd;
 
 		Bound& b = registry.bounds.emplace(entity);
-		b.angle = -90.0f;
+		b.angle = glm::radians(-90.f);
 		b.axis = vec3(1,0,0);
+		b.offset = p.offset;
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
@@ -231,7 +231,7 @@ void createRoomBounds(RenderSystem *renderer)
 		registry.backgrounds.emplace(entity);
 
 		//add door symbol for each wall
-		createDoorSymbol(renderer,entity);
+		// createDoorSymbol(renderer,entity);
 	}
 }
 

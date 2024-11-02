@@ -207,10 +207,12 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		WindowState &ws = registry.windowStates.components[0];
 		float angle;
 		vec3 axis;
+		vec3 offset;
 		if (registry.bounds.has(entity)) {
 			Bound& b = registry.bounds.get(entity);
 			angle = b.angle;
 			axis = b.axis;
+			offset = b.offset;
 		} else if (registry.doorSymbols.has(entity)) {
 			DoorSymbol& d = registry.doorSymbols.get(entity);
 			angle = d.angle;
@@ -218,13 +220,20 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		} else {
 			assert(false);
 		}
-		mat4 model = 	glm::translate(glm::mat4(1.0f),
-						vec3(motion.position.x,motion.position.y,0.0f))
-						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))  
-						* glm::translate(glm::mat4(1.0f),vec3(offset,1.0f) * glm::normalize(vec3(motion.scale,1.0f)))
-						* glm::rotate(glm::mat4(1.0f),radians(angle),axis) //rotate to be vertical on z axis
-						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f)
-					);
+		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x,motion.position.y,0.0f))
+						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))
+						* glm::translate(glm::mat4(1.0f),offset)
+						* glm::rotate(glm::mat4(1.0f),angle,axis) //rotate to be vertical on z axis
+						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
+		glm::vec3 position = glm::vec3(motion.position.x, motion.position.y, 0.0f);
+		float angle1 = motion.angle;
+		float angle2 = angle; // Second rotation angle
+		glm::vec3 scale = glm::vec3(motion.scale, 1.0f);
+
+		std::cout << "Position: (" << position.x << ", " << position.y << ", " << position.z << ") "
+				<< "Angle 1: " << angle1 << " radians "
+				<< "Angle 2: " << angle2 << " radians "
+				<< "Scale: (" << scale.x << ", " << scale.y << ", " << scale.z << ")\n";
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
 		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, 400.0f); // Position above the XY plane
 		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f);
@@ -232,7 +241,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
-		float fov = 115.0f; //makes walls appear larger the less there is
+		float fov = 125.0f; //makes walls appear larger the less there is
 		float aspectRatio = (ws.width) / (ws.height);
 		float near = 0.1f;
 		float far = 10000.0f;

@@ -28,9 +28,9 @@ void MapSystem::init(RenderSystem *renderer)
     loadMusic();
     WindowState &ws = registry.windowStates.components[0];
     // create door colliders
-    float offsetRightLeft = 100;
-    float offsetTop = 60;
-    float offsetBot = 90;
+    float offsetRightLeft = 160;
+    float offsetTop = 70;
+    float offsetBot = 120;
     float doorWidthX = 200;
     float doorWidthY = 80.0f;
     createDoor(renderer, {ws.width / 2 - doorWidthX / 2, offsetTop}, {ws.width / 2 + doorWidthX / 2, offsetTop});
