@@ -24,7 +24,7 @@ enum BossType { BigCBoss };
 
 struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
-    std::vector<std::tuple<BulletStackEffect,vec2>> treasures; //for treasure rooms
+    std::vector<std::tuple<AttackData,vec2>> treasures; //for treasure rooms
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
     std::vector<SpecialEvent> specialEvents; 
     float spawnDelay; //in seconds - for enemies and bosses

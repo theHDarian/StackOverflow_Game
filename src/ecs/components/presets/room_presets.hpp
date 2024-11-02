@@ -52,10 +52,12 @@ const RoomPreset RestingRoom1 {
 const RoomPreset TreasureRoom1 {
     {},
     {
-        {sizeUpA,{0.5f,0.5f}}
+        {threeBurst,{0.5f,0.5f}}
     },
     {},
     {},
+    2.0f,
+    5,
 };
 
 const RoomPreset BossRoom1 {
