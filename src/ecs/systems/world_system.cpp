@@ -8,8 +8,7 @@
 #include <iostream>
 #include <glm/detail/func_trigonometric.inl>
 #include <SDL.h>
-#include <SDL_mixer.h>
-
+#include "sound_system.hpp"
 #include "physics_system.hpp"
 
 // include these for now
@@ -33,16 +32,6 @@ WorldSystem::WorldSystem()
 }
 
 WorldSystem::~WorldSystem() {
-	
-	// destroy music components
-	if (playerHurtSound != nullptr)
-		Mix_FreeChunk(playerHurtSound);
-	if (playerDashSound != nullptr)
-		Mix_FreeChunk(playerDashSound);
-	if (playerShootSound != nullptr)
-		Mix_FreeChunk(playerShootSound);
-
-	Mix_CloseAudio();
 
 	// Destroy all created components
 	registry.clear_all_components();
@@ -91,12 +80,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 	  window_width_px = vidMode->width;
 	  window_height_px = vidMode->height;
-	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -109,49 +98,26 @@ GLFWwindow* WorldSystem::createWindow() {
 		return nullptr;
 	}
 
+
+
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 
-	// Loading music and sounds with SDL
-	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-		fprintf(stderr, "Failed to initialize SDL Audio: %s\n", SDL_GetError());
-		return nullptr;
-	}
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
-		fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
-		return nullptr;
-	}
-
-	playerHurtSound = Mix_LoadWAV(audio_path("sfx/player_hurtv1.wav").c_str());
-	playerHurtSound->volume = 0.4f * MIX_MAX_VOLUME;
-	if (!playerHurtSound) {
-		fprintf(stderr, "Failed to load player hurt sound: %s\n", Mix_GetError());
-	}
-
-	playerDashSound = Mix_LoadWAV(audio_path("sfx/dash.wav").c_str());
-	playerDashSound->volume = 0.4f * MIX_MAX_VOLUME;
-
-	playerShootSound = Mix_LoadWAV(audio_path("sfx/player_shoot.wav").c_str());
-	playerShootSound->volume = 0.1f * MIX_MAX_VOLUME;
-
-	if (playerHurtSound == nullptr || playerDashSound == nullptr || playerShootSound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n make sure the data directory is present",
-				audio_path("sfx/player_hurtv1.wav").c_str());
-		return nullptr;
-	}
 	std::string title = "StackOverflow";
 
 	glfwSetWindowTitle(window, title.c_str());
 
+
 	return window;
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg) {
 	this->renderer = renderer_arg;
 	// Playing background music indefinitely
 	fprintf(stderr, "Loaded music\n");
+	this->soundPlayer = soundPlayer_arg;
 
 
 	// Set all states to default
@@ -446,6 +412,8 @@ void WorldSystem::handleInput() {
 				gameState.dialogueScene = false;
 			}
 		}
+		//change volume
+		soundPlayer->setVolume(gameState.currentVolume);
 	}
 
 }
@@ -474,8 +442,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			dash.dashDirection = direction;
 			if (!registry.emitParticles.has(player))
 				registry.emitParticles.emplace(player, ParticleRequestType::PlayerDash,dash.endTimer, 7);
-			Mix_PlayChannelTimed( 2, playerDashSound, 0, 200);
-			Mix_Volume(3, playerDashSound->volume * MIX_MAX_VOLUME);
+			soundPlayer->playPlayerDashSound();
 		}
 	}
 	// Tick dash timer
@@ -528,13 +495,10 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	}
 	int channel = 1;  // Use a specific channel, e.g., channel 1
 
-	if (!Mix_Playing(channel)) {  // Check if the channel is not playing
-		Mix_PlayChannelTimed(channel, playerShootSound, 0, max(250.0f, min(
+	soundPlayer->playPlayerShootSound(max(250.0f, min(
 			50.0f,
 			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst))));  // Play sound on specified channel
-	}
-	Mix_Volume(3, playerShootSound->volume * MIX_MAX_VOLUME);
+				BulletBurst, pl.maxBulletBurst))));
 
 	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
 		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
@@ -622,7 +586,7 @@ void WorldSystem::movePlayer() {
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
-	
+
 }
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
@@ -646,8 +610,8 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	}
 
 	//play hit sound
-	Mix_PlayChannel(3, playerHurtSound, 0);
-	Mix_Volume(3, playerHurtSound->volume * MIX_MAX_VOLUME);
+	soundPlayer->playPlayerHurtSound();
+
 	//add player invincibility frames
 	if (!registry.invincibles.has(player))
 		registry.invincibles.emplace(player);

@@ -7,10 +7,10 @@
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
 
-
+class SoundSystem;
 class EnemySystem {
 public:
-    EnemySystem(RenderSystem* renderer);
+    EnemySystem(RenderSystem* renderer, SoundSystem* sound);
     ~EnemySystem();
     void step(float elapsed_ms);
 private:
@@ -26,4 +26,5 @@ private:
     void merge(Entity entity, EnemyPattern& currPattern, std::vector<Entity> &pendingDeletion);
     void creatingMergeBee(int count, vec2 pos);
     RenderSystem* render;
+    SoundSystem* sound;
 };

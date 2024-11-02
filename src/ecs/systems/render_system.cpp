@@ -320,6 +320,15 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
+GLFWimage RenderSystem::loadCursorImage(const char* filename) {
+	GLFWimage image;
+	image.pixels = stbi_load(filename, &image.width, &image.height, 0, 4);
+	if (!image.pixels) {
+		std::cerr << "Failed to load cursor image: " << filename << std::endl;
+	}
+	return image;
+}
+
 void RenderSystem::drawSetupFrame(){
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
@@ -974,7 +983,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	drawSetupFrame();
 	WindowState& windowState = registry.windowStates.components[0];
-	vec2 position = { windowState.width/2, windowState.height-60.0};
+	vec2 position = { windowState.width/2, windowState.height*0.92};
 	vec2 scale = { 600, 30 };
 	Motion& motion = registry.motions.get(entity);
 
