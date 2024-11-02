@@ -36,6 +36,10 @@ struct Door {
     bool isPrev; //if is previous room, block it
     vec2 startPos, endPos;
 };
+struct DoorSymbol {
+    float angle;
+    vec3 axis;
+};
 
 struct Room {
     RoomPreset preset;

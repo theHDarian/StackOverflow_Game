@@ -183,8 +183,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			gl_has_errors();
 		}
 	} else if (render_request.used_effect == EFFECT_ASSET_ID::ROOM_BOUND) {
-		Bound& b = registry.bounds.get(entity);
-
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
 		gl_has_errors();
@@ -207,12 +205,24 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 
 		WindowState &ws = registry.windowStates.components[0];
-		
+		float angle;
+		vec3 axis;
+		if (registry.bounds.has(entity)) {
+			Bound& b = registry.bounds.get(entity);
+			angle = b.angle;
+			axis = b.axis;
+		} else if (registry.doorSymbols.has(entity)) {
+			DoorSymbol& d = registry.doorSymbols.get(entity);
+			angle = d.angle;
+			axis = d.axis;
+		} else {
+			assert(false);
+		}
 		mat4 model = 	glm::translate(glm::mat4(1.0f),
 						vec3(motion.position.x,motion.position.y,0.0f))
 						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))  
 						* glm::translate(glm::mat4(1.0f),vec3(offset,1.0f) * glm::normalize(vec3(motion.scale,1.0f)))
-						* glm::rotate(glm::mat4(1.0f),radians(b.angle),b.axis) //rotate to be vertical on z axis
+						* glm::rotate(glm::mat4(1.0f),radians(angle),axis) //rotate to be vertical on z axis
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f)
 					);
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);

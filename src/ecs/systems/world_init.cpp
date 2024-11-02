@@ -133,9 +133,30 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 		{"none",
 		 EFFECT_ASSET_ID::EGG,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE});
-
 	return entity;
 }
+
+Entity createDoorSymbol(RenderSystem * renderer, Entity boundEnt) {
+	Motion& boundMotion = registry.motions.get(boundEnt);
+	Bound& bound = registry.bounds.get(boundEnt);
+
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = boundMotion.position;
+	motion.angle = boundMotion.angle;
+	motion.scale = vec2(100.0f);
+
+	DoorSymbol& symbol = registry.doorSymbols.emplace(entity);
+	symbol.angle = bound.angle;
+	symbol.axis = bound.axis;
+
+	RenderRequest& rr = registry.renderRequests.insert(entity, 
+		{"door_symbol_enemy.png",
+		EFFECT_ASSET_ID::ROOM_BOUND,
+		GEOMETRY_BUFFER_ID::SPRITE}
+	);
+}
+
 
 void createRoomBounds(RenderSystem *renderer)
 {
@@ -208,6 +229,9 @@ void createRoomBounds(RenderSystem *renderer)
 			EFFECT_ASSET_ID::ROOM_BOUND,
 			GEOMETRY_BUFFER_ID::SPRITE});		
 		registry.backgrounds.emplace(entity);
+
+		//add door symbol for each wall
+		createDoorSymbol(renderer,entity);
 	}
 }
 

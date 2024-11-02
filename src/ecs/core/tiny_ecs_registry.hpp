@@ -60,6 +60,7 @@ public:
 	ComponentContainer<MenuUIText> menuUITexts;
 	ComponentContainer<Damaged> damageds;
 	ComponentContainer<Door> doors;
+	ComponentContainer<DoorSymbol> doorSymbols;
 	ComponentContainer<Bound> bounds; //room boundaries
 	ComponentContainer<MapRequest> mapRequests;
 	ComponentContainer<BossEnemy> bosses;
@@ -120,6 +121,7 @@ public:
 		registry_list.push_back(&animations);
 		registry_list.push_back(&sprites);
 		registry_list.push_back(&spriteTimers);
+		registry_list.push_back(&doorSymbols);
 
 	}
 
