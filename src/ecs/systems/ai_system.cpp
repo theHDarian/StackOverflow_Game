@@ -84,30 +84,29 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			}
 			if (bee != entity)
 			{
-				std::cout << "the distance between bee is : " << glm::distance(EnemyPosMotion, registry.motions.get(bee).position) << std::endl;
-				std::cout << "the distance between bee is using enemymovement: " << glm::distance(EnemyPos, registry.motions.get(bee).position) << std::endl;
 				closeToBee = (glm::distance(EnemyPosMotion, registry.motions.get(bee).position) < closeToBeeDistance);
-				if (closeToBee)
+				BeeEnemy &beeComponent = registry.bees.get(entity);
+				BeeEnemy &otherBeeComponent = registry.bees.get(bee);
+				int mergeTotal = beeComponent.mergeCount + otherBeeComponent.mergeCount;
+				Motion &motion = registry.motions.get(entity);
+				if (closeToBee && mergeTotal <= beeComponent.maxMerge)
 				{
-					std::cout << "close to bee is true" << std::endl;
 					registry.bees.get(entity).nearbyBees.insert(bee);
 					auto reaction = getReactions(currPattern.reactions, ReactionType::BEE_CLOSE);
 					if (reaction)
 					{
 						enemy.patternIndex = reaction->index;
 						reaction_found = true;
-						std::cout << "bee close!" << enemy.currEnemyPattern().name << std::endl;
 						BeeEnemy &beeComponent = registry.bees.get(entity);
 						BeeEnemy &otherBeeComponent = registry.bees.get(bee);
-						beeComponent.mergeReady = true;
-						otherBeeComponent.mergeReady = true;
 					}
 					if (registry.bees.get(entity).nearbyBees.size() == 0)
 					{
 						auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
 					}
 					break;
-				} else
+				}
+				else
 				{
 					registry.bees.get(entity).nearbyBees.erase(bee);
 					if (registry.bees.get(entity).nearbyBees.size() == 0)

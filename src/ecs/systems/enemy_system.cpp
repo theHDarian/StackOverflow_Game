@@ -389,11 +389,7 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
                 BeeEnemy &otherBee = registry.bees.get(otherBeeEntity);
                 int mergeTotal = otherBee.mergeCount + bee.mergeCount;
                 Motion &motion = registry.motions.get(entity);
-                std::cout << mergeTotal << "merge Total" << "max bee" << bee.maxMerge << std::endl;
-                if (mergeTotal > bee.maxMerge)
-                {
-                    return;
-                }else if(otherBee.merge == false && bee.merge == false)
+                if(otherBee.merge == false && bee.merge == false)
                 {
                     creatingMergeBee(mergeTotal, motion.position);
                 }
