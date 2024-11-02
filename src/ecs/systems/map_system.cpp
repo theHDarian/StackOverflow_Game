@@ -156,6 +156,19 @@ RoomType randomRoomType(bool excludeNone)
 {
     return static_cast<RoomType>(rand() % (excludeNone ? RoomType::None - 1 : RoomType::None));
 }
+std::string getSymbol(RoomType type) {
+    if (type == RoomType::BossBigCRoom) {
+        return "door_symbol_boss.png";
+    } else if (type == RoomType::TreasureRoom) {
+        return "door_symbol_treasure.png";
+    } else if (type == RoomType::RestRoom) {
+        return "door_symbol_resting.png";
+    } else if (type == RoomType::None) {
+        return "none"; 
+    }else {
+        return "door_symbol_enemy.png";
+    }
+}
 
 void MapSystem::changeRoom(RoomType type, int doorIndex)
 {
@@ -194,6 +207,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
+    registry.renderRequests.get(registry.doorSymbols.entities[spawnIndex]).texture_name = getSymbol(doors[spawnIndex].room);
 
     bool excludeNone = false;
     for (int i = 0; i < doors.size(); i++)
@@ -207,35 +221,23 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.isPrev = false;
         if (d.room == RoomType::None)
             excludeNone = true;
+        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
     }
 }
-std::string getSymbol(RoomType type) {
-    if (type == RoomType::BossBigCRoom) {
-        return "door_symbol_boss.png";
-    } else if (type == RoomType::TreasureRoom) {
-        return "door_symbol_treasure.png";
-    } else if (type == RoomType::RestRoom) {
-        return "door_symbol_resting.png";
-    } else if (type == RoomType::None) {
-        return "none"; 
-    }else {
-        return "door_symbol_enemy.png";
-    }
-}
+
 void MapSystem::resetMap()
 {
     clearRoomActors();
 
     bool excludeNone = false;
-    int index = 0;
-    for (Door &d : registry.doors.components)
+    for (int i  =  0; i < 4; i++)
     {
+        Door& d = registry.doors.components[i];
         d.room = randomRoomType(excludeNone);
         if (d.room == RoomType::None)
             excludeNone = true;
 
-        registry.renderRequests.get(registry.doorSymbols.entities[index]).texture_name = getSymbol(d.room);
-        index++;
+        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
     }
 
     for (Door &d : registry.doors.components)

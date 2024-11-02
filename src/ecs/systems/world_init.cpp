@@ -185,6 +185,15 @@ void createRoomBounds(RenderSystem *renderer)
 			vec3(0),
 			vec2(0,-spriteOffset)
 		},
+		{ //right
+			vec2(ws.width-150, 0), 
+			vec2(ws.width-150, ws.height), 
+			vec2(ws.width - windowDimensions.x + 98.f/2.f,ws.height/2),
+			vec2(windowDimensions.y,92.f),
+			glm::radians(270.f),
+			vec3(0,0,49),
+			vec2(-spriteOffset,0)
+		},
 		{ //bottom
 			vec2(ws.width, ws.height-100.f), 
 			vec2(0, ws.height-100.f),
@@ -195,15 +204,7 @@ void createRoomBounds(RenderSystem *renderer)
 			vec2(0,spriteOffset)
 		},
 		//NOTE: left and righ wall require some weird z offset
-		{ //right
-			vec2(ws.width-150, 0), 
-			vec2(ws.width-150, ws.height), 
-			vec2(ws.width - windowDimensions.x + 98.f/2.f,ws.height/2),
-			vec2(windowDimensions.y,92.f),
-			glm::radians(270.f),
-			vec3(0,0,49),
-			vec2(-spriteOffset,0)
-		},
+		
 		{ //left
 			vec2(150.f, ws.height), 
 			vec2(150.f, 0),
