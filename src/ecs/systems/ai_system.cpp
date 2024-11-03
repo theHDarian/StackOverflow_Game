@@ -16,13 +16,13 @@ void AISystem::step(float elapsed_ms)
 		Enemy &enemy = enemy_registry.get(entity);
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
 		// std::cout << movement_registry.entities.size() << " is the size of movement entity" << std::endl;
-		std::cout << currPattern.name << " initial" << std::endl;
+		//std::cout << currPattern.name << " initial" << std::endl;
 		EnemyMovement &movement = movement_registry.get(entity);
 		Motion &motion = registry.motions.get(entity);
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING
 		updateState(enemy, movement, entity);
-		std::cout << currPattern.name << "after update" << std::endl;
+		//std::cout << currPattern.name << "after update" << std::endl;
 
 		// THINKING
 		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
@@ -120,7 +120,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 
 	if (hpPercent < 0.25f)
 	{
-		std::cout << "current enemy hp" << hpPercent << std::endl;
+		//std::cout << "current enemy hp" << hpPercent << std::endl;
 		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTYFIVE_HEALTH);
 		if (reaction)
 		{
@@ -171,7 +171,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::DURATION))
 	{
-		std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
+		//std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
 		if (currPattern.curDuration < 0.f)
 		{
 			enemy.patternIndex = currPattern.next;

@@ -181,11 +181,11 @@ void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData)
     }
 }
 
-void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData)
+void EnemySystem::shootAllDirection(vec2 pos, float offset, AttackData atkData)
 {
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
+        float a = offset + atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
         createEnemyBullet(render, pos, {cos(a), sin(a)}, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
     }
 }
@@ -295,6 +295,7 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
 {
     Enemy &enemy = registry.enemies.get(entity);
+    Motion& em = registry.motions.get(entity);
     vec2 velocity = (playerMotion.position + playerMotion.velocity / 2.0f) - pos;
     if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
     {
@@ -303,7 +304,8 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::RADIAL)
     {
-        shootAllDirection(pos, atkData);
+        std::cout << em.angle << std::endl;
+        shootAllDirection(pos, em.angle, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::LASER)
