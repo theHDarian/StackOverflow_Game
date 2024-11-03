@@ -163,14 +163,14 @@ void SoundSystem::loadSoundEffects() {
         fprintf(stderr, "Failed to load player dash sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load player dash sound");
     }
-    playerDashSound->volume = 0.6f * MIX_MAX_VOLUME;
+    playerDashSound->volume = 0.3f * MIX_MAX_VOLUME;
 
     playerShootSound = Mix_LoadWAV(audio_path("sfx/player_shoot.wav").c_str());
     if (!playerShootSound) {
         fprintf(stderr, "Failed to load player shoot sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load player shoot sound");
     }
-    playerShootSound->volume = 0.8f * MIX_MAX_VOLUME;
+    playerShootSound->volume = 0.4f * MIX_MAX_VOLUME;
 
     for (int i = 0; i < 4; i++) {
         enemyShootSounds.push_back(Mix_LoadWAV(audio_path("sfx/Shoot_0" + std::to_string(i) + ".wav").c_str()));
@@ -190,11 +190,13 @@ void SoundSystem::loadSoundEffects() {
         fprintf(stderr, "Failed to load incoming dialogue sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load incoming dialogue sound");
     }
+    incomingDialogueSound->volume = 0.4f * MIX_MAX_VOLUME;
     nextDialogueSound = Mix_LoadWAV(audio_path("sfx/next_dialogue_short.wav").c_str());
     if (!nextDialogueSound) {
         fprintf(stderr, "Failed to load next dialogue sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load next dialogue sound");
     }
+    nextDialogueSound->volume = 0.2f * MIX_MAX_VOLUME;
 
 }
 

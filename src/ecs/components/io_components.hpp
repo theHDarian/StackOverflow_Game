@@ -35,5 +35,5 @@ struct GameState {
 	bool gameOver;
 	bool dialogueScene = false;
 	bool cutScene = false;
-	float currentVolume = 0.3f;
+	float currentVolume = 0.25f;
 };
