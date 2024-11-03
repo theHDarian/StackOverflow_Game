@@ -43,15 +43,18 @@ void UISystem::playDialogue() {
 	if (gameState.dialogueScene && input.nextDialogue) {
 		input.nextDialogue = false;
 
-		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
-		if (registry.dialogueLines.get(dialogueBox).current == 1) {
-			soundSystem->playIncomingDialogueSound();
-		} else {
-			soundSystem->stopIncomingDialogueSound();
-			soundSystem->playNextDialogueSound();
-		}
 
+		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
 		if (nextLine.text.compare("<end>") != 0) {
+			if (nextLine.sfx == IncomingDialogue) {
+				soundSystem->playIncomingDialogueSound();
+			} else if (nextLine.sfx == DoorOpen) {
+				soundSystem->playDoorOpenSound();
+			} else {
+				soundSystem->stopIncomingDialogueSound();
+				soundSystem->playNextDialogueSound();
+			}
+
 			registry.renderRequests.get(dialogueBox).show = true;
 			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
 			if (nextLine.speakerName != "N") { // N is narrator for now

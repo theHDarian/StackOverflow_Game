@@ -24,7 +24,7 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     this->renderer = renderer;
     this->soundPlayer = soundPlayer_arg;
     assert(registry.maps.components.size() > 0);
-    soundPlayer->nextMusic();
+    soundPlayer->playNextMusic();
     WindowState &ws = registry.windowStates.components[0];
     // create door colliders
     float offsetRightLeft = ws.width / (6 * ws.width/(float)ws.height);
@@ -145,7 +145,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     //play door sound
 
     // change music
-    soundPlayer->nextMusic();
+    soundPlayer->playNextMusic();
 
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
@@ -239,7 +239,7 @@ void MapSystem::nextMusic()
     {
         currMusicIndex = nextMusicIndex;
     }
-    Sound &currentBGM = normalRoomMusic[currMusicIndex];
+    SoundRequest &currentBGM = normalRoomMusic[currMusicIndex];
     Mix_FreeMusic(backgroundMusic);
     Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
     Mix_FadeInMusic(newbackgroundMusic, currentBGM.loops, 1000);

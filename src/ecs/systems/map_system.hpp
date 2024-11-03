@@ -21,9 +21,9 @@ class MapSystem {
     void loadMusic();
 
     Mix_Music* backgroundMusic;
-    std::vector<Sound> normalRoomMusic;
-    std::vector<Sound> bossRoomMusic;
-    std::vector<Sound> specialRoomMusic;
+    std::vector<SoundRequest> normalRoomMusic;
+    std::vector<SoundRequest> bossRoomMusic;
+    std::vector<SoundRequest> specialRoomMusic;
     int currMusicIndex;
 
     void nextMusic();
