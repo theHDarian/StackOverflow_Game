@@ -95,7 +95,6 @@ int main() {
 		uiSystem.step(elapsed_ms);
 		sceneSystem.step(elapsed_ms); // not sure if this should always be here
 		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
-		world.clearDeleteQueue();
 
 		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
 			world.handleInput();
@@ -118,7 +117,7 @@ int main() {
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
 		}
-		
+		world.clearDeleteQueue();
 		// note: the more complex our drawing is, the more complex the order,
 		// and the more appealing z-buffering...
 		// strong assumption: each of these entities has a renderRequest
