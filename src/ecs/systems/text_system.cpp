@@ -199,9 +199,6 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
     glActiveTexture(GL_TEXTURE0);
     gl_has_errors();
 
-    // iterate through all characters
-    // need to keep track of words then...
-
     // tokenize string by space (should maintain \n!)
     // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
     std::vector<std::string> tokenizedText;
@@ -227,6 +224,7 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
     tokenizedText.push_back(str);
 
     vec2 textPos = { x, y };
+
     for (std::string word : tokenizedText) {
         // calculate the length of the word to determine if need to insert new line 
         // copy pasted from word render for now
@@ -234,12 +232,16 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
         float xpos = textPos.x;
         float ypos = textPos.y;
 
+        // approximate word size as opposed to looping
+        xpos += (Characters[65].Size.x * scale + Characters[65].Bearing.x * scale + 1.0f) * word.length();
+        /*
         for (c = word.begin(); c != word.end(); c++)
         {
             Character ch = Characters[*c];
             xpos += ch.Bearing.x * scale + ch.Size.x * scale;
             //ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
         }
+        */
 
         // compare with text box size
         if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
