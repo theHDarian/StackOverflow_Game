@@ -36,7 +36,9 @@ const RoomPreset EnemyRoomBees1 {
         {EnemyType::OneBee,{0.2f,0.8f}},
         {EnemyType::OneBee,{0.8f,0.8f}},
         {EnemyType::OneBee,{0.8f,0.2f}},
-        {EnemyType::OneBee,{0.2f,0.2f}}
+        {EnemyType::OneBee,{0.2f,0.2f}},
+        {EnemyType::BeeHive, {0.2f, 0.4f}},
+        {EnemyType::BeeHive, {0.8f, 0.4f}}
     },
     {},
     {},
@@ -49,6 +51,9 @@ const RoomPreset EnemyRoomTripleBuff1 {
     {
         {EnemyType::MediumEnemyCharge,{0.2f,0.8f}}, 
         {EnemyType::MediumEnemyCharge,{0.8f,0.2f}},
+        {EnemyType::MediumEnemyTank,{0.2f, 0.2f}},
+        {EnemyType::HardEnemyAngel, {0.2f, 0.4f}},
+        {EnemyType::HardEnemyAngel, {0.8f, 0.4f}}
     },
     {},
     {},
