@@ -772,7 +772,7 @@ struct EnemyMediumBeeHive : Enemy {
 		currHealth = maxHealth;
 		enemyPatterns = {idlingState, spawningState, halfHPState, deadHiveState};
 		sprite = {
-			"bee_hive_open.png",
+			"bee_hive_close.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,	
 		};
