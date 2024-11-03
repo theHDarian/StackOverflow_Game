@@ -66,6 +66,7 @@ public:
 	ComponentContainer<BossEnemy> bosses;
 	ComponentContainer<Animation> animations;
 	ComponentContainer<BeeEnemy> bees;
+	ComponentContainer<Hive> beeHive;
 	ComponentContainer<AnimationSequence> animationSequences;
 
 	// constructor that adds all containers for looping over them
@@ -125,6 +126,7 @@ public:
 		registry_list.push_back(&spriteTimers);
 		registry_list.push_back(&doorSymbols);
 		registry_list.push_back(&bees);
+		registry_list.push_back(&beeHive);
 		registry_list.push_back(&animationSequences);
 	}
 

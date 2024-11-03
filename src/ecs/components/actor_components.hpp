@@ -212,7 +212,11 @@ enum EnemyType {
     BossBigC,
     OneBee,
     TwoBee,
-    ThreeBee
+    ThreeBee,
+    MediumEnemyTank,
+    BeeHive,
+    HardEnemyAngel,
+    MediumEnemySkull
 };
 
 enum class EnemyAttackPattern {
@@ -272,8 +276,8 @@ enum class EnemyBehavior {
     ROTATE_IN_PLACE,
     TELEPORT,
     IDLE,
-    MERGE_BEE
-
+    MERGE_BEE,
+    SPAWNING
 };
 
 
@@ -337,6 +341,7 @@ struct Enemy {
     };
     vec2 scale;
     SpriteData sprite;
+    bool newPattern = false;
 };
 
 struct EnemyMovement {
@@ -401,6 +406,11 @@ struct Damaged {
     float countdown = max;
 };
 
+struct Hive {
+    float currSpawnCD;
+    float maxSpawnCD;
+};
+
 struct BeeEnemy {
     std::set<Entity> nearbyBees;
     int mergeCount = 1;
@@ -408,3 +418,4 @@ struct BeeEnemy {
     bool canMerge = true;
     bool merge = false;
 };
+

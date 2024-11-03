@@ -396,6 +396,25 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = Bee3();
 		BeeEnemy& bee = registry.bees.emplace(entity);
 		bee.mergeCount = 3;
+		break;
+	}
+	case EnemyType::MediumEnemyTank:
+	{
+		enemy = EnemyMediumTank();
+		break;
+	}
+	case EnemyType::BeeHive:
+	{
+		enemy = EnemyMediumBeeHive();
+		Hive& hive = registry.beeHive.emplace(entity);
+		hive.currSpawnCD = 5000.f;
+		hive.maxSpawnCD = 5000.f;
+		break;
+	}
+	case EnemyType::HardEnemyAngel:
+	{
+		enemy = EnemyHardAngel();
+		break;
 	}
 	}
 
