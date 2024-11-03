@@ -39,6 +39,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type);
 // Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
 Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData);
 
+Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBulletDeath onDeath);
+
 Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity start, AttackData atkData);
 
 // a player-fired bullet

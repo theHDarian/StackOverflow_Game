@@ -5,6 +5,8 @@
 #include "utils/random.hpp"
 #include "SDL.h"
 #include "components/presets/room_presets.hpp"
+#include "sound_system.hpp"
+
 
 MapSystem::MapSystem()
 {
@@ -15,17 +17,14 @@ MapSystem::MapSystem()
 }
 MapSystem::~MapSystem()
 {
-    if (backgroundMusic != nullptr)
-    {
-        Mix_FreeMusic(backgroundMusic);
-    }
     registry.maps.clear();
 }
-void MapSystem::init(RenderSystem *renderer)
+void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
 {
     this->renderer = renderer;
+    this->soundPlayer = soundPlayer_arg;
     assert(registry.maps.components.size() > 0);
-    loadMusic();
+    soundPlayer->nextMusic();
     WindowState &ws = registry.windowStates.components[0];
     // create door colliders
     float offsetRightLeft = 160;
@@ -38,50 +37,6 @@ void MapSystem::init(RenderSystem *renderer)
     createDoor(renderer, {ws.width / 2 - doorWidthX / 2, ws.height - offsetBot}, {ws.width / 2 + doorWidthX / 2, ws.height - offsetBot});
     createDoor(renderer, {offsetRightLeft, ws.height / 2 - doorWidthY / 2}, {offsetRightLeft, ws.height / 2 + doorWidthY / 2});
     resetMap();
-}
-
-void MapSystem::loadMusic()
-{
-    Sound roomMusic[] = {
-        {SoundType::normalBGM, audio_path("room/game-music-loop-1.wav"), 0.1f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-2.wav"), 0.1f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-3.wav"), 0.1f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-4.wav"), 1.0f, -1},
-    };
-
-    // Loading music and sounds with SDL
-    if (SDL_Init(SDL_INIT_AUDIO) < 0)
-    {
-        fprintf(stderr, "Failed to initialize SDL Audio: %s\n", SDL_GetError());
-        throw std::runtime_error("Failed to initialize SDL Audio");
-    }
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
-    {
-        fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
-        throw std::runtime_error("Failed to open audio device");
-    }
-
-    for (Sound &track : roomMusic)
-    {
-        normalRoomMusic.push_back(track);
-        std::cout << "Loaded background music " << track.path << std::endl;
-    }
-
-    Sound boss = {SoundType::bossBGM, audio_path("boss/boss-music.wav"), 0.2f, -1};
-    bossRoomMusic.push_back(boss);
-
-    Sound special = {SoundType::specialBGM, audio_path("special/special-room.wav"), 0.2f, -1};
-    specialRoomMusic.push_back(special);
-
-    Sound &currentBGM = normalRoomMusic[0];
-
-    backgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
-    }
-
-    nextMusic();
 }
 
 void MapSystem::step(float elapsed_ms)
@@ -184,8 +139,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     Door &door = doors[doorIndex];
     if (door.room == RoomType::None || !map.currRoom.cleared)
         return;
+    //play door sound
 
-    nextMusic();
+    // change music
+    soundPlayer->nextMusic();
 
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
@@ -258,31 +215,7 @@ void MapSystem::resetMap()
 
     // set initial room to enemy
     map.currRoom = Room();
-    std::vector<RoomPreset> presets = roomDirectory.at(RoomType::TreasureRoom);
+    std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomBee);
     RoomPreset randomPreset = Random::ListItem(presets);
     map.currRoom.preset = randomPreset;
-}
-
-void MapSystem::nextMusic()
-{
-    int nextMusicIndex = rand() % normalRoomMusic.size();
-    if (nextMusicIndex == currMusicIndex)
-    {
-        return;
-    }
-    else
-    {
-        currMusicIndex = nextMusicIndex;
-    }
-    Sound &currentBGM = normalRoomMusic[currMusicIndex];
-    Mix_FreeMusic(backgroundMusic);
-    Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
-    Mix_FadeInMusic(newbackgroundMusic, currentBGM.loops, 1000);
-    backgroundMusic = newbackgroundMusic;
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
-    }
-    int volume = currentBGM.volume * MIX_MAX_VOLUME;
-    Mix_VolumeMusic(volume);
 }

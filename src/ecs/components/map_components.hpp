@@ -9,9 +9,7 @@ enum Side : char {
 enum RoomType : char {
     EnemyRoomDash,
     EnemyRoomTripleBuff,
-    // EnemyRoomBulletSize,
-    // EnemyRoomDmg,
-    // EnemyRoomSpeed,
+    EnemyRoomBee,
     TreasureRoom,
     RestRoom,
     BossBigCRoom, //remove for now to prevent bug

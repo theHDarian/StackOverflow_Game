@@ -8,10 +8,11 @@
 #include <random>
 
 #define SDL_MAIN_HANDLED
-#include <SDL.h>
-#include <SDL_mixer.h>
 
 #include "render_system.hpp"
+
+// forward declaration for sound system
+class SoundSystem;
 
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
@@ -24,7 +25,7 @@ public:
 	GLFWwindow* createWindow();
 
 	// starts the game
-	void init(RenderSystem* renderer);
+	void init(RenderSystem* renderer,  SoundSystem* soundPlayer_arg);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -42,6 +43,8 @@ public:
 	void handleInput();
 
 	void clearDeleteQueue();
+
+	void enemyBulletDeath(Entity e);
 
 
 static float getModifiedValue(BulletEffectType bf, float value);
@@ -74,9 +77,7 @@ private:
 	Entity player;
 	Entity aimIndicator;
 
-    Mix_Chunk* playerHurtSound;
-	Mix_Chunk* playerShootSound;
-	Mix_Chunk* playerDashSound;
+	SoundSystem* soundPlayer;
 
 	// C++ random number generator
 	std::default_random_engine rng;

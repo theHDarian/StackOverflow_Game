@@ -25,6 +25,7 @@ struct IOState {
 	bool shouldShowDialogue = false;
 	bool nextDialogue = false;
 
+
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
 };
@@ -33,4 +34,5 @@ struct GameState {
 	bool gamePaused;
 	bool gameOver;
 	bool dialogueScene = false;
+	float currentVolume = 0.5f;
 };

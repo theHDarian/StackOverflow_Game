@@ -9,17 +9,22 @@
 #include <thread>
 #include <vector>
 #include <glm/gtx/compatibility.hpp>
+#include "sound_system.hpp"
 #include <chrono>
 
 #include "ai_system.hpp"
+#include <mutex>
+
+std::mutex beeMutex;
 
 float COOLDOWN_SHOOT_MS = 2000;
 float BASE_BULLET_SPEED = 1;
 float PLACEHOLDER_FOR_ANGLE = 0.f;
 
-EnemySystem::EnemySystem(RenderSystem *renderer)
+EnemySystem::EnemySystem(RenderSystem *renderer, SoundSystem *sound)
 {
     render = renderer;
+    this->sound = sound;
 };
 
 EnemySystem::~EnemySystem() {
@@ -30,18 +35,38 @@ void EnemySystem::step(float elapsed_ms)
 
     Entity player = registry.players.entities[0];
     Motion &playerMotion = registry.motions.get(player);
-
+    // std::cout << "current enemy :" << registry.enemies.entities.size() << std::endl;
+    // std::cout << "current bee enemy: " << registry.bees.entities.size() << std::endl;
+    std::vector<Entity> pendingDeletion;
     // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities)
     {
         if (registry.fades.has(entity))
             continue;
+        if (!registry.enemies.has(entity))
+        {
+            continue;
+        }
         Enemy &enemy = registry.enemies.get(entity);
         Motion &motion = registry.motions.get(entity);
         vec2 pos = motion.position;
         float angle = motion.angle;
 
-        EnemyPattern& pattern = enemy.currEnemyPattern();
+        EnemyPattern &pattern = enemy.currEnemyPattern();
+        if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
+        {
+            std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
+             merge(entity, pattern, pendingDeletion);
+        }
+
+        for (Entity deletedBee : pendingDeletion)
+        {
+            std::cout << pendingDeletion.size() << "to be delted" << std::endl;
+            if (!registry.deleteds.has(deletedBee))
+                registry.deleteds.emplace(deletedBee);
+            registry.bees.remove(deletedBee);
+            registry.enemies.remove(deletedBee);
+        }
 
         // move enemy using lerp
         if (registry.enemyMovement.has(entity))
@@ -80,9 +105,11 @@ void EnemySystem::step(float elapsed_ms)
         // NOTE: enemy must attack AFTER being moved
         // or else causes corrupted memory in effect/geometry/texture id and makes it a huge number
         // no idea why
-        if (pattern.canAttack == true) {
+        if (pattern.canAttack == true)
+        {
             pattern.currAtkCD -= elapsed_ms;
-            if (pattern.currAtkCD < 0) {
+            if (pattern.currAtkCD < 0)
+            {
                 AttackData atkData = pattern.atkData;
                 attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
             }
@@ -163,20 +190,23 @@ void EnemySystem::shootAllDirection(vec2 pos, AttackData atkData)
     }
 }
 
-
-void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData) {
+void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData)
+{
     AttackData atkData2 = atkData;
     atkData2.speed = atkData.speed * sin(M_PI / atkData.numBullets + M_PI / 2.0f);
     float offset = M_PI / atkData.numBullets;
-    for (uint i = 0; i < atkData.numBullets; i++) {
+    for (uint i = 0; i < atkData.numBullets; i++)
+    {
         float a = atkData.angleOffset + i * (2.0f * M_PI / atkData.numBullets);
-        createEnemyBullet(render, pos, { cos(a), sin(a) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
-        createEnemyBullet(render, pos, { cos(a + offset), sin(a + offset) }, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData2);
+        createEnemyBullet(render, pos, {cos(a), sin(a)}, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData);
+        createEnemyBullet(render, pos, {cos(a + offset), sin(a + offset)}, atkData.veer.x * vec2(cos(a + atkData.veer.y), sin(a + atkData.veer.y)), atkData2);
     }
 }
 
-void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst& burst) {
-    if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0) {
+void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
+{
+    if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0)
+    {
         return;
     }
 
@@ -264,7 +294,7 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
 
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
 {
-    Enemy& enemy = registry.enemies.get(entity);
+    Enemy &enemy = registry.enemies.get(entity);
     vec2 velocity = (playerMotion.position + playerMotion.velocity / 2.0f) - pos;
     if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
     {
@@ -324,5 +354,100 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
             burst.curBurst = atkData.numBullets;
             burst.burstCooldown = 0;
         }
+    }
+    //play shoot sound
+    if (atkData.attackType == EnemyAttackPattern::NONE )
+        return;
+
+    if ( atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
+        if (atkData.shape == EnemyBulletShape::CIRCLE) {
+            sound->playEnemyShootSound(0, atkData.numBullets);
+        }
+        else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
+            sound->playEnemyShootSound(1, atkData.numBullets);
+        }
+        else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
+            sound->playEnemyShootSound(2, atkData.numBullets);
+        }
+    } else {
+        if (atkData.shape == EnemyBulletShape::CIRCLE) {
+            sound->playEnemyShootSound(0, 0);
+        }
+        else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
+            sound->playEnemyShootSound(1, 0);
+        }
+        else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
+            sound->playEnemyShootSound(2, 0);
+        }
+    }
+}
+
+void EnemySystem::creatingMergeBee(int count, vec2 pos)
+{
+    switch (count)
+    {
+    case 2:
+        std::cout << "CREATING" << std::endl;
+        createEnemy(render, pos, EnemyType::TwoBee);
+        break;
+    case 3:
+        createEnemy(render, pos, EnemyType::ThreeBee);
+        break;
+    default:
+        std::cout << "CREATING 1" << std::endl;
+        createEnemy(render, pos, EnemyType::TwoBee);
+    }
+}
+
+void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion)
+{
+    std::lock_guard<std::mutex> lock(beeMutex);
+    if (registry.bees.has(entity) && currPattern.type == EnemyBehavior::MERGE_BEE)
+    {
+        BeeEnemy &bee = registry.bees.get(entity);
+        // getting the first bee
+        // std::cout << "WANT MERGE!" << std::endl;
+        std::vector<Entity> deletedBees;
+        for (Entity otherBeeEntity : registry.bees.get(entity).nearbyBees)
+        {
+            if (!registry.deleteds.has(otherBeeEntity) && otherBeeEntity != NULL)
+            {
+
+                BeeEnemy &otherBee = registry.bees.get(otherBeeEntity);
+                int mergeTotal = otherBee.mergeCount + bee.mergeCount;
+                Motion &motion = registry.motions.get(entity);
+                if(otherBee.merge == false && bee.merge == false)
+                {
+                    creatingMergeBee(mergeTotal, motion.position);
+                }
+
+                // std::cout << "MERGED AND CREATED COMBINED BEES" << std::endl;
+                otherBee.merge = true;
+                bee.merge = true;
+                deletedBees.push_back(entity);
+                deletedBees.push_back(otherBeeEntity);
+                // std::cout << "NOW DELETE EXISTING BEE" << std::endl;
+                break;
+            }
+        }
+
+        for (Entity deletedBee : deletedBees)
+        {
+            for (Entity nearby : registry.bees.get(deletedBee).nearbyBees)
+            {
+                if (registry.bees.has(nearby))
+                {
+                    auto &nearbyBee = registry.bees.get(nearby);
+                    nearbyBee.nearbyBees.erase(deletedBee);
+                }
+            }
+            pendingDeletion.push_back(deletedBee);
+        }
+        // 		std::cout << " time to merge bees with other bees: " << registry.bees.get(bee).nearbyBees.size() << std::endl;
+        // 		registry.bees.get(bee).mergeCount += registry.bees.get(bee).nearbyBees.size();
+        // 		registry.bees.get(bee).nearbyBees.clear();
+        // 		if (registry.bees.get(bee).mergeCount >= 1) {
+        // 			registry.renderRequests.get(bee).texture_name = "bee_fly_2";
+        // 		}
     }
 }

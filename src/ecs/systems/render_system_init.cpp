@@ -510,7 +510,6 @@ bool loadEffectFromFile(
 	return true;
 }
 
-
 #if IMGUI_ENABLED
 void RenderSystem::initImGui() {
 	IMGUI_CHECKVERSION();
@@ -519,7 +518,10 @@ void RenderSystem::initImGui() {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	// Disable ImGui Cursor Handling
+	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();

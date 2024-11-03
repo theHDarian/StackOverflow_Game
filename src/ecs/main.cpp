@@ -15,6 +15,7 @@
 #include "ai_system.hpp"
 #include "map_system.hpp"
 #include "text_system.hpp"
+#include "sound_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -28,83 +29,100 @@ using Clock = std::chrono::high_resolution_clock;
 #include <stdlib.h>
 
 // Entry point
-int main()
-{
+int main() {
+    // Global systems
+    WorldSystem world;
+    RenderSystem renderer;
+    PhysicsSystem physics;
+    IOSystem ioSystem;
+    ParticleSystem particleSystem;
+    AISystem aiSystem;
+    SoundSystem soundSystem;
+    EnemySystem enemySystem(&renderer, &soundSystem);
+    MapSystem mapSystem;
+    TextSystem textSystem;
 
-	// Global systems
-	WorldSystem world;
-	RenderSystem renderer;
-	PhysicsSystem physics;
-	IOSystem ioSystem;
-	ParticleSystem particleSystem;
-	AISystem aiSystem;
-	EnemySystem enemySystem(&renderer);
-	MapSystem mapSystem;
-	TextSystem textSystem;
+    // Initialize window
+    GLFWwindow* window = world.createWindow();
+    if (!window) {
+        // Time to read the error message
+        printf("Press any key to exit");
+        getchar();
+        return EXIT_FAILURE;
+    }
+
+    glfwMakeContextCurrent(window);
+
+    // Initialize the main systems
+    renderer.init(window);
+    particleSystem.init(window);
+    ioSystem.init(window);
+    world.init(&renderer, &soundSystem);
+    textSystem.initFreetypeLib();
+    mapSystem.init(&renderer, &soundSystem);
+
+    // Load and set the custom cursor
+    GLFWimage cursorImg = renderer.loadCursorImage(textures_path("cursor.png").c_str());
+    if (cursorImg.pixels == nullptr) {
+        fprintf(stderr, "Failed to load cursor image\n");
+        return EXIT_FAILURE;
+    }
+    GLFWcursor* customCursor = glfwCreateCursor(&cursorImg, cursorImg.width/2, cursorImg.height/2);
+    if (customCursor == nullptr) {
+        fprintf(stderr, "Failed to create custom cursor\n");
+        return EXIT_FAILURE;
+    }
+    glfwSetCursor(window, customCursor);
+    fprintf(stderr, "Custom cursor set\n");
 
 
-	// Initializing window
-	GLFWwindow* window = world.createWindow();
-	if (!window) {
-		// Time to read the error message
-		printf("Press any key to exit");
-		getchar();
-		return EXIT_FAILURE;
-	}
+    // Variable timestep loop
+    auto t = Clock::now();
+    while (!world.isOver()) {
+        // Processes system messages, if this wasn't present the window would become unresponsive
+        glfwPollEvents();
+        // Calculating elapsed times in milliseconds from the previous iteration
+        auto now = Clock::now();
+        float elapsed_ms =(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
+        t = now;
 
-	// initialize the main systems
-	renderer.init(window);
-	particleSystem.init(window);
-	ioSystem.init(window);
-	world.init(&renderer);
-	textSystem.initFreetypeLib();
-	mapSystem.init(&renderer);
+        if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isDialogue()) {
+            world.handleInput();
+        } else {
+            mapSystem.step(elapsed_ms);
+            world.step(elapsed_ms);
+            physics.step(elapsed_ms);
+            aiSystem.step(elapsed_ms);
+            enemySystem.step(elapsed_ms);
+            particleSystem.step(elapsed_ms);
+            renderer.step(elapsed_ms);
+            world.handleCollisions();
+            world.clearDeleteQueue();
+        }
 
-	// variable timestep loop
-	auto t = Clock::now();
-	while (!world.isOver()) {
-		// Processes system messages, if this wasn't present the window would become unresponsive
-		glfwPollEvents();
+        // note: the more complex our drawing is, the more complex the order,
+        // and the more appealing z-buffering...
+        // strong assumption: each of these entities has a renderRequest
+        // OR: make multiple renderRequest type components
+        // (probably easier to avoid entities that could span multiple components)
+        // (or maybe just check each item manually for now...)
+        // Q: what about finer grain order? like where does hover over bullet stack ui go?
+        registry.frames.components[0].prevFrameBuffer = 0;
+        renderer.drawBackgroundElements();
+        particleSystem.render();
+        renderer.drawGameElements();
+        renderer.drawGameUI();
+        textSystem.renderGameUIText();
+        renderer.drawDialogueUI();
+        textSystem.renderDialogueUIText();
+        renderer.drawToScreen(); // postprocessing
+        renderer.drawMenuUI();
+        textSystem.renderMenuUIText();
+        glfwSwapBuffers(window);
+    }
 
-		// Calculating elapsed times in milliseconds from the previous iteration
-		auto now = Clock::now();
-		float elapsed_ms =
-			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
-		t = now;
-		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isDialogue()) {
-			world.handleInput();
-		} else {
-			mapSystem.step(elapsed_ms);
-			world.step(elapsed_ms);
-			physics.step(elapsed_ms);
-			aiSystem.step(elapsed_ms);
-			enemySystem.step(elapsed_ms);
-			particleSystem.step(elapsed_ms);
-			renderer.step(elapsed_ms);
-			world.handleCollisions();
-			world.clearDeleteQueue();
-		}
-		// note: the more complex our drawing is, the more complex the order,
-		// and the more appealing z-buffering...
-		// strong assumption: each of these entities has a renderRequest
-		// OR: make multiple renderRequest type components
-		// (probably easier to avoid entities that could span multiple components)
-		// (or maybe just check each item manually for now...)
-		// Q: what about finer grain order? like where does hover over bullet stack ui go?
-		registry.frames.components[0].prevFrameBuffer = 0;
-		renderer.drawBackgroundElements();
-		particleSystem.render();
-		renderer.drawGameElements();
-		renderer.drawGameUI();
-		textSystem.renderGameUIText();
-		renderer.drawDialogueUI();
-		textSystem.renderDialogueUIText();
-		renderer.drawToScreen(); //postprocessing
-		renderer.drawMenuUI();
-		textSystem.renderMenuUIText();
-
-		glfwSwapBuffers(window);
-	}
-
-	return EXIT_SUCCESS;
+    // Cleanup
+    glfwDestroyCursor(customCursor);
+    return EXIT_SUCCESS;
 }
+

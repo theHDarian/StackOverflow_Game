@@ -3,11 +3,14 @@
 #include "render_system.hpp"
 #include "SDL_mixer.h"
 
+
+class SoundSystem;
+
 class MapSystem {
     public:
         MapSystem();
         ~MapSystem();
-        void init(RenderSystem* renderer);
+        void init(RenderSystem *renderer, SoundSystem *soundPlayer_arg);
         void step(float elapsed_ms);
     private:
         RenderSystem* renderer;
@@ -24,4 +27,5 @@ class MapSystem {
     int currMusicIndex;
 
     void nextMusic();
+    SoundSystem* soundPlayer;
 };

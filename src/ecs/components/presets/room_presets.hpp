@@ -31,6 +31,19 @@ const RoomPreset EnemyRoomDash1 {
     5.0f,
     5
 };
+const RoomPreset EnemyRoomBees1 {
+    {
+        {EnemyType::OneBee,{0.2f,0.8f}},
+        {EnemyType::OneBee,{0.8f,0.8f}},
+        {EnemyType::OneBee,{0.8f,0.2f}},
+        {EnemyType::OneBee,{0.2f,0.2f}}
+    },
+    {},
+    {},
+    {},
+    5.0f,
+    5
+};
 
 const RoomPreset EnemyRoomTripleBuff1 {
     {
@@ -74,6 +87,7 @@ const RoomPreset BossRoom1 {
 const std::map<RoomType,std::vector<RoomPreset>> roomDirectory = {
     {RoomType::EnemyRoomDash,{EnemyRoomDash1}},
     {RoomType::EnemyRoomTripleBuff,{EnemyRoomTripleBuff1}},
+    {RoomType::EnemyRoomBee,{EnemyRoomBees1}},
     {RoomType::RestRoom,{RestingRoom1}},
     {RoomType::TreasureRoom,{TreasureRoom1}},
     {RoomType::BossBigCRoom,{BossRoom1}}

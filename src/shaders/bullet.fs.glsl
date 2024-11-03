@@ -9,9 +9,12 @@ uniform vec3 fcolor;
 uniform int changeColor = 0;
 uniform float alpha = 1.0;
 uniform float effectAlpha = 1.0;
+uniform float time;
 
 uniform int shape; //0 = rect, 1 = tri, 2 = circ
+uniform vec2 scale;
 uniform bool laser = false;
+uniform bool onDeath = false;
 uniform int effectSize = 1;
 uniform vec3 bcolor1;
 uniform vec3 bcolor2;
@@ -125,12 +128,15 @@ void main()
 	switch (shape) {
 	case 0:
 		color = vec4(rectangle(), 1.0);
+		if (onDeath && distance(texcoord * scale, vec2(0.5) * scale) < 0.1 * scale.x) color.rgb = vec3(sin(time), 0.0, 0.0);
 		break;
 	case 1:
 		color = vec4(tri(), 1.0);
+		if (onDeath && distance(texcoord * scale, vec2(0.5 * (scale.y / scale.x), 0.5) * scale) < 0.1 * scale.x) color.rgb = vec3(sin(time), 0.0, 0.0);
 		break;
 	case 2:
 		color = vec4(circle(), 1.0);
+		if (onDeath && distance(texcoord * scale, vec2(0.5) * scale) < 0.1 * scale.x) color.rgb = vec3(sin(time), 0.0, 0.0);
 		break;
 	}
 	color.a *= texture(sampler0, texcoord).a;
