@@ -46,7 +46,7 @@ void SceneSystem::step(float elapsed_ms) {
 				if (map.currRoom.cutsceneCount == 1 && map.currRoom.dialogueCount == 0) {
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
-					lines.lines.push_back(Dialogue{ "[Incoming Message... Press [E] to accept.]", "N", "N" });
+					lines.lines.push_back(Dialogue{ "[Incoming Message...]\n[Press [E] to accept.]", "N", "N" });
 					lines.lines.push_back(Dialogue{ "Hello? Can you here me?", "Scientist", "scientist_avatar.png" });
 					lines.lines.push_back(Dialogue{ "Oh, great! I was worried I'd be stuck in this lab all alone!", "Scientist", "scientist_avatar.png" });
 					lines.lines.push_back(Dialogue{ "It's been ages since I've found someone who wouldn't outright attack me here, and there's so much I want to say, but before that--", "Scientist", "scientist_avatar.png" });
