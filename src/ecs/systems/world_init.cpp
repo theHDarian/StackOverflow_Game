@@ -153,6 +153,7 @@ Entity createDoorSymbol(RenderSystem * renderer, vec2 position, float angle, vec
 		EFFECT_ASSET_ID::ROOM_BOUND,
 		GEOMETRY_BUFFER_ID::SPRITE}
 	);
+	return entity;
 }
 
 

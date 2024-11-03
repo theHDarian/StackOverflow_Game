@@ -244,9 +244,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
 		float fov = 125.0f; //makes walls appear larger the less there is
 		float aspectRatio = (ws.width) / (ws.height);
-		float near = 0.1f;
-		float far = 10000.0f;
-		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near, far);
+		float near_var = 0.1f;
+		float far_var = 10000.0f;
+		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near_var, far_var);
 		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float *)&proj4);
 	} 
 	else
