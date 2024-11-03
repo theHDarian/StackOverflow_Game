@@ -188,12 +188,13 @@ void createRoomBounds(RenderSystem *renderer)
 		vec2 symbolOffset;
 	};
 	vec2 windowDimensions = {ws.width-80,ws.height+270};
+	float ratio = ws.height / ws.width;
 	std::vector<WallPos> wallPositions = {
 		{ //top 
-			vec2(0, 60), 
-			vec2(ws.width, 60),
-			vec2(ws.width / 2.f,ws.height - windowDimensions.y + 98.f/2.f),
-			vec2(windowDimensions.x,98.f),
+			vec2(0, ws.height / 10.3), // manually offset by approx height of player sprite
+			vec2(ws.width,ws.height / 10.3),
+			vec2(ws.width / 2.f, -ws.height / 4.3),
+			vec2(ws.width - ws.width / 6, ws.height / (6 * ws.width / ws.height)),
 			0,
 			vec3(0),
 			vec2(0,-spriteOffset)
@@ -201,17 +202,17 @@ void createRoomBounds(RenderSystem *renderer)
 		{ //right
 			vec2(ws.width-150, 0), 
 			vec2(ws.width-150, ws.height), 
-			vec2(ws.width - windowDimensions.x + 98.f/2.f,ws.height/2),
-			vec2(windowDimensions.y,92.f),
+			vec2(ws.width / 7.8, ws.height / 2),
+			vec2(ws.height + ws.height / 3.3, ws.width/(12 * ws.width / ws.height)),
 			glm::radians(270.f),
 			vec3(0,0,49),
 			vec2(-spriteOffset,0)
 		},
 		{ //bottom
-			vec2(ws.width, ws.height-100.f), 
-			vec2(0, ws.height-100.f),
-			vec2(ws.width/2,windowDimensions.y-98.f/2.f),
-			vec2(windowDimensions.x,98.f),
+			vec2(ws.width, ws.height- ws.height / 10.3), // manually offset by mc feet
+			vec2(0, ws.height- ws.height / 10.3),
+			vec2(ws.width/2, ws.height + ws.height / 4.3),
+			vec2(ws.width - ws.width / 6, ws.height / (6 * ws.width / ws.height)),
 			glm::radians(180.f),
 			vec3(0),
 			vec2(0,spriteOffset)

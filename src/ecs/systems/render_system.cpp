@@ -242,7 +242,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 						* glm::rotate(glm::mat4(1.0f),angle,axis) //rotate to be vertical on z axis
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
-		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, 400.0f); // Position above the XY plane
+		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, ws.height /6.575 + ws.width / 6.575); // Position above the XY plane
 		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f);
 		glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
 
