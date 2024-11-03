@@ -32,10 +32,10 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     float offsetBot = ws.height / (6 * ws.width / (float)ws.height);
     float doorWidthX = 200;
     float doorWidthY = 80.0f;
-    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, offsetTop}, {ws.width / 2 + doorWidthX / 2, offsetTop});
-    createDoor(renderer, {ws.width - offsetRightLeft, ws.height / 2 - doorWidthY / 2}, {ws.width - offsetRightLeft, ws.height / 2 + doorWidthY / 2});
-    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, ws.height - offsetBot}, {ws.width / 2 + doorWidthX / 2, ws.height - offsetBot});
-    createDoor(renderer, {offsetRightLeft, ws.height / 2 - doorWidthY / 2}, {offsetRightLeft, ws.height / 2 + doorWidthY / 2});
+    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, offsetTop + 10}, {ws.width / 2 + doorWidthX / 2, offsetTop + 10});
+    createDoor(renderer, {ws.width - offsetRightLeft - 10, ws.height / 2 - doorWidthY / 2}, {ws.width - offsetRightLeft - 10, ws.height / 2 + doorWidthY / 2});
+    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, ws.height - offsetBot - 10}, {ws.width / 2 + doorWidthX / 2, ws.height - offsetBot - 10});
+    createDoor(renderer, {offsetRightLeft + 10, ws.height / 2 - doorWidthY / 2}, {offsetRightLeft + 10, ws.height / 2 + doorWidthY / 2});
     resetMap();
 }
 
