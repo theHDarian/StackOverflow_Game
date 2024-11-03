@@ -13,8 +13,10 @@ void AISystem::step(float elapsed_ms)
 	// std::cout << enemy_registry.entities.size() << " is the size of enemy entity" << std::endl;
 	for (Entity entity : enemy_registry.entities)
 	{
+
 		Enemy &enemy = enemy_registry.get(entity);
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
+		enemy.newPattern = false;
 		// std::cout << movement_registry.entities.size() << " is the size of movement entity" << std::endl;
 		std::cout << currPattern.name << " initial" << std::endl;
 		EnemyMovement &movement = movement_registry.get(entity);
@@ -33,6 +35,7 @@ void AISystem::step(float elapsed_ms)
 		}
 		else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB))
 		{
+	
 			movement.posA = movement.posB;
 			// ACTING
 			// std::cout << currPattern.name << "before getmove" << std::endl;
@@ -96,6 +99,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 					if (reaction)
 					{
 						enemy.patternIndex = reaction->index;
+						enemy.newPattern = true;
 						reaction_found = true;
 						BeeEnemy &beeComponent = registry.bees.get(entity);
 						BeeEnemy &otherBeeComponent = registry.bees.get(bee);
@@ -125,6 +129,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		if (reaction)
 		{
 			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
 			reaction_found = true;
 		}
 	}
@@ -145,6 +150,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		if (reaction)
 		{
 			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
 			reaction_found = true;
 		}
 	}
@@ -155,6 +161,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		{
 			std::cout << "got reaction for follow player" << std::endl;
 			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
 			reaction_found = true;
 		}
 	}
@@ -164,6 +171,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		if (reaction)
 		{
 			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
 			reaction_found = true;
 		}
 		// PLAYER BULLET CLOSE TO BE IMPELMENTED..
@@ -175,6 +183,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		if (currPattern.curDuration < 0.f)
 		{
 			enemy.patternIndex = currPattern.next;
+			enemy.newPattern = true;
 			// std::cout << currPattern.next << " index currPattern.next" << std::endl;
 			currPattern.curDuration = currPattern.maxDuration;
 			// std::cout << "change to " << enemy.currEnemyPattern().name << std::endl;
@@ -204,8 +213,10 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getCurrentPos(entity);
 	case EnemyBehavior::MERGE_BEE:
 		return getCurrentPos(entity);
+	case EnemyBehavior::SPAWNING:
+		return getCurrentPos(entity);
 	default:
-		return vec2{0, 0};
+		return getCurrentPos(entity);
 	};
 };
 
@@ -243,9 +254,14 @@ vec2 AISystem::generateRandomPos(Entity entity)
 	// std::cout << "height " << windowState.height << std::endl;
 	float pos_x = rand() % width;
 	float pos_y = rand() % height;
+
 	vec2 scale = registry.motions.get(entity).scale;
-	pos_x = glm::clamp(pos_x, 0.f + scale[0], static_cast<float>(width) - scale[0]);
-	pos_y = glm::clamp(pos_y, 0.f + scale[1], static_cast<float>(height) - scale[1]);
+	float minX = 150.f + scale[0];
+	float minY = 100.f + scale[1];
+	float maxX = width - 150.f - scale[0];
+	float maxY = height - 60.f - scale[1];
+	pos_x = glm::clamp(pos_x, minX, maxX);
+	pos_y = glm::clamp(pos_y, minY, maxY);
 	return vec2(pos_x, pos_y);
 }
 

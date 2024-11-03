@@ -515,6 +515,7 @@ struct TestEnemy : Enemy
 
 struct EnemyEasySentry : Enemy
 {
+
 	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot};
 	EnemyEasySentry()
 	{
@@ -529,6 +530,65 @@ struct EnemyEasySentry : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(-12, 0)};
+		scale = vec2({288.0f / 2, 240.f / 2});
+	};
+};
+
+struct EnemyMediumTank : Enemy
+{
+
+	Reaction durationWalking = {
+		ReactionType::DURATION,
+		0
+	};
+	Reaction durationShoot = {
+		ReactionType::DURATION,
+		1
+	};
+	Reaction halfHP = {
+		ReactionType::FIFTY_HEALTH,
+		2
+	};
+
+	Reaction durationWalkingRage = {
+		ReactionType::DURATION,
+		3
+	};
+
+	Reaction durationAttackMissile = {
+		ReactionType::DURATION,
+		4
+	};
+
+	Reaction durationAttackSniper = {
+		ReactionType::DURATION,
+		5
+	};
+
+	Reaction durationSpiralShot = {
+		ReactionType::DURATION,
+		2
+	};
+
+	EnemyPattern randomState ={"RANDOM POSITION", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {durationShoot, halfHP}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idleState = {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {durationWalking, halfHP}, 0, true, 0.f, 800.f, radialBurst};
+	EnemyPattern rageState = {"HALF HP", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {durationWalkingRage}, 3, true, 0.f, 500.f, twelveSpiralShot};
+	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {durationAttackMissile}, 4, false, 0.f, 0.f, NoAttack};
+	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {durationAttackSniper}, 5, true, 0.f, 300.f, missile};
+	EnemyPattern shootSniper = {"sniper", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {durationSpiralShot}, 2, true , 0.f, 300.f, SniperShot};
+	EnemyMediumTank()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState, idleState, rageState, walkingRage, shootMisile, shootSniper
+		};
+		patternIndex = 0;
+		sprite = {
+			"enemy_Crab.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		};
 		scale = vec2({288.0f / 2, 240.f / 2});
 	};
 };
@@ -682,6 +742,84 @@ struct Bee3 : Enemy
 			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
+		scale = vec2({864 / 8.f, 720 / 8.f});
+	};
+};
+
+struct EnemyMediumBeeHive : Enemy {
+	Reaction Spawning{
+		ReactionType::DURATION,
+		1
+	};
+	Reaction idling {
+		ReactionType::DURATION,
+		0
+	};
+	Reaction halfHP {
+		ReactionType::FIFTY_HEALTH,
+		2
+	};
+	Reaction finalIdle {
+		ReactionType::DURATION,
+		3
+	};
+	EnemyPattern idlingState = {"IDLING", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {Spawning, halfHP}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::SPAWNING, {}, 0, 3000.f , 3000.f, {idling, halfHP}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyPattern halfHPState = {"SPAWN LOT BEES", EnemyBehavior::SPAWNING, {}, 0, 3000.f, 3000.f, {finalIdle}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern deadHiveState = {"DEAD HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {finalIdle}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyMediumBeeHive() {
+		maxHealth = 200;
+		currHealth = maxHealth;
+		enemyPatterns = {idlingState, spawningState, halfHPState, deadHiveState};
+		sprite = {
+			"beehive_close.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,	
+		};
+		patternIndex = 0;
+		scale = vec2({240.0f / 2, 312.f / 2});
+	};
+};
+
+struct EnemyHardAngel : Enemy{
+	Reaction Attack2{
+		ReactionType::DURATION,
+		3
+	};
+	Reaction Attack0 {
+		ReactionType::DURATION,
+		1
+	};
+	Reaction Attack1 {
+		ReactionType::DURATION,
+		2,
+	};
+
+	Reaction Attack3 {
+		ReactionType::DURATION,
+		0
+	};
+	EnemyPattern attack1State = {"ATTACK 1", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {Attack0}, 1, true, 500.f, 500.f, SniperShot};
+	EnemyPattern attack2State = {"ATTACK 2", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {Attack1}, 2, true, 0.f, 500.f, wave};
+	EnemyPattern attack3State = {"ATTACK 3", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {Attack2}, 0, true, 0.f, 500.f, fourAllAround};
+	EnemyPattern followPlayerState = {"ATTACK4", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {Attack3}, 0, true, 0.f, 600.f, SniperShot};
+	EnemyHardAngel() {
+		maxHealth = 200;
+		currHealth = maxHealth;
+		enemyPatterns = {attack1State, attack2State, attack3State, followPlayerState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
 		scale = vec2({864 / 8.f, 480 / 8.f});
 	};
 };
+
+// struct EnemyHardSkull : {
+
+// 	EnemyHardSkull() {
+
+// 	};
+// };

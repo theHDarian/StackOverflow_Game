@@ -52,6 +52,8 @@ void EnemySystem::step(float elapsed_ms)
         vec2 pos = motion.position;
         float angle = motion.angle;
 
+
+        // merge bee logic
         EnemyPattern &pattern = enemy.currEnemyPattern();
         if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
         {
@@ -66,6 +68,15 @@ void EnemySystem::step(float elapsed_ms)
                 registry.deleteds.emplace(deletedBee);
             registry.bees.remove(deletedBee);
             registry.enemies.remove(deletedBee);
+        }
+
+        // beeHive logic
+        if (registry.beeHive.has(entity)) {
+            Hive& hive = registry.beeHive.get(entity);
+            hive.currSpawnCD -= elapsed_ms;
+            if (pattern.type == EnemyBehavior::SPAWNING) {
+                beeHiveSpawn(entity, pattern, hive);
+            }
         }
 
         // move enemy using lerp
@@ -154,6 +165,8 @@ void EnemySystem::step(float elapsed_ms)
         }
     }
 }
+
+
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData)
 {
@@ -395,7 +408,7 @@ void EnemySystem::creatingMergeBee(int count, vec2 pos)
         break;
     default:
         std::cout << "CREATING 1" << std::endl;
-        createEnemy(render, pos, EnemyType::TwoBee);
+        createEnemy(render, pos, EnemyType::OneBee);
     }
 }
 
@@ -450,4 +463,21 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
         // 			registry.renderRequests.get(bee).texture_name = "bee_fly_2";
         // 		}
     }
+}
+
+void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern& currPattern, Hive& hive) {
+    Motion& motion = registry.motions.get(entity);
+    if (hive.currSpawnCD < 0.f) {
+        // play open "animation" here
+        if (!registry.spriteTimers.has(entity)) {
+            RenderRequest& rr = registry.renderRequests.get(entity);
+            SpriteTimer& st = registry.spriteTimers.emplace(entity);
+            st.count_ms = 1000;
+            st.nextEffect = rr.used_effect;
+            st.nextSprite = rr.texture_name;
+            rr.texture_name = "beehive_open.png";
+        }
+        creatingMergeBee(1, motion.position);
+        hive.currSpawnCD = hive.maxSpawnCD;
+    } 
 }
