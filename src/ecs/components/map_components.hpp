@@ -29,6 +29,7 @@ struct Room {
     int dialogueCount = 0; // place here for now
     int cutsceneCount = 0;
     bool dialogueDone = true;
+    bool cutSceneDone = true;
 };
 enum MapRequestType {
     RestartGame = 'R',

@@ -191,6 +191,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom.cutsceneCount = 0;
     map.currRoom.dialogueCount = 0;
     map.currRoom.dialogueDone = true;
+    map.currRoom.cutSceneDone = true;
 
     map.roomsTraversed++;
 
@@ -242,27 +243,17 @@ void MapSystem::resetMap()
     map.currRoom.variant = 0;
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
-
-    // beginning animation sequence - mc wakes up
-    Entity player = registry.players.entities[0];
-    AnimationSequence& as = registry.animationSequences.emplace(player);
-    as.nextEffect = EFFECT_ASSET_ID::TEXTURED;
-    as.nextSprite = "mcv1_base.png";
-    RenderRequest& rr = registry.renderRequests.get(player);
-    rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
-    rr.texture_name = "mc_startup";
-    registry.animations.get(player).max_frames = 40; // hard code for now
-
-    // play cutscene
-    GameState& gameState = registry.gameStates.components[0];
-    gameState.cutScene = true;
+    map.currRoom.cutsceneCount = 0;
+    map.currRoom.dialogueCount = 0;
+    map.currRoom.dialogueDone = true;
+    map.currRoom.cutSceneDone = true;
 
     // clear ongoing dialogue to prepare for next
+    GameState& gameState = registry.gameStates.components[0];
     DialogueLines& lines = registry.dialogueLines.components[0];
     lines = DialogueLines();
     gameState.dialogueScene = false;
     IOState& iostate = registry.ioStates.components[0];
-
 }
 
 void MapSystem::nextMusic()

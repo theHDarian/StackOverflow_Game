@@ -415,6 +415,7 @@ void WorldSystem::playCutscene() {
 		gameState.cutScene = false;
 		Map& map = registry.maps.components[0];
 		map.currRoom.cutsceneCount++;
+		map.currRoom.cutSceneDone = true;
 	}
 }
 
