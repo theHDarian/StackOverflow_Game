@@ -120,12 +120,25 @@ struct ParticleProps {
 };
 
 //TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
-enum SoundType { normalBGM,bossBGM, specialBGM, SFX };
-struct Sound {
+enum SoundType {
+	normalBGM,
+	bossBGM,
+	specialBGM,
+	PlayerHurt,
+	DashSound,
+	PlayerShoot,
+	EnemyShoot,
+	IncomingDialogue,
+	NormalDialogue,
+	DoorOpen,
+};
+struct SoundRequest {
 	SoundType type;
 	std::string path;
 	float volume; //0 to 1
 	int loops;
+	float ticks;
+	int songIndex;
 };
 
 
@@ -291,6 +304,7 @@ struct Dialogue {
 	std::string text;
 	std::string speakerName;
 	std::string speakerAvatar;
+	SoundType sfx;
 };
 
 struct DialogueLines {
@@ -306,6 +320,8 @@ struct DialogueLines {
 		}
 	}
 };
+
+
 
 struct BG {
 	// is BG

@@ -43,8 +43,8 @@ int main() {
     EnemySystem enemySystem(&renderer, &soundSystem);
     MapSystem mapSystem;
     TextSystem textSystem;
-	UISystem uiSystem;
-	SceneSystem sceneSystem;
+	UISystem uiSystem(&soundSystem);
+	SceneSystem sceneSystem(&soundSystem);
 
     // Initialize window
     GLFWwindow* window = world.createWindow();
@@ -114,6 +114,7 @@ int main() {
 			aiSystem.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
 			particleSystem.step(elapsed_ms);
+			// soundSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
 			world.clearDeleteQueue();

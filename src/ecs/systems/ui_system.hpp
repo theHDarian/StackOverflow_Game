@@ -5,10 +5,13 @@
 #include "tiny_ecs.hpp"
 #include "tiny_ecs_registry.hpp"
 
+class SoundSystem;
+
 // System responsible for handling user input
 class UISystem {
 public:
-    UISystem();
+    UISystem(SoundSystem *soundSystem);
+
     ~UISystem();
     // Initialize the window
     bool init(GLFWwindow* window);
@@ -33,4 +36,6 @@ private:
     Entity createDialogueBox(vec2 position, vec2 scale);
 
     Entity createDialogueAvatar(vec2 position, vec2 scale);
+
+    SoundSystem* soundSystem;
 };

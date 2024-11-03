@@ -10,6 +10,8 @@
 
 class SoundSystem {
 public:
+    void step(float elapsed_ms);
+
     SoundSystem();
     ~SoundSystem();
 
@@ -19,7 +21,13 @@ public:
 
     bool setVolume(float volume);
 
-    void nextMusic();
+    void playNextMusic();
+
+    void playNextMusic(int songIndex);
+
+    void playBossMusic(int songIndex);
+
+    void playSpecialMusic(int songIndex);
 
     void playPlayerHurtSound();
     void playPlayerDashSound();
@@ -30,17 +38,30 @@ public:
 
     void playDoorOpenSound();
 
+    void playIncomingDialogueSound();
+
+    bool isPlayingIncomingDialogueSound();
+
+    void stopIncomingDialogueSound();
+
+    void playNextDialogueSound();
+
+    void stopNextDialogueSound();
+
     float volume;
 
 private:
     int currMusicIndex;
     Mix_Music* backgroundMusic;
-    std::vector<Sound> normalRoomMusic;
-    std::vector<Sound> bossRoomMusic;
-    std::vector<Sound> specialRoomMusic;
+    std::vector<SoundRequest> normalRoomMusic;
+    std::vector<SoundRequest> bossRoomMusic;
+    std::vector<SoundRequest> specialRoomMusic;
     Mix_Chunk* playerHurtSound;
     Mix_Chunk* playerShootSound;
     Mix_Chunk* playerDashSound;
+
+    Mix_Chunk* incomingDialogueSound;
+    Mix_Chunk* nextDialogueSound;
 
     // Mix_Chunk* playerDeathSound;
     // Mix_Chunk* enemyHurtSound;

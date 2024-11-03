@@ -43,10 +43,10 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.shouldEnd = true;
 	}
 	if  (key == GLFW_KEY_MINUS && action == GLFW_PRESS) {
-		gameState.currentVolume = std::max(0.0f, gameState.currentVolume - 0.1f);
+		gameState.currentVolume = std::max(0.0f, gameState.currentVolume - 0.0125f);
 	}
 	if  (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
-		gameState.currentVolume = std::min(1.0f, gameState.currentVolume + 0.1f);
+		gameState.currentVolume = std::min(1.0f, gameState.currentVolume + 0.0125f);
 	}
 
 	// Resetting game

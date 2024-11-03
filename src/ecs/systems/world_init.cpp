@@ -188,43 +188,45 @@ void createRoomBounds(RenderSystem *renderer)
 		vec2 symbolOffset;
 	};
 	vec2 windowDimensions = {ws.width-80,ws.height+270};
+	float ratio1 = ws.height / (float)ws.width;
+	float ratio2 = ws.width / (float)ws.height;
 	std::vector<WallPos> wallPositions = {
 		{ //top 
-			vec2(0, 60), 
-			vec2(ws.width, 60),
-			vec2(ws.width / 2.f,ws.height - windowDimensions.y + 98.f/2.f),
-			vec2(windowDimensions.x,98.f),
+
+			vec2(0, ws.height / (6 * ratio2)), // manually offset by approx height of player sprite
+			vec2(ws.width,ws.height / (6 * ratio2)),
+			vec2(ws.width / 2.f, -ws.height / (6 * ratio1 * (1+ 0.5*ratio1))),
+			vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
 			0,
 			vec3(0),
 			vec2(0,-spriteOffset)
 		},
 		{ //right
-			vec2(ws.width-150, 0), 
-			vec2(ws.width-150, ws.height), 
-			vec2(ws.width - windowDimensions.x + 98.f/2.f,ws.height/2),
-			vec2(windowDimensions.y,92.f),
+			vec2(ws.width- ws.width / (6 * ratio2), 0),
+			vec2(ws.width- ws.width / (6 * ratio2), ws.height),
+			vec2(ws.width / (6 * (1 + ratio1 * 0.5)), ws.height / 2),
+			vec2(ws.height + ws.height /(6 * ratio1), ws.width / (12 * ratio2)),
 			glm::radians(270.f),
-			vec3(0,0,49),
+			vec3(0,0,50),
 			vec2(-spriteOffset,0)
 		},
 		{ //bottom
-			vec2(ws.width, ws.height-100.f), 
-			vec2(0, ws.height-100.f),
-			vec2(ws.width/2,windowDimensions.y-98.f/2.f),
-			vec2(windowDimensions.x,98.f),
+			vec2(ws.width, ws.height- ws.height / (6 * ratio2)), // manually offset by mc feet
+			vec2(0, ws.height- ws.height / (6 * ratio2)),
+			vec2(ws.width/2, ws.height + ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
+			vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
 			glm::radians(180.f),
 			vec3(0),
 			vec2(0,spriteOffset)
 		},
 		//NOTE: left and righ wall require some weird z offset
-		
 		{ //left
-			vec2(150.f, ws.height), 
-			vec2(150.f, 0),
-			vec2(windowDimensions.x-98.f/2.f ,ws.height/2),
-			vec2(windowDimensions.y,92.f),
+			vec2(ws.width / (6 * ratio2), ws.height),
+			vec2(ws.width / (6 * ratio2), 0),
+			vec2(ws.width - ws.width / (6 * (1 + ratio1 * 0.5)) ,ws.height/2),
+			vec2(ws.height + ws.height / (6 * ratio1), ws.width / (12 * ratio2)),
 			glm::radians(90.f),
-			vec3(0,0,49),
+			vec3(0,0,50),
 			vec2(spriteOffset,0)
 		}
 	};
