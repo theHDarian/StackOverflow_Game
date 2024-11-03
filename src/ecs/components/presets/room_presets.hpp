@@ -18,6 +18,26 @@
 //     int numSpecialBulletsToSpawn = 5;
 // };
 
+const RoomPreset TutorialRoom1Preset {
+    {},
+    {},
+    {},
+    {},
+    100000.0f,
+    0
+};
+
+const RoomPreset TutorialRoom2Preset {
+    {
+        {EnemyType::EasyEnemySentry,{0.5f,0.5f}},
+    },
+    {},
+    {},
+    {},
+    0.0f,
+    0
+};
+
 const RoomPreset EnemyRoomDash1 {
     {
         {EnemyType::EasyEnemySentry,{0.2f,0.8f}},

@@ -37,8 +37,14 @@ void RenderSystem::step(float elapsed_ms) {
 		}
 		if (anim.animation_countdown <= 0) {
 			anim.animation_countdown = anim.animation_countdown_base;
-			anim.frame = (anim.frame + 1) % anim.max_frames;
-			//std::cout << "time to change frame to frame " << anim.frame << std::endl;
+			anim.frame = (anim.frame + 1) % anim.max_frames;  
+		}
+		if (registry.animationSequences.has(entity) && anim.frame >= anim.max_frames - 1) {
+			AnimationSequence& as = registry.animationSequences.get(entity);
+			RenderRequest& rr = registry.renderRequests.get(entity);
+			rr.texture_name = as.nextSprite;
+			rr.used_effect = as.nextEffect;
+			registry.animationSequences.remove(entity);
 		}
 	}
 }
@@ -439,6 +445,8 @@ void RenderSystem::drawGameElements()
 	mat3 projection_2D = createProjectionMatrix();
 	glBindVertexArray(vao);
 
+	IOState& ioState = registry.ioStates.components[0];
+
 	// this setup requires us know what types of things to render
 	// and won't render all render requests if not given the proper component
 	// Note, its not very efficient to access elements indirectly via the entity
@@ -448,7 +456,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.playerBullets.entities)
@@ -464,8 +473,9 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
 		drawHPbar(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.players.entities)
@@ -473,7 +483,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.walls.entities)
