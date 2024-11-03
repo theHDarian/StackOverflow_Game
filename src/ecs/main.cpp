@@ -43,8 +43,8 @@ int main() {
     EnemySystem enemySystem(&renderer, &soundSystem);
     MapSystem mapSystem;
     TextSystem textSystem;
-	UISystem uiSystem;
-	SceneSystem sceneSystem;
+	UISystem uiSystem(&soundSystem);
+	SceneSystem sceneSystem(&soundSystem);
 
     // Initialize window
     GLFWwindow* window = world.createWindow();

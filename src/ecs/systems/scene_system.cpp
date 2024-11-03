@@ -1,6 +1,9 @@
 #include "scene_system.hpp"
 
-SceneSystem::SceneSystem() {
+#include "sound_system.hpp"
+
+SceneSystem::SceneSystem( SoundSystem* soundSystem) {
+	this->soundSystem = soundSystem;
 
 }
 
@@ -47,7 +50,7 @@ void SceneSystem::step(float elapsed_ms) {
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
 					lines.lines.push_back(Dialogue{ "[Incoming Message...]\n[Press [E] to accept.]", "N", "N" });
-					lines.lines.push_back(Dialogue{ "Hello? Can you here me?", "Scientist", "scientist_avatar.png" });
+					lines.lines.push_back(Dialogue{ "Hello? Can you hear me?", "Scientist", "scientist_avatar.png" });
 					lines.lines.push_back(Dialogue{ "Oh, great! I was worried I'd be stuck in this lab all alone!", "Scientist", "scientist_avatar.png" });
 					lines.lines.push_back(Dialogue{ "It's been ages since I've found someone who wouldn't outright attack me here, and there's so much I want to say, but before that--", "Scientist", "scientist_avatar.png" });
 					lines.lines.push_back(Dialogue{ "--you must've just come online not too long ago, so I'll let you get your bearings and look around first.", "Scientist", "scientist_avatar.png" });

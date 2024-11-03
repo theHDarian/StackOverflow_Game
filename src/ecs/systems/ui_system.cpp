@@ -1,8 +1,10 @@
 #include "ui_system.hpp"
 
+#include "sound_system.hpp"
 
-UISystem::UISystem() {
 
+UISystem::UISystem(SoundSystem* soundSystem) {
+	this->soundSystem = soundSystem;
 }
 
 UISystem::~UISystem() {
@@ -40,7 +42,15 @@ void UISystem::playDialogue() {
 
 	if (gameState.dialogueScene && input.nextDialogue) {
 		input.nextDialogue = false;
+
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
+		if (registry.dialogueLines.get(dialogueBox).current == 1) {
+			soundSystem->playIncomingDialogueSound();
+		} else {
+			soundSystem->stopIncomingDialogueSound();
+			soundSystem->playNextDialogueSound();
+		}
+
 		if (nextLine.text.compare("<end>") != 0) {
 			registry.renderRequests.get(dialogueBox).show = true;
 			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
@@ -60,6 +70,7 @@ void UISystem::playDialogue() {
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			Map& map = registry.maps.components[0];
 			map.currRoom.dialogueDone = true;
+			soundSystem->stopNextDialogueSound();
 		}
 	}
 }

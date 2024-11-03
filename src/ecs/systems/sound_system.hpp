@@ -30,6 +30,16 @@ public:
 
     void playDoorOpenSound();
 
+    void playIncomingDialogueSound();
+
+    bool isPlayingIncomingDialogueSound();
+
+    void stopIncomingDialogueSound();
+
+    void playNextDialogueSound();
+
+    void stopNextDialogueSound();
+
     float volume;
 
 private:
@@ -41,6 +51,9 @@ private:
     Mix_Chunk* playerHurtSound;
     Mix_Chunk* playerShootSound;
     Mix_Chunk* playerDashSound;
+
+    Mix_Chunk* incomingDialogueSound;
+    Mix_Chunk* nextDialogueSound;
 
     // Mix_Chunk* playerDeathSound;
     // Mix_Chunk* enemyHurtSound;

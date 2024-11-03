@@ -11,7 +11,7 @@
 
 SoundSystem::SoundSystem()
 {
-    volume = 0.5f;
+    volume = 0.3f;
     loadMusic();
     loadSoundEffects();
 }
@@ -26,6 +26,16 @@ SoundSystem::~SoundSystem()
         Mix_FreeChunk(playerDashSound);
     if (playerShootSound != nullptr)
         Mix_FreeChunk(playerShootSound);
+    if (doorOpenSound != nullptr)
+        Mix_FreeChunk(doorOpenSound);
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (enemyShootSounds[i] != nullptr)
+            Mix_FreeChunk(enemyShootSounds[i]);
+    }
+
+
     if (Mix_PlayingMusic())
         Mix_HaltMusic();
     Mix_CloseAudio();
@@ -35,10 +45,10 @@ SoundSystem::~SoundSystem()
 void SoundSystem::loadMusic()
 {
     Sound roomMusic[] = {
-        {SoundType::normalBGM, audio_path("room/game-music-loop-1.wav"), 0.1f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-2.wav"), 0.1f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-3.wav"), 0.1f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-4.wav"), 0.1f, -1},
+        {SoundType::normalBGM, audio_path("room/game-music-loop-1.wav"), 0.05f, -1},
+        {SoundType::normalBGM, audio_path("room/game-music-loop-2.wav"), 0.05f, -1},
+        {SoundType::normalBGM, audio_path("room/game-music-loop-3.wav"), 0.05f, -1},
+        {SoundType::normalBGM, audio_path("room/game-music-loop-4.wav"), 0.05f, -1},
     };
 
     // Ensure SDL audio system is initialized only once
@@ -65,7 +75,7 @@ void SoundSystem::loadMusic()
     Sound special = {SoundType::specialBGM, audio_path("special/special-room.wav"), 0.2f, -1};
     specialRoomMusic.push_back(special);
 
-    Sound &currentBGM = normalRoomMusic[0];
+    Sound &currentBGM = roomMusic[0];
 
     backgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
     if (!backgroundMusic)
@@ -121,6 +131,16 @@ void SoundSystem::loadSoundEffects() {
         fprintf(stderr, "Failed to load door open sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load door open sound");
     }
+    incomingDialogueSound = Mix_LoadWAV(audio_path("sfx/incoming_dialogue.wav").c_str());
+    if (!incomingDialogueSound) {
+        fprintf(stderr, "Failed to load incoming dialogue sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load incoming dialogue sound");
+    }
+    nextDialogueSound = Mix_LoadWAV(audio_path("sfx/next_dialogue_short.wav").c_str());
+    if (!nextDialogueSound) {
+        fprintf(stderr, "Failed to load next dialogue sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load next dialogue sound");
+    }
 
 }
 
@@ -141,7 +161,7 @@ void SoundSystem::nextMusic()
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic(volume * MIX_MAX_VOLUME);
+    Mix_VolumeMusic(volume * MIX_MAX_VOLUME * currentBGM.volume);
 }
 
 void SoundSystem::playPlayerHurtSound() {
@@ -176,6 +196,38 @@ void SoundSystem::playDoorOpenSound() {
     }
 }
 
+void SoundSystem::playIncomingDialogueSound() {
+    if (!Mix_Playing(6)) {
+        Mix_PlayChannel(6, incomingDialogueSound, 0);
+        Mix_Volume(6, incomingDialogueSound->volume * volume);
+    }
+}
+
+bool SoundSystem::isPlayingIncomingDialogueSound() {
+    return Mix_Playing(6);
+}
+
+void SoundSystem::stopIncomingDialogueSound() {
+    if (Mix_Playing(6))
+        Mix_HaltChannel(6);
+}
+
+void SoundSystem::playNextDialogueSound() {
+    if (!Mix_Playing(7)) {
+        Mix_PlayChannel(7, nextDialogueSound, 0);
+        Mix_Volume(7, nextDialogueSound->volume * volume);
+    } else {
+        Mix_HaltChannel(7);
+        Mix_PlayChannel(7, nextDialogueSound, 0);
+        Mix_Volume(7, nextDialogueSound->volume * volume);
+    }
+}
+
+void SoundSystem::stopNextDialogueSound() {
+    if (Mix_Playing(7))
+        Mix_HaltChannel(7);
+}
+
 
 bool SoundSystem::increaseVolume() {
     std::cout << "Volume increased" << std::endl;
@@ -183,7 +235,7 @@ bool SoundSystem::increaseVolume() {
         std::cout << "old Volume: " << volume << std::endl;
         this->volume += 0.1f;
         std::cout << "Volume: " << volume << std::endl;
-        Mix_VolumeMusic(volume * MIX_MAX_VOLUME * 0.3);
+        Mix_VolumeMusic(volume * MIX_MAX_VOLUME * 0.3f);
         Mix_Volume(1, playerShootSound->volume * volume);
         Mix_Volume(2, playerDashSound->volume * volume);
         Mix_Volume(3, playerHurtSound->volume * volume);
@@ -198,7 +250,7 @@ bool SoundSystem::decreaseVolume() {
         std::cout << "old Volume: " << volume << std::endl;
         this->volume -= 0.1f;
         std::cout << "Volume: " << volume << std::endl;
-        Mix_VolumeMusic(volume * MIX_MAX_VOLUME * 0.3);
+        Mix_VolumeMusic(volume * MIX_MAX_VOLUME * 0.3f);
         Mix_Volume(1, playerShootSound->volume * volume);
         Mix_Volume(2, playerDashSound->volume * volume);
         Mix_Volume(3, playerHurtSound->volume * volume);
@@ -212,7 +264,7 @@ bool SoundSystem::setVolume(float volume) {
         std::cout << "old Volume: " << volume << std::endl;
         this->volume = volume;
         std::cout << "Volume: " << volume << std::endl;
-        Mix_VolumeMusic(volume * MIX_MAX_VOLUME);
+        Mix_VolumeMusic(volume * MIX_MAX_VOLUME *  0.05f);
         Mix_Volume(1, playerShootSound->volume * volume);
         Mix_Volume(2, playerDashSound->volume * volume);
         Mix_Volume(3, playerHurtSound->volume * volume);
