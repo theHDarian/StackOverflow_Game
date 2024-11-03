@@ -533,6 +533,7 @@ struct EnemyEasySentry : Enemy
 {
 
 	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, quadShot};
+
 	EnemyEasySentry()
 	{
 		maxHealth = 100;
@@ -546,7 +547,7 @@ struct EnemyEasySentry : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(-12, 0)};
-		scale = vec2({288.0f / 2, 240.f / 2});
+		scale = vec2({240.0f / 2, 240.f / 2});
 	};
 };
 
@@ -632,7 +633,7 @@ struct EnemyBigC : Enemy
 struct EnemyMediumCharge : Enemy
 {
 	Reaction lowHealth = {
-		ReactionType::TWENTYFIVE_HEALTH,
+		ReactionType::FIFTY_HEALTH,
 		0};
 
 	Reaction durationFollow = {

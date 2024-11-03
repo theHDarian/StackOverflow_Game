@@ -65,7 +65,7 @@ void MapSystem::step(float elapsed_ms)
     
 
     // set room to cleared if all enemies are defeated
-    if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty())
+    if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
     {
         map.currRoom.cleared = true;
     }
@@ -126,8 +126,10 @@ std::string getSymbol(RoomType type) {
     } else if (type == RoomType::RestRoom) {
         return "door_symbol_resting.png";
     } else if (type == RoomType::None) {
-        return "none"; 
-    }else {
+        return "none";
+    } else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
+        return "eel.png";
+    } else {
         return "door_symbol_enemy.png";
     }
 }
@@ -137,6 +139,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     std::vector<Door> &doors = registry.doors.components;
     Map &map = registry.maps.components[0];
     Door &door = doors[doorIndex];
+
     if (door.room == RoomType::None || !map.currRoom.cleared)
         return;
     //play door sound
@@ -163,10 +166,16 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // change current room in the map
     map.currRoom = Room();
     assert(door.room != RoomType::None);
-    std::vector<RoomPreset> presets = roomDirectory.at(door.room);
-    RoomPreset randomPreset = Random::ListItem(presets);
-    map.currRoom.preset = randomPreset;
+    if (door.room == RoomType::TutorialRoom2) {
+        map.currRoom.preset = TutorialRoom2Preset;
+    }
+    else {
+        std::vector<RoomPreset> presets = roomDirectory.at(door.room);
+        RoomPreset randomPreset = Random::ListItem(presets);
+        map.currRoom.preset = randomPreset;
+    }
     map.roomsTraversed++;
+    map.currRoom.type = door.room;
 
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
@@ -193,29 +202,52 @@ void MapSystem::resetMap()
 {
     clearRoomActors();
 
-    bool excludeNone = false;
-    for (int i  =  0; i < 4; i++)
-    {
-        Door& d = registry.doors.components[i];
-        d.room = randomRoomType(excludeNone);
-        if (d.room == RoomType::None)
-            excludeNone = true;
-
-        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
-    }
-
+    // preset doors for first tutorial room
     for (Door &d : registry.doors.components)
     {
         d.isPrev = false;
+        d.room = RoomType::None;
     }
+    registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
 
     Map &map = registry.maps.components[0];
     map.currRegion = MapRegion::Tutorial;
     map.roomsTraversed = 0;
 
-    // set initial room to enemy
     map.currRoom = Room();
-    std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomBee);
-    RoomPreset randomPreset = Random::ListItem(presets);
-    map.currRoom.preset = randomPreset;
+    map.currRoom.preset = TutorialRoom1Preset;
+    map.currRoom.type = TutorialRoom1;
+    //std::cout << map.currRoom.cleared << std::endl;
+    //std::cout << map.currRoom.dialogueCount << std::endl;
+
+    // clear ongoing dialogue to prepare for next
+    GameState& gameState = registry.gameStates.components[0];
+    DialogueLines& lines = registry.dialogueLines.components[0];
+    lines = DialogueLines();
+    gameState.dialogueScene = false;
+    IOState& iostate = registry.ioStates.components[0];
+}
+
+void MapSystem::nextMusic()
+{
+    int nextMusicIndex = rand() % normalRoomMusic.size();
+    if (nextMusicIndex == currMusicIndex)
+    {
+        return;
+    }
+    else
+    {
+        currMusicIndex = nextMusicIndex;
+    }
+    Sound &currentBGM = normalRoomMusic[currMusicIndex];
+    Mix_FreeMusic(backgroundMusic);
+    Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
+    Mix_FadeInMusic(newbackgroundMusic, currentBGM.loops, 1000);
+    backgroundMusic = newbackgroundMusic;
+    if (!backgroundMusic)
+    {
+        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+    }
+    int volume = currentBGM.volume * MIX_MAX_VOLUME;
+    Mix_VolumeMusic(volume);
 }

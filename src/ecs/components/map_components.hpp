@@ -13,7 +13,9 @@ enum RoomType : char {
     TreasureRoom,
     RestRoom,
     BossBigCRoom, //remove for now to prevent bug
-    None //Keep None at the end of the list to be compatible with existing get random function
+    None, //Keep None at the end of the list to be compatible with existing get random function
+    TutorialRoom1,
+    TutorialRoom2
 };
 
 enum SpecialEvent { BouncingDisc,RebootStation };
@@ -42,8 +44,13 @@ struct DoorSymbol {
 
 struct Room {
     RoomPreset preset;
-    bool cleared;
-    float timeElapsed; //time passed since enter room in seconds
+    RoomType type;
+    bool cleared = false;
+    float timeElapsed = 0; //time passed since enter room in seconds
+    int dialogueCount = 0; // place here for now
+    int cutsceneCount = 0;
+    bool dialogueDone = true;
+    bool cutSceneDone = true;
 };
 enum MapRequestType {
     RestartGame = 'R',

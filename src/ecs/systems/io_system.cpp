@@ -57,13 +57,15 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
         ioState.shouldRestart = true;
 	}
 
+	// Debug toggle for colliders
+	if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
+		ioState.debugMode = !ioState.debugMode;
+	}
+
 	// show dialogue window and play dialogue sequence (temp function)
-	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused) {
-		// pause game when dialogue plays for now
-		if (!ioState.shouldShowDialogue)
-			gameState.dialogueScene = true;
-		ioState.shouldShowDialogue = true;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
+		gameState.dialogueScene = true;
 	}
 
 	//Player movement
@@ -105,7 +107,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state, GameStat
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
-        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused) {
+        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused && !gameState.dialogueScene && !gameState.cutScene) {
 
             state.shouldDash = true;
         }
@@ -142,4 +144,9 @@ bool IOSystem::isGameOver()const {
 // move it here for now
 bool IOSystem::isDialogue()const {
 	return registry.gameStates.components[0].dialogueScene;
+}
+
+// temporary!
+bool IOSystem::isCutscene()const {
+	return registry.gameStates.components[0].cutScene;
 }
