@@ -455,6 +455,22 @@ const AttackData NoAttack{
 	0,
 	0};
 
+const AttackData quadShot{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		blunt,
+		4,
+		0.0,
+		{20, 20},
+		200,
+		3000,
+		{0.0, 0.0},
+		0,
+		0,
+		0 
+	};
+
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
 ////////////////////////////////////
@@ -516,7 +532,7 @@ struct TestEnemy : Enemy
 struct EnemyEasySentry : Enemy
 {
 
-	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot};
+	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, quadShot};
 	EnemyEasySentry()
 	{
 		maxHealth = 100;
