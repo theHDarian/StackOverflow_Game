@@ -26,6 +26,7 @@ bool UISystem::init(GLFWwindow* window) {
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
+	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
 
 	return true;
 }
@@ -36,38 +37,84 @@ void UISystem::playDialogue() {
 
 	if (gameState.dialogueScene && input.nextDialogue) {
 		input.nextDialogue = false;
-		std::string nextLine = registry.dialogueLines.get(dialogueBox).next().text; // don't know how to sort system ahhh
-		//std::cout << " dialogue line " << nextLine << std::endl;
-		if (strcmp(nextLine.c_str(), "<end>") != 0) {
+		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
+		if (nextLine.text.compare("<end>") != 0) {
 			registry.renderRequests.get(dialogueBox).show = true;
-			registry.textRenderRequests.get(dialogueBox).text = nextLine;
+			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
+			if (nextLine.speakerName != "N") { // N is narrator for now
+				registry.renderRequests.get(dialogueAvatar).show = true;
+				registry.renderRequests.get(dialogueAvatar).texture_name = nextLine.speakerAvatar;
+				registry.textRenderRequests.get(dialogueAvatar).text = nextLine.speakerName;
+			}
+			else {
+				registry.renderRequests.get(dialogueAvatar).show = false;
+			}
 		}
 		// no more lines of dialogue
 		else {
 			registry.renderRequests.get(dialogueBox).show = false;
 			gameState.dialogueScene = false;
+			registry.renderRequests.get(dialogueAvatar).show = false;
 
 			// hard code check here again - queue next lines of dialogue
 			Map& map = registry.maps.components[0];
 			if (map.currRoom.type == RoomType::TutorialRoom1 && !map.currRoom.dialogueDone) {
 				DialogueLines& lines = registry.dialogueLines.components[0];
 				lines = DialogueLines();
-				lines.lines.push_back(Dialogue{ "Done looking around?", "S", "S" });
-				lines.lines.push_back(Dialogue{ "Oh, was the door locked?", "S", "S" });
-				lines.lines.push_back(Dialogue{ "Well, doesn't look like anyone's guarding it, so I think I can just...", "S", "S" });
-				lines.lines.push_back(Dialogue{ "Aha, there! It should be unlocked now.", "S", "S" });
-				lines.lines.push_back(Dialogue{ "Ah, about all the things I wanted to say--I think I got too excited got a bit ahead of myself there, sorry about that.", "S", "S" });
-				lines.lines.push_back(Dialogue{ "But, there is one thing I do want to tell you.", "S", "S" });
-				lines.lines.push_back(Dialogue{ "This place isn't worth staying in. It's overrun by murderous robots, and everyone who was once here has either long since left, or...\nyeah, they've all left.", "S", "S" });
-				lines.lines.push_back(Dialogue{ "So, you should leave too. I'll even help you and make sure of that.", "S", "S" });
-				lines.lines.push_back(Dialogue{ "And what about me? \nHeh, don't worry about me. I've already been stuck here long enough, so this is the least I could do.", "S", "S" });
-				lines.lines.push_back(Dialogue{ "Anyway, the only way out is forwards! Head on down to the door on the bottom once you're ready.", "S", "S" });
+				lines.lines.push_back(Dialogue{ "Done looking around?", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "Oh, was the door locked?", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "Well, doesn't look like anyone's guarding it, so I think I can just...", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "Aha, there! It should be unlocked now.", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "Ah, about all the things I wanted to say--I think I got too excited got a bit ahead of myself there, sorry about that.", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "But, there is one thing I do want to tell you.", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "This place isn't worth staying in. It's overrun by dangerous robots, and everyone who was once here has either long since left, or...\nyeah, they've all left.", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "So, you should leave too. I'll even help you and make sure of that.", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "And what about me? \nHeh, don't worry about me. I've already been stuck here long enough, so this is the least I could do.", "Scientist", "scientist_avatar.png" });
+				lines.lines.push_back(Dialogue{ "Anyway, the only way out is forwards! Head on down to the door on the bottom once you're ready.", "Scientist", "scientist_avatar.png" });
 				map.currRoom.dialogueDone = true; // bad, what if we have many of such checks?
 			} else if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueDone) {
 				map.currRoom.cleared = true;
 			}
 		}
 	}
+}
+
+Entity UISystem::createDialogueAvatar(vec2 position, vec2 scale) {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	// consider doing a check of "should I render now"? Or hide entity?
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "none",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.dialogueUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = scale;
+
+	// attach 1 text render request
+	registry.dialogueUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = position.x - scale.x / 2;				
+	text.y = windowState.height - position.y - scale.y / 2 - 40;
+	text.scale = 0.45;
+	text.text = "speaker name";
+	// too lazy to calculate fitting text box size, and it prob won't overflow
+	// so just set it to some big number
+	text.topRightBound = { 1000, 1000 };
+	text.bottomLeftBound = { 0, 0 };
+
+	return entity;
 }
 
 
@@ -109,12 +156,12 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	// with current text projection matrix being "flipped" coords
 	// temp fix for getting window size for now
 	WindowState& windowState = registry.windowStates.components[0];
-	text.x = windowState.width - scale.x + 25;				// 25 is just some padding
+	text.x = windowState.width - scale.x + 300;				// 25 is just some padding
 	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
-	text.scale = 0.5;										// for some reason, scale should be small
+	text.scale = 0.5;										
 	text.text = "hello this is test dialogue!";
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
-	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.topRightBound = { scale.x - 75, scale.y - 25 };
+	text.bottomLeftBound = { text.x + 25, 0 + 25 };
 
 	// attach list of dialogue lines
 	// probably shouldn't be attached to box, but to some dialogue state entity?

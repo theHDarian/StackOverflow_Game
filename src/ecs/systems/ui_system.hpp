@@ -22,6 +22,7 @@ private:
     Entity gameOverMenu;
     Entity stackUI;
     Entity dialogueBox;
+    Entity dialogueAvatar;
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
@@ -30,4 +31,6 @@ private:
     Entity createStackUI(WindowState& windowState, StackCompile& stack);
 
     Entity createDialogueBox(vec2 position, vec2 scale);
+
+    Entity createDialogueAvatar(vec2 position, vec2 scale);
 };

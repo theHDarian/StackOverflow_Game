@@ -301,8 +301,8 @@ struct TextRenderRequest {
 
 struct Dialogue {
 	std::string text;
-	std::string speakerAvatar;
 	std::string speakerName;
+	std::string speakerAvatar;
 };
 
 struct DialogueLines {

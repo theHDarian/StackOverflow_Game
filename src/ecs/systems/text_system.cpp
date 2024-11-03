@@ -237,15 +237,12 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
         for (c = word.begin(); c != word.end(); c++)
         {
             Character ch = Characters[*c];
-            xpos += x + ch.Bearing.x * scale;
-            ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+            xpos += ch.Bearing.x * scale + ch.Size.x * scale;
+            //ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
         }
 
-        // compare screen size
-        // may use "text box" borders instead, but use screen for now
-        // consider also adding padding
-        WindowState& ws = registry.windowStates.components[0];
-        if (xpos > topRightBound.x || xpos < bottomLeftBound.x) {
+        // compare with text box size
+        if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
             textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale;
             textPos.x = x;
         }
