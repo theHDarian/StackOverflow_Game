@@ -3,6 +3,7 @@
 #include <glm/trigonometric.hpp>
 #include "premades.hpp"
 #include "ai_system.hpp"
+#include "utils/random.hpp"
 
 Entity createPlayer(RenderSystem *renderer, vec2 pos)
 {
@@ -130,27 +131,115 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 		{"none",
 		 EFFECT_ASSET_ID::EGG,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE});
-	vec3 c = registry.colors.emplace(entity);
-	c.r = 0.0;
-	c.g = 0.0;
-	c.b = 1.0;
-
 	return entity;
 }
 
+Entity createDoorSymbol(RenderSystem * renderer, vec2 position, float angle, vec2 scale, float symbolAngle, vec3 axis, vec3 offset,vec2 spriteOffset) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position + spriteOffset;
+	motion.angle = angle;
+	motion.scale = vec2(40.f,80) * normalize(vec2(2*scale.x/120.f,2*scale.y/66.f)) * 2.f;
+
+	DoorSymbol& symbol = registry.doorSymbols.emplace(entity);
+	symbol.angle = symbolAngle;
+	symbol.axis = axis;
+	symbol.offset = offset;
+
+	registry.backgrounds.emplace(entity);
+
+	RenderRequest& rr = registry.renderRequests.insert(entity, 
+		{"door_symbol_enemy.png",
+		EFFECT_ASSET_ID::ROOM_BOUND,
+		GEOMETRY_BUFFER_ID::SPRITE}
+	);
+	return entity;
+}
+
+
 void createRoomBounds(RenderSystem *renderer)
 {
-	WindowState &wS = registry.windowStates.components[0];
+	WindowState &ws = registry.windowStates.components[0];
 
 	Entity bounds[4];
-	bounds[0] = createTestWall(renderer, {0, 0}, {wS.width, 0});
-	bounds[1] = createTestWall(renderer, {wS.width, 0}, {wS.width, wS.height});
-	bounds[2] = createTestWall(renderer, {wS.width, wS.height}, {0, wS.height});
-	bounds[3] = createTestWall(renderer, {0, wS.height}, {0, 0});
+	float spriteOffset = 30.f;
 
-	for (Entity b : bounds)
-	{
-		registry.bounds.emplace(b);
+	struct WallPos {
+		vec2 colliderStart;
+		vec2 colliderEnd;
+		vec2 spritePosition;
+		vec2 spriteScale;
+		float spriteAngle;
+		vec3 offset;
+		vec2 symbolOffset;
+	};
+	vec2 windowDimensions = {ws.width-80,ws.height+270};
+	std::vector<WallPos> wallPositions = {
+		{ //top 
+			vec2(0, 60), 
+			vec2(ws.width, 60),
+			vec2(ws.width / 2.f,ws.height - windowDimensions.y + 98.f/2.f),
+			vec2(windowDimensions.x,98.f),
+			0,
+			vec3(0),
+			vec2(0,-spriteOffset)
+		},
+		{ //right
+			vec2(ws.width-150, 0), 
+			vec2(ws.width-150, ws.height), 
+			vec2(ws.width - windowDimensions.x + 98.f/2.f,ws.height/2),
+			vec2(windowDimensions.y,92.f),
+			glm::radians(270.f),
+			vec3(0,0,49),
+			vec2(-spriteOffset,0)
+		},
+		{ //bottom
+			vec2(ws.width, ws.height-100.f), 
+			vec2(0, ws.height-100.f),
+			vec2(ws.width/2,windowDimensions.y-98.f/2.f),
+			vec2(windowDimensions.x,98.f),
+			glm::radians(180.f),
+			vec3(0),
+			vec2(0,spriteOffset)
+		},
+		//NOTE: left and righ wall require some weird z offset
+		
+		{ //left
+			vec2(150.f, ws.height), 
+			vec2(150.f, 0),
+			vec2(windowDimensions.x-98.f/2.f ,ws.height/2),
+			vec2(windowDimensions.y,92.f),
+			glm::radians(90.f),
+			vec3(0,0,49),
+			vec2(spriteOffset,0)
+		}
+	};
+	for (auto& p : wallPositions) {
+		auto entity = Entity();
+
+		auto &motion = registry.motions.emplace(entity);
+		motion.position = p.spritePosition;
+		motion.scale = p.spriteScale;
+		motion.angle = p.spriteAngle;
+
+		auto &wall = registry.walls.emplace(entity);
+		wall.startPosition = p.colliderStart;
+		wall.endPosition = p.colliderEnd;
+
+		Bound& b = registry.bounds.emplace(entity);
+		b.angle = glm::radians(-90.f);
+		b.axis = vec3(1,0,0);
+		b.offset = p.offset;
+
+		RenderRequest &rr = registry.renderRequests.insert(
+			entity,
+			{"wall_horizontal.png",
+			EFFECT_ASSET_ID::ROOM_BOUND,
+			GEOMETRY_BUFFER_ID::SPRITE});		
+		registry.backgrounds.emplace(entity);
+
+		//add door symbol for each wall
+		createDoorSymbol(renderer,motion.position,motion.angle,motion.scale,b.angle,b.axis,b.offset,p.symbolOffset);
 	}
 }
 
@@ -221,51 +310,6 @@ Entity createTestPoly(RenderSystem *renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-// mesh enemy that doesn't do anything
-Entity createBigC(RenderSystem *renderer, vec2 position)
-{
-	auto entity = Entity();
-
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::MESH_GB);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	// Initialize the motion
-	auto &motion = registry.motions.emplace(entity);
-	motion.angle = 0;
-	motion.velocity = {0, 0};
-	motion.position = position;
-
-	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({700 * (1.923352 / 2.0f), 700});
-	// motion.scale = vec2({ 500, 500 });
-
-	registry.meshColliders.emplace(entity);
-
-	auto &enemy = registry.enemies.emplace(entity);
-	enemy.maxHealth = 1000;
-	enemy.currHealth = enemy.maxHealth;
-
-	EnemyMovement &movement = registry.enemyMovement.emplace(entity);
-	movement.angularSpeed = 3;
-	movement.posA = position;
-	movement.posB = position;
-
-	auto &boss = registry.bosses.emplace(entity);
-
-	/*AttackData& atk = registry.attackDatas.emplace(entity);
-	atk = none;*/
-
-	registry.sprites.emplace(entity);
-	registry.renderRequests.insert(
-		entity,
-		{// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
-		 "none",
-		 EFFECT_ASSET_ID::MESH,
-		 GEOMETRY_BUFFER_ID::MESH_GB});
-
-	return entity;
-}
 
 Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 {
@@ -433,8 +477,6 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	// inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;
 	inv.countdown = 200.0f;
 
-	auto &spriteComponent = registry.sprites.emplace(entity);
-
 	std::string renderShape;
 	if (atkData.shape == RECTANGLE)
 	{
@@ -447,6 +489,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
+		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_square.png";
 		renderShape = "enemy_bullet_square.png";
 	}
@@ -460,6 +503,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 		pc.setPolyLengths();
+		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_triangle.png";
 		renderShape = "enemy_bullet_triangle.png";
 	}
@@ -467,13 +511,12 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	{
 		CircleCollider &cc = registry.circleColliders.emplace(entity);
 		cc.radius = motion.scale.x / 2;
-		spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
 		renderShape = "enemy_bullet_circle.png";
 	}
 
 	registry.renderRequests.insert(
 		entity,
-		{// spriteComponent.sprites[SPRITE_STATE::BASE],
+		{
 		 renderShape,
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
@@ -515,7 +558,6 @@ Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, E
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
-	spriteComponent.sprites[SPRITE_STATE::BASE] = TEXTURE_ASSET_ID::ENEMY_BULLET_CIRCLE;
 
 	registry.renderRequests.insert(
 		entity,
@@ -548,8 +590,6 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	motion.velocity = {0, 0};
 	motion.scale = {0, atkData.size.y}; // Ensure scale is initialized
 	motion.veer = {0, 0};
-
-	auto &spriteComponent = registry.sprites.emplace(entity);
 
 	Laser &laser = registry.lasers.emplace(entity);
 	laser.start = start;
@@ -822,8 +862,12 @@ float getModifiedValue(BulletEffectType bf, float value)
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
-	if (atkData.rareBulletEffects.size() > 0)
+	float prob = 0.1f * (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
+	Map &map = registry.maps.components[0];
+
+	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
+		registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 		return atkData.rareBulletEffects;
 	}
 	return {atkData.defaultEffect};

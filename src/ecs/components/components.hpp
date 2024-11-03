@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 
-#include "map_components.hpp"
 #include "io_components.hpp"
 #include "ui_components.hpp"
 
@@ -54,7 +53,11 @@ struct WallCollider {
 };
 
 
-struct Bound {}; //room bounds
+struct Bound {
+	float angle; //degrees
+	vec3 axis;
+	vec3 offset;
+}; //room bounds
 
 struct AABBCollider {
 	// As offsets of motion.position:
@@ -178,24 +181,6 @@ struct Mesh
 // shouldn't matter much, but apparently enum CLASSES don't inherently cast to ints
 // so I've (Amanda) explicitly set them to be ints
 // should ask why that's the case/why it works fine even w/o inherent casting
-enum  TEXTURE_ASSET_ID : unsigned int {
-	FISH = 0,
-	PUFFERFISH = FISH + 1,
-	CIRCLE_SPRITE = PUFFERFISH + 1,
-	MC_BASE = CIRCLE_SPRITE + 1,
-	MC_HIT = MC_BASE + 1,
-	AIM_INDICATOR = MC_HIT + 1,
-	FLOOR = AIM_INDICATOR + 1,
-	MC_BULLET = FLOOR + 1,
-	ENEMY_BULLET_SQUARE = MC_BULLET + 1,
-	ENEMY_BULLET_CIRCLE = ENEMY_BULLET_SQUARE + 1,
-	ENEMY_BULLET_TRIANGLE = ENEMY_BULLET_CIRCLE + 1,
-	CHEVRON = ENEMY_BULLET_TRIANGLE + 1,
-	RECTANGLE_SPRITE = CHEVRON + 1,
-	PARALLELOGRAM = RECTANGLE_SPRITE + 1,
-	TEXTURE_COUNT = PARALLELOGRAM + 1,
-};
-const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum  EFFECT_ASSET_ID : unsigned int {
 	COLOURED = 0,
@@ -205,7 +190,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	POSTPROCESS = TEXTURED + 1,
 	DASH = POSTPROCESS + 1,
 	HP_BAR = DASH + 1,
-	ANIMATE = HP_BAR + 1,
+	ROOM_BOUND = HP_BAR + 1,
+	ANIMATE = ROOM_BOUND + 1,
 	BULLET = ANIMATE + 1,
 	EFFECT_COUNT = BULLET + 1
 };

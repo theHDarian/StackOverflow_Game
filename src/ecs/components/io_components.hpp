@@ -1,4 +1,5 @@
 #pragma once
+#include <time.h>
 
 #include "common.hpp"
 #include "utils/extended_stack.hpp"
@@ -7,6 +8,10 @@ struct WindowState {
     int width;
 	int height;
     bool isRetinaDisplay;
+
+	float fps;
+	int numFramesThisSecond;
+	time_t currUnixTime;
 };
 
 struct IOState {

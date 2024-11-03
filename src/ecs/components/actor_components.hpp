@@ -4,7 +4,7 @@
 #include <map>
 #include <iostream>
 #include <any>
-#include <components.hpp>
+#include "components.hpp"
 
 
 
@@ -58,7 +58,7 @@ struct Player
 
     int maxDashCharges = baseDashNum;
 
-    float currDashCooldown = 0.0f;
+    float currDashCooldown = baseDashCDR;
     float dashCooldown = baseDashCDR;
 
     int bulletCluster = 1;
@@ -316,7 +316,6 @@ struct EnemyPattern {
 
 struct SpriteData
 {
-
 	std::string texturePath;
 	EFFECT_ASSET_ID effectId;
 	GEOMETRY_BUFFER_ID geometryId;

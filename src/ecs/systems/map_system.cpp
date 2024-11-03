@@ -4,7 +4,9 @@
 #include "world_init.hpp"
 #include "utils/random.hpp"
 #include "SDL.h"
+#include "components/presets/room_presets.hpp"
 #include "sound_system.hpp"
+
 
 MapSystem::MapSystem()
 {
@@ -25,12 +27,15 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     soundPlayer->nextMusic();
     WindowState &ws = registry.windowStates.components[0];
     // create door colliders
-    float offset = 20;
-    float doorWidth = 30;
-    createDoor(renderer, {ws.width / 2 - doorWidth / 2, offset}, {ws.width / 2 + doorWidth / 2, offset});
-    createDoor(renderer, {ws.width - offset, ws.height / 2 - doorWidth / 2}, {ws.width - offset, ws.height / 2 + doorWidth / 2});
-    createDoor(renderer, {ws.width / 2 - doorWidth / 2, ws.height - offset}, {ws.width / 2 + doorWidth / 2, ws.height - offset});
-    createDoor(renderer, {offset, ws.height / 2 - doorWidth / 2}, {offset, ws.height / 2 + doorWidth / 2});
+    float offsetRightLeft = 160;
+    float offsetTop = 70;
+    float offsetBot = 120;
+    float doorWidthX = 200;
+    float doorWidthY = 80.0f;
+    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, offsetTop}, {ws.width / 2 + doorWidthX / 2, offsetTop});
+    createDoor(renderer, {ws.width - offsetRightLeft, ws.height / 2 - doorWidthY / 2}, {ws.width - offsetRightLeft, ws.height / 2 + doorWidthY / 2});
+    createDoor(renderer, {ws.width / 2 - doorWidthX / 2, ws.height - offsetBot}, {ws.width / 2 + doorWidthX / 2, ws.height - offsetBot});
+    createDoor(renderer, {offsetRightLeft, ws.height / 2 - doorWidthY / 2}, {offsetRightLeft, ws.height / 2 + doorWidthY / 2});
     resetMap();
 }
 
@@ -38,8 +43,36 @@ void MapSystem::step(float elapsed_ms)
 {
     Map &map = registry.maps.components[0];
     map.currRoom.timeElapsed += elapsed_ms / 1000.0f;
-    // switch rooms if needed
 
+    handleMapRequests();
+
+    // spawn enemy based on current time
+    WindowState &wS = registry.windowStates.components[0];
+    if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay)
+    {
+        for (auto &e : map.currRoom.preset.enemies)
+        {
+            createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
+        }
+        map.currRoom.preset.enemies = {};
+
+        //spawn treasures
+        for(auto& e : map.currRoom.preset.treasures) {
+            createEnemyBullet(renderer,std::get<vec2>(e)* vec2(wS.width,wS.height),vec2(0.8,0.8),vec2(0),std::get<AttackData>(e));
+        }
+        map.currRoom.preset.treasures = {};
+    }
+    
+
+    // set room to cleared if all enemies are defeated
+    if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty())
+    {
+        map.currRoom.cleared = true;
+    }
+}
+
+void MapSystem::handleMapRequests()
+{
     if (registry.mapRequests.components.size() > 0)
     {
         auto &r = registry.mapRequests.components[0];
@@ -50,24 +83,6 @@ void MapSystem::step(float elapsed_ms)
         else if (r.requestType == MapRequestType::RestartGame)
             resetMap();
         registry.mapRequests.clear();
-    }
-
-    WindowState &wS = registry.windowStates.components[0];
-    // std::cout << " enemy size " << registry.enemies.size() << std::endl;
-    if (registry.enemies.size() == 0)
-    {
-        //createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::TestRevampedEnemy);
-        //createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::EasyEnemySentry);
-        //createEnemy(renderer, vec2(wS.width / 2,wS.height / 2), EnemyType::BossBigC);
-        //createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
-        // createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-        // createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-        createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::OneBee);
-
-        
     }
 }
 
@@ -98,24 +113,31 @@ void clearRoomActors()
 
     registry.emitParticles.emplace(Entity(), ParticleRequestType::ClearParticles, 0.0f, 0);
 }
-RoomType getRandomRoomType(bool includeNone)
-{
-    int r = Random::Float() * 4;
-    if (r > 3)
-        return RoomType::TreasureRoom;
-    if (r > 2)
-        return RoomType::RestRoom;
-    if (r > 1)
-        return RoomType::EnemyRoom;
 
-    return includeNone ? RoomType::None : RoomType::EnemyRoom;
+RoomType randomRoomType(bool excludeNone)
+{
+    return static_cast<RoomType>(rand() % (excludeNone ? RoomType::None - 1 : RoomType::None));
+}
+std::string getSymbol(RoomType type) {
+    if (type == RoomType::BossBigCRoom) {
+        return "door_symbol_boss.png";
+    } else if (type == RoomType::TreasureRoom) {
+        return "door_symbol_treasure.png";
+    } else if (type == RoomType::RestRoom) {
+        return "door_symbol_resting.png";
+    } else if (type == RoomType::None) {
+        return "none"; 
+    }else {
+        return "door_symbol_enemy.png";
+    }
 }
 
 void MapSystem::changeRoom(RoomType type, int doorIndex)
 {
     std::vector<Door> &doors = registry.doors.components;
+    Map &map = registry.maps.components[0];
     Door &door = doors[doorIndex];
-    if (door.room == RoomType::None)
+    if (door.room == RoomType::None || !map.currRoom.cleared)
         return;
     //play door sound
 
@@ -139,20 +161,19 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     clearRoomActors();
 
     // change current room in the map
-    Map &map = registry.maps.components[0];
-    Entity ent = registry.maps.entities[0];
-    map.currRoom.type = type;
-    map.currRoom.variant = 0;
-    map.currRoom.cleared = false;
-    map.currRoom.timeElapsed = 0;
-
+    map.currRoom = Room();
+    assert(door.room != RoomType::None);
+    std::vector<RoomPreset> presets = roomDirectory.at(door.room);
+    RoomPreset randomPreset = Random::ListItem(presets);
+    map.currRoom.preset = randomPreset;
     map.roomsTraversed++;
 
-    // copy room type
+    // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
+    registry.renderRequests.get(registry.doorSymbols.entities[spawnIndex]).texture_name = getSymbol(doors[spawnIndex].room);
 
-    bool includeNone = true;
+    bool excludeNone = false;
     for (int i = 0; i < doors.size(); i++)
     {
         // reset previous room type
@@ -160,10 +181,11 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             continue;
 
         Door &d = registry.doors.components[i];
-        d.room = getRandomRoomType(includeNone);
+        d.room = randomRoomType(excludeNone);
         d.isPrev = false;
         if (d.room == RoomType::None)
-            includeNone = false;
+            excludeNone = true;
+        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
     }
 }
 
@@ -171,12 +193,15 @@ void MapSystem::resetMap()
 {
     clearRoomActors();
 
-    bool includeNone = true;
-    for (Door &d : registry.doors.components)
+    bool excludeNone = false;
+    for (int i  =  0; i < 4; i++)
     {
-        d.room = getRandomRoomType(includeNone);
+        Door& d = registry.doors.components[i];
+        d.room = randomRoomType(excludeNone);
         if (d.room == RoomType::None)
-            includeNone = false;
+            excludeNone = true;
+
+        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
     }
 
     for (Door &d : registry.doors.components)
@@ -188,10 +213,9 @@ void MapSystem::resetMap()
     map.currRegion = MapRegion::Tutorial;
     map.roomsTraversed = 0;
 
-    map.currRoom.type = RoomType::EnemyRoom;
-    map.currRoom.variant = 0;
-    map.currRoom.cleared = false;
-    map.currRoom.timeElapsed = 0;
-
-    // createBigC(renderer, vec2(600, 600));
+    // set initial room to enemy
+    map.currRoom = Room();
+    std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomBee);
+    RoomPreset randomPreset = Random::ListItem(presets);
+    map.currRoom.preset = randomPreset;
 }

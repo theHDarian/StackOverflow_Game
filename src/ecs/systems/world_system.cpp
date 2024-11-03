@@ -8,6 +8,8 @@
 #include <iostream>
 #include <glm/detail/func_trigonometric.inl>
 #include <SDL.h>
+#include <SDL_mixer.h>
+#include <time.h>
 #include "sound_system.hpp"
 #include "physics_system.hpp"
 
@@ -127,14 +129,15 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	gameState.dialogueScene = false;
 
 	WindowState& wS = registry.windowStates.components[0];
+	wS.currUnixTime = time(NULL);
 	currentSpeed = 1.f;
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
 	aimIndicator = createAimIndicator(renderer);
 
 	WindowState& ws = registry.windowStates.components[0];
-	createRoomBounds(renderer);
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
+	createRoomBounds(renderer);
 
 	// this feels very bad, put as temp fix for getting window size for now
 	dialogueBox = createDialogueBox(vec2(wS.width /2, wS.height - wS.height /8), vec2(wS.width, wS.height /4));
@@ -146,6 +149,18 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	WindowState& ws = registry.windowStates.components[0];
+	if (time(NULL) - ws.currUnixTime > 1.0f) {
+		ws.fps = ws.numFramesThisSecond;
+		ws.numFramesThisSecond = 0;
+		ws.currUnixTime = time(NULL);
+
+		char title[256]; // Buffer for the title string
+    	snprintf(title, sizeof(title), "StackOverflow (FPS: %.0f)", ws.fps);
+		glfwSetWindowTitle(window,title);
+	} else {
+		ws.numFramesThisSecond++;
+	}
 	// Processing inputs
 	handleInput();
 
@@ -167,7 +182,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// 			registry.remove_all_components_of(motions_registry.entities[i]);
 	// 	}
 	// }
-
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
 
 	movePlayer();
@@ -437,7 +451,6 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 
 		if (!registry.dashes.has(player) && pl.currDashCharges > 0) {
 			pl.currDashCharges--;
-			pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
 			if (!registry.emitParticles.has(player))

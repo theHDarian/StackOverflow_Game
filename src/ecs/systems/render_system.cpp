@@ -191,7 +191,64 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 			gl_has_errors();
 		}
-	}
+	} else if (render_request.used_effect == EFFECT_ASSET_ID::ROOM_BOUND) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+		gl_has_errors();
+		assert(in_texcoord_loc >= 0);
+
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+
+		glEnableVertexAttribArray(in_texcoord_loc);
+		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+		gl_has_errors();
+
+		// Enable and bind the texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		gl_has_errors();
+
+		WindowState &ws = registry.windowStates.components[0];
+		float angle;
+		vec3 axis;
+		vec3 offset;
+		if (registry.bounds.has(entity)) {
+			Bound& b = registry.bounds.get(entity);
+			angle = b.angle;
+			axis = b.axis;
+			offset = b.offset;
+		} else if (registry.doorSymbols.has(entity)) {
+			DoorSymbol& d = registry.doorSymbols.get(entity);
+			angle = d.angle;
+			axis = d.axis;
+			offset = d.offset;
+		} else {
+			assert(false);
+		}
+		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x,motion.position.y,0.0f))
+						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))
+						* glm::translate(glm::mat4(1.0f),offset)
+						* glm::rotate(glm::mat4(1.0f),angle,axis) //rotate to be vertical on z axis
+						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
+		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
+		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, 400.0f); // Position above the XY plane
+		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f);
+		glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
+
+		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
+		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
+		float fov = 125.0f; //makes walls appear larger the less there is
+		float aspectRatio = (ws.width) / (ws.height);
+		float near_var = 0.1f;
+		float far_var = 10000.0f;
+		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near_var, far_var);
+		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float *)&proj4);
+	} 
 	else
 	{
 		assert(false && "Type of render request not supported");
@@ -249,11 +306,14 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float *)&transform.mat);
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float *)&projection);
-	gl_has_errors();
+	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
+		GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+		glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float *)&transform.mat);
+		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+		glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float *)&projection);
+		gl_has_errors();
+	}
+
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
@@ -365,7 +425,6 @@ void RenderSystem::drawBackgroundElements() {
 	for (Entity entity : registry.backgrounds.entities) {
 		if (!registry.renderRequests.get(entity).show)
 			continue;
-		
 		drawTexturedMesh(entity, projection_2D);
 	}
 	glBindVertexArray(0);
@@ -419,7 +478,7 @@ void RenderSystem::drawGameElements()
 
 	for (Entity& entity : registry.walls.entities)
 	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.backgrounds.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 	}
@@ -528,6 +587,7 @@ void RenderSystem::drawImGui() {
 	int menuWidth = 200;
 	IOState& ioState = registry.ioStates.components[0];
 	WindowState& windowState = registry.windowStates.components[0];
+	Map& map = registry.maps.components[0];
 	// std::cout << windowState.width << " " << windowState.height << std::endl;
 
 	ImGui_ImplOpenGL3_NewFrame();
@@ -545,7 +605,8 @@ void RenderSystem::drawImGui() {
 	
 	// STACK INFORMATION
 	StackCompile& sc = registry.stackCompile.components[0];
-	ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	// ImGui::Text("Stack Size: %lu", sc.currStack.size());
+	ImGui::Text("S. Bullets Left: %d",map.currRoom.preset.numSpecialBulletsToSpawn);
 	ImGui::TextColored(ImVec4(1,1,0,1), "Additives");
 	ImGui::BeginChild("AdditiveContent",ImVec2(180,80),true);
 		std::map<BulletEffectType, float>::iterator it;
@@ -565,8 +626,8 @@ void RenderSystem::drawImGui() {
 
 	for (int i = 0; i < registry.doors.components.size();i++) {
 		Door& d = registry.doors.components[i];
-		char type = d.isPrev ? 'P' : d.room;
-		ImGui::Text("Door %d: type %c",i,type);
+		int type = d.isPrev ? -1 : d.room;
+		ImGui::Text("Door %d: type %d",i,type);
 	}
 
 	if (ImGui::Button("Restart Game")) {

@@ -1,16 +1,32 @@
 #pragma once
 #include "common.hpp"
+#include "components/actor_components.hpp"
 
 enum Side : char {
     Left = 'L',Top = 'T',Bottom = 'B',Right = 'R'
 };
 
 enum RoomType : char {
-    EnemyRoom = 'E',
-    TreasureRoom = 'T',
-    BossRoom = 'B',
-    RestRoom = 'R',
-    None = 'N'
+    EnemyRoomDash,
+    EnemyRoomTripleBuff,
+    EnemyRoomBee,
+    TreasureRoom,
+    RestRoom,
+    BossBigCRoom, //remove for now to prevent bug
+    None //Keep None at the end of the list to be compatible with existing get random function
+};
+
+enum SpecialEvent { BouncingDisc,RebootStation };
+enum RoomProp { Plant1 };
+enum BossType { BigCBoss };
+
+struct RoomPreset {
+    std::vector<std::tuple<EnemyType,vec2>> enemies;
+    std::vector<std::tuple<AttackData,vec2>> treasures; //for treasure rooms
+    std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
+    std::vector<SpecialEvent> specialEvents; 
+    float spawnDelay; //in seconds - for enemies and bosses
+    int numSpecialBulletsToSpawn = 5;
 };
 
 struct Door {
@@ -18,10 +34,14 @@ struct Door {
     bool isPrev; //if is previous room, block it
     vec2 startPos, endPos;
 };
+struct DoorSymbol {
+    float angle;
+    vec3 axis;
+    vec3 offset;
+};
 
 struct Room {
-    RoomType type;
-    int variant; // the variant within the room type
+    RoomPreset preset;
     bool cleared;
     float timeElapsed; //time passed since enter room in seconds
 };

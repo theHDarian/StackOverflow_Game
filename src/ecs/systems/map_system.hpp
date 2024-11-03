@@ -16,5 +16,16 @@ class MapSystem {
         RenderSystem* renderer;
         void resetMap();
         void changeRoom(RoomType type,int doorIndex);
-        SoundSystem* soundPlayer;
+        void handleMapRequests();
+
+    void loadMusic();
+
+    Mix_Music* backgroundMusic;
+    std::vector<Sound> normalRoomMusic;
+    std::vector<Sound> bossRoomMusic;
+    std::vector<Sound> specialRoomMusic;
+    int currMusicIndex;
+
+    void nextMusic();
+    SoundSystem* soundPlayer;
 };

@@ -4,6 +4,7 @@
 #include "tiny_ecs.hpp"
 #include "components.hpp"
 #include "actor_components.hpp"
+#include "map_components.hpp"
 
 class ECSRegistry
 {
@@ -23,11 +24,11 @@ public:
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
-	ComponentContainer<Sprites> sprites;
 	ComponentContainer<CollisionShape> collisionShapes;
-	ComponentContainer<SpriteTimer> spriteTimers;
 	ComponentContainer<TextRenderRequest> textRenderRequests;
 	ComponentContainer<DialogueLines> dialogueLines;
+	ComponentContainer<Sprites> sprites;
+	ComponentContainer<SpriteTimer> spriteTimers;
 	ComponentContainer<BG> backgrounds;
 	ComponentContainer<EnemyMovement> enemyMovement;
 	ComponentContainer<StackCompile> stackCompile;
@@ -59,6 +60,7 @@ public:
 	ComponentContainer<MenuUIText> menuUITexts;
 	ComponentContainer<Damaged> damageds;
 	ComponentContainer<Door> doors;
+	ComponentContainer<DoorSymbol> doorSymbols;
 	ComponentContainer<Bound> bounds; //room boundaries
 	ComponentContainer<MapRequest> mapRequests;
 	ComponentContainer<BossEnemy> bosses;
@@ -80,8 +82,6 @@ public:
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
-		registry_list.push_back(&sprites);
-		registry_list.push_back(&spriteTimers);
 		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&frames);
 		registry_list.push_back(&emitParticles);
@@ -120,6 +120,9 @@ public:
 		registry_list.push_back(&damageds);
 		registry_list.push_back(&bosses);
 		registry_list.push_back(&animations);
+		registry_list.push_back(&sprites);
+		registry_list.push_back(&spriteTimers);
+		registry_list.push_back(&doorSymbols);
 		registry_list.push_back(&bees);
 	}
 
