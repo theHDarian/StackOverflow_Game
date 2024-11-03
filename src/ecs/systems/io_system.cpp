@@ -58,8 +58,8 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 
 	// show dialogue window and play dialogue sequence (temp function)
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused) {
-		// pause game when dialogue plays for now
 		ioState.nextDialogue = true;
+		gameState.dialogueScene = true;
 	}
 
 	//Player movement
@@ -101,7 +101,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state, GameStat
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
-        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused && !gameState.dialogueScene) {
+        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused && !gameState.dialogueScene && !gameState.cutScene) {
 
             state.shouldDash = true;
         }

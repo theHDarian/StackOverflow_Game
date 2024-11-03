@@ -92,8 +92,7 @@ void MapSystem::step(float elapsed_ms)
         if (r.requestType == MapRequestType::ChangeRoom)
         {
             // prevent player from progressing if they haven't cleared tutorial room
-            if (map.currRoom.type != RoomType::TutorialRoom || map.currRoom.cleared) {
-                //std::cout << "switching to type " << r.type << std::endl;
+            if ((map.currRoom.type != RoomType::TutorialRoom1 && map.currRoom.type != RoomType::TutorialRoom2) || map.currRoom.cleared) {
                 changeRoom(r.type, r.doorIndex);
             }
         }
@@ -112,10 +111,12 @@ void MapSystem::step(float elapsed_ms)
         createEnemy(renderer, vec2(wS.width * Random::Float(),wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
     }
 
-    if (map.currRoom.type == RoomType::TutorialRoom && !map.currRoom.cleared && registry.enemies.size() == 0) { // tutorial room cleared!
+    if (map.currRoom.type == RoomType::TutorialRoom2 && !map.currRoom.cleared && registry.enemies.size() == 0) { // tutorial room cleared!
         DialogueLines& lines = registry.dialogueLines.components[0];
         lines = DialogueLines(); // reset instead of properly making new dialogue req to be processed
-        lines.lines.push_back("Congrats on clearing tutorial room!");
+        lines.lines.push_back(Dialogue{ "Whew, I was a bit worried there, but you did it!" , "S", "S"});
+        lines.lines.push_back(Dialogue{ "Now that no one's guarding the door anymore, you should be able to walk through it just fine." , "S", "S" });
+        lines.lines.push_back(Dialogue{ "Ah" , "S", "S" });
         
         // this part is to just mockup dialogue keypress until proper system is setup
         IOState& iostate = registry.ioStates.components[0];
@@ -218,19 +219,36 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         if (d.room == RoomType::None)
             includeNone = false;
     }
+
+    if (map.currRoom.type == RoomType::TutorialRoom2) {
+        WindowState& wS = registry.windowStates.components[0];
+        createEnemy(renderer, vec2(wS.width / 2.f, wS.height / 2.f), EnemyType::MediumEnemyCharge);
+        
+        DialogueLines& lines = registry.dialogueLines.components[0];
+        lines = DialogueLines();
+        lines.lines.push_back(Dialogue{ "Ah, there it is, one of those murderous robots...", "S", "S" });
+        lines.lines.push_back(Dialogue{ "With that thing there, I don't think I'll be able to open the door so easily for you this time.\nLooks like you've got no choice but to fight it.", "S", "S" });
+        lines.lines.push_back(Dialogue{ "No need to worry though, I'm sure you're equipped with the means to deal with it, right?", "S", "S" });
+        lines.lines.push_back(Dialogue{ "[Aim and shoot with the [Left Mouse Button]!]", "N", "N" });
+
+        // this part is to just mockup dialogue keypress until proper system is setup
+        IOState& iostate = registry.ioStates.components[0];
+        GameState& gameState = registry.gameStates.components[0];
+        iostate.nextDialogue = true; // why are there so many parts to be turned on
+        gameState.dialogueScene = true;
+    }
 }
 
 void MapSystem::resetMap()
 {
     clearRoomActors();
 
-    bool includeNone = true;
+    // preset doors for first tutorial room
     for (Door &d : registry.doors.components)
     {
-        d.room = getRandomRoomType(includeNone);
-        if (d.room == RoomType::None)
-            includeNone = false;
+        d.room = RoomType::None;
     }
+    registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
 
     for (Door &d : registry.doors.components)
     {
@@ -241,15 +259,10 @@ void MapSystem::resetMap()
     map.currRegion = MapRegion::Tutorial;
     map.roomsTraversed = 0;
 
-    //map.currRoom.type = RoomType::EnemyRoom;
-    map.currRoom.type = RoomType::TutorialRoom;
+    map.currRoom.type = RoomType::TutorialRoom1;
     map.currRoom.variant = 0;
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
-
-    // for tutorial, spawn 1 enemy to start with
-    WindowState& wS = registry.windowStates.components[0];
-    createEnemy(renderer, vec2(wS.width * Random::Float(), wS.height * Random::Float()), EnemyType::MediumEnemyCharge);
 
     // beginning animation sequence - mc wakes up
     Entity player = registry.players.entities[0];
@@ -271,7 +284,6 @@ void MapSystem::resetMap()
     gameState.dialogueScene = false;
     IOState& iostate = registry.ioStates.components[0];
 
-    // createBigC(renderer, vec2(600, 600));
 }
 
 void MapSystem::nextMusic()

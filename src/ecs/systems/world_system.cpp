@@ -416,11 +416,18 @@ void WorldSystem::playCutscene() {
 
 		// idea: play relevant dialogue connected to cutscenes based on room progression
 		// (but that should be handled by overall dialogue system instead, not here?)
+		// consider: dialogue request, request for key/preset type
 		Map& map = registry.maps.components[0];
-		if (map.currRoom.type == RoomType::TutorialRoom && !map.currRoom.cleared) {
+		if (map.currRoom.type == RoomType::TutorialRoom1 && !map.currRoom.cleared) {
 			DialogueLines& lines = registry.dialogueLines.components[0];
 			lines = DialogueLines();
-			lines.lines.push_back("Welcome to the tutorial room!");
+			lines.lines.push_back(Dialogue{ "[Incoming Message... Press [E] to accept.]", "N", "N" });
+			lines.lines.push_back(Dialogue{ "Hello? Can you here me?", "S", "S" });
+			lines.lines.push_back(Dialogue{ "Oh, great! I was worried I'd be stuck in this lab all alone!", "S", "S" });
+			lines.lines.push_back(Dialogue{ "It's been ages since I've found someone who wouldn't outright attack me here, and there's so much I want to say, but before that--", "S", "S" });
+			lines.lines.push_back(Dialogue{ "--you must've just come online not too long ago, so I'll let you get your bearings and look around first.", "S", "S" });
+			lines.lines.push_back(Dialogue{ "Let me know once you're done.", "S", "S" });
+			lines.lines.push_back(Dialogue{ "[Try moving around the room using the [WASD] keys. Call the doc again by pressin [E] when you're done looking around]", "N", "N" });
 
 			// this part is to just mockup dialogue keypress until proper system is setup
 			IOState& iostate = registry.ioStates.components[0];

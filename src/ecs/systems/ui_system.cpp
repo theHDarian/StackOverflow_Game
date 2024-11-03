@@ -36,7 +36,7 @@ void UISystem::playDialogue() {
 
 	if (gameState.dialogueScene && input.nextDialogue) {
 		input.nextDialogue = false;
-		std::string nextLine = registry.dialogueLines.get(dialogueBox).next(); // don't know how to sort system ahhh
+		std::string nextLine = registry.dialogueLines.get(dialogueBox).next().text; // don't know how to sort system ahhh
 		//std::cout << " dialogue line " << nextLine << std::endl;
 		if (strcmp(nextLine.c_str(), "<end>") != 0) {
 			registry.renderRequests.get(dialogueBox).show = true;
@@ -46,6 +46,26 @@ void UISystem::playDialogue() {
 		else {
 			registry.renderRequests.get(dialogueBox).show = false;
 			gameState.dialogueScene = false;
+
+			// hard code check here again - queue next lines of dialogue
+			Map& map = registry.maps.components[0];
+			if (map.currRoom.type == RoomType::TutorialRoom1 && !map.currRoom.dialogueDone) {
+				DialogueLines& lines = registry.dialogueLines.components[0];
+				lines = DialogueLines();
+				lines.lines.push_back(Dialogue{ "Done looking around?", "S", "S" });
+				lines.lines.push_back(Dialogue{ "Oh, was the door locked?", "S", "S" });
+				lines.lines.push_back(Dialogue{ "Well, doesn't look like anyone's guarding it, so I think I can just...", "S", "S" });
+				lines.lines.push_back(Dialogue{ "Aha, there! It should be unlocked now.", "S", "S" });
+				lines.lines.push_back(Dialogue{ "Ah, about all the things I wanted to say--I think I got too excited got a bit ahead of myself there, sorry about that.", "S", "S" });
+				lines.lines.push_back(Dialogue{ "But, there is one thing I do want to tell you.", "S", "S" });
+				lines.lines.push_back(Dialogue{ "This place isn't worth staying in. It's overrun by murderous robots, and everyone who was once here has either long since left, or...\nyeah, they've all left.", "S", "S" });
+				lines.lines.push_back(Dialogue{ "So, you should leave too. I'll even help you and make sure of that.", "S", "S" });
+				lines.lines.push_back(Dialogue{ "And what about me? \nHeh, don't worry about me. I've already been stuck here long enough, so this is the least I could do.", "S", "S" });
+				lines.lines.push_back(Dialogue{ "Anyway, the only way out is forwards! Head on down to the door on the bottom once you're ready.", "S", "S" });
+				map.currRoom.dialogueDone = true; // bad, what if we have many of such checks?
+			} else if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueDone) {
+				map.currRoom.cleared = true;
+			}
 		}
 	}
 }
@@ -99,10 +119,6 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	// attach list of dialogue lines
 	// probably shouldn't be attached to box, but to some dialogue state entity?
 	auto& lines = registry.dialogueLines.emplace(entity);
-	lines.lines.push_back("hello, this is a dialogue box. \npress e to go to next dialogue");
-	lines.lines.push_back("when dialogue is happening, there shouldn't be any fighting going on\nas a temp fix for that, the game is paused while dialogue is happening");
-	lines.lines.push_back("but also note the dialogue \"paused \" state is separate from the game paused state!\n(press esc to pause the game right now and see)");
-	lines.lines.push_back("oh hey there's no more dialogue after this, so pressing e again won't open another dialogue box\ngoodbye");
 
 	return entity;
 }

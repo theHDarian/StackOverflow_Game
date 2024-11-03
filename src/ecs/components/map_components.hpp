@@ -11,7 +11,8 @@ enum RoomType : char {
     BossRoom = 'B',
     RestRoom = 'R',
     None = 'N',
-    TutorialRoom = 'S' // S for start
+    TutorialRoom1 = '1',
+    TutorialRoom2 = '2'
 };
 
 struct Door {
@@ -25,6 +26,7 @@ struct Room {
     int variant; // the variant within the room type
     bool cleared;
     float timeElapsed; //time passed since enter room in seconds
+    bool dialogueDone = false; // place here for now
 };
 enum MapRequestType {
     RestartGame = 'R',

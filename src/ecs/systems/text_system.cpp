@@ -140,7 +140,7 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
 
         // newline addition referenced from https://www.youtube.com/watch?v=S0PyZKX4lyI
         if (*c == '\n') {
-            y -= ((ch.Size.y)) * 1.3 * scale;
+            y -= ((ch.Size.y)) * 2.0 * scale;
             x = copyX;
             textEndPos = { x, y };
         }
@@ -246,7 +246,7 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
         // consider also adding padding
         WindowState& ws = registry.windowStates.components[0];
         if (xpos > topRightBound.x || xpos < bottomLeftBound.x) {
-            textPos.y -= ((Characters[0].Size.y)) * 1.3 * scale;
+            textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale;
             textPos.x = x;
         }
         if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {

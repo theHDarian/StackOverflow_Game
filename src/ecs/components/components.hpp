@@ -299,16 +299,22 @@ struct TextRenderRequest {
 	vec2 bottomLeftBound;
 };
 
+struct Dialogue {
+	std::string text;
+	std::string speakerAvatar;
+	std::string speakerName;
+};
+
 struct DialogueLines {
-	std::vector<std::string> lines;
+	std::vector<Dialogue> lines;
 	int current = 0;
 
-	std::string next() {
+	Dialogue next() {
 		if (current < lines.size()) {
 			return lines[current++];
 		}
 		else {
-			return "<end>"; // maybe end of str constant
+			return Dialogue{"<end>", "<end>", "<end>"}; // maybe end of str constant
 		}
 	}
 };
