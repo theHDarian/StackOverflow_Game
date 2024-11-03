@@ -26,7 +26,9 @@ struct Room {
     int variant; // the variant within the room type
     bool cleared;
     float timeElapsed; //time passed since enter room in seconds
-    bool dialogueDone = false; // place here for now
+    int dialogueCount = 0; // place here for now
+    int cutsceneCount = 0;
+    bool dialogueDone = true;
 };
 enum MapRequestType {
     RestartGame = 'R',

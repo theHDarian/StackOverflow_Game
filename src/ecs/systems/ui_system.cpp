@@ -55,26 +55,8 @@ void UISystem::playDialogue() {
 			registry.renderRequests.get(dialogueBox).show = false;
 			gameState.dialogueScene = false;
 			registry.renderRequests.get(dialogueAvatar).show = false;
-
-			// hard code check here again - queue next lines of dialogue
 			Map& map = registry.maps.components[0];
-			if (map.currRoom.type == RoomType::TutorialRoom1 && !map.currRoom.dialogueDone) {
-				DialogueLines& lines = registry.dialogueLines.components[0];
-				lines = DialogueLines();
-				lines.lines.push_back(Dialogue{ "Done looking around?", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "Oh, was the door locked?", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "Well, doesn't look like anyone's guarding it, so I think I can just...", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "Aha, there! It should be unlocked now.", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "Ah, about all the things I wanted to say--I think I got too excited got a bit ahead of myself there, sorry about that.", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "But, there is one thing I do want to tell you.", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "This place isn't worth staying in. It's overrun by dangerous robots, and everyone who was once here has either long since left, or...\nyeah, they've all left.", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "So, you should leave too. I'll even help you and make sure of that.", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "And what about me? \nHeh, don't worry about me. I've already been stuck here long enough, so this is the least I could do.", "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "Anyway, the only way out is forwards! Head on down to the door on the bottom once you're ready.", "Scientist", "scientist_avatar.png" });
-				map.currRoom.dialogueDone = true; // bad, what if we have many of such checks?
-			} else if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueDone) {
-				map.currRoom.cleared = true;
-			}
+			map.currRoom.dialogueDone = true;
 		}
 	}
 }

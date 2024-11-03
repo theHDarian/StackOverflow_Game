@@ -112,24 +112,6 @@ void MapSystem::step(float elapsed_ms)
     }
 
     if (map.currRoom.type == RoomType::TutorialRoom2 && !map.currRoom.cleared && registry.enemies.size() == 0) { // tutorial room cleared!
-        DialogueLines& lines = registry.dialogueLines.components[0];
-        lines = DialogueLines(); // reset instead of properly making new dialogue req to be processed
-        lines.lines.push_back(Dialogue{ "Whew, I was a bit worried there, but you did it!" , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "Now that no one's guarding the door anymore, you should be able to walk through it." , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "Well, since you handled all that just fine, looks like you don't need to much of my help after all." , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "Ah, before I go though, there's one last thing I should tell you." , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "You seem to have a special stack container that can encode and store anything you come in contact with into units of pure data." , "Scientist", "scientist_avatar.png" }); // maybe better to demonstrate with inert bullet in earlier room
-        lines.lines.push_back(Dialogue{ "But it's a stack after all, so I'm sure it'll overflow if you have too many--and that can't be a good thing." , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "I sure wonder how you'll make use of this stack... Perhaps you'll use it to modify your abilities?" , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "Anyway, to get to the lab exit, I suggest you make your way to the Biology Wing. There should be less rogue robot activity there." , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "I'll contact you again when you get there. I wish you luck, little robot." , "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "[Press [P] to pause and hover over your stach to take a closer look at it!]" , "N", "N" });
-
-        // this part is to just mockup dialogue keypress until proper system is setup
-        IOState& iostate = registry.ioStates.components[0];
-        GameState& gameState = registry.gameStates.components[0];
-        iostate.nextDialogue = true; // why are there so many parts to be turned on
-        gameState.dialogueScene = true;
         map.currRoom.cleared = true;
     }
 }
@@ -206,6 +188,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom.variant = 0;
     map.currRoom.cleared = false;
     map.currRoom.timeElapsed = 0;
+    map.currRoom.cutsceneCount = 0;
+    map.currRoom.dialogueCount = 0;
+    map.currRoom.dialogueDone = true;
 
     map.roomsTraversed++;
 
@@ -230,19 +215,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     if (map.currRoom.type == RoomType::TutorialRoom2) {
         WindowState& wS = registry.windowStates.components[0];
         createEnemy(renderer, vec2(wS.width / 2.f, wS.height / 2.f), EnemyType::MediumEnemyCharge);
-        
-        DialogueLines& lines = registry.dialogueLines.components[0];
-        lines = DialogueLines();
-        lines.lines.push_back(Dialogue{ "Ah, there it is, one of those dangerous robots...", "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "With that thing there, I don't think I'll be able to open the door so easily for you this time.\nLooks like you've got no choice but to fight it.", "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "No need to worry though, I'm sure you're equipped with the means to deal with it, right?", "Scientist", "scientist_avatar.png" });
-        lines.lines.push_back(Dialogue{ "[Aim and shoot with the [Left Mouse Button]!]", "N", "N" });
-
-        // this part is to just mockup dialogue keypress until proper system is setup
-        IOState& iostate = registry.ioStates.components[0];
-        GameState& gameState = registry.gameStates.components[0];
-        iostate.nextDialogue = true; // why are there so many parts to be turned on
-        gameState.dialogueScene = true;
     }
 }
 

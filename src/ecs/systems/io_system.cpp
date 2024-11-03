@@ -57,7 +57,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	}
 
 	// show dialogue window and play dialogue sequence (temp function)
-	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
 		gameState.dialogueScene = true;
 	}

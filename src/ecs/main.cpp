@@ -16,6 +16,7 @@
 #include "map_system.hpp"
 #include "text_system.hpp"
 #include "ui_system.hpp"
+#include "scene_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -43,6 +44,7 @@ int main()
 	MapSystem mapSystem;
 	TextSystem textSystem;
 	UISystem uiSystem;
+	SceneSystem sceneSystem;
 
 	// Initializing window
 	GLFWwindow* window = world.createWindow();
@@ -75,7 +77,9 @@ int main()
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
 		uiSystem.step(elapsed_ms);
+		sceneSystem.step(elapsed_ms); // not sure if this should always be here
 		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
+		
 
 		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
 			world.handleInput();
