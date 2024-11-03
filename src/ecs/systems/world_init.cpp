@@ -557,7 +557,6 @@ Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, E
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
-	spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_circle.png";
 
 	registry.renderRequests.insert(
 		entity,
