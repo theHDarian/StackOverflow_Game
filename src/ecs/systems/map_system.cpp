@@ -126,9 +126,9 @@ std::string getSymbol(RoomType type) {
     } else if (type == RoomType::RestRoom) {
         return "door_symbol_resting.png";
     } else if (type == RoomType::None) {
-        return "none";
+        return "none.png";
     } else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
-        return "eel.png";
+        return "door_symbol_tutorial.png";
     } else {
         return "door_symbol_enemy.png";
     }
@@ -203,12 +203,15 @@ void MapSystem::resetMap()
     clearRoomActors();
 
     // preset doors for first tutorial room
-    for (Door &d : registry.doors.components)
+    for (int i = 0; i < 4; i++)
     {
+        Door &d = registry.doors.components[i];
         d.isPrev = false;
         d.room = RoomType::None;
+        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
     }
     registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
+    registry.renderRequests.get(registry.doorSymbols.entities[2]).texture_name = getSymbol(registry.doors.components[2].room);
 
     Map &map = registry.maps.components[0];
     map.currRegion = MapRegion::Tutorial;

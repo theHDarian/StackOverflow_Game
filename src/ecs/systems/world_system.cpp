@@ -79,15 +79,15 @@ GLFWwindow* WorldSystem::createWindow() {
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	  window_width_px = vidMode->width;
-	  window_height_px = vidMode->height;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	// const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
+	//   window_width_px = vidMode->width;
+	//   window_height_px = vidMode->height;
+	// window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
-	//window_width_px = 1280;
-	//window_height_px = 720;
-	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	window_width_px = 1280;
+	window_height_px = 720;
+	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -144,21 +144,6 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
-	WindowState& ws = registry.windowStates.components[0];
-	if (time(NULL) - ws.currUnixTime > 1.0f) {
-		ws.fps = ws.numFramesThisSecond;
-		ws.numFramesThisSecond = 0;
-		ws.currUnixTime = time(NULL);
-
-		char title[256]; // Buffer for the title string
-    	snprintf(title, sizeof(title), "StackOverflow (FPS: %.0f)", ws.fps);
-		glfwSetWindowTitle(window,title);
-	} else {
-		ws.numFramesThisSecond++;
-	}
-	// Processing inputs
-	handleInput();
-
 	// Remove debug info from the last step
 	// comment this out for now
 	//while (registry.debugComponents.entities.size() > 0)
