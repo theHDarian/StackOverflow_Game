@@ -508,7 +508,7 @@ struct TestEnemy : Enemy
 		ReactionType::PLAYER_CLOSE,
 		2};
 	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack};
-	EnemyPattern patrolState = {"PATROL", EnemyBehavior::PATROLLING, {{100, 400}, {400, 400}, {400, 900}, {100, 900}}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot};
+	EnemyPattern patrolState = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot};
 	EnemyPattern followState = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot};
 	TestEnemy()
 	{
@@ -744,10 +744,15 @@ struct Bee3 : Enemy
 		ReactionType::DURATION,
 		0};
 
+	Reaction playerClose = {
+		ReactionType::PLAYER_CLOSE,
+		1
+	};
 
 
-	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionFollow}, 1, false, 0, 0, threeSpray};
-	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {reactionIdle}, 0, true, 0, 2000.f, threeSpray};
+
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {playerClose}, 1, false, 0, 1000.f, threeSpray};
+	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {playerClose, reactionIdle}, 0, true, 0, 1000.f, threeSpray};
 	Bee3()
 	{
 		maxHealth = 100;
