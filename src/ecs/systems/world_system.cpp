@@ -270,6 +270,9 @@ void WorldSystem::handleCollisions() {
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
 
+		if (registry.deleteds.has(entity) || registry.deleteds.has(entity_other))
+			continue;
+
 		// Player centric collision handling
 		if (registry.players.has(entity)) {
 			// Checking Player - Deadly collisions
