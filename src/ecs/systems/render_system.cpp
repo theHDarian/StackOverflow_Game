@@ -748,9 +748,9 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++) {
 		// no variance on shape for now
-		std::string bulletShape = "enemy_bullet_circle.png";
+		std::string bulletShape = "enemy_bullet_square.png";
 		// start from bottom to top
-		drawUIBullet(vec2(stackui.bulletStartPos.x, stackui.bulletStartPos.y - i * stackui.bulletSize.y - i * stackui.bulletOffset), stackui.bulletSize,
+		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
 			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
 	}
 }
@@ -922,7 +922,7 @@ void RenderSystem::drawDashes(const mat3& projection) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	vec2 pos = { 100,100 };
+	vec2 pos = { 75,210 };
 	vec2 scale = { 50, 50 };
 	float offset = 10;
 

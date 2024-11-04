@@ -275,17 +275,17 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 
 	StackUI& stackui = registry.stackUI.emplace(entity);
 
-	stackui.bulletStartPos = { 75, windowState.height - 200 };
-	stackui.bulletSize = { 50, 50 };
+	stackui.bulletStartPos = { 75, 100 };
+	stackui.bulletSize = { 20, 50 };
 	stackui.bulletOffset = 10; // space between bullets
 
-	stackui.stackSize = vec2(stackui.bulletSize.x + 2 * stackui.bulletOffset, stack.baseStackSize * stackui.bulletSize.y + stack.baseStackSize * stackui.bulletOffset + 2 * stackui.bulletOffset);
-	stackui.stackPos = vec2(stackui.bulletStartPos.x, stackui.bulletStartPos.y - stackui.stackSize.y / 2 + stackui.bulletSize.y - stackui.bulletOffset);
+	stackui.stackSize = vec2(stack.baseStackSize * stackui.bulletSize.x + stack.baseStackSize * stackui.bulletOffset + 2 * stackui.bulletOffset, stackui.bulletSize.y + 2 * stackui.bulletOffset);
+	stackui.stackPos = vec2(stackui.bulletStartPos.x + stackui.stackSize.x / 2 - stackui.bulletSize.x - stackui.bulletOffset / 2, stackui.bulletStartPos.y);
 
 	registry.gameUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
-	text.x = stackui.stackPos.x - stackui.bulletSize.x;
+	text.x = stackui.bulletStartPos.x - stackui.bulletSize.x - stackui.bulletOffset / 2;
 	text.y = (stackui.bulletStartPos.y - windowState.height) * -1 - 2 * stackui.bulletOffset - stackui.bulletSize.y;
 	text.scale = 0.25;
 	// too lazy to calculate fitting text box size, and it prob won't overflow
