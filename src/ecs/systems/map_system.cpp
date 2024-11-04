@@ -144,6 +144,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         return;
     //play door sound
 
+    //play door close sound
+    soundPlayer->playDoorCloseSound();
+
     // change music
     soundPlayer->playNextMusic();
 
