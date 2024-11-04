@@ -268,13 +268,13 @@ void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burs
     vec2 velocity = vec2(cos(burst.burstDirection), sin(burst.burstDirection));
     if (atkData.numBullets == burst.curBurst)
     {
-        createEnemyBullet(render, pos, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
+        createEnemyBullet(render, burst.start, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
     }
     else
     {
         vec2 perp = vec2(-velocity.y, velocity.x) * 30.f * (float)(atkData.numBullets - burst.curBurst);
-        createEnemyBullet(render, pos + perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
-        createEnemyBullet(render, pos - perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
+        createEnemyBullet(render, burst.start + perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
+        createEnemyBullet(render, burst.start - perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
     }
     burst.curBurst--;
     burst.burstCooldown = 200;
@@ -321,6 +321,12 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         shootAllDirection(pos, em.angle, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
+    else if (atkData.attackType == EnemyAttackPattern::RADIAL_POLYGON)
+    {
+        //std::cout << em.angle << std::endl;
+        shootRadialPolygon(pos, atkData);
+        currPattern.currAtkCD = currPattern.maxAtkCD;
+    }
     else if (atkData.attackType == EnemyAttackPattern::LASER)
     {
         shootLaser(pos, entity, atkData);
@@ -349,6 +355,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         if (burst.curBurst == atkData.numBullets)
         {
             burst.burstDirection = atan2(velocity.y, velocity.x);
+            burst.start = pos;
         }
         shootWave(pos, atkData, elapsed_ms, burst);
         if (burst.curBurst <= 0)

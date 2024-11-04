@@ -397,6 +397,10 @@ bool PhysicsSystem::AABBToTriangle(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2, vec
 }
 
 bool PhysicsSystem::AABBToLaser(Entity aabb, Entity laser) {
+	if (registry.deleteds.has(laser)) {
+		return false;
+	}
+
 	Motion& mA = registry.motions.get(aabb);
 	Motion& mB = registry.motions.get(laser);
 
