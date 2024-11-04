@@ -250,8 +250,8 @@ void WorldSystem::restartGame() {
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
 
-	std::cout << ("MyString") << std::endl;
-	std::cout << std::hash<std::string>{}("MyString") << std::endl;
+	//std::cout << ("MyString") << std::endl;
+	//std::cout << std::hash<std::string>{}("MyString") << std::endl;
 
 	// Reset the game speed
 	currentSpeed = 1.f;

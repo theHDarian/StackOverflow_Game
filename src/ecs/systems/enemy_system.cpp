@@ -57,13 +57,13 @@ void EnemySystem::step(float elapsed_ms)
         EnemyPattern &pattern = enemy.currEnemyPattern();
         if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
         {
-            std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
+            //std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
              merge(entity, pattern, pendingDeletion);
         }
 
         for (Entity deletedBee : pendingDeletion)
         {
-            std::cout << pendingDeletion.size() << "to be delted" << std::endl;
+            //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
             if (!registry.deleteds.has(deletedBee))
                 registry.deleteds.emplace(deletedBee);
             registry.bees.remove(deletedBee);
@@ -317,7 +317,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::RADIAL)
     {
-        std::cout << em.angle << std::endl;
+        //std::cout << em.angle << std::endl;
         shootAllDirection(pos, em.angle, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
@@ -402,14 +402,14 @@ void EnemySystem::creatingMergeBee(int count, vec2 pos)
     switch (count)
     {
     case 2:
-        std::cout << "CREATING" << std::endl;
+        //std::cout << "CREATING" << std::endl;
         createEnemy(render, pos, EnemyType::TwoBee);
         break;
     case 3:
         createEnemy(render, pos, EnemyType::ThreeBee);
         break;
     default:
-        std::cout << "CREATING 1" << std::endl;
+        //std::cout << "CREATING 1" << std::endl;
         createEnemy(render, pos, EnemyType::OneBee);
     }
 }
