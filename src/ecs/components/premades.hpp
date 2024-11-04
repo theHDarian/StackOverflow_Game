@@ -644,7 +644,7 @@ struct EnemyMediumCharge : Enemy
 		ReactionType::DURATION,
 		0};
 	EnemyPattern idleState = {"IDLE ATTACKING", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {durationIdle}, 0, true, 0.f, 2000.f, missile};
-	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyMediumCharge()
 	{
 		maxHealth = 50;
@@ -751,8 +751,8 @@ struct Bee3 : Enemy
 
 
 
-	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {playerClose}, 1, false, 0, 1000.f, threeSpray};
-	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {playerClose, reactionIdle}, 0, true, 0, 1000.f, threeSpray};
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionFollow}, 1, false, 0, 1000.f, threeSpray};
+	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionFollow}, 0, true, 0, 1000.f, threeSpray};
 	Bee3()
 	{
 		maxHealth = 100;

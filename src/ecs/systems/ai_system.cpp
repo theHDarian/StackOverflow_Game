@@ -18,13 +18,13 @@ void AISystem::step(float elapsed_ms)
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
 		enemy.newPattern = false;
 		// std::cout << movement_registry.entities.size() << " is the size of movement entity" << std::endl;
-		//std::cout << currPattern.name << " initial" << std::endl;
+		// std::cout << currPattern.name << " initial" << std::endl;
 		EnemyMovement &movement = movement_registry.get(entity);
 		Motion &motion = registry.motions.get(entity);
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING
 		updateState(enemy, movement, entity);
-		//std::cout << currPattern.name << "after update" << std::endl;
+		// std::cout << currPattern.name << "after update" << std::endl;
 
 		// THINKING
 		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
@@ -35,7 +35,7 @@ void AISystem::step(float elapsed_ms)
 		}
 		else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB))
 		{
-	
+
 			movement.posA = movement.posB;
 			// ACTING
 			// std::cout << currPattern.name << "before getmove" << std::endl;
@@ -122,21 +122,9 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		}
 	}
 
-	if (distance < closeDistance)
+	if (hpPercent < 0.25f)
 	{
-		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
-		if (reaction)
-		{
-			std::cout << "got reaction for follow player" << std::endl;
-			enemy.patternIndex = reaction->index;
-			enemy.newPattern = true;
-			reaction_found = true;
-		}
-	}
-
-	else if (hpPercent < 0.25f)
-	{
-		//std::cout << "current enemy hp" << hpPercent << std::endl;
+		// std::cout << "current enemy hp" << hpPercent << std::endl;
 		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTYFIVE_HEALTH);
 		if (reaction)
 		{
@@ -166,6 +154,17 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			reaction_found = true;
 		}
 	}
+	else if (distance < closeDistance)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
+		if (reaction)
+		{
+			std::cout << "got reaction for follow player" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+		}
+	}
 	else if (hpPercent < 0.75f)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::SEVENTYFIVE_HEALTH);
@@ -180,7 +179,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::DURATION))
 	{
-		//std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
+		// std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
 		if (currPattern.curDuration < 0.f)
 		{
 			enemy.patternIndex = currPattern.next;
