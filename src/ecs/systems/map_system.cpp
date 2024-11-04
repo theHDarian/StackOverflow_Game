@@ -147,8 +147,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     //play door close sound
     soundPlayer->playDoorCloseSound();
 
-    // change music
-    soundPlayer->playNextMusic();
 
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
@@ -179,6 +177,15 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     }
     map.roomsTraversed++;
     map.currRoom.type = door.room;
+    if (map.currRoom.type == RoomType::BossBigCRoom) {
+        soundPlayer->playBossMusic(0);
+    } else if (map.currRoom.type == RoomType::TreasureRoom) {
+        soundPlayer->playSpecialMusic(0);
+    }
+    else {
+        soundPlayer->playNextMusic();
+    }
+
 
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;

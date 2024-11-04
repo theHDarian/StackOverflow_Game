@@ -202,6 +202,7 @@ void SoundSystem::loadSoundEffects() {
         fprintf(stderr, "Failed to load door close sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load door close sound");
     }
+    doorCloseSound->volume = 0.4f * MIX_MAX_VOLUME;
 
 }
 
