@@ -130,8 +130,8 @@ int main() {
 			// soundSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
-			world.clearDeleteQueue();
 		}
+		world.clearDeleteQueue();
 		// note: the more complex our drawing is, the more complex the order,
 		// and the more appealing z-buffering...
 		// strong assumption: each of these entities has a renderRequest

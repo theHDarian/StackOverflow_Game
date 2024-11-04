@@ -470,6 +470,15 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
 void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern& currPattern, Hive& hive) {
     Motion& motion = registry.motions.get(entity);
     if (hive.currSpawnCD < 0.f) {
+        // play open "animation" here
+        if (!registry.spriteTimers.has(entity)) {
+            RenderRequest& rr = registry.renderRequests.get(entity);
+            SpriteTimer& st = registry.spriteTimers.emplace(entity);
+            st.count_ms = 1000;
+            st.nextEffect = rr.used_effect;
+            st.nextSprite = rr.texture_name;
+            rr.texture_name = "beehive_open.png";
+        }
         creatingMergeBee(1, motion.position);
         hive.currSpawnCD = hive.maxSpawnCD;
     } 
