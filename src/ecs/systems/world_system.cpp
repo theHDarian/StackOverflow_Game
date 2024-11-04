@@ -250,8 +250,8 @@ void WorldSystem::restartGame() {
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
 
-	std::cout << ("MyString") << std::endl;
-	std::cout << std::hash<std::string>{}("MyString") << std::endl;
+	//std::cout << ("MyString") << std::endl;
+	//std::cout << std::hash<std::string>{}("MyString") << std::endl;
 
 	// Reset the game speed
 	currentSpeed = 1.f;
@@ -269,6 +269,9 @@ void WorldSystem::handleCollisions() {
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
+
+		if (registry.deleteds.has(entity) || registry.deleteds.has(entity_other))
+			continue;
 
 		// Player centric collision handling
 		if (registry.players.has(entity)) {

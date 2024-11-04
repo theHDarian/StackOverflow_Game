@@ -57,13 +57,13 @@ void EnemySystem::step(float elapsed_ms)
         EnemyPattern &pattern = enemy.currEnemyPattern();
         if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
         {
-            std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
+            //std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
              merge(entity, pattern, pendingDeletion);
         }
 
         for (Entity deletedBee : pendingDeletion)
         {
-            std::cout << pendingDeletion.size() << "to be delted" << std::endl;
+            //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
             if (!registry.deleteds.has(deletedBee))
                 registry.deleteds.emplace(deletedBee);
             registry.bees.remove(deletedBee);
@@ -268,13 +268,13 @@ void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burs
     vec2 velocity = vec2(cos(burst.burstDirection), sin(burst.burstDirection));
     if (atkData.numBullets == burst.curBurst)
     {
-        createEnemyBullet(render, pos, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
+        createEnemyBullet(render, burst.start, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
     }
     else
     {
         vec2 perp = vec2(-velocity.y, velocity.x) * 30.f * (float)(atkData.numBullets - burst.curBurst);
-        createEnemyBullet(render, pos + perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
-        createEnemyBullet(render, pos - perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
+        createEnemyBullet(render, burst.start + perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
+        createEnemyBullet(render, burst.start - perp, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
     }
     burst.curBurst--;
     burst.burstCooldown = 200;
@@ -317,8 +317,14 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::RADIAL)
     {
-        std::cout << em.angle << std::endl;
+        //std::cout << em.angle << std::endl;
         shootAllDirection(pos, em.angle, atkData);
+        currPattern.currAtkCD = currPattern.maxAtkCD;
+    }
+    else if (atkData.attackType == EnemyAttackPattern::RADIAL_POLYGON)
+    {
+        //std::cout << em.angle << std::endl;
+        shootRadialPolygon(pos, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::LASER)
@@ -349,6 +355,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         if (burst.curBurst == atkData.numBullets)
         {
             burst.burstDirection = atan2(velocity.y, velocity.x);
+            burst.start = pos;
         }
         shootWave(pos, atkData, elapsed_ms, burst);
         if (burst.curBurst <= 0)
@@ -402,14 +409,14 @@ void EnemySystem::creatingMergeBee(int count, vec2 pos)
     switch (count)
     {
     case 2:
-        std::cout << "CREATING" << std::endl;
+        //std::cout << "CREATING" << std::endl;
         createEnemy(render, pos, EnemyType::TwoBee);
         break;
     case 3:
         createEnemy(render, pos, EnemyType::ThreeBee);
         break;
     default:
-        std::cout << "CREATING 1" << std::endl;
+        //std::cout << "CREATING 1" << std::endl;
         createEnemy(render, pos, EnemyType::OneBee);
     }
 }
@@ -439,6 +446,8 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
                 // std::cout << "MERGED AND CREATED COMBINED BEES" << std::endl;
                 otherBee.merge = true;
                 bee.merge = true;
+                //bee.nearbyBees.clear();
+                //otherBee.nearbyBees.clear();
                 deletedBees.push_back(entity);
                 deletedBees.push_back(otherBeeEntity);
                 // std::cout << "NOW DELETE EXISTING BEE" << std::endl;
@@ -470,6 +479,15 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
 void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern& currPattern, Hive& hive) {
     Motion& motion = registry.motions.get(entity);
     if (hive.currSpawnCD < 0.f) {
+        // play open "animation" here
+        if (!registry.spriteTimers.has(entity)) {
+            RenderRequest& rr = registry.renderRequests.get(entity);
+            SpriteTimer& st = registry.spriteTimers.emplace(entity);
+            st.count_ms = 1000;
+            st.nextEffect = rr.used_effect;
+            st.nextSprite = rr.texture_name;
+            rr.texture_name = "beehive_open.png";
+        }
         creatingMergeBee(1, motion.position);
         hive.currSpawnCD = hive.maxSpawnCD;
     } 

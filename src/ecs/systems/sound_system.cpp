@@ -197,6 +197,12 @@ void SoundSystem::loadSoundEffects() {
         throw std::runtime_error("Failed to load next dialogue sound");
     }
     nextDialogueSound->volume = 0.2f * MIX_MAX_VOLUME;
+    doorCloseSound = Mix_LoadWAV(audio_path("sfx/door_close.wav").c_str());
+    if (!doorCloseSound) {
+        fprintf(stderr, "Failed to load door close sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load door close sound");
+    }
+    doorCloseSound->volume = 0.4f * MIX_MAX_VOLUME;
 
 }
 
@@ -280,6 +286,13 @@ void SoundSystem::playDoorOpenSound() {
     if (!Mix_Playing(5)) {
         Mix_PlayChannel(5, doorOpenSound, 0);
         Mix_Volume(5, doorOpenSound->volume * volume);
+    }
+}
+
+void SoundSystem::playDoorCloseSound() {
+    if (!Mix_Playing(5)) {
+        Mix_PlayChannel(5, doorCloseSound, 0);
+        Mix_Volume(5, doorCloseSound->volume * volume);
     }
 }
 

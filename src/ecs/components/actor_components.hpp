@@ -373,6 +373,7 @@ struct Burst {
     int curBurst = 0;
     float burstCooldown = 0;
     float burstDirection = 0;
+    vec2 start;
 };
 
 struct HomingBullet {

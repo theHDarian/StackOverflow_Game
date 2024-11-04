@@ -26,6 +26,7 @@ private:
     Entity stackUI;
     Entity dialogueBox;
     Entity dialogueAvatar;
+    Entity controlsGuide;
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
@@ -36,6 +37,8 @@ private:
     Entity createDialogueBox(vec2 position, vec2 scale);
 
     Entity createDialogueAvatar(vec2 position, vec2 scale);
+
+    Entity createControlsGuide(vec2 position, vec2 scale);
 
     SoundSystem* soundSystem;
 };

@@ -38,6 +38,8 @@ public:
 
     void playDoorOpenSound();
 
+    void playDoorCloseSound();
+
     void playIncomingDialogueSound();
 
     bool isPlayingIncomingDialogueSound();
@@ -69,6 +71,7 @@ private:
     std::vector<Mix_Chunk*> enemyShootSounds;
 
     Mix_Chunk* doorOpenSound;
+    Mix_Chunk* doorCloseSound;
 
     void loadMusic();
     void loadSoundEffects();

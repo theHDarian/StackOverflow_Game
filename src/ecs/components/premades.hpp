@@ -764,7 +764,7 @@ struct Bee3 : Enemy
 			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
-		scale = vec2({864 / 8.f, 480 / 8.f});
+		scale = vec2({864 / 8.f, 720 / 8.f});
 	};
 };
 
@@ -794,12 +794,12 @@ struct EnemyMediumBeeHive : Enemy {
 		currHealth = maxHealth;
 		enemyPatterns = {idlingState, spawningState, halfHPState, deadHiveState};
 		sprite = {
-			"bee_hive_close.png",
+			"beehive_close.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,	
 		};
 		patternIndex = 0;
-		scale = vec2({288.0f / 2, 240.f / 2});
+		scale = vec2({240.0f / 2, 312.f / 2});
 	};
 };
 
@@ -835,7 +835,7 @@ struct EnemyHardAngel : Enemy{
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		patternIndex = 0;
-		scale = vec2({864 / 8.f, 480 / 8.f});
+		scale = vec2({192 / 2.f, 216 / 2.f});
 	};
 };
 
