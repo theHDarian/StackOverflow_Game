@@ -27,7 +27,7 @@ const RoomPreset TutorialRoom1Preset{
 
 const RoomPreset TutorialRoom2Preset{
     {
-        {EnemyType::ThreeBee, {0.5f, 0.5f}},
+        {EnemyType::EasyEnemySentry, {0.5f, 0.5f}},
     },
     {},
     {},
