@@ -16,6 +16,7 @@ void UISystem::step(float elapsed_ms) {
 	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
 	if (!gameState.gameOver) {
 		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
+		registry.renderRequests.get(controlsGuide).show = gameState.gamePaused;
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
 		if (!gameState.dialogueScene) {
 			registry.renderRequests.get(dialogueAvatar).show = false;
@@ -28,6 +29,7 @@ bool UISystem::init(GLFWwindow* window) {
 	WindowState& wS = registry.windowStates.components[0];
 	
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
+	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2 + wS.height / 8), vec2(wS.width, wS.height / 4));
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
@@ -169,6 +171,47 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	return entity;
 }
 
+Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "none",
+		 EFFECT_ASSET_ID::EGG,
+		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+	rr.show = false;
+
+	registry.menuUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = scale;
+
+	// temp colour
+	auto& color = registry.colors.emplace(entity);
+	color.r = 0.0;
+	color.b = 0.0;
+	color.g = 0.9;
+
+	// attach 1 text render request
+	registry.menuUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = windowState.width - scale.x + 25;
+	text.y = windowState.height - position.y + scale.y / 4;
+	text.scale = 0.5;
+	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue, [C] to toggle collider visuals";
+	text.topRightBound = { scale.x - 25, scale.y - 25 };
+	text.bottomLeftBound = { text.x, 0 + 25 };
+
+	return entity;
+}
+
 // not a real menu right now; just to show the game is paused
 Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 {
@@ -205,7 +248,7 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	// need a mechanism to figure out text line size
 	WindowState& windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 25;
-	text.y = windowState.height - position.y + scale.y / 4;
+	text.y = windowState.height - position.y;
 	text.scale = 1.5;
 	text.text = "Game Paused";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
