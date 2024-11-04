@@ -439,8 +439,8 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
                 // std::cout << "MERGED AND CREATED COMBINED BEES" << std::endl;
                 otherBee.merge = true;
                 bee.merge = true;
-                bee.nearbyBees.clear();
-                otherBee.nearbyBees.clear();
+                //bee.nearbyBees.clear();
+                //otherBee.nearbyBees.clear();
                 deletedBees.push_back(entity);
                 deletedBees.push_back(otherBeeEntity);
                 // std::cout << "NOW DELETE EXISTING BEE" << std::endl;
