@@ -36,7 +36,7 @@ int TextSystem::initFreetypeLib() {
     }
 
     // find path to font
-    std::string font_name = font_path("ByteBounce.ttf").c_str();
+    std::string font_name = font_path("ChicagoFLF.ttf").c_str();
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
@@ -131,7 +131,9 @@ int TextSystem::initFreetypeLib() {
 // what would API for text look like?
 vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm::vec3 color) {
     // temp put here to readjust sizes btween diff fonts
-    scale *= 2.5;
+    //scale *= 2.5; // for bytebounce
+    //scale *= 2.0; // for bionic comic
+    scale *= 1.5;
     
     float copyX = x;
     vec2 textEndPos = { x, y };
@@ -249,8 +251,8 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
 
         // compare with text box size
         if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
-            //textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale;
-            textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale * 2.5;
+            textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale;
+            //textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale * 2.5;
             textPos.x = x;
         }
         if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {
