@@ -24,7 +24,7 @@ struct IOState {
 	vec2 mousePosition;
 	bool nextDialogue = false;
 	bool debugMode = false;
-
+	bool tutorialOn = false;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;

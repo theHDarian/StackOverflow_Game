@@ -36,7 +36,7 @@ int TextSystem::initFreetypeLib() {
     }
 
     // find path to font
-    std::string font_name = font_path("Pixeled.ttf").c_str();
+    std::string font_name = font_path("ByteBounce.ttf").c_str();
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
@@ -130,6 +130,9 @@ int TextSystem::initFreetypeLib() {
 
 // what would API for text look like?
 vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm::vec3 color) {
+    // temp put here to readjust sizes btween diff fonts
+    scale *= 2.5;
+    
     float copyX = x;
     vec2 textEndPos = { x, y };
     
@@ -140,7 +143,8 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
 
         // newline addition referenced from https://www.youtube.com/watch?v=S0PyZKX4lyI
         if (*c == '\n') {
-            y -= ((ch.Size.y)) * 2.0 * scale;
+            //y -= ((ch.Size.y)) * 2.0 * scale;
+            y -= ((Characters[65].Size.y)) * 2.0 * scale;
             x = copyX;
             textEndPos = { x, y };
         }
@@ -245,7 +249,8 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
 
         // compare with text box size
         if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
-            textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale;
+            //textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale;
+            textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale * 2.5;
             textPos.x = x;
         }
         if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {

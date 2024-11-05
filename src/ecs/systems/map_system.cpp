@@ -218,33 +218,60 @@ void MapSystem::resetMap()
 {
     clearRoomActors();
 
-    // preset doors for first tutorial room
-    for (int i = 0; i < 4; i++)
-    {
-        Door &d = registry.doors.components[i];
-        d.isPrev = false;
-        d.room = RoomType::None;
-        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+    IOState& iostate = registry.ioStates.components[0];
+    if (iostate.tutorialOn) {
+        // preset doors for first tutorial room
+        for (int i = 0; i < 4; i++)
+        {
+            Door& d = registry.doors.components[i];
+            d.isPrev = false;
+            d.room = RoomType::None;
+            registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+        }
+        registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
+        registry.renderRequests.get(registry.doorSymbols.entities[2]).texture_name = getSymbol(registry.doors.components[2].room);
+
+        Map& map = registry.maps.components[0];
+        map.currRegion = MapRegion::Tutorial;
+        map.roomsTraversed = 0;
+
+        map.currRoom = Room();
+        map.currRoom.preset = TutorialRoom1Preset;
+        map.currRoom.type = TutorialRoom1;
     }
-    registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
-    registry.renderRequests.get(registry.doorSymbols.entities[2]).texture_name = getSymbol(registry.doors.components[2].room);
+    else {
+        bool excludeNone = false;
+        for (int i = 0; i < 4; i++)
+        {
+            Door& d = registry.doors.components[i];
+            d.room = randomRoomType(excludeNone);
+            if (d.room == RoomType::None)
+                excludeNone = true;
 
-    Map &map = registry.maps.components[0];
-    map.currRegion = MapRegion::Tutorial;
-    map.roomsTraversed = 0;
+            registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+        }
 
-    map.currRoom = Room();
-    map.currRoom.preset = TutorialRoom1Preset;
-    map.currRoom.type = TutorialRoom1;
-    //std::cout << map.currRoom.cleared << std::endl;
-    //std::cout << map.currRoom.dialogueCount << std::endl;
+        for (Door& d : registry.doors.components)
+        {
+            d.isPrev = false;
+        }
+
+        Map& map = registry.maps.components[0];
+        map.currRegion = MapRegion::Tutorial;
+        map.roomsTraversed = 0;
+
+        // set initial room to enemy
+        map.currRoom = Room();
+        std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomBee);
+        RoomPreset randomPreset = Random::ListItem(presets);
+        map.currRoom.preset = randomPreset;
+    }
 
     // clear ongoing dialogue to prepare for next
     GameState& gameState = registry.gameStates.components[0];
     DialogueLines& lines = registry.dialogueLines.components[0];
     lines = DialogueLines();
     gameState.dialogueScene = false;
-    IOState& iostate = registry.ioStates.components[0];
 }
 
 void MapSystem::nextMusic()

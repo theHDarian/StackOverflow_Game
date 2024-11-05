@@ -62,6 +62,11 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.debugMode = !ioState.debugMode;
 	}
 
+	// tutorial toggle
+	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
+		ioState.tutorialOn = !ioState.tutorialOn;
+	}
+
 	// show dialogue window and play dialogue sequence (temp function)
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
