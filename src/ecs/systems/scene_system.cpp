@@ -107,7 +107,7 @@ void SceneSystem::step(float elapsed_ms) {
 				lines.lines.push_back(Dialogue{ "I sure wonder how you'll make use of this stack... Perhaps you'll use it to modify your abilities?" , "Scientist", "scientist_avatar.png" });
 				lines.lines.push_back(Dialogue{ "Anyway, to get to the lab exit, I suggest you make your way to the Biology Wing. There should be less rogue robot activity there." , "Scientist", "scientist_avatar.png" });
 				lines.lines.push_back(Dialogue{ "I'll contact you again when you get there. I wish you luck, little robot." , "Scientist", "scientist_avatar.png" });
-				lines.lines.push_back(Dialogue{ "[Press [P] to pause and hover over your stach to take a closer look at it!]" , "N", "N" });
+				lines.lines.push_back(Dialogue{ "[Press [P] to pause and hover over your stack to take a closer look at it!]" , "N", "N" });
 				summonDialogue();
 			}
 		}

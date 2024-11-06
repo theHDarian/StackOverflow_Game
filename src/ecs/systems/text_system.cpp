@@ -251,7 +251,7 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
 
         // compare with text box size
         if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
-            textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale;
+            textPos.y -= ((Characters[65].Size.y)) * 2.0 * 1.5 * scale;
             //textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale * 2.5;
             textPos.x = x;
         }

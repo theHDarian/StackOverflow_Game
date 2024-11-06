@@ -205,7 +205,7 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 0.5;
-	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue, [C] to toggle collider visuals";
+	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals, [T] to turn tutorial on/off";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
 
