@@ -164,6 +164,13 @@ void EnemySystem::step(float elapsed_ms)
             }
         }
     }
+
+    for (Entity bee : registry.bees.entities) {
+        if (!registry.deleteds.has(bee) && registry.bees.get(bee).merge) {
+            creatingMergeBee(registry.bees.get(bee).mergeCount, registry.motions.get(bee).position);
+            registry.deleteds.emplace(bee);
+        }
+    }
 }
 
 
@@ -429,44 +436,49 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
         BeeEnemy &bee = registry.bees.get(entity);
         // getting the first bee
         // std::cout << "WANT MERGE!" << std::endl;
-        std::vector<Entity> deletedBees;
+        //std::vector<Entity> deletedBees;
         for (Entity otherBeeEntity : registry.bees.get(entity).nearbyBees)
         {
-            if (!registry.deleteds.has(otherBeeEntity) && otherBeeEntity != NULL)
+            if (bee.mergeCount >= bee.maxMerge) {
+                break;
+            }
+            if (!registry.deleteds.has(otherBeeEntity) && !registry.bees.get(otherBeeEntity).merge/* && otherBeeEntity != NULL*/)
             {
-
                 BeeEnemy &otherBee = registry.bees.get(otherBeeEntity);
-                int mergeTotal = otherBee.mergeCount + bee.mergeCount;
-                Motion &motion = registry.motions.get(entity);
-                if(otherBee.merge == false && bee.merge == false)
-                {
-                    creatingMergeBee(mergeTotal, motion.position);
-                }
-
+                //int mergeTotal = otherBee.mergeCount + bee.mergeCount;
+                //Motion &motion = registry.motions.get(entity);
+                //if(otherBee.merge == false && bee.merge == false)
+                //{
+                    //creatingMergeBee(mergeTotal, motion.position);
+                //}
+                bee.mergeCount += otherBee.mergeCount;
+                registry.deleteds.emplace(otherBeeEntity);
+                registry.bees.remove(otherBeeEntity);
                 // std::cout << "MERGED AND CREATED COMBINED BEES" << std::endl;
-                otherBee.merge = true;
+                //otherBee.merge = true;
                 bee.merge = true;
                 //bee.nearbyBees.clear();
                 //otherBee.nearbyBees.clear();
-                deletedBees.push_back(entity);
-                deletedBees.push_back(otherBeeEntity);
+                /*deletedBees.push_back(entity);
+                deletedBees.push_back(otherBeeEntity);*/
                 // std::cout << "NOW DELETE EXISTING BEE" << std::endl;
-                break;
+                //break;
             }
         }
+        bee.nearbyBees.clear();
 
-        for (Entity deletedBee : deletedBees)
-        {
-            for (Entity nearby : registry.bees.get(deletedBee).nearbyBees)
-            {
-                if (registry.bees.has(nearby))
-                {
-                    auto &nearbyBee = registry.bees.get(nearby);
-                    nearbyBee.nearbyBees.erase(deletedBee);
-                }
-            }
-            pendingDeletion.push_back(deletedBee);
-        }
+        //for (Entity deletedBee : deletedBees)
+        //{
+        //    for (Entity nearby : registry.bees.get(deletedBee).nearbyBees)
+        //    {
+        //        if (registry.bees.has(nearby))
+        //        {
+        //            auto &nearbyBee = registry.bees.get(nearby);
+        //            nearbyBee.nearbyBees.erase(deletedBee);
+        //        }
+        //    }
+        //    pendingDeletion.push_back(deletedBee);
+        //}
         // 		std::cout << " time to merge bees with other bees: " << registry.bees.get(bee).nearbyBees.size() << std::endl;
         // 		registry.bees.get(bee).mergeCount += registry.bees.get(bee).nearbyBees.size();
         // 		registry.bees.get(bee).nearbyBees.clear();

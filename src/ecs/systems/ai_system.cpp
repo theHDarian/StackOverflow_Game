@@ -91,6 +91,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 				BeeEnemy &beeComponent = registry.bees.get(entity);
 				BeeEnemy &otherBeeComponent = registry.bees.get(bee);
 				int mergeTotal = beeComponent.mergeCount + otherBeeComponent.mergeCount;
+				//beeComponent.
 				Motion &motion = registry.motions.get(entity);
 				if (closeToBee && mergeTotal <= beeComponent.maxMerge)
 				{
@@ -112,7 +113,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 				}
 				else
 				{
-					registry.bees.get(entity).nearbyBees.erase(bee);
+					//registry.bees.get(entity).nearbyBees.erase(bee);
 					if (registry.bees.get(entity).nearbyBees.size() == 0)
 					{
 						auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
