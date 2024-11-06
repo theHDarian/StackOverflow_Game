@@ -418,6 +418,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyHardAngel();
 		break;
 	}
+	case EnemyType::EasyEnemySkull:
+	{
+		enemy = EnemyEasySkull();
+		break;
+	}
 	}
 
 	Motion &motion = registry.motions.emplace(entity);
