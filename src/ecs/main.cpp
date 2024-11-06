@@ -146,8 +146,8 @@ int main() {
 		renderer.drawGameUI();
 		textSystem.renderGameUIText();
 		renderer.drawDialogueUI();
-		renderer.drawToScreen(); //postprocessing
 		textSystem.renderDialogueUIText();
+		renderer.drawToScreen(); //postprocessing
 		renderer.drawMenuUI();
 		textSystem.renderMenuUIText();
 
