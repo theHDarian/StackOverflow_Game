@@ -27,7 +27,7 @@ const RoomPreset TutorialRoom1Preset{
 
 const RoomPreset TutorialRoom2Preset{
     {
-        {EnemyType::EasyEnemySentry, {0.2f, 0.2f}},
+        {EnemyType::EasyEnemySkull, {0.5f, 0.5f}},
     },
     {},
     {},
@@ -41,7 +41,10 @@ const RoomPreset EnemyRoomDash1{
      {EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
      {EnemyType::EasyEnemySentry, {0.2f, 0.2f}},
      {EnemyType::TestRevampedEnemy, {0.2, 0.4}},
-     {EnemyType::TestRevampedEnemy, {0.8, 0.4}}},
+     {EnemyType::TestRevampedEnemy, {0.8, 0.4}},
+     {EnemyType::EasyEnemySkull, {0.2f, 0.4f}},
+     {EnemyType::EasyEnemySkull, {0.8f, 0.4f}}
+     },
     {},
     {},
     {},

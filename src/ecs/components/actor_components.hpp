@@ -216,7 +216,7 @@ enum EnemyType {
     MediumEnemyTank,
     BeeHive,
     HardEnemyAngel,
-    MediumEnemySkull
+    EasyEnemySkull
 };
 
 enum class EnemyAttackPattern {

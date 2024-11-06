@@ -839,6 +839,26 @@ struct EnemyHardAngel : Enemy{
 	};
 };
 
+struct EnemyEasySkull : Enemy {
+	Reaction AttackLaser {
+		ReactionType::DURATION,
+		0
+	};
+	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f , 4000.f, laserNoRotate};
+	EnemyEasySkull() {
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = {laserState};
+		sprite = {
+			"skull.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		};
+		patternIndex = 0;
+		scale = vec2({230.0f / 2, 240.f / 2});
+	};
+};
+
 // struct EnemyHardSkull : {
 
 // 	EnemyHardSkull() {
