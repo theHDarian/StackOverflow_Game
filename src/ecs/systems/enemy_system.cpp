@@ -61,14 +61,14 @@ void EnemySystem::step(float elapsed_ms)
              merge(entity, pattern, pendingDeletion);
         }
 
-        for (Entity deletedBee : pendingDeletion)
-        {
-            //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
-            if (!registry.deleteds.has(deletedBee))
-                registry.deleteds.emplace(deletedBee);
-            registry.bees.remove(deletedBee);
-            registry.enemies.remove(deletedBee);
-        }
+        //for (Entity deletedBee : pendingDeletion)
+        //{
+        //    //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
+        //    if (!registry.deleteds.has(deletedBee))
+        //        registry.deleteds.emplace(deletedBee);
+        //    registry.bees.remove(deletedBee);
+        //    registry.enemies.remove(deletedBee);
+        //}
 
         // beeHive logic
         if (registry.beeHive.has(entity)) {
@@ -165,6 +165,7 @@ void EnemySystem::step(float elapsed_ms)
         }
     }
 
+    // remove bees
     for (Entity bee : registry.bees.entities) {
         if (!registry.deleteds.has(bee) && registry.bees.get(bee).merge) {
             creatingMergeBee(registry.bees.get(bee).mergeCount, registry.motions.get(bee).position);

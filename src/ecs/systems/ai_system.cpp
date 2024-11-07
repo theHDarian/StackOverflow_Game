@@ -70,7 +70,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	bool reaction_found = false;
 
 	// this is potentially VERY costly, but idk where to put this
-	float closeToBeeDistance = 150.f;
+	float closeToBeeDistance = 100.f;
 	bool closeToBee = false;
 
 	if (registry.bees.has(entity))

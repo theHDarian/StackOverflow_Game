@@ -131,7 +131,7 @@ int TextSystem::initFreetypeLib() {
 // what would API for text look like?
 vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm::vec3 color) {
     // temp put here to readjust sizes btween diff fonts
-    scale *= 2.5; // for bytebounce
+    scale *= 2.75; // for bytebounce
     //scale *= 2.0; // for bionic comic
     //scale *= 1.5;
 
@@ -252,7 +252,7 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
 
         // compare with text box size
         if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
-            textPos.y -= ((Characters[65].Size.y)) * 2.0 * 2.5 * scale;
+            textPos.y -= ((Characters[65].Size.y)) * 2.0 * 2.75 * scale;
             //textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale * 2.5;
             textPos.x = x;
         }
