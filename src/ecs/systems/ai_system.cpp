@@ -75,6 +75,15 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 
 	if (registry.bees.has(entity))
 	{
+		if (registry.bees.get(entity).nearbyBees.size() == 0)
+		{
+			auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
+			if (reaction) {
+				enemy.patternIndex = reaction->index;
+				enemy.newPattern = true;
+				reaction_found = true;
+			}
+		}
 		for (Entity bee : registry.bees.entities)
 		{
 			if (registry.bees.get(entity).maxMerge == registry.bees.get(entity).mergeCount)
@@ -88,11 +97,11 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			if (bee != entity)
 			{
 				closeToBee = (glm::distance(EnemyPosMotion, registry.motions.get(bee).position) < closeToBeeDistance);
-				BeeEnemy &beeComponent = registry.bees.get(entity);
-				BeeEnemy &otherBeeComponent = registry.bees.get(bee);
+				BeeEnemy& beeComponent = registry.bees.get(entity);
+				BeeEnemy& otherBeeComponent = registry.bees.get(bee);
 				int mergeTotal = beeComponent.mergeCount + otherBeeComponent.mergeCount;
 				//beeComponent.
-				Motion &motion = registry.motions.get(entity);
+				Motion& motion = registry.motions.get(entity);
 				if (closeToBee && mergeTotal <= beeComponent.maxMerge)
 				{
 					registry.bees.get(entity).nearbyBees.insert(bee);
@@ -102,22 +111,14 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 						enemy.patternIndex = reaction->index;
 						enemy.newPattern = true;
 						reaction_found = true;
-						BeeEnemy &beeComponent = registry.bees.get(entity);
-						BeeEnemy &otherBeeComponent = registry.bees.get(bee);
+						BeeEnemy& beeComponent = registry.bees.get(entity);
+						BeeEnemy& otherBeeComponent = registry.bees.get(bee);
 					}
 					if (registry.bees.get(entity).nearbyBees.size() == 0)
 					{
 						auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
 					}
 					break;
-				}
-				else
-				{
-					//registry.bees.get(entity).nearbyBees.erase(bee);
-					if (registry.bees.get(entity).nearbyBees.size() == 0)
-					{
-						auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
-					}
 				}
 			}
 		}

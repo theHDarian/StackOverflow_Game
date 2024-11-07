@@ -38,6 +38,7 @@ void EnemySystem::step(float elapsed_ms)
     // std::cout << "current enemy :" << registry.enemies.entities.size() << std::endl;
     // std::cout << "current bee enemy: " << registry.bees.entities.size() << std::endl;
     std::vector<Entity> pendingDeletion;
+    std::vector<vec3> createBees;
     // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities)
     {
@@ -165,13 +166,18 @@ void EnemySystem::step(float elapsed_ms)
         }
     }
 
-    // remove bees
+    // remove bees, create new ones
     for (Entity bee : registry.bees.entities) {
         if (!registry.deleteds.has(bee) && registry.bees.get(bee).merge) {
-            creatingMergeBee(registry.bees.get(bee).mergeCount, registry.motions.get(bee).position);
+            createBees.push_back(vec3(registry.motions.get(bee).position.x, registry.motions.get(bee).position.y, registry.bees.get(bee).mergeCount));
             registry.deleteds.emplace(bee);
         }
     }
+
+    for (vec3 newBee : createBees) {
+        creatingMergeBee(newBee.z, vec2(newBee.x, newBee.y));
+    }
+
 }
 
 
@@ -431,7 +437,7 @@ void EnemySystem::creatingMergeBee(int count, vec2 pos)
 
 void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion)
 {
-    std::lock_guard<std::mutex> lock(beeMutex);
+    //std::lock_guard<std::mutex> lock(beeMutex);
     if (registry.bees.has(entity) && currPattern.type == EnemyBehavior::MERGE_BEE)
     {
         BeeEnemy &bee = registry.bees.get(entity);
@@ -454,7 +460,7 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
                 //}
                 bee.mergeCount += otherBee.mergeCount;
                 registry.deleteds.emplace(otherBeeEntity);
-                registry.bees.remove(otherBeeEntity);
+                //registry.bees.remove(otherBeeEntity);
                 // std::cout << "MERGED AND CREATED COMBINED BEES" << std::endl;
                 //otherBee.merge = true;
                 bee.merge = true;
