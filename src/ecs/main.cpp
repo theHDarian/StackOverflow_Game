@@ -67,7 +67,7 @@ int main() {
     mapSystem.init(&renderer, &soundSystem);
 
     // Load and set the custom cursor
-    GLFWimage cursorImg = renderer.loadCursorImage(textures_path("cursor.png").c_str());
+    GLFWimage cursorImg = renderer.loadCursorImage(textures_path("Player/cursor.png").c_str());
     if (cursorImg.pixels == nullptr) {
         fprintf(stderr, "Failed to load cursor image\n");
         return EXIT_FAILURE;

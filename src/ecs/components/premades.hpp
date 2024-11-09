@@ -749,10 +749,24 @@ struct Bee3 : Enemy
 		1
 	};
 
+	const AttackData beeSpray{
+	EnemyAttackPattern::SPRAY,
+	TRIANGLE,
+	{},
+	blunt,
+	15,
+	M_PI,
+	{20, 20},
+	600,
+	3000,
+	{0, 0},
+	0,
+	0,
+	0 };
 
 
-	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionFollow}, 1, false, 0, 1000.f, threeSpray};
-	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionFollow}, 0, true, 0, 1000.f, threeSpray};
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {reactionFollow}, 1, true, 0, 600.f, beeSpray};
+	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {reactionFollow}, 0, false, 0, 1000.f, none};
 	Bee3()
 	{
 		maxHealth = 100;

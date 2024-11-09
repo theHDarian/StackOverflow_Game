@@ -118,10 +118,13 @@ void RenderSystem::initializeGlTextures()
 	const std::string base = data_path() + "/textures/";
 
 	uint i = 0;
-	for (const auto& entry : directory_iterator(base)) 
+	for (const auto& entry : recursive_directory_iterator(base))
 	{
 		const std::string& path = entry.path().string();
 		ivec2& dimensions = texture_dimensions[i];
+
+		size_t test = path.find(".png");
+		if (test > path.size()) continue;
 
 		stbi_uc* data;
 		data = stbi_load(path.c_str(), &dimensions.x, &dimensions.y, NULL, 4);
@@ -134,8 +137,10 @@ void RenderSystem::initializeGlTextures()
 		}
 
 		std::string copy = path;
+		size_t cutoff = copy.find_last_of("/");
+		if (cutoff >= std::string::npos) cutoff = copy.find_last_of("\\");
 		//name_to_texture.insert({ copy.substr(copy.find_last_of('\\') + 1), i});
-		name_to_texture.insert({ copy.substr(base.length() - 1), i });
+		name_to_texture.insert({ copy.substr(cutoff + 1), i });
 
 		//std::cout << copy.substr(base.length()-1) << std::endl;
 

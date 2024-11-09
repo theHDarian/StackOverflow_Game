@@ -513,9 +513,9 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		homing.target = registry.players.entities[0];
 	}
 
-	Invisible &inv = registry.invisibles.emplace(entity);
-	// inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;
-	inv.countdown = 200.0f;
+	//Invisible &inv = registry.invisibles.emplace(entity);
+	//// inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;
+	//inv.countdown = 200.0f;
 
 	std::string renderShape;
 	if (atkData.shape == RECTANGLE)
@@ -687,8 +687,8 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
 	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
 
-	Invisible &inv = registry.invisibles.emplace(entity);
-	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
+	//Invisible &inv = registry.invisibles.emplace(entity);
+	//inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
 	// Initialize the motion
 	auto &motion = registry.motions.emplace(entity);
