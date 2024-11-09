@@ -232,6 +232,7 @@ void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData)
 
 void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
 {
+    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
     if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0)
     {
         return;
@@ -244,6 +245,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         // Generate a random offset within the range
         double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
         offset = burst.burstDirection + offset;
+        sound->playEnemyShootSound(sfxNum, 0);
         createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData.veer.x * vec2(cos(offset + atkData.veer.y), sin(offset + atkData.veer.y)), atkData);
     }
     else if (burst.curBurst != atkData.numBullets)
@@ -274,6 +276,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
 
 void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
 {
+    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
     // std::cout << burst.curBurst << std::endl;
     if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0)
     {
@@ -282,6 +285,7 @@ void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burs
     vec2 velocity = vec2(cos(burst.burstDirection), sin(burst.burstDirection));
     if (atkData.numBullets == burst.curBurst)
     {
+        sound->playEnemyShootSound(sfxNum, 0);
         createEnemyBullet(render, burst.start, velocity, atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y)), atkData);
     }
     else
@@ -321,23 +325,29 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
 
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
 {
+    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
+
+
     Enemy &enemy = registry.enemies.get(entity);
     Motion& em = registry.motions.get(entity);
     vec2 velocity = (playerMotion.position + playerMotion.velocity / 2.0f) - pos;
     if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
     {
+        sound->playEnemyShootSound(sfxNum, 0);
         shootShotgun(velocity, pos, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::RADIAL)
     {
         //std::cout << em.angle << std::endl;
+        sound->playEnemyShootSound(sfxNum, 0);
         shootAllDirection(pos, em.angle, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::RADIAL_POLYGON)
     {
         //std::cout << em.angle << std::endl;
+        sound->playEnemyShootSound(sfxNum, 0);
         shootRadialPolygon(pos, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
@@ -348,6 +358,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::TRAIL)
     {
+        sound->playEnemyShootSound(sfxNum, atkData.numBullets);
         shootShotgun(velocity, pos, atkData);
         currPattern.currAtkCD = 400;
     }
@@ -392,30 +403,30 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         }
     }
     //play shoot sound
-    if (atkData.attackType == EnemyAttackPattern::NONE )
-        return;
-
-    if ( atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
-        if (atkData.shape == EnemyBulletShape::CIRCLE) {
-            sound->playEnemyShootSound(0, atkData.numBullets);
-        }
-        else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
-            sound->playEnemyShootSound(1, atkData.numBullets);
-        }
-        else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
-            sound->playEnemyShootSound(2, atkData.numBullets);
-        }
-    } else {
-        if (atkData.shape == EnemyBulletShape::CIRCLE) {
-            sound->playEnemyShootSound(0, 0);
-        }
-        else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
-            sound->playEnemyShootSound(1, 0);
-        }
-        else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
-            sound->playEnemyShootSound(2, 0);
-        }
-    }
+    // if (atkData.attackType == EnemyAttackPattern::NONE )
+    //     return;
+    //
+    // if ( atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
+    //     if (atkData.shape == EnemyBulletShape::CIRCLE) {
+    //         sound->playEnemyShootSound(0, atkData.numBullets);
+    //     }
+    //     else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
+    //         sound->playEnemyShootSound(1, atkData.numBullets);
+    //     }
+    //     else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
+    //         sound->playEnemyShootSound(2, atkData.numBullets);
+    //     }
+    // } else {
+    //     if (atkData.shape == EnemyBulletShape::CIRCLE) {
+    //         sound->playEnemyShootSound(0, 0);
+    //     }
+    //     else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
+    //         sound->playEnemyShootSound(1, 0);
+    //     }
+    //     else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
+    //         sound->playEnemyShootSound(2, 0);
+    //     }
+    // }
 }
 
 void EnemySystem::creatingMergeBee(int count, vec2 pos)
