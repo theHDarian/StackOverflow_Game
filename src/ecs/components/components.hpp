@@ -10,7 +10,6 @@
 #include "io_components.hpp"
 #include "ui_components.hpp"
 
-
 // Stucture to store collision information
 struct Collision
 {
@@ -311,6 +310,15 @@ struct DialogueLines {
 	std::vector<Dialogue> lines;
 	int current = 0;
 
+	Dialogue prev() {
+		if (current > 0) {
+			return lines[current - 1];
+		}
+		else {
+			return Dialogue{ "<end>", "<end>", "<end>" }; // maybe end of str constant
+		}
+	}
+
 	Dialogue next() {
 		if (current < lines.size()) {
 			return lines[current++];
@@ -321,14 +329,9 @@ struct DialogueLines {
 	}
 };
 
-
-
 struct BG {
 	// is BG
 };
-
-
-
 
 struct Fade {
 	float max = 500;

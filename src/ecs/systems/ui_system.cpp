@@ -43,11 +43,17 @@ void UISystem::playDialogue() {
 	GameState& gameState = registry.gameStates.components[0];
 
 	if (gameState.dialogueScene && input.nextDialogue) {
+		// keep track of current speaker stuff
+		std::string currSpeakerName = registry.dialogueLines.get(dialogueBox).prev().speakerName;
+		std::string currSpeakerAvatar = registry.dialogueLines.get(dialogueBox).prev().speakerAvatar;
+
 		input.nextDialogue = false;
-
-
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
-		if (nextLine.text.compare("<end>") != 0) {
+		if (nextLine.text.compare("<end>") != 0) { // there is a next line
+			registry.renderRequests.get(dialogueBox).show = true;
+			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
+			
+			// play a sound if there is one
 			if (nextLine.sfx == IncomingDialogue) {
 				soundSystem->playIncomingDialogueSound();
 			} else if (nextLine.sfx == DoorOpen) {
@@ -57,15 +63,18 @@ void UISystem::playDialogue() {
 				soundSystem->playNextDialogueSound();
 			}
 
-			registry.renderRequests.get(dialogueBox).show = true;
-			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
-			if (nextLine.speakerName != "N") { // N is narrator for now
-				registry.renderRequests.get(dialogueAvatar).show = true;
-				registry.renderRequests.get(dialogueAvatar).texture_name = nextLine.speakerAvatar;
+			// change speaker avatar and name to current
+			if (nextLine.speakerName.length() > 0 && nextLine.speakerName.compare(currSpeakerName) != 0) {
 				registry.textRenderRequests.get(dialogueAvatar).text = nextLine.speakerName;
 			}
-			else {
-				registry.renderRequests.get(dialogueAvatar).show = false;
+			if (nextLine.speakerAvatar.length() > 0 && nextLine.speakerAvatar.compare(currSpeakerAvatar) != 0) {
+				if (nextLine.speakerName != "N") { // N is narrator for now
+					registry.renderRequests.get(dialogueAvatar).show = true;
+					registry.renderRequests.get(dialogueAvatar).texture_name = nextLine.speakerAvatar;
+				}
+				else {
+					registry.renderRequests.get(dialogueAvatar).show = false;
+				}
 			}
 		}
 		// no more lines of dialogue
