@@ -1,0 +1,28 @@
+# write interactables dialogue here
+# format for item header:
+# ITEM <item name> <choice> 
+
+# format for body:
+# blah blah text
+
+# format for speaker:
+# SPEAKER speakername speakeravatar
+
+# format for sound:
+# SOUND soundname
+
+# format for choice:
+# CHOICE choice1 choice2 choice3...
+
+# note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
+
+ITEM PopStack -1
+Do you want to pop stack?
+CHOICES Yes No
+SPEAKER Stack eel.png
+
+ITEM PopStack 0
+Yes pop stack
+
+ITEM PopStack 1
+No pop stack
