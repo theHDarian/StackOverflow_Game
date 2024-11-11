@@ -112,12 +112,20 @@ void clearRoomActors()
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
+    for (Entity ent : registry.interactables.entities)
+    {
+        if (!registry.deleteds.has(ent))
+            registry.deleteds.emplace(ent);
+    }
+    /*
     // lame fix for splitting bullet persisting after reset
+    // doesnt work!!
     for (Entity ent : registry.enemyBullets.entities)
     {
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
+    */
 
     registry.emitParticles.emplace(Entity(), ParticleRequestType::ClearParticles, 0.0f, 0);
 }
@@ -262,14 +270,24 @@ void MapSystem::resetMap()
         map.currRegion = MapRegion::Tutorial;
         map.roomsTraversed = 0;
 
+        /*
         // set initial room to enemy
         map.currRoom = Room();
         std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomBee);
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
+        */
+
+        // temporarily set start room to empty, create pop console
+        map.currRoom = Room();
+        std::vector<RoomPreset> presets = roomDirectory.at(RoomType::RestRoom);
+        RoomPreset randomPreset = Random::ListItem(presets);
+        map.currRoom.preset = randomPreset;
+        createPopConsole(renderer, vec2(500, 500));
     }
 
     // clear ongoing dialogue to prepare for next
+    // perhaps reset should be a main-system level thing to easily tell each system to reset itself?
     GameState& gameState = registry.gameStates.components[0];
     DialogueLines& lines = registry.dialogueLines.components[0];
     lines = DialogueLines();

@@ -1,0 +1,37 @@
+# write interactables dialogue here
+# Note: the parser does NOT validate correctness of script for now
+
+# format for item header:
+# ITEM <item name> <choice> <dialogue count>
+# dialogue count is to just keep track of dialogue progression based on num dialogue passed
+# default/no choice option is -1
+
+# format for body:
+# blah blah text
+
+# format for speaker:
+# SPEAKER speakername speakeravatar
+# speaker name can have spaces
+
+# format for sound:
+# SOUND soundname
+
+# format for choice:
+# CHOICE choice1 choice2 choice3...
+
+# note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
+
+ITEM PopStack -1 0
+Do you want to pop stack?
+CHOICES Yes No
+SPEAKER Pop Console pop_console.png
+
+ITEM PopStack 0 0
+Yes pop stack
+SOUND incomingDialogue
+
+ITEM PopStack 1 0
+No pop stack
+
+ITEM PopStack -1 1
+You've already used this!

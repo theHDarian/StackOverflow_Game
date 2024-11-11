@@ -69,9 +69,13 @@ public:
 	ComponentContainer<Hive> beeHive;
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
-	ComponentContainer<Interactable> interactables;
 	ComponentContainer<Critter> critters;
 	ComponentContainer<Object> objects;
+	ComponentContainer<DialogueChoice> dialogueChoices;
+	ComponentContainer<InteractableObject> interactables;
+	ComponentContainer<DialogueRequest> dialogueRequests;
+	ComponentContainer<InteractableReaction> interactableReactions;
+	ComponentContainer<NearbyInteractables> nearbyInteractables;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -135,7 +139,11 @@ public:
 		registry_list.push_back(&soundRequests);
 		registry_list.push_back(&critters);
 		registry_list.push_back(&objects);
+		registry_list.push_back(&dialogueChoices);
 		registry_list.push_back(&interactables);
+		registry_list.push_back(&dialogueRequests);
+		registry_list.push_back(&interactableReactions);
+		registry_list.push_back(&nearbyInteractables);
 	}
 
 	void clear_all_components() {

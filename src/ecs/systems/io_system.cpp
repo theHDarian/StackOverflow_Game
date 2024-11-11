@@ -67,15 +67,38 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.tutorialOn = !ioState.tutorialOn;
 	}
 
-	// show dialogue window and play dialogue sequence (temp function)
+	// show dialogue window and play dialogue sequence
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
 		gameState.dialogueScene = true;
+		// bad check for when near interactible objects
+		// maybe should be two different keys? E and space?
+
+		// take latest object
+		if (registry.nearbyInteractables.entities.size() > 0) {
+			InteractableObject& object = registry.interactables.get(registry.nearbyInteractables.entities[0]);
+			registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
+		}
 	}
+	
+	if (gameState.dialogueScene) {
+		handleDialogueChoice(key, action, ioState, gameState);
+	}
+	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
-	//Player movement
-	handleMovementInput(key,action,ioState, gameState);
+}
 
+void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameState& gameState) {
+	if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_W) { // highlight choice above
+			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+		}
+		else if (key == GLFW_KEY_S) { // highlight choice below
+			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
+		}
+	}
 }
 
 void IOSystem::mouseClick(int button, int action, int mods) {

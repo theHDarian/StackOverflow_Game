@@ -246,6 +246,22 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// interactible object management placed here and hard coded for now 
+	// can consider: each behaviour type is component, when choice X is selected then enact that behaviour
+	for (InteractableReaction& reaction : registry.interactableReactions.components) {
+		InteractableObject& object = registry.interactables.get(reaction.object);
+		if (object.name.compare("PopStack") == 0) { // the choices are known implicitly by person who wrote object script for now
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
+			}
+		}
+	}
+
+	registry.interactableReactions.clear();
+
 	// place sprite timer progression here for now
 	for (auto& entity : registry.spriteTimers.entities) {
 		auto& spriteTimer = registry.spriteTimers.get(entity);
@@ -332,6 +348,14 @@ void WorldSystem::handleCollisions() {
 				else if (glm::length(motion.position - wall.endPosition) < circle.radius) {
 					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
 				}
+			}
+
+			// check if player is within detection radius of interactible
+			// this is for when player is near and has to press E to interact
+			if (registry.interactables.has(entity_other)) {
+				// bad singleton implementation: only interested in one E so just io system can just grab most recent one
+				// consider grabbing nearest one instead
+				registry.nearbyInteractables.emplace(entity_other);
 			}
 		}
 
@@ -425,6 +449,8 @@ void WorldSystem::handleInput() {
 	//change volume
 	GameState& gameState = registry.gameStates.components[0];
 	soundPlayer->setVolume(gameState.currentVolume);
+	// clear here for now
+	registry.nearbyInteractables.clear();
 	}
 
 void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {

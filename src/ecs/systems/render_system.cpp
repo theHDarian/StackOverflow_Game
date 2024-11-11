@@ -66,21 +66,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	transform.translate(offset * glm::normalize(motion.scale));
 	transform.scale(motion.scale);
 
-	/*
-		// cheat a bit to test bee specifically
-	if (render_request.texture_name.compare("bee_fly") == 0) {
-		vec2 scale = texture_dimensions[name_to_texture[render_request.texture_name]];
-		transform.translate(offset * glm::normalize(scale) * motion.scale);
-		transform.scale(scale * motion.scale);
-		// this doesn't work well, other stuff still need to know the scale :(
-	}
-	else {
-		transform.translate(offset * glm::normalize(motion.scale));
-		transform.scale(motion.scale);
-	}
-	*/
-
-
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
 	const GLuint program = (GLuint)effects[used_effect_enum];
@@ -483,6 +468,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.players.entities)
@@ -508,15 +495,16 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.backgrounds.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
+			drawTexturedMesh(entity, projection_2D);
 	}
-
 
 	for (Entity& entity : registry.doors.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
+			drawTexturedMesh(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.critters.entities)

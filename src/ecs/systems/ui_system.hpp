@@ -40,5 +40,7 @@ private:
 
     Entity createControlsGuide(vec2 position, vec2 scale);
 
+    Entity createDialogueChoice(std::string choice, vec2 position);
+
     SoundSystem* soundSystem;
 };

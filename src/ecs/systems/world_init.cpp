@@ -136,7 +136,7 @@ Entity createCursor()
 {
 	auto cursor = Entity();
 	Motion &cursorMotion = registry.motions.emplace(cursor);
-	cursorMotion.scale = {100, 100};
+	cursorMotion.scale = {64, 64};
 	cursorMotion.position = {0, 0};
 	Sprites &cursorSprites = registry.sprites.emplace(cursor);
 	cursorSprites.sprites[SPRITE_STATE::BASE] = "cursor.png";
@@ -160,15 +160,22 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 	auto& o = registry.objects.emplace(console);
 	o.baseOffset = 20;
 
-	auto& wall = registry.walls.emplace(console);
 	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
-	wall.startPosition = vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2);
-	wall.endPosition = vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2);
-
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
 	registry.backgrounds.emplace(console);
 
-	//TODO Add collider so player can interact
-	//TODO Add way to know what'll happen when player interacts?
+	// use aabb as near player range for now for pseudo-offsetting
+	// note: visuald doesn't seem to align with collider??? So use circle instead
+	//AABBCollider& aabb = registry.aabbs.emplace(console);
+	//aabb.topLeft = vec2(-m.scale.x / 10, -m.scale.y / 50);
+	//aabb.bottomRight = vec2(m.scale.x / 2, m.scale.y / 1.5);
+
+	CircleCollider& cc = registry.circleColliders.emplace(console);
+	cc.radius = m.scale.y / 4;
+
+	InteractableObject& object = registry.interactables.emplace(console);
+	object.name = "PopStack";
+	// or maybe object type enum? This is not a unique id, just an object type identifier
 
 	Animation& a = registry.animations.emplace(console);
 	a.max_frames = 8;

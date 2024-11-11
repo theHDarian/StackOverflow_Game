@@ -10,7 +10,6 @@
 #include "io_components.hpp"
 #include "ui_components.hpp"
 
-
 // Stucture to store collision information
 struct Collision
 {
@@ -309,12 +308,22 @@ struct Dialogue {
 	std::string text;
 	std::string speakerName;
 	std::string speakerAvatar;
+	std::vector<std::string> choices;
 	SoundType sfx;
 };
 
 struct DialogueLines {
 	std::vector<Dialogue> lines;
 	int current = 0;
+
+	Dialogue prev() {
+		if (current > 0) {
+			return lines[current - 1];
+		}
+		else {
+			return Dialogue{ "<end>", "<end>", "<end>" }; // maybe end of str constant
+		}
+	}
 
 	Dialogue next() {
 		if (current < lines.size()) {
@@ -326,27 +335,9 @@ struct DialogueLines {
 	}
 };
 
-enum class InteractableType {
-	ResetStack,
-	Treasure,
-	None,
-};
-
-
-struct Interactable {
-	InteractableType type = InteractableType::None;
-	bool interacted = false;
-	Dialogue dialogue;
-};
-
-
-
 struct BG {
 	// is BG
 };
-
-
-
 
 struct Fade {
 	float max = 500;
@@ -355,4 +346,28 @@ struct Fade {
 
 struct Deleted {
 	// this entity is marked for deletion
+};
+
+struct DialogueChoice {
+
+};
+
+struct InteractableObject {
+	std::string name;
+	int dialogueCount = 0;
+};
+
+struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
+
+};
+
+struct InteractableReaction {
+	// something changed, let the object know what
+	Entity object;
+	int choice = -1;
+	InteractableReaction(Entity& object, int choice) { this->object = object; this->choice = choice; };
+};
+
+struct NearbyInteractables {
+	// placeholder component that has list of nearby interactibles the io system can respond to
 };

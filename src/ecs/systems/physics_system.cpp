@@ -128,6 +128,13 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
+	// Player to interactible ranges/objects
+	for (uint i = 0; i < registry.interactables.components.size(); i++) {
+		if (CircleToCircle(registry.interactables.entities[i], player)) {
+			registry.collisions.emplace_with_duplicates(player, registry.interactables.entities[i]);
+		}
+	}
+
 	// Player  -> EnemyBullets	(Circle to Circle for now)
 	// EnemyBullets -> Walls	(Circle to wall for now)
 	for (uint i = 0; i < eBullets.components.size(); i++) {
@@ -167,15 +174,6 @@ void PhysicsSystem::step(float elapsed_ms)
 				(registry.meshColliders.has(enemies.entities[i]) && CircleToMesh(pBullets.entities[j], enemies.entities[i]))) {
 				registry.collisions.emplace_with_duplicates(enemies.entities[i], pBullets.entities[j]);
 			}
-		}
-	}
-
-
-
-	 //Player  -> debugComponents (circle to poly)
-	for (uint i = 0; i < debug.components.size(); i++) {
-		if (CircleToPoly(player, debug.entities[i])) {
-			registry.collisions.emplace_with_duplicates(player, debug.entities[i]);
 		}
 	}
 
