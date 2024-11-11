@@ -326,6 +326,19 @@ struct DialogueLines {
 	}
 };
 
+enum class InteractableType {
+	ResetStack,
+	Treasure,
+	None,
+};
+
+
+struct Interactable {
+	InteractableType type = InteractableType::None;
+	bool interacted = false;
+	Dialogue dialogue;
+};
+
 
 
 struct BG {

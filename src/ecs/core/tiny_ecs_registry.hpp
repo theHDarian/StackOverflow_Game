@@ -69,6 +69,7 @@ public:
 	ComponentContainer<Hive> beeHive;
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
+	ComponentContainer<Interactable> interactables;
 	ComponentContainer<Critter> critters;
 	ComponentContainer<Object> objects;
 
@@ -134,6 +135,7 @@ public:
 		registry_list.push_back(&soundRequests);
 		registry_list.push_back(&critters);
 		registry_list.push_back(&objects);
+		registry_list.push_back(&interactables);
 	}
 
 	void clear_all_components() {

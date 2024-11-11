@@ -132,6 +132,23 @@ Entity createCritter(RenderSystem* renderer, vec2 pos) {
 	return critter;
 }
 
+Entity createCursor()
+{
+	auto cursor = Entity();
+	Motion &cursorMotion = registry.motions.emplace(cursor);
+	cursorMotion.scale = {130, 130};
+	cursorMotion.position = {0, 0};
+	Sprites &cursorSprites = registry.sprites.emplace(cursor);
+	cursorSprites.sprites[SPRITE_STATE::BASE] = "cursor.png";
+	registry.renderRequests.insert(
+		cursor,
+		{"cursorTEST.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+	registry.gameUIs.emplace(cursor);
+	return cursor;
+}
+
 Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 	const Entity console = Entity();
 

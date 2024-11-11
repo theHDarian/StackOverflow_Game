@@ -15,6 +15,8 @@ Entity resetPlayer();
 
 Entity createAimIndicator(RenderSystem* renderer);
 
+Entity createCursor();
+
 Entity createCritter(RenderSystem* renderer, vec2 pos);
 
 Entity createPopConsole(RenderSystem* renderer, vec2 pos);

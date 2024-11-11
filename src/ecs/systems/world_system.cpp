@@ -136,6 +136,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
 	aimIndicator = createAimIndicator(renderer);
+	cursor = createCursor();
 
 	WindowState& ws = registry.windowStates.components[0];
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
@@ -595,6 +596,9 @@ void WorldSystem::movePlayer() {
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
+
+	Motion& cursorMotion = registry.motions.get(cursor);
+	cursorMotion.position = input.mousePosition;
 
 }
 
