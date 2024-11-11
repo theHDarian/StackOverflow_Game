@@ -245,6 +245,25 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// interactible object management for now 
+	for (InteractibleReaction& reaction : registry.interactibleReactions.components) {
+		InteractibleObject& object = registry.interactibles.get(reaction.object);
+		// hard code stack pop behaviour for now
+		// lazy: ask to play next dialogue if there is any here rather than in the dialogue system
+		if (object.name.compare("PopStack") == 0) {
+			if (reaction.choice == 0) { // yes
+				std::cout << "player chose to pop stack!" << std::endl;
+				object.dialogueCount++;
+			}
+			else if (reaction.choice == 1) { // no
+				std::cout << "player chose not to pop stack!" << std::endl;
+				// not incrementing allows player to keep asking to pop until pop, but finicky
+			}
+		}
+	}
+
+	registry.interactibleReactions.clear();
+
 	// place sprite timer progression here for now
 	for (auto& entity : registry.spriteTimers.entities) {
 		auto& spriteTimer = registry.spriteTimers.get(entity);
@@ -331,6 +350,11 @@ void WorldSystem::handleCollisions() {
 				else if (glm::length(motion.position - wall.endPosition) < circle.radius) {
 					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
 				}
+			}
+
+			if (registry.interactibles.has(entity_other)) {
+				if (!registry.nearbyInteractibles.has(entity_other))
+					registry.nearbyInteractibles.emplace(entity_other);
 			}
 		}
 

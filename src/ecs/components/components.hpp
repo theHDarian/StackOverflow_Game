@@ -351,3 +351,24 @@ struct Deleted {
 struct DialogueChoice {
 	bool selected = false;
 };
+
+struct InteractibleObject {
+	std::string name;
+	int dialogueCount = 0;
+};
+
+struct DialogueRequest {
+	//std::string objectName;
+	//int dialogueCount;
+};
+
+struct InteractibleReaction {
+	// something changed, let the object know what
+	Entity object;
+	int choice = -1;
+	InteractibleReaction(Entity& object, int choice) { this->object = object; this->choice = choice; };
+};
+
+struct NearbyInteractibles {
+
+};

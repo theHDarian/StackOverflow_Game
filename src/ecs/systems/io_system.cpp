@@ -71,6 +71,15 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
 		gameState.dialogueScene = true;
+		// bad check for when near interactible objects
+		// maybe should be two different keys? E and space?
+
+		// take nearest object
+		if (registry.nearbyInteractibles.entities.size() > 0) {
+			InteractibleObject& object = registry.interactibles.get(registry.nearbyInteractibles.entities[0]);
+			registry.dialogueRequests.emplace(registry.nearbyInteractibles.entities[0]);
+			registry.nearbyInteractibles.clear();
+		}
 	}
 
 	

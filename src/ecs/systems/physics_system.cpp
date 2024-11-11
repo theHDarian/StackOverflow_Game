@@ -106,6 +106,13 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
+	// Player to interactible ranges/objects
+	for (uint i = 0; i < registry.interactibles.components.size(); i++) {
+		if (AABBToAABB(registry.interactibles.entities[i], player)) {
+			registry.collisions.emplace_with_duplicates(player, registry.interactibles.entities[i]);
+		}
+	}
+
 	// Player  -> EnemyBullets	(Circle to Circle for now)
 	// EnemyBullets -> Walls	(Circle to wall for now)
 	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;

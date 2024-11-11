@@ -58,16 +58,6 @@ void UISystem::playDialogue() {
 		// keep track of current speaker stuff
 		std::string currSpeakerName = registry.dialogueLines.get(dialogueBox).prev().speakerName;
 		std::string currSpeakerAvatar = registry.dialogueLines.get(dialogueBox).prev().speakerAvatar;
-		
-		// check: what choice did the player make last time?
-		if (registry.dialogueChoices.entities.size() > 0)
-			gameState.dialogueChoice = input.hoveringDialogueChoice;
-
-		// clear choices here for now
-		for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.dialogueChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
 
 		//std::cout << "player chose choice: " << gameState.dialogueChoice << std::endl;
 

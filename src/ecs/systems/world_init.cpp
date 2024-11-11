@@ -153,6 +153,16 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 	//TODO Add collider so player can interact
 	//TODO Add way to know what'll happen when player interacts?
 
+	// use aabb as near player range for now, not sure if I can use another circle
+	AABBCollider& aabb = registry.aabbs.emplace(console);
+	aabb.topLeft = vec2(-m.scale.x / 2, -m.scale.y / 2);
+	aabb.bottomRight = vec2(m.scale.x / 2, m.scale.y / 2);
+
+	InteractibleObject& object = registry.interactibles.emplace(console);
+	object.name = "PopStack";
+	// or maybe object type??
+	// somehow find way to bind choice num and actions
+
 	Animation& a = registry.animations.emplace(console);
 	a.max_frames = 8;
 	a.animation_countdown_base = 100;

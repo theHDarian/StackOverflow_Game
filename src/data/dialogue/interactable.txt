@@ -21,8 +21,8 @@ Do you want to pop stack?
 CHOICES Yes No
 SPEAKER Stack eel.png
 
-ITEM PopStack 0 1
+ITEM PopStack 0 0
 Yes pop stack
 
-ITEM PopStack 1 1
+ITEM PopStack 1 0
 No pop stack

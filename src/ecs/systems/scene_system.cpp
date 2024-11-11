@@ -7,7 +7,8 @@
 SceneSystem::SceneSystem( SoundSystem* soundSystem) {
 	this->soundSystem = soundSystem;
 	storyDialogue = std::unordered_map<Scene, std::vector<Dialogue>>();
-	interactableDialogue = std::unordered_map<InteractibleDialogue, std::vector<Dialogue>>();
+	interactibleDialogue = std::unordered_map<InteractibleDialogue, std::vector<Dialogue>>();
+	currentObject = Entity();
 	loadStoryDialogue();
 	loadInteractableDialogue();
 }
@@ -43,7 +44,7 @@ void SceneSystem::loadInteractableDialogue() {
 				if (action.compare("ITEM") == 0) {
 					// new scene, so place all prev lines into map, unless this is the first scene
 					if (lines.size() > 0) {
-						interactableDialogue.insert({ {item}, {lines} });
+						interactibleDialogue.insert({ {item}, {lines} });
 						lines = std::vector<Dialogue>();
 					}
 
@@ -116,7 +117,7 @@ void SceneSystem::loadInteractableDialogue() {
 			}
 		}
 		entity_file.close();
-		interactableDialogue.insert({ {item}, {lines} });
+		interactibleDialogue.insert({ {item}, {lines} });
 	}
 	else
 	{
@@ -238,6 +239,16 @@ void SceneSystem::summonDialogue() {
 	map.currRoom.dialogueDone = false;
 }
 
+// shows dialogue for interactible objects immediately
+void SceneSystem::summonInteractibleDialogue(Entity object) {
+	IOState& iostate = registry.ioStates.components[0];
+	GameState& gameState = registry.gameStates.components[0];
+	iostate.nextDialogue = true;
+	gameState.dialogueScene = true;
+	Map& map = registry.maps.components[0];
+	map.currRoom.dialogueDone = false;
+}
+
 // shows dialogue only when player presses E (for now)
 // consider having hash to key as well
 void SceneSystem::playerInputDialogue() {
@@ -248,6 +259,34 @@ void SceneSystem::playerInputDialogue() {
 
 void SceneSystem::step(float elapsed_ms) {
 	Map& map = registry.maps.components[0];
+	GameState& gameState = registry.gameStates.components[0];
+	IOState& input = registry.ioStates.components[0];
+
+	if (gameState.dialogueScene && input.nextDialogue) {
+		// update choice
+		if (registry.dialogueChoices.entities.size() > 0) {
+			assert(registry.interactibles.has(currentObject));
+
+			gameState.dialogueChoice = input.hoveringDialogueChoice;
+			Entity objectEntity = currentObject;
+			registry.interactibleReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice);
+			InteractibleObject& object = registry.interactibles.get(objectEntity);
+			InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+			if (interactibleDialogue.count(dialogueObject) > 0) {
+				DialogueLines& lines = registry.dialogueLines.components[0];
+				lines = DialogueLines();
+				lines.lines = interactibleDialogue[dialogueObject];
+			}
+			gameState.dialogueChoice = -1; // enforce it to be valid only for duration of request
+			// hope no other system needs to look at it rn...
+		}
+
+		// clear choices here for now
+		for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+			Entity e = registry.dialogueChoices.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+	}
 	
 	if (map.currRoom.cutSceneDone) {
 		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.cutsceneCount == 0) {
@@ -262,12 +301,12 @@ void SceneSystem::step(float elapsed_ms) {
 			registry.animations.get(player).max_frames = 40; // hard code for now
 
 			// play cutscene
-			GameState& gameState = registry.gameStates.components[0];
 			gameState.cutScene = true;
 			map.currRoom.cutSceneDone = false;
 		}
 	}
 
+	// make sure we only have 1 dialogue going on at a time
 	if (map.currRoom.dialogueDone) {
 		// construct current scene object
 		Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared };
@@ -277,14 +316,6 @@ void SceneSystem::step(float elapsed_ms) {
 		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 2 && !map.currRoom.cleared) {
 			map.currRoom.cleared = true;
 		}
-
-		//if (map.currRoom.type == RoomType::RestRoom && map.currRoom.dialogueCount == 0) {
-		//	std::cout << "playing dialogue!" << std::endl;
-		//	DialogueLines& lines = registry.dialogueLines.components[0];
-		//	lines = DialogueLines();
-		//	lines.lines = interactableDialogue[{"PopStack", -1, 0}];
-		//	summonDialogue();
-		//}
 
 		if (storyDialogue.count(scene) > 0) {
 			DialogueLines& lines = registry.dialogueLines.components[0];
@@ -297,7 +328,20 @@ void SceneSystem::step(float elapsed_ms) {
 			else {
 				summonDialogue();
 			}
-		} 
+		}
+
+		for (Entity entity : registry.dialogueRequests.entities) {
+			InteractibleObject& object = registry.interactibles.get(entity);
+			InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+			if (interactibleDialogue.count(dialogueObject) > 0) {
+				DialogueLines& lines = registry.dialogueLines.components[0];
+				lines = DialogueLines();
+				lines.lines = interactibleDialogue[dialogueObject];
+				currentObject = entity;
+				summonInteractibleDialogue(entity);
+			}
+		}
+		registry.dialogueRequests.clear();
 	}
 
 }
