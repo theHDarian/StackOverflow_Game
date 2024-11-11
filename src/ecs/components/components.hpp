@@ -239,6 +239,11 @@ struct Animation {
 	float animation_countdown_base = animation_countdown;
 };
 
+// For 3D rendering
+struct Object {
+	float baseOffset = 0; //Where, from the center of the obj, the player should transition from front to back
+};
+
 // Expected sprite states other systems can use
 // eg: physics system sets object's sprite to DAMAGED upon collision
 // not all entities may have all these sprites, so should check

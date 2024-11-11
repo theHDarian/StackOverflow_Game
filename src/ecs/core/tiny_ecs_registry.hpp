@@ -69,6 +69,8 @@ public:
 	ComponentContainer<Hive> beeHive;
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
+	ComponentContainer<Critter> critters;
+	ComponentContainer<Object> objects;
 	ComponentContainer<DialogueChoice> dialogueChoices;
 
 	// constructor that adds all containers for looping over them
@@ -131,6 +133,8 @@ public:
 		registry_list.push_back(&beeHive);
 		registry_list.push_back(&animationSequences);
 		registry_list.push_back(&soundRequests);
+		registry_list.push_back(&critters);
+		registry_list.push_back(&objects);
 		registry_list.push_back(&dialogueChoices);
 	}
 

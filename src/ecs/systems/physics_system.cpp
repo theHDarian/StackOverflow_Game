@@ -172,6 +172,27 @@ void PhysicsSystem::step(float elapsed_ms)
 				registry.mapRequests.emplace(doors.entities[i],MapRequestType::ChangeRoom,doors.components[i].room,i);
 		}
 	}
+
+	// Critters
+	ComponentContainer<Critter>& critters = registry.critters;
+	for (uint i = 0; i < critters.components.size(); i++) {
+		auto& crit = critters.components[i];
+		if (crit.startled) continue;
+		auto& cm = registry.motions.get(critters.entities[i]);
+		bool shouldStartle = CheapCircleToCircle(m.position, c.radius, cm.position, crit.radius);
+		if (!shouldStartle) {
+			for (uint j = 0; j < pBullets.components.size(); j++) {
+				auto& bm = registry.motions.get(pBullets.entities[j]);
+				auto& bc = registry.circleColliders.get(pBullets.entities[j]);
+				shouldStartle = shouldStartle || CheapCircleToCircle(bm.position, bc.radius, cm.position, crit.radius);
+				if (shouldStartle) break;
+			}	
+		}
+		if (shouldStartle) {
+			crit.startled = true;
+			cm.velocity = crit.flee;
+		}
+	}
 }
 
 

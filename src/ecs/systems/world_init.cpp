@@ -106,8 +106,111 @@ Entity createAimIndicator(RenderSystem *renderer)
 	return aimIndicator;
 }
 
-// Purely for testing walls, puts 2 fish at either end of the line segment
-Entity createTestWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)
+Entity createCritter(RenderSystem* renderer, vec2 pos) {
+	auto critter = Entity();
+	Motion& m = registry.motions.emplace(critter);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = vec2(40,40);
+
+	Critter& c = registry.critters.emplace(critter);
+	float angle = (rand() % 101) / 100.f;
+	angle = ((1 - angle) * 3.f * M_PI / 4.f) + ((angle)*M_PI / 4.f) + M_PI;
+	c.flee = (rand() % 40 + 80.f) * vec2(cos(angle), sin(angle));
+
+	Animation& a = registry.animations.emplace(critter);
+	a.max_frames = 2;
+	a.animation_countdown_base = 10000000;
+	a.animation_countdown = 10000000;
+
+	registry.renderRequests.insert(
+		critter,
+		{ "critter_butterfly_green",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return critter;
+}
+
+Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
+	const Entity console = Entity();
+
+	Motion& m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 200.f * vec2(1, 1.4166666);
+
+	auto& o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	auto& wall = registry.walls.emplace(console);
+	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
+	wall.startPosition = vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2);
+	wall.endPosition = vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2);
+
+	registry.backgrounds.emplace(console);
+
+	//TODO Add collider so player can interact
+	//TODO Add way to know what'll happen when player interacts?
+
+	Animation& a = registry.animations.emplace(console);
+	a.max_frames = 8;
+	a.animation_countdown_base = 100;
+
+	registry.renderRequests.insert(
+		console,
+		{ "pop_console",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return console;
+}
+
+Entity createBibleTree(RenderSystem* renderer, vec2 pos) {
+	const Entity tree = Entity();
+
+	pos -= vec2(25, 100);
+
+	Motion& m = registry.motions.emplace(tree);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 400.f * vec2(1.2777777, 1);
+
+	auto& o = registry.objects.emplace(tree);
+	o.baseOffset = 190;
+
+	auto& wall = registry.walls.emplace(tree);
+	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
+	wall.startPosition = vec2(pos.x - 13 + c.radius * 2, pos.y + 190 - c.radius * 2);
+	wall.endPosition = vec2(pos.x + 45 - c.radius * 2, pos.y + 190 - c.radius * 2);
+
+	registry.backgrounds.emplace(tree);
+
+	createCritter(renderer, pos + vec2(-200, -180));
+	createCritter(renderer, pos + vec2(93, -185));
+	createCritter(renderer, pos + vec2(20, -205));
+	createCritter(renderer, pos + vec2(-116, -140));
+	createCritter(renderer, pos + vec2(-45, -85));
+	createCritter(renderer, pos + vec2(48, -163));
+	createCritter(renderer, pos + vec2(-68, -20));
+	createCritter(renderer, pos + vec2(68, 0));
+	createCritter(renderer, pos + vec2(-128, -68));
+	createCritter(renderer, pos + vec2(225, -116));
+	createCritter(renderer, pos + vec2(156, -106));
+
+	//TODO Add collider so player can interact
+	//TODO Add way to know what'll happen when player interacts?
+
+	registry.renderRequests.insert(
+		tree,
+		{ "bandedtree.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return tree;
+}
+
+Entity createWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)
 {
 	auto entity = Entity();
 
