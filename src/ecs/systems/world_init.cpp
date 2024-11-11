@@ -183,6 +183,33 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 	return console;
 }
 
+Entity createGardener(RenderSystem* renderer, vec2 pos) {
+	const Entity gardener = Entity();
+
+	Motion& m = registry.motions.emplace(gardener);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 300.f * vec2(1, 1);
+
+	auto& o = registry.objects.emplace(gardener);
+	o.baseOffset = 20;
+
+	//TODO Add collider so player can interact
+	//TODO Add way to know what'll happen when player interacts?
+
+	Animation& a = registry.animations.emplace(gardener);
+	a.max_frames = 4;
+	a.animation_countdown_base = 300;
+
+	registry.renderRequests.insert(
+		gardener,
+		{ "gardener",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return gardener;
+}
+
 Entity createBibleTree(RenderSystem* renderer, vec2 pos) {
 	const Entity tree = Entity();
 
