@@ -12,6 +12,8 @@ struct WindowState {
 	float fps;
 	int numFramesThisSecond;
 	time_t currUnixTime;
+
+	time_t startTime;
 };
 
 struct IOState {

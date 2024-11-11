@@ -420,3 +420,9 @@ struct BeeEnemy {
     bool merge = false;
 };
 
+struct Critter {
+    float radius = 100;
+    bool startled = false;
+    vec2 flee = vec2(0);
+    float life = 10000;
+};

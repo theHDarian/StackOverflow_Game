@@ -17,6 +17,7 @@
 // but may change to handle like render system does
 #include "text_system.hpp"
 #include "utils/random.hpp"
+#include <chrono>
 
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
@@ -91,6 +92,7 @@ GLFWwindow* WorldSystem::createWindow() {
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
+	windowState.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	windowState.width = window_width_px;
 	windowState.height = window_height_px;
 	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
@@ -138,6 +140,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	WindowState& ws = registry.windowStates.components[0];
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
 	createRoomBounds(renderer);
+
+	createCritter(renderer, { ws.width / 4, ws.height / 4 });
 
 }
 #pragma endregion
@@ -219,6 +223,26 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			Damaged& entity = registry.damageds.components[i];
 			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
 				registry.damageds.remove(registry.damageds.entities[i]);
+			}
+		}
+	}
+
+	// Critter management
+	if (registry.critters.entities.size() > 0) {
+		for (int i = (int)registry.critters.components.size() - 1; i >= 0; --i) {
+			if (registry.deleteds.has(registry.critters.entities[i])) continue;
+			auto& critter = registry.critters.components[i];
+			if (critter.startled) {
+				critter.life -= elapsed_ms_since_last_update;
+				if (registry.animations.get(registry.critters.entities[i]).animation_countdown_base > 100) {
+					registry.animations.get(registry.critters.entities[i]).animation_countdown = 50;
+					registry.animations.get(registry.critters.entities[i]).animation_countdown_base = 50;
+				}
+				if (critter.life <= 0) registry.deleteds.emplace(registry.critters.entities[i]);
+			}
+			else {
+				float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - registry.windowStates.components[0].startTime;
+				registry.animations.get(registry.critters.entities[i]).frame = (sin(time/(300.f + i * 25.f) + 3.f * i) < -0.99);
 			}
 		}
 	}

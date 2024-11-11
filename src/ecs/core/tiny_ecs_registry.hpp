@@ -69,6 +69,7 @@ public:
 	ComponentContainer<Hive> beeHive;
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
+	ComponentContainer<Critter> critters;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -130,6 +131,7 @@ public:
 		registry_list.push_back(&beeHive);
 		registry_list.push_back(&animationSequences);
 		registry_list.push_back(&soundRequests);
+		registry_list.push_back(&critters);
 	}
 
 	void clear_all_components() {

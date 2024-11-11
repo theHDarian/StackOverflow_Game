@@ -36,6 +36,7 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     createDoor(renderer, {ws.width - offsetRightLeft - 10, ws.height / 2 - doorWidthY / 2}, {ws.width - offsetRightLeft - 10, ws.height / 2 + doorWidthY / 2});
     createDoor(renderer, {ws.width / 2 - doorWidthX / 2, ws.height - offsetBot - 10}, {ws.width / 2 + doorWidthX / 2, ws.height - offsetBot - 10});
     createDoor(renderer, {offsetRightLeft + 10, ws.height / 2 - doorWidthY / 2}, {offsetRightLeft + 10, ws.height / 2 + doorWidthY / 2});
+
     resetMap();
 }
 
@@ -53,6 +54,7 @@ void MapSystem::step(float elapsed_ms)
         for (auto &e : map.currRoom.preset.enemies)
         {
             createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
+
         }
         map.currRoom.preset.enemies = {};
 

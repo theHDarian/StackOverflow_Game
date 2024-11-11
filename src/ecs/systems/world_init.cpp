@@ -106,6 +106,32 @@ Entity createAimIndicator(RenderSystem *renderer)
 	return aimIndicator;
 }
 
+Entity createCritter(RenderSystem* renderer, vec2 pos) {
+	auto critter = Entity();
+	Motion& m = registry.motions.emplace(critter);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = vec2(40,40);
+
+	Critter& c = registry.critters.emplace(critter);
+	float angle = (rand() % 101) / 100.f;
+	angle = ((1 - angle) * 3.f * M_PI / 4.f) + ((angle)*M_PI / 4.f) + M_PI;
+	c.flee = (rand() % 40 + 80.f) * vec2(cos(angle), sin(angle));
+
+	Animation& a = registry.animations.emplace(critter);
+	a.max_frames = 2;
+	a.animation_countdown_base = 10000000;
+	a.animation_countdown = 10000000;
+
+	registry.renderRequests.insert(
+		critter,
+		{ "critter_butterfly",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return critter;
+}
+
 // Purely for testing walls, puts 2 fish at either end of the line segment
 Entity createTestWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)
 {
