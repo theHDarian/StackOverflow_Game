@@ -70,6 +70,7 @@ public:
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
 	ComponentContainer<Critter> critters;
+	ComponentContainer<Object> objects;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -132,6 +133,7 @@ public:
 		registry_list.push_back(&animationSequences);
 		registry_list.push_back(&soundRequests);
 		registry_list.push_back(&critters);
+		registry_list.push_back(&objects);
 	}
 
 	void clear_all_components() {

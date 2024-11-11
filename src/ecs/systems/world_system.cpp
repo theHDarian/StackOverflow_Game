@@ -141,8 +141,6 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
 	createRoomBounds(renderer);
 
-	createCritter(renderer, { ws.width / 4, ws.height / 4 });
-
 }
 #pragma endregion
 

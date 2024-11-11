@@ -17,8 +17,11 @@ Entity createAimIndicator(RenderSystem* renderer);
 
 Entity createCritter(RenderSystem* renderer, vec2 pos);
 
-// Wall for testing, denoted by 2 blobs
-Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
+Entity createPopConsole(RenderSystem* renderer, vec2 pos);
+
+Entity createBibleTree(RenderSystem* renderer, vec2 pos);
+
+Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
 Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);
 
