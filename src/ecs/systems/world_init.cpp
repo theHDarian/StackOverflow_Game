@@ -136,13 +136,13 @@ Entity createCursor()
 {
 	auto cursor = Entity();
 	Motion &cursorMotion = registry.motions.emplace(cursor);
-	cursorMotion.scale = {130, 130};
+	cursorMotion.scale = {100, 100};
 	cursorMotion.position = {0, 0};
 	Sprites &cursorSprites = registry.sprites.emplace(cursor);
 	cursorSprites.sprites[SPRITE_STATE::BASE] = "cursor.png";
 	registry.renderRequests.insert(
 		cursor,
-		{"cursorTEST.png",
+		{"CursorYB.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 	registry.gameUIs.emplace(cursor);
