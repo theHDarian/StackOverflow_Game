@@ -35,3 +35,32 @@ No pop stack
 
 ITEM PopStack -1 1
 You've already used this!
+
+ITEM BibleTree -1 0
+A tree with red fruits. Pick one?
+CHOICES Yes No
+
+ITEM BibleTree 0 0
+You pick off a fruit. It gives off an eerie shine.
+[Obtained fruit!]
+
+ITEM BibleTree 1 0
+You decide to not give into your temptations.
+
+ITEM BibleTree -1 1
+A tree with one less red fruit. Would you like to pick another?
+CHOICES Yes No
+
+ITEM BibleTree 0 1
+You pick off a fruit. You begin to wonder what you'll do with all this fruit.
+[Obtained fruit!]
+
+ITEM BibleTree 1 1
+Perhaps one fruit really is enough.
+
+ITEM BibleTree -1 2
+Little robot: +2 fruits. Tree: -2 fruits. Yeah, that might be enough.
+
+ITEM Gardener -1 0
+Isn't the weather nice today?
+SPEAKER Gardener eel.png

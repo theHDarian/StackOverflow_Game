@@ -487,8 +487,9 @@ void RenderSystem::drawGameElements()
 			continue;
 		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f < registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
 			drawTexturedMesh(entity, projection_2D);
+			if (ioState.debugMode)
+				drawAllColliders(entity, projection_2D);
 		}
-			
 	}
 
 	for (Entity& entity : registry.walls.entities)

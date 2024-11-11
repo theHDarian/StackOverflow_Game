@@ -258,6 +258,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
 			}
 		}
+
+		if (object.name.compare("BibleTree") == 0) {
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
+			}
+		}
+
 	}
 
 	registry.interactableReactions.clear();
@@ -355,7 +365,9 @@ void WorldSystem::handleCollisions() {
 			if (registry.interactables.has(entity_other)) {
 				// bad singleton implementation: only interested in one E so just io system can just grab most recent one
 				// consider grabbing nearest one instead
-				registry.nearbyInteractables.emplace(entity_other);
+				//registry.nearbyInteractables.clear();
+				if (!registry.interactableReactions.has(entity_other))
+					registry.nearbyInteractables.emplace(entity_other);
 			}
 		}
 

@@ -201,9 +201,6 @@ Entity createGardener(RenderSystem* renderer, vec2 pos) {
 	auto& o = registry.objects.emplace(gardener);
 	o.baseOffset = 20;
 
-	//TODO Add collider so player can interact
-	//TODO Add way to know what'll happen when player interacts?
-
 	Animation& a = registry.animations.emplace(gardener);
 	a.max_frames = 4;
 	a.animation_countdown_base = 300;
@@ -213,6 +210,12 @@ Entity createGardener(RenderSystem* renderer, vec2 pos) {
 		{ "gardener",
 		 EFFECT_ASSET_ID::ANIMATE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	InteractableObject& object = registry.interactables.emplace(gardener);
+	object.name = "Gardener";
+
+	CircleCollider& cc = registry.circleColliders.emplace(gardener);
+	cc.radius = m.scale.y / 4;
 
 	return gardener;
 }
@@ -230,10 +233,8 @@ Entity createBibleTree(RenderSystem* renderer, vec2 pos) {
 	auto& o = registry.objects.emplace(tree);
 	o.baseOffset = 190;
 
-	auto& wall = registry.walls.emplace(tree);
 	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
-	wall.startPosition = vec2(pos.x - 13 + c.radius * 2, pos.y + 190 - c.radius * 2);
-	wall.endPosition = vec2(pos.x + 45 - c.radius * 2, pos.y + 190 - c.radius * 2);
+	createWall(renderer, vec2(pos.x - 13 + c.radius * 2, pos.y + 190 - c.radius * 2), vec2(pos.x + 45 - c.radius * 2, pos.y + 190 - c.radius * 2));
 
 	registry.backgrounds.emplace(tree);
 
@@ -249,14 +250,17 @@ Entity createBibleTree(RenderSystem* renderer, vec2 pos) {
 	createCritter(renderer, pos + vec2(225, -116));
 	createCritter(renderer, pos + vec2(156, -106));
 
-	//TODO Add collider so player can interact
-	//TODO Add way to know what'll happen when player interacts?
-
 	registry.renderRequests.insert(
 		tree,
 		{ "bandedtree.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	InteractableObject& object = registry.interactables.emplace(tree);
+	object.name = "BibleTree";
+
+	CircleCollider& cc = registry.circleColliders.emplace(tree);
+	cc.radius = 200; // hard code for now, can't seem to see if use scale??
 
 	return tree;
 }

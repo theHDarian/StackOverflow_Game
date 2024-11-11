@@ -130,8 +130,9 @@ void PhysicsSystem::step(float elapsed_ms)
 
 	// Player to interactible ranges/objects
 	for (uint i = 0; i < registry.interactables.components.size(); i++) {
-		if (CircleToCircle(registry.interactables.entities[i], player)) {
-			registry.collisions.emplace_with_duplicates(player, registry.interactables.entities[i]);
+		Entity interactable = registry.interactables.entities[i];
+		if (registry.circleColliders.has(interactable) && CircleToCircle(interactable, player)) {
+			registry.collisions.emplace_with_duplicates(player, interactable);
 		}
 	}
 

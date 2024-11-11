@@ -284,6 +284,8 @@ void MapSystem::resetMap()
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
         createPopConsole(renderer, vec2(500, 500));
+        createBibleTree(renderer, vec2(700, 500));
+        createGardener(renderer, vec2(1000, 700));
     }
 
     // clear ongoing dialogue to prepare for next
