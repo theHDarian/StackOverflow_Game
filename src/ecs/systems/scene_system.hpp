@@ -25,7 +25,7 @@ private:
     // instead of a bunch of if statements and hard coding
     SoundSystem* soundSystem;
     std::unordered_map<Scene, std::vector<Dialogue>> storyDialogue;
-    std::unordered_map<std::string, std::vector<Dialogue>> interactableDialogue;
+    std::unordered_map<InteractibleDialogue, std::vector<Dialogue>> interactableDialogue;
 
     void summonDialogue();
     void playerInputDialogue();

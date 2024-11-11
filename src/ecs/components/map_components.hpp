@@ -110,3 +110,31 @@ struct std::hash<Scene>
         return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1) ^ (h4 << 1);
     }
 };
+
+struct InteractibleDialogue {
+    std::string object;
+    int choice;
+    int dialogueCount;
+
+    //// ref: https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key
+    bool operator==(const InteractibleDialogue& other) const
+    {
+        return (object.compare(other.object) == 0
+            && choice == other.choice
+            && dialogueCount == other.dialogueCount);
+    }
+};
+
+// ref: https://en.cppreference.com/w/cpp/utility/hash
+template <>
+struct std::hash<InteractibleDialogue>
+{
+    std::size_t operator()(const InteractibleDialogue& s) const noexcept
+    {
+        std::size_t h1 = std::hash<std::string>{}(s.object);
+        std::size_t h2 = std::hash<int>{}(s.dialogueCount);
+        std::size_t h3 = std::hash<int>{}(s.choice);
+
+        return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1);
+    }
+};

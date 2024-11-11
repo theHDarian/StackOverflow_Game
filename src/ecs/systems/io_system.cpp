@@ -67,15 +67,31 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.tutorialOn = !ioState.tutorialOn;
 	}
 
-	// show dialogue window and play dialogue sequence (temp function)
+	// show dialogue window and play dialogue sequence
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
 		gameState.dialogueScene = true;
 	}
 
-	//Player movement
-	handleMovementInput(key,action,ioState, gameState);
+	
+	if (gameState.dialogueScene) {
+		handleDialogueChoice(key, action, ioState, gameState);
+	}
+		handleMovementInput(key, action, ioState, gameState);
 
+}
+
+void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameState& gameState) {
+	if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_W) { // highlight choice above
+			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+		}
+		else if (key == GLFW_KEY_S) { // highlight choice below
+			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
+		}
+	}
 }
 
 void IOSystem::mouseClick(int button, int action, int mods) {

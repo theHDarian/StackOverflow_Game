@@ -260,14 +260,21 @@ void MapSystem::resetMap()
         map.currRegion = MapRegion::Tutorial;
         map.roomsTraversed = 0;
 
+        /*
         // set initial room to enemy
         map.currRoom = Room();
         std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomBee);
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
+        */
+        map.currRoom = Room();
+        std::vector<RoomPreset> presets = roomDirectory.at(RoomType::RestRoom);
+        RoomPreset randomPreset = Random::ListItem(presets);
+        map.currRoom.preset = randomPreset;
     }
 
     // clear ongoing dialogue to prepare for next
+    // perhaps reset should be a main-system level thing to easily tell each system to reset itself?
     GameState& gameState = registry.gameStates.components[0];
     DialogueLines& lines = registry.dialogueLines.components[0];
     lines = DialogueLines();

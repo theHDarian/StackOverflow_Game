@@ -325,6 +325,12 @@ void TextSystem::renderDialogueUIText() {
             renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
     }
 
+    // workaround for now instead of having text have its own show
+    for (Entity entity : registry.dialogueChoices.entities) {
+        auto& textReq = registry.textRenderRequests.get(entity);
+        renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+    }
+
     glBindVertexArray(0);
     gl_has_errors();
 }

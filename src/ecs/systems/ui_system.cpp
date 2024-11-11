@@ -21,6 +21,17 @@ void UISystem::step(float elapsed_ms) {
 		if (!gameState.dialogueScene) {
 			registry.renderRequests.get(dialogueAvatar).show = false;
 		}
+		if (registry.dialogueChoices.entities.size() > 0) {
+			int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
+			int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
+
+			if (lastChoice > -1) {
+				registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
+				registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+			}
+			registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
+			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
+		}
 	}
 }
 
@@ -41,11 +52,24 @@ bool UISystem::init(GLFWwindow* window) {
 void UISystem::playDialogue() {
 	IOState& input = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];
+	WindowState& wS = registry.windowStates.components[0];
 
 	if (gameState.dialogueScene && input.nextDialogue) {
 		// keep track of current speaker stuff
 		std::string currSpeakerName = registry.dialogueLines.get(dialogueBox).prev().speakerName;
 		std::string currSpeakerAvatar = registry.dialogueLines.get(dialogueBox).prev().speakerAvatar;
+		
+		// check: what choice did the player make last time?
+		if (registry.dialogueChoices.entities.size() > 0)
+			gameState.dialogueChoice = input.hoveringDialogueChoice;
+
+		// clear choices here for now
+		for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+			Entity e = registry.dialogueChoices.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+
+		//std::cout << "player chose choice: " << gameState.dialogueChoice << std::endl;
 
 		input.nextDialogue = false;
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
@@ -76,6 +100,18 @@ void UISystem::playDialogue() {
 					registry.renderRequests.get(dialogueAvatar).show = false;
 				}
 			}
+
+			vec2 startingPosition = vec2(400, wS.height - wS.height / 8 - 25);
+			// display options for player if there is one
+			for (int i = 0; i < nextLine.choices.size(); i++) {
+				vec2 nextPosition = vec2(startingPosition.x, startingPosition.y + i * 50);
+				createDialogueChoice(nextLine.choices[i], nextPosition);
+			}
+			// set choice 1 to highlighted
+			if (registry.dialogueChoices.components.size() > 0) {
+				input.hoveringDialogueChoice = 0;
+				input.lastHoverDialogueChoice = -1;
+			}
 		}
 		// no more lines of dialogue
 		else {
@@ -87,6 +123,43 @@ void UISystem::playDialogue() {
 			soundSystem->stopNextDialogueSound();
 		}
 	}
+}
+
+Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	// consider doing a check of "should I render now"? Or hide entity?
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_triangle.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.dialogueUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = {30, 30};
+
+	//registry.dialogueUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = position.x + motion.scale.x;
+	text.y = windowState.height - position.y - motion.scale.y / 2;
+	text.scale = 0.45;
+	text.text = choice;
+	text.topRightBound = { windowState.width - 75, windowState.height - 25 };
+	text.bottomLeftBound = { text.x + 25, 0 + 25 };
+
+	registry.dialogueChoices.emplace(entity);
+
+	return entity;
 }
 
 Entity UISystem::createDialogueAvatar(vec2 position, vec2 scale) {

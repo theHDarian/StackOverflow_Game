@@ -303,6 +303,7 @@ struct Dialogue {
 	std::string text;
 	std::string speakerName;
 	std::string speakerAvatar;
+	std::vector<std::string> choices;
 	SoundType sfx;
 };
 
@@ -340,4 +341,8 @@ struct Fade {
 
 struct Deleted {
 	// this entity is marked for deletion
+};
+
+struct DialogueChoice {
+	bool selected = false;
 };

@@ -7,7 +7,7 @@
 SceneSystem::SceneSystem( SoundSystem* soundSystem) {
 	this->soundSystem = soundSystem;
 	storyDialogue = std::unordered_map<Scene, std::vector<Dialogue>>();
-	interactableDialogue = std::unordered_map<std::string, std::vector<Dialogue>>();
+	interactableDialogue = std::unordered_map<InteractibleDialogue, std::vector<Dialogue>>();
 	loadStoryDialogue();
 	loadInteractableDialogue();
 }
@@ -22,7 +22,8 @@ void SceneSystem::loadInteractableDialogue() {
 	std::ifstream entity_file(filename);
 	//Scene scene;
 	// for now, consider using just item name. In future may consider other conditions
-	std::string item;
+	//std::string item;
+	InteractibleDialogue item;
 	std::vector<Dialogue> lines;
 
 	if (entity_file.is_open())
@@ -47,11 +48,13 @@ void SceneSystem::loadInteractableDialogue() {
 					}
 
 					std::string itemName;
+					int choice;
+					int dialogueCount;
 
 					std::stringstream ss_line(line);
-					ss_line >> action >> itemName;
+					ss_line >> action >> itemName >> choice >> dialogueCount;
 
-					item = itemName;
+					item = {itemName, choice, dialogueCount};
 				}
 				else if (action.compare("SPEAKER") == 0) {
 					std::string speakerName;
@@ -78,7 +81,7 @@ void SceneSystem::loadInteractableDialogue() {
 					}
 				}
 				else if (action.compare("CHOICES") == 0) {
-					std::string choiceLine = line.substr(line.find_first_of(" "));
+					std::string choiceLine = line.substr(line.find_first_of(" ") + 1);
 					std::stringstream ss_choices(choiceLine);
 
 					std::string choice;
@@ -88,9 +91,8 @@ void SceneSystem::loadInteractableDialogue() {
 					while (std::getline(ss_choices, choice, ' ')) {
 						choices.push_back(choice);
 					}
-				}
-				else if (action.compare("CHOICE") == 0) {
 
+					lines.back().choices = choices;
 				}
 				else { // this is just a body of text
 					// need to manually add \n back into strings... use this until can think of better way
@@ -276,10 +278,12 @@ void SceneSystem::step(float elapsed_ms) {
 			map.currRoom.cleared = true;
 		}
 
-		//if (map.currRoom.type == RoomType::EnemyRoomBee) {
+		//if (map.currRoom.type == RoomType::RestRoom && map.currRoom.dialogueCount == 0) {
+		//	std::cout << "playing dialogue!" << std::endl;
 		//	DialogueLines& lines = registry.dialogueLines.components[0];
 		//	lines = DialogueLines();
-		//	lines.lines = interactableDialogue["PopStack"];
+		//	lines.lines = interactableDialogue[{"PopStack", -1, 0}];
+		//	summonDialogue();
 		//}
 
 		if (storyDialogue.count(scene) > 0) {
