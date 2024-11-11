@@ -807,6 +807,11 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
 	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
 
+	if (getModifiedValue(Homing, 0) > 0) {
+		HomingBullet& home = registry.homes.emplace(entity);
+		home.homingIntensity = getModifiedValue(Homing, 0);
+	}
+
 	//Invisible &inv = registry.invisibles.emplace(entity);
 	//inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
