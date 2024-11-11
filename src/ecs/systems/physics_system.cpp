@@ -107,6 +107,8 @@ void PhysicsSystem::step(float elapsed_ms)
 	}
 
 	// Player to interactible ranges/objects
+	// ideally circle to circle, but use aabb for now until find better way to have
+	// wall + interactible behaviour
 	for (uint i = 0; i < registry.interactibles.components.size(); i++) {
 		if (AABBToAABB(registry.interactibles.entities[i], player)) {
 			registry.collisions.emplace_with_duplicates(player, registry.interactibles.entities[i]);

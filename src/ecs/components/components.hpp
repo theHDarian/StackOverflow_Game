@@ -349,7 +349,7 @@ struct Deleted {
 };
 
 struct DialogueChoice {
-	bool selected = false;
+
 };
 
 struct InteractibleObject {
@@ -357,9 +357,8 @@ struct InteractibleObject {
 	int dialogueCount = 0;
 };
 
-struct DialogueRequest {
-	//std::string objectName;
-	//int dialogueCount;
+struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
+
 };
 
 struct InteractibleReaction {
@@ -370,5 +369,5 @@ struct InteractibleReaction {
 };
 
 struct NearbyInteractibles {
-
+	// placeholder component that has list of nearby interactibles the io system can respond to
 };

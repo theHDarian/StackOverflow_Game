@@ -119,7 +119,7 @@ int main() {
 		else if (ioSystem.isDialogue()) {
 			mapSystem.step(elapsed_ms); // just so the tutorial room can spawn an enemy right away
 			uiSystem.playDialogue();
-			world.step(elapsed_ms); // this is just where interactable objects are currently reacting in
+			world.step(elapsed_ms); // this is just where interactable objects are currently reacting in, consider separating later
 		}
 		else {
 			mapSystem.step(elapsed_ms);

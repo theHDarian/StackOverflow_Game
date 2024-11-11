@@ -160,8 +160,7 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 
 	InteractibleObject& object = registry.interactibles.emplace(console);
 	object.name = "PopStack";
-	// or maybe object type??
-	// somehow find way to bind choice num and actions
+	// or maybe object type enum? This is not a unique id, just an object type identifier
 
 	Animation& a = registry.animations.emplace(console);
 	a.max_frames = 8;

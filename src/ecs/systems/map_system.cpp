@@ -269,6 +269,8 @@ void MapSystem::resetMap()
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
         */
+
+        // temporarily set start room to empty, create pop console
         map.currRoom = Room();
         std::vector<RoomPreset> presets = roomDirectory.at(RoomType::RestRoom);
         RoomPreset randomPreset = Random::ListItem(presets);

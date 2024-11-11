@@ -74,19 +74,18 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		// bad check for when near interactible objects
 		// maybe should be two different keys? E and space?
 
-		// take nearest object
+		// take latest object
 		if (registry.nearbyInteractibles.entities.size() > 0) {
 			InteractibleObject& object = registry.interactibles.get(registry.nearbyInteractibles.entities[0]);
 			registry.dialogueRequests.emplace(registry.nearbyInteractibles.entities[0]);
 			registry.nearbyInteractibles.clear();
 		}
 	}
-
 	
 	if (gameState.dialogueScene) {
 		handleDialogueChoice(key, action, ioState, gameState);
 	}
-		handleMovementInput(key, action, ioState, gameState);
+	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
 }
 

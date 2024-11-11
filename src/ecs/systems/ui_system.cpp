@@ -21,14 +21,14 @@ void UISystem::step(float elapsed_ms) {
 		if (!gameState.dialogueScene) {
 			registry.renderRequests.get(dialogueAvatar).show = false;
 		}
+		// update which dialogue choice is highlighted. Consider updating only when necessary?
 		if (registry.dialogueChoices.entities.size() > 0) {
 			int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
 			int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
-
-			if (lastChoice > -1) {
-				registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
-				registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
-			}
+			// unhighlight the last hovered choice
+			registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
+			registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+			// highlight current choice
 			registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
 			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
 		}
@@ -58,8 +58,6 @@ void UISystem::playDialogue() {
 		// keep track of current speaker stuff
 		std::string currSpeakerName = registry.dialogueLines.get(dialogueBox).prev().speakerName;
 		std::string currSpeakerAvatar = registry.dialogueLines.get(dialogueBox).prev().speakerAvatar;
-
-		//std::cout << "player chose choice: " << gameState.dialogueChoice << std::endl;
 
 		input.nextDialogue = false;
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
@@ -97,32 +95,32 @@ void UISystem::playDialogue() {
 				vec2 nextPosition = vec2(startingPosition.x, startingPosition.y + i * 50);
 				createDialogueChoice(nextLine.choices[i], nextPosition);
 			}
-			// set choice 1 to highlighted
+			// set first choice to highlighted by default
 			if (registry.dialogueChoices.components.size() > 0) {
 				input.hoveringDialogueChoice = 0;
-				input.lastHoverDialogueChoice = -1;
+				input.lastHoverDialogueChoice = 0;
 			}
 		}
 		// no more lines of dialogue
 		else {
 			registry.renderRequests.get(dialogueBox).show = false;
-			gameState.dialogueScene = false;
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			Map& map = registry.maps.components[0];
 			map.currRoom.dialogueDone = true;
+			gameState.dialogueScene = false;
 			soundSystem->stopNextDialogueSound();
 		}
 	}
 }
 
+// makes a dialogue choice to be choice
+// consider separating text show with render request show
 Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	Entity entity = Entity();
 
-	// copies code from draw line as a box for now
-	// consider doing a check of "should I render now"? Or hide entity?
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "enemy_bullet_triangle.png",
+		{ "enemy_bullet_triangle.png", // temporary choice selection indicator
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
@@ -135,7 +133,7 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	motion.position = position;
 	motion.scale = {30, 30};
 
-	//registry.dialogueUITexts.emplace(entity);
+	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 
@@ -155,8 +153,6 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 Entity UISystem::createDialogueAvatar(vec2 position, vec2 scale) {
 	Entity entity = Entity();
 
-	// copies code from draw line as a box for now
-	// consider doing a check of "should I render now"? Or hide entity?
 	auto& rr = registry.renderRequests.insert(
 		entity,
 		{ "eel.png",

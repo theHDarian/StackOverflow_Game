@@ -39,10 +39,9 @@ void SceneSystem::loadInteractableDialogue() {
 			{
 				// split line different based on what first word is
 				std::string action = line.substr(0, line.find_first_of(" "));
-				//std::cout << action << std::endl;
 
 				if (action.compare("ITEM") == 0) {
-					// new scene, so place all prev lines into map, unless this is the first scene
+					// new item, so place all prev lines into map, unless this is the first item
 					if (lines.size() > 0) {
 						interactibleDialogue.insert({ {item}, {lines} });
 						lines = std::vector<Dialogue>();
@@ -60,9 +59,14 @@ void SceneSystem::loadInteractableDialogue() {
 				else if (action.compare("SPEAKER") == 0) {
 					std::string speakerName;
 					std::string speakerAvatar;
+					std::string reqBody;
 
 					std::stringstream ss_line(line);
-					ss_line >> action >> speakerName >> speakerAvatar;
+
+					// to allow spaces in speaker name
+					reqBody = line.substr(line.find_first_of(" ") + 1);
+					speakerAvatar = reqBody.substr(reqBody.find_last_of(" ") + 1);
+					speakerName = reqBody.substr(0, reqBody.find_last_of(" "));
 
 					lines.back().speakerName = speakerName;
 					lines.back().speakerAvatar = speakerAvatar;
@@ -235,26 +239,25 @@ void SceneSystem::summonDialogue() {
 	Map& map = registry.maps.components[0];
 	iostate.nextDialogue = true;
 	gameState.dialogueScene = true;
-	map.currRoom.dialogueCount++;
 	map.currRoom.dialogueDone = false;
+	map.currRoom.dialogueCount++;
 }
 
 // shows dialogue for interactible objects immediately
 void SceneSystem::summonInteractibleDialogue(Entity object) {
 	IOState& iostate = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];
+	Map& map = registry.maps.components[0];
 	iostate.nextDialogue = true;
 	gameState.dialogueScene = true;
-	Map& map = registry.maps.components[0];
 	map.currRoom.dialogueDone = false;
 }
 
 // shows dialogue only when player presses E (for now)
-// consider having hash to key as well
 void SceneSystem::playerInputDialogue() {
 	Map& map = registry.maps.components[0];
-	map.currRoom.dialogueCount++;
 	map.currRoom.dialogueDone = false;
+	map.currRoom.dialogueCount++;
 }
 
 void SceneSystem::step(float elapsed_ms) {
@@ -265,19 +268,20 @@ void SceneSystem::step(float elapsed_ms) {
 	if (gameState.dialogueScene && input.nextDialogue) {
 		// update choice
 		if (registry.dialogueChoices.entities.size() > 0) {
-			assert(registry.interactibles.has(currentObject));
+			assert(registry.interactibles.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
 
-			gameState.dialogueChoice = input.hoveringDialogueChoice;
+			gameState.dialogueChoice = input.hoveringDialogueChoice; // commit player choice
 			Entity objectEntity = currentObject;
-			registry.interactibleReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice);
+			registry.interactibleReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice); // emplace with dupes for now, in case some other system needs this
 			InteractibleObject& object = registry.interactibles.get(objectEntity);
 			InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
-			if (interactibleDialogue.count(dialogueObject) > 0) {
+			if (interactibleDialogue.count(dialogueObject) > 0) { // if there's more lines of dialogue to be played after choice
 				DialogueLines& lines = registry.dialogueLines.components[0];
 				lines = DialogueLines();
 				lines.lines = interactibleDialogue[dialogueObject];
 			}
-			gameState.dialogueChoice = -1; // enforce it to be valid only for duration of request
+			gameState.dialogueChoice = -1; 
+			// enforce it to be valid only for duration of request
 			// hope no other system needs to look at it rn...
 		}
 
@@ -312,7 +316,6 @@ void SceneSystem::step(float elapsed_ms) {
 		Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared };
 
 		// again, just check for that 1 tutorial room for now
-		// also consider some better way...
 		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 2 && !map.currRoom.cleared) {
 			map.currRoom.cleared = true;
 		}
@@ -330,14 +333,14 @@ void SceneSystem::step(float elapsed_ms) {
 			}
 		}
 
-		for (Entity entity : registry.dialogueRequests.entities) {
+		for (Entity entity : registry.dialogueRequests.entities) { // IDEALLY should only be one at a time
 			InteractibleObject& object = registry.interactibles.get(entity);
 			InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
 			if (interactibleDialogue.count(dialogueObject) > 0) {
 				DialogueLines& lines = registry.dialogueLines.components[0];
 				lines = DialogueLines();
 				lines.lines = interactibleDialogue[dialogueObject];
-				currentObject = entity;
+				currentObject = entity; // need to keep track of current speaking object
 				summonInteractibleDialogue(entity);
 			}
 		}

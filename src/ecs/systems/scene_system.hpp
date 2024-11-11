@@ -21,8 +21,6 @@ public:
     void step(float elapsed_ms);
 
 private:
-    // TO DO: add internal state of game to dialogue map
-    // instead of a bunch of if statements and hard coding
     SoundSystem* soundSystem;
     std::unordered_map<Scene, std::vector<Dialogue>> storyDialogue;
     std::unordered_map<InteractibleDialogue, std::vector<Dialogue>> interactibleDialogue;
