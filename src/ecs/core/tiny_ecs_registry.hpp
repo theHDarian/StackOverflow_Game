@@ -72,10 +72,10 @@ public:
 	ComponentContainer<Critter> critters;
 	ComponentContainer<Object> objects;
 	ComponentContainer<DialogueChoice> dialogueChoices;
-	ComponentContainer<InteractibleObject> interactibles;
+	ComponentContainer<InteractableObject> interactables;
 	ComponentContainer<DialogueRequest> dialogueRequests;
-	ComponentContainer<InteractibleReaction> interactibleReactions;
-	ComponentContainer<NearbyInteractibles> nearbyInteractibles;
+	ComponentContainer<InteractableReaction> interactableReactions;
+	ComponentContainer<NearbyInteractables> nearbyInteractables;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -140,10 +140,10 @@ public:
 		registry_list.push_back(&critters);
 		registry_list.push_back(&objects);
 		registry_list.push_back(&dialogueChoices);
-		registry_list.push_back(&interactibles);
+		registry_list.push_back(&interactables);
 		registry_list.push_back(&dialogueRequests);
-		registry_list.push_back(&interactibleReactions);
-		registry_list.push_back(&nearbyInteractibles);
+		registry_list.push_back(&interactableReactions);
+		registry_list.push_back(&nearbyInteractables);
 	}
 
 	void clear_all_components() {

@@ -352,7 +352,7 @@ struct DialogueChoice {
 
 };
 
-struct InteractibleObject {
+struct InteractableObject {
 	std::string name;
 	int dialogueCount = 0;
 };
@@ -361,13 +361,13 @@ struct DialogueRequest { // consider adding req types, so that dialogue system k
 
 };
 
-struct InteractibleReaction {
+struct InteractableReaction {
 	// something changed, let the object know what
 	Entity object;
 	int choice = -1;
-	InteractibleReaction(Entity& object, int choice) { this->object = object; this->choice = choice; };
+	InteractableReaction(Entity& object, int choice) { this->object = object; this->choice = choice; };
 };
 
-struct NearbyInteractibles {
+struct NearbyInteractables {
 	// placeholder component that has list of nearby interactibles the io system can respond to
 };

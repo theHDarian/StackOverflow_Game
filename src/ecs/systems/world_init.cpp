@@ -143,11 +143,8 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 	auto& o = registry.objects.emplace(console);
 	o.baseOffset = 20;
 
-	auto& wall = registry.walls.emplace(console);
 	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
-	wall.startPosition = vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2);
-	wall.endPosition = vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2);
-
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
 	registry.backgrounds.emplace(console);
 
 	//TODO Add collider so player can interact
@@ -155,10 +152,10 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 
 	// use aabb as near player range for now, not sure if I can use another circle
 	AABBCollider& aabb = registry.aabbs.emplace(console);
-	aabb.topLeft = vec2(-m.scale.x / 2, -m.scale.y / 2);
-	aabb.bottomRight = vec2(m.scale.x / 2, m.scale.y / 2);
+	aabb.topLeft = vec2(-m.scale.x / 10, -m.scale.y / 50);
+	aabb.bottomRight = vec2(m.scale.x / 2, m.scale.y / 1.5);
 
-	InteractibleObject& object = registry.interactibles.emplace(console);
+	InteractableObject& object = registry.interactables.emplace(console);
 	object.name = "PopStack";
 	// or maybe object type enum? This is not a unique id, just an object type identifier
 

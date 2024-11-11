@@ -268,12 +268,12 @@ void SceneSystem::step(float elapsed_ms) {
 	if (gameState.dialogueScene && input.nextDialogue) {
 		// update choice
 		if (registry.dialogueChoices.entities.size() > 0) {
-			assert(registry.interactibles.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
+			assert(registry.interactables.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
 
 			gameState.dialogueChoice = input.hoveringDialogueChoice; // commit player choice
 			Entity objectEntity = currentObject;
-			registry.interactibleReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice); // emplace with dupes for now, in case some other system needs this
-			InteractibleObject& object = registry.interactibles.get(objectEntity);
+			registry.interactableReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice); // emplace with dupes for now, in case some other system needs this
+			InteractableObject& object = registry.interactables.get(objectEntity);
 			InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
 			if (interactibleDialogue.count(dialogueObject) > 0) { // if there's more lines of dialogue to be played after choice
 				DialogueLines& lines = registry.dialogueLines.components[0];
@@ -334,7 +334,7 @@ void SceneSystem::step(float elapsed_ms) {
 		}
 
 		for (Entity entity : registry.dialogueRequests.entities) { // IDEALLY should only be one at a time
-			InteractibleObject& object = registry.interactibles.get(entity);
+			InteractableObject& object = registry.interactables.get(entity);
 			InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
 			if (interactibleDialogue.count(dialogueObject) > 0) {
 				DialogueLines& lines = registry.dialogueLines.components[0];

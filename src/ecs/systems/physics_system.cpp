@@ -109,9 +109,9 @@ void PhysicsSystem::step(float elapsed_ms)
 	// Player to interactible ranges/objects
 	// ideally circle to circle, but use aabb for now until find better way to have
 	// wall + interactible behaviour
-	for (uint i = 0; i < registry.interactibles.components.size(); i++) {
-		if (AABBToAABB(registry.interactibles.entities[i], player)) {
-			registry.collisions.emplace_with_duplicates(player, registry.interactibles.entities[i]);
+	for (uint i = 0; i < registry.interactables.components.size(); i++) {
+		if (AABBToAABB(registry.interactables.entities[i], player)) {
+			registry.collisions.emplace_with_duplicates(player, registry.interactables.entities[i]);
 		}
 	}
 
@@ -157,16 +157,6 @@ void PhysicsSystem::step(float elapsed_ms)
 				(registry.meshColliders.has(enemies.entities[i]) && CircleToMesh(pBullets.entities[j], enemies.entities[i]))) {
 				registry.collisions.emplace_with_duplicates(enemies.entities[i], pBullets.entities[j]);
 			}
-		}
-	}
-
-
-
-	 //Player  -> debugComponents (circle to poly)
-	ComponentContainer<DebugComponent>& debug = registry.debugComponents;
-	for (uint i = 0; i < debug.components.size(); i++) {
-		if (CircleToPoly(player, debug.entities[i])) {
-			registry.collisions.emplace_with_duplicates(player, debug.entities[i]);
 		}
 	}
 

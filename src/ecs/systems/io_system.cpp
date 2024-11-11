@@ -75,10 +75,9 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		// maybe should be two different keys? E and space?
 
 		// take latest object
-		if (registry.nearbyInteractibles.entities.size() > 0) {
-			InteractibleObject& object = registry.interactibles.get(registry.nearbyInteractibles.entities[0]);
-			registry.dialogueRequests.emplace(registry.nearbyInteractibles.entities[0]);
-			registry.nearbyInteractibles.clear();
+		if (registry.nearbyInteractables.entities.size() > 0) {
+			InteractableObject& object = registry.interactables.get(registry.nearbyInteractables.entities[0]);
+			registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
 		}
 	}
 	

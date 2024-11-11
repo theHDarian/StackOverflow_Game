@@ -112,12 +112,20 @@ void clearRoomActors()
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
+    for (Entity ent : registry.interactables.entities)
+    {
+        if (!registry.deleteds.has(ent))
+            registry.deleteds.emplace(ent);
+    }
+    /*
     // lame fix for splitting bullet persisting after reset
+    // doesnt work!!
     for (Entity ent : registry.enemyBullets.entities)
     {
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
+    */
 
     registry.emitParticles.emplace(Entity(), ParticleRequestType::ClearParticles, 0.0f, 0);
 }
