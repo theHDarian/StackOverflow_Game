@@ -117,6 +117,11 @@ void clearRoomActors()
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
+    for (Entity ent : registry.critters.entities)
+    {
+        if (!registry.deleteds.has(ent))
+            registry.deleteds.emplace(ent);
+    }
     /*
     // lame fix for splitting bullet persisting after reset
     // doesnt work!!
