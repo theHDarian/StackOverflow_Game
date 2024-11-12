@@ -17,13 +17,13 @@
 # SOUND soundname
 
 # format for choice:
-# CHOICE choice1 choice2 choice3...
+# CHOICES choice1\choice2\choice3...
 
 # note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
 
 ITEM PopStack -1 0
 Do you want to pop stack?
-CHOICES Yes No
+CHOICES Yes\No
 SPEAKER Pop Console pop_console.png
 
 ITEM PopStack 0 0
@@ -38,7 +38,7 @@ You've already used this!
 
 ITEM BibleTree -1 0
 A tree with red fruits. Pick one?
-CHOICES Yes No
+CHOICES Yes\No
 
 ITEM BibleTree 0 0
 You pick off a fruit. It gives off an eerie shine.
@@ -49,7 +49,7 @@ You decide to not give into your temptations.
 
 ITEM BibleTree -1 1
 A tree with one less red fruit. Would you like to pick another?
-CHOICES Yes No
+CHOICES Yes\No
 
 ITEM BibleTree 0 1
 You pick off a fruit. You begin to wonder what you'll do with all this fruit.
@@ -59,8 +59,17 @@ ITEM BibleTree 1 1
 Perhaps one fruit really is enough.
 
 ITEM BibleTree -1 2
-Little robot: +2 fruits. Tree: -2 fruits. Yeah, that might be enough.
+Little robot: +2 fruits. Tree: -2 fruits. Yeah, that might be enough for now.
 
 ITEM Gardener -1 0
 Isn't the weather nice today?
+SPEAKER Gardener eel.png
+CHOICES It sure is.\But there is no weather to speak of here?
+
+ITEM Gardener 0 0
+Hehe, I knew you'd think so too!
+SPEAKER Gardener eel.png
+
+ITEM Gardener 1 0
+Tsk, tsk. Can't you let a gardener dream?
 SPEAKER Gardener eel.png

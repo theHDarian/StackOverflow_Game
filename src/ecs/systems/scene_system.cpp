@@ -93,7 +93,7 @@ void SceneSystem::loadInteractableDialogue() {
 					std::vector<std::string> choices;
 
 					// ref: https://stackoverflow.com/questions/5888022/split-string-by-single-spaces
-					while (std::getline(ss_choices, choice, ' ')) {
+					while (std::getline(ss_choices, choice, '\\')) {
 						choices.push_back(choice);
 					}
 
