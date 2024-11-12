@@ -353,7 +353,7 @@ vec2 AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	boidKeepBound(entity, boid);
 
 
-	float maxSpeed = 200.f;
+	float maxSpeed = 300.f;
 	if (glm::length(boid.velocity) > maxSpeed)
 	{
 		boid.velocity = glm::normalize(boid.velocity) * maxSpeed;
