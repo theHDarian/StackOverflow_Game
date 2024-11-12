@@ -86,7 +86,7 @@ void SceneSystem::step(float elapsed_ms) {
 		Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared };
 
 		// again, just check for that 1 tutorial room for now
-		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 2 && !map.currRoom.cleared) {
+		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 3 && !map.currRoom.cleared) {
 			map.currRoom.cleared = true;
 		}
 
@@ -113,7 +113,10 @@ void SceneSystem::step(float elapsed_ms) {
 				}
 			}
 			else if (req.type == DialogueRequestType::StoryDialogue) {
+				scene.dialogueCount++; // check if have match for +1 over
 				if (storyDialogue.count(scene) > 0) {
+					// if so, make sure to add + 1 to current room too
+					map.currRoom.dialogueCount++;
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
 					lines.lines = storyDialogue[scene];

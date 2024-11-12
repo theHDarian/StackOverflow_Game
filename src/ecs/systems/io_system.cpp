@@ -74,7 +74,6 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 			registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
 		}
 		else if (!gameState.dialogueScene && registry.maps.components[0].currRoom.dialogueDone) {
-			registry.maps.components[0].currRoom.dialogueCount++; // lame way to "wait until player input" by adding 1 to counter
 			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
 			req.type = DialogueRequestType::StoryDialogue;
 		}
