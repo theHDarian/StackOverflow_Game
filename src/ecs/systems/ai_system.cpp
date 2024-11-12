@@ -371,19 +371,20 @@ void AISystem::boidKeepBound(Entity entity, Boid &boid) {
     float maxX = width - 150.f - scale[0];
     float maxY = height - 100.f - scale[1];
     float turnFactor = 0.5f;
+	float momentumFactor = 50.f;
     vec2 position = boid.position;
 
     if (position[0] < minX) {
-        boid.velocity[0] = glm::abs(boid.velocity[0]) + turnFactor;
+        boid.velocity[0] += glm::abs(boid.velocity[0]) * turnFactor + momentumFactor;
     }
     if (position[0] > maxX) {
-        boid.velocity[0] = -glm::abs(boid.velocity[0]) - turnFactor;
+        boid.velocity[0] -= glm::abs(boid.velocity[0]) * turnFactor + momentumFactor;
     }
     if (position[1] < minY) {
-        boid.velocity[1] = glm::abs(boid.velocity[1]) + turnFactor;
+        boid.velocity[1] += glm::abs(boid.velocity[1]) * turnFactor + momentumFactor;
     }
     if (position[1] > maxY) {
-        boid.velocity[1] = -glm::abs(boid.velocity[1]) - turnFactor;
+        boid.velocity[1] -= glm::abs(boid.velocity[1]) * turnFactor + momentumFactor;
     }
 }
 

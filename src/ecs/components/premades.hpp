@@ -870,7 +870,7 @@ struct EnemyHardBoid :  Enemy {
 		currHealth = maxHealth;
 		enemyPatterns = {boidState};
 		sprite = {
-			"enemy_bullet_circle.png",
+			"enemy_bullet_triangle.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
