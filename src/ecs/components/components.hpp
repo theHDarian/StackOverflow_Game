@@ -358,8 +358,13 @@ struct InteractableObject {
 	int dialogueCount = 0;
 };
 
-struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
+enum DialogueRequestType {
+	StoryDialogue,
+	InteractableDialogue
+};
 
+struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
+	DialogueRequestType type = InteractableDialogue;
 };
 
 struct InteractableReaction {

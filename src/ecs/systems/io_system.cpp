@@ -62,21 +62,25 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.debugMode = !ioState.debugMode;
 	}
 
-	// show dialogue window and play dialogue sequence
+	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
-		gameState.dialogueScene = true;
-		// bad check for when near interactible objects
-		// maybe should be two different keys? E and space?
 
 		// take latest object
 		if (registry.nearbyInteractables.entities.size() > 0) {
 			InteractableObject& object = registry.interactables.get(registry.nearbyInteractables.entities[0]);
+			// for now, have all interacted objects go through dialogue
+			// can change in the future
 			registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
+		}
+		else if (!gameState.dialogueScene && registry.maps.components[0].currRoom.dialogueDone) {
+			registry.maps.components[0].currRoom.dialogueCount++; // lame way to "wait until player input" by adding 1 to counter
+			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+			req.type = DialogueRequestType::StoryDialogue;
 		}
 	}
 	
-	if (gameState.dialogueScene) {
+	if (gameState.dialogueScene && !gameState.gamePaused) {
 		handleDialogueChoice(key, action, ioState, gameState);
 	}
 	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
@@ -93,6 +97,9 @@ void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameSta
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
 			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
 		}
+		//else if (key == GLFW_KEY_SPACE) { // progress through dialogue
+		//	state.nextDialogue = true;
+		//}
 	}
 }
 

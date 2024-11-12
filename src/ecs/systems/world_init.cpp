@@ -298,11 +298,18 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	door.startPos = startPos;
 	door.endPos = endPos;
 
+	InteractableObject& object = registry.interactables.emplace(entity);
+	object.name = "LockedDoor";
+
 	registry.renderRequests.insert(
 		entity,
 		{"none",
 		 EFFECT_ASSET_ID::EGG,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE});
+
+	// bad fix for interactable object system to figure out door index
+	door.doorIndex = registry.doors.components.size() - 1;
+
 	return entity;
 }
 

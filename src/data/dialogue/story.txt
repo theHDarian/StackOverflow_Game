@@ -39,7 +39,7 @@ Let me know once you're done.
 [Try moving around the room using the [WASD] keys, or dash around using [SPACE]/[Right Mouse Button]. \nCall the scientist again by pressing [E] when you're done looking around.]
 SPEAKER N N
 
-SCENE TutorialRoom1 1 1 0 -1
+SCENE TutorialRoom1 2 1 0 -1
 Done looking around?
 SPEAKER Scientist scientist_avatar.png
 SOUND IncomingDialogue

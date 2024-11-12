@@ -445,6 +445,17 @@ void RenderSystem::drawGameElements()
 			drawAllColliders(entity, projection_2D);
 	}
 
+	for (Entity& entity : registry.objects.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
+			drawTexturedMesh(entity, projection_2D);
+			if (ioState.debugMode)
+				drawAllColliders(entity, projection_2D);
+		}
+	}
+
 	for (Entity& entity : registry.playerBullets.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -459,15 +470,6 @@ void RenderSystem::drawGameElements()
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 		drawHPbar(entity, projection_2D);
-		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
-	}
-
-	for (Entity& entity : registry.objects.entities)
-	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
-			continue;
-		drawTexturedMesh(entity, projection_2D);
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection_2D);
 	}

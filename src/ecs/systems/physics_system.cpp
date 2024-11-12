@@ -180,10 +180,12 @@ void PhysicsSystem::step(float elapsed_ms)
 
 	//Player -> doors
 	for (uint i = 0; i < doors.components.size(); i++) {
-		if (!doors.components[i].isPrev && CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)) {
+		if (/*!doors.components[i].isPrev &&*/ CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)) {
 			//spawn on side opposite to the door
-			if (registry.mapRequests.components.size() <= 0)
-				registry.mapRequests.emplace(doors.entities[i],MapRequestType::ChangeRoom,doors.components[i].room,i);
+			if (registry.mapRequests.components.size() <= 0 && !registry.nearbyInteractables.has(registry.doors.entities[i]))
+				registry.nearbyInteractables.emplace(registry.doors.entities[i]); // user has to press e to move doors
+				//registry.dialogueRequests.emplace(registry.doors.entities[i]); // prompt user if want to change door
+				//registry.mapRequests.emplace(doors.entities[i],MapRequestType::ChangeRoom,doors.components[i].room,i);
 		}
 	}
 

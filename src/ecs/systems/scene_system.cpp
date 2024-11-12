@@ -94,28 +94,35 @@ void SceneSystem::step(float elapsed_ms) {
 			DialogueLines& lines = registry.dialogueLines.components[0];
 			lines = DialogueLines();
 			lines.lines = storyDialogue[scene];
-			// right now, just check for that one scene
-			if (scene == Scene{RoomType::TutorialRoom1, 1, 1, false}) {
-				playerInputDialogue();
-			}
-			else {
-				summonDialogue();
-			}
+			summonDialogue();
 			isStoryDialogue = true;
 		}
 
 		for (Entity entity : registry.dialogueRequests.entities) { // IDEALLY should only be one at a time
-			InteractableObject& object = registry.interactables.get(entity);
-			InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
-			if (interactibleDialogue.count(dialogueObject) > 0) {
-				DialogueLines& lines = registry.dialogueLines.components[0];
-				lines = DialogueLines();
-				lines.lines = interactibleDialogue[dialogueObject];
-				currentObject = entity; // need to keep track of current speaking object
-				summonInteractibleDialogue(entity);
-				isStoryDialogue = false;
+			DialogueRequest& req = registry.dialogueRequests.get(entity);
+			if (req.type == DialogueRequestType::InteractableDialogue) {
+				InteractableObject& object = registry.interactables.get(entity);
+				InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+				if (interactibleDialogue.count(dialogueObject) > 0) {
+					DialogueLines& lines = registry.dialogueLines.components[0];
+					lines = DialogueLines();
+					lines.lines = interactibleDialogue[dialogueObject];
+					currentObject = entity; // need to keep track of current speaking object
+					summonInteractibleDialogue(entity);
+					isStoryDialogue = false;
+				}
+			}
+			else if (req.type == DialogueRequestType::StoryDialogue) {
+				if (storyDialogue.count(scene) > 0) {
+					DialogueLines& lines = registry.dialogueLines.components[0];
+					lines = DialogueLines();
+					lines.lines = storyDialogue[scene];
+					summonDialogue();
+					isStoryDialogue = true;
+				}
 			}
 		}
+		
 		registry.dialogueRequests.clear();
 	}
 
@@ -381,13 +388,6 @@ void SceneSystem::summonInteractibleDialogue(Entity object) {
 	iostate.nextDialogue = true;
 	gameState.dialogueScene = true;
 	map.currRoom.dialogueDone = false;
-}
-
-// shows dialogue only when player presses E (for now)
-void SceneSystem::playerInputDialogue() {
-	Map& map = registry.maps.components[0];
-	map.currRoom.dialogueDone = false;
-	map.currRoom.dialogueCount++;
 }
 
 void SceneSystem::handleStoryChoices() {

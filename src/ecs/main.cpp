@@ -111,7 +111,7 @@ int main() {
 		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
 
 		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
-			world.handleInput();
+			// do nothing
 		}
 		else if (ioSystem.isCutscene()) { // should be in separate system, but lazy
 			renderer.step(elapsed_ms);

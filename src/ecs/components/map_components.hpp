@@ -35,6 +35,7 @@ struct Door {
 	RoomType room; //room the door leads to
     bool isPrev; //if is previous room, block it
     vec2 startPos, endPos;
+    int doorIndex = -1; // used by interactibles for now
 };
 struct DoorSymbol {
     float angle;

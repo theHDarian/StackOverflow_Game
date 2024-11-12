@@ -174,7 +174,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		movePlayer();
 		//check dash related variables
 		dash(dashDirection, elapsed_ms_since_last_update);
-
 		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
 	}
 
@@ -282,6 +281,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				iostate.tutorialOn = true;
 			}
 			registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+		}
+
+		if (object.name.compare("UnlockedDoor") == 0) {
+			assert(registry.doors.has(reaction.object));
+			
+			if (reaction.choice == 0) {
+				registry.mapRequests.emplace(reaction.object, MapRequestType::ChangeRoom, registry.doors.get(reaction.object).room, registry.doors.get(reaction.object).doorIndex);
+			}
 		}
 	}
 
@@ -391,7 +398,6 @@ void WorldSystem::handleCollisions() {
 			if (registry.interactables.has(entity_other)) {
 				// bad singleton implementation: only interested in one E so just io system can just grab most recent one
 				// consider grabbing nearest one instead
-				//registry.nearbyInteractables.clear();
 				if (!registry.interactableReactions.has(entity_other))
 					registry.nearbyInteractables.emplace(entity_other);
 			}

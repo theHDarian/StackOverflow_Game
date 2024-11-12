@@ -30,6 +30,22 @@ Would you like to skip the tutorial?
 CHOICES Yes\No
 CUT blackscreen.png
 
+ITEM LockedTutorialDoor -1 0
+The door seems to be locked. Maybe the scientist could lend a hand?
+
+ITEM EmptyDoor -1 0
+This doesn't seem to lead to anywhere.
+
+ITEM UnlockedDoor -1 0
+Enter door?
+CHOICES Yes\No
+
+ITEM LockedDoor -1 0
+The door is locked.
+
+ITEM PrevDoor -1 0
+The only way out is forwards, not backwards!
+
 ITEM PopStack -1 0
 Do you want to pop stack?
 CHOICES Yes\No
