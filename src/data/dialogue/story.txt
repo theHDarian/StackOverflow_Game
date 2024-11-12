@@ -75,3 +75,19 @@ Anyway, to get to the lab exit, I suggest you make your way to the Biology Wing.
 I'll contact you again when you get there. I wish you luck, little robot.
 [Press [P] to pause and hover over your stack to take a closer look at it!]
 SPEAKER N N
+# REMOVE LATER
+# notice how this line is too long so it overlaps with the choices
+Also this is just a test for story dialogue choices. Player, which fruit do you like more?
+CHOICES Apples\Cherries
+
+SCENE TutorialRoom2 2 0 1 0
+I see, so you like apples.
+
+SCENE TutorialRoom2 2 0 1 1
+I see, so you like cherries.
+
+# note: adding as an extra dialogue makes dialogue box sleep for 1 ms before waking up
+# consider constantly checking if there's dialogue before sleeping to prevent flashing
+# like when dealing with choices?
+SCENE TutorialRoom2 3 0 1 -1
+Thanks for answering!

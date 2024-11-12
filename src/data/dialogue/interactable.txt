@@ -32,6 +32,7 @@ CUT blackscreen.png
 
 ITEM LockedTutorialDoor -1 0
 The door seems to be locked. Maybe the scientist could lend a hand?
+[Call the scientist by pressing [E] when you're done looking around the room.]
 
 ITEM EmptyDoor -1 0
 This doesn't seem to lead to anywhere.
@@ -62,7 +63,7 @@ ITEM PopStack -1 1
 You've already used this!
 
 ITEM BibleTree -1 0
-A tree with red fruits. Pick one?
+A tree with red fruit. Pick one?
 CHOICES Yes\No
 
 ITEM BibleTree 0 0

@@ -42,11 +42,12 @@ void SceneSystem::step(float elapsed_ms) {
 			else {
 				// figure out where to react to story changes -- probably here for now
 				handleStoryChoices();
-				Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared };
+				Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared, gameState.dialogueChoice };
 				if (storyDialogue.count(scene) > 0) { // if there's more lines of dialogue to be played after choice
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
 					lines.lines = storyDialogue[scene];
+					map.currRoom.dialogueCount++; // increment here for now, consider removing auto-increment
 				}
 			}
 
@@ -83,9 +84,9 @@ void SceneSystem::step(float elapsed_ms) {
 	// make sure we only have 1 dialogue going on at a time
 	if (map.currRoom.dialogueDone) {
 		// construct current scene object
-		Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared };
+		Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared, gameState.dialogueChoice };
 
-		// again, just check for that 1 tutorial room for now
+		// just check for that 1 tutorial room for now
 		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 3 && !map.currRoom.cleared) {
 			map.currRoom.cleared = true;
 		}
@@ -164,9 +165,10 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					int dialogueCount;
 					int cutsceneCount;
 					bool roomCleared;
+					int choice;
 
 					std::stringstream ss_line(line);
-					ss_line >> action >> roomName >> dialogueCount >> cutsceneCount >> roomCleared;
+					ss_line >> action >> roomName >> dialogueCount >> cutsceneCount >> roomCleared >> choice;
 
 					// lazy way to deal with room enums for now, fix later
 					RoomType room;
@@ -177,7 +179,7 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 						room = RoomType::TutorialRoom2;
 					}
 
-					scene = { room, dialogueCount, cutsceneCount, roomCleared };
+					scene = { room, dialogueCount, cutsceneCount, roomCleared, choice };
 
 					//std::cout << roomName << dialogueCount << cutsceneCount << roomCleared << std::endl;
 				}
@@ -302,7 +304,17 @@ void SceneSystem::summonInteractibleDialogue(Entity object) {
 	map.currRoom.dialogueDone = false;
 }
 
-// Not finished
 void SceneSystem::handleStoryChoices() {
 	// hard code reactions for now
+	Map& map = registry.maps.components[0];
+	GameState& gameState = registry.gameStates.components[0];
+	if (map.currRoom.type == RoomType::TutorialRoom2 && map.currRoom.dialogueCount == 2 && map.currRoom.cleared) {
+		std::cout << "The player has chosen ";
+		if (gameState.dialogueChoice == 0) {
+			std::cout << "apples!" << std::endl;
+		}
+		else {
+			std::cout << "cherries!" << std::endl;
+		}
+	}
 }

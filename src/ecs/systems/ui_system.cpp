@@ -83,7 +83,7 @@ void UISystem::playDialogue() {
 				registry.textRenderRequests.get(dialogueAvatar).text = nextLine.speakerName;
 			}
 			if (nextLine.speakerAvatar.length() > 0 && nextLine.speakerAvatar.compare(currSpeakerAvatar) != 0) {
-				if (nextLine.speakerName != "N") { // N is narrator for now
+				if (nextLine.speakerName.compare("N") != 0) { // N is narrator for now
 					registry.renderRequests.get(dialogueAvatar).show = true;
 					registry.renderRequests.get(dialogueAvatar).texture_name = nextLine.speakerAvatar;
 				}
@@ -94,8 +94,13 @@ void UISystem::playDialogue() {
 			
 			// change screen cut in image if there is one
 			if (nextLine.cutInTexture.length() > 0 && nextLine.cutInTexture.compare(currCutIn) != 0) {
-				registry.renderRequests.get(screenCutIn).texture_name = nextLine.cutInTexture;
-				registry.renderRequests.get(screenCutIn).show = true;
+				if (nextLine.cutInTexture.compare("N") != 0) {
+					registry.renderRequests.get(screenCutIn).texture_name = nextLine.cutInTexture;
+					registry.renderRequests.get(screenCutIn).show = true;
+				}
+				else {
+					registry.renderRequests.get(screenCutIn).show = true;
+				}
 			}
 
 			vec2 startingPosition = vec2(400, wS.height - wS.height / 8 - 25);

@@ -86,6 +86,7 @@ struct Scene {
     int dialogueCount;
     int cutSceneCount;
     bool roomCleared;
+    int choice;
 
     //// ref: https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key
     bool operator==(const Scene& other) const
@@ -93,7 +94,8 @@ struct Scene {
         return (room == other.room
             && dialogueCount == other.dialogueCount
             && cutSceneCount == other.cutSceneCount
-            && roomCleared == other.roomCleared);
+            && roomCleared == other.roomCleared
+            && choice == other.choice);
     }
 };
 
@@ -107,8 +109,9 @@ struct std::hash<Scene>
         std::size_t h2 = std::hash<int>{}(s.dialogueCount);
         std::size_t h3 = std::hash<int>{}(s.cutSceneCount);
         std::size_t h4 = std::hash<bool>{}(s.roomCleared);
+        std::size_t h5 = std::hash<int>{}(s.choice);
 
-        return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1) ^ (h4 << 1);
+        return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1) ^ (h4 << 1) ^ ((h5 << 1) >> 1);
     }
 };
 
