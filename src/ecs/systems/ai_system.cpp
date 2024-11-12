@@ -5,6 +5,8 @@
 #include "actor_components.hpp"
 #include "io_components.hpp"
 #include <iostream>
+#include <random>
+#include <glm/glm.hpp>
 
 void AISystem::step(float elapsed_ms)
 {
@@ -13,6 +15,12 @@ void AISystem::step(float elapsed_ms)
 	// std::cout << enemy_registry.entities.size() << " is the size of enemy entity" << std::endl;
 	for (Entity entity : enemy_registry.entities)
 	{
+		if (registry.boids.has(entity))
+		{
+			Boid &boid = registry.boids.get(entity);
+			computeBoidVelocity(entity, boid);
+			continue;
+		}
 
 		Enemy &enemy = enemy_registry.get(entity);
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
@@ -78,7 +86,8 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		if (registry.bees.get(entity).nearbyBees.size() == 0)
 		{
 			auto reaction = getReactions(currPattern.reactions, ReactionType::NO_BEES);
-			if (reaction) {
+			if (reaction)
+			{
 				enemy.patternIndex = reaction->index;
 				enemy.newPattern = true;
 				reaction_found = true;
@@ -97,11 +106,11 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			if (bee != entity)
 			{
 				closeToBee = (glm::distance(EnemyPosMotion, registry.motions.get(bee).position) < closeToBeeDistance);
-				BeeEnemy& beeComponent = registry.bees.get(entity);
-				BeeEnemy& otherBeeComponent = registry.bees.get(bee);
+				BeeEnemy &beeComponent = registry.bees.get(entity);
+				BeeEnemy &otherBeeComponent = registry.bees.get(bee);
 				int mergeTotal = beeComponent.mergeCount + otherBeeComponent.mergeCount;
-				//beeComponent.
-				Motion& motion = registry.motions.get(entity);
+				// beeComponent.
+				Motion &motion = registry.motions.get(entity);
 				if (closeToBee && mergeTotal <= beeComponent.maxMerge)
 				{
 					registry.bees.get(entity).nearbyBees.insert(bee);
@@ -111,8 +120,8 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 						enemy.patternIndex = reaction->index;
 						enemy.newPattern = true;
 						reaction_found = true;
-						BeeEnemy& beeComponent = registry.bees.get(entity);
-						BeeEnemy& otherBeeComponent = registry.bees.get(bee);
+						BeeEnemy &beeComponent = registry.bees.get(entity);
+						BeeEnemy &otherBeeComponent = registry.bees.get(bee);
 					}
 					if (registry.bees.get(entity).nearbyBees.size() == 0)
 					{
@@ -333,4 +342,172 @@ vec2 AISystem::evadeBullet(Entity entity)
 
 void AISystem::angryMode(Entity entity)
 {
+}
+
+vec2 AISystem::computeBoidVelocity(Entity entity, Boid &boid)
+{
+	boidWander(entity, boid);
+	boidComputeCoherence(entity, boid);
+	boidComputeSeperation(entity, boid);
+	boidComputeAlignment(entity, boid);
+	boidKeepBound(entity, boid);
+
+
+	float maxSpeed = 200.f;
+	if (glm::length(boid.velocity) > maxSpeed)
+	{
+		boid.velocity = glm::normalize(boid.velocity) * maxSpeed;
+	}
+}
+
+void AISystem::boidKeepBound(Entity entity, Boid &boid) {
+    WindowState &windowState = registry.windowStates.components[0];
+    int width = windowState.width;
+    int height = windowState.height;
+
+    vec2 scale = registry.motions.get(entity).scale;
+    float minX = 150.f + scale[0];
+    float minY = 100.f + scale[1];
+    float maxX = width - 150.f - scale[0];
+    float maxY = height - 100.f - scale[1];
+    float turnFactor = 0.5f;
+    vec2 position = boid.position;
+
+    if (position[0] < minX) {
+        boid.velocity[0] = glm::abs(boid.velocity[0]) + turnFactor;
+    }
+    if (position[0] > maxX) {
+        boid.velocity[0] = -glm::abs(boid.velocity[0]) - turnFactor;
+    }
+    if (position[1] < minY) {
+        boid.velocity[1] = glm::abs(boid.velocity[1]) + turnFactor;
+    }
+    if (position[1] > maxY) {
+        boid.velocity[1] = -glm::abs(boid.velocity[1]) - turnFactor;
+    }
+}
+
+void AISystem::boidComputeCoherence(Entity entity, Boid &boid)
+{
+	float centeringFactor = 0.01;
+	vec2 center = vec2{0, 0};
+	int numNeighbors = 0;
+
+	vec2 position = boid.position;
+	for (Entity other : registry.boids.entities)
+	{
+		if (other == entity)
+		{
+			continue;
+		};
+		Boid &otherBoid = registry.boids.get(other);
+		vec2 otherPos = otherBoid.position;
+		float neighborRnge = 200.f;
+		float distance = glm::distance(position, otherPos);
+
+		if (distance < neighborRnge)
+		{
+			center += otherPos;
+			numNeighbors++;
+		}
+	}
+
+	if (numNeighbors > 0)
+	{
+		center /= numNeighbors;
+		vec2 cohesionVelocity = (center - position) * centeringFactor;
+		boid.velocity += cohesionVelocity;
+	}
+}
+
+
+void AISystem::boidComputeSeperation(Entity entity, Boid &boid)
+{
+	float minDistance = 50.f;
+	float avoidFactor = 0.05;
+	vec2 move = vec2(0, 0);
+	vec2 position = boid.position;
+	for (Entity other : registry.boids.entities)
+	{
+		if (other == entity)
+		{
+			continue;
+		};
+		Boid &otherBoid = registry.boids.get(other);
+		vec2 otherPos = otherBoid.position;
+		float distance = glm::distance(position, otherPos);
+
+		if (distance < minDistance)
+		{
+			move[0] += boid.position[0] - otherPos[0];
+			move[1] += boid.position[1] - otherPos[1];
+		};
+	}
+	boid.velocity[0] += move[0] * avoidFactor;
+	boid.velocity[1] += move[1] * avoidFactor;
+}
+
+void AISystem::boidComputeAlignment(Entity entity, Boid& boid) {
+	vec2 avgVelocity = vec2(0, 0);
+	int numNeighbors = 0;
+	float matchingFactor = 0.02;
+
+	vec2 position = boid.position;
+	for (Entity other : registry.boids.entities)
+	{
+		if (other == entity)
+		{
+			continue;
+		};
+		Boid &otherBoid = registry.boids.get(other);
+		vec2 otherPos = otherBoid.position;
+		float neighborRnge = 200.f;
+		float distance = glm::distance(position, otherPos);
+
+		if (distance < neighborRnge)
+		{
+			avgVelocity[0] += otherBoid.velocity[0];
+			avgVelocity[1] += otherBoid.velocity[1];
+			numNeighbors += 1;
+		}
+	}
+
+	if (numNeighbors > 0)
+	{
+		avgVelocity[0] /= numNeighbors;
+		avgVelocity[1] /= numNeighbors;
+
+		boid.velocity[0] += (avgVelocity[0] - boid.velocity[0]) * matchingFactor;
+		boid.velocity[1] += (avgVelocity[1] - boid.velocity[1]) * matchingFactor;
+	}
+}
+
+float getRandomInRange(float min, float max) {
+    static std::random_device rd; // Seed for the random number generator
+    static std::mt19937 gen(rd()); // Mersenne Twister RNG
+    std::uniform_real_distribution<float> dis(min, max);
+    return dis(gen);
+}
+
+void AISystem::boidWander(Entity entity, Boid& boid)
+{
+    float wanderRadius = 50.0f;       
+    float wanderDistance = 100.0f;     
+    float wanderJitter = 5.0f;        
+    float wanderFactor = 0.1f;         
+
+    boid.wanderAngle += getRandomInRange(-wanderJitter, wanderJitter);
+    
+    vec2 wanderTarget = vec2(
+        cos(boid.wanderAngle) * wanderRadius,
+        sin(boid.wanderAngle) * wanderRadius
+    );
+    
+    vec2 ahead = boid.velocity;
+    ahead = glm::normalize(ahead) * wanderDistance;  
+    vec2 target = boid.position + ahead + wanderTarget;
+
+    vec2 desiredVelocity = target - boid.position;
+
+    boid.velocity += desiredVelocity * wanderFactor;
 }

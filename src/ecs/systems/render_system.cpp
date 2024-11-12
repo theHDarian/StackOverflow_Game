@@ -473,7 +473,10 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawHPbar(entity, projection_2D);
+		if (!registry.boids.has(entity)) {
+			drawHPbar(entity, projection_2D);
+		}
+	
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection_2D);
 	}

@@ -859,6 +859,26 @@ struct EnemyEasySkull : Enemy {
 	};
 };
 
+struct EnemyHardBoid :  Enemy {
+	Reaction boid {
+		ReactionType::DURATION,
+		0
+	};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyHardBoid() {
+		maxHealth = 20;
+		currHealth = maxHealth;
+		enemyPatterns = {boidState};
+		sprite = {
+			"enemy_bullet_circle.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({20.f, 20.f});
+		patternIndex = 0;
+	}
+};
+
 // struct EnemyHardSkull : {
 
 // 	EnemyHardSkull() {

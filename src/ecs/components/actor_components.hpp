@@ -216,7 +216,8 @@ enum EnemyType {
     MediumEnemyTank,
     BeeHive,
     HardEnemyAngel,
-    EasyEnemySkull
+    EasyEnemySkull,
+    HardEnemyBoid
 };
 
 enum class EnemyAttackPattern {
@@ -277,7 +278,8 @@ enum class EnemyBehavior {
     TELEPORT,
     IDLE,
     MERGE_BEE,
-    SPAWNING
+    SPAWNING,
+    BOIDS
 };
 
 
@@ -315,6 +317,12 @@ struct EnemyPattern {
     float currAtkCD;
     float maxAtkCD;
     AttackData atkData;
+};
+
+struct Boid {
+    vec2 velocity;
+    vec2 position;
+    float wanderAngle;
 };
 
 
