@@ -29,8 +29,6 @@ private:
 
     void summonDialogue();
     void summonInteractibleDialogue(Entity object);
-    void playerInputDialogue();
-    void loadStoryDialogue();
-    void loadInteractableDialogue();
+    void loadDialogue(std::string dialogueType);
     void handleStoryChoices();
 };
