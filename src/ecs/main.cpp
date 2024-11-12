@@ -114,13 +114,15 @@ int main() {
 			world.handleInput();
 		}
 		else if (ioSystem.isCutscene()) { // should be in separate system, but lazy
-			renderer.step(elapsed_ms); // duplication
+			renderer.step(elapsed_ms);
 			world.playCutscene();
+			world.step(elapsed_ms);
 		}
 		else if (ioSystem.isDialogue()) {
 			mapSystem.step(elapsed_ms); // just so the tutorial room can spawn an enemy right away
 			uiSystem.playDialogue();
 			world.step(elapsed_ms); // this is just where interactable objects are currently reacting in, consider separating later
+			renderer.step(elapsed_ms);
 		}
 		else {
 			mapSystem.step(elapsed_ms);

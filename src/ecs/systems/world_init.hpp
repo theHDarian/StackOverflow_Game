@@ -55,6 +55,8 @@ Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity st
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
+Entity createSkipDialogue();
+
 float getModifiedValue(BulletEffectType bf, float value);
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData);

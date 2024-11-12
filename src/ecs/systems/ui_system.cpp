@@ -20,6 +20,7 @@ void UISystem::step(float elapsed_ms) {
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
 		if (!gameState.dialogueScene) {
 			registry.renderRequests.get(dialogueAvatar).show = false;
+			registry.renderRequests.get(screenCutIn).show = false;
 		}
 		// update which dialogue choice is highlighted. Consider updating only when necessary?
 		if (registry.dialogueChoices.entities.size() > 0) {
@@ -45,6 +46,7 @@ bool UISystem::init(GLFWwindow* window) {
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
+	screenCutIn = createScreenCutIn();
 
 	return true;
 }
@@ -58,6 +60,7 @@ void UISystem::playDialogue() {
 		// keep track of current speaker stuff
 		std::string currSpeakerName = registry.dialogueLines.get(dialogueBox).prev().speakerName;
 		std::string currSpeakerAvatar = registry.dialogueLines.get(dialogueBox).prev().speakerAvatar;
+		std::string currCutIn = registry.dialogueLines.get(dialogueBox).prev().cutInTexture;
 
 		input.nextDialogue = false;
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
@@ -87,6 +90,12 @@ void UISystem::playDialogue() {
 				else {
 					registry.renderRequests.get(dialogueAvatar).show = false;
 				}
+			}
+			
+			// change screen cut in image if there is one
+			if (nextLine.cutInTexture.length() > 0 && nextLine.cutInTexture.compare(currCutIn) != 0) {
+				registry.renderRequests.get(screenCutIn).texture_name = nextLine.cutInTexture;
+				registry.renderRequests.get(screenCutIn).show = true;
 			}
 
 			vec2 startingPosition = vec2(400, wS.height - wS.height / 8 - 25);
@@ -403,6 +412,30 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 	// so just set it to some big number
 	text.topRightBound = { 1000, 1000 };
 	text.bottomLeftBound = { 0, 0 };
+
+	return entity;
+}
+
+Entity UISystem::createScreenCutIn() {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "eel.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.screenCutIns.emplace(entity);
+
+	WindowState& windowState = registry.windowStates.components[0];
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = { windowState.width / 2, windowState.height / 2 };
+	motion.scale = { windowState.width, windowState.height};
 
 	return entity;
 }

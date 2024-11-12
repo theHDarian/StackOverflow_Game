@@ -37,7 +37,7 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     createDoor(renderer, {ws.width / 2 - doorWidthX / 2, ws.height - offsetBot - 10}, {ws.width / 2 + doorWidthX / 2, ws.height - offsetBot - 10});
     createDoor(renderer, {offsetRightLeft + 10, ws.height / 2 - doorWidthY / 2}, {offsetRightLeft + 10, ws.height / 2 + doorWidthY / 2});
 
-    resetMap();
+    //resetMap();
 }
 
 void MapSystem::step(float elapsed_ms)
@@ -292,13 +292,6 @@ void MapSystem::resetMap()
         createBibleTree(renderer, vec2(700, 500));
         createGardener(renderer, vec2(1000, 700));
     }
-
-    // clear ongoing dialogue to prepare for next
-    // perhaps reset should be a main-system level thing to easily tell each system to reset itself?
-    GameState& gameState = registry.gameStates.components[0];
-    DialogueLines& lines = registry.dialogueLines.components[0];
-    lines = DialogueLines();
-    gameState.dialogueScene = false;
 }
 
 void MapSystem::nextMusic()

@@ -25,10 +25,12 @@ private:
     std::unordered_map<Scene, std::vector<Dialogue>> storyDialogue;
     std::unordered_map<InteractibleDialogue, std::vector<Dialogue>> interactibleDialogue;
     Entity currentObject;
+    bool isStoryDialogue;
 
     void summonDialogue();
     void summonInteractibleDialogue(Entity object);
     void playerInputDialogue();
     void loadStoryDialogue();
     void loadInteractableDialogue();
+    void handleStoryChoices();
 };

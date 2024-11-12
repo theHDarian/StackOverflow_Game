@@ -875,6 +875,13 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	return entity;
 }
 
+Entity createSkipDialogue() {
+	Entity entity = Entity();
+	InteractableObject& object = registry.interactables.emplace(entity);
+	object.name = "SkipTutorial";
+	return entity;
+}
+
 float getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity &player = registry.players.entities[0];

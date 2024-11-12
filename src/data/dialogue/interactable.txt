@@ -19,7 +19,16 @@
 # format for choice:
 # CHOICES choice1\choice2\choice3...
 
+# format for cutscene image
+# CUT cutsceneimage.png 
+# just an image for now
+
 # note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
+
+ITEM SkipTutorial -1 0
+Would you like to skip the tutorial?
+CHOICES Yes\No
+CUT blackscreen.png
 
 ITEM PopStack -1 0
 Do you want to pop stack?
@@ -63,13 +72,13 @@ Little robot: +2 fruits. Tree: -2 fruits. Yeah, that might be enough for now.
 
 ITEM Gardener -1 0
 Isn't the weather nice today?
-SPEAKER Gardener eel.png
+SPEAKER Gardener gardener_v2.png
 CHOICES It sure is.\But there is no weather to speak of here?
 
 ITEM Gardener 0 0
 Hehe, I knew you'd think so too!
-SPEAKER Gardener eel.png
+SPEAKER Gardener gardener_v2.png
 
 ITEM Gardener 1 0
 Tsk, tsk. Can't you let a gardener dream?
-SPEAKER Gardener eel.png
+SPEAKER Gardener gardener_v2.png

@@ -309,6 +309,7 @@ struct Dialogue {
 	std::string speakerName;
 	std::string speakerAvatar;
 	std::vector<std::string> choices;
+	std::string cutInTexture;
 	SoundType sfx;
 };
 

@@ -142,6 +142,9 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
 	createRoomBounds(renderer);
 
+	// mock interactable call instead of proper ui for now
+	Entity skipDialogue = createSkipDialogue();
+	registry.dialogueRequests.emplace(skipDialogue);
 }
 #pragma endregion
 
@@ -166,12 +169,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// 	}
 	// }
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
+	GameState& gameState = registry.gameStates.components[0];
+	if (!gameState.dialogueScene && !gameState.cutScene) {
+		movePlayer();
+		//check dash related variables
+		dash(dashDirection, elapsed_ms_since_last_update);
 
-	movePlayer();
-    //check dash related variables
-    dash(dashDirection, elapsed_ms_since_last_update);
-
-	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
+		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
+	}
 
 	// Updating the invincibility timer
 	if (registry.invincibles.entities.size() > 0) {
@@ -268,6 +273,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
+		if (object.name.compare("SkipTutorial") == 0) {
+			IOState& iostate = registry.ioStates.components[0];
+			if (reaction.choice == 0) { // yes
+				iostate.tutorialOn = false;
+			}
+			else if (reaction.choice == 1) { // no
+				iostate.tutorialOn = true;
+			}
+			registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+		}
 	}
 
 	registry.interactableReactions.clear();
@@ -284,8 +299,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	WindowState& wS = registry.windowStates.components[0];
-
 	return true;
 }
 
@@ -298,6 +311,7 @@ void WorldSystem::restartGame() {
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
+	gameState.dialogueChoice = -1;
 
 	//std::cout << ("MyString") << std::endl;
 	//std::cout << std::hash<std::string>{}("MyString") << std::endl;
@@ -305,11 +319,23 @@ void WorldSystem::restartGame() {
 	// Reset the game speed
 	currentSpeed = 1.f;
 
-	// Debugging for memory/component leaks
-
 	Entity player = resetPlayer();
 
-	registry.mapRequests.emplace(player,MapRequestType::RestartGame);
+	// resetting dialogue related stuff
+	DialogueLines& lines = registry.dialogueLines.components[0];
+	lines = DialogueLines();
+	// clear choices here for now
+	for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+		Entity e = registry.dialogueChoices.entities[i];
+		registry.deleteEntityAndRelatedEntities(e);
+	}
+	registry.maps.components[0].currRoom.dialogueDone = true;
+
+	// mock interactable call instead of proper ui for now
+	Entity skipDialogue = createSkipDialogue();
+	registry.dialogueRequests.emplace(skipDialogue);
+
+	//registry.mapRequests.emplace(player,MapRequestType::RestartGame);
 }
 
 // Compute collisions between entities
@@ -458,12 +484,17 @@ void WorldSystem::handleInput() {
 		input.shouldRestart = false;
 		restartGame();
 	}
+
+	Motion& cursorMotion = registry.motions.get(cursor);
+	cursorMotion.position = input.mousePosition;
+
 	//change volume
 	GameState& gameState = registry.gameStates.components[0];
 	soundPlayer->setVolume(gameState.currentVolume);
-	// clear here for now
+	
+	// clear nearby interactables here for now
 	registry.nearbyInteractables.clear();
-	}
+}
 
 void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 	// Tick Dash Charge Timer
@@ -634,9 +665,6 @@ void WorldSystem::movePlayer() {
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
-
-	Motion& cursorMotion = registry.motions.get(cursor);
-	cursorMotion.position = input.mousePosition;
 
 }
 

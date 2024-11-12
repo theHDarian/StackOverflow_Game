@@ -554,6 +554,13 @@ void RenderSystem::drawDialogueUI() {
 	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
 
+	for (Entity entity : registry.screenCutIns.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+	
 	for (Entity& entity : registry.dialogueUIs.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)

@@ -1,23 +1,31 @@
 # lines with this will be considered as comments and ignored
+# Note: the parser does NOT validate correctness of script for now
+
 # format of scene header:
-# SCENE <roomtype> <room dialogue count> <room cutscene count> <room is cleared> 
+# SCENE <roomtype> <room dialogue count> <room cutscene count> <room is cleared> <choice>
 # note: 0 is false, 1 is true
 # consider: roomtype to name map? or just somehow know what number = what room
 # or consider: room name as a string
 
-# format of lines:
-# text blah blah
+# format for body:
+# blah blah text
 
-# format of speaker:
-# SPEAKER speakername speakerAvatar
+# format for speaker:
+# SPEAKER speakername speakeravatar
+# speaker name can have spaces
 
-# format of sound:
+# format for sound:
 # SOUND soundname
 
-# format of text:
+# format for choice:
+# CHOICES choice1\choice2\choice3...
+
+# note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
+
+# format of text (to be implemented in future):
 # blah blah text blah <color <insert color name>> text </color>
 
-SCENE TutorialRoom1 0 1 0
+SCENE TutorialRoom1 0 1 0 -1
 
 [Incoming Message...] \n[Press [E] to accept.]
 SPEAKER N N
@@ -31,7 +39,7 @@ Let me know once you're done.
 [Try moving around the room using the [WASD] keys, or dash around using [SPACE]/[Right Mouse Button]. \nCall the scientist again by pressing [E] when you're done looking around.]
 SPEAKER N N
 
-SCENE TutorialRoom1 1 1 0
+SCENE TutorialRoom1 1 1 0 -1
 Done looking around?
 SPEAKER Scientist scientist_avatar.png
 SOUND IncomingDialogue
@@ -46,7 +54,7 @@ So, you should leave too. I'll even help you and make sure of that.
 And what about me? \nHeh, don't worry about me. I've already been stuck here long enough, so this is the least I could do.
 Anyway, the only way out is forwards! Head on down to the door on the bottom once you're ready.
 
-SCENE TutorialRoom2 0 0 0
+SCENE TutorialRoom2 0 0 0 -1
 Ah, there it is, one of those dangerous robots...
 SPEAKER Scientist scientist_avatar.png
 With that thing there, I don't think I'll be able to open the door so easily for you this time.\nLooks like you've got no choice but to fight it.
@@ -54,7 +62,7 @@ No need to worry though, I'm sure you're equipped with the means to deal with it
 [Aim and shoot with the [Left Mouse Button]!]
 SPEAKER N N
 
-SCENE TutorialRoom2 1 0 1
+SCENE TutorialRoom2 1 0 1 -1
 Whew, I was a bit worried there, but you did it!
 SPEAKER Scientist scientist_avatar.png
 Now that no one's guarding the door anymore, you should be able to walk through it.
