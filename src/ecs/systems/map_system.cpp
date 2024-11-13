@@ -69,8 +69,6 @@ void MapSystem::step(float elapsed_ms)
     // set room to cleared if all enemies are defeated
     if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
     {
-        if (!map.currRoom.cleared)
-            soundPlayer->playDoorOpenSound();
         map.currRoom.cleared = true;
     }
 
@@ -78,8 +76,13 @@ void MapSystem::step(float elapsed_ms)
         // make all doors unlocked doors
         for (int i = 0; i < 4; i++)
         {
-            if(registry.doors.components[i].room != RoomType::None && !registry.doors.components[i].isPrev)
+            if (registry.interactables.get(registry.doors.entities[i]).name == "OpenDoor") {
+                continue;
+            }
+            if(registry.doors.components[i].room != RoomType::None && !registry.doors.components[i].isPrev && registry.interactables.get(registry.doors.entities[i]).name != "LockedDoor") {
+                soundPlayer->playDoorOpenSound();
                 registry.interactables.get(registry.doors.entities[i]).name = "OpenDoor";
+            }
         }
     }
 }

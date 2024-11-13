@@ -292,6 +292,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if (stack.useKey()) {
 					soundPlayer->playDoorOpenSound();
 					object.name = "OpenDoor";
+					reaction.choice = 1;
 				} else {
 					DialogueLines& nokey = registry.dialogueLines.emplace(Entity());
 					nokey.lines.push_back(Dialogue{ "Hey, those are the doors need a special keycode to unlock!", "Scientist", "scientist_avatar.png" });
