@@ -152,6 +152,13 @@ const BulletStackEffect dashUpM = {
 	"dashUpM",
 	""};
 
+const BulletStackEffect key = {
+	Key,
+	Additive,
+	0,
+	"Key",
+	"" };
+
 //////////////////////////////////////////
 ///////////  AttackData  /////////////////
 //////////////////////////////////////////
@@ -244,7 +251,7 @@ const AttackData laserRotate{
 	{0, 20},
 	0,
 	8000,
-	{0.8, M_PI / 300},
+	{0.6, M_PI / 300},
 	0,
 	0,
 	0};
@@ -359,8 +366,8 @@ const AttackData twoPincerShot{
 const AttackData twelveSpiralShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{},
-	dashUpA,
+	{key},
+	blunt,
 	12,
 	0.0,
 	{20, 20},
@@ -865,7 +872,7 @@ struct EnemyEasySkull : Enemy {
 		ReactionType::DURATION,
 		0
 	};
-	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f , 4000.f, laserNoRotate};
+	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f , 10000.f, laserRotate};
 	EnemyEasySkull() {
 		maxHealth = 100;
 		currHealth = maxHealth;
