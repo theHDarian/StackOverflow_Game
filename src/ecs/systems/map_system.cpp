@@ -69,6 +69,8 @@ void MapSystem::step(float elapsed_ms)
     // set room to cleared if all enemies are defeated
     if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
     {
+        if (!map.currRoom.cleared)
+            soundPlayer->playDoorOpenSound();
         map.currRoom.cleared = true;
     }
 

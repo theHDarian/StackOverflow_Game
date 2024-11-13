@@ -13,3 +13,4 @@
 #endif //INTERACTABLE_EFFECTS_H
 
 void resetStack(Entity player, RenderSystem* renderer);
+void extendStack (Entity player, int extension);

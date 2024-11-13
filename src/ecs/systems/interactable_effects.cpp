@@ -30,12 +30,23 @@ void resetStack(Entity player, RenderSystem* renderer) {
         }
         registry.stackCompile.remove(player);
         StackCompile& newreg = registry.stackCompile.emplace(player);
+        Player& pl = registry.players.get(player);
+        pl.currDashCharges = pl.baseDashNum;
+        pl.currDashCooldown = pl.baseDashCDR;
+
 
     }
 }
 
 void unlockDoor(Entity door) {
     //todo
+}
+
+void extendStack (Entity player, int extension) {
+    if (registry.stackCompile.has(player)) {
+        StackCompile& reg = registry.stackCompile.get(player);
+        reg.baseStackSize += extension;
+    }
 }
 
 

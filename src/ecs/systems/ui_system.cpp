@@ -51,6 +51,12 @@ bool UISystem::init(GLFWwindow* window) {
 	return true;
 }
 
+bool UISystem::resetStackUI() {
+	WindowState& wS = registry.windowStates.components[0];
+	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
+	return true;
+}
+
 void UISystem::playDialogue() {
 	IOState& input = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];

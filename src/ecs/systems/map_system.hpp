@@ -18,14 +18,5 @@ class MapSystem {
         void changeRoom(RoomType type,int doorIndex);
         void handleMapRequests();
 
-    void loadMusic();
-
-    Mix_Music* backgroundMusic;
-    std::vector<SoundRequest> normalRoomMusic;
-    std::vector<SoundRequest> bossRoomMusic;
-    std::vector<SoundRequest> specialRoomMusic;
-    int currMusicIndex;
-
-    void nextMusic();
     SoundSystem* soundPlayer;
 };

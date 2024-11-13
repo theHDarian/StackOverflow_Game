@@ -42,7 +42,11 @@ Enter door?
 CHOICES Yes\No
 
 ITEM ClosedDoor -1 0
-The door is locked.
+The door is shut.
+
+ITEM LockedDoor -1 0
+This door seems to require a keycode to unlock. Try to unlock it?
+CHOICES Yes\No
 
 ITEM PrevDoor -1 0
 The only way out is forwards, not backwards!
