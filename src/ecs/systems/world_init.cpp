@@ -4,6 +4,7 @@
 #include "premades.hpp"
 #include "ai_system.hpp"
 #include "utils/random.hpp"
+#include <glm/gtx/string_cast.hpp>
 
 Entity createPlayer(RenderSystem *renderer, vec2 pos)
 {
@@ -294,9 +295,13 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	motion.scale = vec2(glm::distance(startPos, endPos), 5);
 	motion.angle = atan2(endPos.y - startPos.y, endPos.x - startPos.x);
 
+	WindowState& ws = registry.windowStates.components[0];
+
 	auto &door = registry.doors.emplace(entity);
 	door.startPos = startPos;
 	door.endPos = endPos;
+	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'T' : 'B' : (door.startPos.x < ws.width / 2.f) ? 'L' : 'R';
+	std::cout << glm::to_string(startPos) << ", " << glm::to_string(endPos) << ", " << door.side << std::endl;
 
 	InteractableObject& object = registry.interactables.emplace(entity);
 	object.name = "LockedDoor";
@@ -402,6 +407,7 @@ void createRoomBounds(RenderSystem *renderer)
 		motion.position = p.spritePosition;
 		motion.scale = p.spriteScale;
 		motion.angle = p.spriteAngle;
+		std::cout << motion.angle << std::endl;
 
 		auto &wall = registry.walls.emplace(entity);
 		wall.startPosition = p.colliderStart;
@@ -411,10 +417,15 @@ void createRoomBounds(RenderSystem *renderer)
 		b.angle = glm::radians(-90.f);
 		b.axis = vec3(1,0,0);
 		b.offset = p.offset;
+		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'T' : 'B' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+
+		auto& anim = registry.animations.emplace(entity);
+		anim.animate = false;
+		anim.max_frames = 3;
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
-			{"wall_horizontal.png",
+			{(p.colliderStart.y == p.colliderEnd.y) ? "wall_horizontal" : "wall_vertical",
 			EFFECT_ASSET_ID::ROOM_BOUND,
 			GEOMETRY_BUFFER_ID::SPRITE});		
 		registry.backgrounds.emplace(entity);
@@ -693,7 +704,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			{-motion.scale.x / 2, motion.scale.y / 2}};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		pc.setPolyLengths();
+		//pc.setPolyLengths();
 		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_square.png";
 		renderShape = "enemy_bullet_square.png";
@@ -707,7 +718,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			{-motion.scale.x / 2, motion.scale.y / 2}};
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		pc.setPolyLengths();
+		//pc.setPolyLengths();
 		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_triangle.png";
 		renderShape = "enemy_bullet_triangle.png";
@@ -810,6 +821,53 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 
 	return entity;
 }
+
+Entity createLightningBullet(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = 450;
+	bullet.bulletRange = 5000;
+	bullet.bulletBounce = 10;
+	bullet.bulletPierce = 10000;
+	bullet.bulletEffects = { lightning };
+	bullet.shape = RECTANGLE;
+
+	Motion& motion = registry.motions.emplace(entity);
+	float angle = (rand() % 100 / 100.f) * 2 * M_PI;
+	motion.angle = angle;
+	motion.position = pos;
+	motion.velocity = 450.f * vec2(cos(angle), sin(angle));
+	motion.scale = 25.f * vec2(2,1); // Ensure scale is initialized
+	motion.veer = { 0, 0 };
+	
+	PolyCollider& pc = registry.polyColliders.emplace(entity);
+	pc.offsetVertices = {
+		{motion.scale.x / 2, motion.scale.y / 3},
+		{motion.scale.x / 2, -motion.scale.y / 3},
+		{-motion.scale.x / 2, -motion.scale.y / 3},
+		{-motion.scale.x / 2, motion.scale.y / 3} };
+	pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+	//pc.setPolyLengths();
+
+	auto& animate = registry.animations.emplace(entity);
+	animate.max_frames = 2;
+	animate.animation_countdown_base = 50;
+
+	registry.renderRequests.insert(
+		entity,
+		{ "lightning_bullet",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 
 Entity createLine(vec2 position, vec2 scale)
 {

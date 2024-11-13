@@ -26,6 +26,13 @@ const BulletStackEffect blunt = {
 	"blunt",
 	""};
 
+const BulletStackEffect lightning = {
+	Lightning,
+	Additive,
+	0,
+	"lightning",
+	"" };
+
 const BulletStackEffect dmgDownA = {
 	BulletDamage,
 	Additive,
@@ -715,9 +722,9 @@ struct Bee2 : Enemy
 		0
 	};
 
-	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, SniperShot};
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, SniperShot};
-	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, true, 0.f, 5000.f, NoAttack};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, false, 0.f, 5000.f, NoAttack};
 
 	Bee2()
 	{

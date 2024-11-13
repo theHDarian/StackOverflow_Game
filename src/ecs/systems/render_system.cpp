@@ -32,12 +32,12 @@ void RenderSystem::step(float elapsed_ms) {
 
 	for (Entity entity : registry.animations.entities) {
 		Animation& anim = registry.animations.get(entity);
-		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE) {
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate) {
 			anim.animation_countdown -= elapsed_ms;
-		}
-		if (anim.animation_countdown <= 0) {
-			anim.animation_countdown = anim.animation_countdown_base;
-			anim.frame = (anim.frame + 1) % anim.max_frames;  
+			if (anim.animation_countdown <= 0) {
+				anim.animation_countdown = anim.animation_countdown_base;
+				anim.frame = (anim.frame + 1) % anim.max_frames;
+			}
 		}
 		if (registry.animationSequences.has(entity) && anim.frame >= anim.max_frames - 1) {
 			AnimationSequence& as = registry.animationSequences.get(entity);
@@ -214,8 +214,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 		assert(registry.renderRequests.has(entity));
 		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-		gl_has_errors();
 
 		WindowState &ws = registry.windowStates.components[0];
 		float angle;
@@ -226,11 +224,33 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			angle = b.angle;
 			axis = b.axis;
 			offset = b.offset;
+
+			int frame = 2;
+			for (Entity& d : registry.doors.entities) {
+				if (registry.doors.get(d).side == b.side) {
+					if (registry.interactables.has(d)) {
+						if (registry.interactables.get(d).name == "ClosedDoor")			{ frame = 0; }
+						else if (registry.interactables.get(d).name == "EmptyDoor")		{ frame = 0; }
+						else if (registry.interactables.get(d).name == "PrevDoor")		{ frame = 0; }
+						else if (registry.interactables.get(d).name == "LockedDoor")	{ frame = 1; }
+					}
+					break;
+				}
+			}
+
+			GLint frame_uloc = glGetUniformLocation(program, "frame");
+			glUniform1i(frame_uloc, frame);
+			gl_has_errors();
+
+			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+			gl_has_errors();
 		} else if (registry.doorSymbols.has(entity)) {
 			DoorSymbol& d = registry.doorSymbols.get(entity);
 			angle = d.angle;
 			axis = d.axis;
 			offset = d.offset;
+			glBindTexture(GL_TEXTURE_2D, texture_id);
+			gl_has_errors();
 		} else {
 			assert(false);
 		}

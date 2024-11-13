@@ -5,6 +5,7 @@
 #include <iostream>
 #include <any>
 #include "components.hpp"
+#include <random>
 
 
 
@@ -24,7 +25,8 @@ enum BulletEffectType {
     PlayerNumDash,
     PlayerStackSize,
     PlayerDashCDR,
-    Inert // Bullet that does nothing but take up stack space
+    Inert, // Bullet that does nothing but take up stack space
+    Lightning
 };
 
 enum EffectCalculation {
@@ -132,7 +134,18 @@ struct StackCompile {
         if (currStack.size() >= maxStackSize) {
             return false;
         }
-        if (effect.type != Inert && effect.effectCalc == Additive) {
+        if (effect.type == Inert) {
+            currStack.push_back(effect);
+            return true;
+        }
+        if (effect.type == Lightning && currStack.size() > 1) {
+            //std::random_device rd;
+            //std::mt19937 g(rd());
+            //std::shuffle(currStack.begin(), currStack.end(), g);
+            std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+            return true;
+        }
+        if (effect.effectCalc == Additive) {
             additives[effect.type] += effect.value;
         } else {
             multiplicatives[effect.type] *= effect.value;

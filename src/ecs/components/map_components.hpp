@@ -32,9 +32,10 @@ struct RoomPreset {
 };
 
 struct Door {
-	RoomType room; //room the door leads to
+	RoomType room = None; //room the door leads to
     bool isPrev; //if is previous room, block it
     vec2 startPos, endPos;
+    char side = 'L';
     int doorIndex = -1; // used by interactibles for now
 };
 struct DoorSymbol {

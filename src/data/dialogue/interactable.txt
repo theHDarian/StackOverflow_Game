@@ -37,11 +37,11 @@ The door seems to be locked. Maybe the scientist could lend a hand?
 ITEM EmptyDoor -1 0
 This doesn't seem to lead to anywhere.
 
-ITEM UnlockedDoor -1 0
+ITEM OpenDoor -1 0
 Enter door?
 CHOICES Yes\No
 
-ITEM LockedDoor -1 0
+ITEM ClosedDoor -1 0
 The door is locked.
 
 ITEM PrevDoor -1 0
