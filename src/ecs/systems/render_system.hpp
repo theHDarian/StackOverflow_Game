@@ -73,7 +73,8 @@ class RenderSystem {
 			{PlayerNumDash,     {0.f, 1.f, 1.f}},
 			{PlayerStackSize,   {0.f, 1.f, 0.f}},
 			{PlayerDashCDR,     {1.f, 0.f, 0.f}},
-			{Inert,             {91.f / 255.f, 99.f / 255.f, 128.f / 255.f}}
+			{Inert,             {91.f / 255.f, 99.f / 255.f, 128.f / 255.f}},
+			{Key,				{1.0, 1.0, 0.0}}
 	};
 
 public:

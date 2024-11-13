@@ -675,12 +675,38 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.shape = atkData.shape;
 	if (atkData.onDeath != EnemyBulletDeath::NONE) bullet.onDeath = atkData.onDeath;
 
-	Motion &motion = registry.motions.emplace(entity);
+	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
 	motion.scale = atkData.size; // Ensure scale is initialized
 	motion.veer = veer;
+
+	if (bullet.bulletEffects[0].type == BulletEffectType::Key) {
+		motion.scale = 16.f * vec2(2.8, 1);
+		motion.velocity = velocity * 800.f;
+		bullet.bulletBounce = 10;
+		bullet.bulletPierce = 0;
+		bullet.bulletRange = 5000;
+
+		PolyCollider& pc = registry.polyColliders.emplace(entity);
+		pc.offsetVertices = {
+			{motion.scale.x / 2, motion.scale.y / 2},
+			{motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2} };
+		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		
+		registry.renderRequests.insert(
+			entity,
+			{
+			 "enemy_bullet_key.png",
+			 EFFECT_ASSET_ID::TEXTURED,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+
+		return entity;
+	}
 
 	if (atkData.homing > 0.0)
 	{

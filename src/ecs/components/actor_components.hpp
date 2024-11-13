@@ -26,7 +26,8 @@ enum BulletEffectType {
     PlayerStackSize,
     PlayerDashCDR,
     Inert, // Bullet that does nothing but take up stack space
-    Lightning
+    Lightning,
+    Key
 };
 
 enum EffectCalculation {
@@ -134,7 +135,7 @@ struct StackCompile {
         if (currStack.size() >= maxStackSize) {
             return false;
         }
-        if (effect.type == Inert) {
+        if (effect.type == Inert || effect.type == Key) {
             currStack.push_back(effect);
             return true;
         }
@@ -153,6 +154,7 @@ struct StackCompile {
         currStack.push_back(effect);
         return true;
     }
+
     BulletStackEffect remove(int index) {
         assert(index < currStack.size() && index >= 0);
 
@@ -174,6 +176,22 @@ struct StackCompile {
         }
         add(effect);
         return effect;
+    }
+    bool useKey() {
+        auto comp = [](BulletStackEffect a) {
+            return a.type == BulletEffectType::Key;
+        };
+
+        // Finding the index of val
+        auto it = std::find_if(currStack.rbegin(), currStack.rend(), comp);
+        if (it == currStack.rend()) return false;
+
+        // Interate backwards from end to index, remove each
+        for (int i = currStack.size() - 1; i >= (it + 1).base() - currStack.begin(); i--) {
+            remove(i);
+        }
+
+        return true;
     }
     void printStack() {
         for (auto& element : currStack) {
@@ -256,7 +274,8 @@ enum class EnemyBulletDeath {
 enum EnemyBulletShape {
     RECTANGLE   = 0,
     TRIANGLE    = 1,
-    CIRCLE      = 2
+    CIRCLE      = 2,
+    KEY         = 3
 };
 
 struct AttackData {
