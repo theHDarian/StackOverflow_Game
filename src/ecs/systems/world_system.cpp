@@ -283,7 +283,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.mapRequests.emplace(player, MapRequestType::RestartGame);
 		}
 
-		if (object.name.compare("UnlockedDoor") == 0) {
+		if (object.name.compare("OpenDoor") == 0) {
 			assert(registry.doors.has(reaction.object));
 			
 			if (reaction.choice == 0) {

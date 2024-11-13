@@ -4,6 +4,7 @@
 #include "premades.hpp"
 #include "ai_system.hpp"
 #include "utils/random.hpp"
+#include <glm/gtx/string_cast.hpp>
 
 Entity createPlayer(RenderSystem *renderer, vec2 pos)
 {
@@ -294,9 +295,13 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	motion.scale = vec2(glm::distance(startPos, endPos), 5);
 	motion.angle = atan2(endPos.y - startPos.y, endPos.x - startPos.x);
 
+	WindowState& ws = registry.windowStates.components[0];
+
 	auto &door = registry.doors.emplace(entity);
 	door.startPos = startPos;
 	door.endPos = endPos;
+	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'T' : 'B' : (door.startPos.x < ws.width / 2.f) ? 'L' : 'R';
+	std::cout << glm::to_string(startPos) << ", " << glm::to_string(endPos) << ", " << door.side << std::endl;
 
 	InteractableObject& object = registry.interactables.emplace(entity);
 	object.name = "LockedDoor";
@@ -402,6 +407,7 @@ void createRoomBounds(RenderSystem *renderer)
 		motion.position = p.spritePosition;
 		motion.scale = p.spriteScale;
 		motion.angle = p.spriteAngle;
+		std::cout << motion.angle << std::endl;
 
 		auto &wall = registry.walls.emplace(entity);
 		wall.startPosition = p.colliderStart;
@@ -411,10 +417,15 @@ void createRoomBounds(RenderSystem *renderer)
 		b.angle = glm::radians(-90.f);
 		b.axis = vec3(1,0,0);
 		b.offset = p.offset;
+		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'T' : 'B' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+
+		auto& anim = registry.animations.emplace(entity);
+		anim.animate = false;
+		anim.max_frames = 3;
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
-			{"wall_horizontal.png",
+			{(p.colliderStart.y == p.colliderEnd.y) ? "wall_horizontal" : "wall_vertical",
 			EFFECT_ASSET_ID::ROOM_BOUND,
 			GEOMETRY_BUFFER_ID::SPRITE});		
 		registry.backgrounds.emplace(entity);

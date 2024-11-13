@@ -77,7 +77,7 @@ void MapSystem::step(float elapsed_ms)
         for (int i = 0; i < 4; i++)
         {
             if(registry.doors.components[i].room != RoomType::None && !registry.doors.components[i].isPrev)
-                registry.interactables.get(registry.doors.entities[i]).name = "UnlockedDoor";
+                registry.interactables.get(registry.doors.entities[i]).name = "OpenDoor";
         }
     }
 }
@@ -227,7 +227,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         // reset previous room type
         if (i == spawnIndex)
             continue;
-        registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+        registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
         Door &d = registry.doors.components[i];
         d.room = randomRoomType(excludeNone);
         d.isPrev = false;
@@ -256,7 +256,7 @@ void MapSystem::resetMap()
         }
         registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
         registry.renderRequests.get(registry.doorSymbols.entities[2]).texture_name = getSymbol(registry.doors.components[2].room);
-        registry.interactables.get(registry.doors.entities[2]).name = "LockedTutorialDoor";
+        registry.interactables.get(registry.doors.entities[2]).name = "ClosedTutorialDoor";
 
         Map& map = registry.maps.components[0];
         map.currRegion = MapRegion::Tutorial;

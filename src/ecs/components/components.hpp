@@ -56,6 +56,7 @@ struct Bound {
 	float angle; //degrees
 	vec3 axis;
 	vec3 offset;
+	char side = 'L';
 }; //room bounds
 
 struct AABBCollider {
@@ -237,6 +238,7 @@ struct Animation {
 	int max_frames = 5; // this type of info should be known by render/sprite system?
 	float animation_countdown = 85;
 	float animation_countdown_base = animation_countdown;
+	bool animate = true;
 };
 
 // For 3D rendering
