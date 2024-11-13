@@ -5,13 +5,12 @@
 // stlib
 #include <cassert>
 #include <sstream>
-#include <iostream>
 #include <glm/detail/func_trigonometric.inl>
 #include <SDL.h>
-#include <SDL_mixer.h>
 #include <time.h>
 #include "sound_system.hpp"
 #include "physics_system.hpp"
+#include "interactable_effects.h"
 
 // include these for now
 // but may change to handle like render system does
@@ -175,30 +174,40 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		//check dash related variables
 		dash(dashDirection, elapsed_ms_since_last_update);
 		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
-	}
 
-	// Updating the invincibility timer
-	if (registry.invincibles.entities.size() > 0) {
-		for (Entity& invincible : registry.invincibles.entities) {
-			float& invincible_timer = registry.invincibles.get(invincible).countdown;
-			invincible_timer -= elapsed_ms_since_last_update;
-			if (invincible_timer <= 0) {
-				registry.invincibles.remove(invincible);
-				//std::cout << "entity is no longer invincible" << std::endl;
+
+		// Updating the invincibility timer
+		if (registry.invincibles.entities.size() > 0) {
+			for (Entity& invincible : registry.invincibles.entities) {
+				float& invincible_timer = registry.invincibles.get(invincible).countdown;
+				invincible_timer -= elapsed_ms_since_last_update;
+				if (invincible_timer <= 0) {
+					registry.invincibles.remove(invincible);
+					//std::cout << "entity is no longer invincible" << std::endl;
+				}
+			}
+		}
+		//check invisibity countdown
+		if (registry.invisibles.entities.size() > 0) {
+			for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
+				Invisible& entity = registry.invisibles.components[i];
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+					registry.invisibles.remove(registry.invisibles.entities[i]);
+				}
+			}
+		}
+		// Updating the bullet ranges
+		if (registry.playerBullets.entities.size() > 0) {
+			for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+				PlayerBullet& bullet = registry.playerBullets.components[i];
+				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+					if (!registry.deleteds.has(registry.playerBullets.entities[i]))
+						registry.deleteds.emplace(registry.playerBullets.entities[i]);
+				}
 			}
 		}
 	}
 
-	// Updating the bullet ranges
-	if (registry.playerBullets.entities.size() > 0) {
-		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
-			PlayerBullet& bullet = registry.playerBullets.components[i];
-			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				if (!registry.deleteds.has(registry.playerBullets.entities[i]))
-					registry.deleteds.emplace(registry.playerBullets.entities[i]);
-			}
-		}
-	}
 	if (registry.enemyBullets.entities.size() > 0) {
 		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
@@ -210,15 +219,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-    //check invisibity countdown
-    if (registry.invisibles.entities.size() > 0) {
-        for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
-            Invisible& entity = registry.invisibles.components[i];
-            if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
-                registry.invisibles.remove(registry.invisibles.entities[i]);
-            }
-        }
-    }
 
 	//check damage countdown
 	if (registry.damageds.entities.size() > 0) {
@@ -257,6 +257,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (object.name.compare("PopStack") == 0) { // the choices are known implicitly by person who wrote object script for now
 			if (reaction.choice == 0) { // yes
 				object.dialogueCount++;
+				resetStack(player, renderer);
 			}
 			else if (reaction.choice == 1) { // no
 				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
@@ -491,6 +492,7 @@ void WorldSystem::handleInput() {
 		restartGame();
 	}
 
+	//move cursor
 	Motion& cursorMotion = registry.motions.get(cursor);
 	cursorMotion.position = input.mousePosition;
 

@@ -145,7 +145,7 @@ Entity createCursor()
 		{"CursorYB.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
-	registry.gameUIs.emplace(cursor);
+	registry.cursors.emplace(cursor);
 	return cursor;
 }
 
@@ -908,4 +908,7 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 	}
 	return {atkData.defaultEffect};
 }
+
+
+
 

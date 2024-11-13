@@ -109,6 +109,8 @@ public:
 	void drawToScreen();
 	void step(float elapsed_ms);
 
+	void drawCursor();
+
 
 	mat3 createProjectionMatrix();
 

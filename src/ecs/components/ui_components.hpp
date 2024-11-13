@@ -43,3 +43,7 @@ struct MenuUIText {
 struct ScreenCutIn {
 
 };
+
+struct Cursor {
+
+};

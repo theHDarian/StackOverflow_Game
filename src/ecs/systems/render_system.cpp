@@ -49,6 +49,19 @@ void RenderSystem::step(float elapsed_ms) {
 	}
 }
 
+void RenderSystem::drawCursor() {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+	mat3 projection_2D = createProjectionMatrix();
+	Entity Cursor = registry.cursors.entities[0];
+	if (registry.renderRequests.has(Cursor) && registry.motions.has(Cursor)) {
+		drawTexturedMesh(Cursor, projection_2D);
+	}
+	glBindVertexArray(0);
+}
+
 void RenderSystem::drawTexturedMesh(Entity entity,
 	const mat3& projection)
 {

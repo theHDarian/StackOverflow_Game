@@ -301,31 +301,11 @@ void MapSystem::resetMap()
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
         createPopConsole(renderer, vec2(500, 500));
-        createBibleTree(renderer, vec2(700, 500));
-        createGardener(renderer, vec2(1000, 700));
+        // createBibleTree(renderer, vec2(700, 500));
+        // createGardener(renderer, vec2(1000, 700));
+        createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
+        createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
+
     }
 }
 
-void MapSystem::nextMusic()
-{
-    int nextMusicIndex = rand() % normalRoomMusic.size();
-    if (nextMusicIndex == currMusicIndex)
-    {
-        return;
-    }
-    else
-    {
-        currMusicIndex = nextMusicIndex;
-    }
-    SoundRequest &currentBGM = normalRoomMusic[currMusicIndex];
-    Mix_FreeMusic(backgroundMusic);
-    Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM.path.c_str());
-    Mix_FadeInMusic(newbackgroundMusic, currentBGM.loops, 1000);
-    backgroundMusic = newbackgroundMusic;
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
-    }
-    int volume = currentBGM.volume * MIX_MAX_VOLUME;
-    Mix_VolumeMusic(volume);
-}
