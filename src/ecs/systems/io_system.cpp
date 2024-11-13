@@ -69,9 +69,13 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		// take latest object
 		if (registry.nearbyInteractables.entities.size() > 0) {
 			InteractableObject& object = registry.interactables.get(registry.nearbyInteractables.entities[0]);
-			// for now, have all interacted objects go through dialogue
-			// can change in the future
-			registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
+			if (object.interactType == InteractableType::DialogueInteractable) {
+				registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
+			}
+			else {
+				// no idea what choice to map, just assume all Es will map to 0
+				registry.interactableReactions.emplace_with_duplicates(registry.nearbyInteractables.entities[0], registry.nearbyInteractables.entities[0], 0);
+			}
 		}
 		else if (!gameState.dialogueScene && registry.maps.components[0].currRoom.dialogueDone) {
 			if (!registry.dialogueRequests.has(registry.players.entities[0])) {

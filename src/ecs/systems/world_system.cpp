@@ -292,6 +292,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if (stack.useKey()) {
 					soundPlayer->playDoorOpenSound();
 					object.name = "OpenDoor";
+					object.interactType = InteractableType::ActionInteractable;
 					reaction.choice = -1;
 				} else { // does not have key, but attempted opening
 					DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);

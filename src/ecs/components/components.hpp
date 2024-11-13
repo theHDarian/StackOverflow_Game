@@ -355,9 +355,15 @@ struct DialogueChoice {
 
 };
 
+enum InteractableType {
+	DialogueInteractable,
+	ActionInteractable
+};
+
 struct InteractableObject {
 	std::string name;
 	int dialogueCount = 0;
+	InteractableType interactType = DialogueInteractable;
 };
 
 enum DialogueRequestType {
