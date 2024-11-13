@@ -219,13 +219,14 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		float angle;
 		vec3 axis;
 		vec3 offset;
+		int frame;
 		if (registry.bounds.has(entity)) {
 			Bound& b = registry.bounds.get(entity);
 			angle = b.angle;
 			axis = b.axis;
 			offset = b.offset;
 
-			int frame = 2;
+			frame = 2;
 			for (Entity& d : registry.doors.entities) {
 				if (registry.doors.get(d).side == b.side) {
 					if (registry.interactables.has(d)) {
@@ -237,23 +238,22 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 					break;
 				}
 			}
-
-			GLint frame_uloc = glGetUniformLocation(program, "frame");
-			glUniform1i(frame_uloc, frame);
-			gl_has_errors();
-
-			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-			gl_has_errors();
 		} else if (registry.doorSymbols.has(entity)) {
 			DoorSymbol& d = registry.doorSymbols.get(entity);
 			angle = d.angle;
 			axis = d.axis;
 			offset = d.offset;
-			glBindTexture(GL_TEXTURE_2D, texture_id);
-			gl_has_errors();
+			frame = d.doorType;
 		} else {
 			assert(false);
 		}
+		GLint frame_uloc = glGetUniformLocation(program, "frame");
+		glUniform1i(frame_uloc, frame);
+		gl_has_errors();
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+		gl_has_errors();
+
 		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x,motion.position.y,0.0f))
 						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))
 						* glm::translate(glm::mat4(1.0f),offset)

@@ -333,7 +333,7 @@ Entity createDoorSymbol(RenderSystem * renderer, vec2 position, float angle, vec
 	registry.backgrounds.emplace(entity);
 
 	RenderRequest& rr = registry.renderRequests.insert(entity, 
-		{"door_symbol_enemy.png",
+		{"door_symbols",
 		EFFECT_ASSET_ID::ROOM_BOUND,
 		GEOMETRY_BUFFER_ID::SPRITE}
 	);

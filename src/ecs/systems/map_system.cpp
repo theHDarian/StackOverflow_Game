@@ -153,20 +153,17 @@ RoomType randomRoomType(bool excludeNone)
 {
     return static_cast<RoomType>(rand() % (excludeNone ? RoomType::None - 1 : RoomType::None));
 }
-std::string getSymbol(RoomType type) {
-    if (type == RoomType::BossBigCRoom) {
-        return "door_symbol_boss.png";
-    } else if (type == RoomType::TreasureRoom) {
-        return "door_symbol_treasure.png";
-    } else if (type == RoomType::RestRoom) {
-        return "door_symbol_resting.png";
-    } else if (type == RoomType::None) {
-        return "none.png";
-    } else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
-        return "door_symbol_tutorial.png";
-    } else {
-        return "door_symbol_enemy.png";
+int getSymbol(RoomType type) {
+    if (type >= enemyRoomTypeStart && type <= enemyRoomTypeEnd) {
+        return (int)enemyRoomTypeStart;
     }
+    else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
+        return (int)RoomType::TutorialRoom1 - (enemyRoomTypeEnd - enemyRoomTypeStart);
+    }
+    else if (type < enemyRoomTypeStart) {
+        return (int)type;
+    }
+    return (int)type - (enemyRoomTypeEnd - enemyRoomTypeStart);
 }
 
 void MapSystem::changeRoom(RoomType type, int doorIndex)
@@ -224,7 +221,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
-    registry.renderRequests.get(registry.doorSymbols.entities[spawnIndex]).texture_name = getSymbol(doors[spawnIndex].room);
+    registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = getSymbol(doors[spawnIndex].room);
 
     bool excludeNone = false;
     for (int i = 0; i < doors.size(); i++)
@@ -240,7 +237,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             excludeNone = true;
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
         }
-        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+        registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
     }
 }
 
@@ -256,11 +253,11 @@ void MapSystem::resetMap()
             Door& d = registry.doors.components[i];
             d.isPrev = false;
             d.room = RoomType::None;
-            registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
         }
         registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
-        registry.renderRequests.get(registry.doorSymbols.entities[2]).texture_name = getSymbol(registry.doors.components[2].room);
+        registry.doorSymbols.get(registry.doorSymbols.entities[2]).doorType = getSymbol(registry.doors.components[2].room);
         registry.interactables.get(registry.doors.entities[2]).name = "ClosedTutorialDoor";
 
         Map& map = registry.maps.components[0];
@@ -280,7 +277,7 @@ void MapSystem::resetMap()
             if (d.room == RoomType::None)
                 excludeNone = true;
 
-            registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
         }
 

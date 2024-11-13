@@ -6,17 +6,19 @@ enum Side : char {
     Left = 'L',Top = 'T',Bottom = 'B',Right = 'R'
 };
 
-enum RoomType : char {
-    EnemyRoomDash,
-    EnemyRoomTripleBuff,
-    EnemyRoomBee,
+enum RoomType : int {
     TreasureRoom,
     RestRoom,
     BossBigCRoom, //remove for now to prevent bug
+    EnemyRoomDash,
+    EnemyRoomTripleBuff,
+    EnemyRoomBee,
     None, //Keep None at the end of the list to be compatible with existing get random function
     TutorialRoom1,
     TutorialRoom2
 };
+const int enemyRoomTypeStart = RoomType::EnemyRoomDash; // add all enemy rooms after this one to make door textures work
+const int enemyRoomTypeEnd = RoomType::EnemyRoomBee; // add all enemy rooms after this one to make door textures work
 
 enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
@@ -42,6 +44,7 @@ struct DoorSymbol {
     float angle;
     vec3 axis;
     vec3 offset;
+    int doorType;
 };
 
 struct Room {
