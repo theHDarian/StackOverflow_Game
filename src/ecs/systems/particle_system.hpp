@@ -4,7 +4,7 @@
 #include <utility>
 #include <vector>
 #include <glm/glm.hpp>
-#include "components.hpp"
+#include "particle_components.hpp"
 #define POOLSIZE 1000
 
 class ParticleSystem {
