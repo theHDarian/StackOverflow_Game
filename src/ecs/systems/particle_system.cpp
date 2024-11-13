@@ -231,16 +231,16 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
         bool hasMotion = registry.motions.has(ent);
 
         //emit based on type of request
-        for (int i = 0; i < emitCount; i++) {
+        for (int j = 0; j < emitCount; j++) {
             if (request.requestType == ParticleRequestType::PlayerDash && hasMotion) {
-                Motion& motion = registry.motions.get(ent);
+                const Motion& motion = registry.motions.get(ent);
                 emit(createParticle(motion.position + vec2(0.0f,motion.scale.y / 2) + vec2(Random::Float(-5,5),Random::Float(-5,5))));
             }
             else if (request.requestType == ParticleRequestType::PlayerBulletCollision) {
                 vec2 pos = request.defaultPos + vec2{ Random::Float(-2,2), Random::Float(-2,2)};
                 explode(createParticle(pos), request.defaultPos);
             } else if (request.requestType == ParticleRequestType::EnemyDeath && hasMotion) {
-                Motion& motion = registry.motions.get(ent);
+                const Motion& motion = registry.motions.get(ent);
                 vec2 pos = motion.position + vec2(Random::Float(-5,5),Random::Float(-5,5));
                 explode(createParticle(pos), motion.position);
             }
@@ -276,7 +276,7 @@ void ParticleSystem::emit(const ParticleProps& props) {
     particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
     particle.sizeEnd = props.sizeEnd;
 
-    poolIndex = --poolIndex % particlePool.size();
+    poolIndex = (poolIndex-1) % particlePool.size();
 }
 
 void ParticleSystem::explode(const ParticleProps& props, vec2 origin) {
@@ -301,7 +301,7 @@ void ParticleSystem::explode(const ParticleProps& props, vec2 origin) {
     particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
     particle.sizeEnd = props.sizeEnd;
 
-    poolIndex = --poolIndex % particlePool.size();
+    poolIndex = (poolIndex-1) % particlePool.size();
 
 }
 
@@ -340,14 +340,6 @@ void ParticleSystem::render() {
     glUseProgram(shaderProgram);
     glBindVertexArray(vao);
 
-    // int success;
-    // glValidateProgram(shaderProgram);
-    // glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
-    // if (!success) {
-    //     char infoLog[512];
-    //     glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-    //     std::cerr << "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n" << infoLog << std::endl;
-    // }
     gl_has_errors();
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");

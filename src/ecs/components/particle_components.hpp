@@ -5,10 +5,20 @@ enum ParticleRequestType {
 	PlayerDash,
 	EnemyDeath,
 	PlayerBulletCollision,
+
+    //updated types
+    PExplode,
+    PPlayerTrail,
+    PBulletTrail,
+    PWallCollision,
+    PLaser,
+    PImplosion, //explosion played backwards
+
 	ClearParticles // special request to clear all current particles
 };
 struct EmitParticle {
 	ParticleRequestType requestType;
+    vec4 colorBegin, colorEnd;
 	
 	float timeRemaining; //in seconds
 	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
