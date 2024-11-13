@@ -684,7 +684,8 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 
 	if (bullet.bulletEffects[0].type == BulletEffectType::Key) {
 		motion.scale = 16.f * vec2(2.8, 1);
-		motion.velocity = velocity * 800.f;
+		motion.velocity = velocity * 400.f;
+		motion.veer = vec2(0);
 		bullet.bulletBounce = 10;
 		bullet.bulletPierce = 0;
 		bullet.bulletRange = 5000;
