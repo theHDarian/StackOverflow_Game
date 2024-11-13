@@ -292,17 +292,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if (stack.useKey()) {
 					soundPlayer->playDoorOpenSound();
 					object.name = "OpenDoor";
-					reaction.choice = 1;
-				} else {
-					DialogueLines& nokey = registry.dialogueLines.emplace(Entity());
-					nokey.lines.push_back(Dialogue{ "Hey, those are the doors need a special keycode to unlock!", "Scientist", "scientist_avatar.png" });
-					nokey.lines.back().sfx = SoundType::IncomingDialogue;
-					nokey.lines.push_back(Dialogue{ "There should be some single-use keycards scattered around the lab.", "Scientist", "scientist_avatar.png" });
-					nokey.lines.push_back(Dialogue{ "You should be able to scrape the data off of them and store it on your stack.", "Scientist", "scientist_avatar.png" });
-					nokey.lines.push_back(Dialogue{ "Some enemies might have done just that, and they might leak those keycodes in a pinch. See if you can get it off of them.", "Scientist", "scientist_avatar.png" });
-					nokey.lines.push_back(Dialogue{ "Good luck!", "Scientist", "scientist_avatar.png" });
-					DialogueRequest& req  = registry.dialogueRequests.emplace(player);
-					req.type = DialogueRequestType::StoryDialogue;
+					reaction.choice = -1;
+				} else { // does not have key, but attempted opening
+					DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+					req.choice = 2; // use this as temporary way to get back to dialogue system
+					if (!gameState.seenLockedDoor) {
+						req.choice = 3;
+						gameState.seenLockedDoor = true;
+					}
 				}
 			}
 		}
@@ -342,6 +339,7 @@ void WorldSystem::restartGame() {
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
+	gameState.seenLockedDoor = false;
 	gameState.dialogueChoice = -1;
 
 	//std::cout << ("MyString") << std::endl;

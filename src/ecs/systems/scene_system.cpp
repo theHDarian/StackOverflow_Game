@@ -104,6 +104,9 @@ void SceneSystem::step(float elapsed_ms) {
 			if (req.type == DialogueRequestType::InteractableDialogue) {
 				InteractableObject& object = registry.interactables.get(entity);
 				InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+				if (req.choice > -1) {
+					dialogueObject.choice = req.choice;
+				}
 				if (interactibleDialogue.count(dialogueObject) > 0) {
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();

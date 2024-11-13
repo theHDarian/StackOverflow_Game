@@ -48,6 +48,18 @@ ITEM LockedDoor -1 0
 This door seems to require a keycode to unlock. Try to unlock it?
 CHOICES Yes\No
 
+ITEM LockedDoor 2 0
+You don't have the keycode to unlock it.
+
+ITEM LockedDoor 3 0
+Hey, those are the doors need a special keycode to unlock!
+SPEAKER Scientist scientist_avatar.png
+SOUND IncomingDialogue
+There should be some single-use keycards scattered around the lab.
+You should be able to scrape the data off of them and store it on your stack.
+Some enemies might have done just that, and they might leak those keycodes in a pinch. See if you can get it off of them.
+Good luck!
+
 ITEM PrevDoor -1 0
 The only way out is forwards, not backwards!
 

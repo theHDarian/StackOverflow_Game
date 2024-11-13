@@ -367,6 +367,7 @@ enum DialogueRequestType {
 
 struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
 	DialogueRequestType type = InteractableDialogue;
+	int choice = -1;
 };
 
 struct InteractableReaction {

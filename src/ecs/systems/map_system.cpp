@@ -175,7 +175,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     Map &map = registry.maps.components[0];
     Door &door = doors[doorIndex];
 
-    if (door.room == RoomType::None || !map.currRoom.cleared)
+    if (door.room == RoomType::None || (!map.currRoom.cleared && registry.interactables.get(registry.doors.entities[doorIndex]).name.compare("OpenDoor") != 0))
         return;
     //play door sound
 
@@ -281,6 +281,7 @@ void MapSystem::resetMap()
                 excludeNone = true;
 
             registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+            registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
         }
 
         for (Door& d : registry.doors.components)
