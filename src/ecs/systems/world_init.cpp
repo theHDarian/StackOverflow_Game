@@ -693,7 +693,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			{-motion.scale.x / 2, motion.scale.y / 2}};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		pc.setPolyLengths();
+		//pc.setPolyLengths();
 		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_square.png";
 		renderShape = "enemy_bullet_square.png";
@@ -707,7 +707,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			{-motion.scale.x / 2, motion.scale.y / 2}};
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		pc.setPolyLengths();
+		//pc.setPolyLengths();
 		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_triangle.png";
 		renderShape = "enemy_bullet_triangle.png";
@@ -810,6 +810,53 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 
 	return entity;
 }
+
+Entity createLightningBullet(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = 450;
+	bullet.bulletRange = 5000;
+	bullet.bulletBounce = 10;
+	bullet.bulletPierce = 10000;
+	bullet.bulletEffects = { lightning };
+	bullet.shape = RECTANGLE;
+
+	Motion& motion = registry.motions.emplace(entity);
+	float angle = (rand() % 100 / 100.f) * 2 * M_PI;
+	motion.angle = angle;
+	motion.position = pos;
+	motion.velocity = 450.f * vec2(cos(angle), sin(angle));
+	motion.scale = 25.f * vec2(2,1); // Ensure scale is initialized
+	motion.veer = { 0, 0 };
+	
+	PolyCollider& pc = registry.polyColliders.emplace(entity);
+	pc.offsetVertices = {
+		{motion.scale.x / 2, motion.scale.y / 3},
+		{motion.scale.x / 2, -motion.scale.y / 3},
+		{-motion.scale.x / 2, -motion.scale.y / 3},
+		{-motion.scale.x / 2, motion.scale.y / 3} };
+	pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+	//pc.setPolyLengths();
+
+	auto& animate = registry.animations.emplace(entity);
+	animate.max_frames = 2;
+	animate.animation_countdown_base = 50;
+
+	registry.renderRequests.insert(
+		entity,
+		{ "lightning_bullet",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 
 Entity createLine(vec2 position, vec2 scale)
 {

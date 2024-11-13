@@ -331,6 +331,10 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     Enemy &enemy = registry.enemies.get(entity);
     Motion& em = registry.motions.get(entity);
     vec2 velocity = (playerMotion.position + playerMotion.velocity / 2.0f) - pos;
+    if (((float)enemy.currHealth / enemy.maxHealth < 0.15) && (rand() % 1000 > 990)) {
+        createLightningBullet(render, em.position);
+    }
+
     if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
     {
         sound->playEnemyShootSound(sfxNum, 0);
