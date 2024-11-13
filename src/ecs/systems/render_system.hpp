@@ -143,7 +143,6 @@ private:
 	#if IMGUI_ENABLED
 	public:
 		ImGuiContext* imgui_context;
-		GLFWimage loadCursorImage(const char *filename);
 
 		void initImGui();
 		void drawImGui();

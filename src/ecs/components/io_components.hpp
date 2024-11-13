@@ -9,7 +9,7 @@ struct WindowState {
 	int height;
     bool isRetinaDisplay;
 
-	float fps;
+	int fps;
 	int numFramesThisSecond;
 	time_t currUnixTime;
 

@@ -66,38 +66,11 @@ int main() {
     textSystem.initFreetypeLib();
     mapSystem.init(&renderer, &soundSystem);
 
-    // // Load and set the custom cursor
-    // GLFWimage cursorImg = renderer.loadCursorImage(textures_path("Player/cursor.png").c_str());
-    // if (cursorImg.pixels == nullptr) {
-    //     fprintf(stderr, "Failed to load cursor image\n");
-    //     return EXIT_FAILURE;
-    // }
-    // GLFWcursor* customCursor = glfwCreateCursor(&cursorImg, cursorImg.width/2, cursorImg.height/2);
-    // if (customCursor == nullptr) {
-    //     fprintf(stderr, "Failed to create custom cursor\n");
-    //     return EXIT_FAILURE;
-    // }
-    // glfwSetCursor(window, customCursor);
-    // fprintf(stderr, "Custom cursor set\n");
-
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// variable timestep loop
 	auto t = Clock::now();
 	while (!world.isOver()) {
-		WindowState& ws = registry.windowStates.components[0];
-		if (time(NULL) - ws.currUnixTime > 1.0f) {
-			ws.fps = ws.numFramesThisSecond;
-			ws.numFramesThisSecond = 0;
-			ws.currUnixTime = time(NULL);
-
-			char title[256]; // Buffer for the title string
-			snprintf(title, sizeof(title), "StackOverflow (FPS: %.0f)", ws.fps);
-			glfwSetWindowTitle(window,title);
-		} else {
-			ws.numFramesThisSecond++;
-		}
-		
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
 
