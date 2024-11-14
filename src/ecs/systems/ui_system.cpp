@@ -15,67 +15,91 @@ void UISystem::step(float elapsed_ms) {
 	GameState& gameState = registry.gameStates.components[0];
 	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
 	if (!gameState.gameOver) {
+		// toggling basic menu uis on/off
 		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
 		registry.renderRequests.get(controlsGuide).show = gameState.gamePaused;
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
-		if (!gameState.dialogueScene) {
+
+		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+		StackUI& stackui = registry.stackUI.get(stackUI);
+		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
-		}
-		// update which dialogue choice is highlighted. Consider updating only when necessary?
-		if (registry.dialogueChoices.entities.size() > 0) {
-			int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
-			int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
-			// unhighlight the last hovered choice
-			registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
-			registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
-			// highlight current choice
-			registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
-			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
-		}
-
-		// update stack ui
-		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
-
-		// is the player hovering over a stack ui bullet right now?
-		// bad: copies code from render system; consider making each bullet an entity
-		StackUI& stackui = registry.stackUI.get(stackUI);
-		IOState& ioState = registry.ioStates.components[0];
-		int bulletHoveredIndex = -1;
-		// should check first: is it in stack ui at all?
-		// this is point in aabb detection
-		if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
-			&& ioState.mousePosition.y > (stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
-			for (int i = 0; i < stack.currStack.size(); i++) {
-				vec2 bulletPos = { stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y };
-				vec2 bulletSize = stackui.bulletSize;
-				if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
-					&& ioState.mousePosition.y > (bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
-					// mouse is hovering overbullet
-					bulletHoveredIndex = i;
-					break;
+			registry.renderRequests.get(bulletUI).show = false;
+			// clear prev frame's e indicators
+			for (Entity entity : registry.interactIndicators.entities) {
+				if (!registry.deleteds.has(entity)) {
+					registry.deleteds.emplace(entity);
 				}
 			}
-			if (bulletHoveredIndex > -1) {
-				std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
+
+			// draw "press e to interact" over all items in nearby interactables list
+			for (Entity entity : registry.nearbyInteractables.entities) {
+				createInteractIndicator(registry.motions.get(entity).position);
+			}
+
+			// update stack ui
+			registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+			
+			// update bullet ui positions
+			if (stack.currStack.size() > stackui.bulletPositions.size()) {
+				for (int i = 0; i < stack.currStack.size() - stackui.bulletPositions.size(); i++) {
+					int index = i + stack.currStack.size() - 1;
+					stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, 
+						stackui.bulletStartPos.y));
+				}
+			}
+			else if (stack.currStack.size() < stackui.bulletPositions.size()) {
+				stackui.bulletPositions.resize(stack.currStack.size());
+			}
+		} 
+
+		if (gameState.gamePaused) { // paused ui here
+			// is the player hovering over a stack ui bullet right now?
+			// bad: copies code from render system; consider making each bullet an entity
+			// note that this is very slow!! might be because of the amount of calculations...
+			IOState& ioState = registry.ioStates.components[0];
+			int bulletHoveredIndex = -1;
+			vec2 bulletSize = stackui.bulletSize;
+			// should check first: is it in stack ui at all?
+			// this is point in aabb detection
+			if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+				&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+				for (vec2 bulletPos : stackui.bulletPositions) {
+					if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+						&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+						// mouse is hovering overbullet
+						//bulletHoveredIndex = i;
+						bulletHoveredIndex++;
+						break;
+					}
+				}
+				if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
+					//std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
+					updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
+						stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+				}
+				else if (bulletHoveredIndex == -1){
+					registry.renderRequests.get(bulletUI).show = false;
+				}
+				lastHoveredBullet = bulletHoveredIndex;
+			}
+			else {
+				registry.renderRequests.get(bulletUI).show = false;
 			}
 		}
-		else {
-			std::cout << "Stack not hovered!" << std::endl;
-		}
-
-
-		// clear prev frame's e indicators
-		for (Entity entity : registry.interactIndicators.entities) {
-			if (!registry.deleteds.has(entity)) {
-				registry.deleteds.emplace(entity);
+		else if (gameState.dialogueScene) {
+			// update which dialogue choice is highlighted. Consider updating only when necessary?
+			if (registry.dialogueChoices.entities.size() > 0) {
+				int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
+				int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
+				// unhighlight the last hovered choice
+				registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
+				registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+				// highlight current choice
+				registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
+				registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
 			}
-		}
-
-		// draw "press e to interact" over all items in nearby interactables list
-		for (Entity entity : registry.nearbyInteractables.entities) {
-			createInteractIndicator(registry.motions.get(entity).position);
 		}
 	}
 }
@@ -91,6 +115,7 @@ bool UISystem::init(GLFWwindow* window) {
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
 	screenCutIn = createScreenCutIn();
+	bulletUI = createBulletUI();
 
 	return true;
 }
@@ -175,6 +200,51 @@ void UISystem::playDialogue() {
 			soundSystem->stopNextDialogueSound();
 		}
 	}
+}
+
+// update bullet ui
+// position = top middle position
+void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
+	Motion& motion = registry.motions.get(bulletUI);
+	motion.position = position;
+
+	registry.renderRequests.get(bulletUI).show = true;
+
+	registry.textRenderRequests.get(bulletUI).text = bullet.name;
+}
+
+Entity UISystem::createBulletUI() {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.menuUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = { 300, 450 };
+	motion.position = { 0, 0 };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 0,0,0 };
+
+	registry.menuUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.scale = 0.40;
+	text.topRightBound = { windowState.width, windowState.height };
+	text.bottomLeftBound = { 0, 0 };
+	text.y = windowState.height - motion.position.y - 15;
+	text.x = motion.position.x - 10;
+
+	return entity;
 }
 
 // draw "E" to interact with object above object's position

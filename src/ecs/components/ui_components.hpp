@@ -6,9 +6,10 @@ struct StackUI {
 	vec2 bulletStartPos;
 	vec2 bulletSize;
 	float bulletOffset; // space between bullets
-
 	vec2 stackSize;
 	vec2 stackPos;
+
+	std::vector<vec2> bulletPositions;
 };
 
 struct GameUI {

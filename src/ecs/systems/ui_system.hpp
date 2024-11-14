@@ -31,6 +31,9 @@ private:
     Entity dialogueAvatar;
     Entity controlsGuide;
     Entity screenCutIn;
+    Entity bulletUI;
+
+    int lastHoveredBullet = -1;
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
@@ -49,6 +52,11 @@ private:
     Entity createScreenCutIn();
 
     Entity createInteractIndicator(vec2 position);
+
+    // assume will only ever have one
+    Entity createBulletUI();
+
+    void updateBulletUI(vec2 position, BulletStackEffect bullet);
 
     SoundSystem* soundSystem;
 };
