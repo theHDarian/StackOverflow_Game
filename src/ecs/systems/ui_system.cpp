@@ -59,7 +59,7 @@ void UISystem::step(float elapsed_ms) {
 			// is the player hovering over a stack ui bullet right now?
 			// bad: copies code from render system; consider making each bullet an entity
 			// note that this is very slow!! might be because of the amount of calculations...
-			/*
+			
 			IOState& ioState = registry.ioStates.components[0];
 			int bulletHoveredIndex = -1;
 			int count = -1;
@@ -92,7 +92,7 @@ void UISystem::step(float elapsed_ms) {
 				registry.renderRequests.get(bulletUI).show = false;
 				registry.renderRequests.get(bulletUIArrow).show = false;
 			}
-			*/
+			
 		}
 		else if (gameState.dialogueScene) {
 			// update which dialogue choice is highlighted. Consider updating only when necessary?
