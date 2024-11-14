@@ -10,3 +10,6 @@ This bullet doesn't do anything.
 
 UI ControlsGuide
 Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals
+
+UI GameOver
+Game Over \npress R to restart

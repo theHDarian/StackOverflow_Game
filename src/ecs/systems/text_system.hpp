@@ -7,7 +7,7 @@
 #include "render_system_init.hpp"
 #include "tiny_ecs_registry.hpp"
 
-
+std::vector<std::string> getTokenizedText(std::string text);
 
 class TextSystem {
 public:
@@ -37,7 +37,8 @@ private:
     std::unordered_map<std::string, std::vector<std::string>> uiTexts;
 
     void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, std::string textName = "");
+    // lazy overloading
+    void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
     vec2 renderWord(std::string text, float x, float y, float scale, glm::vec3 color);
-    std::vector<std::string> getTokenizedText(std::string text);
     void loadText();
 };

@@ -148,7 +148,7 @@ void UISystem::playDialogue() {
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
 		if (nextLine.text.compare("<end>") != 0) { // there is a next line
 			registry.renderRequests.get(dialogueBox).show = true;
-			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
+			registry.textRenderRequests.get(dialogueBox).tokenizedText = nextLine.tokenizedText;
 			
 			// play a sound if there is one
 			if (nextLine.sfx == IncomingDialogue) {
@@ -460,7 +460,6 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	text.x = windowState.width - scale.x + 300;				// 25 is just some padding
 	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
 	text.scale = 0.5;										
-	text.text = "hello this is test dialogue!";
 	text.topRightBound = { scale.x - 75, scale.y - 25 };
 	text.bottomLeftBound = { text.x + 25, 0 + 25 };
 
@@ -505,7 +504,7 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 0.5;
-	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals";
+	//text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
 	text.textName = "ControlsGuide";
@@ -596,9 +595,10 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 1.2;
-	text.text = "Game Over \npress R to restart";
+	//text.text = "Game Over \npress R to restart";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.textName = "GameOver";
 
 	return entity;
 }

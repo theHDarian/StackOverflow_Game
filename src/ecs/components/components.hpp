@@ -307,10 +307,12 @@ struct TextRenderRequest {
 
 	// temp: add id for text for now if it is preloaded
 	std::string textName = "";
+	std::vector<std::string> tokenizedText = std::vector<std::string>();
 };
 
 struct Dialogue {
 	std::string text;
+	std::vector<std::string> tokenizedText;
 	std::string speakerName;
 	std::string speakerAvatar;
 	std::vector<std::string> choices;
@@ -327,7 +329,7 @@ struct DialogueLines {
 			return lines[current - 1];
 		}
 		else {
-			return Dialogue{ "<end>", "<end>", "<end>" }; // maybe end of str constant
+			return Dialogue{ "<end>" }; // maybe end of str constant
 		}
 	}
 
@@ -336,7 +338,7 @@ struct DialogueLines {
 			return lines[current++];
 		}
 		else {
-			return Dialogue{"<end>", "<end>", "<end>"}; // maybe end of str constant
+			return Dialogue{"<end>"}; // maybe end of str constant
 		}
 	}
 };

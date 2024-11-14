@@ -1,5 +1,6 @@
 #include "scene_system.hpp"
 #include "sound_system.hpp"
+#include "text_system.hpp"
 #include <fstream>		// for reading text files
 #include <iostream>
 #include <sstream>	
@@ -266,7 +267,9 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					}
 					dialogueBody += line.substr(start, end);
 
-					lines.push_back(Dialogue{ dialogueBody });
+					std::vector<std::string> tokenizedText = getTokenizedText(dialogueBody);
+
+					lines.push_back(Dialogue{ dialogueBody, tokenizedText });
 					//std::cout << "text: " << dialogueBody << std::endl;
 				}
 

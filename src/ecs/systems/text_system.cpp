@@ -194,7 +194,7 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
     return textEndPos;
 }
 
-std::vector<std::string> TextSystem::getTokenizedText(std::string text) {
+std::vector<std::string> getTokenizedText(std::string text) {
     // tokenize string by space (should maintain \n!)
     // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
     std::vector<std::string> tokenizedText;
@@ -219,6 +219,49 @@ std::vector<std::string> TextSystem::getTokenizedText(std::string text) {
     }
     tokenizedText.push_back(str);
     return tokenizedText;
+}
+
+void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color,
+    vec2 topRightBound, vec2 bottomLeftBound) {
+    // activate corresponding render state, hard code to just 1 text rendering program for now
+// (can also pass shader itself as parameter and use that)
+    glUseProgram(program);
+    gl_has_errors();
+
+    // can also consider adding a transform matrix here
+    glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
+    glActiveTexture(GL_TEXTURE0);
+    gl_has_errors();
+
+    std::string newLine = "\n";
+    vec2 textPos = { x, y };
+
+    for (std::string word : tokenizedText) {
+        // calculate the length of the word to determine if need to insert new line 
+        float xpos = textPos.x;
+        float ypos = textPos.y;
+
+        // approximate word size as opposed to looping
+        xpos += (Characters[65].Size.x + Characters[65].Bearing.x + 1.0f) * word.length() * scale * 2.50;
+
+        // compare with text box size
+        if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
+            textPos.y -= ((Characters[65].Size.y)) * 2.0 * 2.50 * scale;
+            textPos.x = x;
+        }
+        if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {
+            // do nothing for now, unless want to write text that goes up and down
+        }
+
+        textPos = renderWord(word, textPos.x, textPos.y, scale, color);
+        // check if new line should be applied
+        if (newLine.compare(word) == 0) {
+            textPos.x = x;
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    gl_has_errors();
 }
 
 void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, 
@@ -320,9 +363,16 @@ void TextSystem::renderDialogueUIText() {
     for (Entity entity : registry.dialogueUITexts.entities)
     {
         auto& textReq = registry.textRenderRequests.get(entity);
-        if (registry.renderRequests.get(entity).show)
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
-                textReq.textName);
+        if (registry.renderRequests.get(entity).show) {
+            if (textReq.tokenizedText.size() > 0) {
+                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+            }
+            else {
+                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
+                    textReq.textName);
+            }
+        }
+            
     }
 
     // workaround for now instead of having text have its own show
