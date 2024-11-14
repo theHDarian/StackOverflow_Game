@@ -33,7 +33,7 @@ struct EmitParticle {
 	ParticleRequestType requestType;
     ParticleProps props;
 	
-	float timeRemaining; //in seconds
+	float timeRemaining; //in milliseconds
 	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
 
 	vec2 defaultPos = UNSET_VEC2; //somewhere off screen as the unset position

@@ -218,13 +218,12 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             break;
         }
         
-        int emitCount = min((int) round(request.numToEmit * (elapsed_ms / request.timeRemaining)),request.numToEmit);
+        int emitCount = (int) ceil(request.numToEmit * min(elapsed_ms / request.timeRemaining,1.f));
+        request.numToEmit -= emitCount;
         request.timeRemaining -= elapsed_ms;
-        if (request.timeRemaining <= 0) {
-            emitCount = request.numToEmit;
+        if (request.timeRemaining <= 0 || request.numToEmit <= 0) {
             removeRequestQueue.push_back(ent);
         }
-        request.numToEmit -= emitCount;
 
         //emit based on type of request
         if (request.defaultPos != UNSET_VEC2) {
