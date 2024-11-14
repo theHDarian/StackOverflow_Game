@@ -34,7 +34,10 @@ private:
     // note: original render system has bottom right be (window width, window height)
     // but this tutorial's projection matrix has top right be (Window width, window height)
     glm::mat4 projection;
+    std::unordered_map<std::string, std::vector<std::string>> uiTexts;
 
-    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
+    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, std::string textName = "");
     vec2 renderWord(std::string text, float x, float y, float scale, glm::vec3 color);
+    std::vector<std::string> getTokenizedText(std::string text);
+    void loadText();
 };

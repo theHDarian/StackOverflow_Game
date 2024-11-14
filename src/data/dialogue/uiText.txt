@@ -1,0 +1,12 @@
+# format:
+# UI <ui name>
+# followed by a body of text
+
+UI bulletInert
+This bullet doesn't do anything.
+
+# alt: map more deterministically?
+# but then would be more load intensive?
+
+UI ControlsGuide
+Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals

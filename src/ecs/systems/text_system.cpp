@@ -125,6 +125,9 @@ int TextSystem::initFreetypeLib() {
     glBindVertexArray(0); 
     gl_has_errors();
 
+    // load texts
+    loadText();
+
     return 1;
 }
 
@@ -132,8 +135,6 @@ int TextSystem::initFreetypeLib() {
 vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm::vec3 color) {
     // temp put here to readjust sizes btween diff fonts
     scale *= 2.50; // for bytebounce
-    //scale *= 2.0; // for bionic comic
-    //scale *= 1.5;
 
     float copyX = x;
     vec2 textEndPos = { x, y };
@@ -193,7 +194,7 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
     return textEndPos;
 }
 
-std::vector<std::string> getTokenizedText(std::string text) {
+std::vector<std::string> TextSystem::getTokenizedText(std::string text) {
     // tokenize string by space (should maintain \n!)
     // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
     std::vector<std::string> tokenizedText;
@@ -220,7 +221,8 @@ std::vector<std::string> getTokenizedText(std::string text) {
     return tokenizedText;
 }
 
-void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound)
+void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, 
+    vec2 topRightBound, vec2 bottomLeftBound, std::string textName)
 {
     // activate corresponding render state, hard code to just 1 text rendering program for now
     // (can also pass shader itself as parameter and use that)
@@ -233,13 +235,19 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
     gl_has_errors();
 
     std::string newLine = "\n";
+    std::vector<std::string> tokenizedText;
     vec2 textPos = { x, y };
 
-    std::vector<std::string> tokenizedText = getTokenizedText(text);
+    if (uiTexts.count(textName) > 0) {
+        tokenizedText = uiTexts[textName];
+        //std::cout << "found text for " << textName << std::endl;
+    }
+    else {
+        tokenizedText = getTokenizedText(text);
+    }
 
     for (std::string word : tokenizedText) {
         // calculate the length of the word to determine if need to insert new line 
-        // copy pasted from word render for now
         float xpos = textPos.x;
         float ypos = textPos.y;
 
@@ -277,7 +285,8 @@ void TextSystem::renderMenuUIText() {
         // for now, tie text visibility to entitie's render visibility
         // but assumption may not always hold
         if (registry.renderRequests.get(entity).show)
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
+                textReq.textName);
     }
 
     glBindVertexArray(0);
@@ -293,7 +302,8 @@ void TextSystem::renderGameUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show) {
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
+                textReq.textName);
         }
     }
 
@@ -311,15 +321,101 @@ void TextSystem::renderDialogueUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show)
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
+                textReq.textName);
     }
 
     // workaround for now instead of having text have its own show
     for (Entity entity : registry.dialogueChoices.entities) {
         auto& textReq = registry.textRenderRequests.get(entity);
-        renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+        renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
+            textReq.textName);
     }
 
     glBindVertexArray(0);
     gl_has_errors();
+}
+
+void TextSystem::loadText() {
+    std::string uiType = "uiText";
+    std::string filename = dialogue_path(uiType + ".txt").c_str();
+    std::ifstream entity_file(filename);
+    std::string uiName;
+    std::vector<std::string> tokenizedText;
+
+    if (entity_file.is_open())
+    {
+        std::string line;
+
+        while (!entity_file.eof())
+        {
+            std::getline(entity_file, line);
+
+            if (line.length() > 0 && line[0] != '#')
+            {
+                // split line different based on what first word is
+                std::string action = line.substr(0, line.find_first_of(" "));
+
+
+                if (action.compare("UI") == 0) {
+                    // new ui text, so place all prev lines into map, unless this is the first one
+                    if (tokenizedText.size() > 0) {
+                        uiTexts.insert({ uiName, tokenizedText });
+                        tokenizedText.clear();
+                    }
+
+                    std::stringstream ss_line(line);
+                    ss_line >> action >> uiName;
+                }
+                else { // this is just a body of text
+                    // need to manually add \n back into strings... use this until can think of better way
+                    //ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c?page=1&tab=scoredesc#tab-top
+                    std::string delim = "\\n";
+                    std::string uiTextBody = "";
+                    auto start = 0U;
+                    auto end = line.find(delim);
+                    while (end != std::string::npos)
+                    {
+                        uiTextBody += line.substr(start, end - start) + '\n';
+                        start = end + delim.length();
+                        end = line.find(delim, start);
+                    }
+                    uiTextBody += line.substr(start, end);
+
+                    // tokenize string by space (should maintain \n!)
+                    // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
+                    std::string space = " ";
+                    std::string newLine = "\n";
+                    // consider adding other delimiters, like \tab, etc
+
+                    std::string str = "";
+                    // this is very expensive!!
+                    // TODO: pre-tokenize all text before loading game
+                    for (char c : uiTextBody) {
+                        if (c == ' ' && str.length() > 0) {
+                            tokenizedText.push_back(str + space + space); // for some reason, need to add 2 spaces
+                            str = "";
+                        }
+                        else if (c == '\n') {
+                            tokenizedText.push_back(str);
+                            tokenizedText.push_back(newLine);
+                            str = "";
+                        }
+                        else {
+                            str += c;
+                        }
+                    }
+                    tokenizedText.push_back(str);
+                    tokenizedText.push_back(newLine);
+                }
+
+            }
+        }
+        entity_file.close();
+        uiTexts.insert({ uiName, tokenizedText });
+    }
+    else
+    {
+        std::cout << "ERROR: failed to open file: " << filename << std::endl;
+    }
 }

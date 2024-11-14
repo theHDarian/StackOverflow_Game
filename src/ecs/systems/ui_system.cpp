@@ -1,7 +1,7 @@
 #include "ui_system.hpp"
 
 #include "sound_system.hpp"
-
+#include <fstream>
 
 UISystem::UISystem(SoundSystem* soundSystem) {
 	this->soundSystem = soundSystem;
@@ -59,6 +59,7 @@ void UISystem::step(float elapsed_ms) {
 			// is the player hovering over a stack ui bullet right now?
 			// bad: copies code from render system; consider making each bullet an entity
 			// note that this is very slow!! might be because of the amount of calculations...
+			/*
 			IOState& ioState = registry.ioStates.components[0];
 			int bulletHoveredIndex = -1;
 			int count = -1;
@@ -91,6 +92,7 @@ void UISystem::step(float elapsed_ms) {
 				registry.renderRequests.get(bulletUI).show = false;
 				registry.renderRequests.get(bulletUIArrow).show = false;
 			}
+			*/
 		}
 		else if (gameState.dialogueScene) {
 			// update which dialogue choice is highlighted. Consider updating only when necessary?
@@ -219,7 +221,7 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	registry.renderRequests.get(bulletUI).show = true;
 
 	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
-	textReq.text = bullet.name;
+	textReq.text = bullet.name + "\nThis bullet does "; // possibly: append text hashed on bullet name
 	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
 
@@ -506,6 +508,7 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.textName = "ControlsGuide";
 
 	return entity;
 }

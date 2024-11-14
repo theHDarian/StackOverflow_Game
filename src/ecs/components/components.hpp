@@ -304,6 +304,9 @@ struct TextRenderRequest {
 	// size of text box
 	vec2 topRightBound;
 	vec2 bottomLeftBound;
+
+	// temp: add id for text for now if it is preloaded
+	std::string textName = "";
 };
 
 struct Dialogue {

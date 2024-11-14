@@ -5,6 +5,10 @@
 #include "tiny_ecs.hpp"
 #include "tiny_ecs_registry.hpp"
 
+#include <unordered_map>
+#include <string>
+#include <sstream>
+
 class SoundSystem;
 
 // System responsible for handling user input
