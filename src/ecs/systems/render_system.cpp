@@ -4,12 +4,6 @@
 #include <glm/gtx/compatibility.hpp>
 
 #include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
 #include "tiny_ecs_registry.hpp"
 #include "world_system.hpp"
 #include "utils/enum_string_mapping.hpp"
@@ -632,6 +626,24 @@ void RenderSystem::drawMenuUI() {
 		//draw Imgui
 		drawImGui();
 	#endif
+}
+
+void RenderSystem::drawMenuOverlayUI() {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+	mat3 projection_2D = createProjectionMatrix();
+
+	for (Entity& entity : registry.menuOverlayUIs.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+
+	glBindVertexArray(0);
+	gl_has_errors();
 }
 
 mat3 RenderSystem::createProjectionMatrix()

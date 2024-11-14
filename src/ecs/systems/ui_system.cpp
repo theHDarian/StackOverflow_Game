@@ -221,9 +221,11 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	registry.renderRequests.get(bulletUI).show = true;
 
 	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
-	textReq.text = bullet.name + "\nThis bullet does "; // possibly: append text hashed on bullet name
+	textReq.textName = "HoverBullet_" + bullet.name;
 	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
+	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
+	textReq.topRightBound = { textReq.x + motion.scale.x - 25, textReq.y };
 
 	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
 	arrowMotion.position = { position.x, position.y + 50 };
@@ -240,7 +242,7 @@ Entity UISystem::createBulletUIArrow() {
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
-	registry.menuUIs.emplace(entity);
+	registry.menuOverlayUIs.emplace(entity);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = M_PI / 2;
@@ -265,18 +267,18 @@ Entity UISystem::createBulletUI() {
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
-	registry.menuUIs.emplace(entity);
+	registry.menuOverlayUIs.emplace(entity);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-	motion.scale = { 300, 300 };
+	motion.scale = { 350, 400 }; // hard code size for now; consider scaling to text in future (tho maybe not needed?)
 	motion.position = { 0, 0 };
 
 	vec3& color = registry.colors.emplace(entity);
 	color = { 11 / 255.f, 84 / 255.f, 87 / 255.f };
 
-	registry.menuUITexts.emplace(entity);
+	registry.menuOverlayUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 	text.scale = 0.40;

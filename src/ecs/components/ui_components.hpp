@@ -52,3 +52,11 @@ struct Cursor {
 struct InteractIndicator {
 
 };
+
+struct MenuOverlayUI {
+
+};
+
+struct MenuOverlayUIText {
+
+};

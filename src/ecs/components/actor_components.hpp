@@ -366,7 +366,7 @@ struct Enemy {
     int maxHealth;
     int currHealth;
     vec2 velocity;
-    BulletStackEffect blunt;
+    BulletStackEffect collisionBullet;
     std::vector<EnemyPattern> enemyPatterns;
     int patternIndex;
     EnemyPattern& currEnemyPattern() {

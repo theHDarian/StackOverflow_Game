@@ -153,6 +153,8 @@ int main() {
 		textSystem.renderDialogueUIText();
 		renderer.drawMenuUI();
 		textSystem.renderMenuUIText();
+		renderer.drawMenuOverlayUI();
+		textSystem.renderMenuOverlayUIText();
 		renderer.drawCursor();
 		renderer.drawToScreen(); //postprocessing
 

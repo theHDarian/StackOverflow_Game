@@ -656,6 +656,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		animate.animation_countdown_base = animate.animation_countdown;
 	}
 
+	enemy.collisionBullet = blunt;
+
 	return entity;
 };
 

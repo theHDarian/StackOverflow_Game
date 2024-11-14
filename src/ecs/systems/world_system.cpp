@@ -737,7 +737,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	}
 	else if (registry.enemies.has(other)) {
 		Enemy& e = registry.enemies.get(other);
-		bool success = registry.stackCompile.get(player).add(e.blunt);
+		bool success = registry.stackCompile.get(player).add(e.collisionBullet);
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
 		}

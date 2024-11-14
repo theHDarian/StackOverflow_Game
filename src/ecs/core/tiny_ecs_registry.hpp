@@ -79,6 +79,8 @@ public:
 	ComponentContainer<ScreenCutIn> screenCutIns;
 	ComponentContainer<Cursor> cursors;
 	ComponentContainer<InteractIndicator> interactIndicators;
+	ComponentContainer<MenuOverlayUI> menuOverlayUIs;
+	ComponentContainer<MenuOverlayUIText> menuOverlayUITexts;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -150,6 +152,8 @@ public:
 		registry_list.push_back(&screenCutIns);
 		registry_list.push_back(&cursors);
 		registry_list.push_back(&interactIndicators);
+		registry_list.push_back(&menuOverlayUIs);
+		registry_list.push_back(&menuOverlayUITexts);
 	}
 
 	void clear_all_components() {

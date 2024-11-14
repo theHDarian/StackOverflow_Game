@@ -125,6 +125,7 @@ public:
 	void drawGameElements();
 	void drawGameUI();
 	void drawMenuUI();
+	void drawMenuOverlayUI();
 	void drawDialogueUI();
 	void drawBackgroundElements();
 	void drawToScreen();

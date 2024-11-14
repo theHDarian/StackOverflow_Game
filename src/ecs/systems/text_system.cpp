@@ -146,8 +146,7 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
 
         // newline addition referenced from https://www.youtube.com/watch?v=S0PyZKX4lyI
         if (*c == '\n') {
-            //y -= ((ch.Size.y)) * 2.0 * scale;
-            y -= ((Characters[65].Size.y)) * 2.0 * scale;
+            y -= (Characters[65].Size.y) * 2.0 * scale;
             x = copyX;
             textEndPos = { x, y };
         }
@@ -158,6 +157,12 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
             // interesting that scale is multiplied here and not in the shader?
             float w = ch.Size.x * scale;
             float h = ch.Size.y * scale;
+
+            if (*c == ' ') { // skip "blank space characters" by not actually drawing them
+                x += (ch.Advance >> 6) * scale;
+                textEndPos = { xpos + w, y };
+                continue;
+            }
 
             // update VBO for each character
             float vertices[6][4] = {
@@ -327,6 +332,23 @@ void TextSystem::renderMenuUIText() {
         auto& textReq = registry.textRenderRequests.get(entity);
         // for now, tie text visibility to entitie's render visibility
         // but assumption may not always hold
+        if (registry.renderRequests.get(entity).show)
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
+                textReq.textName);
+    }
+
+    glBindVertexArray(0);
+    gl_has_errors();
+}
+
+void TextSystem::renderMenuOverlayUIText() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(VAO);
+
+    for (Entity& entity : registry.menuOverlayUITexts.entities)
+    {
+        auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show)
             renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound,
                 textReq.textName);

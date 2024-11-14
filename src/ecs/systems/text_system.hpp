@@ -18,6 +18,7 @@ public:
     void renderMenuUIText();
     void renderGameUIText();
     void renderDialogueUIText();
+    void renderMenuOverlayUIText();
 
 private:
     struct Character {
