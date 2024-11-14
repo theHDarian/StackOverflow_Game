@@ -33,6 +33,39 @@ void UISystem::step(float elapsed_ms) {
 			registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
 			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
 		}
+
+		// update stack ui
+		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+
+		// is the player hovering over a stack ui bullet right now?
+		// bad: copies code from render system; consider making each bullet an entity
+		StackUI& stackui = registry.stackUI.get(stackUI);
+		IOState& ioState = registry.ioStates.components[0];
+		int bulletHoveredIndex = -1;
+		// should check first: is it in stack ui at all?
+		// this is point in aabb detection
+		if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+			&& ioState.mousePosition.y > (stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+			for (int i = 0; i < stack.currStack.size(); i++) {
+				vec2 bulletPos = { stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y };
+				vec2 bulletSize = stackui.bulletSize;
+				if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+					&& ioState.mousePosition.y > (bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+					// mouse is hovering overbullet
+					bulletHoveredIndex = i;
+					break;
+				}
+			}
+			if (bulletHoveredIndex > -1) {
+				std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
+			}
+		}
+		else {
+			std::cout << "Stack not hovered!" << std::endl;
+		}
+
+
 		// clear prev frame's e indicators
 		for (Entity entity : registry.interactIndicators.entities) {
 			if (!registry.deleteds.has(entity)) {
@@ -361,7 +394,7 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 0.5;
-	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals, [T] to turn tutorial on/off";
+	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
 

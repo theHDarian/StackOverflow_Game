@@ -241,19 +241,10 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
 
         // approximate word size as opposed to looping
         xpos += (Characters[65].Size.x + Characters[65].Bearing.x + 1.0f) * word.length() * scale * 2.50;
-        /*
-        for (c = word.begin(); c != word.end(); c++)
-        {
-            Character ch = Characters[*c];
-            xpos += ch.Bearing.x * scale + ch.Size.x * scale;
-            //ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
-        }
-        */
 
         // compare with text box size
         if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
             textPos.y -= ((Characters[65].Size.y)) * 2.0 * 2.50 * scale;
-            //textPos.y -= ((Characters[65].Size.y)) * 2.0 * scale * 2.5;
             textPos.x = x;
         }
         if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {
@@ -298,13 +289,7 @@ void TextSystem::renderGameUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show) {
-            // rendering every frame is slower than render when change happens?
-            std::string textString = textReq.text;
-            if (registry.stackUI.has(entity)) {
-                StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-                textString = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
-            }
-            renderText(textString, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
         }
     }
 

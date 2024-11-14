@@ -161,7 +161,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
 		if (reaction)
 		{
-			std::cout << "got reaction for follow player" << std::endl;
+			//std::cout << "got reaction for follow player" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
