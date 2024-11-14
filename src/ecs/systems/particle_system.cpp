@@ -242,6 +242,14 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             request.props.velocity.base = -motion.velocity * 0.4f;
             request.props.velocity.variation = normalize(-motion.velocity) * Random::Float(100.f);
             trail(request.props,emitCount);
+        } else if (request.requestType == ParticleRequestType::PPlayerTrail) {
+            const Motion& motion = registry.motions.get(ent);
+            //should be attached to player already, set the velocity to upwards
+            request.props.position.base.y += motion.scale.y/2.f; //appear at feet level
+            request.props.position.variation.y *= 0.4f;
+            request.props.velocity.base += vec2(0,-20.f);
+            request.props.velocity.variation += vec2(10,0);
+            trail(request.props,emitCount);
         }
     }
     if (shouldClear) {

@@ -536,7 +536,8 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			dash.dashDirection = direction;
 			if (!registry.emitParticles.has(player)) {
 				ParticleProps props = playerTrail;
-				registry.emitParticles.emplace(player, ParticleRequestType::PPlayerTrail,ParticleProps(),dash.endTimer, 7);
+				props.velocity.base = -(pl.dashSpeed * glm::normalize(dash.dashDirection)) * 0.1f;
+				registry.emitParticles.emplace(player, ParticleRequestType::PPlayerTrail,props,dash.endTimer, rand() % 20 + 60);
 			}
 			soundPlayer->playPlayerDashSound();
 		}
