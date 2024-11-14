@@ -290,7 +290,7 @@ void ParticleSystem::impact(const ParticleProps& props, int emitCount, vec2 dire
         vec2 dir = normalize(particle.position - props.position.base);
         float explosionSpeed = 70.f;
         particle.velocity += dir * explosionSpeed;
-        printf("Emit: %.1f %.1f\n",dir.x,dir.y);
+        // printf("Emit: %.1f %.1f\n",dir.x,dir.y);
     }
 }
 
