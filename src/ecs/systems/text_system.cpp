@@ -135,7 +135,6 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
     //scale *= 2.0; // for bionic comic
     //scale *= 1.5;
 
-    
     float copyX = x;
     vec2 textEndPos = { x, y };
     
@@ -149,6 +148,7 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
             //y -= ((ch.Size.y)) * 2.0 * scale;
             y -= ((Characters[65].Size.y)) * 2.0 * scale;
             x = copyX;
+            textEndPos = { x, y };
         }
         else {
             float xpos = x + ch.Bearing.x * scale;
@@ -193,6 +193,33 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
     return textEndPos;
 }
 
+std::vector<std::string> getTokenizedText(std::string text) {
+    // tokenize string by space (should maintain \n!)
+    // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
+    std::vector<std::string> tokenizedText;
+    std::string space = " ";
+    std::string newLine = "\n";
+    // consider adding other delimiters, like \tab, etc
+
+    std::string str = "";
+    for (char c : text) {
+        if (c == ' ' && str.length() > 0) {
+            tokenizedText.push_back(str + space + space); // for some reason, need to add 2 spaces
+            str = "";
+        }
+        else if (c == '\n') {
+            tokenizedText.push_back(str);
+            tokenizedText.push_back(newLine);
+            str = "";
+        }
+        else {
+            str += c;
+        }
+    }
+    tokenizedText.push_back(str);
+    return tokenizedText;
+}
+
 void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound)
 {
     // activate corresponding render state, hard code to just 1 text rendering program for now
@@ -205,39 +232,14 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
     glActiveTexture(GL_TEXTURE0);
     gl_has_errors();
 
-    // tokenize string by space (should maintain \n!)
-    // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
-    std::vector<std::string> tokenizedText;
-    std::string space = " ";
     std::string newLine = "\n";
-    // consider adding other delimiters, like \tab, etc
-
-    std::string str = "";
-    // this is very expensive!!
-    // TODO: pre-tokenize all text before loading game
-    //for (char c : text) {
-    //    if (c == ' ' && str.length() > 0) {
-    //        tokenizedText.push_back(str + space + space); // for some reason, need to add 2 spaces
-    //        str = "";
-    //    }
-    //    else if (c == '\n') {
-    //        tokenizedText.push_back(str);
-    //        tokenizedText.push_back(newLine);
-    //        str = "";
-    //    }
-    //    else {
-    //        str += c;
-    //    }
-    //}
-    //tokenizedText.push_back(str);
-    tokenizedText.push_back(text);
-
     vec2 textPos = { x, y };
+
+    std::vector<std::string> tokenizedText = getTokenizedText(text);
 
     for (std::string word : tokenizedText) {
         // calculate the length of the word to determine if need to insert new line 
         // copy pasted from word render for now
-        std::string::const_iterator c;
         float xpos = textPos.x;
         float ypos = textPos.y;
 
