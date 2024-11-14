@@ -26,6 +26,13 @@ const BulletStackEffect blunt = {
 	"blunt",
 	""};
 
+const BulletStackEffect lightning = {
+	Lightning,
+	Additive,
+	0,
+	"lightning",
+	"" };
+
 const BulletStackEffect dmgDownA = {
 	BulletDamage,
 	Additive,
@@ -145,6 +152,13 @@ const BulletStackEffect dashUpM = {
 	"dashUpM",
 	""};
 
+const BulletStackEffect key = {
+	Key,
+	Additive,
+	0,
+	"Key",
+	"" };
+
 //////////////////////////////////////////
 ///////////  AttackData  /////////////////
 //////////////////////////////////////////
@@ -237,7 +251,7 @@ const AttackData laserRotate{
 	{0, 20},
 	0,
 	8000,
-	{0.8, M_PI / 300},
+	{0.6, M_PI / 300},
 	0,
 	0,
 	0};
@@ -352,8 +366,8 @@ const AttackData twoPincerShot{
 const AttackData twelveSpiralShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{},
-	dashUpA,
+	{key},
+	blunt,
 	12,
 	0.0,
 	{20, 20},
@@ -715,9 +729,9 @@ struct Bee2 : Enemy
 		0
 	};
 
-	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, SniperShot};
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, SniperShot};
-	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, true, 0.f, 5000.f, NoAttack};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, false, 0.f, 5000.f, NoAttack};
 
 	Bee2()
 	{
@@ -749,10 +763,24 @@ struct Bee3 : Enemy
 		1
 	};
 
+	const AttackData beeSpray{
+	EnemyAttackPattern::SPRAY,
+	TRIANGLE,
+	{},
+	blunt,
+	15,
+	M_PI,
+	{20, 20},
+	600,
+	3000,
+	{0, 0},
+	0,
+	0,
+	0 };
 
 
-	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionFollow}, 1, false, 0, 1000.f, threeSpray};
-	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionFollow}, 0, true, 0, 1000.f, threeSpray};
+	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {reactionFollow}, 1, true, 0, 600.f, beeSpray};
+	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {reactionFollow}, 0, false, 0, 1000.f, none};
 	Bee3()
 	{
 		maxHealth = 100;
@@ -844,7 +872,7 @@ struct EnemyEasySkull : Enemy {
 		ReactionType::DURATION,
 		0
 	};
-	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f , 4000.f, laserNoRotate};
+	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f , 10000.f, laserRotate};
 	EnemyEasySkull() {
 		maxHealth = 100;
 		currHealth = maxHealth;

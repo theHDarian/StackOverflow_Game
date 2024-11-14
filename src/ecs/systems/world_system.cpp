@@ -17,6 +17,7 @@
 // but may change to handle like render system does
 #include "text_system.hpp"
 #include "utils/random.hpp"
+#include <chrono>
 
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
@@ -91,6 +92,7 @@ GLFWwindow* WorldSystem::createWindow() {
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
+	windowState.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	windowState.width = window_width_px;
 	windowState.height = window_height_px;
 	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
@@ -134,11 +136,15 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
 	aimIndicator = createAimIndicator(renderer);
+	cursor = createCursor();
 
 	WindowState& ws = registry.windowStates.components[0];
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
 	createRoomBounds(renderer);
 
+	// mock interactable call instead of proper ui for now
+	Entity skipDialogue = createSkipDialogue();
+	registry.dialogueRequests.emplace(skipDialogue);
 }
 #pragma endregion
 
@@ -163,12 +169,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// 	}
 	// }
 	vec2 dashDirection = registry.ioStates.components[0].lastInputAxis;
-
-	movePlayer();
-    //check dash related variables
-    dash(dashDirection, elapsed_ms_since_last_update);
-
-	shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum,registry.players.get(player).bulletCluster));
+	GameState& gameState = registry.gameStates.components[0];
+	if (!gameState.dialogueScene && !gameState.cutScene) {
+		movePlayer();
+		//check dash related variables
+		dash(dashDirection, elapsed_ms_since_last_update);
+		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
+	}
 
 	// Updating the invincibility timer
 	if (registry.invincibles.entities.size() > 0) {
@@ -223,6 +230,70 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Critter management
+	if (registry.critters.entities.size() > 0) {
+		for (int i = (int)registry.critters.components.size() - 1; i >= 0; --i) {
+			if (registry.deleteds.has(registry.critters.entities[i])) continue;
+			auto& critter = registry.critters.components[i];
+			if (critter.startled) {
+				critter.life -= elapsed_ms_since_last_update;
+				if (registry.animations.get(registry.critters.entities[i]).animation_countdown_base > 100) {
+					registry.animations.get(registry.critters.entities[i]).animation_countdown = 50;
+					registry.animations.get(registry.critters.entities[i]).animation_countdown_base = 50;
+				}
+				if (critter.life <= 0) registry.deleteds.emplace(registry.critters.entities[i]);
+			}
+			else {
+				float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - registry.windowStates.components[0].startTime;
+				registry.animations.get(registry.critters.entities[i]).frame = (sin(time/(300.f + i * 25.f) + 3.f * i) < -0.99);
+			}
+		}
+	}
+
+	// interactible object management placed here and hard coded for now 
+	// can consider: each behaviour type is component, when choice X is selected then enact that behaviour
+	for (InteractableReaction& reaction : registry.interactableReactions.components) {
+		InteractableObject& object = registry.interactables.get(reaction.object);
+		if (object.name.compare("PopStack") == 0) { // the choices are known implicitly by person who wrote object script for now
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
+			}
+		}
+
+		if (object.name.compare("BibleTree") == 0) {
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
+			}
+		}
+
+		if (object.name.compare("SkipTutorial") == 0) {
+			IOState& iostate = registry.ioStates.components[0];
+			if (reaction.choice == 0) { // yes
+				iostate.tutorialOn = false;
+			}
+			else if (reaction.choice == 1) { // no
+				iostate.tutorialOn = true;
+			}
+			registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+		}
+
+		if (object.name.compare("OpenDoor") == 0) {
+			assert(registry.doors.has(reaction.object));
+			
+			if (reaction.choice == 0) {
+				registry.mapRequests.emplace(reaction.object, MapRequestType::ChangeRoom, registry.doors.get(reaction.object).room, registry.doors.get(reaction.object).doorIndex);
+			}
+		}
+	}
+
+	registry.interactableReactions.clear();
+
 	// place sprite timer progression here for now
 	for (auto& entity : registry.spriteTimers.entities) {
 		auto& spriteTimer = registry.spriteTimers.get(entity);
@@ -234,8 +305,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.spriteTimers.remove(entity);
 		}
 	}
-
-	WindowState& wS = registry.windowStates.components[0];
 
 	return true;
 }
@@ -249,6 +318,7 @@ void WorldSystem::restartGame() {
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
+	gameState.dialogueChoice = -1;
 
 	//std::cout << ("MyString") << std::endl;
 	//std::cout << std::hash<std::string>{}("MyString") << std::endl;
@@ -256,11 +326,23 @@ void WorldSystem::restartGame() {
 	// Reset the game speed
 	currentSpeed = 1.f;
 
-	// Debugging for memory/component leaks
-
 	Entity player = resetPlayer();
 
-	registry.mapRequests.emplace(player,MapRequestType::RestartGame);
+	// resetting dialogue related stuff
+	DialogueLines& lines = registry.dialogueLines.components[0];
+	lines = DialogueLines();
+	// clear choices here for now
+	for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+		Entity e = registry.dialogueChoices.entities[i];
+		registry.deleteEntityAndRelatedEntities(e);
+	}
+	registry.maps.components[0].currRoom.dialogueDone = true;
+
+	// mock interactable call instead of proper ui for now
+	Entity skipDialogue = createSkipDialogue();
+	registry.dialogueRequests.emplace(skipDialogue);
+
+	//registry.mapRequests.emplace(player,MapRequestType::RestartGame);
 }
 
 // Compute collisions between entities
@@ -310,6 +392,15 @@ void WorldSystem::handleCollisions() {
 					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
 				}
 			}
+
+			// check if player is within detection radius of interactible
+			// this is for when player is near and has to press E to interact
+			if (registry.interactables.has(entity_other)) {
+				// bad singleton implementation: only interested in one E so just io system can just grab most recent one
+				// consider grabbing nearest one instead
+				if (!registry.interactableReactions.has(entity_other))
+					registry.nearbyInteractables.emplace(entity_other);
+			}
 		}
 
 		// Enemy bullet centric handling
@@ -326,7 +417,7 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
-					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
+					motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 
 					// Assumes bullet flies towards facing direction
 					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
@@ -358,11 +449,12 @@ void WorldSystem::handleCollisions() {
 					vec2 n = glm::normalize(a - c);
 
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
-					motion.veer = motion.veer - 2 * (glm::dot(motion.velocity, n)) * n;
+					motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 					// Assumes bullet flies towards facing direction
 					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.playerBullets.get(entity).bulletBounce -= 1;
+					registry.ignores.get(entity).clear();
 				}
 				else {
 					if (!registry.deleteds.has(entity))
@@ -399,10 +491,17 @@ void WorldSystem::handleInput() {
 		input.shouldRestart = false;
 		restartGame();
 	}
+
+	Motion& cursorMotion = registry.motions.get(cursor);
+	cursorMotion.position = input.mousePosition;
+
 	//change volume
 	GameState& gameState = registry.gameStates.components[0];
 	soundPlayer->setVolume(gameState.currentVolume);
-	}
+	
+	// clear nearby interactables here for now
+	registry.nearbyInteractables.clear();
+}
 
 void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 	// Tick Dash Charge Timer

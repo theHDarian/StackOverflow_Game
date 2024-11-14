@@ -5,6 +5,7 @@
 #include <iostream>
 #include <any>
 #include "components.hpp"
+#include <random>
 
 
 
@@ -24,7 +25,9 @@ enum BulletEffectType {
     PlayerNumDash,
     PlayerStackSize,
     PlayerDashCDR,
-    Inert // Bullet that does nothing but take up stack space
+    Inert, // Bullet that does nothing but take up stack space
+    Lightning,
+    Key
 };
 
 enum EffectCalculation {
@@ -132,7 +135,18 @@ struct StackCompile {
         if (currStack.size() >= maxStackSize) {
             return false;
         }
-        if (effect.type != Inert && effect.effectCalc == Additive) {
+        if (effect.type == Inert || effect.type == Key) {
+            currStack.push_back(effect);
+            return true;
+        }
+        if (effect.type == Lightning && currStack.size() > 1) {
+            //std::random_device rd;
+            //std::mt19937 g(rd());
+            //std::shuffle(currStack.begin(), currStack.end(), g);
+            std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+            return true;
+        }
+        if (effect.effectCalc == Additive) {
             additives[effect.type] += effect.value;
         } else {
             multiplicatives[effect.type] *= effect.value;
@@ -140,6 +154,7 @@ struct StackCompile {
         currStack.push_back(effect);
         return true;
     }
+
     BulletStackEffect remove(int index) {
         assert(index < currStack.size() && index >= 0);
 
@@ -161,6 +176,22 @@ struct StackCompile {
         }
         add(effect);
         return effect;
+    }
+    bool useKey() {
+        auto comp = [](BulletStackEffect a) {
+            return a.type == BulletEffectType::Key;
+        };
+
+        // Finding the index of val
+        auto it = std::find_if(currStack.rbegin(), currStack.rend(), comp);
+        if (it == currStack.rend()) return false;
+
+        // Interate backwards from end to index, remove each
+        for (int i = currStack.size() - 1; i >= (it + 1).base() - currStack.begin(); i--) {
+            remove(i);
+        }
+
+        return true;
     }
     void printStack() {
         for (auto& element : currStack) {
@@ -194,7 +225,7 @@ struct PlayerBullet {
     float damage = 10;
     float bulletSpeed = 400;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange = 3000;
+    float bulletRange = 10000;
     // Player bullet only scale in all directions?
     float bulletSize = 20;
     int bulletPierce = 0;
@@ -244,7 +275,8 @@ enum class EnemyBulletDeath {
 enum EnemyBulletShape {
     RECTANGLE   = 0,
     TRIANGLE    = 1,
-    CIRCLE      = 2
+    CIRCLE      = 2,
+    KEY         = 3
 };
 
 struct AttackData {
@@ -428,3 +460,9 @@ struct BeeEnemy {
     bool merge = false;
 };
 
+struct Critter {
+    float radius = 100;
+    bool startled = false;
+    vec2 flee = vec2(0);
+    float life = 10000;
+};

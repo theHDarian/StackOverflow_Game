@@ -10,7 +10,6 @@
 #include "io_components.hpp"
 #include "ui_components.hpp"
 
-
 // Stucture to store collision information
 struct Collision
 {
@@ -52,11 +51,27 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+//For ignoring collisions
+struct Ignore {
+	std::vector<Entity> ignores = {};
+
+	bool has(Entity entity) {
+		for (Entity e : ignores) {
+			if ((unsigned int)e == (unsigned int)entity) return true;
+		}
+		return false;
+	}
+
+	void clear() {
+		ignores = {};
+	}
+};
 
 struct Bound {
 	float angle; //degrees
 	vec3 axis;
 	vec3 offset;
+	char side = 'L';
 }; //room bounds
 
 struct AABBCollider {
@@ -238,6 +253,12 @@ struct Animation {
 	int max_frames = 5; // this type of info should be known by render/sprite system?
 	float animation_countdown = 85;
 	float animation_countdown_base = animation_countdown;
+	bool animate = true;
+};
+
+// For 3D rendering
+struct Object {
+	float baseOffset = 0; //Where, from the center of the obj, the player should transition from front to back
 };
 
 // Expected sprite states other systems can use
@@ -304,12 +325,23 @@ struct Dialogue {
 	std::string text;
 	std::string speakerName;
 	std::string speakerAvatar;
+	std::vector<std::string> choices;
+	std::string cutInTexture;
 	SoundType sfx;
 };
 
 struct DialogueLines {
 	std::vector<Dialogue> lines;
 	int current = 0;
+
+	Dialogue prev() {
+		if (current > 0) {
+			return lines[current - 1];
+		}
+		else {
+			return Dialogue{ "<end>", "<end>", "<end>" }; // maybe end of str constant
+		}
+	}
 
 	Dialogue next() {
 		if (current < lines.size()) {
@@ -321,14 +353,9 @@ struct DialogueLines {
 	}
 };
 
-
-
 struct BG {
 	// is BG
 };
-
-
-
 
 struct Fade {
 	float max = 500;
@@ -337,4 +364,33 @@ struct Fade {
 
 struct Deleted {
 	// this entity is marked for deletion
+};
+
+struct DialogueChoice {
+
+};
+
+struct InteractableObject {
+	std::string name;
+	int dialogueCount = 0;
+};
+
+enum DialogueRequestType {
+	StoryDialogue,
+	InteractableDialogue
+};
+
+struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
+	DialogueRequestType type = InteractableDialogue;
+};
+
+struct InteractableReaction {
+	// something changed, let the object know what
+	Entity object;
+	int choice = -1;
+	InteractableReaction(Entity& object, int choice) { this->object = object; this->choice = choice; };
+};
+
+struct NearbyInteractables {
+	// placeholder component that has list of nearby interactibles the io system can respond to
 };

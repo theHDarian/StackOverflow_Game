@@ -30,6 +30,7 @@ inline std::string textures_path(const std::string& name) {return data_path() + 
 inline std::string audio_path(const std::string& name) {return data_path() + "/audio/" + std::string(name);};
 inline std::string mesh_path(const std::string& name) {return data_path() + "/meshes/" + std::string(name);};
 inline std::string font_path(const std::string& name) { return data_path() + "/fonts/" + std::string(name); };
+inline std::string dialogue_path(const std::string& name) { return data_path() + "/dialogue/" + std::string(name); };
 
 
 #ifndef M_PI

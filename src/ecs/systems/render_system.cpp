@@ -32,12 +32,12 @@ void RenderSystem::step(float elapsed_ms) {
 
 	for (Entity entity : registry.animations.entities) {
 		Animation& anim = registry.animations.get(entity);
-		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE) {
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate) {
 			anim.animation_countdown -= elapsed_ms;
-		}
-		if (anim.animation_countdown <= 0) {
-			anim.animation_countdown = anim.animation_countdown_base;
-			anim.frame = (anim.frame + 1) % anim.max_frames;  
+			if (anim.animation_countdown <= 0) {
+				anim.animation_countdown = anim.animation_countdown_base;
+				anim.frame = (anim.frame + 1) % anim.max_frames;
+			}
 		}
 		if (registry.animationSequences.has(entity) && anim.frame >= anim.max_frames - 1) {
 			AnimationSequence& as = registry.animationSequences.get(entity);
@@ -65,21 +65,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	transform.rotate(motion.angle);
 	transform.translate(offset * glm::normalize(motion.scale));
 	transform.scale(motion.scale);
-
-	/*
-		// cheat a bit to test bee specifically
-	if (render_request.texture_name.compare("bee_fly") == 0) {
-		vec2 scale = texture_dimensions[name_to_texture[render_request.texture_name]];
-		transform.translate(offset * glm::normalize(scale) * motion.scale);
-		transform.scale(scale * motion.scale);
-		// this doesn't work well, other stuff still need to know the scale :(
-	}
-	else {
-		transform.translate(offset * glm::normalize(motion.scale));
-		transform.scale(motion.scale);
-	}
-	*/
-
 
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
@@ -216,8 +201,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 		assert(registry.renderRequests.has(entity));
 		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-		gl_has_errors();
 
 		WindowState &ws = registry.windowStates.components[0];
 		float angle;
@@ -228,11 +211,33 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			angle = b.angle;
 			axis = b.axis;
 			offset = b.offset;
+
+			int frame = 2;
+			for (Entity& d : registry.doors.entities) {
+				if (registry.doors.get(d).side == b.side) {
+					if (registry.interactables.has(d)) {
+						if (registry.interactables.get(d).name == "ClosedDoor")			{ frame = 0; }
+						else if (registry.interactables.get(d).name == "EmptyDoor")		{ frame = 0; }
+						else if (registry.interactables.get(d).name == "PrevDoor")		{ frame = 0; }
+						else if (registry.interactables.get(d).name == "LockedDoor")	{ frame = 1; }
+					}
+					break;
+				}
+			}
+
+			GLint frame_uloc = glGetUniformLocation(program, "frame");
+			glUniform1i(frame_uloc, frame);
+			gl_has_errors();
+
+			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+			gl_has_errors();
 		} else if (registry.doorSymbols.has(entity)) {
 			DoorSymbol& d = registry.doorSymbols.get(entity);
 			angle = d.angle;
 			axis = d.axis;
 			offset = d.offset;
+			glBindTexture(GL_TEXTURE_2D, texture_id);
+			gl_has_errors();
 		} else {
 			assert(false);
 		}
@@ -460,6 +465,17 @@ void RenderSystem::drawGameElements()
 			drawAllColliders(entity, projection_2D);
 	}
 
+	for (Entity& entity : registry.objects.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
+			drawTexturedMesh(entity, projection_2D);
+			if (ioState.debugMode)
+				drawAllColliders(entity, projection_2D);
+		}
+	}
+
 	for (Entity& entity : registry.playerBullets.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -490,15 +506,34 @@ void RenderSystem::drawGameElements()
 			drawAllColliders(entity, projection_2D);
 	}
 
+	for (Entity& entity : registry.objects.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f < registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
+			drawTexturedMesh(entity, projection_2D);
+			if (ioState.debugMode)
+				drawAllColliders(entity, projection_2D);
+		}
+	}
+
 	for (Entity& entity : registry.walls.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.backgrounds.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
+			drawTexturedMesh(entity, projection_2D);
 	}
 
-
 	for (Entity& entity : registry.doors.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
+			drawTexturedMesh(entity, projection_2D);
+	}
+
+	for (Entity& entity : registry.critters.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
@@ -544,6 +579,13 @@ void RenderSystem::drawDialogueUI() {
 	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
 
+	for (Entity entity : registry.screenCutIns.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+	
 	for (Entity& entity : registry.dialogueUIs.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)

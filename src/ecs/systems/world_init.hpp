@@ -15,8 +15,17 @@ Entity resetPlayer();
 
 Entity createAimIndicator(RenderSystem* renderer);
 
-// Wall for testing, denoted by 2 blobs
-Entity createTestWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
+Entity createCursor();
+
+Entity createCritter(RenderSystem* renderer, vec2 pos);
+
+Entity createPopConsole(RenderSystem* renderer, vec2 pos);
+
+Entity createGardener(RenderSystem* renderer, vec2 pos);
+
+Entity createBibleTree(RenderSystem* renderer, vec2 pos);
+
+Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
 Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);
 
@@ -43,8 +52,12 @@ Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, E
 
 Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity start, AttackData atkData);
 
+Entity createLightningBullet(RenderSystem* renderer, vec2 pos);
+
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
+
+Entity createSkipDialogue();
 
 float getModifiedValue(BulletEffectType bf, float value);
 

@@ -29,4 +29,6 @@ private:
     void onMouseMove(vec2 mousePosition);
 
     void handleMovementInput(int key, int action, IOState &state, GameState &gameState);
+
+    void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameState& gameState);
 };

@@ -62,20 +62,44 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.debugMode = !ioState.debugMode;
 	}
 
-	// tutorial toggle
-	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
-		ioState.tutorialOn = !ioState.tutorialOn;
-	}
-
-	// show dialogue window and play dialogue sequence (temp function)
+	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
-		gameState.dialogueScene = true;
+
+		// take latest object
+		if (registry.nearbyInteractables.entities.size() > 0) {
+			InteractableObject& object = registry.interactables.get(registry.nearbyInteractables.entities[0]);
+			// for now, have all interacted objects go through dialogue
+			// can change in the future
+			registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
+		}
+		else if (!gameState.dialogueScene && registry.maps.components[0].currRoom.dialogueDone) {
+			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+			req.type = DialogueRequestType::StoryDialogue;
+		}
 	}
+	
+	if (gameState.dialogueScene && !gameState.gamePaused) {
+		handleDialogueChoice(key, action, ioState, gameState);
+	}
+	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
-	//Player movement
-	handleMovementInput(key,action,ioState, gameState);
+}
 
+void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameState& gameState) {
+	if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_W) { // highlight choice above
+			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+		}
+		else if (key == GLFW_KEY_S) { // highlight choice below
+			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
+		}
+		//else if (key == GLFW_KEY_SPACE) { // progress through dialogue
+		//	state.nextDialogue = true;
+		//}
+	}
 }
 
 void IOSystem::mouseClick(int button, int action, int mods) {

@@ -32,9 +32,11 @@ struct RoomPreset {
 };
 
 struct Door {
-	RoomType room; //room the door leads to
+	RoomType room = None; //room the door leads to
     bool isPrev; //if is previous room, block it
     vec2 startPos, endPos;
+    char side = 'L';
+    int doorIndex = -1; // used by interactibles for now
 };
 struct DoorSymbol {
     float angle;
@@ -77,4 +79,67 @@ struct Map {
     Room currRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
     MapRegion currRegion;
+};
+
+struct Scene {
+    // keeps track of game state in a scene
+    RoomType room;
+    int dialogueCount;
+    int cutSceneCount;
+    bool roomCleared;
+    int choice;
+
+    //// ref: https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key
+    bool operator==(const Scene& other) const
+    {
+        return (room == other.room
+            && dialogueCount == other.dialogueCount
+            && cutSceneCount == other.cutSceneCount
+            && roomCleared == other.roomCleared
+            && choice == other.choice);
+    }
+};
+
+// ref: https://en.cppreference.com/w/cpp/utility/hash
+template <>
+struct std::hash<Scene>
+{
+    std::size_t operator()(const Scene& s) const noexcept
+    {
+        std::size_t h1 = std::hash<char>{}(s.room);
+        std::size_t h2 = std::hash<int>{}(s.dialogueCount);
+        std::size_t h3 = std::hash<int>{}(s.cutSceneCount);
+        std::size_t h4 = std::hash<bool>{}(s.roomCleared);
+        std::size_t h5 = std::hash<int>{}(s.choice);
+
+        return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1) ^ (h4 << 1) ^ ((h5 << 1) >> 1);
+    }
+};
+
+struct InteractibleDialogue {
+    std::string object;
+    int choice;
+    int dialogueCount;
+
+    //// ref: https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key
+    bool operator==(const InteractibleDialogue& other) const
+    {
+        return (object.compare(other.object) == 0
+            && choice == other.choice
+            && dialogueCount == other.dialogueCount);
+    }
+};
+
+// ref: https://en.cppreference.com/w/cpp/utility/hash
+template <>
+struct std::hash<InteractibleDialogue>
+{
+    std::size_t operator()(const InteractibleDialogue& s) const noexcept
+    {
+        std::size_t h1 = std::hash<std::string>{}(s.object);
+        std::size_t h2 = std::hash<int>{}(s.dialogueCount);
+        std::size_t h3 = std::hash<int>{}(s.choice);
+
+        return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1);
+    }
 };

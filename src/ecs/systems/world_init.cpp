@@ -4,6 +4,7 @@
 #include "premades.hpp"
 #include "ai_system.hpp"
 #include "utils/random.hpp"
+#include <glm/gtx/string_cast.hpp>
 
 Entity createPlayer(RenderSystem *renderer, vec2 pos)
 {
@@ -109,8 +110,166 @@ Entity createAimIndicator(RenderSystem *renderer)
 	return aimIndicator;
 }
 
-// Purely for testing walls, puts 2 fish at either end of the line segment
-Entity createTestWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)
+Entity createCritter(RenderSystem* renderer, vec2 pos) {
+	auto critter = Entity();
+	Motion& m = registry.motions.emplace(critter);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = vec2(40,40);
+
+	Critter& c = registry.critters.emplace(critter);
+	float angle = (rand() % 101) / 100.f;
+	angle = ((1 - angle) * 3.f * M_PI / 4.f) + ((angle)*M_PI / 4.f) + M_PI;
+	c.flee = (rand() % 40 + 80.f) * vec2(cos(angle), sin(angle));
+
+	Animation& a = registry.animations.emplace(critter);
+	a.max_frames = 2;
+	a.animation_countdown_base = 10000000;
+	a.animation_countdown = 10000000;
+
+	registry.renderRequests.insert(
+		critter,
+		{ "critter_butterfly_green",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return critter;
+}
+
+Entity createCursor()
+{
+	auto cursor = Entity();
+	Motion &cursorMotion = registry.motions.emplace(cursor);
+	cursorMotion.scale = {64, 64};
+	cursorMotion.position = {0, 0};
+	Sprites &cursorSprites = registry.sprites.emplace(cursor);
+	cursorSprites.sprites[SPRITE_STATE::BASE] = "cursor.png";
+	registry.renderRequests.insert(
+		cursor,
+		{"CursorYB.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+	registry.gameUIs.emplace(cursor);
+	return cursor;
+}
+
+Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
+	const Entity console = Entity();
+
+	Motion& m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 200.f * vec2(1, 1.4166666);
+
+	auto& o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	registry.backgrounds.emplace(console);
+
+	// use aabb as near player range for now for pseudo-offsetting
+	// note: visuald doesn't seem to align with collider??? So use circle instead
+	//AABBCollider& aabb = registry.aabbs.emplace(console);
+	//aabb.topLeft = vec2(-m.scale.x / 10, -m.scale.y / 50);
+	//aabb.bottomRight = vec2(m.scale.x / 2, m.scale.y / 1.5);
+
+	CircleCollider& cc = registry.circleColliders.emplace(console);
+	cc.radius = m.scale.y / 4;
+
+	InteractableObject& object = registry.interactables.emplace(console);
+	object.name = "PopStack";
+	// or maybe object type enum? This is not a unique id, just an object type identifier
+
+	Animation& a = registry.animations.emplace(console);
+	a.max_frames = 8;
+	a.animation_countdown_base = 100;
+
+	registry.renderRequests.insert(
+		console,
+		{ "pop_console",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return console;
+}
+
+Entity createGardener(RenderSystem* renderer, vec2 pos) {
+	const Entity gardener = Entity();
+
+	Motion& m = registry.motions.emplace(gardener);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 300.f * vec2(1, 1);
+
+	auto& o = registry.objects.emplace(gardener);
+	o.baseOffset = 20;
+
+	Animation& a = registry.animations.emplace(gardener);
+	a.max_frames = 4;
+	a.animation_countdown_base = 300;
+
+	registry.renderRequests.insert(
+		gardener,
+		{ "gardener",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	InteractableObject& object = registry.interactables.emplace(gardener);
+	object.name = "Gardener";
+
+	CircleCollider& cc = registry.circleColliders.emplace(gardener);
+	cc.radius = m.scale.y / 4;
+
+	return gardener;
+}
+
+Entity createBibleTree(RenderSystem* renderer, vec2 pos) {
+	const Entity tree = Entity();
+
+	pos -= vec2(25, 100);
+
+	Motion& m = registry.motions.emplace(tree);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 400.f * vec2(1.2777777, 1);
+
+	auto& o = registry.objects.emplace(tree);
+	o.baseOffset = 190;
+
+	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - 13 + c.radius * 2, pos.y + 190 - c.radius * 2), vec2(pos.x + 45 - c.radius * 2, pos.y + 190 - c.radius * 2));
+
+	registry.backgrounds.emplace(tree);
+
+	createCritter(renderer, pos + vec2(-200, -180));
+	createCritter(renderer, pos + vec2(93, -185));
+	createCritter(renderer, pos + vec2(20, -205));
+	createCritter(renderer, pos + vec2(-116, -140));
+	createCritter(renderer, pos + vec2(-45, -85));
+	createCritter(renderer, pos + vec2(48, -163));
+	createCritter(renderer, pos + vec2(-68, -20));
+	createCritter(renderer, pos + vec2(68, 0));
+	createCritter(renderer, pos + vec2(-128, -68));
+	createCritter(renderer, pos + vec2(225, -116));
+	createCritter(renderer, pos + vec2(156, -106));
+
+	registry.renderRequests.insert(
+		tree,
+		{ "bandedtree.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	InteractableObject& object = registry.interactables.emplace(tree);
+	object.name = "BibleTree";
+
+	CircleCollider& cc = registry.circleColliders.emplace(tree);
+	cc.radius = 200; // hard code for now, can't seem to see if use scale??
+
+	return tree;
+}
+
+Entity createWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)
 {
 	auto entity = Entity();
 
@@ -139,15 +298,26 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	motion.scale = vec2(glm::distance(startPos, endPos), 5);
 	motion.angle = atan2(endPos.y - startPos.y, endPos.x - startPos.x);
 
+	WindowState& ws = registry.windowStates.components[0];
+
 	auto &door = registry.doors.emplace(entity);
 	door.startPos = startPos;
 	door.endPos = endPos;
+	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'T' : 'B' : (door.startPos.x < ws.width / 2.f) ? 'L' : 'R';
+	std::cout << glm::to_string(startPos) << ", " << glm::to_string(endPos) << ", " << door.side << std::endl;
+
+	InteractableObject& object = registry.interactables.emplace(entity);
+	object.name = "LockedDoor";
 
 	registry.renderRequests.insert(
 		entity,
 		{"none",
 		 EFFECT_ASSET_ID::EGG,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE});
+
+	// bad fix for interactable object system to figure out door index
+	door.doorIndex = registry.doors.components.size() - 1;
+
 	return entity;
 }
 
@@ -236,6 +406,7 @@ void createRoomBounds(RenderSystem *renderer)
 		motion.position = p.spritePosition;
 		motion.scale = p.spriteScale;
 		motion.angle = p.spriteAngle;
+		std::cout << motion.angle << std::endl;
 
 		auto &wall = registry.walls.emplace(entity);
 		wall.startPosition = p.colliderStart;
@@ -245,12 +416,17 @@ void createRoomBounds(RenderSystem *renderer)
 		b.angle = glm::radians(-90.f);
 		b.axis = vec3(1, 0, 0);
 		b.offset = p.offset;
+		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'T' : 'B' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+
+		auto& anim = registry.animations.emplace(entity);
+		anim.animate = false;
+		anim.max_frames = 3;
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
-			{"wall_horizontal.png",
-			 EFFECT_ASSET_ID::ROOM_BOUND,
-			 GEOMETRY_BUFFER_ID::SPRITE});
+			{(p.colliderStart.y == p.colliderEnd.y) ? "wall_horizontal" : "wall_vertical",
+			EFFECT_ASSET_ID::ROOM_BOUND,
+			GEOMETRY_BUFFER_ID::SPRITE});		
 		registry.backgrounds.emplace(entity);
 
 		// add door symbol for each wall
@@ -510,12 +686,38 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	if (atkData.onDeath != EnemyBulletDeath::NONE)
 		bullet.onDeath = atkData.onDeath;
 
-	Motion &motion = registry.motions.emplace(entity);
+	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
 	motion.position = pos;
 	motion.velocity = velocity * bullet.bulletSpeed;
 	motion.scale = atkData.size; // Ensure scale is initialized
 	motion.veer = veer;
+
+	if (bullet.bulletEffects[0].type == BulletEffectType::Key) {
+		motion.scale = 16.f * vec2(2.8, 1);
+		motion.velocity = velocity * 800.f;
+		bullet.bulletBounce = 10;
+		bullet.bulletPierce = 0;
+		bullet.bulletRange = 5000;
+
+		PolyCollider& pc = registry.polyColliders.emplace(entity);
+		pc.offsetVertices = {
+			{motion.scale.x / 2, motion.scale.y / 2},
+			{motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2} };
+		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		
+		registry.renderRequests.insert(
+			entity,
+			{
+			 "enemy_bullet_key.png",
+			 EFFECT_ASSET_ID::TEXTURED,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+
+		return entity;
+	}
 
 	if (atkData.homing > 0.0)
 	{
@@ -524,9 +726,9 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		homing.target = registry.players.entities[0];
 	}
 
-	Invisible &inv = registry.invisibles.emplace(entity);
-	// inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;
-	inv.countdown = 200.0f;
+	//Invisible &inv = registry.invisibles.emplace(entity);
+	//// inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;
+	//inv.countdown = 200.0f;
 
 	std::string renderShape;
 	if (atkData.shape == RECTANGLE)
@@ -539,7 +741,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			{-motion.scale.x / 2, motion.scale.y / 2}};
 		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		pc.setPolyLengths();
+		//pc.setPolyLengths();
 		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_square.png";
 		renderShape = "enemy_bullet_square.png";
@@ -553,7 +755,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			{-motion.scale.x / 2, motion.scale.y / 2}};
 		pc.maxLength = glm::length(vec2(-motion.scale.x / 2, -motion.scale.y / 2));
 		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
-		pc.setPolyLengths();
+		//pc.setPolyLengths();
 		auto &spriteComponent = registry.sprites.emplace(entity);
 		spriteComponent.sprites[SPRITE_STATE::BASE] = "enemy_bullet_triangle.png";
 		renderShape = "enemy_bullet_triangle.png";
@@ -658,6 +860,53 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	return entity;
 }
 
+Entity createLightningBullet(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = 450;
+	bullet.bulletRange = 5000;
+	bullet.bulletBounce = 10;
+	bullet.bulletPierce = 10000;
+	bullet.bulletEffects = { lightning };
+	bullet.shape = RECTANGLE;
+
+	Motion& motion = registry.motions.emplace(entity);
+	float angle = (rand() % 100 / 100.f) * 2 * M_PI;
+	motion.angle = angle;
+	motion.position = pos;
+	motion.velocity = 450.f * vec2(cos(angle), sin(angle));
+	motion.scale = 25.f * vec2(2,1); // Ensure scale is initialized
+	motion.veer = { 0, 0 };
+	
+	PolyCollider& pc = registry.polyColliders.emplace(entity);
+	pc.offsetVertices = {
+		{motion.scale.x / 2, motion.scale.y / 3},
+		{motion.scale.x / 2, -motion.scale.y / 3},
+		{-motion.scale.x / 2, -motion.scale.y / 3},
+		{-motion.scale.x / 2, motion.scale.y / 3} };
+	pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+	//pc.setPolyLengths();
+
+	auto& animate = registry.animations.emplace(entity);
+	animate.max_frames = 2;
+	animate.animation_countdown_base = 50;
+
+	registry.renderRequests.insert(
+		entity,
+		{ "lightning_bullet",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+
 Entity createLine(vec2 position, vec2 scale)
 {
 	Entity entity = Entity();
@@ -697,8 +946,13 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
 	bullet.bulletBounce = getModifiedValue(Bounce, bullet.bulletBounce);
 
-	Invisible &inv = registry.invisibles.emplace(entity);
-	inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
+	if (getModifiedValue(Homing, 0) > 0) {
+		HomingBullet& home = registry.homes.emplace(entity);
+		home.homingIntensity = getModifiedValue(Homing, 0);
+	}
+
+	//Invisible &inv = registry.invisibles.emplace(entity);
+	//inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 
 	// Initialize the motion
 	auto &motion = registry.motions.emplace(entity);
@@ -710,6 +964,8 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
+	registry.ignores.emplace(entity);
+
 	auto &spriteComponent = registry.sprites.emplace(entity);
 	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
 
@@ -719,6 +975,13 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
+	return entity;
+}
+
+Entity createSkipDialogue() {
+	Entity entity = Entity();
+	InteractableObject& object = registry.interactables.emplace(entity);
+	object.name = "SkipTutorial";
 	return entity;
 }
 

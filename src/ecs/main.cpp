@@ -66,20 +66,21 @@ int main() {
     textSystem.initFreetypeLib();
     mapSystem.init(&renderer, &soundSystem);
 
-    // Load and set the custom cursor
-    GLFWimage cursorImg = renderer.loadCursorImage(textures_path("cursor.png").c_str());
-    if (cursorImg.pixels == nullptr) {
-        fprintf(stderr, "Failed to load cursor image\n");
-        return EXIT_FAILURE;
-    }
-    GLFWcursor* customCursor = glfwCreateCursor(&cursorImg, cursorImg.width/2, cursorImg.height/2);
-    if (customCursor == nullptr) {
-        fprintf(stderr, "Failed to create custom cursor\n");
-        return EXIT_FAILURE;
-    }
-    glfwSetCursor(window, customCursor);
-    fprintf(stderr, "Custom cursor set\n");
+    // // Load and set the custom cursor
+    // GLFWimage cursorImg = renderer.loadCursorImage(textures_path("Player/cursor.png").c_str());
+    // if (cursorImg.pixels == nullptr) {
+    //     fprintf(stderr, "Failed to load cursor image\n");
+    //     return EXIT_FAILURE;
+    // }
+    // GLFWcursor* customCursor = glfwCreateCursor(&cursorImg, cursorImg.width/2, cursorImg.height/2);
+    // if (customCursor == nullptr) {
+    //     fprintf(stderr, "Failed to create custom cursor\n");
+    //     return EXIT_FAILURE;
+    // }
+    // glfwSetCursor(window, customCursor);
+    // fprintf(stderr, "Custom cursor set\n");
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// variable timestep loop
 	auto t = Clock::now();
@@ -110,15 +111,18 @@ int main() {
 		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
 
 		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
-			world.handleInput();
+			// do nothing
 		}
 		else if (ioSystem.isCutscene()) { // should be in separate system, but lazy
-			renderer.step(elapsed_ms); // duplication
+			renderer.step(elapsed_ms);
 			world.playCutscene();
+			world.step(elapsed_ms);
 		}
 		else if (ioSystem.isDialogue()) {
-			mapSystem.step(elapsed_ms);
+			mapSystem.step(elapsed_ms); // just so the tutorial room can spawn an enemy right away
 			uiSystem.playDialogue();
+			world.step(elapsed_ms); // this is just where interactable objects are currently reacting in, consider separating later
+			renderer.step(elapsed_ms);
 		}
 		else {
 			mapSystem.step(elapsed_ms);
@@ -155,7 +159,7 @@ int main() {
 	}
 
     // Cleanup
-    glfwDestroyCursor(customCursor);
+    // glfwDestroyCursor(customCursor);
     return EXIT_SUCCESS;
 }
 

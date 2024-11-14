@@ -27,6 +27,7 @@ private:
     Entity dialogueBox;
     Entity dialogueAvatar;
     Entity controlsGuide;
+    Entity screenCutIn;
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
@@ -39,6 +40,10 @@ private:
     Entity createDialogueAvatar(vec2 position, vec2 scale);
 
     Entity createControlsGuide(vec2 position, vec2 scale);
+
+    Entity createDialogueChoice(std::string choice, vec2 position);
+    
+    Entity createScreenCutIn();
 
     SoundSystem* soundSystem;
 };

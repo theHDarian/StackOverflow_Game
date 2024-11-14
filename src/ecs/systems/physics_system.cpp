@@ -6,15 +6,23 @@
 #include <glm/gtx/string_cast.hpp>
 #include <bitset>
 
+auto& motion_registry = registry.motions;
+auto& dash_registry = registry.dashes;
+ComponentContainer<WallCollider>& walls = registry.walls;
+ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
+ComponentContainer<Enemy>& enemies = registry.enemies;
+ComponentContainer<PlayerBullet>& pBullets = registry.playerBullets;
+ComponentContainer<Critter>& critters = registry.critters;
+ComponentContainer<Door>& doors = registry.doors;
+ComponentContainer<DebugComponent>& debug = registry.debugComponents;
+ComponentContainer<Ignore>& ignores = registry.ignores;
+
 void PhysicsSystem::step(float elapsed_ms)
 {
-	CheapCircleToTriangle({ 50,50 }, 20, { 30,10 }, { 40, 50 }, {10, 40});
-
-	auto& motion_registry = registry.motions;
-	float step_seconds = elapsed_ms / 1000.f;
 	Entity player = registry.players.entities[0];
-	auto& dash_registry = registry.dashes;
-	ComponentContainer<WallCollider>& walls = registry.walls;
+	Motion& m = registry.motions.get(player);
+	CircleCollider& c = registry.circleColliders.get(player);
+	float step_seconds = elapsed_ms / 1000.f;
 
 	// Move motion entities that are not dashing
 	for(uint i = 0; i< motion_registry.size(); i++)
@@ -29,12 +37,30 @@ void PhysicsSystem::step(float elapsed_ms)
 		//slightly broken
 		if (!registry.lasers.has(entity) && (registry.enemyBullets.has(entity) || registry.playerBullets.has(entity))) motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
-		if (registry.homes.has(entity) && registry.motions.has(registry.homes.get(entity).target)) {
-			vec2 target = registry.motions.get(registry.homes.get(entity).target).position;
-			float intensity = registry.homes.get(entity).homingIntensity;
-			target -= motion.position;
-			float mag = glm::length(motion.velocity);
-			motion.velocity = mag * glm::normalize(intensity * glm::normalize(target) + (1 - intensity) * glm::normalize(motion.velocity));
+		if (registry.homes.has(entity)) {
+			if (registry.motions.has(registry.homes.get(entity).target)) {
+				vec2 target = registry.motions.get(registry.homes.get(entity).target).position;
+				float intensity = registry.homes.get(entity).homingIntensity;
+				target -= motion.position;
+				float mag = glm::length(motion.velocity);
+				motion.velocity = mag * glm::normalize(intensity * glm::normalize(target) + (1 - intensity) * glm::normalize(motion.velocity));
+			} 
+			if (registry.playerBullets.has(entity) && registry.enemies.entities.size() > 0) {
+				// Find a new target
+				uint newTarget = 0;
+				float minDist = 999999;
+				for (uint i = 0; i < enemies.components.size(); i++) {
+					if (ignores.get(entity).has(enemies.entities[i])) continue;
+					Motion& emm = motion_registry.get(enemies.entities[i]);
+					vec2 vecTo = emm.position - motion.position;
+					if (glm::dot(vecTo, vecTo) < minDist) {
+						minDist = glm::dot(vecTo, vecTo);
+						newTarget = i;
+					}
+				}
+				if (minDist < 999990) registry.homes.get(entity).target = enemies.entities[newTarget];
+				if (minDist > 999990) registry.homes.remove(entity);
+			}
 		}
 
 		if (registry.lasers.has(entity)) {
@@ -106,9 +132,16 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
+	// Player to interactible ranges/objects
+	for (uint i = 0; i < registry.interactables.components.size(); i++) {
+		Entity interactable = registry.interactables.entities[i];
+		if (registry.circleColliders.has(interactable) && CircleToCircle(interactable, player)) {
+			registry.collisions.emplace_with_duplicates(player, interactable);
+		}
+	}
+
 	// Player  -> EnemyBullets	(Circle to Circle for now)
 	// EnemyBullets -> Walls	(Circle to wall for now)
-	ComponentContainer<EnemyBullet>& eBullets = registry.enemyBullets;
 	for (uint i = 0; i < eBullets.components.size(); i++) {
 		if ((registry.circleColliders.has(eBullets.entities[i]) && AABBToCircle(player, eBullets.entities[i])) || 
 			(registry.polyColliders.has(eBullets.entities[i]) && AABBToPoly(player, eBullets.entities[i])) ||
@@ -123,11 +156,6 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// Player  -> Enemies		(Circle to Circle)
-	// Enemies -> PlayerBullets	(Circle to Circle)
-	ComponentContainer<Enemy>& enemies = registry.enemies;
-	ComponentContainer<PlayerBullet>& pBullets = registry.playerBullets;
-
 	// PlayerBullets -> Walls	(Circle to Wall)
 	for (uint i = 0; i < pBullets.components.size(); i++) {
 		for (uint j = 0; j < walls.components.size(); j++) {
@@ -137,6 +165,8 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
+	// Player  -> Enemies		(Circle to Circle)
+	// Enemies -> PlayerBullets	(Circle to Circle)
 	for (uint i = 0; i < enemies.components.size(); i++) {
 		if ((registry.circleColliders.has(enemies.entities[i]) && CircleToCircle(player, enemies.entities[i])) || 
 			registry.meshColliders.has(enemies.entities[i]) && (AABBToMesh(player, enemies.entities[i])) ||
@@ -146,30 +176,39 @@ void PhysicsSystem::step(float elapsed_ms)
 		for (uint j = 0; j < pBullets.components.size(); j++) {
 			if (registry.circleColliders.has(enemies.entities[i]) && CircleToCircle(enemies.entities[i], pBullets.entities[j]) || 
 				(registry.meshColliders.has(enemies.entities[i]) && CircleToMesh(pBullets.entities[j], enemies.entities[i]))) {
-				registry.collisions.emplace_with_duplicates(enemies.entities[i], pBullets.entities[j]);
+				if (!ignores.get(pBullets.entities[j]).has(enemies.entities[i])) registry.collisions.emplace_with_duplicates(enemies.entities[i], pBullets.entities[j]);
 			}
 		}
 	}
 
-
-
-	 //Player  -> debugComponents (circle to poly)
-	ComponentContainer<DebugComponent>& debug = registry.debugComponents;
-	for (uint i = 0; i < debug.components.size(); i++) {
-		if (CircleToPoly(player, debug.entities[i])) {
-			registry.collisions.emplace_with_duplicates(player, debug.entities[i]);
+	//Player -> doors
+	for (uint i = 0; i < doors.components.size(); i++) {
+		if (/*!doors.components[i].isPrev &&*/ CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)) {
+			//spawn on side opposite to the door
+			if (registry.mapRequests.components.size() <= 0 && !registry.nearbyInteractables.has(registry.doors.entities[i]))
+				registry.nearbyInteractables.emplace(registry.doors.entities[i]); // user has to press e to move doors
+				//registry.dialogueRequests.emplace(registry.doors.entities[i]); // prompt user if want to change door
+				//registry.mapRequests.emplace(doors.entities[i],MapRequestType::ChangeRoom,doors.components[i].room,i);
 		}
 	}
 
-	//Player -> doors
-	ComponentContainer<Door>& doors = registry.doors;
-	Motion& m = registry.motions.get(player);
-	CircleCollider& c = registry.circleColliders.get(player);
-	for (uint i = 0; i < doors.components.size(); i++) {
-		if (!doors.components[i].isPrev && CircleToLine(m.position,c.radius,doors.components[i].startPos,doors.components[i].endPos)) {
-			//spawn on side opposite to the door
-			if (registry.mapRequests.components.size() <= 0)
-				registry.mapRequests.emplace(doors.entities[i],MapRequestType::ChangeRoom,doors.components[i].room,i);
+	// Critters
+	for (uint i = 0; i < critters.components.size(); i++) {
+		auto& crit = critters.components[i];
+		if (crit.startled) continue;
+		auto& cm = registry.motions.get(critters.entities[i]);
+		bool shouldStartle = CheapCircleToCircle(m.position, c.radius, cm.position, crit.radius);
+		if (!shouldStartle) {
+			for (uint j = 0; j < pBullets.components.size(); j++) {
+				auto& bm = registry.motions.get(pBullets.entities[j]);
+				auto& bc = registry.circleColliders.get(pBullets.entities[j]);
+				shouldStartle = shouldStartle || CheapCircleToCircle(bm.position, bc.radius, cm.position, crit.radius);
+				if (shouldStartle) break;
+			}	
+		}
+		if (shouldStartle) {
+			crit.startled = true;
+			cm.velocity = crit.flee;
 		}
 	}
 }

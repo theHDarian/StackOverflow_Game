@@ -12,6 +12,8 @@ struct WindowState {
 	float fps;
 	int numFramesThisSecond;
 	time_t currUnixTime;
+
+	time_t startTime;
 };
 
 struct IOState {
@@ -25,6 +27,8 @@ struct IOState {
 	bool nextDialogue = false;
 	bool debugMode = false;
 	bool tutorialOn = false;
+	int hoveringDialogueChoice = -1;
+	int lastHoverDialogueChoice = -1;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
@@ -35,5 +39,6 @@ struct GameState {
 	bool gameOver;
 	bool dialogueScene = false;
 	bool cutScene = false;
+	int dialogueChoice = -1;
 	float currentVolume = 0.25f;
 };

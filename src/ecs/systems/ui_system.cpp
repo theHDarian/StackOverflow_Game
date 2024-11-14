@@ -20,6 +20,18 @@ void UISystem::step(float elapsed_ms) {
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
 		if (!gameState.dialogueScene) {
 			registry.renderRequests.get(dialogueAvatar).show = false;
+			registry.renderRequests.get(screenCutIn).show = false;
+		}
+		// update which dialogue choice is highlighted. Consider updating only when necessary?
+		if (registry.dialogueChoices.entities.size() > 0) {
+			int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
+			int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
+			// unhighlight the last hovered choice
+			registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
+			registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+			// highlight current choice
+			registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
+			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
 		}
 	}
 }
@@ -34,6 +46,7 @@ bool UISystem::init(GLFWwindow* window) {
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
+	screenCutIn = createScreenCutIn();
 
 	return true;
 }
@@ -41,13 +54,21 @@ bool UISystem::init(GLFWwindow* window) {
 void UISystem::playDialogue() {
 	IOState& input = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];
+	WindowState& wS = registry.windowStates.components[0];
 
 	if (gameState.dialogueScene && input.nextDialogue) {
+		// keep track of current speaker stuff
+		std::string currSpeakerName = registry.dialogueLines.get(dialogueBox).prev().speakerName;
+		std::string currSpeakerAvatar = registry.dialogueLines.get(dialogueBox).prev().speakerAvatar;
+		std::string currCutIn = registry.dialogueLines.get(dialogueBox).prev().cutInTexture;
+
 		input.nextDialogue = false;
-
-
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
-		if (nextLine.text.compare("<end>") != 0) {
+		if (nextLine.text.compare("<end>") != 0) { // there is a next line
+			registry.renderRequests.get(dialogueBox).show = true;
+			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
+			
+			// play a sound if there is one
 			if (nextLine.sfx == IncomingDialogue) {
 				soundSystem->playIncomingDialogueSound();
 			} else if (nextLine.sfx == DoorOpen) {
@@ -57,34 +78,95 @@ void UISystem::playDialogue() {
 				soundSystem->playNextDialogueSound();
 			}
 
-			registry.renderRequests.get(dialogueBox).show = true;
-			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
-			if (nextLine.speakerName != "N") { // N is narrator for now
-				registry.renderRequests.get(dialogueAvatar).show = true;
-				registry.renderRequests.get(dialogueAvatar).texture_name = nextLine.speakerAvatar;
+			// change speaker avatar and name to current
+			if (nextLine.speakerName.length() > 0 && nextLine.speakerName.compare(currSpeakerName) != 0) {
 				registry.textRenderRequests.get(dialogueAvatar).text = nextLine.speakerName;
 			}
-			else {
-				registry.renderRequests.get(dialogueAvatar).show = false;
+			if (nextLine.speakerAvatar.length() > 0 && nextLine.speakerAvatar.compare(currSpeakerAvatar) != 0) {
+				if (nextLine.speakerName.compare("N") != 0) { // N is narrator for now
+					registry.renderRequests.get(dialogueAvatar).show = true;
+					registry.renderRequests.get(dialogueAvatar).texture_name = nextLine.speakerAvatar;
+				}
+				else {
+					registry.renderRequests.get(dialogueAvatar).show = false;
+				}
+			}
+			
+			// change screen cut in image if there is one
+			if (nextLine.cutInTexture.length() > 0 && nextLine.cutInTexture.compare(currCutIn) != 0) {
+				if (nextLine.cutInTexture.compare("N") != 0) {
+					registry.renderRequests.get(screenCutIn).texture_name = nextLine.cutInTexture;
+					registry.renderRequests.get(screenCutIn).show = true;
+				}
+				else {
+					registry.renderRequests.get(screenCutIn).show = true;
+				}
+			}
+
+			vec2 startingPosition = vec2(400, wS.height - wS.height / 8 - 25);
+			// display options for player if there is one
+			for (int i = 0; i < nextLine.choices.size(); i++) {
+				vec2 nextPosition = vec2(startingPosition.x, startingPosition.y + i * 50);
+				createDialogueChoice(nextLine.choices[i], nextPosition);
+			}
+			// set first choice to highlighted by default
+			if (registry.dialogueChoices.components.size() > 0) {
+				input.hoveringDialogueChoice = 0;
+				input.lastHoverDialogueChoice = 0;
 			}
 		}
 		// no more lines of dialogue
 		else {
 			registry.renderRequests.get(dialogueBox).show = false;
-			gameState.dialogueScene = false;
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			Map& map = registry.maps.components[0];
 			map.currRoom.dialogueDone = true;
+			gameState.dialogueScene = false;
 			soundSystem->stopNextDialogueSound();
 		}
 	}
 }
 
+// makes a dialogue choice to be choice
+// consider separating text show with render request show
+Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_triangle.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.dialogueUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = {30, 30};
+
+	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = position.x + motion.scale.x;
+	text.y = windowState.height - position.y - motion.scale.y / 2;
+	text.scale = 0.45;
+	text.text = choice;
+	text.topRightBound = { windowState.width - 75, windowState.height - 25 };
+	text.bottomLeftBound = { text.x + 25, 0 + 25 };
+
+	registry.dialogueChoices.emplace(entity);
+
+	return entity;
+}
+
 Entity UISystem::createDialogueAvatar(vec2 position, vec2 scale) {
 	Entity entity = Entity();
 
-	// copies code from draw line as a box for now
-	// consider doing a check of "should I render now"? Or hide entity?
 	auto& rr = registry.renderRequests.insert(
 		entity,
 		{ "eel.png",
@@ -335,6 +417,30 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 	// so just set it to some big number
 	text.topRightBound = { 1000, 1000 };
 	text.bottomLeftBound = { 0, 0 };
+
+	return entity;
+}
+
+Entity UISystem::createScreenCutIn() {
+	Entity entity = Entity();
+
+	// copies code from draw line as a box for now
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "eel.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.screenCutIns.emplace(entity);
+
+	WindowState& windowState = registry.windowStates.components[0];
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = { windowState.width / 2, windowState.height / 2 };
+	motion.scale = { windowState.width, windowState.height};
 
 	return entity;
 }

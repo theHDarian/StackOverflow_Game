@@ -39,3 +39,7 @@ struct DialogueUIText {
 struct MenuUIText {
 
 };
+
+struct ScreenCutIn {
+
+};

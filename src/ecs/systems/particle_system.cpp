@@ -149,8 +149,8 @@ void ParticleSystem::init(GLFWwindow* window) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 6 * POOLSIZE, indices, GL_DYNAMIC_DRAW);
     gl_has_errors();
 
-    texture_handles[0] = loadTexture(textures_path("aim_indicator.png"));
-    texture_handles[1] = loadTexture(textures_path("chevron.png"));
+    texture_handles[0] = loadTexture(textures_path("Player/aim_indicator.png"));
+    texture_handles[1] = loadTexture(textures_path("Misc/chevron.png"));
     glBindVertexArray(0);
     gl_has_errors();
 

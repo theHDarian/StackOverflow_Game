@@ -2,13 +2,14 @@
 
 #include "common.hpp"
 #include "components.hpp"
-
 #include "tiny_ecs.hpp"
 #include "tiny_ecs_registry.hpp"
 
+#include <unordered_map>
+
 class SoundSystem;
 
-// System responsible for handling user input
+// System responsible for handling dialogue and cutscenes
 class SceneSystem {
 public:
 
@@ -20,8 +21,18 @@ public:
     void step(float elapsed_ms);
 
 private:
-    // TO DO: add internal state of game to dialogue map
-    // instead of a bunch of if statements and hard coding
-    void summonDialogue();
     SoundSystem* soundSystem;
+    // fun fact: if you don't ask it to hash certain parts, it won't!
+    // it'll then grab the nearest hash match based on supplied parameters! Could be useful
+    // maybe can do check like "if this field is -1, then that means it doesn't matter to dialogue, so don't bother hashing"
+    // (unless it was just a happy accident)
+    std::unordered_map<Scene, std::vector<Dialogue>> storyDialogue;
+    std::unordered_map<InteractibleDialogue, std::vector<Dialogue>> interactibleDialogue;
+    Entity currentObject;
+    bool isStoryDialogue;
+
+    void summonDialogue();
+    void summonInteractibleDialogue(Entity object);
+    void loadDialogue(std::string dialogueType);
+    void handleStoryChoices();
 };

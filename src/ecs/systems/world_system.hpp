@@ -73,6 +73,7 @@ private:
 	// Player Controls
 	Entity player;
 	Entity aimIndicator;
+	Entity cursor;
 
 	SoundSystem* soundPlayer;
 

@@ -1,0 +1,101 @@
+# write interactables dialogue here
+# Note: the parser does NOT validate correctness of script for now
+
+# format for item header:
+# ITEM <item name> <choice> <dialogue count>
+# dialogue count is to just keep track of dialogue progression based on num dialogue passed
+# default/no choice option is -1
+
+# format for body:
+# blah blah text
+
+# format for speaker:
+# SPEAKER speakername speakeravatar
+# speaker name can have spaces
+
+# format for sound:
+# SOUND soundname
+
+# format for choice:
+# CHOICES choice1\choice2\choice3...
+
+# format for cutscene image
+# CUT cutsceneimage.png 
+# just an image for now
+
+# note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
+
+ITEM SkipTutorial -1 0
+Would you like to skip the tutorial?
+CHOICES Yes\No
+CUT blackscreen.png
+
+ITEM LockedTutorialDoor -1 0
+The door seems to be locked. Maybe the scientist could lend a hand?
+[Call the scientist by pressing [E] when you're done looking around the room.]
+
+ITEM EmptyDoor -1 0
+This doesn't seem to lead to anywhere.
+
+ITEM OpenDoor -1 0
+Enter door?
+CHOICES Yes\No
+
+ITEM ClosedDoor -1 0
+The door is locked.
+
+ITEM PrevDoor -1 0
+The only way out is forwards, not backwards!
+
+ITEM PopStack -1 0
+Do you want to pop stack?
+CHOICES Yes\No
+SPEAKER Pop Console pop_console.png
+
+ITEM PopStack 0 0
+Yes pop stack
+SOUND incomingDialogue
+
+ITEM PopStack 1 0
+No pop stack
+
+ITEM PopStack -1 1
+You've already used this!
+
+ITEM BibleTree -1 0
+A tree with red fruit. Pick one?
+CHOICES Yes\No
+
+ITEM BibleTree 0 0
+You pick off a fruit. It gives off an eerie shine.
+[Obtained fruit!]
+
+ITEM BibleTree 1 0
+You decide to not give into your temptations.
+
+ITEM BibleTree -1 1
+A tree with one less red fruit. Would you like to pick another?
+CHOICES Yes\No
+
+ITEM BibleTree 0 1
+You pick off a fruit. You begin to wonder what you'll do with all this fruit.
+[Obtained fruit!]
+
+ITEM BibleTree 1 1
+Perhaps one fruit really is enough.
+
+ITEM BibleTree -1 2
+Little robot: +2 fruits. Tree: -2 fruits. Yeah, that might be enough for now.
+
+ITEM Gardener -1 0
+Isn't the weather nice today?
+SPEAKER Gardener gardener_v2.png
+CHOICES It sure is.\But there is no weather to speak of here?
+
+ITEM Gardener 0 0
+Hehe, I knew you'd think so too!
+SPEAKER Gardener gardener_v2.png
+
+ITEM Gardener 1 0
+Tsk, tsk. Can't you let a gardener dream?
+SPEAKER Gardener gardener_v2.png

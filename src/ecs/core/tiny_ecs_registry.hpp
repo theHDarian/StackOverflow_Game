@@ -70,6 +70,15 @@ public:
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
 	ComponentContainer<Boid> boids;
+	ComponentContainer<Critter> critters;
+	ComponentContainer<Object> objects;
+	ComponentContainer<DialogueChoice> dialogueChoices;
+	ComponentContainer<InteractableObject> interactables;
+	ComponentContainer<DialogueRequest> dialogueRequests;
+	ComponentContainer<InteractableReaction> interactableReactions;
+	ComponentContainer<NearbyInteractables> nearbyInteractables;
+	ComponentContainer<ScreenCutIn> screenCutIns;
+	ComponentContainer<Ignore> ignores;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -132,6 +141,15 @@ public:
 		registry_list.push_back(&animationSequences);
 		registry_list.push_back(&soundRequests);
 		registry_list.push_back(&boids);
+		registry_list.push_back(&critters);
+		registry_list.push_back(&objects);
+		registry_list.push_back(&dialogueChoices);
+		registry_list.push_back(&interactables);
+		registry_list.push_back(&dialogueRequests);
+		registry_list.push_back(&interactableReactions);
+		registry_list.push_back(&nearbyInteractables);
+		registry_list.push_back(&screenCutIns);
+		registry_list.push_back(&ignores);
 	}
 
 	void clear_all_components() {
