@@ -298,6 +298,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniform1i(change_color_uloc, 1);
 		glUniform1f(effectAlpha, alpha);
 	}
+	else if (registry.interactIndicators.has(entity)) { // hard code here for now
+		alpha = 0.7;
+	}
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, alpha);
@@ -803,7 +806,7 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++) {
 		// no variance on shape for now
-		std::string bulletShape = "enemy_bullet_square.png";
+		std::string bulletShape = bulletEffectShapes[stack.currStack[i].type];
 		// start from bottom to top
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
 			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
@@ -862,7 +865,7 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	glUniform3fv(color_uloc, 1, (float*)&color);
 	// want to overwrite the colour with given; could also use a separate shader program
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-	glUniform1i(change_color_uloc, 1);
+	glUniform1i(change_color_uloc, 0);
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, 1);
 	gl_has_errors();

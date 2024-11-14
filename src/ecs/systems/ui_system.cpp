@@ -33,6 +33,17 @@ void UISystem::step(float elapsed_ms) {
 			registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
 			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
 		}
+		// clear prev frame's e indicators
+		for (Entity entity : registry.interactIndicators.entities) {
+			if (!registry.deleteds.has(entity)) {
+				registry.deleteds.emplace(entity);
+			}
+		}
+
+		// draw "press e to interact" over all items in nearby interactables list
+		for (Entity entity : registry.nearbyInteractables.entities) {
+			createInteractIndicator(registry.motions.get(entity).position);
+		}
 	}
 }
 
@@ -133,6 +144,60 @@ void UISystem::playDialogue() {
 	}
 }
 
+// draw "E" to interact with object above object's position
+// create for now instead of drawing above each interactable and showing/hiding (may regret later)
+Entity UISystem::createInteractIndicator(vec2 position) {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	registry.gameUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = { 50, 50 };
+	motion.position = { position.x, position.y };
+	
+	// hard code these offsets to make the doors look nice
+	if (position.y < windowState.height / 2 - 10) {
+		motion.position.y -= 50;
+	}
+	else if (position.y > windowState.height / 2 + 10) {
+		motion.position.y += 50;
+	}
+
+	if (position.x < windowState.width / 10) {
+		motion.position.x -= 50;
+	}
+	else if (position.x > windowState.width - windowState.width / 10) {
+		motion.position.x += 50;
+	}
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 0.3,0.3,0.3 };
+
+	registry.gameUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.text = "E";
+	text.scale = 0.40;
+	text.topRightBound = { windowState.width, windowState.height };
+	text.bottomLeftBound = { 0, 0 };
+	text.y = windowState.height - motion.position.y - 15;
+	text.x = motion.position.x - 10;
+
+	registry.interactIndicators.emplace(entity);
+
+	return entity;
+}
+
 // makes a dialogue choice to be choice
 // consider separating text show with render request show
 Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
@@ -152,6 +217,9 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	motion.velocity = { 0, 0 };
 	motion.position = position;
 	motion.scale = {30, 30};
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 1,0,0 };
 
 	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
 	auto& text = registry.textRenderRequests.emplace(entity);

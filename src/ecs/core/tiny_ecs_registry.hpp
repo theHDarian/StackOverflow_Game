@@ -78,6 +78,7 @@ public:
 	ComponentContainer<NearbyInteractables> nearbyInteractables;
 	ComponentContainer<ScreenCutIn> screenCutIns;
 	ComponentContainer<Cursor> cursors;
+	ComponentContainer<InteractIndicator> interactIndicators;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -148,6 +149,7 @@ public:
 		registry_list.push_back(&nearbyInteractables);
 		registry_list.push_back(&screenCutIns);
 		registry_list.push_back(&cursors);
+		registry_list.push_back(&interactIndicators);
 	}
 
 	void clear_all_components() {

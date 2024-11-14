@@ -47,3 +47,7 @@ struct ScreenCutIn {
 struct Cursor {
 
 };
+
+struct InteractIndicator {
+
+};

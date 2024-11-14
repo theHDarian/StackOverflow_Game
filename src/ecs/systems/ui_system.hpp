@@ -48,5 +48,7 @@ private:
     
     Entity createScreenCutIn();
 
+    Entity createInteractIndicator(vec2 position);
+
     SoundSystem* soundSystem;
 };
