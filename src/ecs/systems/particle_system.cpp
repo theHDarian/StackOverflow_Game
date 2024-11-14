@@ -8,7 +8,6 @@
 #include "ai_system.hpp"
 #include "ai_system.hpp"
 #include "render_system.hpp"
-#include "components/presets/particle_presets.hpp"
 
 ParticleSystem::Vertex* ParticleSystem::createQuad(Vertex* target, vec4 color, mat4 transform, float texID) {
     float size = 1.0f;
@@ -231,19 +230,16 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
         bool hasMotion = registry.motions.has(ent);
 
         //emit based on type of request
-        for (int j = 0; j < emitCount; j++) {
-            if (request.requestType == ParticleRequestType::PlayerDash && hasMotion) {
-                const Motion& motion = registry.motions.get(ent);
-                emit(createParticle(motion.position + vec2(0.0f,motion.scale.y / 2) + vec2(Random::Float(-5,5),Random::Float(-5,5))));
+        if (request.requestType == ParticleRequestType::PlayerBulletCollision || request.requestType == ParticleRequestType::EnemyDeath) {
+            ParticleProps p;
+            if (registry.motions.has(ent)) {
+                Motion& motion = registry.motions.get(ent);
+                p.positionVariation = motion.scale/2.f;
+                p.position = motion.position;
+            } else {
+                p.position = request.defaultPos;
             }
-            else if (request.requestType == ParticleRequestType::PlayerBulletCollision) {
-                vec2 pos = request.defaultPos + vec2{ Random::Float(-2,2), Random::Float(-2,2)};
-                explode(createParticle(pos), request.defaultPos);
-            } else if (request.requestType == ParticleRequestType::EnemyDeath && hasMotion) {
-                const Motion& motion = registry.motions.get(ent);
-                vec2 pos = motion.position + vec2(Random::Float(-5,5),Random::Float(-5,5));
-                explode(createParticle(pos), motion.position);
-            }
+            explode(p,emitCount,false);
         }
     }
     if (shouldClear) {
@@ -256,18 +252,14 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
     }
 }
 
-void ParticleSystem::emit(const ParticleProps& props) {
+int ParticleSystem::activateParticle(const ParticleProps& props) {
+    int index = poolIndex;
     Particle& particle = particlePool[poolIndex];
     particle.active = true;
     particle.position = props.position;
-    particle.rotation = Random::Float() * 2.0f * glm::pi<float>();
-
-    // Velocity
     particle.velocity = props.velocity;
     particle.velocity.x += props.velocityVariation.x * (Random::Float() - 0.5f);
     particle.velocity.y += props.velocityVariation.y * (Random::Float() - 0.5f);
-
-    // Color
     particle.colorBegin = props.colorBegin;
     particle.colorEnd = props.colorEnd;
 
@@ -276,33 +268,24 @@ void ParticleSystem::emit(const ParticleProps& props) {
     particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
     particle.sizeEnd = props.sizeEnd;
 
-    poolIndex = (poolIndex-1) % particlePool.size();
-}
-
-void ParticleSystem::explode(const ParticleProps& props, vec2 origin) {
-    Particle& particle = particlePool[poolIndex];
-    particle.active = true;
-    particle.position = props.position;
     particle.rotation = Random::Float() * 2.0f * glm::pi<float>();
 
-    vec2 offset = origin - props.position;
-    vec2 direction = normalize(offset);
-    float length = offset.length();
-
-    particle.velocity = -(direction * length) * 70.0f + props.velocity ;
-    particle.velocity.x += props.velocityVariation.x * (Random::Float() - 0.5f);
-    particle.velocity.y += props.velocityVariation.y * (Random::Float() - 0.5f);
-
-    particle.colorBegin = props.colorBegin;
-    particle.colorEnd = props.colorEnd;
-
-    particle.lifetime = props.lifetime;
-    particle.lifeRemaining = props.lifetime;
-    particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
-    particle.sizeEnd = props.sizeEnd;
-
     poolIndex = (poolIndex-1) % particlePool.size();
+    return index;
+}
 
+void ParticleSystem::explode(const ParticleProps& props, int emitCount, bool isImplosion = false) {
+    for (int j = 0; j < emitCount; j++) {
+        Particle& particle = particlePool[activateParticle(props)];
+
+        //override position and velocity
+        particle.position += Random::Vec2(props.positionVariation*2.f) - props.positionVariation;
+        vec2 offset = particle.position - props.position;
+        vec2 direction = normalize(offset);
+        float length = offset.length();
+        float explosionSpeed = 70.f;
+        particle.velocity = (isImplosion?-1.f:1.f) * direction * explosionSpeed + props.velocity + Random::Vec2(props.velocityVariation*2.f) - props.velocityVariation;
+    }
 }
 
 void ParticleSystem::render() {
@@ -390,8 +373,3 @@ void ParticleSystem::render() {
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-ParticleProps ParticleSystem::createParticle(vec2 pos) {
-    ParticleProps p = DefaultParticle();
-    p.position = pos;
-    return p;
-}

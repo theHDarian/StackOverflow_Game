@@ -141,7 +141,7 @@ void clearRoomActors()
     }
     */
 
-    registry.emitParticles.emplace(Entity(), ParticleRequestType::ClearParticles, 0.0f, 0);
+    registry.emitParticles.emplace(Entity(),ParticleRequestType::ClearParticles, ParticleProps(),0.0f, 0);
 }
 
 RoomType randomRoomType(bool excludeNone)

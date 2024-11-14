@@ -13,9 +13,9 @@ public:
     ~ParticleSystem();
     void init(GLFWwindow* window);
     void step(float elapsed_ms);
-    void emit(const ParticleProps& particleProps);
 
-    void explode(const ::ParticleProps &props, vec2 origin);
+    int activateParticle(const ParticleProps& props);
+    void explode(const ParticleProps& props, int emitCount,bool isImplosion);
 
     void render();
     bool initScreenTexture();
@@ -27,6 +27,7 @@ private:
         vec2 position;
         vec2 velocity;
         vec4 colorBegin,colorEnd;
+        int textureIndex;
         float rotation;
         float sizeBegin, sizeEnd;
 

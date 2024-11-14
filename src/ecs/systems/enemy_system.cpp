@@ -147,7 +147,7 @@ void EnemySystem::step(float elapsed_ms)
                     Fade &f = registry.fades.emplace(entity);
                     registry.deleteds.emplace(entity);
                     if (!registry.emitParticles.has(entity))
-                        registry.emitParticles.emplace(entity, ParticleRequestType::EnemyDeath, f.max, rand() % 10 + 10);
+                        registry.emitParticles.emplace(entity,ParticleRequestType::EnemyDeath, ParticleProps(),f.max, rand() % 10 + 10);
                 }
 
                 // std::cout << "enemy " << entity << "has died" << std::endl;

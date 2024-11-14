@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include <assert.h>
+#include "common.hpp"
 
 class Random {
     public:
@@ -14,5 +15,8 @@ class Random {
         static T ListItem(const std::vector<T> &list) {
             assert(!list.empty());
             return list[(int)floor(Float()*list.size())];
+        }
+        static vec2 Vec2(vec2 v) {
+            return vec2(Float()*v.x,Float()*v.y);
         }
 };

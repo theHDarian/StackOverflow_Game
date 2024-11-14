@@ -437,7 +437,7 @@ void WorldSystem::handleCollisions() {
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
 			if (registry.motions.has(entity)) {
-				EmitParticle& p = registry.emitParticles.emplace(Entity(),ParticleRequestType::PlayerBulletCollision,0,rand() % 3 + 3);
+				EmitParticle& p = registry.emitParticles.emplace(Entity(),ParticleRequestType::PlayerBulletCollision,ParticleProps(),0,rand() % 3 + 3);
 				p.defaultPos = registry.motions.get(entity).position;
 			}
 			if (registry.walls.has(entity_other)) {
@@ -527,7 +527,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
 			if (!registry.emitParticles.has(player))
-				registry.emitParticles.emplace(player, ParticleRequestType::PlayerDash,dash.endTimer, 7);
+				registry.emitParticles.emplace(player, ParticleRequestType::PlayerDash,ParticleProps(),dash.endTimer, 7);
 			soundPlayer->playPlayerDashSound();
 		}
 	}
