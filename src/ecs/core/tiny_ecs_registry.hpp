@@ -77,6 +77,7 @@ public:
 	ComponentContainer<InteractableReaction> interactableReactions;
 	ComponentContainer<NearbyInteractables> nearbyInteractables;
 	ComponentContainer<ScreenCutIn> screenCutIns;
+	ComponentContainer<Ignore> ignores;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -146,6 +147,7 @@ public:
 		registry_list.push_back(&interactableReactions);
 		registry_list.push_back(&nearbyInteractables);
 		registry_list.push_back(&screenCutIns);
+		registry_list.push_back(&ignores);
 	}
 
 	void clear_all_components() {

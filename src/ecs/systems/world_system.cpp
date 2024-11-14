@@ -454,6 +454,7 @@ void WorldSystem::handleCollisions() {
 					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 					registry.playerBullets.get(entity).bulletBounce -= 1;
+					registry.ignores.get(entity).clear();
 				}
 				else {
 					if (!registry.deleteds.has(entity))

@@ -954,6 +954,8 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
+	registry.ignores.emplace(entity);
+
 	auto &spriteComponent = registry.sprites.emplace(entity);
 	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
 
