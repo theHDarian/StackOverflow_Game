@@ -35,3 +35,12 @@ const ParticleProps sparks {
     -1,
     1000.f
 };
+
+const ParticleProps playerBulletTrail {
+    {{0,0},{0,0}},
+    {{0,0},{100,100}},
+    {{ 73 / 255.0f, 214 / 255.0f, 101 / 255.0f, 1.0f },{ 123 / 255.0f, 219 / 255.0f, 131 / 255.0f, .4f }},
+    {6.f,1.f,2.f},
+    -1,
+    300.f
+};

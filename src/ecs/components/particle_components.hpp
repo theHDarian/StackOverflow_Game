@@ -34,18 +34,18 @@ struct EmitParticle {
     ParticleProps props;
 	
 	float timeRemaining; //in milliseconds
-	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
+	int numToEmitPerSecond; //remaining number to emit, divided evenly throughout the countdown
 
 	vec2 defaultPos = UNSET_VEC2; //somewhere off screen as the unset position
 
     //reqtype specific parameters
     vec2 impactDirection;
 
-	EmitParticle(ParticleRequestType reqType, ParticleProps props,float duration = 0.0f, int numToEmit = 0) {
+	EmitParticle(ParticleRequestType reqType, ParticleProps props,float duration = 0.0f, int numToEmitPerSecond = 0) {
 		this->requestType = reqType;
         this->props = props;
 		this->timeRemaining = duration;
-		this->numToEmit = numToEmit;
+		this->numToEmitPerSecond = numToEmitPerSecond;
 	}
 };
 

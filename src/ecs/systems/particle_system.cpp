@@ -218,10 +218,9 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             break;
         }
         
-        int emitCount = (int) ceil(request.numToEmit * min(elapsed_ms / request.timeRemaining,1.f));
-        request.numToEmit -= emitCount;
+        int emitCount = (int) ceil(request.numToEmitPerSecond * elapsed_ms/1000.f);
         request.timeRemaining -= elapsed_ms;
-        if (request.timeRemaining <= 0 || request.numToEmit <= 0) {
+        if (request.timeRemaining <= 0) {
             removeRequestQueue.push_back(ent);
         }
 
@@ -238,6 +237,11 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             explode(request.props,emitCount,false);
         } else if (request.requestType == ParticleRequestType::PWallCollision) {
             impact(request.props,emitCount,request.impactDirection);
+        } else if (request.requestType == ParticleRequestType::PBulletTrail) {
+            const Motion& motion = registry.motions.get(ent);
+            request.props.velocity.base = -motion.velocity * 0.4f;
+            request.props.velocity.variation = normalize(-motion.velocity) * Random::Float(100.f);
+            trail(request.props,emitCount);
         }
     }
     if (shouldClear) {
@@ -301,6 +305,12 @@ void ParticleSystem::explode(const ParticleProps& props, int emitCount, bool isI
         vec2 direction = normalize(particle.position - props.position.base);
         float explosionSpeed = 70.f;
         particle.velocity += (isImplosion?-1.f:1.f) * direction * explosionSpeed;
+    }
+}
+
+void ParticleSystem::trail(const ParticleProps& props, int emitCount) {
+    for (int j = 0; j < emitCount; j++) {
+        Particle& particle = particlePool[activateParticle(props)];
     }
 }
 

@@ -5,6 +5,8 @@
 #include "ai_system.hpp"
 #include "utils/random.hpp"
 #include <glm/gtx/string_cast.hpp>
+#include "components/presets/particle_presets.hpp"
+#include "utils/vector_operations.hpp"
 
 Entity createPlayer(RenderSystem *renderer, vec2 pos)
 {
@@ -963,6 +965,10 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
+	//add bullet trail
+	ParticleProps props = playerBulletTrail;
+	props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+	EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 3 + 5);
 	return entity;
 }
 

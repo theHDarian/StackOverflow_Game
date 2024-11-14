@@ -149,7 +149,7 @@ void EnemySystem::step(float elapsed_ms)
                     registry.deleteds.emplace(entity);
                     if (!registry.emitParticles.has(entity)) {
                         ParticleProps props = sparks;
-                        registry.emitParticles.emplace(entity,PExplode, ParticleProps(),f.max, rand() % 10 + 10);
+                        registry.emitParticles.emplace(entity,PExplode, ParticleProps(),f.max, rand() % 20 + 20);
                     }
                 }
 
