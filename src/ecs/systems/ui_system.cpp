@@ -26,6 +26,7 @@ void UISystem::step(float elapsed_ms) {
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
 			registry.renderRequests.get(bulletUI).show = false;
+			registry.renderRequests.get(bulletUIArrow).show = false;
 			// clear prev frame's e indicators
 			for (Entity entity : registry.interactIndicators.entities) {
 				if (!registry.deleteds.has(entity)) {
@@ -60,17 +61,18 @@ void UISystem::step(float elapsed_ms) {
 			// note that this is very slow!! might be because of the amount of calculations...
 			IOState& ioState = registry.ioStates.components[0];
 			int bulletHoveredIndex = -1;
+			int count = -1;
 			vec2 bulletSize = stackui.bulletSize;
 			// should check first: is it in stack ui at all?
 			// this is point in aabb detection
 			if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
 				&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
 				for (vec2 bulletPos : stackui.bulletPositions) {
+					count++;
 					if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
 						&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
 						// mouse is hovering overbullet
-						//bulletHoveredIndex = i;
-						bulletHoveredIndex++;
+						bulletHoveredIndex = count;
 						break;
 					}
 				}
@@ -81,11 +83,13 @@ void UISystem::step(float elapsed_ms) {
 				}
 				else if (bulletHoveredIndex == -1){
 					registry.renderRequests.get(bulletUI).show = false;
+					registry.renderRequests.get(bulletUIArrow).show = false;
 				}
 				lastHoveredBullet = bulletHoveredIndex;
 			}
 			else {
 				registry.renderRequests.get(bulletUI).show = false;
+				registry.renderRequests.get(bulletUIArrow).show = false;
 			}
 		}
 		else if (gameState.dialogueScene) {
@@ -116,6 +120,7 @@ bool UISystem::init(GLFWwindow* window) {
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
 	screenCutIn = createScreenCutIn();
 	bulletUI = createBulletUI();
+	bulletUIArrow = createBulletUIArrow();
 
 	return true;
 }
@@ -202,15 +207,49 @@ void UISystem::playDialogue() {
 	}
 }
 
-// update bullet ui
+// update bullet ui and its arrow
 // position = top middle position
 void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	Motion& motion = registry.motions.get(bulletUI);
-	motion.position = position;
-
+	WindowState& windowState = registry.windowStates.components[0];
+	motion.position = vec2(position.x, position.y + motion.scale.y / 2 + 50);
+	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
+		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
+	}
 	registry.renderRequests.get(bulletUI).show = true;
 
-	registry.textRenderRequests.get(bulletUI).text = bullet.name;
+	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
+	textReq.text = bullet.name;
+	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
+	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
+
+	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
+	arrowMotion.position = { position.x, position.y + 50 };
+	registry.renderRequests.get(bulletUIArrow).show = true;
+}
+
+Entity UISystem::createBulletUIArrow() {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_triangle.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.menuUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = M_PI / 2;
+	motion.velocity = { 0, 0 };
+	motion.position = { 0,0 };
+	motion.scale = {-30, 30};
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 1,1,1 };
+
+	return entity;
 }
 
 Entity UISystem::createBulletUI() {
@@ -229,11 +268,11 @@ Entity UISystem::createBulletUI() {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-	motion.scale = { 300, 450 };
+	motion.scale = { 300, 300 };
 	motion.position = { 0, 0 };
 
 	vec3& color = registry.colors.emplace(entity);
-	color = { 0,0,0 };
+	color = { 11 / 255.f, 84 / 255.f, 87 / 255.f };
 
 	registry.menuUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);

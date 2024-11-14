@@ -32,6 +32,7 @@ private:
     Entity controlsGuide;
     Entity screenCutIn;
     Entity bulletUI;
+    Entity bulletUIArrow;
 
     int lastHoveredBullet = -1;
 
@@ -55,6 +56,8 @@ private:
 
     // assume will only ever have one
     Entity createBulletUI();
+
+    Entity createBulletUIArrow();
 
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
 
