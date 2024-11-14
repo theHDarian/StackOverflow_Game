@@ -69,6 +69,7 @@ public:
 	ComponentContainer<Hive> beeHive;
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
+	ComponentContainer<Boid> boids;
 	ComponentContainer<Critter> critters;
 	ComponentContainer<Object> objects;
 	ComponentContainer<DialogueChoice> dialogueChoices;
@@ -139,6 +140,7 @@ public:
 		registry_list.push_back(&beeHive);
 		registry_list.push_back(&animationSequences);
 		registry_list.push_back(&soundRequests);
+		registry_list.push_back(&boids);
 		registry_list.push_back(&critters);
 		registry_list.push_back(&objects);
 		registry_list.push_back(&dialogueChoices);
