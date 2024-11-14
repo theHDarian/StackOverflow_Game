@@ -5,10 +5,8 @@
 
 class Random {
     public:
-        static float Float(float min = 0.0f, float max = 1.0f) {
-            assert(max > min);
-            float range = max - min;
-            return (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * range + min;
+        static float Float(float val = 1.0f) {
+            return (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * val;
         }
 
         template<typename T>

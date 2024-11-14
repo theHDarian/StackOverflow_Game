@@ -230,16 +230,18 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
         bool hasMotion = registry.motions.has(ent);
 
         //emit based on type of request
-        if (request.requestType == ParticleRequestType::PlayerBulletCollision || request.requestType == ParticleRequestType::EnemyDeath) {
+        if (request.requestType == ParticleRequestType::PExplode) {
             ParticleProps p;
             if (registry.motions.has(ent)) {
                 Motion& motion = registry.motions.get(ent);
-                p.positionVariation = motion.scale/2.f;
-                p.position = motion.position;
+                p.position.variation = motion.scale/2.f;
+                p.position.base = motion.position;
             } else {
-                p.position = request.defaultPos;
+                p.position.base = request.defaultPos;
             }
             explode(p,emitCount,false);
+        } else {
+
         }
     }
     if (shouldClear) {
@@ -256,19 +258,17 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
     int index = poolIndex;
     Particle& particle = particlePool[poolIndex];
     particle.active = true;
-    particle.position = props.position;
-    particle.velocity = props.velocity;
-    particle.velocity.x += props.velocityVariation.x * (Random::Float() - 0.5f);
-    particle.velocity.y += props.velocityVariation.y * (Random::Float() - 0.5f);
-    particle.colorBegin = props.colorBegin;
-    particle.colorEnd = props.colorEnd;
+    particle.position = props.position.base + (Random::Vec2(props.position.variation * 2.f) - props.position.variation);
+    particle.velocity = props.velocity.base + (Random::Vec2(props.velocity.variation * 2.f) - props.velocity.variation);
+    particle.colorBegin = props.color.start;
+    particle.colorEnd = props.color.end;
 
     particle.lifetime = props.lifetime;
     particle.lifeRemaining = props.lifetime;
-    particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
-    particle.sizeEnd = props.sizeEnd;
+    particle.sizeBegin = props.size.start + (Random::Float(props.size.variation*2.f) - props.size.variation);
+    particle.sizeEnd = props.size.end;
 
-    particle.rotation = Random::Float() * 2.0f * glm::pi<float>();
+    particle.rotation = Random::Float(2.0f) * glm::pi<float>();
 
     poolIndex = (poolIndex-1) % particlePool.size();
     return index;
@@ -279,12 +279,11 @@ void ParticleSystem::explode(const ParticleProps& props, int emitCount, bool isI
         Particle& particle = particlePool[activateParticle(props)];
 
         //override position and velocity
-        particle.position += Random::Vec2(props.positionVariation*2.f) - props.positionVariation;
-        vec2 offset = particle.position - props.position;
+        vec2 offset = particle.position - props.position.base;
         vec2 direction = normalize(offset);
         float length = offset.length();
         float explosionSpeed = 70.f;
-        particle.velocity = (isImplosion?-1.f:1.f) * direction * explosionSpeed + props.velocity + Random::Vec2(props.velocityVariation*2.f) - props.velocityVariation;
+        particle.velocity += (isImplosion?-1.f:1.f) * direction * explosionSpeed;
     }
 }
 

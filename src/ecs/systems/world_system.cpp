@@ -12,6 +12,7 @@
 #include <time.h>
 #include "sound_system.hpp"
 #include "physics_system.hpp"
+#include "components/presets/particle_presets.hpp"
 
 // include these for now
 // but may change to handle like render system does
@@ -437,7 +438,7 @@ void WorldSystem::handleCollisions() {
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
 			if (registry.motions.has(entity)) {
-				EmitParticle& p = registry.emitParticles.emplace(Entity(),ParticleRequestType::PlayerBulletCollision,ParticleProps(),0,rand() % 3 + 3);
+				EmitParticle& p = registry.emitParticles.emplace(Entity(),PExplode,ParticleProps(),0,rand() % 3 + 3);
 				p.defaultPos = registry.motions.get(entity).position;
 			}
 			if (registry.walls.has(entity_other)) {
@@ -526,8 +527,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCharges--;
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
-			if (!registry.emitParticles.has(player))
-				registry.emitParticles.emplace(player, ParticleRequestType::PlayerDash,ParticleProps(),dash.endTimer, 7);
+			if (!registry.emitParticles.has(player)) {
+				ParticleProps props = playerTrail;
+				registry.emitParticles.emplace(player, ParticleRequestType::PPlayerTrail,ParticleProps(),dash.endTimer, 7);
+			}
 			soundPlayer->playPlayerDashSound();
 		}
 	}

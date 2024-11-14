@@ -2,18 +2,11 @@
 #include "common.hpp"
 
 struct ParticleProps {
-    vec2 position = {0,0};
-    vec2 positionVariation = {0,0};
+    Vec2Randomized position = {{0,0},{0,0}};
+    Vec2Randomized velocity = {{0,0},{10,10}};
 
-    vec2 velocity = {0,0};
-    vec2 velocityVariation = {10,10};
-
-    vec4 colorBegin = { 143 / 255.0f, 37 / 255.0f, 132 / 255.0f, 1.0f };
-    vec4 colorEnd = { 17 / 255.0f, 14 / 255.0f, 99 / 255.0f, .4f };
-
-    float sizeBegin = 10.f;
-    float sizeEnd = 2.0f;
-    float sizeVariation = 3.f;
+    Vec4StartEnd color = {{ 143 / 255.0f, 37 / 255.0f, 132 / 255.0f, 1.0f },{ 17 / 255.0f, 14 / 255.0f, 99 / 255.0f, .4f }}; //begin, end
+    FloatStartEndRandomized size = {10.f,2.f,3.f}; //begin, end, variation
     
     int textureIndex = -1;
     float lifetime = 1000.0f;

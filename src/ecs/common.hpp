@@ -54,4 +54,15 @@ struct Transform {
 	}
 };
 
+//structs used by presets to make instantiation easier to read
+struct Vec2Randomized {
+    vec2 base,variation;
+};
+struct Vec4StartEnd {
+    vec4 start,end;
+};
+struct FloatStartEndRandomized {
+    float start,end,variation;
+};
+
 bool gl_has_errors();
