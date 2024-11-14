@@ -28,11 +28,13 @@ private:
 	bool CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3);
 	bool AABBToLine(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2);
 	bool AABBToTriangle(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2, vec2 p3);
+	bool AABBToTriangleWithWall(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2, vec2 p3, Entity wall);
 	bool AABBToLaser(Entity aabb, Entity laser);
 	bool LineToLine(vec2 line1Start,vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint);
 	int	 PointInAABB(const glm::vec2& p, const glm::vec2& max, const glm::vec2& min);
 	bool PointInTriangle(vec2 p, vec2 p1, vec2 p2, vec2 p3);
 	bool CheapCircleToCircle(vec2 p1, float r1, vec2 p2, float r2);
 	bool CheapCircleToTriangle(vec2 p, float r, vec2 a, vec2 b, vec2 c);
+	void placeWall(Entity player, Entity mesh);
 	vec2 rotate(vec2 v, float angle);
 };

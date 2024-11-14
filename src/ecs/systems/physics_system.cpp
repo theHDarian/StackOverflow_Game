@@ -5,6 +5,7 @@
 #include "components.hpp"
 #include <glm/gtx/string_cast.hpp>
 #include <bitset>
+#include <queue>
 
 void PhysicsSystem::step(float elapsed_ms)
 {
@@ -166,9 +167,16 @@ void PhysicsSystem::step(float elapsed_ms)
 
 	for (uint i = 0; i < enemies.components.size(); i++) {
 		if ((registry.circleColliders.has(enemies.entities[i]) && CircleToCircle(player, enemies.entities[i])) || 
-			registry.meshColliders.has(enemies.entities[i]) && (AABBToMesh(player, enemies.entities[i])) ||
 			registry.aabbs.has(enemies.entities[i]) && (AABBToAABB(player, enemies.entities[i]))) {
 			registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
+		}
+		if (registry.meshColliders.has(enemies.entities[i])) {
+			if ((AABBToMesh(player, enemies.entities[i]))) {
+				registry.collisions.emplace_with_duplicates(player, enemies.entities[i]);
+			}
+			if (registry.walls.has(enemies.entities[i])) {
+				//placeWall(player, enemies.entities[i]);
+			}
 		}
 		for (uint j = 0; j < pBullets.components.size(); j++) {
 			if (registry.circleColliders.has(enemies.entities[i]) && CircleToCircle(enemies.entities[i], pBullets.entities[j]) || 
@@ -420,6 +428,10 @@ bool PhysicsSystem::AABBToMesh(Entity aabb, Entity mesh) {
 			rotate(m.vertices[m.vertex_indices[i+0]].position, mB.angle), 
 			rotate(m.vertices[m.vertex_indices[i+1]].position, mB.angle),
 			rotate(m.vertices[m.vertex_indices[i+2]].position, mB.angle))) return true;
+		//if (AABBToTriangleWithWall(offset + br, offset + tl, 
+		//	rotate(m.vertices[m.vertex_indices[i+0]].position, mB.angle), 
+		//	rotate(m.vertices[m.vertex_indices[i+1]].position, mB.angle),
+		//	rotate(m.vertices[m.vertex_indices[i+2]].position, mB.angle), mesh)) return true;
 	}
 	return false;
 }
@@ -430,6 +442,62 @@ bool PhysicsSystem::AABBToTriangle(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2, vec
 	if (AABBToLine(maxxy, minxy, p1, p3)) return true;
 	if (AABBToLine(maxxy, minxy, p2, p3)) return true;
 	return false;
+}
+
+bool PhysicsSystem::AABBToTriangleWithWall(vec2 maxxy, vec2 minxy, vec2 p1, vec2 p2, vec2 p3, Entity wall) {
+	WallCollider& w = registry.walls.get(wall);
+	Motion& mB = registry.motions.get(wall);
+	if (AABBToLine(maxxy, minxy, p1, p2)) {
+		w.startPosition = p1 * mB.scale + mB.position;
+		w.endPosition = p2 * mB.scale + mB.position;
+		return true; 
+	}
+	if (AABBToLine(maxxy, minxy, p1, p3)) {
+		w.startPosition = p1 * mB.scale + mB.position;
+		w.endPosition = p3 * mB.scale + mB.position;
+		return true; 
+	}
+	if (AABBToLine(maxxy, minxy, p2, p3)) { 
+		w.startPosition = p2 * mB.scale + mB.position;
+		w.endPosition = p3 * mB.scale + mB.position;
+		return true; 
+	}
+	return false;
+}
+
+void PhysicsSystem::placeWall(Entity player, Entity mesh)
+{
+	Motion& mA = registry.motions.get(player);
+
+	WallCollider& w = registry.walls.get(mesh);
+	Motion& mB = registry.motions.get(mesh);
+	Mesh m = *registry.meshPtrs.get(mesh);
+
+	vec2 offset = { mA.position.x - mB.position.x, mA.position.y - mB.position.y };
+	
+	auto distance = [](vec2 p, vec2 p1) {
+		vec2 offset = p - p1;
+		return (glm::dot(offset, offset));
+	};
+
+	std::priority_queue<std::pair<float, int>> max_heap;
+	for (uint i = 0; i < m.vertex_indices.size(); i ++) {
+		vec2 p1 = rotate(m.vertices[m.vertex_indices[i]].position, mB.angle) * mB.scale;
+		if (i < 3) {
+			max_heap.push({ distance(offset, p1), 0 });
+			continue;
+		}
+		if (distance(offset, p1) < max_heap.top().first) {
+			max_heap.pop();
+			max_heap.push({ distance(offset, p1), i + 0 });
+		}
+	}
+	//vec2 p4 = rotate(m.vertices[m.vertex_indices[max_heap.top().second]].position, mB.angle) * mB.scale; max_heap.pop();
+	vec2 p3 = rotate(m.vertices[m.vertex_indices[max_heap.top().second]].position, mB.angle) * mB.scale; max_heap.pop();
+	vec2 p2 = rotate(m.vertices[m.vertex_indices[max_heap.top().second]].position, mB.angle) * mB.scale; max_heap.pop();
+	vec2 p1 = rotate(m.vertices[m.vertex_indices[max_heap.top().second]].position, mB.angle) * mB.scale; max_heap.pop();
+	w.startPosition = p1 + mB.position;
+	w.endPosition = ((abs(glm::dot(p1 - offset, p2 - p1)) < abs(glm::dot(p1 - offset, p3 - p1))) ? p2 : p3) + mB.position;
 }
 
 bool PhysicsSystem::AABBToLaser(Entity aabb, Entity laser) {

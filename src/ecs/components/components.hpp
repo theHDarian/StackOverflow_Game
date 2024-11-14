@@ -47,8 +47,8 @@ struct PolyCollider {
 
 struct WallCollider {
 	// Start an end of the line segment
-	vec2 startPosition;
-	vec2 endPosition;
+	vec2 startPosition = vec2(-1000.f);
+	vec2 endPosition = vec2(-1000.f);;
 };
 
 

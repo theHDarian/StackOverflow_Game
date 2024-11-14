@@ -547,6 +547,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = EnemyBigC();
 		registry.bosses.emplace(entity);
+		registry.walls.emplace(entity);
 		break;
 	}
 	case EnemyType::MediumEnemyCharge:
