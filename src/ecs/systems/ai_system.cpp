@@ -344,7 +344,7 @@ void AISystem::angryMode(Entity entity)
 {
 }
 
-vec2 AISystem::computeBoidVelocity(Entity entity, Boid &boid)
+void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 {
 	boidWander(entity, boid);
 	boidComputeCoherence(entity, boid);

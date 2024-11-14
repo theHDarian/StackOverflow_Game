@@ -18,7 +18,7 @@ private:
 	static vec2 getNextPatrolPos(Entity entity);
 	static void updateState(Enemy& enemy, EnemyMovement movement, Entity entity);
 	static void angryMode(Entity entity);
-	static vec2 computeBoidVelocity(Entity entity , Boid& boid);
+	static void computeBoidVelocity(Entity entity , Boid& boid);
 	static void boidKeepBound(Entity entity, Boid& boid);
 	static void boidComputeCoherence(Entity entity, Boid& boid);
 	static void boidComputeSeperation(Entity entity, Boid& boid);
