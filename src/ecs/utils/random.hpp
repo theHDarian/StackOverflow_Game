@@ -17,4 +17,9 @@ class Random {
         static vec2 Vec2(vec2 v) {
             return vec2(Float()*v.x,Float()*v.y);
         }
+
+        static vec2 Direction() {
+            float angle = Float() * 2.0f * M_PI;
+            return glm::vec2(cos(angle), sin(angle));
+        }
 };

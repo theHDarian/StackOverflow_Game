@@ -211,37 +211,34 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
     std::vector<Entity> removeRequestQueue;
     bool shouldClear = false;
     for (int i = 0; i < registry.emitParticles.components.size();i++) {
-        //tick request timers
         Entity& ent = registry.emitParticles.entities[i];
         EmitParticle& request = registry.emitParticles.components[i];
-
         if (request.requestType == ParticleRequestType::ClearParticles) {
             shouldClear = true;
             break;
         }
         
-        int emitCount = glm::min((int) glm::round(request.numToEmit * (elapsed_ms / request.timeRemaining)),request.numToEmit);
+        int emitCount = min((int) round(request.numToEmit * (elapsed_ms / request.timeRemaining)),request.numToEmit);
         request.timeRemaining -= elapsed_ms;
         if (request.timeRemaining <= 0) {
             emitCount = request.numToEmit;
             removeRequestQueue.push_back(ent);
         }
         request.numToEmit -= emitCount;
-        bool hasMotion = registry.motions.has(ent);
 
         //emit based on type of request
-        if (request.requestType == ParticleRequestType::PExplode) {
-            ParticleProps p;
-            if (registry.motions.has(ent)) {
-                Motion& motion = registry.motions.get(ent);
-                p.position.variation = motion.scale/2.f;
-                p.position.base = motion.position;
-            } else {
-                p.position.base = request.defaultPos;
-            }
-            explode(p,emitCount,false);
-        } else {
+        if (request.defaultPos != UNSET_VEC2) {
+            request.props.position.base = request.defaultPos;
+        } else if (registry.motions.has(ent)) {
+            const Motion& motion = registry.motions.get(ent);
+            request.props.position.variation = motion.scale/2.f;
+            request.props.position.base = motion.position;
+        }
 
+        if (request.requestType == ParticleRequestType::PExplode) {
+            explode(request.props,emitCount,false);
+        } else if (request.requestType == ParticleRequestType::PWallCollision) {
+            impact(request.props,emitCount,request.impactDirection);
         }
     }
     if (shouldClear) {
@@ -258,7 +255,11 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
     int index = poolIndex;
     Particle& particle = particlePool[poolIndex];
     particle.active = true;
-    particle.position = props.position.base + (Random::Vec2(props.position.variation * 2.f) - props.position.variation);
+    if (props.position.variation == vec2(0.f)) {
+        particle.position = props.position.base + Random::Direction() * 0.1f;
+    } else {
+        particle.position = props.position.base + (Random::Vec2(props.position.variation * 2.f) - props.position.variation);
+    }
     particle.velocity = props.velocity.base + (Random::Vec2(props.velocity.variation * 2.f) - props.velocity.variation);
     particle.colorBegin = props.color.start;
     particle.colorEnd = props.color.end;
@@ -274,14 +275,31 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
     return index;
 }
 
+void ParticleSystem::impact(const ParticleProps& props, int emitCount, vec2 direction = {0,1}) {
+    for (int j = 0; j < emitCount; j++) {
+        Particle& particle = particlePool[activateParticle(props)];
+
+        //override velocity
+        vec2 offset = particle.position - props.position.base;
+        if (dot(particle.velocity,direction) < 0) {
+            particle.velocity *= -1.f;
+        }
+        if (dot(offset,direction) < 0) {
+            particle.position = props.position.base - offset;
+        }
+        vec2 dir = normalize(particle.position - props.position.base);
+        float explosionSpeed = 70.f;
+        particle.velocity += dir * explosionSpeed;
+        printf("Emit: %.1f %.1f\n",dir.x,dir.y);
+    }
+}
+
 void ParticleSystem::explode(const ParticleProps& props, int emitCount, bool isImplosion = false) {
     for (int j = 0; j < emitCount; j++) {
         Particle& particle = particlePool[activateParticle(props)];
 
         //override position and velocity
-        vec2 offset = particle.position - props.position.base;
-        vec2 direction = normalize(offset);
-        float length = offset.length();
+        vec2 direction = normalize(particle.position - props.position.base);
         float explosionSpeed = 70.f;
         particle.velocity += (isImplosion?-1.f:1.f) * direction * explosionSpeed;
     }

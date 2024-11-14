@@ -1,9 +1,10 @@
 #pragma once
 #include "common.hpp"
+#define UNSET_VEC2 vec2(-1000.f)
 
 struct ParticleProps {
     Vec2Randomized position = {{0,0},{0,0}};
-    Vec2Randomized velocity = {{0,0},{10,10}};
+    Vec2Randomized velocity = {{0,0},{100,100}};
 
     Vec4StartEnd color = {{ 143 / 255.0f, 37 / 255.0f, 132 / 255.0f, 1.0f },{ 17 / 255.0f, 14 / 255.0f, 99 / 255.0f, .4f }}; //begin, end
     FloatStartEndRandomized size = {10.f,2.f,3.f}; //begin, end, variation
@@ -35,7 +36,10 @@ struct EmitParticle {
 	float timeRemaining; //in seconds
 	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
 
-	vec2 defaultPos; //position to fallback to if attached entity does not have motion
+	vec2 defaultPos = UNSET_VEC2; //somewhere off screen as the unset position
+
+    //reqtype specific parameters
+    vec2 impactDirection;
 
 	EmitParticle(ParticleRequestType reqType, ParticleProps props,float duration = 0.0f, int numToEmit = 0) {
 		this->requestType = reqType;

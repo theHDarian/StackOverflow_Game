@@ -16,12 +16,11 @@ public:
 
     int activateParticle(const ParticleProps& props);
     void explode(const ParticleProps& props, int emitCount,bool isImplosion);
+    void impact(const ParticleProps& props, int emitCount, vec2 direction);
 
     void render();
     bool initScreenTexture();
     void clearParticles();
-
-    ParticleProps createParticle(vec2 pos);
 private:
     struct Particle {
         vec2 position;

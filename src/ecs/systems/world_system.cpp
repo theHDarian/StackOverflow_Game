@@ -18,6 +18,7 @@
 // but may change to handle like render system does
 #include "text_system.hpp"
 #include "utils/random.hpp"
+#include "utils/vector_operations.hpp"
 #include <chrono>
 
 // Game configuration
@@ -437,16 +438,11 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
-			if (registry.motions.has(entity)) {
-				EmitParticle& p = registry.emitParticles.emplace(Entity(),PExplode,ParticleProps(),0,rand() % 3 + 3);
-				p.defaultPos = registry.motions.get(entity).position;
-			}
 			if (registry.walls.has(entity_other)) {
+				Motion& motion = registry.motions.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
 				if (registry.playerBullets.get(entity).bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
-					Motion& motion = registry.motions.get(entity);
-					WallCollider& wall = registry.walls.get(entity_other);
-
 					vec2 a = motion.position - wall.startPosition;
 					vec2 b = wall.endPosition - wall.startPosition;
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
@@ -460,8 +456,19 @@ void WorldSystem::handleCollisions() {
 					registry.playerBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					if (!registry.deleteds.has(entity))
+					//emit wall collision particle
+					ParticleProps props = sparks;
+					props.position.variation = rotate(motion.scale,motion.angle);
+					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,ParticleProps(),500,rand() % 10 + 10);
+					//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
+					ep.defaultPos = motion.position;
+					vec2 a = wall.endPosition-wall.startPosition;
+					vec2 b = -motion.velocity;
+					vec2 p = dot(a,b)/dot(a,a)*a;
+					ep.impactDirection = normalize(b-p);
+					if (!registry.deleteds.has(entity)) {
 						registry.deleteds.emplace(entity);
+					}
 				}
 
 			}
