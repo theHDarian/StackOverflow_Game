@@ -172,6 +172,12 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 							  sizeof(ColoredVertex), (void *)0);
 		gl_has_errors();
 
+		GLuint time_uloc = glGetUniformLocation(program, "time");
+		glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
+		GLuint angle_uloc = glGetUniformLocation(program, "angle");
+		glUniform1f(angle_uloc, (float)(registry.motions.get(entity).angle));
+
 		if (render_request.used_effect == EFFECT_ASSET_ID::EGG) {
 			GLint in_color_loc = glGetAttribLocation(program, "in_color");
 			gl_has_errors();
