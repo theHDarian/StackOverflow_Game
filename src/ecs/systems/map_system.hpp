@@ -26,6 +26,5 @@ class MapSystem {
     std::vector<SoundRequest> specialRoomMusic;
     int currMusicIndex;
 
-    void nextMusic();
     SoundSystem* soundPlayer;
 };

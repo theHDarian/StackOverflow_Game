@@ -4,8 +4,10 @@
 #include <utility>
 #include <vector>
 #include <glm/glm.hpp>
-#include "components.hpp"
+#include "particle_components.hpp"
 #define POOLSIZE 1000
+#define TEXTURE_ROW_SIZE 4 //number of textures per row in the spritesheet
+#define TEXTURE_NUM_ROWS 4
 
 class ParticleSystem {
 public:
@@ -13,20 +15,21 @@ public:
     ~ParticleSystem();
     void init(GLFWwindow* window);
     void step(float elapsed_ms);
-    void emit(const ParticleProps& particleProps);
 
-    void explode(const ::ParticleProps &props, vec2 origin);
+    int activateParticle(const ParticleProps& props);
+    void explode(const ParticleProps& props, int emitCount,bool isImplosion);
+    void impact(const ParticleProps& props, int emitCount, vec2 direction);
+    void trail(const ParticleProps& props, int emitCount);
 
     void render();
     bool initScreenTexture();
     void clearParticles();
-
-    ParticleProps createParticle(vec2 pos);
 private:
     struct Particle {
         vec2 position;
         vec2 velocity;
         vec4 colorBegin,colorEnd;
+        int textureIndex;
         float rotation;
         float sizeBegin, sizeEnd;
 
@@ -55,7 +58,7 @@ private:
     GLuint off_screen_render_buffer_color;
 	GLuint off_screen_render_buffer_depth;
 
-    std::array<GLuint,2> texture_handles;
+    GLuint texture_handle;
     
     glm::mat4 projection;
     GLFWwindow* window;

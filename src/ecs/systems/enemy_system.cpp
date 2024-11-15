@@ -14,6 +14,8 @@
 
 #include "ai_system.hpp"
 #include <mutex>
+#include "components/presets/particle_presets.hpp"
+#include "utils/random.hpp"
 
 std::mutex beeMutex;
 
@@ -161,8 +163,9 @@ void EnemySystem::step(float elapsed_ms)
                 {
                     Fade &f = registry.fades.emplace(entity);
                     registry.deleteds.emplace(entity);
-                    if (!registry.emitParticles.has(entity))
-                        registry.emitParticles.emplace(entity, ParticleRequestType::EnemyDeath, f.max, rand() % 10 + 10);
+
+                    ParticleProps props = sparks;
+                    registry.emitParticles.replace(entity,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
                 }
 
                 // std::cout << "enemy " << entity << "has died" << std::endl;

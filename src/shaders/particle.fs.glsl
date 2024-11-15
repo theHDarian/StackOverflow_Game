@@ -5,7 +5,9 @@ in vec2 texcoord;
 in float texIndex;    
 layout(location = 0) out vec4 out_color;
 
-uniform sampler2D particle_sampler[2]; 
+uniform sampler2D particle_sampler; 
+uniform int particle_texture_row_size = 0;
+uniform int particle_texture_num_rows = 0;
 
 void main()
 {
@@ -13,9 +15,12 @@ void main()
     if (index < 0) {
         //use color
         out_color = color;
-    } else if (index >= 2) {
-        out_color = vec4(1.0, 0.0, 0.0, 1.0); 
     } else {
-        out_color = texture(particle_sampler[index], texcoord);
+        float currRow = floor(texIndex / float(particle_texture_row_size));
+        float currCol = texIndex - (currRow * float(particle_texture_row_size));
+        vec2 base = vec2(currCol, currRow) / vec2(float(particle_texture_row_size), float(particle_texture_num_rows));
+        vec2 offset = texcoord / vec2(particle_texture_row_size, particle_texture_num_rows);
+        out_color = texture(particle_sampler, base + offset);
+        // out_color = texture(particle_sampler, texcoord);
     }
 }

@@ -477,15 +477,6 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
-GLFWimage RenderSystem::loadCursorImage(const char* filename) {
-	GLFWimage image;
-	image.pixels = stbi_load(filename, &image.width, &image.height, 0, 4);
-	if (!image.pixels) {
-		std::cerr << "Failed to load cursor image: " << filename << std::endl;
-	}
-	return image;
-}
-
 void RenderSystem::drawSetupFrame(){
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);

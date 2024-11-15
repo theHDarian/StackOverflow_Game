@@ -34,6 +34,16 @@ void UISystem::step(float elapsed_ms) {
 			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
 		}
 	}
+	//update FPS
+	WindowState& ws = registry.windowStates.components[0];
+	if (time(NULL) - ws.currUnixTime > 1.0f) {
+		ws.fps = ws.numFramesThisSecond;
+		ws.numFramesThisSecond = 0;
+		ws.currUnixTime = time(NULL);
+		registry.textRenderRequests.get(fpsCounter).text = "FPS: " + std::to_string(ws.fps);
+	} else {
+		ws.numFramesThisSecond++;
+	}
 }
 
 bool UISystem::init(GLFWwindow* window) {
@@ -47,6 +57,7 @@ bool UISystem::init(GLFWwindow* window) {
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
 	screenCutIn = createScreenCutIn();
+	fpsCounter = createFpsCounter();
 
 	return true;
 }
@@ -441,6 +452,30 @@ Entity UISystem::createScreenCutIn() {
 	motion.velocity = { 0, 0 };
 	motion.position = { windowState.width / 2, windowState.height / 2 };
 	motion.scale = { windowState.width, windowState.height};
+
+	return entity;
+}
+
+Entity UISystem::createFpsCounter() {
+	WindowState& windowState = registry.windowStates.components[0];
+	auto entity = Entity();
+
+	registry.gameUITexts.emplace(entity);
+	auto& rr = registry.renderRequests.insert(
+		entity, { "none",
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
+	vec2 dimensions = {100.f,25.f};
+	float padding = 25.f;
+	trr.text = "FPS: 0";
+	trr.color = vec3(1.0f);
+	trr.scale = 0.35f;
+	trr.x = windowState.width - dimensions.x - padding;
+	trr.y = windowState.height - (dimensions.y + padding);
+	trr.topRightBound = { windowState.width + 1000,windowState.height };
+	trr.bottomLeftBound = { 0,0 };
 
 	return entity;
 }

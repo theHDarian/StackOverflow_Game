@@ -5,6 +5,7 @@
 #include "components.hpp"
 #include "actor_components.hpp"
 #include "map_components.hpp"
+#include "particle_components.hpp"
 
 class ECSRegistry
 {

@@ -15,10 +15,6 @@ public:
     SoundSystem();
     ~SoundSystem();
 
-    bool increaseVolume();
-
-    bool decreaseVolume();
-
     bool setVolume(float volume);
 
     void playNextMusic();
@@ -50,10 +46,11 @@ public:
 
     void stopNextDialogueSound();
 
-    float volume;
+    float volume = 0.5f; //note this is overridden by gamestate
 
 private:
     int currMusicIndex;
+    SoundRequest* currentBGM;
     Mix_Music* backgroundMusic;
     std::vector<SoundRequest> normalRoomMusic;
     std::vector<SoundRequest> bossRoomMusic;

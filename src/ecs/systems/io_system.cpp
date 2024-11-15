@@ -42,10 +42,10 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		ioState.shouldEnd = true;
 	}
-	if  (key == GLFW_KEY_MINUS && action == GLFW_PRESS) {
+	if  (key == GLFW_KEY_MINUS && action != GLFW_RELEASE) {
 		gameState.currentVolume = std::max(0.0f, gameState.currentVolume - 0.0125f);
 	}
-	if  (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
+	if  (key == GLFW_KEY_EQUAL && action != GLFW_RELEASE) {
 		gameState.currentVolume = std::min(1.0f, gameState.currentVolume + 0.0125f);
 	}
 

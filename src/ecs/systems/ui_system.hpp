@@ -28,6 +28,7 @@ private:
     Entity dialogueAvatar;
     Entity controlsGuide;
     Entity screenCutIn;
+    Entity fpsCounter;
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
@@ -44,6 +45,8 @@ private:
     Entity createDialogueChoice(std::string choice, vec2 position);
     
     Entity createScreenCutIn();
+
+    Entity createFpsCounter();
 
     SoundSystem* soundSystem;
 };

@@ -12,11 +12,13 @@
 #include <time.h>
 #include "sound_system.hpp"
 #include "physics_system.hpp"
+#include "components/presets/particle_presets.hpp"
 
 // include these for now
 // but may change to handle like render system does
 #include "text_system.hpp"
 #include "utils/random.hpp"
+#include "utils/vector_operations.hpp"
 #include <chrono>
 
 // Game configuration
@@ -76,6 +78,7 @@ GLFWwindow* WorldSystem::createWindow() {
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_REFRESH_RATE,60);
+	glfwWindowHint(GLFW_DECORATED,GLFW_FALSE); //make borderless window
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
@@ -88,7 +91,9 @@ GLFWwindow* WorldSystem::createWindow() {
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
@@ -433,16 +438,11 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
-			if (registry.motions.has(entity)) {
-				EmitParticle& p = registry.emitParticles.emplace(Entity(),ParticleRequestType::PlayerBulletCollision,0,rand() % 3 + 3);
-				p.defaultPos = registry.motions.get(entity).position;
-			}
 			if (registry.walls.has(entity_other)) {
+				Motion& motion = registry.motions.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
 				if (registry.playerBullets.get(entity).bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
-					Motion& motion = registry.motions.get(entity);
-					WallCollider& wall = registry.walls.get(entity_other);
-
 					vec2 a = motion.position - wall.startPosition;
 					vec2 b = wall.endPosition - wall.startPosition;
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
@@ -457,8 +457,19 @@ void WorldSystem::handleCollisions() {
 					registry.ignores.get(entity).clear();
 				}
 				else {
-					if (!registry.deleteds.has(entity))
+					//emit wall collision particle
+					ParticleProps props = playerBulletCollision;
+					props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+					//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
+					ep.defaultPos = motion.position;
+					vec2 a = wall.endPosition-wall.startPosition;
+					vec2 b = -motion.velocity;
+					vec2 p = dot(a,b)/dot(a,a)*a;
+					ep.impactDirection = normalize(b-p);
+					if (!registry.deleteds.has(entity)) {
 						registry.deleteds.emplace(entity);
+					}
 				}
 
 			}
@@ -524,8 +535,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCharges--;
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
-			if (!registry.emitParticles.has(player))
-				registry.emitParticles.emplace(player, ParticleRequestType::PlayerDash,dash.endTimer, 7);
+			ParticleProps props = playerTrail;
+			props.velocity.base = -(pl.dashSpeed * glm::normalize(dash.dashDirection)) * 0.1f;
+
+			registry.emitParticles.replace(player, ParticleRequestType::PPlayerTrail,props,dash.endTimer, Random::Int(20) + 60);
 			soundPlayer->playPlayerDashSound();
 		}
 	}
@@ -699,8 +712,11 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	soundPlayer->playPlayerHurtSound();
 
 	//add player invincibility frames
-	if (!registry.invincibles.has(player))
+	if (!registry.invincibles.has(player)) {
 		registry.invincibles.emplace(player);
+		ParticleProps props = playerDamaged;
+		registry.emitParticles.replace(player,PExplode, props,100, 1);
+	}
 
 	//add to stack for enemy bullets
 	if (registry.enemyBullets.has(other)) {

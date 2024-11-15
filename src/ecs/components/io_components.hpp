@@ -9,7 +9,7 @@ struct WindowState {
 	int height;
     bool isRetinaDisplay;
 
-	float fps;
+	int fps;
 	int numFramesThisSecond;
 	time_t currUnixTime;
 
@@ -40,5 +40,5 @@ struct GameState {
 	bool dialogueScene = false;
 	bool cutScene = false;
 	int dialogueChoice = -1;
-	float currentVolume = 0.25f;
+	float currentVolume = 0.5f;
 };
