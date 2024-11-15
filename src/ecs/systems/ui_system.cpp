@@ -38,13 +38,13 @@ void UISystem::step(float elapsed_ms) {
 	//update FPS
 	WindowState& ws = registry.windowStates.components[0];
 	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
+
+	ws.numFramesThisSecond++;
 	if (elapsed > 1000.0f) {
 		ws.fps = ws.numFramesThisSecond;
 		ws.numFramesThisSecond = 0;
 		ws.currUnixTime = Clock::now();
 		registry.textRenderRequests.get(fpsCounter).text = "FPS: " + std::to_string(ws.fps);
-	} else {
-		ws.numFramesThisSecond++;
 	}
 }
 
