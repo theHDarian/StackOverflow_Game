@@ -272,8 +272,9 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
         particle.position = props.position.base + (Random::Vec2(props.position.variation * 2.f) - props.position.variation);
     }
     particle.velocity = props.velocity.base + (Random::Vec2(props.velocity.variation * 2.f) - props.velocity.variation);
-    particle.colorBegin = props.color.start;
-    particle.colorEnd = props.color.end;
+    Vec4StartEnd color = Random::ListItem(props.colors);
+    particle.colorBegin = color.start;
+    particle.colorEnd = color.end;
 
     particle.lifetime = props.lifetime;
     particle.lifeRemaining = props.lifetime;

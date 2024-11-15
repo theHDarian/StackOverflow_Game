@@ -6,7 +6,7 @@ struct ParticleProps {
     Vec2Randomized position = {{0,0},{0,0}};
     Vec2Randomized velocity = {{0,0},{100,100}};
 
-    Vec4StartEnd color = {{ 143 / 255.0f, 37 / 255.0f, 132 / 255.0f, 1.0f },{ 17 / 255.0f, 14 / 255.0f, 99 / 255.0f, .4f }}; //begin, end
+    std::vector<Vec4StartEnd> colors = {{{ 143 / 255.0f, 37 / 255.0f, 132 / 255.0f, 1.0f },{ 17 / 255.0f, 14 / 255.0f, 99 / 255.0f, .4f }}}; //begin, end
     FloatStartEndRandomized size = {10.f,2.f,3.f}; //begin, end, variation
     
     int textureIndex = -1;

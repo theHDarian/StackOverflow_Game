@@ -707,6 +707,11 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			 EFFECT_ASSET_ID::TEXTURED,
 			 GEOMETRY_BUFFER_ID::SPRITE });
 
+		ParticleProps props = enemyBullet;
+		props.colors.push_back(enemyBulletColors.at(Key));		
+		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 3 + 5);
+
 		return entity;
 	}
 
@@ -764,6 +769,19 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		 renderShape,
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
+	
+	//bullet trail
+	ParticleProps props = enemyBullet;
+	for (const BulletStackEffect& effect : bullet.bulletEffects) {
+		BulletEffectType type = effect.type;
+		if (type == BulletEffectType::Inert) continue;
+		props.colors.push_back(enemyBulletColors.at(type));		
+	}
+	if (!props.colors.empty()) {
+		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 3 + 5);
+	}
+	
 
 	return entity;
 }
@@ -968,7 +986,7 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	//add bullet trail
 	ParticleProps props = playerBulletTrail;
 	props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-	EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 3 + 5);
+	EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 2 + 3);
 	return entity;
 }
 

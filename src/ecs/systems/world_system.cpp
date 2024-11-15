@@ -457,9 +457,9 @@ void WorldSystem::handleCollisions() {
 				}
 				else {
 					//emit wall collision particle
-					ParticleProps props = sparks;
+					ParticleProps props = playerBulletCollision;
 					props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,500,rand() % 3 + 3);
+					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,300,rand() % 1 + 2);
 					//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
 					ep.defaultPos = motion.position;
 					vec2 a = wall.endPosition-wall.startPosition;
