@@ -16,7 +16,7 @@ class Random {
         template<typename T>
         static T ListItem(const std::vector<T> &list) {
             assert(!list.empty());
-            return list[(int)floor(Float()*list.size())];
+            return list[Int(list.size())];
         }
         static vec2 Vec2(vec2 v) {
             return vec2(Float()*v.x,Float()*v.y);
