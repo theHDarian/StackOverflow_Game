@@ -4,6 +4,7 @@
 
 // stlib
 #include <chrono>
+#include <thread>
 
 // internal
 #include "physics_system.hpp"
@@ -29,6 +30,8 @@ using Clock = std::chrono::high_resolution_clock;
 #endif
 
 #include <stdlib.h>
+
+#define TARGET_FPS 120
 
 // Entry point
 int main() {
@@ -69,6 +72,7 @@ int main() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// variable timestep loop
+	const float frameDuration = (1000.f / (float) TARGET_FPS);
 	auto t = Clock::now();
 	while (!world.isOver()) {
 		// Processes system messages, if this wasn't present the window would become unresponsive
@@ -76,8 +80,14 @@ int main() {
 
 		// Calculating elapsed times in milliseconds from the previous iteration
 		auto now = Clock::now();
-		float elapsed_ms =
-			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
+		float elapsed_ms = (float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
+		
+		if (elapsed_ms < frameDuration) { //limit FPS
+			std::chrono::microseconds duration = std::chrono::microseconds((int)((frameDuration - elapsed_ms) * 1000) );
+			std::this_thread::sleep_for(duration);
+			continue;
+		}
+
 		t = now;
 		uiSystem.step(elapsed_ms);
 		sceneSystem.step(elapsed_ms); // not sure if this should always be here

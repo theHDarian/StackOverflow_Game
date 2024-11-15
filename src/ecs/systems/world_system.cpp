@@ -21,6 +21,8 @@
 #include "utils/vector_operations.hpp"
 #include <chrono>
 
+using Clock = std::chrono::high_resolution_clock;
+
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
 const size_t MAX_NUM_FISH = 5;
@@ -97,7 +99,7 @@ GLFWwindow* WorldSystem::createWindow() {
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
-	windowState.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	windowState.startTime = Clock::now();
 	windowState.width = window_width_px;
 	windowState.height = window_height_px;
 	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
@@ -136,7 +138,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	gameState.dialogueScene = false;
 
 	WindowState& wS = registry.windowStates.components[0];
-	wS.currUnixTime = time(NULL);
+	wS.currUnixTime = Clock::now();
 	currentSpeed = 1.f;
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
@@ -249,7 +251,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if (critter.life <= 0) registry.deleteds.emplace(registry.critters.entities[i]);
 			}
 			else {
-				float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - registry.windowStates.components[0].startTime;
+				float time = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - registry.windowStates.components[0].startTime).count();
 				registry.animations.get(registry.critters.entities[i]).frame = (sin(time/(300.f + i * 25.f) + 3.f * i) < -0.99);
 			}
 		}

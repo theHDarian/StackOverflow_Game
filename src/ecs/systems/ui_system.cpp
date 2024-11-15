@@ -2,6 +2,7 @@
 
 #include "sound_system.hpp"
 
+using Clock = std::chrono::high_resolution_clock;
 
 UISystem::UISystem(SoundSystem* soundSystem) {
 	this->soundSystem = soundSystem;
@@ -36,10 +37,11 @@ void UISystem::step(float elapsed_ms) {
 	}
 	//update FPS
 	WindowState& ws = registry.windowStates.components[0];
-	if (time(NULL) - ws.currUnixTime > 1.0f) {
+	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
+	if (elapsed > 1000.0f) {
 		ws.fps = ws.numFramesThisSecond;
 		ws.numFramesThisSecond = 0;
-		ws.currUnixTime = time(NULL);
+		ws.currUnixTime = Clock::now();
 		registry.textRenderRequests.get(fpsCounter).text = "FPS: " + std::to_string(ws.fps);
 	} else {
 		ws.numFramesThisSecond++;

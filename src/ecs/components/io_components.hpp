@@ -11,9 +11,9 @@ struct WindowState {
 
 	int fps;
 	int numFramesThisSecond;
-	time_t currUnixTime;
+	std::__1::chrono::steady_clock::time_point currUnixTime;
 
-	time_t startTime;
+	std::__1::chrono::steady_clock::time_point startTime;
 };
 
 struct IOState {
