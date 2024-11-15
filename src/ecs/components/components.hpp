@@ -51,6 +51,21 @@ struct WallCollider {
 	vec2 endPosition;
 };
 
+//For ignoring collisions
+struct Ignore {
+	std::vector<Entity> ignores = {};
+
+	bool has(Entity entity) {
+		for (Entity e : ignores) {
+			if ((unsigned int)e == (unsigned int)entity) return true;
+		}
+		return false;
+	}
+
+	void clear() {
+		ignores = {};
+	}
+};
 
 struct Bound {
 	float angle; //degrees

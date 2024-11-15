@@ -247,7 +247,8 @@ enum EnemyType {
     MediumEnemyTank,
     BeeHive,
     HardEnemyAngel,
-    EasyEnemySkull
+    EasyEnemySkull,
+    HardEnemyBoid
 };
 
 enum class EnemyAttackPattern {
@@ -309,7 +310,8 @@ enum class EnemyBehavior {
     TELEPORT,
     IDLE,
     MERGE_BEE,
-    SPAWNING
+    SPAWNING,
+    BOIDS
 };
 
 
@@ -349,6 +351,12 @@ struct EnemyPattern {
     AttackData atkData;
 };
 
+struct Boid {
+    vec2 velocity;
+    vec2 position;
+    float wanderAngle;
+};
+
 
 struct SpriteData
 {
@@ -381,7 +389,7 @@ struct EnemyMovement {
     vec2 posB;
     float distanceTraveled;
     float speed;
-    float angularSpeed = 90.0f;
+    float angularSpeed = 20.0f;
 };
 
 struct BossEnemy {

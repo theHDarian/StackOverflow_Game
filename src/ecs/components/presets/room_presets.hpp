@@ -26,9 +26,10 @@ const RoomPreset TutorialRoom1Preset{
     0};
 
 const RoomPreset TutorialRoom2Preset{
-    {
-        {EnemyType::EasyEnemySkull, {0.5f, 0.5f}},
-    },
+    {{EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}}},
     {},
     {},
     {},

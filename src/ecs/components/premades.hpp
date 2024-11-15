@@ -251,7 +251,7 @@ const AttackData laserRotate{
 	{0, 20},
 	0,
 	8000,
-	{0.6, M_PI / 300},
+	{1.2, M_PI / 300},
 	0,
 	0,
 	0};
@@ -634,7 +634,7 @@ struct EnemyBigC : Enemy
 		currHealth = maxHealth;
 
 		enemyPatterns = {
-			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
+			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, false, 0.f, 5000.f, twelveSpiralShot}};
 		patternIndex = 0;
 		sprite = {// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
 				  "none",
@@ -885,6 +885,26 @@ struct EnemyEasySkull : Enemy {
 		patternIndex = 0;
 		scale = vec2({230.0f / 2, 240.f / 2});
 	};
+};
+
+struct EnemyHardBoid :  Enemy {
+	Reaction boid {
+		ReactionType::DURATION,
+		0
+	};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyHardBoid() {
+		maxHealth = 20;
+		currHealth = maxHealth;
+		enemyPatterns = {boidState};
+		sprite = {
+			"enemy_bullet_triangle.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({20.f, 20.f});
+		patternIndex = 0;
+	}
 };
 
 // struct EnemyHardSkull : {

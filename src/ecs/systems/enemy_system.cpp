@@ -55,31 +55,46 @@ void EnemySystem::step(float elapsed_ms)
         vec2 pos = motion.position;
         float angle = motion.angle;
 
-
         // merge bee logic
         EnemyPattern &pattern = enemy.currEnemyPattern();
         if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
         {
-            //std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
-             merge(entity, pattern, pendingDeletion);
+            // std::cout << "MERGING WITH BEE SIZE:" << registry.bees.get(entity).nearbyBees.size() << std::endl;
+            merge(entity, pattern, pendingDeletion);
         }
 
-        //for (Entity deletedBee : pendingDeletion)
+        // for (Entity deletedBee : pendingDeletion)
         //{
-        //    //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
-        //    if (!registry.deleteds.has(deletedBee))
-        //        registry.deleteds.emplace(deletedBee);
-        //    registry.bees.remove(deletedBee);
-        //    registry.enemies.remove(deletedBee);
-        //}
+        //     //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
+        //     if (!registry.deleteds.has(deletedBee))
+        //         registry.deleteds.emplace(deletedBee);
+        //     registry.bees.remove(deletedBee);
+        //     registry.enemies.remove(deletedBee);
+        // }
 
         // beeHive logic
-        if (registry.beeHive.has(entity)) {
-            Hive& hive = registry.beeHive.get(entity);
+        if (registry.beeHive.has(entity))
+        {
+            Hive &hive = registry.beeHive.get(entity);
             hive.currSpawnCD -= elapsed_ms;
-            if (pattern.type == EnemyBehavior::SPAWNING) {
+            if (pattern.type == EnemyBehavior::SPAWNING)
+            {
                 beeHiveSpawn(entity, pattern, hive);
             }
+        }
+
+        if (registry.boids.has(entity))
+        {
+            Boid &boid = registry.boids.get(entity);
+            boid.position += boid.velocity * (elapsed_ms / 1000.f);
+            motion.position += boid.velocity * (elapsed_ms / 1000.f);
+
+            if (glm::length(boid.velocity) > 0.0f)
+            {
+                motion.angle = atan2(boid.velocity.y, boid.velocity.x);
+            }
+
+            continue;
         }
 
         // move enemy using lerp
@@ -157,7 +172,10 @@ void EnemySystem::step(float elapsed_ms)
                 // std::cout << "enemy " << entity << "has died" << std::endl;
             }
 
-            if (!registry.deleteds.has(other_entity))
+            bulletStat.bulletPierce -= 1;
+            registry.ignores.get(other_entity).ignores.push_back(entity);
+
+            if (!registry.deleteds.has(other_entity) && bulletStat.bulletPierce < 0)
                 registry.deleteds.emplace(other_entity);
             if (!registry.damageds.has(entity) && enemyStat.currHealth > 0)
             {
@@ -171,20 +189,20 @@ void EnemySystem::step(float elapsed_ms)
     }
 
     // remove bees, create new ones
-    for (Entity bee : registry.bees.entities) {
-        if (!registry.deleteds.has(bee) && registry.bees.get(bee).merge) {
+    for (Entity bee : registry.bees.entities)
+    {
+        if (!registry.deleteds.has(bee) && registry.bees.get(bee).merge)
+        {
             createBees.push_back(vec3(registry.motions.get(bee).position.x, registry.motions.get(bee).position.y, registry.bees.get(bee).mergeCount));
             registry.deleteds.emplace(bee);
         }
     }
 
-    for (vec3 newBee : createBees) {
+    for (vec3 newBee : createBees)
+    {
         creatingMergeBee(newBee.z, vec2(newBee.x, newBee.y));
     }
-
 }
-
-
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData)
 {
@@ -333,7 +351,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
 
 
     Enemy &enemy = registry.enemies.get(entity);
-    Motion& em = registry.motions.get(entity);
+    Motion &em = registry.motions.get(entity);
     vec2 velocity = (playerMotion.position + playerMotion.velocity / 2.0f) - pos;
     if (((float)enemy.currHealth / enemy.maxHealth < 0.15) && (rand() % 1000 > 990)) {
         createLightningBullet(render, em.position);
@@ -442,85 +460,89 @@ void EnemySystem::creatingMergeBee(int count, vec2 pos)
     switch (count)
     {
     case 2:
-        //std::cout << "CREATING" << std::endl;
+        // std::cout << "CREATING" << std::endl;
         createEnemy(render, pos, EnemyType::TwoBee);
         break;
     case 3:
         createEnemy(render, pos, EnemyType::ThreeBee);
         break;
     default:
-        //std::cout << "CREATING 1" << std::endl;
+        // std::cout << "CREATING 1" << std::endl;
         createEnemy(render, pos, EnemyType::OneBee);
     }
 }
 
 void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion)
 {
-    //std::lock_guard<std::mutex> lock(beeMutex);
+    // std::lock_guard<std::mutex> lock(beeMutex);
     if (registry.bees.has(entity) && currPattern.type == EnemyBehavior::MERGE_BEE)
     {
         BeeEnemy &bee = registry.bees.get(entity);
         // getting the first bee
         // std::cout << "WANT MERGE!" << std::endl;
-        //std::vector<Entity> deletedBees;
+        // std::vector<Entity> deletedBees;
         for (Entity otherBeeEntity : registry.bees.get(entity).nearbyBees)
         {
-            if (bee.mergeCount >= bee.maxMerge) {
+            if (bee.mergeCount >= bee.maxMerge)
+            {
                 break;
             }
-            if (!registry.deleteds.has(otherBeeEntity) && !registry.bees.get(otherBeeEntity).merge/* && otherBeeEntity != NULL*/)
+            if (!registry.deleteds.has(otherBeeEntity) && !registry.bees.get(otherBeeEntity).merge /* && otherBeeEntity != NULL*/)
             {
                 BeeEnemy &otherBee = registry.bees.get(otherBeeEntity);
-                //int mergeTotal = otherBee.mergeCount + bee.mergeCount;
-                //Motion &motion = registry.motions.get(entity);
-                //if(otherBee.merge == false && bee.merge == false)
+                // int mergeTotal = otherBee.mergeCount + bee.mergeCount;
+                // Motion &motion = registry.motions.get(entity);
+                // if(otherBee.merge == false && bee.merge == false)
                 //{
-                    //creatingMergeBee(mergeTotal, motion.position);
+                // creatingMergeBee(mergeTotal, motion.position);
                 //}
                 bee.mergeCount += otherBee.mergeCount;
                 registry.deleteds.emplace(otherBeeEntity);
-                //registry.bees.remove(otherBeeEntity);
-                // std::cout << "MERGED AND CREATED COMBINED BEES" << std::endl;
-                //otherBee.merge = true;
+                // registry.bees.remove(otherBeeEntity);
+                //  std::cout << "MERGED AND CREATED COMBINED BEES" << std::endl;
+                // otherBee.merge = true;
                 bee.merge = true;
-                //bee.nearbyBees.clear();
-                //otherBee.nearbyBees.clear();
+                // bee.nearbyBees.clear();
+                // otherBee.nearbyBees.clear();
                 /*deletedBees.push_back(entity);
                 deletedBees.push_back(otherBeeEntity);*/
                 // std::cout << "NOW DELETE EXISTING BEE" << std::endl;
-                //break;
+                // break;
             }
         }
         bee.nearbyBees.clear();
 
-        //for (Entity deletedBee : deletedBees)
+        // for (Entity deletedBee : deletedBees)
         //{
-        //    for (Entity nearby : registry.bees.get(deletedBee).nearbyBees)
-        //    {
-        //        if (registry.bees.has(nearby))
-        //        {
-        //            auto &nearbyBee = registry.bees.get(nearby);
-        //            nearbyBee.nearbyBees.erase(deletedBee);
-        //        }
-        //    }
-        //    pendingDeletion.push_back(deletedBee);
-        //}
-        // 		std::cout << " time to merge bees with other bees: " << registry.bees.get(bee).nearbyBees.size() << std::endl;
-        // 		registry.bees.get(bee).mergeCount += registry.bees.get(bee).nearbyBees.size();
-        // 		registry.bees.get(bee).nearbyBees.clear();
-        // 		if (registry.bees.get(bee).mergeCount >= 1) {
-        // 			registry.renderRequests.get(bee).texture_name = "bee_fly_2";
-        // 		}
+        //     for (Entity nearby : registry.bees.get(deletedBee).nearbyBees)
+        //     {
+        //         if (registry.bees.has(nearby))
+        //         {
+        //             auto &nearbyBee = registry.bees.get(nearby);
+        //             nearbyBee.nearbyBees.erase(deletedBee);
+        //         }
+        //     }
+        //     pendingDeletion.push_back(deletedBee);
+        // }
+        //  		std::cout << " time to merge bees with other bees: " << registry.bees.get(bee).nearbyBees.size() << std::endl;
+        //  		registry.bees.get(bee).mergeCount += registry.bees.get(bee).nearbyBees.size();
+        //  		registry.bees.get(bee).nearbyBees.clear();
+        //  		if (registry.bees.get(bee).mergeCount >= 1) {
+        //  			registry.renderRequests.get(bee).texture_name = "bee_fly_2";
+        //  		}
     }
 }
 
-void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern& currPattern, Hive& hive) {
-    Motion& motion = registry.motions.get(entity);
-    if (hive.currSpawnCD < 0.f) {
+void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern &currPattern, Hive &hive)
+{
+    Motion &motion = registry.motions.get(entity);
+    if (hive.currSpawnCD < 0.f)
+    {
         // play open "animation" here
-        if (!registry.spriteTimers.has(entity)) {
-            RenderRequest& rr = registry.renderRequests.get(entity);
-            SpriteTimer& st = registry.spriteTimers.emplace(entity);
+        if (!registry.spriteTimers.has(entity))
+        {
+            RenderRequest &rr = registry.renderRequests.get(entity);
+            SpriteTimer &st = registry.spriteTimers.emplace(entity);
             st.count_ms = 1000;
             st.nextEffect = rr.used_effect;
             st.nextSprite = rr.texture_name;
@@ -528,5 +550,5 @@ void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern& currPattern, Hive& h
         }
         creatingMergeBee(1, motion.position);
         hive.currSpawnCD = hive.maxSpawnCD;
-    } 
+    }
 }

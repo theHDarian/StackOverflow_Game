@@ -75,17 +75,20 @@ Entity resetPlayer()
 	StackCompile &sc = registry.stackCompile.get(ent);
 	sc = StackCompile();
 
-	Animation& anim = registry.animations.get(ent);
+	Animation &anim = registry.animations.get(ent);
 	anim = Animation();
 
 	// remove animation sequence here for now
-	if (registry.animationSequences.has(ent)) {
+	if (registry.animationSequences.has(ent))
+	{
 		registry.animationSequences.remove(ent);
 	}
-	if (registry.spriteTimers.has(ent)) { 
+	if (registry.spriteTimers.has(ent))
+	{
 		registry.spriteTimers.remove(ent);
 	}
-	if (registry.invincibles.has(ent)) {
+	if (registry.invincibles.has(ent))
+	{
 		registry.invincibles.remove(ent);
 	}
 
@@ -320,28 +323,27 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	return entity;
 }
 
-Entity createDoorSymbol(RenderSystem * renderer, vec2 position, float angle, vec2 scale, float symbolAngle, vec3 axis, vec3 offset,vec2 spriteOffset) {
+Entity createDoorSymbol(RenderSystem *renderer, vec2 position, float angle, vec2 scale, float symbolAngle, vec3 axis, vec3 offset, vec2 spriteOffset)
+{
 	auto entity = Entity();
-	Motion& motion = registry.motions.emplace(entity);
+	Motion &motion = registry.motions.emplace(entity);
 	motion.position = position + spriteOffset;
 	motion.angle = angle;
-	motion.scale = vec2(40.f,80) * normalize(vec2(2*scale.x/120.f,2*scale.y/66.f)) * 2.f;
+	motion.scale = vec2(40.f, 80) * normalize(vec2(2 * scale.x / 120.f, 2 * scale.y / 66.f)) * 2.f;
 
-	DoorSymbol& symbol = registry.doorSymbols.emplace(entity);
+	DoorSymbol &symbol = registry.doorSymbols.emplace(entity);
 	symbol.angle = symbolAngle;
 	symbol.axis = axis;
 	symbol.offset = offset;
 
 	registry.backgrounds.emplace(entity);
 
-	RenderRequest& rr = registry.renderRequests.insert(entity, 
-		{"door_symbol_enemy.png",
-		EFFECT_ASSET_ID::ROOM_BOUND,
-		GEOMETRY_BUFFER_ID::SPRITE}
-	);
+	RenderRequest &rr = registry.renderRequests.insert(entity,
+													   {"door_symbol_enemy.png",
+														EFFECT_ASSET_ID::ROOM_BOUND,
+														GEOMETRY_BUFFER_ID::SPRITE});
 	return entity;
 }
-
 
 void createRoomBounds(RenderSystem *renderer)
 {
@@ -350,7 +352,8 @@ void createRoomBounds(RenderSystem *renderer)
 	Entity bounds[4];
 	float spriteOffset = 30.f;
 
-	struct WallPos {
+	struct WallPos
+	{
 		vec2 colliderStart;
 		vec2 colliderEnd;
 		vec2 spritePosition;
@@ -359,50 +362,46 @@ void createRoomBounds(RenderSystem *renderer)
 		vec3 offset;
 		vec2 symbolOffset;
 	};
-	vec2 windowDimensions = {ws.width-80,ws.height+270};
+	vec2 windowDimensions = {ws.width - 80, ws.height + 270};
 	float ratio1 = ws.height / (float)ws.width;
 	float ratio2 = ws.width / (float)ws.height;
 	std::vector<WallPos> wallPositions = {
-		{ //top 
+		{// top
 
-			vec2(0, ws.height / (6 * ratio2)), // manually offset by approx height of player sprite
-			vec2(ws.width,ws.height / (6 * ratio2)),
-			vec2(ws.width / 2.f, -ws.height / (6 * ratio1 * (1+ 0.5*ratio1))),
-			vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
-			0,
-			vec3(0),
-			vec2(0,-spriteOffset)
-		},
-		{ //right
-			vec2(ws.width- ws.width / (6 * ratio2), 0),
-			vec2(ws.width- ws.width / (6 * ratio2), ws.height),
-			vec2(ws.width / (6 * (1 + ratio1 * 0.5)), ws.height / 2),
-			vec2(ws.height + ws.height /(6 * ratio1), ws.width / (12 * ratio2)),
-			glm::radians(270.f),
-			vec3(0,0,50),
-			vec2(-spriteOffset,0)
-		},
-		{ //bottom
-			vec2(ws.width, ws.height- ws.height / (6 * ratio2)), // manually offset by mc feet
-			vec2(0, ws.height- ws.height / (6 * ratio2)),
-			vec2(ws.width/2, ws.height + ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
-			vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
-			glm::radians(180.f),
-			vec3(0),
-			vec2(0,spriteOffset)
-		},
-		//NOTE: left and righ wall require some weird z offset
-		{ //left
-			vec2(ws.width / (6 * ratio2), ws.height),
-			vec2(ws.width / (6 * ratio2), 0),
-			vec2(ws.width - ws.width / (6 * (1 + ratio1 * 0.5)) ,ws.height/2),
-			vec2(ws.height + ws.height / (6 * ratio1), ws.width / (12 * ratio2)),
-			glm::radians(90.f),
-			vec3(0,0,50),
-			vec2(spriteOffset,0)
-		}
-	};
-	for (auto& p : wallPositions) {
+		 vec2(0, ws.height / (6 * ratio2)), // manually offset by approx height of player sprite
+		 vec2(ws.width, ws.height / (6 * ratio2)),
+		 vec2(ws.width / 2.f, -ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
+		 vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
+		 0,
+		 vec3(0),
+		 vec2(0, -spriteOffset)},
+		{// right
+		 vec2(ws.width - ws.width / (6 * ratio2), 0),
+		 vec2(ws.width - ws.width / (6 * ratio2), ws.height),
+		 vec2(ws.width / (6 * (1 + ratio1 * 0.5)), ws.height / 2),
+		 vec2(ws.height + ws.height / (6 * ratio1), ws.width / (12 * ratio2)),
+		 glm::radians(270.f),
+		 vec3(0, 0, 50),
+		 vec2(-spriteOffset, 0)},
+		{													   // bottom
+		 vec2(ws.width, ws.height - ws.height / (6 * ratio2)), // manually offset by mc feet
+		 vec2(0, ws.height - ws.height / (6 * ratio2)),
+		 vec2(ws.width / 2, ws.height + ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
+		 vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
+		 glm::radians(180.f),
+		 vec3(0),
+		 vec2(0, spriteOffset)},
+		// NOTE: left and righ wall require some weird z offset
+		{// left
+		 vec2(ws.width / (6 * ratio2), ws.height),
+		 vec2(ws.width / (6 * ratio2), 0),
+		 vec2(ws.width - ws.width / (6 * (1 + ratio1 * 0.5)), ws.height / 2),
+		 vec2(ws.height + ws.height / (6 * ratio1), ws.width / (12 * ratio2)),
+		 glm::radians(90.f),
+		 vec3(0, 0, 50),
+		 vec2(spriteOffset, 0)}};
+	for (auto &p : wallPositions)
+	{
 		auto entity = Entity();
 
 		auto &motion = registry.motions.emplace(entity);
@@ -415,9 +414,9 @@ void createRoomBounds(RenderSystem *renderer)
 		wall.startPosition = p.colliderStart;
 		wall.endPosition = p.colliderEnd;
 
-		Bound& b = registry.bounds.emplace(entity);
+		Bound &b = registry.bounds.emplace(entity);
 		b.angle = glm::radians(-90.f);
-		b.axis = vec3(1,0,0);
+		b.axis = vec3(1, 0, 0);
 		b.offset = p.offset;
 		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'T' : 'B' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
 
@@ -432,8 +431,8 @@ void createRoomBounds(RenderSystem *renderer)
 			GEOMETRY_BUFFER_ID::SPRITE});		
 		registry.backgrounds.emplace(entity);
 
-		//add door symbol for each wall
-		createDoorSymbol(renderer,motion.position,motion.angle,motion.scale,b.angle,b.axis,b.offset,p.symbolOffset);
+		// add door symbol for each wall
+		createDoorSymbol(renderer, motion.position, motion.angle, motion.scale, b.angle, b.axis, b.offset, p.symbolOffset);
 	}
 }
 
@@ -504,7 +503,6 @@ Entity createTestPoly(RenderSystem *renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-
 Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 {
 	auto entity = Entity();
@@ -526,6 +524,11 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 
 	return entity;
 };
+
+float getRandomFloat(float min, float max)
+{
+	return min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
+}
 
 Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 {
@@ -566,7 +569,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::TwoBee:
 	{
 		enemy = Bee2();
-		BeeEnemy& bee = registry.bees.emplace(entity);
+		BeeEnemy &bee = registry.bees.emplace(entity);
 		bee.mergeCount = 2;
 
 		break;
@@ -574,7 +577,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::ThreeBee:
 	{
 		enemy = Bee3();
-		BeeEnemy& bee = registry.bees.emplace(entity);
+		BeeEnemy &bee = registry.bees.emplace(entity);
 		bee.mergeCount = 3;
 		break;
 	}
@@ -586,7 +589,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BeeHive:
 	{
 		enemy = EnemyMediumBeeHive();
-		Hive& hive = registry.beeHive.emplace(entity);
+		Hive &hive = registry.beeHive.emplace(entity);
 		hive.currSpawnCD = 5000.f;
 		hive.maxSpawnCD = 5000.f;
 		break;
@@ -601,7 +604,14 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyEasySkull();
 		break;
 	}
-	}
+	case EnemyType::HardEnemyBoid:
+		enemy = EnemyHardBoid();
+		Boid &boid = registry.boids.emplace(entity);
+		boid.position = pos;
+		float randomX = getRandomFloat(-150.f, 150.f);
+		float randomY = getRandomFloat(-150.f, 150.f);
+		boid.velocity = vec2(randomX, randomY);
+	};
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -675,7 +685,8 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletPierce = atkData.bulletPierce;
 	bullet.bulletEffects = getBulletEffects(atkData);
 	bullet.shape = atkData.shape;
-	if (atkData.onDeath != EnemyBulletDeath::NONE) bullet.onDeath = atkData.onDeath;
+	if (atkData.onDeath != EnemyBulletDeath::NONE)
+		bullet.onDeath = atkData.onDeath;
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = atan2(velocity.y, velocity.x);
@@ -765,8 +776,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 
 	registry.renderRequests.insert(
 		entity,
-		{
-		 renderShape,
+		{renderShape,
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 	
@@ -786,29 +796,31 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	return entity;
 }
 
-Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, EnemyBulletDeath onDeath)
+Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, EnemyBulletDeath onDeath)
 {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	EnemyBullet &bullet = registry.enemyBullets.emplace(entity);
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 0;
-	bullet.bulletEffects = { blunt };
+	bullet.bulletEffects = {blunt};
 	bullet.shape = CIRCLE;
 
-	Motion& motion = registry.motions.emplace(entity);
+	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
 
-	if (onDeath == EnemyBulletDeath::EXPLODE) {
+	if (onDeath == EnemyBulletDeath::EXPLODE)
+	{
 		bullet.bulletSpeed = 0;
 		bullet.bulletRange = 200;
 		motion.velocity = velocity * bullet.bulletSpeed;
-		motion.scale = {240,240}; // Ensure scale is initialized
+		motion.scale = {240, 240}; // Ensure scale is initialized
 	}
-	else if (onDeath == EnemyBulletDeath::CLUSTER) {
+	else if (onDeath == EnemyBulletDeath::CLUSTER)
+	{
 		bullet.bulletSpeed = 200;
 		bullet.bulletRange = 1000;
 		motion.velocity = velocity * bullet.bulletSpeed;
@@ -816,9 +828,9 @@ Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, E
 		motion.veer = -motion.velocity * 0.8f;
 	}
 
-	auto& spriteComponent = registry.sprites.emplace(entity);
+	auto &spriteComponent = registry.sprites.emplace(entity);
 
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
 
 	registry.renderRequests.insert(
@@ -826,7 +838,7 @@ Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, E
 		{// spriteComponent.sprites[SPRITE_STATE::BASE],
 		 "enemy_bullet_circle.png",
 		 EFFECT_ASSET_ID::BULLET,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	//bullet trail (if we decide to add effects in the future)
 	ParticleProps props = enemyBullet;
@@ -949,8 +961,6 @@ Entity createLine(vec2 position, vec2 scale)
 	return entity;
 }
 
-
-
 Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 {
 	auto entity = Entity();
@@ -985,6 +995,8 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 
 	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = motion.scale.x / 2;
+
+	registry.ignores.emplace(entity);
 
 	auto &spriteComponent = registry.sprites.emplace(entity);
 	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
@@ -1028,4 +1040,3 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 	}
 	return {atkData.defaultEffect};
 }
-
