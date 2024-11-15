@@ -305,8 +305,7 @@ struct TextRenderRequest {
 	vec2 topRightBound;
 	vec2 bottomLeftBound;
 
-	// temp: add id for text for now if it is preloaded
-	std::string textName = "";
+	// temp: add for now if it is preloaded
 	std::vector<std::string> tokenizedText = std::vector<std::string>();
 };
 

@@ -40,6 +40,8 @@ private:
 
     int lastHoveredBullet = -1;
 
+    std::unordered_map<std::string, std::vector<std::string>> uiTexts;
+
     Entity createPauseMenu(vec2 position, vec2 scale);
 
     Entity createGameOverMenu(vec2 position, vec2 scale);
@@ -62,6 +64,8 @@ private:
     Entity createBulletUI();
 
     Entity createBulletUIArrow();
+
+    void loadText();
 
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
 

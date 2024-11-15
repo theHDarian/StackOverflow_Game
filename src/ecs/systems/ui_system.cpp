@@ -1,6 +1,7 @@
 #include "ui_system.hpp"
 
 #include "sound_system.hpp"
+#include "text_system.hpp"
 #include <fstream>
 
 UISystem::UISystem(SoundSystem* soundSystem) {
@@ -22,6 +23,22 @@ void UISystem::step(float elapsed_ms) {
 
 		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 		StackUI& stackui = registry.stackUI.get(stackUI);
+
+		// update stack ui
+		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+
+		// update bullet ui positions
+		if (stack.currStack.size() > stackui.bulletPositions.size()) {
+			for (int i = 0; i < stack.currStack.size() - stackui.bulletPositions.size(); i++) {
+				int index = i + stack.currStack.size() - 1;
+				stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
+					stackui.bulletStartPos.y));
+			}
+		}
+		else if (stack.currStack.size() < stackui.bulletPositions.size()) {
+			stackui.bulletPositions.resize(stack.currStack.size());
+		}
+
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
@@ -38,28 +55,14 @@ void UISystem::step(float elapsed_ms) {
 			for (Entity entity : registry.nearbyInteractables.entities) {
 				createInteractIndicator(registry.motions.get(entity).position);
 			}
-
-			// update stack ui
-			registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
-			
-			// update bullet ui positions
-			if (stack.currStack.size() > stackui.bulletPositions.size()) {
-				for (int i = 0; i < stack.currStack.size() - stackui.bulletPositions.size(); i++) {
-					int index = i + stack.currStack.size() - 1;
-					stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, 
-						stackui.bulletStartPos.y));
-				}
-			}
-			else if (stack.currStack.size() < stackui.bulletPositions.size()) {
-				stackui.bulletPositions.resize(stack.currStack.size());
-			}
+		
 		} 
 
 		if (gameState.gamePaused) { // paused ui here
 			// is the player hovering over a stack ui bullet right now?
 			// bad: copies code from render system; consider making each bullet an entity
-			// note that this is very slow!! might be because of the amount of calculations...
-			
+			// may optimize using some other method like colour picking/just limiting search size
+			// in the future (since search space is pretty deterministic)
 			IOState& ioState = registry.ioStates.components[0];
 			int bulletHoveredIndex = -1;
 			int count = -1;
@@ -72,7 +75,6 @@ void UISystem::step(float elapsed_ms) {
 					count++;
 					if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
 						&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
-						// mouse is hovering overbullet
 						bulletHoveredIndex = count;
 						break;
 					}
@@ -113,6 +115,8 @@ void UISystem::step(float elapsed_ms) {
 bool UISystem::init(GLFWwindow* window) {
 	// just use window state until can figure out grabbing from window directly
 	WindowState& wS = registry.windowStates.components[0];
+
+	loadText();
 	
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2 + wS.height / 8), vec2(wS.width, wS.height / 4));
@@ -221,7 +225,7 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	registry.renderRequests.get(bulletUI).show = true;
 
 	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
-	textReq.textName = "HoverBullet_" + bullet.name;
+	textReq.tokenizedText = uiTexts["HoverBullet_" + bullet.name];
 	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
 	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
@@ -509,7 +513,7 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	//text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
-	text.textName = "ControlsGuide";
+	text.tokenizedText = uiTexts["ControlsGuide"];
 
 	return entity;
 }
@@ -600,7 +604,7 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	//text.text = "Game Over \npress R to restart";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
-	text.textName = "GameOver";
+	text.tokenizedText = uiTexts["GameOver"];
 
 	return entity;
 }
@@ -664,4 +668,66 @@ Entity UISystem::createScreenCutIn() {
 	motion.scale = { windowState.width, windowState.height};
 
 	return entity;
+}
+
+void UISystem::loadText() {
+	std::string uiType = "uiText";
+	std::string filename = dialogue_path(uiType + ".txt").c_str();
+	std::ifstream entity_file(filename);
+	std::string uiName;
+	std::vector<std::string> tokenizedText;
+
+	if (entity_file.is_open())
+	{
+		std::string line;
+
+		while (!entity_file.eof())
+		{
+			std::getline(entity_file, line);
+
+			if (line.length() > 0 && line[0] != '#')
+			{
+				// split line different based on what first word is
+				std::string action = line.substr(0, line.find_first_of(" "));
+
+
+				if (action.compare("UI") == 0) {
+					// new ui text, so place all prev lines into map, unless this is the first one
+					if (tokenizedText.size() > 0) {
+						uiTexts.insert({ uiName, tokenizedText });
+						tokenizedText.clear();
+					}
+
+					std::stringstream ss_line(line);
+					ss_line >> action >> uiName;
+				}
+				else { // this is just a body of text
+					// need to manually add \n back into strings... use this until can think of better way
+					//ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c?page=1&tab=scoredesc#tab-top
+					std::string delim = "\\n";
+					std::string uiTextBody = "";
+					std::string newLine = "\n";
+					auto start = 0U;
+					auto end = line.find(delim);
+					while (end != std::string::npos)
+					{
+						uiTextBody += line.substr(start, end - start) + '\n';
+						start = end + delim.length();
+						end = line.find(delim, start);
+					}
+					uiTextBody += line.substr(start, end);
+					std::vector<std::string> newTokenizedText = getTokenizedText(uiTextBody);
+					// ref: https://www.geeksforgeeks.org/concatenate-two-vectors-in-cpp/
+					tokenizedText.insert(tokenizedText.end(), newTokenizedText.begin(), newTokenizedText.end());
+					tokenizedText.push_back(newLine);
+				}
+			}
+		}
+		entity_file.close();
+		uiTexts.insert({ uiName, tokenizedText });
+	}
+	else
+	{
+		std::cout << "ERROR: failed to open file: " << filename << std::endl;
+	}
 }
