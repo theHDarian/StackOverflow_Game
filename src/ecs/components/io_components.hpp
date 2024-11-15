@@ -1,5 +1,6 @@
 #pragma once
 #include <time.h>
+#include <chrono>
 
 #include "common.hpp"
 #include "utils/extended_stack.hpp"
@@ -11,9 +12,9 @@ struct WindowState {
 
 	int fps;
 	int numFramesThisSecond;
-	std::__1::chrono::steady_clock::time_point currUnixTime;
+	std::chrono::steady_clock::time_point currUnixTime;
 
-	std::__1::chrono::steady_clock::time_point startTime;
+	std::chrono::steady_clock::time_point startTime;
 };
 
 struct IOState {
