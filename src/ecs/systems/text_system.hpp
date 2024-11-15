@@ -22,15 +22,21 @@ public:
 
 private:
     struct Character {
-        unsigned int TextureID;  // ID handle of the glyph texture
+        int TextureID;  // ID handle of the glyph texture
         glm::ivec2   Size;       // Size of glyph
         glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
         unsigned int Advance;    // Offset to advance to next glyph
     };
-
+    
     std::map<GLchar, Character> Characters;
     GLuint VAO, VBO;
     GLuint program;
+    std::vector<mat4> transforms;
+    std::vector<int> letterMap;
+    GLuint textureArray;
+    int INSTANCED_ARRAY_SIZE = 100; // note: tutorial used 400, but my pc can only handle 100 lol
+    // if it's too big: will cause a linking error when trying to compile shader files
+    
     // projection matrix; may consider using same one as render system instead
     // note: original render system has bottom right be (window width, window height)
     // but this tutorial's projection matrix has top right be (Window width, window height)
@@ -42,4 +48,5 @@ private:
     void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
     vec2 renderWord(std::string text, float x, float y, float scale, glm::vec3 color);
     void loadText();
+    void drawInstancedText(int length);
 };
