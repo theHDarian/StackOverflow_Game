@@ -385,7 +385,7 @@ void ParticleSystem::render() {
     gl_has_errors();
 
     uint32_t indexCount = 0;
-    std::array<Vertex,1000> vertices;
+    std::array<Vertex,POOLSIZE * 4> vertices;
     Vertex* buffer = vertices.data();
     for (auto& particle : particlePool) {
         if (!particle.active) {
