@@ -148,8 +148,7 @@ void ParticleSystem::init(GLFWwindow* window) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 6 * POOLSIZE, indices, GL_DYNAMIC_DRAW);
     gl_has_errors();
 
-    texture_handles[0] = loadTexture(textures_path("Player/aim_indicator.png"));
-    texture_handles[1] = loadTexture(textures_path("Misc/chevron.png"));
+    texture_handle = loadTexture(textures_path("Misc/particles.png"));
     glBindVertexArray(0);
     gl_has_errors();
 
@@ -282,6 +281,12 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
     particle.sizeEnd = props.size.end;
 
     particle.rotation = Random::Float(2.0f) * glm::pi<float>();
+    if (props.textureRowIndex >= 0) {
+        //flip so that index starts at top row (instead of bottom for textures)
+        particle.textureIndex = (TEXTURE_ROW_SIZE * (TEXTURE_NUM_ROWS - 1 - props.textureRowIndex)) + Random::Int(TEXTURE_ROW_SIZE); //get random texture in row
+    } else {
+        particle.textureIndex = -1;
+    }
 
     poolIndex = (poolIndex-1) % particlePool.size();
     return index;
@@ -361,10 +366,8 @@ void ParticleSystem::render() {
     gl_has_errors();
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    unsigned int textureLoc = glGetUniformLocation(shaderProgram,"particle_sampler");
-    int samplers[2] = {0,1};
 
-    if (projectionLoc == -1 || textureLoc == -1) {
+    if (projectionLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
         return; // Prevent further execution if uniforms are not found
     }
@@ -372,13 +375,10 @@ void ParticleSystem::render() {
 
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,texture_handles[0]);
-     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D,texture_handles[1]);
+    glBindTexture(GL_TEXTURE_2D,texture_handle);
     gl_has_errors();
     
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    glUniform1iv(textureLoc,2,samplers);
     gl_has_errors();
 
     uint32_t indexCount = 0;
@@ -399,7 +399,7 @@ void ParticleSystem::render() {
                               glm::rotate(glm::mat4(1.0f), particle.rotation, { 0.0f, 0.0f, 1.0f }) *
                               glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
 
-        buffer = createQuad(buffer,color,transform,-1); //-1 to use color, or any valid texture_handles index
+        buffer = createQuad(buffer,color,transform,particle.textureIndex); //-1 to use color, or any valid texture_handles index
         indexCount+=6;
         gl_has_errors();
     }

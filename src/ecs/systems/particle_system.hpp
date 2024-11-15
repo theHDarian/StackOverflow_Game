@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #include "particle_components.hpp"
 #define POOLSIZE 1000
+#define TEXTURE_ROW_SIZE 4 //number of textures per row in the spritesheet
+#define TEXTURE_NUM_ROWS 4
 
 class ParticleSystem {
 public:
@@ -56,7 +58,7 @@ private:
     GLuint off_screen_render_buffer_color;
 	GLuint off_screen_render_buffer_depth;
 
-    std::array<GLuint,2> texture_handles;
+    GLuint texture_handle;
     
     glm::mat4 projection;
     GLFWwindow* window;

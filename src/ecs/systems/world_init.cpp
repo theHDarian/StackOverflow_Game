@@ -710,7 +710,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		ParticleProps props = enemyBullet;
 		props.colors.push_back(enemyBulletColors.at(Key));		
 		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 3 + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(3) + 5);
 
 		return entity;
 	}
@@ -779,7 +779,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	}
 	if (!props.colors.empty()) {
 		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 3 + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(3) + 5);
 	}
 	
 
@@ -827,6 +827,18 @@ Entity createEnemyBulletDeath(RenderSystem* renderer, vec2 pos, vec2 velocity, E
 		 "enemy_bullet_circle.png",
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	//bullet trail (if we decide to add effects in the future)
+	ParticleProps props = enemyBullet;
+	for (const BulletStackEffect& effect : bullet.bulletEffects) {
+		BulletEffectType type = effect.type;
+		if (type == BulletEffectType::Inert) continue;
+		props.colors.push_back(enemyBulletColors.at(type));		
+	}
+	if (!props.colors.empty()) {
+		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(3) + 5);
+	}
 
 	return entity;
 }
@@ -986,7 +998,7 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	//add bullet trail
 	ParticleProps props = playerBulletTrail;
 	props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-	EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,rand() % 2 + 3);
+	EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(2) + 3);
 	return entity;
 }
 

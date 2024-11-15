@@ -9,7 +9,7 @@ struct ParticleProps {
     std::vector<Vec4StartEnd> colors = {{{ 143 / 255.0f, 37 / 255.0f, 132 / 255.0f, 1.0f },{ 17 / 255.0f, 14 / 255.0f, 99 / 255.0f, .4f }}}; //begin, end
     FloatStartEndRandomized size = {10.f,2.f,3.f}; //begin, end, variation
     
-    int textureIndex = -1;
+    int textureRowIndex = -1;
     float lifetime = 1000.0f;
 };
 

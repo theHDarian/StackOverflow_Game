@@ -146,7 +146,7 @@ void clearRoomActors()
 
 RoomType randomRoomType(bool excludeNone)
 {
-    return static_cast<RoomType>(rand() % (excludeNone ? RoomType::None - 1 : RoomType::None));
+    return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 std::string getSymbol(RoomType type) {
     if (type == RoomType::BossBigCRoom) {

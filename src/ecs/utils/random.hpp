@@ -9,6 +9,10 @@ class Random {
             return (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * val;
         }
 
+        static int Int(int val) { //random int less than val
+            return rand() % val;
+        }
+
         template<typename T>
         static T ListItem(const std::vector<T> &list) {
             assert(!list.empty());

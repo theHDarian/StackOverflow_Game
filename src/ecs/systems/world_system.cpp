@@ -459,7 +459,7 @@ void WorldSystem::handleCollisions() {
 					//emit wall collision particle
 					ParticleProps props = playerBulletCollision;
 					props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,300,rand() % 1 + 2);
+					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
 					//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
 					ep.defaultPos = motion.position;
 					vec2 a = wall.endPosition-wall.startPosition;
@@ -537,7 +537,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			if (!registry.emitParticles.has(player)) {
 				ParticleProps props = playerTrail;
 				props.velocity.base = -(pl.dashSpeed * glm::normalize(dash.dashDirection)) * 0.1f;
-				registry.emitParticles.emplace(player, ParticleRequestType::PPlayerTrail,props,dash.endTimer, rand() % 20 + 60);
+				registry.emitParticles.emplace(player, ParticleRequestType::PPlayerTrail,props,dash.endTimer, Random::Int(20) + 60);
 			}
 			soundPlayer->playPlayerDashSound();
 		}
@@ -731,6 +731,12 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
 		}
+	}
+	if (!registry.emitParticles.has(player)) {
+		ParticleProps props = playerDamaged;
+		registry.emitParticles.emplace(player,PExplode, props,100, 1);
+	} else {
+		assert(false); //testing
 	}
 }
 

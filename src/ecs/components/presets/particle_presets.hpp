@@ -13,7 +13,7 @@
 //     Vec4StartEnd color = {{ 143 / 255.0f, 37 / 255.0f, 132 / 255.0f, 1.0f },{ 17 / 255.0f, 14 / 255.0f, 99 / 255.0f, .4f }}; //begin, end
 //     FloatStartEndRandomized size = {10.f,2.f,3.f}; //begin, end, variation
     
-//     int textureIndex = -1;
+//     int textureRowIndex = -1;
 //     float lifetime = 1000.0f;
 // };
 
@@ -51,6 +51,15 @@ const ParticleProps playerBulletCollision {
     {{{ 73 / 255.0f, 214 / 255.0f, 101 / 255.0f, 1.0f },{ 66 / 255.0f, 245 / 255.0f, 194 / 255.0f, .8f }}},
     {6.f,1.f,2.f},
     -1,
+    800.f
+};
+
+const ParticleProps playerDamaged {
+    {{0,0},{0,0}},
+    {{0,0},{100,100}},
+    {{{1,1,1,1},{1,1,1,1}}},
+    {20.f,5.f,2.f},
+    0, //row 1 of textures
     800.f
 };
 
