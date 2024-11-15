@@ -96,7 +96,6 @@ SoundSystem::~SoundSystem()
 
 void SoundSystem::loadMusic()
 {
-    Mix_MasterVolume(MIX_MAX_VOLUME);
     SoundRequest roomMusic[] = {
         {SoundType::normalBGM, audio_path("room/game-music-loop-1.wav"), 0.2f, -1},
         {SoundType::normalBGM, audio_path("room/game-music-loop-2.wav"), 0.2f, -1},

@@ -469,7 +469,7 @@ Entity UISystem::createFpsCounter() {
 	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
 	vec2 dimensions = {100.f,25.f};
 	float padding = 25.f;
-	trr.text = 'FPS: 0';
+	trr.text = "FPS: 0";
 	trr.color = vec3(1.0f);
 	trr.scale = 0.35f;
 	trr.x = windowState.width - dimensions.x - padding;
