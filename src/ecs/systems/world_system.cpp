@@ -535,11 +535,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCharges--;
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
-			if (!registry.emitParticles.has(player)) {
-				ParticleProps props = playerTrail;
-				props.velocity.base = -(pl.dashSpeed * glm::normalize(dash.dashDirection)) * 0.1f;
-				registry.emitParticles.emplace(player, ParticleRequestType::PPlayerTrail,props,dash.endTimer, Random::Int(20) + 60);
-			}
+			ParticleProps props = playerTrail;
+			props.velocity.base = -(pl.dashSpeed * glm::normalize(dash.dashDirection)) * 0.1f;
+
+			registry.emitParticles.replace(player, ParticleRequestType::PPlayerTrail,props,dash.endTimer, Random::Int(20) + 60);
 			soundPlayer->playPlayerDashSound();
 		}
 	}
@@ -713,8 +712,11 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	soundPlayer->playPlayerHurtSound();
 
 	//add player invincibility frames
-	if (!registry.invincibles.has(player))
+	if (!registry.invincibles.has(player)) {
 		registry.invincibles.emplace(player);
+		ParticleProps props = playerDamaged;
+		registry.emitParticles.replace(player,PExplode, props,100, 1);
+	}
 
 	//add to stack for enemy bullets
 	if (registry.enemyBullets.has(other)) {
@@ -732,12 +734,6 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
 		}
-	}
-	if (!registry.emitParticles.has(player)) {
-		ParticleProps props = playerDamaged;
-		registry.emitParticles.emplace(player,PExplode, props,100, 1);
-	} else {
-		assert(false); //testing
 	}
 }
 
