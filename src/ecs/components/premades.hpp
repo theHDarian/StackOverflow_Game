@@ -251,7 +251,7 @@ const AttackData laserRotate{
 	{0, 20},
 	0,
 	8000,
-	{0.6, M_PI / 300},
+	{1.2, M_PI / 300},
 	0,
 	0,
 	0};

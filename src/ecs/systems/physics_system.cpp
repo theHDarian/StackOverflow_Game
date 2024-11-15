@@ -78,8 +78,8 @@ void PhysicsSystem::step(float elapsed_ms)
 						currLength = glm::distance(intersectionPoint, start.position);
 					}
 				}
-				motion.position = start.position + vec2(cos(motion.angle), sin(motion.angle)) * min(laser.length, currLength);
-				motion.scale.x = min(laser.length, currLength) * 2;
+				motion.position = start.position + vec2(cos(motion.angle), sin(motion.angle)) * min(laser.length, currLength) * 0.5f;
+				motion.scale.x = min(laser.length, currLength);
 			} else {
 				registry.deleteds.emplace(entity);
 			}
