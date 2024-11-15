@@ -46,7 +46,7 @@ private:
     void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, std::string textName = "");
     // lazy overloading
     void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
-    vec2 renderWord(std::string text, float x, float y, float scale, glm::vec3 color);
+    void renderWord(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
     void loadText();
     void drawInstancedText(int length);
 };

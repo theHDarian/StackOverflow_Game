@@ -183,99 +183,86 @@ int TextSystem::initFreetypeLib() {
     return 1;
 }
 
-// what would API for text look like?
-vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm::vec3 color) {
+/*
+ref: https://learnopengl.com/In-Practice/Text-Rendering
+optimizations made based on: https://www.youtube.com/watch?v=S0PyZKX4lyI
+gist of changes referenced:
+- newline character
+- not actually drawing out spaces
+- using a fixed texcoord with static draws instead (less costly than dynamic) and using a transform matrix to transform texcoods
+- using instanced rendering to draw a bunch at once. limiting draw calls = limiting costly communications between cpu and gpu
+- avoid binding every time too by using a texture array of characters
+
+additional things added:
+- adapted to consider text wrapping
+- tokenized text beforehand to help with text wrapping
+*/
+void TextSystem::renderWord(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound) {
     // temp put here to readjust sizes btween diff fonts
     scale *= 2.50; // for bytebounce
-    scale *= 48.0f / 256.0f; // so letters still look as same as before
+    scale *= 48.0f / 256.0f; // so letters still look as same as before after changing texture sizes
 
     float copyX = x;
-    vec2 textEndPos = { x, y };
 
-    // just bind once
+    glUseProgram(program);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
+    glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
 
-    // which num are we on now?
+    // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
-    
-    std::string::const_iterator c;
-    for (c = text.begin(); c != text.end(); c++)
-    {
-        
-        Character ch = Characters[*c];
 
-        // newline addition referenced from https://www.youtube.com/watch?v=S0PyZKX4lyI
-        if (*c == '\n') {
-            y -= (Characters[65].Size.y) * 2.0 * scale;
+    for (std::string text : tokenizedText) {
+
+        // approximate next word length and compare with text box size
+        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x + 0.5f) * text.length() * scale) > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
+            y -= ((Characters[65].Size.y)) * 2.0 * scale;
             x = copyX;
-            textEndPos = { x, y };
         }
-        else {
-            float xpos = x + ch.Bearing.x * scale;
-            float ypos = y - (256 - ch.Bearing.y) * scale;
-
-            // interesting that scale is multiplied here and not in the shader?
-            float w = ch.Size.x * scale;
-            float h = ch.Size.y * scale;
-
-            if (*c == ' ') { // skip "blank space characters" by not actually drawing them
-                x += (ch.Advance >> 6) * scale;
-                textEndPos = { xpos + w, y };
-                continue;
+        if (y > topRightBound.y || y < bottomLeftBound.y) {
+            // do nothing for now, unless want to write text that goes up and down
+        }
+        
+        std::string::const_iterator c;
+        for (c = text.begin(); c != text.end(); c++)
+        {
+            Character ch = Characters[*c];
+            if (*c == '\n') {
+                y -= (Characters[65].Size.y) * 2.0 * scale;
+                x = copyX;
             }
+            else {
+                float xpos = x + ch.Bearing.x * scale;
+                float ypos = y - (256 - ch.Bearing.y) * scale;
 
-            // set up all our stuff here, and pass it in at once at end
-            // instead, set up matrix we'll use to transform our generic triangle strip
-            // this will be where we want to draw our text (translate) and how big (Scale)
-            // but since generic rect = 0 and 1, need to also put in actual char size data for scale
-            // remember we need to take text bearings into account too
-            transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
-                * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
-            // which letter are we drawing?
-            letterMap[currentIndex] = ch.TextureID;
-            
+                if (*c == ' ') { // skip "blank space characters" by not actually drawing them
+                    x += (ch.Advance >> 6) * scale;
+                    continue;
+                }
 
-            // update VBO for each character
-            // let's avoid constantly creating this constantly...
-            //float vertices[6][4] = {
-            //    { xpos,     ypos + h,   0.0f, 0.0f },
-            //    { xpos,     ypos,       0.0f, 1.0f },
-            //    { xpos + w, ypos,       1.0f, 1.0f },
+                // set up all our stuff here, and pass it in at once at end
+                // set up matrix we'll use to transform our generic triangle strip
+                // this will be where we want to draw our text (translate) and how big (Scale)
+                // but since generic rect = 0 and 1, need to also put in actual char size data for scale
+                // remember we need to take text bearings into account too
+                transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
+                    * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
+                // which letter are we drawing?
+                letterMap[currentIndex] = ch.TextureID;
 
-            //    { xpos,     ypos + h,   0.0f, 0.0f },
-            //    { xpos + w, ypos,       1.0f, 1.0f },
-            //    { xpos + w, ypos + h,   1.0f, 0.0f }
-            //};
+                // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+                x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
 
-            // render glyph texture over quad
-            //glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-            //gl_has_errors();
-            // update content of VBO memory
-            //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            //gl_has_errors();
-            //glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices)
-            //gl_has_errors();
-            
-            // render quad
-            // we want to be able to do instanced call -- call shader multiple times at once
-            // ie draw whole sentence at once
-            //glDrawArrays(GL_TRIANGLES, 0, 6);
-            
-            //gl_has_errors();
-            // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-            x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+                // update index of drawn char
+                currentIndex++;
 
-            // very inefficient way to get end position right now
-            textEndPos = { xpos + w, y };
-            // update index of drawn char
-            currentIndex++;
-
-            // put here for now
-            // we don't want to draw more than we can fit at once, so just break for now
-            if (currentIndex == INSTANCED_ARRAY_SIZE) {
-                drawInstancedText(currentIndex);
-                currentIndex = 0; // now can render more than 100 text at a time
+                // we don't want to draw more than we can fit at once, so issue a draw call when full
+                if (currentIndex == INSTANCED_ARRAY_SIZE) {
+                    drawInstancedText(currentIndex);
+                    currentIndex = 0; // now can render more than 100 text at a time
+                }
             }
         }
     }
@@ -283,9 +270,8 @@ vec2 TextSystem::renderWord(std::string text, float x, float y, float scale, glm
     drawInstancedText(currentIndex);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     gl_has_errors();
-
-    return textEndPos;
 }
 
 // length = how many rendering at once
@@ -305,15 +291,17 @@ void TextSystem::drawInstancedText(int length) {
 std::vector<std::string> getTokenizedText(std::string text) {
     // tokenize string by space (should maintain \n!)
     // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
-    std::vector<std::string> tokenizedText;
     std::string space = " ";
     std::string newLine = "\n";
+    std::vector<std::string> tokenizedText;
     // consider adding other delimiters, like \tab, etc
 
     std::string str = "";
+    // this is very expensive!!
+    // TODO: pre-tokenize all text before loading game
     for (char c : text) {
         if (c == ' ' && str.length() > 0) {
-            tokenizedText.push_back(str + space + space); // for some reason, need to add 2 spaces
+            tokenizedText.push_back(str + space); // for some reason, need to add 2 spaces
             str = "";
         }
         else if (c == '\n') {
@@ -331,66 +319,14 @@ std::vector<std::string> getTokenizedText(std::string text) {
 
 void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color,
     vec2 topRightBound, vec2 bottomLeftBound) {
-    // activate corresponding render state, hard code to just 1 text rendering program for now
-// (can also pass shader itself as parameter and use that)
-    glUseProgram(program);
-    gl_has_errors();
 
-    // can also consider adding a transform matrix here
-    glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-    gl_has_errors();
-
-    std::string newLine = "\n";
-    vec2 textPos = { x, y };
-
-    for (std::string word : tokenizedText) {
-        // calculate the length of the word to determine if need to insert new line 
-        float xpos = textPos.x;
-        float ypos = textPos.y;
-
-        // approximate word size as opposed to looping
-        xpos += (Characters[65].Size.x + Characters[65].Bearing.x + 1.0f) * word.length() * scale * 2.50;
-
-        // compare with text box size
-        if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
-            textPos.y -= ((Characters[65].Size.y)) * 2.0 * 2.50 * scale;
-            textPos.x = x;
-        }
-        if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {
-            // do nothing for now, unless want to write text that goes up and down
-        }
-
-        textPos = renderWord(word, textPos.x, textPos.y, scale, color);
-        // check if new line should be applied
-        if (newLine.compare(word) == 0) {
-            textPos.x = x;
-        }
-    }
-
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    gl_has_errors();
+    renderWord(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound);
 }
 
 void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, 
     vec2 topRightBound, vec2 bottomLeftBound, std::string textName)
 {
-    // activate corresponding render state, hard code to just 1 text rendering program for now
-    // (can also pass shader itself as parameter and use that)
-    glUseProgram(program);
-    gl_has_errors();
-
-    // can also consider adding a transform matrix here
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-    glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
-    //glActiveTexture(GL_TEXTURE0);
-    gl_has_errors();
-
-    std::string newLine = "\n";
     std::vector<std::string> tokenizedText;
-    vec2 textPos = { x, y };
 
     if (uiTexts.count(textName) > 0) {
         tokenizedText = uiTexts[textName];
@@ -400,37 +336,12 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
         tokenizedText = getTokenizedText(text);
     }
 
-    for (std::string word : tokenizedText) {
-        // calculate the length of the word to determine if need to insert new line 
-        float xpos = textPos.x;
-        float ypos = textPos.y;
-
-        // approximate word size as opposed to looping
-        xpos += (Characters[65].Size.x + Characters[65].Bearing.x + 1.0f) * word.length() * scale * 2.50;
-
-        // compare with text box size
-        if (xpos > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
-            textPos.y -= ((Characters[65].Size.y)) * 2.0 * 2.50 * scale;
-            textPos.x = x;
-        }
-        if (ypos > topRightBound.y || ypos < bottomLeftBound.y) {
-            // do nothing for now, unless want to write text that goes up and down
-        }
-
-        textPos = renderWord(word, textPos.x, textPos.y, scale, color);
-        // check if new line should be applied
-        if (newLine.compare(word) == 0) {
-            textPos.x = x;
-        }
-    }
-    
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    gl_has_errors();
+    renderWord(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound);
 }
 
 void TextSystem::renderMenuUIText() {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindVertexArray(VAO);
 
     for (Entity& entity : registry.menuUITexts.entities)
@@ -559,7 +470,8 @@ void TextSystem::loadText() {
                         end = line.find(delim, start);
                     }
                     uiTextBody += line.substr(start, end);
-
+                    
+                    // TODO: make this use tokenize text function instead
                     // tokenize string by space (should maintain \n!)
                     // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
                     std::string space = " ";
@@ -571,7 +483,7 @@ void TextSystem::loadText() {
                     // TODO: pre-tokenize all text before loading game
                     for (char c : uiTextBody) {
                         if (c == ' ' && str.length() > 0) {
-                            tokenizedText.push_back(str + space + space); // for some reason, need to add 2 spaces
+                            tokenizedText.push_back(str + space); // for some reason, need to add 2 spaces
                             str = "";
                         }
                         else if (c == '\n') {
