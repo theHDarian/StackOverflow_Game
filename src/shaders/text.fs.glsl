@@ -1,3 +1,6 @@
+// ref: https://learnopengl.com/In-Practice/Text-Rendering
+// optimizations made based on: https://www.youtube.com/watch?v=S0PyZKX4lyI
+
 #version 330 core
 // in vec2 TexCoords;
 // since we're now passing out a struct, we need to declare same struct in 

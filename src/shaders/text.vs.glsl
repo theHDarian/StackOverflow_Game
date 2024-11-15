@@ -1,3 +1,6 @@
+// ref: https://learnopengl.com/In-Practice/Text-Rendering
+// optimizations made based on: https://www.youtube.com/watch?v=S0PyZKX4lyI
+
 #version 330 core
 //layout (location = 0) in vec4 vertex; // <vec2 pos, vec2 tex>
 layout (location = 0) in vec2 vertex; // since we now only use vec2 as vertex positions

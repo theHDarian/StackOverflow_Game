@@ -85,25 +85,6 @@ int TextSystem::initFreetypeLib() {
             face->glyph->bitmap.buffer
         );
 
-        // generate texture per character
-        // let's try using an array instead!
-        /*
-        unsigned int texture;
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RED,
-            face->glyph->bitmap.width,
-            face->glyph->bitmap.rows,
-            0,
-            GL_RED,
-            GL_UNSIGNED_BYTE,
-            face->glyph->bitmap.buffer
-        );*/
-        // set texture options
-
         // now store character for later use
         // first = index to our letter
         Character character = {
@@ -258,7 +239,7 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
                 // we don't want to draw more than we can fit at once, so issue a draw call when full
                 if (currentIndex == INSTANCED_ARRAY_SIZE) {
                     drawInstancedText(currentIndex);
-                    currentIndex = 0; // now can render more than 100 text at a time
+                    currentIndex = 0;
                 }
             }
         }
@@ -287,15 +268,12 @@ void TextSystem::drawInstancedText(int length) {
 
 std::vector<std::string> getTokenizedText(std::string text) {
     // tokenize string by space (should maintain \n!)
-    // ref for tokenizing: https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
     std::string space = " ";
     std::string newLine = "\n";
     std::vector<std::string> tokenizedText;
     // consider adding other delimiters, like \tab, etc
 
     std::string str = "";
-    // this is very expensive!!
-    // TODO: pre-tokenize all text before loading game
     for (char c : text) {
         if (c == ' ' && str.length() > 0) {
             tokenizedText.push_back(str + space); // for some reason, need to add 2 spaces
@@ -317,12 +295,14 @@ std::vector<std::string> getTokenizedText(std::string text) {
 void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, 
     vec2 topRightBound, vec2 bottomLeftBound)
 {
+    // consider saving this in the future w/ a dirty bit if it gets expensive
     std::vector<std::string> tokenizedText = getTokenizedText(text);
     renderText(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound);
 }
 
 void TextSystem::renderMenuUIText() {
-    // no longer need to turn these on again now that we render BEFORE post processing (which turns off blending)
+    // no longer need to turn these on again now that we render BEFORE post processing 
+    // (which turns off blending)
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindVertexArray(VAO);

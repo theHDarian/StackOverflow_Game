@@ -435,9 +435,9 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	// consider doing a check of "should I render now"? Or hide entity?
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.dialogueUIs.emplace(entity);
@@ -448,11 +448,10 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	motion.position = position;
 	motion.scale = scale;
 
-	// temp colour
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
-	color.b = 1.0;
-	color.g = 1.0;
+	color.b = 0.0;
+	color.g = 0.0;
 
 	// attach 1 text render request
 	registry.dialogueUITexts.emplace(entity);
@@ -482,9 +481,9 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -495,11 +494,10 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	motion.position = position;
 	motion.scale = scale;
 
-	// temp colour
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
 	color.b = 0.0;
-	color.g = 0.9;
+	color.g = 0.0;
 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
@@ -526,9 +524,9 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -543,7 +541,7 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
 	color.b = 0.0;
-	color.g = 0.9;
+	color.g = 0.0;
 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
@@ -571,9 +569,9 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -649,7 +647,6 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 Entity UISystem::createScreenCutIn() {
 	Entity entity = Entity();
 
-	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
 		{ "eel.png",
