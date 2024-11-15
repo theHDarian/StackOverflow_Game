@@ -370,7 +370,7 @@ void AISystem::boidKeepBound(Entity entity, Boid &boid) {
     float minY = 100.f + scale[1];
     float maxX = width - 150.f - scale[0];
     float maxY = height - 100.f - scale[1];
-    float turnFactor = 0.5f;
+    float turnFactor = 1.0f;
 	float momentumFactor = 50.f;
     vec2 position = boid.position;
 
@@ -403,7 +403,7 @@ void AISystem::boidComputeCoherence(Entity entity, Boid &boid)
 		};
 		Boid &otherBoid = registry.boids.get(other);
 		vec2 otherPos = otherBoid.position;
-		float neighborRnge = 200.f;
+		float neighborRnge = 1000.f;
 		float distance = glm::distance(position, otherPos);
 
 		if (distance < neighborRnge)
@@ -424,7 +424,7 @@ void AISystem::boidComputeCoherence(Entity entity, Boid &boid)
 
 void AISystem::boidComputeSeperation(Entity entity, Boid &boid)
 {
-	float minDistance = 50.f;
+	float minDistance = 20.f;
 	float avoidFactor = 0.05;
 	vec2 move = vec2(0, 0);
 	vec2 position = boid.position;

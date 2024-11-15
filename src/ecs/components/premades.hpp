@@ -894,11 +894,11 @@ struct EnemyHardBoid :  Enemy {
 	};
 	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
 	EnemyHardBoid() {
-		maxHealth = 20;
+		maxHealth = 1;
 		currHealth = maxHealth;
 		enemyPatterns = {boidState};
 		sprite = {
-			"enemy_bullet_triangle.png",
+			"bio_boid.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
