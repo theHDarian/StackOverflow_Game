@@ -634,7 +634,7 @@ struct EnemyBigC : Enemy
 		currHealth = maxHealth;
 
 		enemyPatterns = {
-			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, twelveSpiralShot}};
+			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, false, 0.f, 5000.f, twelveSpiralShot}};
 		patternIndex = 0;
 		sprite = {// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
 				  "none",

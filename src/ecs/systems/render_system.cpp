@@ -336,6 +336,86 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 }
 
+void RenderSystem::drawMesh(Entity entity,
+	const mat3& projection, GLenum mode)
+{
+	glPolygonMode(GL_FRONT_AND_BACK, mode);
+	glLineWidth(6.0f);
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	Motion& motion = registry.motions.get(entity);
+	// Transformation code, see Rendering and Transformation in the template
+	// specification for more info Incrementally updates transformation matrix,
+	// thus ORDER IS IMPORTANT
+	Transform transform;
+	vec2 offset = registry.renderRequests.get(entity).offset;
+
+	transform.translate(motion.position);
+	transform.rotate(motion.angle);
+	transform.translate(offset * glm::normalize(motion.scale));
+	transform.scale(motion.scale);
+
+	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
+	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ColoredVertex), (void*)0);
+	gl_has_errors();
+
+	GLuint time_uloc = glGetUniformLocation(program, "time");
+	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
+	GLuint angle_uloc = glGetUniformLocation(program, "angle");
+	glUniform1f(angle_uloc, (float)(registry.motions.get(entity).angle));
+
+	GLuint mode_uloc = glGetUniformLocation(program, "mode");
+	glUniform1i(mode_uloc, mode == GL_FILL);
+
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+
+	if (mode == GL_FILL) drawMesh(entity, projection, GL_LINE);
+	if (mode == GL_LINE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
 // draw the intermediate texture to the screen, with some distortion to simulate
 // water
 void RenderSystem::drawToScreen()
@@ -494,7 +574,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D, GL_FILL);
 		if (!registry.boids.has(entity)) {
 			drawHPbar(entity, projection_2D);
 		}

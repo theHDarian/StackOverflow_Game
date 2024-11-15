@@ -9,6 +9,7 @@ uniform vec3 fcolor;
 uniform int light_up;
 uniform float time;
 uniform float angle;
+uniform bool mode = true;
 
 // Output color
 layout(location = 0) out vec4 color;
@@ -100,8 +101,13 @@ float fbm(vec2 p) {
 
 void main()
 {
-	float a = POWER * fbm(SCALE * rotate(vpos)) + BIAS;
-	a = (a > 0.5) ? 0.8 : (a > 0.3) ? 0.5 : 0.3;
-	color = vec4(0.0, 1.0, 1.0, a);
-
+	if (mode) {
+		float a = POWER * fbm(SCALE * rotate(vpos)) + BIAS;
+		a = (a > 0.5) ? 0.8 : (a > 0.3) ? 0.5 : 0.3;
+		color = vec4(0.0, 1.0, 1.0, a);
+	}
+	else {
+		color = vec4(0.0, 1.0, 1.0, 1.0);
+	}
+	
 }

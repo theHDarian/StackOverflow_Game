@@ -389,7 +389,7 @@ struct EnemyMovement {
     vec2 posB;
     float distanceTraveled;
     float speed;
-    float angularSpeed = 90.0f;
+    float angularSpeed = 20.0f;
 };
 
 struct BossEnemy {
