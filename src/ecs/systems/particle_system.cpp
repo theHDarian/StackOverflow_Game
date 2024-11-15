@@ -168,8 +168,6 @@ void ParticleSystem::init(GLFWwindow* window) {
         std::cerr << "ERROR::INIT::SCREEN_TEXTURE_FAILED\n";
         return; // Prevent further execution if screen texture initialization fails
     }
-
-    // Clean up ib and vbo
 }
 
 ParticleSystem::~ParticleSystem() {
@@ -376,6 +374,11 @@ void ParticleSystem::render() {
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D,texture_handle);
+    gl_has_errors();
+
+    // set up texture sheet params
+    glUniform1i(glGetUniformLocation(shaderProgram, "particle_texture_row_size"),(GLint) TEXTURE_ROW_SIZE);
+    glUniform1i(glGetUniformLocation(shaderProgram, "particle_texture_num_rows"),(GLint) TEXTURE_NUM_ROWS);
     gl_has_errors();
     
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
