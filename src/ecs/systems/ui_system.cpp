@@ -645,8 +645,7 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 	stackui.bulletSize = { 20, 50 };
 	stackui.bulletOffset = 10; // space between bullets
 
-	stackui.stackSize = vec2(stack.baseStackSize * stackui.bulletSize.x + stack.baseStackSize * stackui.bulletOffset + 2 * stackui.bulletOffset, stackui.bulletSize.y + 2 * stackui.bulletOffset);
-	stackui.stackPos = vec2(stackui.bulletStartPos.x + stackui.stackSize.x / 2 - stackui.bulletSize.x - stackui.bulletOffset / 2, stackui.bulletStartPos.y);
+	stackui.updateStackUISize(stack.baseStackSize);
 
 	registry.gameUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
