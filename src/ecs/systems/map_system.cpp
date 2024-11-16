@@ -173,12 +173,19 @@ RoomType randomRoomType(bool excludeNone)
 }
 int getSymbol(RoomType type) {
     if (type >= enemyRoomTypeStart && type <= enemyRoomTypeEnd) {
-        return (int)enemyRoomTypeStart;
+        // return (int)enemyRoomTypeStart;
+        return 3;
     }
     else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
         return (int)RoomType::TutorialRoom1 - (enemyRoomTypeEnd - enemyRoomTypeStart);
     }
     else if (type < enemyRoomTypeStart) {
+        if (type >= treasureRoomTypeStart && type <= treasureRoomTypeEnd) {
+            return 0;
+        }
+        if (type >= restRoomTypeStart && type <= restRoomTypeEnd) {
+            return 1;
+        }
         return (int)type;
     }
     return (int)type - (enemyRoomTypeEnd - enemyRoomTypeStart);
@@ -258,6 +265,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
+        if (d.room == LockedEnemyRoom || d.room == RoomType::LockedTreasureRoom) {
+            registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+        }
         registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
     }
 }
@@ -301,7 +311,7 @@ void MapSystem::resetMap()
                 excludeNone = true;
 
             registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
-            registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+            registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
 
@@ -330,7 +340,7 @@ void MapSystem::resetMap()
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
-        createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
+        // createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
         // createRamStick(renderer, vec2(500, 500));
 
     }

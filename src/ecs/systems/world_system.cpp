@@ -320,7 +320,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
-		if (object.name == "Ram") {
+		if (object.item == InteractableItem::Ram) {
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
 				extendStack( player, 10);
@@ -366,6 +366,8 @@ void WorldSystem::restartGame() {
 	currentSpeed = 1.f;
 
 	Entity player = resetPlayer();
+	StackUI& stackUI = registry.stackUI.components[0];
+	stackUI.updateStackUISize(registry.stackCompile.get(player).baseStackSize);
 
 	// resetting dialogue related stuff
 	DialogueLines& lines = registry.dialogueLines.components[0];

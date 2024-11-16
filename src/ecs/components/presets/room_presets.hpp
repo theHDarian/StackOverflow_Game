@@ -123,11 +123,24 @@ const RoomPreset EnemyRoomTripleBuff1{
 {},
     0.0f,
     5};
+const RoomPreset EnemyRoomTripleBuffEX{
+        {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
+         {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
+        {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
+        {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
+        {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
+         {EnemyType::HardEnemyAngel, {0.8f, 0.4f}}},
+        {},
+        {},
+        {},
+    {},
+        0.0f,
+        35};
 const RoomPreset RestingRoom1{
     {},
     {},
     {},
-{ {InteractableItem::PopConsole, {0.5f, 0.5f}}, {InteractableItem::Ram, {0.25f, 0.25f}}},
+{ {InteractableItem::PopConsole, {0.5f, 0.5f}}},
     {SpecialEvent::RebootStation}};
 const RoomPreset TreasureRoom1{
     {},
@@ -137,6 +150,25 @@ const RoomPreset TreasureRoom1{
 {},
     0.0f,
     5,
+};
+const RoomPreset TreasureRoom2{
+    {},
+    {{threeBurst, {0.5f, 0.5f}}},
+    {},
+    {},
+{},
+    0.0f,
+    5,
+};
+
+const RoomPreset TreasureRoomRam{
+    {},
+    {},
+    {},
+    { {InteractableItem::Ram, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    0,
 };
 
 const RoomPreset BossRoom1{
@@ -151,7 +183,10 @@ const RoomPreset BossRoom1{
 const std::map<RoomType, std::vector<RoomPreset>> roomDirectory = {
     {RoomType::EnemyRoomDash, {EnemyRoomDash1}},
     {RoomType::EnemyRoomTripleBuff, {EnemyRoomTripleBuff1}},
+    { LockedEnemyRoom, { EnemyRoomTripleBuffEX}},
     {RoomType::EnemyRoomBee, {EnemyRoomBees1}},
     {RoomType::RestRoom, {RestingRoom1}},
-    {RoomType::TreasureRoom, {TreasureRoom1}},
+    {RoomType::TreasureRoom, {TreasureRoom1, TreasureRoom2,}},
+    {RoomType::LockedTreasureRoom, { TreasureRoomRam}},
     {RoomType::BossBigCRoom, {BossRoom1}}};
+

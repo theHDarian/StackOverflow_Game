@@ -8,17 +8,25 @@ enum Side : char {
 
 enum RoomType : int {
     TreasureRoom,
+    LockedTreasureRoom,
     RestRoom,
     BossBigCRoom, //remove for now to prevent bug
     EnemyRoomDash,
     EnemyRoomTripleBuff,
+    LockedEnemyRoom,
     EnemyRoomBee,
     None, //Keep None at the end of the list to be compatible with existing get random function
     TutorialRoom1,
-    TutorialRoom2
+    TutorialRoom2,
 };
 const int enemyRoomTypeStart = RoomType::EnemyRoomDash; // add all enemy rooms after this one to make door textures work
-const int enemyRoomTypeEnd = RoomType::EnemyRoomBee; // add all enemy rooms after this one to make door textures work
+const int enemyRoomTypeEnd = RoomType::EnemyRoomBee; // add all enemy rooms before this one to make door textures work
+const int tutorialRoomTypeStart = RoomType::TutorialRoom1;
+const int tutorialRoomTypeEnd = RoomType::TutorialRoom2;
+const int treasureRoomTypeStart = RoomType::TreasureRoom;
+const int treasureRoomTypeEnd = RoomType::LockedTreasureRoom;
+const int restRoomTypeStart = RoomType::RestRoom;
+const int restRoomTypeEnd = RoomType::RestRoom;
 
 enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
