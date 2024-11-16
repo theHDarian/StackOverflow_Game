@@ -340,7 +340,10 @@ void RenderSystem::drawMesh(Entity entity,
 	const mat3& projection, GLenum mode)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, mode);
-	glLineWidth(6.0f);
+	GLint range[2];
+    glGetIntegerv(GL_ALIASED_LINE_WIDTH_RANGE, range);
+	float lineWidth = min(6.0f, (float) range[1]);
+	glLineWidth(lineWidth);
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
