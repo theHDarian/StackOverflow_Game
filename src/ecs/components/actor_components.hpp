@@ -187,7 +187,8 @@ struct StackCompile {
         if (it == currStack.rend()) return false;
 
         // Interate backwards from end to index, remove each
-        for (int i = currStack.size() - 1; i >= (it + 1).base() - currStack.begin(); i--) {
+        int end = (it + 1).base() - currStack.begin();
+        for (int i = currStack.size() - 1; i >= end; i--) {
             remove(i);
         }
 
@@ -373,7 +374,7 @@ struct Enemy {
     int maxHealth;
     int currHealth;
     vec2 velocity;
-    BulletStackEffect blunt;
+    BulletStackEffect collisionBullet;
     std::vector<EnemyPattern> enemyPatterns;
     int patternIndex;
     EnemyPattern& currEnemyPattern() {

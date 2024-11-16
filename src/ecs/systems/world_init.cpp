@@ -151,7 +151,7 @@ Entity createCursor()
 		{"CursorYB.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
-	registry.gameUIs.emplace(cursor);
+	registry.cursors.emplace(cursor);
 	return cursor;
 }
 
@@ -338,10 +338,11 @@ Entity createDoorSymbol(RenderSystem *renderer, vec2 position, float angle, vec2
 
 	registry.backgrounds.emplace(entity);
 
-	RenderRequest &rr = registry.renderRequests.insert(entity,
-													   {"door_symbol_enemy.png",
-														EFFECT_ASSET_ID::ROOM_BOUND,
-														GEOMETRY_BUFFER_ID::SPRITE});
+	RenderRequest& rr = registry.renderRequests.insert(entity, 
+		{"door_symbols",
+		EFFECT_ASSET_ID::ROOM_BOUND,
+		GEOMETRY_BUFFER_ID::SPRITE}
+	);
 	return entity;
 }
 
@@ -668,6 +669,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		animate.animation_countdown_base = animate.animation_countdown;
 	}
 
+	enemy.collisionBullet = blunt;
+
 	return entity;
 };
 
@@ -697,7 +700,8 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 
 	if (bullet.bulletEffects[0].type == BulletEffectType::Key) {
 		motion.scale = 16.f * vec2(2.8, 1);
-		motion.velocity = velocity * 800.f;
+		motion.velocity = velocity * 400.f;
+		motion.veer = vec2(0);
 		bullet.bulletBounce = 10;
 		bullet.bulletPierce = 0;
 		bullet.bulletRange = 5000;

@@ -1,6 +1,8 @@
 #include "ui_system.hpp"
 
 #include "sound_system.hpp"
+#include "text_system.hpp"
+#include <fstream>
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -16,41 +18,119 @@ void UISystem::step(float elapsed_ms) {
 	GameState& gameState = registry.gameStates.components[0];
 	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
 	if (!gameState.gameOver) {
+		// toggling basic menu uis on/off
 		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
 		registry.renderRequests.get(controlsGuide).show = gameState.gamePaused;
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
-		if (!gameState.dialogueScene) {
+
+		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+		StackUI& stackui = registry.stackUI.get(stackUI);
+
+		// update stack ui
+		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+
+		//update FPS
+		WindowState& ws = registry.windowStates.components[0];
+		float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
+
+		ws.numFramesThisSecond++;
+		if (elapsed > 1000.0f) {
+			ws.fps = ws.numFramesThisSecond;
+			ws.numFramesThisSecond = 0;
+			ws.currUnixTime = Clock::now();
+			registry.textRenderRequests.get(fpsCounter).text = "FPS: " + std::to_string(ws.fps);
+		}
+
+		// update bullet ui positions
+		if (stack.currStack.size() > stackui.bulletPositions.size()) {
+			for (int i = 0; i < stack.currStack.size() - stackui.bulletPositions.size(); i++) {
+				int index = i + stack.currStack.size() - 1;
+				stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
+					stackui.bulletStartPos.y));
+			}
+		}
+		else if (stack.currStack.size() < stackui.bulletPositions.size()) {
+			stackui.bulletPositions.resize(stack.currStack.size());
+		}
+
+		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
-		}
-		// update which dialogue choice is highlighted. Consider updating only when necessary?
-		if (registry.dialogueChoices.entities.size() > 0) {
-			int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
-			int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
-			// unhighlight the last hovered choice
-			registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
-			registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
-			// highlight current choice
-			registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
-			registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
-		}
-	}
-	//update FPS
-	WindowState& ws = registry.windowStates.components[0];
-	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
+			registry.renderRequests.get(bulletUI).show = false;
+			registry.renderRequests.get(bulletUIArrow).show = false;
+			// clear prev frame's e indicators
+			for (Entity entity : registry.interactIndicators.entities) {
+				if (!registry.deleteds.has(entity)) {
+					registry.deleteds.emplace(entity);
+				}
+			}
 
-	ws.numFramesThisSecond++;
-	if (elapsed > 1000.0f) {
-		ws.fps = ws.numFramesThisSecond;
-		ws.numFramesThisSecond = 0;
-		ws.currUnixTime = Clock::now();
-		registry.textRenderRequests.get(fpsCounter).text = "FPS: " + std::to_string(ws.fps);
+			// draw "press e to interact" over all items in nearby interactables list
+			for (Entity entity : registry.nearbyInteractables.entities) {
+				createInteractIndicator(registry.motions.get(entity).position);
+			}
+		
+		} 
+
+		if (gameState.gamePaused) { // paused ui here
+			// is the player hovering over a stack ui bullet right now?
+			// bad: copies code from render system; consider making each bullet an entity
+			// may optimize using some other method like colour picking/just limiting search size
+			// in the future (since search space is pretty deterministic)
+			IOState& ioState = registry.ioStates.components[0];
+			int bulletHoveredIndex = -1;
+			int count = -1;
+			vec2 bulletSize = stackui.bulletSize;
+			// should check first: is it in stack ui at all?
+			// this is point in aabb detection
+			if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+				&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+				for (vec2 bulletPos : stackui.bulletPositions) {
+					count++;
+					if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+						&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+						bulletHoveredIndex = count;
+						break;
+					}
+				}
+				if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
+					//std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
+					updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
+						stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+				}
+				else if (bulletHoveredIndex == -1){
+					registry.renderRequests.get(bulletUI).show = false;
+					registry.renderRequests.get(bulletUIArrow).show = false;
+				}
+				lastHoveredBullet = bulletHoveredIndex;
+			}
+			else {
+				registry.renderRequests.get(bulletUI).show = false;
+				registry.renderRequests.get(bulletUIArrow).show = false;
+			}
+			
+		}
+		else if (gameState.dialogueScene) {
+			// update which dialogue choice is highlighted. Consider updating only when necessary?
+			if (registry.dialogueChoices.entities.size() > 0) {
+				int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
+				int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
+				// unhighlight the last hovered choice
+				registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
+				registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+				// highlight current choice
+				registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
+				registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
+			}
+		}
 	}
 }
 
 bool UISystem::init(GLFWwindow* window) {
 	// just use window state until can figure out grabbing from window directly
 	WindowState& wS = registry.windowStates.components[0];
+
+	loadText();
 	
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2 + wS.height / 8), vec2(wS.width, wS.height / 4));
@@ -59,8 +139,16 @@ bool UISystem::init(GLFWwindow* window) {
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
 	screenCutIn = createScreenCutIn();
+	bulletUI = createBulletUI();
+	bulletUIArrow = createBulletUIArrow();
 	fpsCounter = createFpsCounter();
 
+	return true;
+}
+
+bool UISystem::resetStackUI() {
+	WindowState& wS = registry.windowStates.components[0];
+	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	return true;
 }
 
@@ -79,7 +167,7 @@ void UISystem::playDialogue() {
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
 		if (nextLine.text.compare("<end>") != 0) { // there is a next line
 			registry.renderRequests.get(dialogueBox).show = true;
-			registry.textRenderRequests.get(dialogueBox).text = nextLine.text;
+			registry.textRenderRequests.get(dialogueBox).tokenizedText = nextLine.tokenizedText;
 			
 			// play a sound if there is one
 			if (nextLine.sfx == IncomingDialogue) {
@@ -140,6 +228,141 @@ void UISystem::playDialogue() {
 	}
 }
 
+// update bullet ui and its arrow
+// position = top middle position
+void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
+	Motion& motion = registry.motions.get(bulletUI);
+	WindowState& windowState = registry.windowStates.components[0];
+	motion.position = vec2(position.x, position.y + motion.scale.y / 2 + 50);
+	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
+		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
+	}
+	registry.renderRequests.get(bulletUI).show = true;
+
+	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
+	textReq.tokenizedText = uiTexts["HoverBullet_" + bullet.name];
+	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
+	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
+	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
+	textReq.topRightBound = { textReq.x + motion.scale.x - 25, textReq.y };
+
+	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
+	arrowMotion.position = { position.x, position.y + 50 };
+	registry.renderRequests.get(bulletUIArrow).show = true;
+}
+
+Entity UISystem::createBulletUIArrow() {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_triangle.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.menuOverlayUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = M_PI / 2;
+	motion.velocity = { 0, 0 };
+	motion.position = { 0,0 };
+	motion.scale = {-30, 30};
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 1,1,1 };
+
+	return entity;
+}
+
+Entity UISystem::createBulletUI() {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.menuOverlayUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = { 350, 400 }; // hard code size for now; consider scaling to text in future (tho maybe not needed?)
+	motion.position = { 0, 0 };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 11 / 255.f, 84 / 255.f, 87 / 255.f };
+
+	registry.menuOverlayUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.scale = 0.40;
+	text.topRightBound = { windowState.width, windowState.height };
+	text.bottomLeftBound = { 0, 0 };
+	text.y = windowState.height - motion.position.y - 15;
+	text.x = motion.position.x - 10;
+
+	return entity;
+}
+
+// draw "E" to interact with object above object's position
+// create for now instead of drawing above each interactable and showing/hiding (may regret later)
+Entity UISystem::createInteractIndicator(vec2 position) {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	registry.gameUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = { 50, 50 };
+	motion.position = { position.x, position.y };
+	
+	// hard code these offsets to make the doors look nice
+	if (position.y < windowState.height / 2 - 10) {
+		motion.position.y -= 50;
+	}
+	else if (position.y > windowState.height / 2 + 10) {
+		motion.position.y += 50;
+	}
+
+	if (position.x < windowState.width / 10) {
+		motion.position.x -= 50;
+	}
+	else if (position.x > windowState.width - windowState.width / 10) {
+		motion.position.x += 50;
+	}
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 0.3,0.3,0.3 };
+
+	registry.gameUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.text = "E";
+	text.scale = 0.40;
+	text.topRightBound = { windowState.width, windowState.height };
+	text.bottomLeftBound = { 0, 0 };
+	text.y = windowState.height - motion.position.y - 15;
+	text.x = motion.position.x - 10;
+
+	registry.interactIndicators.emplace(entity);
+
+	return entity;
+}
+
 // makes a dialogue choice to be choice
 // consider separating text show with render request show
 Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
@@ -159,6 +382,9 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	motion.velocity = { 0, 0 };
 	motion.position = position;
 	motion.scale = {30, 30};
+
+	vec3& color = registry.colors.emplace(entity);
+	color = { 1,0,0 };
 
 	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
 	auto& text = registry.textRenderRequests.emplace(entity);
@@ -224,9 +450,9 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	// consider doing a check of "should I render now"? Or hide entity?
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.dialogueUIs.emplace(entity);
@@ -237,11 +463,10 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	motion.position = position;
 	motion.scale = scale;
 
-	// temp colour
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
-	color.b = 1.0;
-	color.g = 1.0;
+	color.b = 0.0;
+	color.g = 0.0;
 
 	// attach 1 text render request
 	registry.dialogueUITexts.emplace(entity);
@@ -255,7 +480,6 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	text.x = windowState.width - scale.x + 300;				// 25 is just some padding
 	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
 	text.scale = 0.5;										
-	text.text = "hello this is test dialogue!";
 	text.topRightBound = { scale.x - 75, scale.y - 25 };
 	text.bottomLeftBound = { text.x + 25, 0 + 25 };
 
@@ -272,9 +496,9 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -285,11 +509,10 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	motion.position = position;
 	motion.scale = scale;
 
-	// temp colour
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
 	color.b = 0.0;
-	color.g = 0.9;
+	color.g = 0.0;
 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
@@ -300,9 +523,10 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 0.5;
-	text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals, [T] to turn tutorial on/off";
+	//text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.tokenizedText = uiTexts["ControlsGuide"];
 
 	return entity;
 }
@@ -315,9 +539,9 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -332,7 +556,7 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	auto& color = registry.colors.emplace(entity);
 	color.r = 0.0;
 	color.b = 0.0;
-	color.g = 0.9;
+	color.g = 0.0;
 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
@@ -360,9 +584,9 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "none",
-		 EFFECT_ASSET_ID::EGG,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = false;
 
 	registry.menuUIs.emplace(entity);
@@ -390,9 +614,10 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	text.x = windowState.width - scale.x + 25;
 	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 1.2;
-	text.text = "Game Over \npress R to restart";
+	//text.text = "Game Over \npress R to restart";
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.tokenizedText = uiTexts["GameOver"];
 
 	return entity;
 }
@@ -437,7 +662,6 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 Entity UISystem::createScreenCutIn() {
 	Entity entity = Entity();
 
-	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
 		{ "eel.png",
@@ -456,6 +680,68 @@ Entity UISystem::createScreenCutIn() {
 	motion.scale = { windowState.width, windowState.height};
 
 	return entity;
+}
+
+void UISystem::loadText() {
+	std::string uiType = "uiText";
+	std::string filename = dialogue_path(uiType + ".txt").c_str();
+	std::ifstream entity_file(filename);
+	std::string uiName;
+	std::vector<std::string> tokenizedText;
+
+	if (entity_file.is_open())
+	{
+		std::string line;
+
+		while (!entity_file.eof())
+		{
+			std::getline(entity_file, line);
+
+			if (line.length() > 0 && line[0] != '#')
+			{
+				// split line different based on what first word is
+				std::string action = line.substr(0, line.find_first_of(" "));
+
+
+				if (action.compare("UI") == 0) {
+					// new ui text, so place all prev lines into map, unless this is the first one
+					if (tokenizedText.size() > 0) {
+						uiTexts.insert({ uiName, tokenizedText });
+						tokenizedText.clear();
+					}
+
+					std::stringstream ss_line(line);
+					ss_line >> action >> uiName;
+				}
+				else { // this is just a body of text
+					// need to manually add \n back into strings... use this until can think of better way
+					//ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c?page=1&tab=scoredesc#tab-top
+					std::string delim = "\\n";
+					std::string uiTextBody = "";
+					std::string newLine = "\n";
+					auto start = 0U;
+					auto end = line.find(delim);
+					while (end != std::string::npos)
+					{
+						uiTextBody += line.substr(start, end - start) + '\n';
+						start = end + delim.length();
+						end = line.find(delim, start);
+					}
+					uiTextBody += line.substr(start, end);
+					std::vector<std::string> newTokenizedText = getTokenizedText(uiTextBody);
+					// ref: https://www.geeksforgeeks.org/concatenate-two-vectors-in-cpp/
+					tokenizedText.insert(tokenizedText.end(), newTokenizedText.begin(), newTokenizedText.end());
+					tokenizedText.push_back(newLine);
+				}
+			}
+		}
+		entity_file.close();
+		uiTexts.insert({ uiName, tokenizedText });
+	}
+	else
+	{
+		std::cout << "ERROR: failed to open file: " << filename << std::endl;
+	}
 }
 
 Entity UISystem::createFpsCounter() {

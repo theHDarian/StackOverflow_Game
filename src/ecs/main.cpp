@@ -134,9 +134,12 @@ int main() {
 		textSystem.renderGameUIText();
 		renderer.drawDialogueUI();
 		textSystem.renderDialogueUIText();
-		renderer.drawToScreen(); //postprocessing
 		renderer.drawMenuUI();
 		textSystem.renderMenuUIText();
+		renderer.drawMenuOverlayUI();
+		textSystem.renderMenuOverlayUIText();
+		renderer.drawCursor();
+		renderer.drawToScreen(); //postprocessing
 
 		glfwSwapBuffers(window);
 	}

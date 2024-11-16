@@ -1,0 +1,29 @@
+# format:
+# UI <ui name>
+# followed by a body of text
+
+UI bulletInert
+This bullet doesn't do anything.
+
+# alt: map more deterministically?
+# but then would be more load intensive?
+
+UI ControlsGuide
+Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals
+
+UI GameOver
+Game Over \npress R to restart
+
+# for simplicity, the name of the bullet will be based off of the name in the premades
+# the name to be displayed will be written at the top
+UI HoverBullet_blunt 
+Inert
+\nThis bullet doesn't do anything.
+
+UI HoverBullet_Key
+Key
+\nA keycard used for unlocking doors. Pops all preceding bullets on the stack after use.
+
+UI HoverBullet_numBulletsUpA
+Multi-shot
+\nIncreases the number of bullets shot at once by an additive amount.

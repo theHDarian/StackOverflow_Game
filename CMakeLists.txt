@@ -47,7 +47,9 @@ endif()
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} "ext/project_path.hpp"
         src/ecs/systems/sound_system.cpp
-        src/ecs/systems/sound_system.hpp)
+        src/ecs/systems/sound_system.hpp
+        src/ecs/systems/interactable_effects.cpp
+        src/ecs/systems/interactable_effects.h)
 target_include_directories(${PROJECT_NAME} PUBLIC src/)
 
 # Added this so policy CMP0065 doesn't scream

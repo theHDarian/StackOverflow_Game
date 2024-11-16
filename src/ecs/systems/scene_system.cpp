@@ -1,5 +1,6 @@
 #include "scene_system.hpp"
 #include "sound_system.hpp"
+#include "text_system.hpp"
 #include <fstream>		// for reading text files
 #include <iostream>
 #include <sstream>	
@@ -104,6 +105,9 @@ void SceneSystem::step(float elapsed_ms) {
 			if (req.type == DialogueRequestType::InteractableDialogue) {
 				InteractableObject& object = registry.interactables.get(entity);
 				InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+				if (req.choice > -1) {
+					dialogueObject.choice = req.choice;
+				}
 				if (interactibleDialogue.count(dialogueObject) > 0) {
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
@@ -263,7 +267,9 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					}
 					dialogueBody += line.substr(start, end);
 
-					lines.push_back(Dialogue{ dialogueBody });
+					std::vector<std::string> tokenizedText = getTokenizedText(dialogueBody);
+
+					lines.push_back(Dialogue{ dialogueBody, tokenizedText });
 					//std::cout << "text: " << dialogueBody << std::endl;
 				}
 

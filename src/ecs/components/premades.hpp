@@ -767,7 +767,7 @@ struct Bee3 : Enemy
 	EnemyAttackPattern::SPRAY,
 	TRIANGLE,
 	{},
-	blunt,
+	collisionBullet,
 	15,
 	M_PI,
 	{20, 20},

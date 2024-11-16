@@ -76,8 +76,14 @@ void MapSystem::step(float elapsed_ms)
         // make all doors unlocked doors
         for (int i = 0; i < 4; i++)
         {
-            if(registry.doors.components[i].room != RoomType::None && !registry.doors.components[i].isPrev)
+            if (registry.interactables.get(registry.doors.entities[i]).name == "OpenDoor") {
+                continue;
+            }
+            if(registry.doors.components[i].room != RoomType::None && !registry.doors.components[i].isPrev && registry.interactables.get(registry.doors.entities[i]).name != "LockedDoor") {
+                soundPlayer->playDoorOpenSound();
                 registry.interactables.get(registry.doors.entities[i]).name = "OpenDoor";
+                registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
+            }
         }
     }
 }
@@ -131,6 +137,11 @@ void clearRoomActors()
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
+    for (Entity ent : registry.interactIndicators.entities)
+    {
+        if (!registry.deleteds.has(ent))
+            registry.deleteds.emplace(ent);
+    }
     /*
     // lame fix for splitting bullet persisting after reset
     // doesnt work!!
@@ -148,20 +159,17 @@ RoomType randomRoomType(bool excludeNone)
 {
     return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
-std::string getSymbol(RoomType type) {
-    if (type == RoomType::BossBigCRoom) {
-        return "door_symbol_boss.png";
-    } else if (type == RoomType::TreasureRoom) {
-        return "door_symbol_treasure.png";
-    } else if (type == RoomType::RestRoom) {
-        return "door_symbol_resting.png";
-    } else if (type == RoomType::None) {
-        return "none.png";
-    } else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
-        return "door_symbol_tutorial.png";
-    } else {
-        return "door_symbol_enemy.png";
+int getSymbol(RoomType type) {
+    if (type >= enemyRoomTypeStart && type <= enemyRoomTypeEnd) {
+        return (int)enemyRoomTypeStart;
     }
+    else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
+        return (int)RoomType::TutorialRoom1 - (enemyRoomTypeEnd - enemyRoomTypeStart);
+    }
+    else if (type < enemyRoomTypeStart) {
+        return (int)type;
+    }
+    return (int)type - (enemyRoomTypeEnd - enemyRoomTypeStart);
 }
 
 void MapSystem::changeRoom(RoomType type, int doorIndex)
@@ -170,7 +178,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     Map &map = registry.maps.components[0];
     Door &door = doors[doorIndex];
 
-    if (door.room == RoomType::None || !map.currRoom.cleared)
+    if (door.room == RoomType::None || (!map.currRoom.cleared && registry.interactables.get(registry.doors.entities[doorIndex]).name.compare("OpenDoor") != 0))
         return;
     //play door sound
 
@@ -219,7 +227,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
-    registry.renderRequests.get(registry.doorSymbols.entities[spawnIndex]).texture_name = getSymbol(doors[spawnIndex].room);
+    registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = getSymbol(doors[spawnIndex].room);
+    registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
     bool excludeNone = false;
     for (int i = 0; i < doors.size(); i++)
@@ -228,14 +237,16 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         if (i == spawnIndex)
             continue;
         registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
+        registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         Door &d = registry.doors.components[i];
         d.room = randomRoomType(excludeNone);
         d.isPrev = false;
         if (d.room == RoomType::None) {
             excludeNone = true;
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
+            registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
-        registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+        registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
     }
 }
 
@@ -251,12 +262,14 @@ void MapSystem::resetMap()
             Door& d = registry.doors.components[i];
             d.isPrev = false;
             d.room = RoomType::None;
-            registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
+            registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
         registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
-        registry.renderRequests.get(registry.doorSymbols.entities[2]).texture_name = getSymbol(registry.doors.components[2].room);
+        registry.doorSymbols.get(registry.doorSymbols.entities[2]).doorType = getSymbol(registry.doors.components[2].room);
         registry.interactables.get(registry.doors.entities[2]).name = "ClosedTutorialDoor";
+        registry.interactables.get(registry.doors.entities[2]).interactType = InteractableType::DialogueInteractable;
 
         Map& map = registry.maps.components[0];
         map.currRegion = MapRegion::Tutorial;
@@ -275,7 +288,9 @@ void MapSystem::resetMap()
             if (d.room == RoomType::None)
                 excludeNone = true;
 
-            registry.renderRequests.get(registry.doorSymbols.entities[i]).texture_name = getSymbol(d.room);
+            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
+            registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+            registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
 
         for (Door& d : registry.doors.components)
@@ -301,7 +316,11 @@ void MapSystem::resetMap()
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
         createPopConsole(renderer, vec2(500, 500));
-        createBibleTree(renderer, vec2(700, 500));
-        createGardener(renderer, vec2(1000, 700));
+        // createBibleTree(renderer, vec2(700, 500));
+        // createGardener(renderer, vec2(1000, 700));
+        createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
+        createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
+
     }
 }
+

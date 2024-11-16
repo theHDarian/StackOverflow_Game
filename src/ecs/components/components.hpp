@@ -289,10 +289,14 @@ struct TextRenderRequest {
 	// size of text box
 	vec2 topRightBound;
 	vec2 bottomLeftBound;
+
+	// temp: add for now if it is preloaded
+	std::vector<std::string> tokenizedText = std::vector<std::string>();
 };
 
 struct Dialogue {
 	std::string text;
+	std::vector<std::string> tokenizedText;
 	std::string speakerName;
 	std::string speakerAvatar;
 	std::vector<std::string> choices;
@@ -309,7 +313,7 @@ struct DialogueLines {
 			return lines[current - 1];
 		}
 		else {
-			return Dialogue{ "<end>", "<end>", "<end>" }; // maybe end of str constant
+			return Dialogue{ "<end>" }; // maybe end of str constant
 		}
 	}
 
@@ -318,7 +322,7 @@ struct DialogueLines {
 			return lines[current++];
 		}
 		else {
-			return Dialogue{"<end>", "<end>", "<end>"}; // maybe end of str constant
+			return Dialogue{"<end>"}; // maybe end of str constant
 		}
 	}
 };
@@ -340,9 +344,15 @@ struct DialogueChoice {
 
 };
 
+enum InteractableType {
+	DialogueInteractable,
+	ActionInteractable
+};
+
 struct InteractableObject {
 	std::string name;
 	int dialogueCount = 0;
+	InteractableType interactType = DialogueInteractable;
 };
 
 enum DialogueRequestType {
@@ -352,6 +362,7 @@ enum DialogueRequestType {
 
 struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
 	DialogueRequestType type = InteractableDialogue;
+	int choice = -1;
 };
 
 struct InteractableReaction {

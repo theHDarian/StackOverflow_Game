@@ -5,6 +5,10 @@
 #include "tiny_ecs.hpp"
 #include "tiny_ecs_registry.hpp"
 
+#include <unordered_map>
+#include <string>
+#include <sstream>
+
 class SoundSystem;
 
 // System responsible for handling user input
@@ -15,6 +19,9 @@ public:
     ~UISystem();
     // Initialize the window
     bool init(GLFWwindow* window);
+
+    bool resetStackUI();
+
     void step(float elapsed_ms);
     void playDialogue();
 
@@ -28,6 +35,12 @@ private:
     Entity dialogueAvatar;
     Entity controlsGuide;
     Entity screenCutIn;
+    Entity bulletUI;
+    Entity bulletUIArrow;
+
+    int lastHoveredBullet = -1;
+
+    std::unordered_map<std::string, std::vector<std::string>> uiTexts;
     Entity fpsCounter;
 
     Entity createPauseMenu(vec2 position, vec2 scale);
@@ -45,6 +58,17 @@ private:
     Entity createDialogueChoice(std::string choice, vec2 position);
     
     Entity createScreenCutIn();
+
+    Entity createInteractIndicator(vec2 position);
+
+    // assume will only ever have one
+    Entity createBulletUI();
+
+    Entity createBulletUIArrow();
+
+    void loadText();
+
+    void updateBulletUI(vec2 position, BulletStackEffect bullet);
 
     Entity createFpsCounter();
 
