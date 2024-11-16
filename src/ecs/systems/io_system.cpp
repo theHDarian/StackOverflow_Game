@@ -62,6 +62,11 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.debugMode = !ioState.debugMode;
 	}
 
+	// turn FPS counter on/off
+	if (key == GLFW_KEY_F && action == GLFW_RELEASE) {
+		ioState.showFPS = !ioState.showFPS;
+	}
+
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;

@@ -26,4 +26,17 @@ Key
 
 UI HoverBullet_numBulletsUpA
 Multi-shot
-\nIncreases the number of bullets shot at once by an additive amount.
+\nIncreases the number of bullets shot at once by 1.
+
+UI HoverBullet_dmgDownA
+Damage Down (A)
+\nDecreases the damage dealt by bullets by 2.
+
+UI HoverBullet_dmgDownM
+Damage Down (M)
+\nDecreases the damage dealt by bullets by 70%.
+
+UI HoverBullet_dashUpA
+Max Dash Increase
+\nIncreases the number of max dashes by 1. 
+

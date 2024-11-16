@@ -542,15 +542,7 @@ void RenderSystem::drawGameElements()
 	// and won't render all render requests if not given the proper component
 	// Note, its not very efficient to access elements indirectly via the entity
 	// albeit iterating through all Sprites in sequence. A good point to optimize
-	for (Entity& entity : registry.enemyBullets.entities)
-	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
-			continue;
-		drawTexturedMesh(entity, projection_2D);
-		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
-	}
-
+	
 	for (Entity& entity : registry.objects.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -560,6 +552,15 @@ void RenderSystem::drawGameElements()
 			if (ioState.debugMode)
 				drawAllColliders(entity, projection_2D);
 		}
+	}
+
+	for (Entity& entity : registry.enemyBullets.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.playerBullets.entities)

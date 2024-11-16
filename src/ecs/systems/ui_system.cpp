@@ -16,7 +16,15 @@ UISystem::~UISystem() {
 
 void UISystem::step(float elapsed_ms) {
 	GameState& gameState = registry.gameStates.components[0];
+	IOState& ioState = registry.ioStates.components[0];
+
 	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
+
+	//update FPS
+	WindowState& ws = registry.windowStates.components[0];
+	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
+	registry.renderRequests.get(fpsCounter).show = ioState.showFPS;
+
 	if (!gameState.gameOver) {
 		// toggling basic menu uis on/off
 		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
@@ -28,10 +36,6 @@ void UISystem::step(float elapsed_ms) {
 
 		// update stack ui
 		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
-
-		//update FPS
-		WindowState& ws = registry.windowStates.components[0];
-		float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
 
 		ws.numFramesThisSecond++;
 		if (elapsed > 1000.0f) {
@@ -77,7 +81,6 @@ void UISystem::step(float elapsed_ms) {
 			// bad: copies code from render system; consider making each bullet an entity
 			// may optimize using some other method like colour picking/just limiting search size
 			// in the future (since search space is pretty deterministic)
-			IOState& ioState = registry.ioStates.components[0];
 			int bulletHoveredIndex = -1;
 			int count = -1;
 			vec2 bulletSize = stackui.bulletSize;
@@ -748,7 +751,7 @@ Entity UISystem::createFpsCounter() {
 	WindowState& windowState = registry.windowStates.components[0];
 	auto entity = Entity();
 
-	registry.gameUITexts.emplace(entity);
+	registry.menuOverlayUITexts.emplace(entity);
 	auto& rr = registry.renderRequests.insert(
 		entity, { "none",
 				 EFFECT_ASSET_ID::EGG,

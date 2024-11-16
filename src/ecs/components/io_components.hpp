@@ -30,6 +30,7 @@ struct IOState {
 	bool tutorialOn = false;
 	int hoveringDialogueChoice = -1;
 	int lastHoverDialogueChoice = -1;
+	bool showFPS = true;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
