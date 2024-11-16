@@ -73,6 +73,7 @@ void MapSystem::step(float elapsed_ms)
         {
             createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e));
         }
+        map.currRoom.preset.interactables = {};
 
     }
     
