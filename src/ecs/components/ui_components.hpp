@@ -11,8 +11,8 @@ struct StackUI {
 
 	std::vector<vec2> bulletPositions;
 
-	void updateStackUISize(int baseStackSize) {
-		stackSize = vec2(baseStackSize * bulletSize.x + baseStackSize * bulletOffset + 2 * bulletOffset, bulletSize.y + 2 * bulletOffset);
+	void updateStackUISize(int bulletCapacity) {
+		stackSize = vec2(bulletCapacity * bulletSize.x + bulletCapacity * bulletOffset + 2 * bulletOffset, bulletSize.y + 2 * bulletOffset);
 		stackPos = vec2(bulletStartPos.x + stackSize.x / 2 - bulletSize.x - bulletOffset / 2, bulletStartPos.y);
 	}
 };
