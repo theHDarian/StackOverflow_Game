@@ -15,6 +15,9 @@ void resetStack(Entity player, RenderSystem* renderer) {
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
+        if (reg.currStack.size() == 0) {
+            return;
+        }
         int size = reg.baseStackSize;
         int i = 0;
         for (BulletStackEffect b : reg.currStack) {
