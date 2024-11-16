@@ -9,7 +9,6 @@ uniform vec3 fcolor;
 uniform int light_up;
 uniform float time;
 uniform float angle;
-uniform bool mode = true;
 
 // Output color
 layout(location = 0) out vec4 color;
@@ -30,8 +29,8 @@ bool  multiply_by_F1 = mod(t, 8.0) >= 4.0;
 bool  inverse = mod(t, 16.0) >= 8.0;
 float distance_type = mod(t / 16.0, 4.0);
 
-vec2 rotate(vec2 v) {
-	return vec2( v.x * cos(angle) - v.y * sin(angle), v.x * sin(angle) + v.y * cos(angle) );
+vec2 rotate(vec2 v, float a) {
+	return vec2( v.x * cos(a) - v.y * sin(a), v.x * sin(a) + v.y * cos(a) );
 }
 
 vec2 hash(vec2 p) {
@@ -95,19 +94,15 @@ float fbm(vec2 p) {
 	return s / m;
 }
 
-// Use:
-//		vec2 p = gl_FragCoord.xy/iResolution.xx;
-//    float c = POWER*fbm( SCALE*p ) + BIAS;
-
 void main()
 {
-	if (mode) {
-		float a = POWER * fbm(SCALE * rotate(vpos)) + BIAS;
+	if (texture(sampler0, vpos + vec2(0.5)).a < 0.5) {
+		float a = POWER * fbm(SCALE * rotate(vpos, angle)) + BIAS;
 		a = (a > 0.5) ? 0.8 : (a > 0.3) ? 0.5 : 0.3;
 		color = vec4(0.0, 1.0, 1.0, a);
 	}
 	else {
-		color = vec4(0.0, 1.0, 1.0, 1.0);
+		float a = POWER * fbm(SCALE * rotate(vpos, angle)) - BIAS;
+		color = vec4(0.0, 1.0, 1.0, 0.6 + a);
 	}
-	
 }

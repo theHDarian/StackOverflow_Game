@@ -640,7 +640,7 @@ struct EnemyBigC : Enemy
 				  "none",
 				  EFFECT_ASSET_ID::MESH,
 				  GEOMETRY_BUFFER_ID::MESH_GB};
-		scale = vec2({700 * (1.923352 / 2.f), 700});
+		scale = vec2({700, 700 * (1.998858f / 1.923352f) });
 	};
 };
 

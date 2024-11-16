@@ -119,7 +119,7 @@ public:
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
-	void drawMesh(Entity entity, const mat3& projection, GLenum mode);
+	void drawMesh(Entity entity, const mat3& projection);
 	void drawDashes(const mat3& projection);
 	void drawHPbar(::Entity &entity, const mat3 & projection);
 	//glm::mat4 createTransform(float x, float y, float scaleX, float scaleY);

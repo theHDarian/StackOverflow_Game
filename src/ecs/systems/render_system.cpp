@@ -337,13 +337,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 }
 
 void RenderSystem::drawMesh(Entity entity,
-	const mat3& projection, GLenum mode)
+	const mat3& projection)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, mode);
-	GLint range[2];
-    glGetIntegerv(GL_ALIASED_LINE_WIDTH_RANGE, range);
-	float lineWidth = min(6.0f, (float) range[1]);
-	glLineWidth(lineWidth);
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
@@ -390,9 +385,11 @@ void RenderSystem::drawMesh(Entity entity,
 	GLuint angle_uloc = glGetUniformLocation(program, "angle");
 	glUniform1f(angle_uloc, (float)(registry.motions.get(entity).angle));
 
-	GLuint mode_uloc = glGetUniformLocation(program, "mode");
-	glUniform1i(mode_uloc, mode == GL_FILL);
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
 
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture["hexagon.png"]];
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
@@ -415,8 +412,6 @@ void RenderSystem::drawMesh(Entity entity,
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 
-	if (mode == GL_FILL) drawMesh(entity, projection, GL_LINE);
-	if (mode == GL_LINE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 // draw the intermediate texture to the screen, with some distortion to simulate
@@ -568,7 +563,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D, GL_FILL);
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
 		if (!registry.boids.has(entity)) {
 			drawHPbar(entity, projection_2D);
 		}
