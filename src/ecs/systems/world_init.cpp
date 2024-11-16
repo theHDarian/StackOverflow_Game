@@ -535,6 +535,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 {
 	auto entity = Entity();
 
+	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
+	movement.posA = pos;
+
 	// std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
 	Enemy &enemy = registry.enemies.emplace(entity);
 	switch (type)
@@ -553,6 +556,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = EnemyBigC();
 		registry.bosses.emplace(entity);
+		movement.angularSpeed = 20;
 		break;
 	}
 	case EnemyType::MediumEnemyCharge:
@@ -620,8 +624,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	motion.velocity = vec2(0, 0);
 	motion.scale = enemy.scale;
 
-	EnemyMovement &movement = registry.enemyMovement.emplace(entity);
-	movement.posA = pos;
 	// if (enemy.behavior == EnemyBehavior::PATROLLING) {
 	// 	movement.posA = enemy.patrolPath[0];
 	// } else {
