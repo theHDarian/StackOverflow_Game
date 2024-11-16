@@ -249,7 +249,8 @@ enum EnemyType {
     BeeHive,
     HardEnemyAngel,
     EasyEnemySkull,
-    HardEnemyBoid
+    HardEnemyBoid,
+    HardEnemyBoidBio
 };
 
 enum class EnemyAttackPattern {
@@ -263,6 +264,7 @@ enum class EnemyAttackPattern {
     WAVE,
     LASER,
     TRAIL,
+    SPAWNING,
     NONE
 };
 
@@ -296,6 +298,7 @@ struct AttackData {
     int bulletBounce = 0;
     float homing = 0;
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
+    EnemyType spawn;
 };
 
 enum class EnemyBehavior {
@@ -311,7 +314,6 @@ enum class EnemyBehavior {
     TELEPORT,
     IDLE,
     MERGE_BEE,
-    SPAWNING,
     BOIDS
 };
 
@@ -365,6 +367,9 @@ struct SpriteData
 	EFFECT_ASSET_ID effectId;
 	GEOMETRY_BUFFER_ID geometryId;
 	vec2 offset;
+    int animationType = 1;
+    int max_Frames = 1;
+    float countdown = 20;
 };
 
 
@@ -446,11 +451,6 @@ struct Motion {
 struct Damaged {
     float max = 200;
     float countdown = max;
-};
-
-struct Hive {
-    float currSpawnCD;
-    float maxSpawnCD;
 };
 
 struct BeeEnemy {

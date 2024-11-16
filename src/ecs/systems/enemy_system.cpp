@@ -72,17 +72,6 @@ void EnemySystem::step(float elapsed_ms)
         //     registry.enemies.remove(deletedBee);
         // }
 
-        // beeHive logic
-        if (registry.beeHive.has(entity))
-        {
-            Hive &hive = registry.beeHive.get(entity);
-            hive.currSpawnCD -= elapsed_ms;
-            if (pattern.type == EnemyBehavior::SPAWNING)
-            {
-                beeHiveSpawn(entity, pattern, hive);
-            }
-        }
-
         if (registry.boids.has(entity))
         {
             Boid &boid = registry.boids.get(entity);
@@ -140,7 +129,8 @@ void EnemySystem::step(float elapsed_ms)
             if (pattern.currAtkCD < 0)
             {
                 AttackData atkData = pattern.atkData;
-                attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
+                if (atkData.attackType != EnemyAttackPattern::SPAWNING) attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
+                else spawn(entity, pattern, pos, atkData);
             }
         }
     }
@@ -427,31 +417,16 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
             burst.burstCooldown = 0;
         }
     }
-    //play shoot sound
-    // if (atkData.attackType == EnemyAttackPattern::NONE )
-    //     return;
-    //
-    // if ( atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
-    //     if (atkData.shape == EnemyBulletShape::CIRCLE) {
-    //         sound->playEnemyShootSound(0, atkData.numBullets);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
-    //         sound->playEnemyShootSound(1, atkData.numBullets);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
-    //         sound->playEnemyShootSound(2, atkData.numBullets);
-    //     }
-    // } else {
-    //     if (atkData.shape == EnemyBulletShape::CIRCLE) {
-    //         sound->playEnemyShootSound(0, 0);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
-    //         sound->playEnemyShootSound(1, 0);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
-    //         sound->playEnemyShootSound(2, 0);
-    //     }
-    // }
+}
+
+void EnemySystem::spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData)
+{
+    if (registry.animations.has(entity)) registry.animations.get(entity).frame = 1;
+    for (uint i = 0; i < atkData.numBullets; i++) {
+        createEnemy(render, pos, atkData.spawn);
+    }
+
+    currPattern.currAtkCD = currPattern.maxAtkCD;
 }
 
 void EnemySystem::creatingMergeBee(int count, vec2 pos)
@@ -510,44 +485,5 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
             }
         }
         bee.nearbyBees.clear();
-
-        // for (Entity deletedBee : deletedBees)
-        //{
-        //     for (Entity nearby : registry.bees.get(deletedBee).nearbyBees)
-        //     {
-        //         if (registry.bees.has(nearby))
-        //         {
-        //             auto &nearbyBee = registry.bees.get(nearby);
-        //             nearbyBee.nearbyBees.erase(deletedBee);
-        //         }
-        //     }
-        //     pendingDeletion.push_back(deletedBee);
-        // }
-        //  		std::cout << " time to merge bees with other bees: " << registry.bees.get(bee).nearbyBees.size() << std::endl;
-        //  		registry.bees.get(bee).mergeCount += registry.bees.get(bee).nearbyBees.size();
-        //  		registry.bees.get(bee).nearbyBees.clear();
-        //  		if (registry.bees.get(bee).mergeCount >= 1) {
-        //  			registry.renderRequests.get(bee).texture_name = "bee_fly_2";
-        //  		}
-    }
-}
-
-void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern &currPattern, Hive &hive)
-{
-    Motion &motion = registry.motions.get(entity);
-    if (hive.currSpawnCD < 0.f)
-    {
-        // play open "animation" here
-        if (!registry.spriteTimers.has(entity))
-        {
-            RenderRequest &rr = registry.renderRequests.get(entity);
-            SpriteTimer &st = registry.spriteTimers.emplace(entity);
-            st.count_ms = 1000;
-            st.nextEffect = rr.used_effect;
-            st.nextSprite = rr.texture_name;
-            rr.texture_name = "beehive_open.png";
-        }
-        creatingMergeBee(1, motion.position);
-        hive.currSpawnCD = hive.maxSpawnCD;
     }
 }

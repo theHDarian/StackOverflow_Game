@@ -594,9 +594,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BeeHive:
 	{
 		enemy = EnemyMediumBeeHive();
-		Hive &hive = registry.beeHive.emplace(entity);
-		hive.currSpawnCD = 5000.f;
-		hive.maxSpawnCD = 5000.f;
 		break;
 	}
 	case EnemyType::HardEnemyAngel:
@@ -610,8 +607,18 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		break;
 	}
 	case EnemyType::HardEnemyBoid:
+	{
 		enemy = EnemyHardBoid();
-		Boid &boid = registry.boids.emplace(entity);
+		Boid& boid = registry.boids.emplace(entity);
+		boid.position = pos;
+		float randomX = getRandomFloat(-150.f, 150.f);
+		float randomY = getRandomFloat(-150.f, 150.f);
+		boid.velocity = vec2(randomX, randomY);
+		break;
+	}
+	case EnemyType::HardEnemyBoidBio:
+		enemy = EnemyHardBoidBio();
+		Boid& boid = registry.boids.emplace(entity);
 		boid.position = pos;
 		float randomX = getRandomFloat(-150.f, 150.f);
 		float randomY = getRandomFloat(-150.f, 150.f);
@@ -666,8 +673,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	if (enemy.sprite.effectId == EFFECT_ASSET_ID::ANIMATE)
 	{
 		auto &animate = registry.animations.emplace(entity);
-		animate.max_frames = 5; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
-		animate.animation_countdown = 20;
+		animate.animate = enemy.sprite.animationType;
+		animate.max_frames = enemy.sprite.max_Frames; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
+		animate.animation_countdown = enemy.sprite.countdown;
 		animate.animation_countdown_base = animate.animation_countdown;
 	}
 

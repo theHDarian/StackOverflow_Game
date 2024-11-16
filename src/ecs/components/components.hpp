@@ -218,12 +218,18 @@ struct RenderRequest {
 	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
 };
 
+enum AnimationTypes {
+	NONE = 0,
+	REGULAR = 1,
+	ONCE = 2
+};
+
 struct Animation {
 	int frame = 0; // stick in animation info to here for now
 	int max_frames = 5; // this type of info should be known by render/sprite system?
 	float animation_countdown = 85;
 	float animation_countdown_base = animation_countdown;
-	bool animate = true;
+	int animate = true;
 };
 
 // For 3D rendering

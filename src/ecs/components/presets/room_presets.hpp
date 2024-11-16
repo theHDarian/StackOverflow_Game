@@ -26,6 +26,16 @@ const RoomPreset TutorialRoom1Preset{
     0};
 
 const RoomPreset TutorialRoom2Preset{
+    {
+         {EnemyType::BeeHive, {0.5f, 0.5f}}},
+    {},
+    {},
+    {},
+    0.0f,
+    0 
+};
+
+const RoomPreset TutorialRoom3Preset{
     {{EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
@@ -94,6 +104,7 @@ const RoomPreset EnemyRoomDash1{
     {},
     0.0f,
     5};
+
 const RoomPreset EnemyRoomBees1{
     {{EnemyType::OneBee, {0.2f, 0.8f}},
      {EnemyType::OneBee, {0.8f, 0.8f}},

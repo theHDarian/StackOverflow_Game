@@ -224,8 +224,6 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getCurrentPos(entity);
 	case EnemyBehavior::MERGE_BEE:
 		return getCurrentPos(entity);
-	case EnemyBehavior::SPAWNING:
-		return getCurrentPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};

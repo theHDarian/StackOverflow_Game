@@ -706,7 +706,10 @@ struct Bee1 : Enemy
 			"bee_fly_1",
 			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
-			vec2(0, 0)};
+			vec2(0),
+			AnimationTypes::REGULAR,
+			5
+		};
 		scale = vec2({864 / 8.f, 480 / 8.f});
 	};
 };
@@ -743,6 +746,9 @@ struct Bee2 : Enemy
 			"bee_fly_2",
 			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			5
 		};
 		scale = vec2({864 / 8.f, 480 / 8.f});
 	};
@@ -791,12 +797,52 @@ struct Bee3 : Enemy
 			"bee_fly_3",
 			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			8
 		};
 		scale = vec2({864 / 8.f, 720 / 8.f});
 	};
 };
 
 struct EnemyMediumBeeHive : Enemy {
+
+	const AttackData OneBee{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		1,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::OneBee
+	};
+
+	const AttackData ManyBoidBees{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		12,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::HardEnemyBoidBio
+	};
+
 	Reaction Spawning{
 		ReactionType::DURATION,
 		1
@@ -806,7 +852,7 @@ struct EnemyMediumBeeHive : Enemy {
 		0
 	};
 	Reaction halfHP {
-		ReactionType::FIFTY_HEALTH,
+		ReactionType::TWENTYFIVE_HEALTH,
 		2
 	};
 	Reaction finalIdle {
@@ -814,20 +860,24 @@ struct EnemyMediumBeeHive : Enemy {
 		3
 	};
 	EnemyPattern idlingState = {"IDLING", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {Spawning, halfHP}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::SPAWNING, {}, 0, 3000.f , 3000.f, {idling, halfHP}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyPattern halfHPState = {"SPAWN LOT BEES", EnemyBehavior::SPAWNING, {}, 0, 3000.f, 3000.f, {finalIdle}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::IDLE, {}, 0, 3000.f , 3000.f, {idling, halfHP}, 0, true, 0.f, 3000.f, OneBee};
+	EnemyPattern halfHPState = {"SPAWN LOT BEES", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {finalIdle}, 3, true, 0.f, 3000.f, ManyBoidBees};
 	EnemyPattern deadHiveState = {"DEAD HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {finalIdle}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyMediumBeeHive() {
 		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {idlingState, spawningState, halfHPState, deadHiveState};
 		sprite = {
-			"beehive_close.png",
-			EFFECT_ASSET_ID::TEXTURED,
+			"bee_hive",
+			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,	
+			vec2(0),
+			AnimationTypes::ONCE,
+			2,
+			800
 		};
 		patternIndex = 0;
-		scale = vec2({240.0f / 2, 312.f / 2});
+		scale = vec2({240.0f / 1.7, 312.f / 1.7});
 	};
 };
 
@@ -898,11 +948,31 @@ struct EnemyHardBoid :  Enemy {
 		currHealth = maxHealth;
 		enemyPatterns = {boidState};
 		sprite = {
-			"bio_boid.png",
+			"hifi_boid.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({20.f, 20.f});
+		patternIndex = 0;
+	}
+};
+
+struct EnemyHardBoidBio : Enemy {
+	Reaction boid{
+		ReactionType::DURATION,
+		0
+	};
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
+	EnemyHardBoidBio() {
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = { boidState };
+		sprite = {
+			"bio_boid.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({ 20.f, 20.f });
 		patternIndex = 0;
 	}
 };

@@ -26,11 +26,16 @@ void RenderSystem::step(float elapsed_ms) {
 
 	for (Entity entity : registry.animations.entities) {
 		Animation& anim = registry.animations.get(entity);
-		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate) {
-			anim.animation_countdown -= elapsed_ms;
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate != AnimationTypes::NONE) {
+			if (anim.animate != AnimationTypes::ONCE || anim.frame != 0) anim.animation_countdown -= elapsed_ms;
 			if (anim.animation_countdown <= 0) {
 				anim.animation_countdown = anim.animation_countdown_base;
-				anim.frame = (anim.frame + 1) % anim.max_frames;
+				if (anim.animate == AnimationTypes::ONCE) {
+					anim.frame = (anim.frame + 1 >= anim.max_frames) ? 0 : anim.frame + 1;
+				}
+				else {
+					anim.frame = (anim.frame + 1) % anim.max_frames;
+				}
 			}
 		}
 		if (registry.animationSequences.has(entity) && anim.frame >= anim.max_frames - 1) {
