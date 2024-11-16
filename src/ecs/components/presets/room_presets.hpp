@@ -22,6 +22,7 @@ const RoomPreset TutorialRoom1Preset{
     {},
     {},
     {},
+{},
     100000.0f,
     0};
 
@@ -77,6 +78,7 @@ const RoomPreset TutorialRoom2Preset{
     {},
     {},
     {},
+{},
     0.0f,
     0};
 
@@ -92,6 +94,7 @@ const RoomPreset EnemyRoomDash1{
     {},
     {},
     {},
+{},
     0.0f,
     5};
 const RoomPreset EnemyRoomBees1{
@@ -104,6 +107,7 @@ const RoomPreset EnemyRoomBees1{
     {},
     {},
     {},
+{},
     0.0f,
     5};
 
@@ -116,18 +120,21 @@ const RoomPreset EnemyRoomTripleBuff1{
     {},
     {},
     {},
+{},
     0.0f,
     5};
 const RoomPreset RestingRoom1{
     {},
     {},
     {},
+{ {InteractableItem::PopConsole, {0.5f, 0.5f}}, {InteractableItem::Ram, {0.25f, 0.25f}}},
     {SpecialEvent::RebootStation}};
 const RoomPreset TreasureRoom1{
     {},
     {{threeBurst, {0.5f, 0.5f}}},
     {},
     {},
+{},
     0.0f,
     5,
 };
@@ -137,6 +144,7 @@ const RoomPreset BossRoom1{
     {},
     {},
     {},
+{},
     0.0f,
     2};
 

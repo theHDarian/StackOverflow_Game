@@ -64,19 +64,36 @@ ITEM PrevDoor -1 0
 The only way out is forwards, not backwards!
 
 ITEM PopStack -1 0
-Do you want to pop stack?
-CHOICES Yes\No
+A mysterious machine. Looks like there's something engraved on the side.
+"Hello dear user! Thank you for choosing the PopStack 3000! Do you have too much stuff on your stack? Look no further! This marvellous machine will pop everything off your stack, leaving you with a clean slate! Would you like to pop your stack?"
 SPEAKER Pop Console pop_console.png
+Well, the instructions are clear enough, although whoever wrote them must have been a bit too enthusiastic about it. Either way, would you like to pop your stack?
+CHOICES Yes\No
 
 ITEM PopStack 0 0
-Yes pop stack
+Stack popped!
 SOUND incomingDialogue
 
 ITEM PopStack 1 0
-No pop stack
+You decide not to pop your tack.
 
 ITEM PopStack -1 1
-You've already used this!
+You've already used this! Thinking back, why does a run-down lab have a machine like this anyway?
+
+ITEM Ram -1 0
+!This is a ram module! These things are a robot's favourite treat, installing it will allow you to store more data in your stack.
+Would you like to install the ram module?
+CHOICES Yes\No
+
+ITEM Ram 0 0
+You install the ram module.
+[stack capacity increased!]
+
+ITEM Ram 1 0
+You decide not to install the ram module.
+
+ITEM Ram -1 1
+You've already installed the ram module.
 
 ITEM BibleTree -1 0
 A tree with red fruit. Pick one?

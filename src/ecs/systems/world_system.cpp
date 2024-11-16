@@ -319,6 +319,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.mapRequests.emplace(reaction.object, MapRequestType::ChangeRoom, registry.doors.get(reaction.object).room, registry.doors.get(reaction.object).doorIndex);
 			}
 		}
+
+		if (object.name == "Ram") {
+			if (reaction.choice == 0) {
+				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+				extendStack( player, 10);
+				reaction.choice = 1;
+				registry.deleteds.emplace(reaction.object);
+			}
+		}
 	}
 
 	registry.interactableReactions.clear();

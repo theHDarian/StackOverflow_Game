@@ -63,6 +63,17 @@ void MapSystem::step(float elapsed_ms)
             createEnemyBullet(renderer,std::get<vec2>(e)* vec2(wS.width,wS.height),vec2(0.8,0.8),vec2(0),std::get<AttackData>(e));
         }
         map.currRoom.preset.treasures = {};
+
+        // for (auto &e : map.currRoom.preset.roomProps)
+        // {
+        //     createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<RoomProp>(e));
+        // }
+
+        for (auto &e : map.currRoom.preset.interactables)
+        {
+            createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e));
+        }
+
     }
     
 
@@ -315,11 +326,11 @@ void MapSystem::resetMap()
         std::vector<RoomPreset> presets = roomDirectory.at(RoomType::RestRoom);
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
-        createPopConsole(renderer, vec2(500, 500));
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
-        createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
+        // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
         createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
+        // createRamStick(renderer, vec2(500, 500));
 
     }
 }

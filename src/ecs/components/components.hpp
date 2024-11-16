@@ -349,10 +349,21 @@ enum InteractableType {
 	ActionInteractable
 };
 
+enum InteractableItem {
+	Ram,
+	PopConsole,
+	OpenDoor,
+	LockedDoor,
+	BibleTree,
+	Gardener,
+	NA,
+};
+
 struct InteractableObject {
 	std::string name;
 	int dialogueCount = 0;
 	InteractableType interactType = DialogueInteractable;
+	InteractableItem item = InteractableItem::NA;
 };
 
 enum DialogueRequestType {
