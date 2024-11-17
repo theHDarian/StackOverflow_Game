@@ -723,7 +723,21 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		float randomX = getRandomFloat(-150.f, 150.f);
 		float randomY = getRandomFloat(-150.f, 150.f);
 		boid.velocity = vec2(randomX, randomY);
+		break;
+	}
+	case EnemyType::MediumEnemyBoar:
+	{
+		enemy = EnemyMediumBoar();
+		break;
+	}
+	case EnemyType::MediumEnemyHealer:
+	{
+		enemy = EnemyMediumHeal();
+		Healer& healer = registry.healers.emplace(entity);
+		healer.coolDown = 0.f;
+	}
 	};
+
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;

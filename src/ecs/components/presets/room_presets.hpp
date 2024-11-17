@@ -115,7 +115,9 @@ const RoomPreset EnemyRoomDash1{
      {EnemyType::EasyEnemySentry, {0.2f, 0.2f}},
      {EnemyType::TestRevampedEnemy, {0.2, 0.4}},
      {EnemyType::TestRevampedEnemy, {0.8, 0.4}},
-     {EnemyType::EasyEnemySkull, {0.5f, 0.5f}}
+     {EnemyType::EasyEnemySkull, {0.5f, 0.5f}},
+     {EnemyType::MediumEnemyBoar, {0.3f, 0.7f}},
+     {EnemyType::MediumEnemyBoar, {0.3f, 0.7f}}
      },
     {},
     {},

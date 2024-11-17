@@ -17,7 +17,10 @@ private:
 	static vec2 getCurrentPos(Entity entity);
 	static vec2 evadeBullet(Entity entity);
 	static vec2 getNextPatrolPos(Entity entity);
+	static vec2 getCharginPos(Entity entity);
+	static vec2 getTeamPos(Entity entity);
 	static void updateState(Enemy& enemy, EnemyMovement movement, Entity entity);
+	static bool updateHealerState(Enemy &enemy, Entity entity);
 	static void angryMode(Entity entity);
 	static void computeBoidVelocity(Entity entity , Boid& boid);
 	static void boidKeepBound(Entity entity, Boid& boid);
