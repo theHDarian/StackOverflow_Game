@@ -38,7 +38,6 @@ precision mediump float;
 
 uniform sampler2D screen_texture;
 uniform float time;
-uniform float chromatic_abberation_intensity;
 in vec2 texcoord;
 
 // compatibility #defines
@@ -64,15 +63,7 @@ in vec2 texcoord;
 
 // ------------- //
 
-vec4 chromatic_abberation(sampler2D Source, vec2 loc)
-{
-    vec2 off_red = vec2(-0.002, 0.002) * chromatic_abberation_intensity;
-    vec2 off_green = vec2(-0.002, -0.002) * chromatic_abberation_intensity;
-    vec2 off_blue = vec2(0.00075, 0.0) * chromatic_abberation_intensity;
-    return vec4(texture(Source, loc + off_red).r, texture(Source, loc + off_green).g, texture(Source, loc + off_blue).b, 1.0);
-}
-
-#define COMPAT_TEXTURE chromatic_abberation
+#define COMPAT_TEXTURE texture
 
 float ToLinear1(float c)
 {
