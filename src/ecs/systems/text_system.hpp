@@ -9,6 +9,12 @@
 
 std::vector<std::string> getTokenizedText(std::string text);
 
+const float FONT_ADJUST_FACTOR = 2.50;
+// manually change this for different fonts for now
+
+// for ByteBounce: 2.5
+// for Chicago: 1.5
+
 class TextSystem {
 public:
     TextSystem();

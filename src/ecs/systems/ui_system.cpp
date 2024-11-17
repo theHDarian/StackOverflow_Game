@@ -669,7 +669,7 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 	text.color = vec3(1, 1, 1);
 	text.x = stackui.bulletStartPos.x - stackui.bulletSize.x - stackui.bulletOffset / 2;
 	text.y = (stackui.bulletStartPos.y - windowState.height) * -1 - 2 * stackui.bulletOffset - stackui.bulletSize.y;
-	text.scale = 0.25;
+	text.scale = 0.3;
 	// too lazy to calculate fitting text box size, and it prob won't overflow
 	// so just set it to some big number
 	text.topRightBound = { 1000, 1000 };

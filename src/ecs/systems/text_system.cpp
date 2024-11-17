@@ -176,8 +176,7 @@ additional things added:
 - tokenized text beforehand to help with text wrapping
 */
 void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound) {
-    // temp put here to readjust sizes btween diff fonts
-    scale *= 2.50; // for bytebounce
+    scale *= FONT_ADJUST_FACTOR;
     scale *= 48.0f / 256.0f; // so letters still look as same as before after changing texture sizes
 
     float copyX = x;
