@@ -258,6 +258,8 @@ enum EnemyType {
     HardEnemyAngel,
     EasyEnemySkull,
     HardEnemyBoid,
+    MediumEnemyBoar,
+    MediumEnemyHealer,
     HardEnemyBoidBio
 };
 
@@ -324,7 +326,10 @@ enum class EnemyBehavior {
     TELEPORT,
     IDLE,
     MERGE_BEE,
-    BOIDS
+    SPAWNING,
+    BOIDS,
+    CHARGING,
+    HEALING
 };
 
 
@@ -337,6 +342,7 @@ enum class ReactionType {
     FIFTY_HEALTH,
     TWENTYFIVE_HEALTH,
     BEE_CLOSE,
+    TEAM_HURT,
     NO_BEES
 };
 
@@ -363,11 +369,17 @@ struct EnemyPattern {
     float maxAtkCD;
     AttackData atkData;
 };
-
 struct Boid {
     vec2 velocity;
     vec2 position;
     float wanderAngle;
+};
+
+struct Healer {
+    float coolDown;
+    float maxCoolDown = 3000.f;
+    int healPower = 90;
+    Entity targetEntity;
 };
 
 
@@ -398,6 +410,7 @@ struct Enemy {
     vec2 scale;
     SpriteData sprite;
     bool newPattern = false;
+    float rotatePower;
     float speedMultiplier = 1.0f;
 };
 

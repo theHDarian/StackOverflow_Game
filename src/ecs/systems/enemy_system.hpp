@@ -28,6 +28,8 @@ private:
     void spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData);
     void merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion);
     void creatingMergeBee(int count, vec2 pos);
+
+    void heal(Entity entoty, EnemyPattern &currPattern);
     RenderSystem *render;
     SoundSystem *sound;
 };

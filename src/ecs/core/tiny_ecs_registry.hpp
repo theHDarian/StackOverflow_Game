@@ -84,6 +84,7 @@ public:
 	ComponentContainer<MenuOverlayUI> menuOverlayUIs;
 	ComponentContainer<MenuOverlayUIText> menuOverlayUITexts;
 	ComponentContainer<Ignore> ignores;
+	ComponentContainer<Healer> healers;
 	ComponentContainer<EffectStack> effectStacks;
 
 
@@ -161,6 +162,7 @@ public:
 		registry_list.push_back(&menuOverlayUIs);
 		registry_list.push_back(&menuOverlayUITexts);
 		registry_list.push_back(&ignores);
+		registry_list.push_back(&healers);
 		registry_list.push_back(&effectStacks);
 	}
 
