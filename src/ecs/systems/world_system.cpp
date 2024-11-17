@@ -79,14 +79,16 @@ GLFWwindow* WorldSystem::createWindow() {
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_REFRESH_RATE,60);
-	glfwWindowHint(GLFW_DECORATED,GLFW_FALSE); //make borderless window
+	//glfwWindowHint(GLFW_DECORATED,GLFW_FALSE); //make borderless window
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	  window_width_px = vidMode->width;
-	  window_height_px = vidMode->height;
+	  //window_width_px = vidMode->width;
+	  //window_height_px = vidMode->height;
+	window_width_px = 1920;
+	window_height_px = 1080;
 	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES

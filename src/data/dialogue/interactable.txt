@@ -67,7 +67,8 @@ ITEM PopStack -1 0
 A mysterious machine. Looks like there's something engraved on the side.
 "Hello dear user! Thank you for choosing the PopStack 3000! Do you have too much stuff on your stack? Look no further! This marvellous machine will pop everything off your stack, leaving you with a clean slate! Would you like to pop your stack?"
 SPEAKER Pop Console pop_console.png
-Well, the instructions are clear enough, although whoever wrote them must have been a bit too enthusiastic about it. Either way, would you like to pop your stack?
+Well, the instructions are clear enough, although whoever wrote them must have been a bit too enthusiastic about it.
+Anyway, would you like to pop your stack?
 CHOICES Yes\No
 
 ITEM PopStack 0 0

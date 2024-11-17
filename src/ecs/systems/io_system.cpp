@@ -102,11 +102,12 @@ void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameSta
 	if (action == GLFW_PRESS) {
 		if (key == GLFW_KEY_W) { // highlight choice above
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
-			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
 		}
 		else if (key == GLFW_KEY_S) { // highlight choice below
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
-			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
+			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+			
 		}
 		//else if (key == GLFW_KEY_SPACE) { // progress through dialogue
 		//	state.nextDialogue = true;

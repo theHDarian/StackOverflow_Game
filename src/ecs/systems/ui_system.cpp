@@ -47,8 +47,9 @@ void UISystem::step(float elapsed_ms) {
 
 		// update bullet ui positions
 		if (stack.currStack.size() > stackui.bulletPositions.size()) {
-			for (int i = 0; i < stack.currStack.size() - stackui.bulletPositions.size(); i++) {
-				int index = i + stack.currStack.size() - 1;
+			int diff = stack.currStack.size() - stackui.bulletPositions.size();
+			for (int i = 0; i < diff; i++) {
+				int index = i + stack.currStack.size() - diff;
 				stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
 					stackui.bulletStartPos.y));
 			}
@@ -207,16 +208,17 @@ void UISystem::playDialogue() {
 				}
 			}
 
-			vec2 startingPosition = vec2(400, wS.height - wS.height / 8 - 25);
+			vec2 startingPosition = vec2(400, wS.height - 100);
 			// display options for player if there is one
-			for (int i = 0; i < nextLine.choices.size(); i++) {
+			for (int i = nextLine.choices.size() - 1; i >= 0 ; i--) {
+				std::cout << nextLine.choices[i] << std::endl;
 				vec2 nextPosition = vec2(startingPosition.x, startingPosition.y + i * 50);
 				createDialogueChoice(nextLine.choices[i], nextPosition);
 			}
 			// set first choice to highlighted by default
 			if (registry.dialogueChoices.components.size() > 0) {
-				input.hoveringDialogueChoice = 0;
-				input.lastHoverDialogueChoice = 0;
+				input.hoveringDialogueChoice = registry.dialogueChoices.components.size() - 1 - 0;
+				input.lastHoverDialogueChoice = registry.dialogueChoices.components.size() - 1 - 0;
 			}
 		}
 		// no more lines of dialogue
@@ -243,7 +245,12 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	registry.renderRequests.get(bulletUI).show = true;
 
 	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
-	textReq.tokenizedText = uiTexts["HoverBullet_" + bullet.name];
+	if (uiTexts.count("HoverBullet_" + bullet.name) > 0) {
+		textReq.tokenizedText = uiTexts["HoverBullet_" + bullet.name];
+	}
+	else {
+		std::cout << "No ui text found for item: " << "HoverBullet_" + bullet.name << std::endl;
+	}
 	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
 	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
