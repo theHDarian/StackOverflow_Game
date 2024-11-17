@@ -44,4 +44,7 @@ UI HoverBullet_sizeUpA
 Bullet Size Up (A)
 \nIncreases the size of bullets by 10.
 
+UI HoverBullet_dashCDRDownA
+Dash CD down (A)
+\nDecreases dash cooldown by 0.75 seconds.
 
