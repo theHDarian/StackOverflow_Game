@@ -104,7 +104,6 @@ struct Frame {
 	GLuint prevFrameBuffer;
 };
 
-//TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType {
 	normalBGM,
 	bossBGM,

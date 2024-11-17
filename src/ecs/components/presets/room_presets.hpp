@@ -227,9 +227,9 @@ const RoomPreset BossRoom1{
 
 //used by roomsTraversed to determine type of enemy to spawn, some enemies only spawn in certain difficulty regions
 enum DifficultyRegion {
-    Intro,
-    Easy,
-    Medium,
+    Intro = 3,
+    Easy = 5,
+    Medium = 7,
     // Hard,
 };
 
@@ -242,7 +242,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory =
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDash1},{}}},
         {RoomType::RestRoom, {{RestingRoom1},{}}},
-        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4},{}}},
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4},{TreasureRoomRam}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1},{}}},
@@ -256,7 +256,21 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory =
     }},
 };
 
-//TODO add locked rarity items
+inline bool hasLocked(RoomType type, int roomsTraversed) {
+    if (type >= RoomType::None) {
+        return false;
+    }
+    if (roomsTraversed < DifficultyRegion::Intro) {
+        return !roomDirectory.at(Intro).at(type).locked.empty();
+    } else if (roomsTraversed < DifficultyRegion::Easy) {
+        return !roomDirectory.at(Easy).at(type).locked.empty();
+    } else if (roomsTraversed < DifficultyRegion::Medium) {
+        return !roomDirectory.at(Medium).at(type).locked.empty();
+    } else {
+        return !roomDirectory.at(Medium).at(type).locked.empty();
+    }
+}
+
 RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
     //boss rooms
     if (type == RoomType::BossBigCRoom) {
@@ -267,15 +281,22 @@ RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
     if (type == RoomType::TutorialRoom2) {
         return TutorialRoom2Preset;
     }
+
     //regular rooms
-    if (roomsTraversed < 3) {
+    if(!hasLocked(type,roomsTraversed) && locked) {
+        assert(false);
+    }
+    if (roomsTraversed < DifficultyRegion::Intro) {
         return Random::ListItem(locked ? roomDirectory.at(Intro).at(type).locked : roomDirectory.at(Intro).at(type).unlocked);
-    } else if (roomsTraversed < 5) {
-        return Random::ListItem(locked ? roomDirectory.at(Easy).at(type).locked : roomDirectory.at(Intro).at(type).unlocked);
+    } else if (roomsTraversed < DifficultyRegion::Easy) {
+        return Random::ListItem(locked ? roomDirectory.at(Easy).at(type).locked : roomDirectory.at(Easy).at(type).unlocked);
+    } else if (DifficultyRegion::Medium) {
+        return Random::ListItem(locked ? roomDirectory.at(Medium).at(type).locked : roomDirectory.at(Medium).at(type).unlocked);
     } else {
-        return Random::ListItem(locked ? roomDirectory.at(Medium).at(type).locked : roomDirectory.at(Intro).at(type).unlocked);
+        return Random::ListItem(locked ? roomDirectory.at(Medium).at(type).locked : roomDirectory.at(Medium).at(type).unlocked);
     }
 }
+
 
 const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::EnemyRoom,3},

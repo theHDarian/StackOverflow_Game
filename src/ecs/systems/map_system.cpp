@@ -214,6 +214,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
+    doors[spawnIndex].isLocked = false;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
     registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = roomTypeToSymbols.at(doors[spawnIndex].room);
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
@@ -228,8 +229,14 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
         registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         Door &d = registry.doors.components[i];
-        d.room = randomRoomType(excludeNone, lockedRooms + excludeNone <= 2, map.roomsTraversed);
-        d.isPrev = false;
+        DoorSymbol &ds = registry.doorSymbols.components[i];
+        d.reset();
+
+        d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
+        if (lockedRooms + excludeNone <= 2 && hasLocked(d.room,map.roomsTraversed + 1)) {
+            //have a chance of spawning locked rooms
+            d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
+        }
         if (d.room == RoomType::None) {
             excludeNone = true;
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
@@ -239,7 +246,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
             lockedRooms++;
         }
-        registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
+        ds.doorType = roomTypeToSymbols.at(d.room);
+        printf("%d\n",ds.doorType);
     }
 }
 
@@ -253,8 +261,7 @@ void MapSystem::resetMap()
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
-            d.isPrev = false;
-            d.room = RoomType::None;
+            d.reset();
             registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
@@ -281,18 +288,14 @@ void MapSystem::resetMap()
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
-            d.room = randomRoomType(excludeNone, false, map.roomsTraversed);
+            d.reset();
+            d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
             if (d.room == RoomType::None)
                 excludeNone = true;
 
             registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
-        }
-
-        for (Door& d : registry.doors.components)
-        {
-            d.isPrev = false;
         }
 
         // temporarily set start room to empty, create pop console

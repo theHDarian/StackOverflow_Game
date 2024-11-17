@@ -13,14 +13,13 @@ enum RoomType : int {
     RestRoom,
     None, //Keep None at the end of the list to be compatible with existing get random function
 
-    //Special rooms that are not spawned via randomRoomType function
+    //Special rooms that are not spawned via getRandomRoomType function
     TutorialRoom1,
     TutorialRoom2,
     BossBigCRoom,
 };
 
-//TODO edit to account for locked
-inline RoomType randomRoomType(bool excludeNone, bool includeLocked, int roomsTraversed)
+inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
 {
     if (roomsTraversed == 4) {
         //Room 5 is the boss level
@@ -51,6 +50,12 @@ struct Door {
     vec2 startPos, endPos;
     char side = 'L';
     int doorIndex = -1; // used by interactibles for now
+
+    void reset() {
+        room = None;
+        isPrev = false;
+        isLocked = false;
+    }
 };
 struct DoorSymbol {
     float angle;
