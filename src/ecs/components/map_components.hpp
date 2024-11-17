@@ -21,9 +21,12 @@ enum RoomType : int {
 
 inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
 {
-    if (roomsTraversed == 4) {
-        //Room 5 is the boss level
+    if (roomsTraversed % 5 == 4) {
+        //Make every 5 rooms the boss room
         return BossBigCRoom;
+    }
+    if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
+        return RoomType::EnemyRoom;
     }
     
     return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
