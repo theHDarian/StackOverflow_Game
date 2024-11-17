@@ -637,6 +637,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		movement.angularSpeed = 20;
 		break;
 	}
+	case EnemyType::BossBeehiveGun:
+	{
+		enemy = BossBeehiveSentry();
+		registry.bossParts.emplace(entity);
+		break;
+	}
 	case EnemyType::MediumEnemyCharge:
 	{
 		enemy = EnemyMediumCharge();
@@ -672,6 +678,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BeeHive:
 	{
 		enemy = EnemyMediumBeeHive();
+		break;
+	}
+	case EnemyType::BossBeehiveMain:
+	{
+		enemy = BossBeeHive();
+		registry.bosses.emplace(entity);
 		break;
 	}
 	case EnemyType::HardEnemyAngel:
@@ -758,6 +770,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 
 	enemy.collisionBullet = blunt;
+
+	if (type == EnemyType::BossBeehiveMain) {
+		createEnemy(renderer, pos + vec2(97, -95), EnemyType::BossBeehiveGun);
+		createEnemy(renderer, pos + vec2(-118, 72), EnemyType::BossBeehiveGun);
+	}
 
 	return entity;
 };

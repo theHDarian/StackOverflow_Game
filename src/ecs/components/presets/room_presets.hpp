@@ -28,7 +28,7 @@ const RoomPreset TutorialRoom1Preset{
 
 const RoomPreset TutorialRoom2Preset{
     {
-         {EnemyType::BeeHive, {0.5f, 0.5f}}},
+         {EnemyType::BossBeehiveMain, {0.5f, 0.5f}}},
     {},
     {},
     {},

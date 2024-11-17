@@ -257,6 +257,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Boss parts
+	if (!registry.bosses.entities.size() > 0) 
+	{
+		for (int i = (int)registry.bossParts.components.size() - 1; i >= 0; --i) {
+			registry.deleteds.emplace(registry.bossParts.entities[i]);
+		}
+	}
+
 	// interactible object management placed here and hard coded for now 
 	// can consider: each behaviour type is component, when choice X is selected then enact that behaviour
 	for (InteractableReaction& reaction : registry.interactableReactions.components) {
