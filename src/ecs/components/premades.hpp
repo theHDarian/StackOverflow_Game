@@ -47,6 +47,20 @@ const BulletStackEffect dmgDownM = {
 	"dmgDownM",
 	""};
 
+const BulletStackEffect dmgUpA = {
+	BulletDamage,
+	Additive,
+	5.0,
+	"dmgUpA",
+	""};
+
+const BulletStackEffect dmgUpM = {
+	BulletDamage,
+	Multiplicative,
+	1.5,
+	"dmgUpM",
+	""};
+
 const BulletStackEffect numBulletsUpA = {
 	BulletNum,
 	Additive,
@@ -152,6 +166,77 @@ const BulletStackEffect dashUpM = {
 	"dashUpM",
 	""};
 
+const BulletStackEffect stackSizeUpA = {
+	PlayerStackSize,
+	Additive,
+	6,
+	"stackSizeUpA",
+	""};
+
+const BulletStackEffect stackSizeUpM = {
+	PlayerStackSize,
+	Multiplicative,
+	2,
+	"stackSizeUpM",
+	""};
+
+const BulletStackEffect dashCDRUpA = {
+	PlayerDashCDR,
+	Additive,
+	500,
+	"dashCDRUpA",
+	""};
+
+const BulletStackEffect dashCDRUpM = {
+	PlayerDashCDR,
+	Multiplicative,
+	1.25,
+	"dashCDRUpM",
+	""};
+
+const BulletStackEffect dashCDRDownA = {
+	PlayerDashCDR,
+	Additive,
+	-750,
+	"dashCDRDownA",
+	""};
+
+const BulletStackEffect dashCDRDownM = {
+	PlayerDashCDR,
+	Multiplicative,
+	0.5,
+	"dashCDRDownM",
+	""};
+
+const BulletStackEffect playerSpeedUpA = {
+	PlayerSpeed,
+	Additive,
+	100,
+	"playerSpeedUpA",
+	""};
+
+const BulletStackEffect playerSpeedUpM = {
+	PlayerSpeed,
+	Multiplicative,
+	1.5,
+	"playerSpeedUpM",
+	""};
+
+
+const BulletStackEffect ostrichWarrior = {
+	PlayerSpeed,
+	Multiplicative,
+	3,
+	"ostrichWarrior",
+	""};
+
+const BulletStackEffect ostrichWarriorDownside = {
+	PlayerDashCDR,
+	Multiplicative,
+	3,
+	"ostrichWarrior",
+	""};
+
 const BulletStackEffect key = {
 	Key,
 	Additive,
@@ -199,7 +284,7 @@ const AttackData none{
 const AttackData trail{
 	EnemyAttackPattern::TRAIL,
 	CIRCLE,
-	{},
+	{ dmgUpA },
 	blunt,
 	1,
 	0,
@@ -214,7 +299,7 @@ const AttackData trail{
 const AttackData wave{
 	EnemyAttackPattern::WAVE,
 	CIRCLE,
-	{},
+	{ dmgUpM },
 	blunt,
 	5,
 	0,
@@ -244,7 +329,7 @@ const AttackData laserNoRotate{
 const AttackData laserRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{},
+	{ },
 	blunt,
 	3,
 	0,
@@ -259,7 +344,7 @@ const AttackData laserRotate{
 const AttackData threeShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
-	{},
+	{ dashCDRDownM},
 	blunt,
 	3,
 	M_PI / 6.0,
@@ -274,7 +359,7 @@ const AttackData threeShot{
 const AttackData missile{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{},
+	{spreadUpA},
 	blunt,
 	1,
 	0,
@@ -427,7 +512,7 @@ const AttackData fiveBurst{
 const AttackData threeSpray{
 	EnemyAttackPattern::SPRAY,
 	CIRCLE,
-	{},
+	{ dmgUpA },
 	blunt,
 	3,
 	M_PI / 16,
@@ -442,7 +527,7 @@ const AttackData threeSpray{
 const AttackData SniperShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{},
+	{bulletPierceUpA},
 	blunt,
 	1,
 	0,
@@ -472,7 +557,7 @@ const AttackData NoAttack{
 const AttackData quadShot{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{},
+		{ bulletPierceUpM},
 		blunt,
 		4,
 		0.0,
@@ -878,6 +963,245 @@ struct EnemyMediumBeeHive : Enemy {
 		};
 		patternIndex = 0;
 		scale = vec2({240.0f / 1.7, 312.f / 1.7});
+	};
+};
+
+struct BossBeeHive : Enemy {
+
+	const AttackData OneBee{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		1,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::OneBee
+	};
+
+	const AttackData twoBee{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		4,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::OneBee
+	};
+
+	const AttackData threeBoidBees{
+	EnemyAttackPattern::SPAWNING,
+	TRIANGLE,
+	{},
+	blunt,
+	3,
+	0,
+	{20, 20},
+	100,
+	3000,
+	{600, 0},
+	0,
+	0,
+	0,
+	EnemyBulletDeath::NONE,
+	EnemyType::HardEnemyBoidBio
+	};
+
+	const AttackData sixBoidBees{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		6,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::HardEnemyBoidBio
+	};
+
+	const AttackData twelveBoidBees{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		12,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::HardEnemyBoidBio
+	};
+
+	const AttackData radialHexagon{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	CIRCLE,
+	{numBulletsUpA, sizeUpA},
+	blunt,
+	6,
+	0,
+	{40, 40},
+	400,
+	3000,
+	{0, 0},
+	0,
+	0,
+	0 };
+
+	const AttackData radialBeehiveBurst1{
+	EnemyAttackPattern::BURST_RADIAL,
+	TRIANGLE,
+	{numBulletsUpA, sizeUpA},
+	blunt,
+	128,
+	M_PI / 20,
+	{20, 20},
+	150,
+	9000,
+	{4, 200},
+	0,
+	0,
+	0 };
+
+	const AttackData radialBeehiveBurst2{
+	EnemyAttackPattern::BURST_RADIAL,
+	TRIANGLE,
+	{numBulletsUpA, sizeUpA},
+	blunt,
+	192,
+	-M_PI/20,
+	{20, 20},
+	150,
+	9000,
+	{5, 200},
+	0,
+	0,
+	0 };
+
+	Reaction duration{
+		ReactionType::DURATION,
+		0
+	};
+	Reaction duration2{
+		ReactionType::DURATION,
+		3
+	};
+	Reaction duration3{
+		ReactionType::DURATION,
+		1
+	};
+	Reaction duration4{
+		ReactionType::DURATION,
+		5
+	};
+	Reaction duration5{
+		ReactionType::DURATION,
+		6
+	};
+	Reaction duration6{
+		ReactionType::DURATION,
+		4
+	};
+	Reaction halfHP{
+		ReactionType::FIFTY_HEALTH,
+		5
+	};
+	Reaction threeQuartersHP{
+		ReactionType::SEVENTYFIVE_HEALTH,
+		2
+	};
+	Reaction quarterHP{
+		ReactionType::TWENTYFIVE_HEALTH,
+		8
+	};
+	EnemyPattern startingState1 =	{ "IDLING", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {duration, threeQuartersHP}, 1, true, 0.f, 1000.f, radialHexagon };
+	EnemyPattern startingState2 =   { "IDLING", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f,    {duration, threeQuartersHP}, 0, true, 0.f, 1000.f, threeBoidBees };
+	EnemyPattern halfHpState1 =		{ "SHOOT RadialBurst", EnemyBehavior::IDLE, {}, 0, 25600.f , 25600.f, {duration, halfHP}, 3, true, 0.f, 100.f, radialBeehiveBurst1 };
+	EnemyPattern halfHpState2 =		{ "SPAWN 1Bee", EnemyBehavior::IDLE, {}, 0, 3000.f , 3000.f, {duration, halfHP}, 4, true, 0.f, 3000.f, OneBee };
+	EnemyPattern halfHpState3 =		{ "SPAWN 6Boids", EnemyBehavior::IDLE, {}, 0, 7000.f , 7000.f, {duration, halfHP}, 2, true, 0.f, 7000.f, sixBoidBees };
+	EnemyPattern quarterHpState1 =	{ "SHOOT RadialBurst", EnemyBehavior::IDLE, {}, 0, 25600.f * 1.5f , 25600.f * 1.5f, {duration, quarterHP}, 6, true, 0.f, 100.f, radialBeehiveBurst2 };
+	EnemyPattern quarterHpState2 =	{ "SPAWN 12Boids", EnemyBehavior::IDLE, {}, 0, 3000.f , 3000.f, {duration, quarterHP}, 7, true, 0.f, 3000.f, sixBoidBees };
+	EnemyPattern quarterHpState3 =	{ "SPAWN 2Bee", EnemyBehavior::IDLE, {}, 0, 3000.f , 3000.f, {duration, quarterHP}, 5, true, 0.f, 1000.f, twoBee };
+	EnemyPattern endingState =		{ "25% HP HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {}, 8, true, 0.f, 5000.f, twelveBoidBees };
+	BossBeeHive() {
+		maxHealth = 1000;
+		currHealth = maxHealth;
+		enemyPatterns = { startingState1, startingState2, halfHpState1, halfHpState2, halfHpState3, quarterHpState1, quarterHpState2, quarterHpState3, endingState };
+		sprite = {
+			"bee_hive_boss",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::ONCE,
+			2,
+			800
+		};
+		patternIndex = 0;
+		scale = vec2(384, 480);
+	};
+};
+
+struct BossBeehiveSentry : Enemy
+{
+
+	const AttackData beehivesentry{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{},
+		blunt,
+		1,
+		0.0,
+		{30, 30},
+		200,
+		3000,
+		{400, 0.0},
+		0,
+		0,
+		0
+	};
+
+	// TODO Vincent add code to make rotate to face player, but not move
+	EnemyPattern rotateState = { "FACE PLAYER", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 2000.f, beehivesentry };
+
+	BossBeehiveSentry()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { rotateState };
+
+		patternIndex = 0;
+		sprite = {
+			"bossBeehiveGun.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(-12, 0) };
+		scale = vec2({ 200.0f, 200.f });
 	};
 };
 

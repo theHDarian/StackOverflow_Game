@@ -38,7 +38,7 @@ enum BossType { BigCBoss };
 
 struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
-    std::vector<std::tuple<AttackData,vec2>> treasures; //for treasure rooms
+    std::vector<BulletStackEffect> treasures; //for treasure rooms
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
     std::vector<std::tuple<InteractableItem, vec2>> interactables; //for interactables
     std::vector<SpecialEvent> specialEvents; 

@@ -31,10 +31,10 @@ void resetStack(Entity player, RenderSystem* renderer) {
             createEnemyBullet( renderer, registry.motions.get(player).position, {cos(angle), sin(angle)}, {0, 0}, atkData);
             i++;
         }
-        reg.currStack.clear();
-        // registry.stackCompile.remove(player);
-        // StackCompile& newreg = registry.stackCompile.emplace(player);
-        // newreg.baseStackSize = size;
+        // reg.currStack.clear();
+        registry.stackCompile.remove(player);
+        StackCompile& newreg = registry.stackCompile.emplace(player);
+        newreg.baseStackSize = size;
         Player& pl = registry.players.get(player);
         pl.currDashCharges = pl.baseDashNum;
         pl.currDashCooldown = pl.baseDashCDR;
@@ -50,6 +50,15 @@ void extendStack (Entity player, int extension) {
         reg.baseStackSize += extension;
         StackUI& ui = registry.stackUI.components[0];
         ui.updateStackUISize(reg.baseStackSize);
+    }
+}
+
+void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
+    if (registry.stackCompile.has(player)) {
+        StackCompile& reg = registry.stackCompile.get(player);
+        for (BulletStackEffect b : effects) {
+            reg.add(b);
+        }
     }
 }
 

@@ -28,7 +28,7 @@ const RoomPreset TutorialRoom1Preset{
 
 const RoomPreset TutorialRoom2Preset{
     {
-         {EnemyType::BeeHive, {0.5f, 0.5f}}},
+         {EnemyType::BossBeehiveMain, {0.5f, 0.5f}}},
     {},
     {},
     {},
@@ -158,10 +158,41 @@ const RoomPreset RestingRoom1{
 
 const RoomPreset TreasureRoom1{
     {},
-    {{threeBurst, {0.5f, 0.5f}}},
+    {numBulletsUpA, sizeUpA},
     {},
+
+    {{PushConsole, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    5,
+};
+
+const RoomPreset TreasureRoom2{
     {},
+    {dashUpA},
     {},
+    {{PushConsole, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    5,
+};
+
+const RoomPreset TreasureRoom3{
+    {},
+    {dmgUpM},
+    {},
+    {{PushConsole, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    5,
+};
+
+const RoomPreset TreasureRoom4{
+    {},
+    {dashCDRDownA},
+    {},
+    {{PushConsole, {0.5f, 0.5f}}},
+{},
     0.0f,
     5,
 };
@@ -175,46 +206,6 @@ const RoomPreset TreasureRoomRam{
     0.0f,
     0,
 };
-
-const RoomPreset TreasureRoom2{
-    {},
-    {{fiveBurst, {0.5f, 0.5f}}},
-    {},
-    {},
-    {},
-    0.0f,
-    5,
-};
-const RoomPreset TreasureRoom3{
-    {},
-    {{laserNoRotate, {0.5f, 0.5f}}},
-    {},
-    {},
-    {},
-    0.0f,
-    5,
-};
-
-const RoomPreset TreasureRoom4{
-    {},
-    {{twelveSpiralShot, {0.5f, 0.5f}}},
-    {},
-    {},
-    {},
-    0.0f,
-    5,
-};
-const RoomPreset TreasureRoomBad{
-    {},
-    {{threeHomingShot, {0.5f, 0.5f}}},
-    {},
-    {},
-    {},
-    0.0f,
-    5,
-};
-
-
 
 const RoomPreset BossRoom1{
     {{EnemyType::BossBigC, {0.5f, 0.5f}}},

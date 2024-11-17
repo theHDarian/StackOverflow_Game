@@ -47,6 +47,10 @@ struct BulletStackEffect {
 
 };
 
+struct EffectStack {
+    std::vector<BulletStackEffect> stack;
+};
+
 // Player component
 struct Player
 {
@@ -242,6 +246,8 @@ enum EnemyType {
     // HardEnemyBehavior
     TestRevampedEnemy,
     BossBigC,
+    BossBeehiveGun,
+    BossBeehiveMain,
     OneBee,
     TwoBee,
     ThreeBee,
@@ -401,6 +407,8 @@ struct EnemyMovement {
 struct BossEnemy {
 };
 
+struct BossParts {
+};
 
 struct EnemyBullet {
     float bulletSpeed;
