@@ -328,6 +328,8 @@ enum class EnemyBehavior {
     MERGE_BEE,
     SPAWNING,
     BOIDS,
+    BOIDSGROUP,
+    BOIDSEXPLODE,
     CHARGING,
     HEALING
 };
@@ -373,6 +375,9 @@ struct Boid {
     vec2 velocity;
     vec2 position;
     float wanderAngle;
+    float coherence;
+    float seperation;
+    float alignment;
 };
 
 struct Healer {
