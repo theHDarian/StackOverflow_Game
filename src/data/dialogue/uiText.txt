@@ -16,35 +16,5 @@ Game Over \npress R to restart
 
 # for simplicity, the name of the bullet will be based off of the name in the premades
 # the name to be displayed will be written at the top
-UI HoverBullet_blunt 
-Inert
-\nThis bullet doesn't do anything.
 
-UI HoverBullet_Key
-Key
-\nA keycard used for unlocking doors. Pops all preceding bullets on the stack after use.
-
-UI HoverBullet_numBulletsUpA
-Multi-shot (A)
-\nIncreases the number of bullets shot at once by 1.
-
-UI HoverBullet_dmgDownA
-Damage Down (A)
-\nDecreases the damage dealt by bullets by 2.
-
-UI HoverBullet_dmgDownM
-Damage Down (M)
-\nDecreases the damage dealt by bullets by 70%.
-
-UI HoverBullet_dashUpA
-Max Dash Increase
-\nIncreases the number of max dashes by 1. 
-
-UI HoverBullet_sizeUpA
-Bullet Size Up (A)
-\nIncreases the size of bullets by 10.
-
-UI HoverBullet_dashCDRDownA
-Dash CD down (A)
-\nDecreases dash cooldown by 0.75 seconds.
 

@@ -69,6 +69,10 @@ private:
 
     void loadText();
 
+    void loadBulletEffects();
+
+    std::string makeBulletTooltip(BulletStackEffect bullet);
+
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
 
     Entity createFpsCounter();
