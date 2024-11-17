@@ -4,6 +4,7 @@
 
 // stlib
 #include <chrono>
+#include <thread>
 
 // internal
 #include "physics_system.hpp"
@@ -29,6 +30,8 @@ using Clock = std::chrono::high_resolution_clock;
 #endif
 
 #include <stdlib.h>
+
+#define TARGET_FPS 120
 
 // Entry point
 int main() {
@@ -66,45 +69,25 @@ int main() {
     textSystem.initFreetypeLib();
     mapSystem.init(&renderer, &soundSystem);
 
-    // // Load and set the custom cursor
-    // GLFWimage cursorImg = renderer.loadCursorImage(textures_path("Player/cursor.png").c_str());
-    // if (cursorImg.pixels == nullptr) {
-    //     fprintf(stderr, "Failed to load cursor image\n");
-    //     return EXIT_FAILURE;
-    // }
-    // GLFWcursor* customCursor = glfwCreateCursor(&cursorImg, cursorImg.width/2, cursorImg.height/2);
-    // if (customCursor == nullptr) {
-    //     fprintf(stderr, "Failed to create custom cursor\n");
-    //     return EXIT_FAILURE;
-    // }
-    // glfwSetCursor(window, customCursor);
-    // fprintf(stderr, "Custom cursor set\n");
-
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// variable timestep loop
+	const float frameDuration = (1000.f / (float) TARGET_FPS);
 	auto t = Clock::now();
 	while (!world.isOver()) {
-		WindowState& ws = registry.windowStates.components[0];
-		if (time(NULL) - ws.currUnixTime > 1.0f) {
-			ws.fps = ws.numFramesThisSecond;
-			ws.numFramesThisSecond = 0;
-			ws.currUnixTime = time(NULL);
-
-			char title[256]; // Buffer for the title string
-			snprintf(title, sizeof(title), "StackOverflow (FPS: %.0f)", ws.fps);
-			glfwSetWindowTitle(window,title);
-		} else {
-			ws.numFramesThisSecond++;
-		}
-		
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
 
 		// Calculating elapsed times in milliseconds from the previous iteration
 		auto now = Clock::now();
-		float elapsed_ms =
-			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
+		float elapsed_ms = (float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
+		
+		if (elapsed_ms < frameDuration) { //limit FPS
+			std::chrono::microseconds duration = std::chrono::microseconds((int)((frameDuration - elapsed_ms) * 1000) );
+			std::this_thread::sleep_for(duration);
+			continue;
+		}
+
 		t = now;
 		uiSystem.step(elapsed_ms);
 		sceneSystem.step(elapsed_ms); // not sure if this should always be here
@@ -151,9 +134,12 @@ int main() {
 		textSystem.renderGameUIText();
 		renderer.drawDialogueUI();
 		textSystem.renderDialogueUIText();
-		renderer.drawToScreen(); //postprocessing
 		renderer.drawMenuUI();
 		textSystem.renderMenuUIText();
+		renderer.drawMenuOverlayUI();
+		textSystem.renderMenuOverlayUIText();
+		renderer.drawCursor();
+		renderer.drawToScreen(); //postprocessing
 
 		glfwSwapBuffers(window);
 	}

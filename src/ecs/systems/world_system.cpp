@@ -5,19 +5,22 @@
 // stlib
 #include <cassert>
 #include <sstream>
-#include <iostream>
 #include <glm/detail/func_trigonometric.inl>
 #include <SDL.h>
-#include <SDL_mixer.h>
 #include <time.h>
 #include "sound_system.hpp"
 #include "physics_system.hpp"
+#include "interactable_effects.h"
+#include "components/presets/particle_presets.hpp"
 
 // include these for now
 // but may change to handle like render system does
 #include "text_system.hpp"
 #include "utils/random.hpp"
+#include "utils/vector_operations.hpp"
 #include <chrono>
+
+using Clock = std::chrono::high_resolution_clock;
 
 // Game configuration
 const size_t MAX_NUM_EELS = 15;
@@ -76,23 +79,28 @@ GLFWwindow* WorldSystem::createWindow() {
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_REFRESH_RATE,60);
+	//glfwWindowHint(GLFW_DECORATED,GLFW_FALSE); //make borderless window
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	  window_width_px = vidMode->width;
-	  window_height_px = vidMode->height;
+	  //window_width_px = vidMode->width;
+	  //window_height_px = vidMode->height;
+	window_width_px = 1920;
+	window_height_px = 1080;
 	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	Entity ent = Entity();
 	WindowState& windowState = registry.windowStates.emplace(ent);
-	windowState.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	windowState.startTime = Clock::now();
 	windowState.width = window_width_px;
 	windowState.height = window_height_px;
 	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
@@ -131,7 +139,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	gameState.dialogueScene = false;
 
 	WindowState& wS = registry.windowStates.components[0];
-	wS.currUnixTime = time(NULL);
+	wS.currUnixTime = Clock::now();
 	currentSpeed = 1.f;
 
 	player = createPlayer(renderer,{wS.width / 2,wS.height/2});
@@ -175,30 +183,40 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		//check dash related variables
 		dash(dashDirection, elapsed_ms_since_last_update);
 		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
-	}
 
-	// Updating the invincibility timer
-	if (registry.invincibles.entities.size() > 0) {
-		for (Entity& invincible : registry.invincibles.entities) {
-			float& invincible_timer = registry.invincibles.get(invincible).countdown;
-			invincible_timer -= elapsed_ms_since_last_update;
-			if (invincible_timer <= 0) {
-				registry.invincibles.remove(invincible);
-				//std::cout << "entity is no longer invincible" << std::endl;
+
+		// Updating the invincibility timer
+		if (registry.invincibles.entities.size() > 0) {
+			for (Entity& invincible : registry.invincibles.entities) {
+				float& invincible_timer = registry.invincibles.get(invincible).countdown;
+				invincible_timer -= elapsed_ms_since_last_update;
+				if (invincible_timer <= 0) {
+					registry.invincibles.remove(invincible);
+					//std::cout << "entity is no longer invincible" << std::endl;
+				}
+			}
+		}
+		//check invisibity countdown
+		if (registry.invisibles.entities.size() > 0) {
+			for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
+				Invisible& entity = registry.invisibles.components[i];
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+					registry.invisibles.remove(registry.invisibles.entities[i]);
+				}
+			}
+		}
+		// Updating the bullet ranges
+		if (registry.playerBullets.entities.size() > 0) {
+			for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
+				PlayerBullet& bullet = registry.playerBullets.components[i];
+				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+					if (!registry.deleteds.has(registry.playerBullets.entities[i]))
+						registry.deleteds.emplace(registry.playerBullets.entities[i]);
+				}
 			}
 		}
 	}
 
-	// Updating the bullet ranges
-	if (registry.playerBullets.entities.size() > 0) {
-		for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
-			PlayerBullet& bullet = registry.playerBullets.components[i];
-			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				if (!registry.deleteds.has(registry.playerBullets.entities[i]))
-					registry.deleteds.emplace(registry.playerBullets.entities[i]);
-			}
-		}
-	}
 	if (registry.enemyBullets.entities.size() > 0) {
 		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 			EnemyBullet& bullet = registry.enemyBullets.components[i];
@@ -210,15 +228,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-    //check invisibity countdown
-    if (registry.invisibles.entities.size() > 0) {
-        for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
-            Invisible& entity = registry.invisibles.components[i];
-            if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
-                registry.invisibles.remove(registry.invisibles.entities[i]);
-            }
-        }
-    }
 
 	//check damage countdown
 	if (registry.damageds.entities.size() > 0) {
@@ -244,9 +253,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if (critter.life <= 0) registry.deleteds.emplace(registry.critters.entities[i]);
 			}
 			else {
-				float time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - registry.windowStates.components[0].startTime;
+				float time = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - registry.windowStates.components[0].startTime).count();
 				registry.animations.get(registry.critters.entities[i]).frame = (sin(time/(300.f + i * 25.f) + 3.f * i) < -0.99);
 			}
+		}
+	}
+
+	// Boss parts
+	if (!registry.bosses.entities.size() > 0) 
+	{
+		for (int i = (int)registry.bossParts.components.size() - 1; i >= 0; --i) {
+			registry.deleteds.emplace(registry.bossParts.entities[i]);
 		}
 	}
 
@@ -257,6 +274,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (object.name.compare("PopStack") == 0) { // the choices are known implicitly by person who wrote object script for now
 			if (reaction.choice == 0) { // yes
 				object.dialogueCount++;
+				resetStack(player, renderer);
 			}
 			else if (reaction.choice == 1) { // no
 				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
@@ -283,11 +301,48 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.mapRequests.emplace(player, MapRequestType::RestartGame);
 		}
 
+		if (object.name.compare("LockedDoor") == 0) {
+			assert(registry.doors.has(reaction.object));
+
+			StackCompile& stack = registry.stackCompile.get(player);
+			if (reaction.choice == 0) {
+				if (stack.useKey()) {
+					soundPlayer->playDoorOpenSound();
+					object.name = "OpenDoor";
+					object.interactType = InteractableType::ActionInteractable;
+					reaction.choice = -1;
+				} else { // does not have key, but attempted opening
+					DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+					req.choice = 2; // use this as temporary way to get back to dialogue system
+					if (!gameState.seenLockedDoor) {
+						req.choice = 3;
+						gameState.seenLockedDoor = true;
+					}
+				}
+			}
+		}
+
 		if (object.name.compare("OpenDoor") == 0) {
 			assert(registry.doors.has(reaction.object));
 			
 			if (reaction.choice == 0) {
 				registry.mapRequests.emplace(reaction.object, MapRequestType::ChangeRoom, registry.doors.get(reaction.object).room, registry.doors.get(reaction.object).doorIndex);
+			}
+		}
+
+		if (object.item == InteractableItem::Ram) {
+			if (reaction.choice == 0) {
+				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+				extendStack( player, 10);
+				object.dialogueCount++;
+				registry.deleteds.emplace(reaction.object);
+			}
+		}
+		if (object.item == PushConsole) {
+			if (reaction.choice == 0) {
+				EffectStack& stack = registry.effectStacks.get(reaction.object);
+				addEffect(player, stack.stack);
+				object.dialogueCount++;
 			}
 		}
 	}
@@ -318,6 +373,7 @@ void WorldSystem::restartGame() {
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
+	gameState.seenLockedDoor = false;
 	gameState.dialogueChoice = -1;
 
 	//std::cout << ("MyString") << std::endl;
@@ -327,6 +383,8 @@ void WorldSystem::restartGame() {
 	currentSpeed = 1.f;
 
 	Entity player = resetPlayer();
+	StackUI& stackUI = registry.stackUI.components[0];
+	stackUI.updateStackUISize(registry.stackCompile.get(player).baseStackSize);
 
 	// resetting dialogue related stuff
 	DialogueLines& lines = registry.dialogueLines.components[0];
@@ -433,16 +491,11 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
-			if (registry.motions.has(entity)) {
-				EmitParticle& p = registry.emitParticles.emplace(Entity(),ParticleRequestType::PlayerBulletCollision,0,rand() % 3 + 3);
-				p.defaultPos = registry.motions.get(entity).position;
-			}
 			if (registry.walls.has(entity_other)) {
+				Motion& motion = registry.motions.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
 				if (registry.playerBullets.get(entity).bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
-					Motion& motion = registry.motions.get(entity);
-					WallCollider& wall = registry.walls.get(entity_other);
-
 					vec2 a = motion.position - wall.startPosition;
 					vec2 b = wall.endPosition - wall.startPosition;
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
@@ -457,8 +510,19 @@ void WorldSystem::handleCollisions() {
 					registry.ignores.get(entity).clear();
 				}
 				else {
-					if (!registry.deleteds.has(entity))
+					//emit wall collision particle
+					ParticleProps props = playerBulletCollision;
+					props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+					//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
+					ep.defaultPos = motion.position;
+					vec2 a = wall.endPosition-wall.startPosition;
+					vec2 b = -motion.velocity;
+					vec2 p = dot(a,b)/dot(a,a)*a;
+					ep.impactDirection = normalize(b-p);
+					if (!registry.deleteds.has(entity)) {
 						registry.deleteds.emplace(entity);
+					}
 				}
 
 			}
@@ -492,6 +556,7 @@ void WorldSystem::handleInput() {
 		restartGame();
 	}
 
+	//move cursor
 	Motion& cursorMotion = registry.motions.get(cursor);
 	cursorMotion.position = input.mousePosition;
 
@@ -524,8 +589,10 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 			pl.currDashCharges--;
 			Dash& dash = registry.dashes.emplace(player);
 			dash.dashDirection = direction;
-			if (!registry.emitParticles.has(player))
-				registry.emitParticles.emplace(player, ParticleRequestType::PlayerDash,dash.endTimer, 7);
+			ParticleProps props = playerTrail;
+			props.velocity.base = -(pl.dashSpeed * glm::normalize(dash.dashDirection)) * 0.1f;
+
+			registry.emitParticles.replace(player, ParticleRequestType::PPlayerTrail,props,dash.endTimer, Random::Int(20) + 60);
 			soundPlayer->playPlayerDashSound();
 		}
 	}
@@ -699,8 +766,11 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	soundPlayer->playPlayerHurtSound();
 
 	//add player invincibility frames
-	if (!registry.invincibles.has(player))
+	if (!registry.invincibles.has(player)) {
 		registry.invincibles.emplace(player);
+		ParticleProps props = playerDamaged;
+		registry.emitParticles.replace(player,PExplode, props,100, 1);
+	}
 
 	//add to stack for enemy bullets
 	if (registry.enemyBullets.has(other)) {
@@ -714,7 +784,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	}
 	else if (registry.enemies.has(other)) {
 		Enemy& e = registry.enemies.get(other);
-		bool success = registry.stackCompile.get(player).add(e.blunt);
+		bool success = registry.stackCompile.get(player).add(e.collisionBullet);
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
 		}

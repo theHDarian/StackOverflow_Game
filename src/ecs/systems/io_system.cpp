@@ -42,10 +42,10 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		ioState.shouldEnd = true;
 	}
-	if  (key == GLFW_KEY_MINUS && action == GLFW_PRESS) {
+	if  (key == GLFW_KEY_MINUS && action != GLFW_RELEASE) {
 		gameState.currentVolume = std::max(0.0f, gameState.currentVolume - 0.0125f);
 	}
-	if  (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
+	if  (key == GLFW_KEY_EQUAL && action != GLFW_RELEASE) {
 		gameState.currentVolume = std::min(1.0f, gameState.currentVolume + 0.0125f);
 	}
 
@@ -62,20 +62,32 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.debugMode = !ioState.debugMode;
 	}
 
+	// turn FPS counter on/off
+	if (key == GLFW_KEY_F && action == GLFW_RELEASE) {
+		ioState.showFPS = !ioState.showFPS;
+	}
+
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
 
 		// take latest object
 		if (registry.nearbyInteractables.entities.size() > 0) {
-			InteractableObject& object = registry.interactables.get(registry.nearbyInteractables.entities[0]);
-			// for now, have all interacted objects go through dialogue
-			// can change in the future
-			registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[0]);
+			size_t index = registry.nearbyInteractables.entities.size() - 1;
+			InteractableObject& object = registry.interactables.get(registry.nearbyInteractables.entities[index]);
+			if (object.interactType == InteractableType::DialogueInteractable) {
+				registry.dialogueRequests.emplace(registry.nearbyInteractables.entities[index]);
+			}
+			else {
+				// no idea what choice to map, just assume all Es will map to 0
+				registry.interactableReactions.emplace_with_duplicates(registry.nearbyInteractables.entities[index], registry.nearbyInteractables.entities[index], 0);
+			}
 		}
 		else if (!gameState.dialogueScene && registry.maps.components[0].currRoom.dialogueDone) {
-			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
-			req.type = DialogueRequestType::StoryDialogue;
+			if (!registry.dialogueRequests.has(registry.players.entities[0])) {
+				DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+				req.type = DialogueRequestType::StoryDialogue;
+			}
 		}
 	}
 	
@@ -90,11 +102,12 @@ void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameSta
 	if (action == GLFW_PRESS) {
 		if (key == GLFW_KEY_W) { // highlight choice above
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
-			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
 		}
 		else if (key == GLFW_KEY_S) { // highlight choice below
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
-			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
+			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+			
 		}
 		//else if (key == GLFW_KEY_SPACE) { // progress through dialogue
 		//	state.nextDialogue = true;

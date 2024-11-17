@@ -8,7 +8,6 @@
 #include "ai_system.hpp"
 #include "ai_system.hpp"
 #include "render_system.hpp"
-#include "components/presets/particle_presets.hpp"
 
 ParticleSystem::Vertex* ParticleSystem::createQuad(Vertex* target, vec4 color, mat4 transform, float texID) {
     float size = 1.0f;
@@ -149,8 +148,7 @@ void ParticleSystem::init(GLFWwindow* window) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 6 * POOLSIZE, indices, GL_DYNAMIC_DRAW);
     gl_has_errors();
 
-    texture_handles[0] = loadTexture(textures_path("Player/aim_indicator.png"));
-    texture_handles[1] = loadTexture(textures_path("Misc/chevron.png"));
+    texture_handle = loadTexture(textures_path("Misc/particles.png"));
     glBindVertexArray(0);
     gl_has_errors();
 
@@ -170,8 +168,6 @@ void ParticleSystem::init(GLFWwindow* window) {
         std::cerr << "ERROR::INIT::SCREEN_TEXTURE_FAILED\n";
         return; // Prevent further execution if screen texture initialization fails
     }
-
-    // Clean up ib and vbo
 }
 
 ParticleSystem::~ParticleSystem() {
@@ -212,38 +208,45 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
     std::vector<Entity> removeRequestQueue;
     bool shouldClear = false;
     for (int i = 0; i < registry.emitParticles.components.size();i++) {
-        //tick request timers
         Entity& ent = registry.emitParticles.entities[i];
         EmitParticle& request = registry.emitParticles.components[i];
-
         if (request.requestType == ParticleRequestType::ClearParticles) {
             shouldClear = true;
             break;
         }
         
-        int emitCount = glm::min((int) glm::round(request.numToEmit * (elapsed_ms / request.timeRemaining)),request.numToEmit);
+        int emitCount = (int) ceil(request.numToEmitPerSecond * elapsed_ms/1000.f);
         request.timeRemaining -= elapsed_ms;
         if (request.timeRemaining <= 0) {
-            emitCount = request.numToEmit;
             removeRequestQueue.push_back(ent);
         }
-        request.numToEmit -= emitCount;
-        bool hasMotion = registry.motions.has(ent);
 
         //emit based on type of request
-        for (int i = 0; i < emitCount; i++) {
-            if (request.requestType == ParticleRequestType::PlayerDash && hasMotion) {
-                Motion& motion = registry.motions.get(ent);
-                emit(createParticle(motion.position + vec2(0.0f,motion.scale.y / 2) + vec2(Random::Float(-5,5),Random::Float(-5,5))));
-            }
-            else if (request.requestType == ParticleRequestType::PlayerBulletCollision) {
-                vec2 pos = request.defaultPos + vec2{ Random::Float(-2,2), Random::Float(-2,2)};
-                explode(createParticle(pos), request.defaultPos);
-            } else if (request.requestType == ParticleRequestType::EnemyDeath && hasMotion) {
-                Motion& motion = registry.motions.get(ent);
-                vec2 pos = motion.position + vec2(Random::Float(-5,5),Random::Float(-5,5));
-                explode(createParticle(pos), motion.position);
-            }
+        if (request.defaultPos != UNSET_VEC2) {
+            request.props.position.base = request.defaultPos;
+        } else if (registry.motions.has(ent)) {
+            const Motion& motion = registry.motions.get(ent);
+            request.props.position.variation = motion.scale/2.f;
+            request.props.position.base = motion.position;
+        }
+
+        if (request.requestType == ParticleRequestType::PExplode) {
+            explode(request.props,emitCount,false);
+        } else if (request.requestType == ParticleRequestType::PWallCollision) {
+            impact(request.props,emitCount,request.impactDirection);
+        } else if (request.requestType == ParticleRequestType::PBulletTrail) {
+            const Motion& motion = registry.motions.get(ent);
+            request.props.velocity.base = -motion.velocity * 0.4f;
+            request.props.velocity.variation = normalize(-motion.velocity) * Random::Float(100.f);
+            trail(request.props,emitCount);
+        } else if (request.requestType == ParticleRequestType::PPlayerTrail) {
+            const Motion& motion = registry.motions.get(ent);
+            //should be attached to player already, set the velocity to upwards
+            request.props.position.base.y += motion.scale.y/2.f; //appear at feet level
+            request.props.position.variation.y *= 0.4f;
+            request.props.velocity.base += vec2(0,-20.f);
+            request.props.velocity.variation += vec2(10,0);
+            trail(request.props,emitCount);
         }
     }
     if (shouldClear) {
@@ -256,53 +259,71 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
     }
 }
 
-void ParticleSystem::emit(const ParticleProps& props) {
+int ParticleSystem::activateParticle(const ParticleProps& props) {
+    int index = poolIndex;
     Particle& particle = particlePool[poolIndex];
     particle.active = true;
-    particle.position = props.position;
-    particle.rotation = Random::Float() * 2.0f * glm::pi<float>();
-
-    // Velocity
-    particle.velocity = props.velocity;
-    particle.velocity.x += props.velocityVariation.x * (Random::Float() - 0.5f);
-    particle.velocity.y += props.velocityVariation.y * (Random::Float() - 0.5f);
-
-    // Color
-    particle.colorBegin = props.colorBegin;
-    particle.colorEnd = props.colorEnd;
+    if (props.position.variation == vec2(0.f)) {
+        particle.position = props.position.base + Random::Direction() * 0.1f;
+    } else {
+        particle.position = props.position.base + (Random::Vec2(props.position.variation * 2.f) - props.position.variation);
+    }
+    particle.velocity = props.velocity.base + (Random::Vec2(props.velocity.variation * 2.f) - props.velocity.variation);
+    Vec4StartEnd color = Random::ListItem(props.colors);
+    particle.colorBegin = color.start;
+    particle.colorEnd = color.end;
 
     particle.lifetime = props.lifetime;
     particle.lifeRemaining = props.lifetime;
-    particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
-    particle.sizeEnd = props.sizeEnd;
+    particle.sizeBegin = props.size.start + (Random::Float(props.size.variation*2.f) - props.size.variation);
+    particle.sizeEnd = props.size.end;
 
-    poolIndex = --poolIndex % particlePool.size();
+    particle.rotation = Random::Float(2.0f) * glm::pi<float>();
+    if (props.textureRowIndex >= 0) {
+        //flip so that index starts at top row (instead of bottom for textures)
+        particle.textureIndex = (TEXTURE_ROW_SIZE * (TEXTURE_NUM_ROWS - 1 - props.textureRowIndex)) + Random::Int(TEXTURE_ROW_SIZE); //get random texture in row
+    } else {
+        particle.textureIndex = -1;
+    }
+
+    poolIndex = (poolIndex-1) % particlePool.size();
+    return index;
 }
 
-void ParticleSystem::explode(const ParticleProps& props, vec2 origin) {
-    Particle& particle = particlePool[poolIndex];
-    particle.active = true;
-    particle.position = props.position;
-    particle.rotation = Random::Float() * 2.0f * glm::pi<float>();
+void ParticleSystem::impact(const ParticleProps& props, int emitCount, vec2 direction = {0,1}) {
+    for (int j = 0; j < emitCount; j++) {
+        Particle& particle = particlePool[activateParticle(props)];
 
-    vec2 offset = origin - props.position;
-    vec2 direction = normalize(offset);
-    float length = offset.length();
+        //override velocity
+        vec2 offset = particle.position - props.position.base;
+        if (dot(particle.velocity,direction) < 0) {
+            particle.velocity *= -1.f;
+        }
+        if (dot(offset,direction) < 0) {
+            particle.position = props.position.base - offset;
+        }
+        vec2 dir = normalize(particle.position - props.position.base);
+        float explosionSpeed = 70.f;
+        particle.velocity += dir * explosionSpeed;
+        // printf("Emit: %.1f %.1f\n",dir.x,dir.y);
+    }
+}
 
-    particle.velocity = -(direction * length) * 70.0f + props.velocity ;
-    particle.velocity.x += props.velocityVariation.x * (Random::Float() - 0.5f);
-    particle.velocity.y += props.velocityVariation.y * (Random::Float() - 0.5f);
+void ParticleSystem::explode(const ParticleProps& props, int emitCount, bool isImplosion = false) {
+    for (int j = 0; j < emitCount; j++) {
+        Particle& particle = particlePool[activateParticle(props)];
 
-    particle.colorBegin = props.colorBegin;
-    particle.colorEnd = props.colorEnd;
+        //override position and velocity
+        vec2 direction = normalize(particle.position - props.position.base);
+        float explosionSpeed = 70.f;
+        particle.velocity += (isImplosion?-1.f:1.f) * direction * explosionSpeed;
+    }
+}
 
-    particle.lifetime = props.lifetime;
-    particle.lifeRemaining = props.lifetime;
-    particle.sizeBegin = props.sizeBegin + props.sizeVariation * (Random::Float() - 0.5f);
-    particle.sizeEnd = props.sizeEnd;
-
-    poolIndex = --poolIndex % particlePool.size();
-
+void ParticleSystem::trail(const ParticleProps& props, int emitCount) {
+    for (int j = 0; j < emitCount; j++) {
+        Particle& particle = particlePool[activateParticle(props)];
+    }
 }
 
 void ParticleSystem::render() {
@@ -340,21 +361,11 @@ void ParticleSystem::render() {
     glUseProgram(shaderProgram);
     glBindVertexArray(vao);
 
-    // int success;
-    // glValidateProgram(shaderProgram);
-    // glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
-    // if (!success) {
-    //     char infoLog[512];
-    //     glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-    //     std::cerr << "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n" << infoLog << std::endl;
-    // }
     gl_has_errors();
 
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    unsigned int textureLoc = glGetUniformLocation(shaderProgram,"particle_sampler");
-    int samplers[2] = {0,1};
 
-    if (projectionLoc == -1 || textureLoc == -1) {
+    if (projectionLoc == -1) {
         std::cerr << "ERROR::SHADER::UNIFORM::LOCATION_NOT_FOUND\n";
         return; // Prevent further execution if uniforms are not found
     }
@@ -362,17 +373,19 @@ void ParticleSystem::render() {
 
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,texture_handles[0]);
-     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D,texture_handles[1]);
+    glBindTexture(GL_TEXTURE_2D,texture_handle);
+    gl_has_errors();
+
+    // set up texture sheet params
+    glUniform1i(glGetUniformLocation(shaderProgram, "particle_texture_row_size"),(GLint) TEXTURE_ROW_SIZE);
+    glUniform1i(glGetUniformLocation(shaderProgram, "particle_texture_num_rows"),(GLint) TEXTURE_NUM_ROWS);
     gl_has_errors();
     
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    glUniform1iv(textureLoc,2,samplers);
     gl_has_errors();
 
     uint32_t indexCount = 0;
-    std::array<Vertex,1000> vertices;
+    std::array<Vertex,POOLSIZE * 4> vertices;
     Vertex* buffer = vertices.data();
     for (auto& particle : particlePool) {
         if (!particle.active) {
@@ -389,7 +402,7 @@ void ParticleSystem::render() {
                               glm::rotate(glm::mat4(1.0f), particle.rotation, { 0.0f, 0.0f, 1.0f }) *
                               glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
 
-        buffer = createQuad(buffer,color,transform,-1); //-1 to use color, or any valid texture_handles index
+        buffer = createQuad(buffer,color,transform,particle.textureIndex); //-1 to use color, or any valid texture_handles index
         indexCount+=6;
         gl_has_errors();
     }
@@ -398,8 +411,3 @@ void ParticleSystem::render() {
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-ParticleProps ParticleSystem::createParticle(vec2 pos) {
-    ParticleProps p = DefaultParticle();
-    p.position = pos;
-    return p;
-}

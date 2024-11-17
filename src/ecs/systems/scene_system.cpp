@@ -1,5 +1,6 @@
 #include "scene_system.hpp"
 #include "sound_system.hpp"
+#include "text_system.hpp"
 #include <fstream>		// for reading text files
 #include <iostream>
 #include <sstream>	
@@ -25,7 +26,7 @@ void SceneSystem::step(float elapsed_ms) {
 	if (gameState.dialogueScene && input.nextDialogue) {
 		// update choice
 		if (registry.dialogueChoices.entities.size() > 0) {
-			gameState.dialogueChoice = input.hoveringDialogueChoice; // commit player choice
+			gameState.dialogueChoice = registry.dialogueChoices.components.size() - 1 - input.hoveringDialogueChoice; // commit player choice
 			if (!isStoryDialogue) {
 				assert(registry.interactables.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
 
@@ -104,6 +105,9 @@ void SceneSystem::step(float elapsed_ms) {
 			if (req.type == DialogueRequestType::InteractableDialogue) {
 				InteractableObject& object = registry.interactables.get(entity);
 				InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+				if (req.choice > -1) {
+					dialogueObject.choice = req.choice;
+				}
 				if (interactibleDialogue.count(dialogueObject) > 0) {
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
@@ -111,6 +115,9 @@ void SceneSystem::step(float elapsed_ms) {
 					currentObject = entity; // need to keep track of current speaking object
 					summonInteractibleDialogue(entity);
 					isStoryDialogue = false;
+				}
+				else {
+					std::cout << "No dialogue found for item: " << object.name << std::endl;
 				}
 			}
 			else if (req.type == DialogueRequestType::StoryDialogue) {
@@ -263,7 +270,9 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					}
 					dialogueBody += line.substr(start, end);
 
-					lines.push_back(Dialogue{ dialogueBody });
+					std::vector<std::string> tokenizedText = getTokenizedText(dialogueBody);
+
+					lines.push_back(Dialogue{ dialogueBody, tokenizedText });
 					//std::cout << "text: " << dialogueBody << std::endl;
 				}
 

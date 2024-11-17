@@ -12,6 +12,7 @@ public:
 	static vec2 getMove(EnemyBehavior behavior, Entity entity);
 private:
 	static vec2 generateRandomPos(Entity entity);
+	static vec2 generateRandomPosInRadius(Entity entity, int radiusNear, int radiusFar);
 	static vec2 getPlayerPos();
 	static vec2 getCurrentPos(Entity entity);
 	static vec2 evadeBullet(Entity entity);

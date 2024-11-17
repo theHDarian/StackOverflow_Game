@@ -5,6 +5,8 @@
 #include "ai_system.hpp"
 #include "utils/random.hpp"
 #include <glm/gtx/string_cast.hpp>
+#include "components/presets/particle_presets.hpp"
+#include "utils/vector_operations.hpp"
 
 Entity createPlayer(RenderSystem *renderer, vec2 pos)
 {
@@ -149,9 +151,66 @@ Entity createCursor()
 		{"CursorYB.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
-	registry.gameUIs.emplace(cursor);
+	registry.cursors.emplace(cursor);
 	return cursor;
 }
+
+Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects) {
+	switch ( item ) {
+		case InteractableItem::PopConsole:
+			return createPopConsole(renderer, pos);
+		case InteractableItem::Ram:
+			return createRamStick(renderer, pos);
+		case InteractableItem::Gardener:
+			return createGardener(renderer, pos);
+		case InteractableItem::BibleTree:
+			return createBibleTree(renderer, pos);
+		case InteractableItem::PushConsole:
+			return createPushConsole(renderer, pos, effects);
+		default:
+			return Entity();
+	}
+}
+
+Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects) {
+	Entity console = Entity();
+	Motion& m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 200.f * vec2(1, 1.4166666);
+
+	auto& o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	registry.backgrounds.emplace(console);
+
+	CircleCollider& cc = registry.circleColliders.emplace(console);
+	cc.radius = m.scale.y / 4;
+
+	InteractableObject& object = registry.interactables.emplace(console);
+	object.name = "PushStack";
+	object.item = InteractableItem::PushConsole;
+	// or maybe object type enum? This is not a unique id, just an object type identifier
+
+	Animation& a = registry.animations.emplace(console);
+	a.max_frames = 8;
+	a.animation_countdown_base = 100;
+
+	EffectStack& stack = registry.effectStacks.emplace(console);
+	stack.stack = std::move(effects);
+
+	registry.renderRequests.insert(
+		console,
+		{ "pop_console",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return console;
+
+}
+
 
 Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 	const Entity console = Entity();
@@ -192,6 +251,27 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return console;
+}
+
+Entity createRamStick (RenderSystem *renderer, vec2 pos) {
+	auto entity = Entity();
+	Motion &motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2(100, 50);
+	motion.angle = 0;
+	auto& object = registry.objects.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{"ram.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+	auto& interact = registry.interactables.emplace(entity);
+	interact.name = "Ram";
+	interact.item = InteractableItem::Ram;
+	registry.circleColliders.emplace(entity).radius = motion.scale.x / 2;
+
+	return entity;
+
 }
 
 Entity createGardener(RenderSystem* renderer, vec2 pos) {
@@ -336,10 +416,11 @@ Entity createDoorSymbol(RenderSystem *renderer, vec2 position, float angle, vec2
 
 	registry.backgrounds.emplace(entity);
 
-	RenderRequest &rr = registry.renderRequests.insert(entity,
-													   {"door_symbol_enemy.png",
-														EFFECT_ASSET_ID::ROOM_BOUND,
-														GEOMETRY_BUFFER_ID::SPRITE});
+	RenderRequest& rr = registry.renderRequests.insert(entity, 
+		{"door_symbols",
+		EFFECT_ASSET_ID::ROOM_BOUND,
+		GEOMETRY_BUFFER_ID::SPRITE}
+	);
 	return entity;
 }
 
@@ -532,6 +613,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 {
 	auto entity = Entity();
 
+	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
+	movement.posA = pos;
+
 	// std::vector<AttackData> atkData = { threeBurst,twelveSpiralShot, threeHomingShot, twoPincerShot };
 	Enemy &enemy = registry.enemies.emplace(entity);
 	switch (type)
@@ -550,6 +634,13 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = EnemyBigC();
 		registry.bosses.emplace(entity);
+		movement.angularSpeed = 20;
+		break;
+	}
+	case EnemyType::BossBeehiveGun:
+	{
+		enemy = BossBeehiveSentry();
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case EnemyType::MediumEnemyCharge:
@@ -587,9 +678,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BeeHive:
 	{
 		enemy = EnemyMediumBeeHive();
-		Hive &hive = registry.beeHive.emplace(entity);
-		hive.currSpawnCD = 5000.f;
-		hive.maxSpawnCD = 5000.f;
+		break;
+	}
+	case EnemyType::BossBeehiveMain:
+	{
+		enemy = BossBeeHive();
+		registry.bosses.emplace(entity);
 		break;
 	}
 	case EnemyType::HardEnemyAngel:
@@ -602,10 +696,29 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyEasySkull();
 		break;
 	}
+	case EnemyType::Snail:
+	{
+		enemy = EnemyEasyTrail();
+		break;
+	}
+	case EnemyType::EvilSnail:
+	{
+		enemy = EnemyHardTrail();
+		break;
+	}
 	case EnemyType::HardEnemyBoid:
 	{
 		enemy = EnemyHardBoid();
-		Boid &boid = registry.boids.emplace(entity);
+		Boid& boid = registry.boids.emplace(entity);
+		boid.position = pos;
+		float randomX = getRandomFloat(-150.f, 150.f);
+		float randomY = getRandomFloat(-150.f, 150.f);
+		boid.velocity = vec2(randomX, randomY);
+		break;
+	}
+	case EnemyType::HardEnemyBoidBio:
+		enemy = EnemyHardBoidBio();
+		Boid& boid = registry.boids.emplace(entity);
 		boid.position = pos;
 		float randomX = getRandomFloat(-150.f, 150.f);
 		float randomY = getRandomFloat(-150.f, 150.f);
@@ -632,8 +745,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	motion.velocity = vec2(0, 0);
 	motion.scale = enemy.scale;
 
-	EnemyMovement &movement = registry.enemyMovement.emplace(entity);
-	movement.posA = pos;
 	// if (enemy.behavior == EnemyBehavior::PATROLLING) {
 	// 	movement.posA = enemy.patrolPath[0];
 	// } else {
@@ -642,7 +753,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	// std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
-	movement.speed = 100.0f;
+	movement.speed = 100.0f * enemy.speedMultiplier;
 	movement.distanceTraveled = 0.0f;
 
 	registry.bursts.emplace(entity);
@@ -676,9 +787,17 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	if (enemy.sprite.effectId == EFFECT_ASSET_ID::ANIMATE)
 	{
 		auto &animate = registry.animations.emplace(entity);
-		animate.max_frames = 5; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
-		animate.animation_countdown = 20;
+		animate.animate = enemy.sprite.animationType;
+		animate.max_frames = enemy.sprite.max_Frames; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
+		animate.animation_countdown = enemy.sprite.countdown;
 		animate.animation_countdown_base = animate.animation_countdown;
+	}
+
+	enemy.collisionBullet = blunt;
+
+	if (type == EnemyType::BossBeehiveMain) {
+		createEnemy(renderer, pos + vec2(97, -95), EnemyType::BossBeehiveGun);
+		createEnemy(renderer, pos + vec2(-118, 72), EnemyType::BossBeehiveGun);
 	}
 
 	return entity;
@@ -710,7 +829,8 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 
 	if (bullet.bulletEffects[0].type == BulletEffectType::Key) {
 		motion.scale = 16.f * vec2(2.8, 1);
-		motion.velocity = velocity * 800.f;
+		motion.velocity = velocity * 400.f;
+		motion.veer = vec2(0);
 		bullet.bulletBounce = 10;
 		bullet.bulletPierce = 0;
 		bullet.bulletRange = 5000;
@@ -730,6 +850,11 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			 "enemy_bullet_key.png",
 			 EFFECT_ASSET_ID::TEXTURED,
 			 GEOMETRY_BUFFER_ID::SPRITE });
+
+		ParticleProps props = enemyBullet;
+		props.colors.push_back(enemyBulletColors.at(Key));		
+		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(3) + 5);
 
 		return entity;
 	}
@@ -787,6 +912,19 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		{renderShape,
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
+	
+	//bullet trail
+	ParticleProps props = enemyBullet;
+	for (const BulletStackEffect& effect : bullet.bulletEffects) {
+		BulletEffectType type = effect.type;
+		if (type == BulletEffectType::Inert) continue;
+		props.colors.push_back(enemyBulletColors.at(type));		
+	}
+	if (!props.colors.empty()) {
+		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(3) + 5);
+	}
+	
 
 	return entity;
 }
@@ -834,6 +972,18 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		 "enemy_bullet_circle.png",
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	//bullet trail (if we decide to add effects in the future)
+	ParticleProps props = enemyBullet;
+	for (const BulletStackEffect& effect : bullet.bulletEffects) {
+		BulletEffectType type = effect.type;
+		if (type == BulletEffectType::Inert) continue;
+		props.colors.push_back(enemyBulletColors.at(type));		
+	}
+	if (!props.colors.empty()) {
+		props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(3) + 5);
+	}
 
 	return entity;
 }
@@ -990,6 +1140,10 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
+	//add bullet trail
+	ParticleProps props = playerBulletTrail;
+	props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+	EmitParticle& ep = registry.emitParticles.emplace(entity,PBulletTrail,props,10000,Random::Int(2) + 3);
 	return entity;
 }
 

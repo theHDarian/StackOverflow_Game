@@ -112,6 +112,14 @@ public:
 		}
 	};
 
+	template<typename... Args>
+	Component& replace(Entity e, Args &&... args) {
+		if (has(e)) {
+			remove(e);
+		}
+		return insert(e, Component(std::forward<Args>(args)...));
+	};
+
 	// Remove all components of type 'Component'
 	void clear()
 	{

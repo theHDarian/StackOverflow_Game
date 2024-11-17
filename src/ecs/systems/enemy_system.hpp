@@ -25,6 +25,7 @@ private:
     void shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst);
     void shootLaser(vec2 pos, Entity enemy, AttackData atkData);
     void attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms);
+    void spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData);
     void merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion);
     void creatingMergeBee(int count, vec2 pos);
     void beeHiveSpawn(Entity entity, EnemyPattern &currPattern, Hive& hive);

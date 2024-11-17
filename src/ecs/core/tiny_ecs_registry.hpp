@@ -5,6 +5,7 @@
 #include "components.hpp"
 #include "actor_components.hpp"
 #include "map_components.hpp"
+#include "particle_components.hpp"
 
 class ECSRegistry
 {
@@ -64,9 +65,9 @@ public:
 	ComponentContainer<Bound> bounds; //room boundaries
 	ComponentContainer<MapRequest> mapRequests;
 	ComponentContainer<BossEnemy> bosses;
+	ComponentContainer<BossParts> bossParts;
 	ComponentContainer<Animation> animations;
 	ComponentContainer<BeeEnemy> bees;
-	ComponentContainer<Hive> beeHive;
 	ComponentContainer<AnimationSequence> animationSequences;
 	ComponentContainer<SoundRequest> soundRequests;
 	ComponentContainer<Boid> boids;
@@ -78,8 +79,14 @@ public:
 	ComponentContainer<InteractableReaction> interactableReactions;
 	ComponentContainer<NearbyInteractables> nearbyInteractables;
 	ComponentContainer<ScreenCutIn> screenCutIns;
+	ComponentContainer<Cursor> cursors;
+	ComponentContainer<InteractIndicator> interactIndicators;
+	ComponentContainer<MenuOverlayUI> menuOverlayUIs;
+	ComponentContainer<MenuOverlayUIText> menuOverlayUITexts;
 	ComponentContainer<Ignore> ignores;
 	ComponentContainer<Healer> healers;
+	ComponentContainer<EffectStack> effectStacks;
+
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -133,12 +140,12 @@ public:
 		registry_list.push_back(&menuUITexts);
 		registry_list.push_back(&damageds);
 		registry_list.push_back(&bosses);
+		registry_list.push_back(&bossParts);
 		registry_list.push_back(&animations);
 		registry_list.push_back(&sprites);
 		registry_list.push_back(&spriteTimers);
 		registry_list.push_back(&doorSymbols);
 		registry_list.push_back(&bees);
-		registry_list.push_back(&beeHive);
 		registry_list.push_back(&animationSequences);
 		registry_list.push_back(&soundRequests);
 		registry_list.push_back(&boids);
@@ -150,8 +157,13 @@ public:
 		registry_list.push_back(&interactableReactions);
 		registry_list.push_back(&nearbyInteractables);
 		registry_list.push_back(&screenCutIns);
+		registry_list.push_back(&cursors);
+		registry_list.push_back(&interactIndicators);
+		registry_list.push_back(&menuOverlayUIs);
+		registry_list.push_back(&menuOverlayUITexts);
 		registry_list.push_back(&ignores);
 		registry_list.push_back(&healers);
+		registry_list.push_back(&effectStacks);
 	}
 
 	void clear_all_components() {

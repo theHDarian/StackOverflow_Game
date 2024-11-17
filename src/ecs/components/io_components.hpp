@@ -1,5 +1,6 @@
 #pragma once
 #include <time.h>
+#include <chrono>
 
 #include "common.hpp"
 #include "utils/extended_stack.hpp"
@@ -9,11 +10,11 @@ struct WindowState {
 	int height;
     bool isRetinaDisplay;
 
-	float fps;
+	int fps;
 	int numFramesThisSecond;
-	time_t currUnixTime;
+	std::chrono::steady_clock::time_point currUnixTime;
 
-	time_t startTime;
+	std::chrono::steady_clock::time_point startTime;
 };
 
 struct IOState {
@@ -29,6 +30,7 @@ struct IOState {
 	bool tutorialOn = false;
 	int hoveringDialogueChoice = -1;
 	int lastHoverDialogueChoice = -1;
+	bool showFPS = true;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
@@ -40,5 +42,6 @@ struct GameState {
 	bool dialogueScene = false;
 	bool cutScene = false;
 	int dialogueChoice = -1;
-	float currentVolume = 0.25f;
+	float currentVolume = 0.5f;
+	bool seenLockedDoor = false;
 };

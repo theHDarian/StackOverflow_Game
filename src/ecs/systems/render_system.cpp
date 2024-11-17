@@ -4,12 +4,6 @@
 #include <glm/gtx/compatibility.hpp>
 
 #include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
-#include "ai_system.hpp"
 #include "tiny_ecs_registry.hpp"
 #include "world_system.hpp"
 #include "utils/enum_string_mapping.hpp"
@@ -32,11 +26,16 @@ void RenderSystem::step(float elapsed_ms) {
 
 	for (Entity entity : registry.animations.entities) {
 		Animation& anim = registry.animations.get(entity);
-		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate) {
-			anim.animation_countdown -= elapsed_ms;
+		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate != AnimationTypes::NONE) {
+			if (anim.animate != AnimationTypes::ONCE || anim.frame != 0) anim.animation_countdown -= elapsed_ms;
 			if (anim.animation_countdown <= 0) {
 				anim.animation_countdown = anim.animation_countdown_base;
-				anim.frame = (anim.frame + 1) % anim.max_frames;
+				if (anim.animate == AnimationTypes::ONCE) {
+					anim.frame = (anim.frame + 1 >= anim.max_frames) ? 0 : anim.frame + 1;
+				}
+				else {
+					anim.frame = (anim.frame + 1) % anim.max_frames;
+				}
 			}
 		}
 		if (registry.animationSequences.has(entity) && anim.frame >= anim.max_frames - 1) {
@@ -47,6 +46,19 @@ void RenderSystem::step(float elapsed_ms) {
 			registry.animationSequences.remove(entity);
 		}
 	}
+}
+
+void RenderSystem::drawCursor() {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+	mat3 projection_2D = createProjectionMatrix();
+	Entity Cursor = registry.cursors.entities[0];
+	if (registry.renderRequests.has(Cursor) && registry.motions.has(Cursor)) {
+		drawTexturedMesh(Cursor, projection_2D);
+	}
+	glBindVertexArray(0);
 }
 
 void RenderSystem::drawTexturedMesh(Entity entity,
@@ -212,17 +224,19 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		float angle;
 		vec3 axis;
 		vec3 offset;
+		int frame;
 		if (registry.bounds.has(entity)) {
 			Bound& b = registry.bounds.get(entity);
 			angle = b.angle;
 			axis = b.axis;
 			offset = b.offset;
 
-			int frame = 2;
+			frame = 2;
 			for (Entity& d : registry.doors.entities) {
 				if (registry.doors.get(d).side == b.side) {
 					if (registry.interactables.has(d)) {
 						if (registry.interactables.get(d).name == "ClosedDoor")			{ frame = 0; }
+						else if (registry.interactables.get(d).name == "ClosedTutorialDoor") { frame = 0; }
 						else if (registry.interactables.get(d).name == "EmptyDoor")		{ frame = 0; }
 						else if (registry.interactables.get(d).name == "PrevDoor")		{ frame = 0; }
 						else if (registry.interactables.get(d).name == "LockedDoor")	{ frame = 1; }
@@ -230,23 +244,22 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 					break;
 				}
 			}
-
-			GLint frame_uloc = glGetUniformLocation(program, "frame");
-			glUniform1i(frame_uloc, frame);
-			gl_has_errors();
-
-			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-			gl_has_errors();
 		} else if (registry.doorSymbols.has(entity)) {
 			DoorSymbol& d = registry.doorSymbols.get(entity);
 			angle = d.angle;
 			axis = d.axis;
 			offset = d.offset;
-			glBindTexture(GL_TEXTURE_2D, texture_id);
-			gl_has_errors();
+			frame = d.doorType;
 		} else {
 			assert(false);
 		}
+		GLint frame_uloc = glGetUniformLocation(program, "frame");
+		glUniform1i(frame_uloc, frame);
+		gl_has_errors();
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+		gl_has_errors();
+
 		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x,motion.position.y,0.0f))
 						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))
 						* glm::translate(glm::mat4(1.0f),offset)
@@ -290,6 +303,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		glUniform1i(change_color_uloc, 1);
 		glUniform1f(effectAlpha, alpha);
+	}
+	else if (registry.interactIndicators.has(entity)) { // hard code here for now
+		alpha = 0.7;
 	}
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
@@ -337,10 +353,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 }
 
 void RenderSystem::drawMesh(Entity entity,
-	const mat3& projection, GLenum mode)
+	const mat3& projection)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, mode);
-	glLineWidth(6.0f);
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
@@ -387,9 +401,11 @@ void RenderSystem::drawMesh(Entity entity,
 	GLuint angle_uloc = glGetUniformLocation(program, "angle");
 	glUniform1f(angle_uloc, (float)(registry.motions.get(entity).angle));
 
-	GLuint mode_uloc = glGetUniformLocation(program, "mode");
-	glUniform1i(mode_uloc, mode == GL_FILL);
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
 
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture["hexagon.png"]];
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
@@ -412,8 +428,6 @@ void RenderSystem::drawMesh(Entity entity,
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 
-	if (mode == GL_FILL) drawMesh(entity, projection, GL_LINE);
-	if (mode == GL_LINE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 // draw the intermediate texture to the screen, with some distortion to simulate
@@ -477,15 +491,6 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
-GLFWimage RenderSystem::loadCursorImage(const char* filename) {
-	GLFWimage image;
-	image.pixels = stbi_load(filename, &image.width, &image.height, 0, 4);
-	if (!image.pixels) {
-		std::cerr << "Failed to load cursor image: " << filename << std::endl;
-	}
-	return image;
-}
-
 void RenderSystem::drawSetupFrame(){
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
@@ -542,15 +547,7 @@ void RenderSystem::drawGameElements()
 	// and won't render all render requests if not given the proper component
 	// Note, its not very efficient to access elements indirectly via the entity
 	// albeit iterating through all Sprites in sequence. A good point to optimize
-	for (Entity& entity : registry.enemyBullets.entities)
-	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
-			continue;
-		drawTexturedMesh(entity, projection_2D);
-		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
-	}
-
+	
 	for (Entity& entity : registry.objects.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -562,6 +559,15 @@ void RenderSystem::drawGameElements()
 		}
 	}
 
+	for (Entity& entity : registry.enemyBullets.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
+	}
+
 	for (Entity& entity : registry.playerBullets.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -570,12 +576,25 @@ void RenderSystem::drawGameElements()
 		drawAllColliders(entity, projection_2D);
 	}
 
-	for (Entity& entity : registry.enemies.entities)
+	for (Entity& entity : registry.bosses.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D, GL_FILL);
-		if (!registry.boids.has(entity)) {
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
+			drawHPbar(entity, projection_2D);
+		}
+
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
+	}
+
+	for (Entity& entity : registry.enemies.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
+			continue;
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
 			drawHPbar(entity, projection_2D);
 		}
 	
@@ -704,6 +723,24 @@ void RenderSystem::drawMenuUI() {
 		//draw Imgui
 		drawImGui();
 	#endif
+}
+
+void RenderSystem::drawMenuOverlayUI() {
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+	mat3 projection_2D = createProjectionMatrix();
+
+	for (Entity& entity : registry.menuOverlayUIs.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection_2D);
+	}
+
+	glBindVertexArray(0);
+	gl_has_errors();
 }
 
 mat3 RenderSystem::createProjectionMatrix()
@@ -879,7 +916,7 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++) {
 		// no variance on shape for now
-		std::string bulletShape = "enemy_bullet_square.png";
+		std::string bulletShape = bulletEffectShapes[stack.currStack[i].type];
 		// start from bottom to top
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
 			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
@@ -938,7 +975,7 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	glUniform3fv(color_uloc, 1, (float*)&color);
 	// want to overwrite the colour with given; could also use a separate shader program
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-	glUniform1i(change_color_uloc, 1);
+	glUniform1i(change_color_uloc, 0);
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, 1);
 	gl_has_errors();
@@ -1127,7 +1164,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	// Getting uniform locations for glUniform* calls
 	if (!isCharging) {
-		vec3 color = { 0.50, 0.50, 0.0 };
+		vec3 color = { 0.60, 0.59, 0.0 };
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
@@ -1146,7 +1183,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
 	else {
-		vec3 color = { 0.50, 0.50, 0.0 }; // grey
+		vec3 color = { 0.60, 0.59, 0.0 }; // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");

@@ -38,7 +38,7 @@ inline std::string dialogue_path(const std::string& name) { return data_path() +
 #endif
 
 #ifndef IMGUI_ENABLED
-#define IMGUI_ENABLED 1
+#define IMGUI_ENABLED 0
 #endif
 
 // The 'Transform' component handles transformations passed to the Vertex shader
@@ -52,6 +52,17 @@ struct Transform {
 	glm::mat4 getMatrix() {
 		return glm::mat4(mat); // Convert mat3 to mat4
 	}
+};
+
+//structs used by presets to make instantiation easier to read
+struct Vec2Randomized {
+    vec2 base,variation;
+};
+struct Vec4StartEnd {
+    vec4 start,end;
+};
+struct FloatStartEndRandomized {
+    float start,end,variation;
 };
 
 bool gl_has_errors();

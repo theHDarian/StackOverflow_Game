@@ -267,6 +267,12 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::RANDOM:
 		// std::cout << "random!" << std::endl;
 		return generateRandomPos(entity);
+	case EnemyBehavior::RANDOM_NEAR:
+		// std::cout << "random!" << std::endl;
+		return generateRandomPosInRadius(entity, 100, 200);
+	case EnemyBehavior::RANDOM_FAR:
+		// std::cout << "random!" << std::endl;
+		return generateRandomPosInRadius(entity, 500, 1000);
 	case EnemyBehavior::FOLLOW_PLAYER:
 		// std::cout << "follow!" << std::endl;
 		return getPlayerPos();
@@ -339,6 +345,7 @@ vec2 AISystem::generateRandomPos(Entity entity)
 	return vec2(pos_x, pos_y);
 }
 
+
 vec2 AISystem::getCharginPos(Entity entity)
 {
 	auto &window_registry = registry.windowStates;
@@ -366,16 +373,44 @@ vec2 AISystem::getCharginPos(Entity entity)
 	// Increase the enemy's speed for the charge
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 500.0f;
-
-	float minX = 150.f + scale[0];
+  
+  float minX = 150.f + scale[0];
 	float minY = 100.f + scale[1];
 	float maxX = width - 150.f - scale[0];
 	float maxY = height - 60.f - scale[1];
+
 	goalPosition[0] = glm::clamp(goalPosition[0], minX, maxX);
 	goalPosition[1] = glm::clamp(goalPosition[1], minY, maxY);
 
 	return goalPosition;
 }
+
+vec2 AISystem::generateRandomPosInRadius(Entity entity, int radiusNear, int radiusFar)
+{
+	auto& window_registry = registry.windowStates;
+	WindowState& windowState = window_registry.components[0];
+	int width = windowState.width;
+	int height = windowState.height;
+	// std::cout << "width " << windowState.width << std::endl;
+	// std::cout << "height " << windowState.height << std::endl;
+	vec2 start = registry.motions.get(entity).position;
+	float angle = 2.0f * M_PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+	float pos_x = cos(angle) * (radiusNear + rand() % (radiusFar - radiusNear)) + start.x;
+	float pos_y = sin(angle) * (radiusNear + rand() % (radiusFar - radiusNear)) + start.y;
+
+	vec2 scale = registry.motions.get(entity).scale;
+  
+  float minX = 150.f + scale[0];
+	float minY = 100.f + scale[1];
+	float maxX = width - 150.f - scale[0];
+	float maxY = height - 60.f - scale[1];
+  
+  pos_x = glm::clamp(pos_x, minX, maxX);
+	pos_y = glm::clamp(pos_y, minY, maxY);
+	return vec2(pos_x, pos_y);
+}
+
+
 
 vec2 AISystem::getTeamPos(Entity entity)
 {
@@ -417,6 +452,7 @@ vec2 AISystem::getTeamPos(Entity entity)
 	}
 	return getCurrentPos(entity);
 };
+
 
 vec2 AISystem::getPlayerPos()
 {

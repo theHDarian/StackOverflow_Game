@@ -104,37 +104,6 @@ struct Frame {
 	GLuint prevFrameBuffer;
 };
 
-enum ParticleRequestType {
-	PlayerDash,
-	EnemyDeath,
-	PlayerBulletCollision,
-	ClearParticles // special request to clear all current particles
-};
-
-struct EmitParticle {
-	ParticleRequestType requestType;
-	
-	float timeRemaining; //in seconds
-	int numToEmit; //remaining number to emit, divided evenly throughout the countdown
-
-	vec2 defaultPos; //position to fallback to if attached entity does not have motion
-
-	EmitParticle(ParticleRequestType reqType, float duration = 0.0f, int numToEmit = 0) {
-		this->requestType = reqType;
-		this->timeRemaining = duration;
-		this->numToEmit = numToEmit;
-	}
-};
-
-struct ParticleProps {
-    vec2 position;
-    vec2 velocity,velocityVariation;
-    vec4 colorBegin, colorEnd;
-    float sizeBegin, sizeEnd, sizeVariation;
-    float lifetime;
-};
-
-//TODO add something to keep track of the sounds - soundType (background, sfx), volume, loop boolean
 enum SoundType {
 	normalBGM,
 	bossBGM,
@@ -248,12 +217,18 @@ struct RenderRequest {
 	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
 };
 
+enum AnimationTypes {
+	NONE = 0,
+	REGULAR = 1,
+	ONCE = 2
+};
+
 struct Animation {
 	int frame = 0; // stick in animation info to here for now
 	int max_frames = 5; // this type of info should be known by render/sprite system?
 	float animation_countdown = 85;
 	float animation_countdown_base = animation_countdown;
-	bool animate = true;
+	int animate = true;
 };
 
 // For 3D rendering
@@ -319,10 +294,14 @@ struct TextRenderRequest {
 	// size of text box
 	vec2 topRightBound;
 	vec2 bottomLeftBound;
+
+	// temp: add for now if it is preloaded
+	std::vector<std::string> tokenizedText = std::vector<std::string>();
 };
 
 struct Dialogue {
 	std::string text;
+	std::vector<std::string> tokenizedText;
 	std::string speakerName;
 	std::string speakerAvatar;
 	std::vector<std::string> choices;
@@ -339,7 +318,7 @@ struct DialogueLines {
 			return lines[current - 1];
 		}
 		else {
-			return Dialogue{ "<end>", "<end>", "<end>" }; // maybe end of str constant
+			return Dialogue{ "<end>" }; // maybe end of str constant
 		}
 	}
 
@@ -348,7 +327,7 @@ struct DialogueLines {
 			return lines[current++];
 		}
 		else {
-			return Dialogue{"<end>", "<end>", "<end>"}; // maybe end of str constant
+			return Dialogue{"<end>"}; // maybe end of str constant
 		}
 	}
 };
@@ -370,9 +349,27 @@ struct DialogueChoice {
 
 };
 
+enum InteractableType {
+	DialogueInteractable,
+	ActionInteractable
+};
+
+enum InteractableItem {
+	Ram,
+	PopConsole,
+	PushConsole,
+	OpenDoor,
+	LockedDoor,
+	BibleTree,
+	Gardener,
+	NA,
+};
+
 struct InteractableObject {
 	std::string name;
 	int dialogueCount = 0;
+	InteractableType interactType = DialogueInteractable;
+	InteractableItem item = InteractableItem::NA;
 };
 
 enum DialogueRequestType {
@@ -382,6 +379,7 @@ enum DialogueRequestType {
 
 struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
 	DialogueRequestType type = InteractableDialogue;
+	int choice = -1;
 };
 
 struct InteractableReaction {

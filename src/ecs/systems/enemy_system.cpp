@@ -14,6 +14,8 @@
 
 #include "ai_system.hpp"
 #include <mutex>
+#include "components/presets/particle_presets.hpp"
+#include "utils/random.hpp"
 
 std::mutex beeMutex;
 
@@ -76,17 +78,6 @@ void EnemySystem::step(float elapsed_ms)
         //     registry.enemies.remove(deletedBee);
         // }
 
-        // beeHive logic
-        if (registry.beeHive.has(entity))
-        {
-            Hive &hive = registry.beeHive.get(entity);
-            hive.currSpawnCD -= elapsed_ms;
-            if (pattern.type == EnemyBehavior::SPAWNING)
-            {
-                beeHiveSpawn(entity, pattern, hive);
-            }
-        }
-
         if (registry.boids.has(entity))
         {
             Boid &boid = registry.boids.get(entity);
@@ -144,7 +135,8 @@ void EnemySystem::step(float elapsed_ms)
             if (pattern.currAtkCD < 0)
             {
                 AttackData atkData = pattern.atkData;
-                attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
+                if (atkData.attackType != EnemyAttackPattern::SPAWNING) attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
+                else spawn(entity, pattern, pos, atkData);
             }
         }
     }
@@ -167,8 +159,9 @@ void EnemySystem::step(float elapsed_ms)
                 {
                     Fade &f = registry.fades.emplace(entity);
                     registry.deleteds.emplace(entity);
-                    if (!registry.emitParticles.has(entity))
-                        registry.emitParticles.emplace(entity, ParticleRequestType::EnemyDeath, f.max, rand() % 10 + 10);
+
+                    ParticleProps props = sparks;
+                    registry.emitParticles.replace(entity,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
                 }
 
                 // std::cout << "enemy " << entity << "has died" << std::endl;
@@ -386,9 +379,10 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::TRAIL)
     {
-        sound->playEnemyShootSound(sfxNum, atkData.numBullets);
+        // Sound is kinda annoying yeah, and its not really "shooting? I guess?
+        //sound->playEnemyShootSound(sfxNum, atkData.numBullets);
         shootShotgun(velocity, pos, atkData);
-        currPattern.currAtkCD = 400;
+        currPattern.currAtkCD = 600;
     }
     else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
     {
@@ -430,31 +424,16 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
             burst.burstCooldown = 0;
         }
     }
-    //play shoot sound
-    // if (atkData.attackType == EnemyAttackPattern::NONE )
-    //     return;
-    //
-    // if ( atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY) {
-    //     if (atkData.shape == EnemyBulletShape::CIRCLE) {
-    //         sound->playEnemyShootSound(0, atkData.numBullets);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
-    //         sound->playEnemyShootSound(1, atkData.numBullets);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
-    //         sound->playEnemyShootSound(2, atkData.numBullets);
-    //     }
-    // } else {
-    //     if (atkData.shape == EnemyBulletShape::CIRCLE) {
-    //         sound->playEnemyShootSound(0, 0);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::RECTANGLE) {
-    //         sound->playEnemyShootSound(1, 0);
-    //     }
-    //     else if (atkData.shape == EnemyBulletShape::TRIANGLE) {
-    //         sound->playEnemyShootSound(2, 0);
-    //     }
-    // }
+}
+
+void EnemySystem::spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData)
+{
+    if (registry.animations.has(entity)) registry.animations.get(entity).frame = 1;
+    for (uint i = 0; i < atkData.numBullets; i++) {
+        createEnemy(render, pos, atkData.spawn);
+    }
+
+    currPattern.currAtkCD = currPattern.maxAtkCD;
 }
 
 void EnemySystem::creatingMergeBee(int count, vec2 pos)
@@ -513,45 +492,6 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
             }
         }
         bee.nearbyBees.clear();
-
-        // for (Entity deletedBee : deletedBees)
-        //{
-        //     for (Entity nearby : registry.bees.get(deletedBee).nearbyBees)
-        //     {
-        //         if (registry.bees.has(nearby))
-        //         {
-        //             auto &nearbyBee = registry.bees.get(nearby);
-        //             nearbyBee.nearbyBees.erase(deletedBee);
-        //         }
-        //     }
-        //     pendingDeletion.push_back(deletedBee);
-        // }
-        //  		std::cout << " time to merge bees with other bees: " << registry.bees.get(bee).nearbyBees.size() << std::endl;
-        //  		registry.bees.get(bee).mergeCount += registry.bees.get(bee).nearbyBees.size();
-        //  		registry.bees.get(bee).nearbyBees.clear();
-        //  		if (registry.bees.get(bee).mergeCount >= 1) {
-        //  			registry.renderRequests.get(bee).texture_name = "bee_fly_2";
-        //  		}
-    }
-}
-
-void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern &currPattern, Hive &hive)
-{
-    Motion &motion = registry.motions.get(entity);
-    if (hive.currSpawnCD < 0.f)
-    {
-        // play open "animation" here
-        if (!registry.spriteTimers.has(entity))
-        {
-            RenderRequest &rr = registry.renderRequests.get(entity);
-            SpriteTimer &st = registry.spriteTimers.emplace(entity);
-            st.count_ms = 1000;
-            st.nextEffect = rr.used_effect;
-            st.nextSprite = rr.texture_name;
-            rr.texture_name = "beehive_open.png";
-        }
-        creatingMergeBee(1, motion.position);
-        hive.currSpawnCD = hive.maxSpawnCD;
     }
 }
 

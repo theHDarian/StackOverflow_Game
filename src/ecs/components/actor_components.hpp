@@ -47,6 +47,10 @@ struct BulletStackEffect {
 
 };
 
+struct EffectStack {
+    std::vector<BulletStackEffect> stack;
+};
+
 // Player component
 struct Player
 {
@@ -187,7 +191,8 @@ struct StackCompile {
         if (it == currStack.rend()) return false;
 
         // Interate backwards from end to index, remove each
-        for (int i = currStack.size() - 1; i >= (it + 1).base() - currStack.begin(); i--) {
+        int end = (it + 1).base() - currStack.begin();
+        for (int i = currStack.size() - 1; i >= end; i--) {
             remove(i);
         }
 
@@ -241,6 +246,10 @@ enum EnemyType {
     // HardEnemyBehavior
     TestRevampedEnemy,
     BossBigC,
+    BossBeehiveGun,
+    BossBeehiveMain,
+    Snail,
+    EvilSnail,
     OneBee,
     TwoBee,
     ThreeBee,
@@ -250,7 +259,8 @@ enum EnemyType {
     EasyEnemySkull,
     HardEnemyBoid,
     MediumEnemyBoar,
-    MediumEnemyHealer
+    MediumEnemyHealer,
+    HardEnemyBoidBio
 };
 
 enum class EnemyAttackPattern {
@@ -264,6 +274,7 @@ enum class EnemyAttackPattern {
     WAVE,
     LASER,
     TRAIL,
+    SPAWNING,
     NONE
 };
 
@@ -297,11 +308,14 @@ struct AttackData {
     int bulletBounce = 0;
     float homing = 0;
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
+    EnemyType spawn;
 };
 
 enum class EnemyBehavior {
     // this is the basic
     RANDOM,
+    RANDOM_NEAR,
+    RANDOM_FAR,
     FOLLOW_PLAYER,
     RETREAT,
     ANGRY,
@@ -375,6 +389,9 @@ struct SpriteData
 	EFFECT_ASSET_ID effectId;
 	GEOMETRY_BUFFER_ID geometryId;
 	vec2 offset;
+    int animationType = 1;
+    int max_Frames = 1;
+    float countdown = 20;
 };
 
 
@@ -384,7 +401,7 @@ struct Enemy {
     int maxHealth;
     int currHealth;
     vec2 velocity;
-    BulletStackEffect blunt;
+    BulletStackEffect collisionBullet;
     std::vector<EnemyPattern> enemyPatterns;
     int patternIndex;
     EnemyPattern& currEnemyPattern() {
@@ -394,19 +411,22 @@ struct Enemy {
     SpriteData sprite;
     bool newPattern = false;
     float rotatePower;
+    float speedMultiplier = 1.0f;
 };
 
 struct EnemyMovement {
     vec2 posA;
     vec2 posB;
     float distanceTraveled;
-    float speed;
-    float angularSpeed = 20.0f;
+    float speed = 20000;
+    float angularSpeed = 90.0f;
 };
 
 struct BossEnemy {
 };
 
+struct BossParts {
+};
 
 struct EnemyBullet {
     float bulletSpeed;
@@ -457,11 +477,6 @@ struct Motion {
 struct Damaged {
     float max = 200;
     float countdown = max;
-};
-
-struct Hive {
-    float currSpawnCD;
-    float maxSpawnCD;
 };
 
 struct BeeEnemy {

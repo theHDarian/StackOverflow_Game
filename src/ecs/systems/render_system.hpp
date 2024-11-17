@@ -74,8 +74,28 @@ class RenderSystem {
 			{PlayerStackSize,   {0.f, 1.f, 0.f}},
 			{PlayerDashCDR,     {1.f, 0.f, 0.f}},
 			{Inert,             {91.f / 255.f, 99.f / 255.f, 128.f / 255.f}},
-			{Key,				{1.0, 1.0, 0.0}}
+			{Key,				{1.0, 1.0, 1.0}}
 	};
+
+	std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
+			{BulletDamage,      "enemy_bullet_square.png"},
+			{ProjectileSpeed,   "enemy_bullet_square.png"},
+			{ProjectileSize,    "enemy_bullet_square.png"},
+			{FireRate,          "enemy_bullet_square.png"},
+			{BulletRange,       "enemy_bullet_square.png"},
+			{BulletSpread,      "enemy_bullet_square.png"},
+			{BulletNum,         "enemy_bullet_square.png"},
+			{BulletBurst,       "enemy_bullet_square.png"},
+			{Bounce,            "enemy_bullet_square.png"},
+			{Pierce,            "enemy_bullet_square.png"},
+			{Homing,            "enemy_bullet_square.png"},
+			{PlayerSpeed,       "enemy_bullet_square.png"},
+			{PlayerNumDash,     "enemy_bullet_square.png"},
+			{PlayerStackSize,   "enemy_bullet_square.png"},
+			{PlayerDashCDR,     "enemy_bullet_square.png"},
+			{Inert,             "enemy_bullet_square.png"},
+			{Key,				"enemy_bullet_key (2).png"} 
+};
 
 public:
 	// Initialize the window
@@ -105,10 +125,13 @@ public:
 	void drawGameElements();
 	void drawGameUI();
 	void drawMenuUI();
+	void drawMenuOverlayUI();
 	void drawDialogueUI();
 	void drawBackgroundElements();
 	void drawToScreen();
 	void step(float elapsed_ms);
+
+	void drawCursor();
 
 
 	mat3 createProjectionMatrix();
@@ -119,7 +142,7 @@ public:
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
-	void drawMesh(Entity entity, const mat3& projection, GLenum mode);
+	void drawMesh(Entity entity, const mat3& projection);
 	void drawDashes(const mat3& projection);
 	void drawHPbar(::Entity &entity, const mat3 & projection);
 	//glm::mat4 createTransform(float x, float y, float scaleX, float scaleY);
@@ -144,7 +167,6 @@ private:
 	#if IMGUI_ENABLED
 	public:
 		ImGuiContext* imgui_context;
-		GLFWimage loadCursorImage(const char *filename);
 
 		void initImGui();
 		void drawImGui();
