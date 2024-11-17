@@ -53,5 +53,14 @@ void extendStack (Entity player, int extension) {
     }
 }
 
+void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
+    if (registry.stackCompile.has(player)) {
+        StackCompile& reg = registry.stackCompile.get(player);
+        for (BulletStackEffect b : effects) {
+            reg.add(b);
+        }
+    }
+}
+
 
 

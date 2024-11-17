@@ -27,7 +27,9 @@ Entity createBibleTree(RenderSystem* renderer, vec2 pos);
 
 Entity createRamStick(RenderSystem* renderer, vec2 pos);
 
-Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item);
+Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);
+
+Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects);
 
 Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 

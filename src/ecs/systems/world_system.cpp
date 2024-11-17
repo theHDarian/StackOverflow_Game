@@ -328,6 +328,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.deleteds.emplace(reaction.object);
 			}
 		}
+		if (object.item == PushConsole) {
+			if (reaction.choice == 0) {
+				EffectStack& stack = registry.effectStacks.get(reaction.object);
+				addEffect(player, stack.stack);
+				reaction.choice = 1;
+			}
+		}
 	}
 
 	registry.interactableReactions.clear();

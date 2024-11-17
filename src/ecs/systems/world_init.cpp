@@ -155,7 +155,7 @@ Entity createCursor()
 	return cursor;
 }
 
-Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item) {
+Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects) {
 	switch ( item ) {
 		case InteractableItem::PopConsole:
 			return createPopConsole(renderer, pos);
@@ -165,9 +165,50 @@ Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem ite
 			return createGardener(renderer, pos);
 		case InteractableItem::BibleTree:
 			return createBibleTree(renderer, pos);
+		case InteractableItem::PushConsole:
+			return createPushConsole(renderer, pos, effects);
 		default:
 			return Entity();
 	}
+}
+
+Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects) {
+	Entity console = Entity();
+	Motion& m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 200.f * vec2(1, 1.4166666);
+
+	auto& o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	registry.backgrounds.emplace(console);
+
+	CircleCollider& cc = registry.circleColliders.emplace(console);
+	cc.radius = m.scale.y / 4;
+
+	InteractableObject& object = registry.interactables.emplace(console);
+	object.name = "PushStack";
+	object.item = InteractableItem::PushConsole;
+	// or maybe object type enum? This is not a unique id, just an object type identifier
+
+	Animation& a = registry.animations.emplace(console);
+	a.max_frames = 8;
+	a.animation_countdown_base = 100;
+
+	EffectStack& stack = registry.effectStacks.emplace(console);
+	stack.stack = std::move(effects);
+
+	registry.renderRequests.insert(
+		console,
+		{ "pop_console",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return console;
+
 }
 
 

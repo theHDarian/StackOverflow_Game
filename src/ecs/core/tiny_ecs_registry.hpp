@@ -83,6 +83,8 @@ public:
 	ComponentContainer<MenuOverlayUI> menuOverlayUIs;
 	ComponentContainer<MenuOverlayUIText> menuOverlayUITexts;
 	ComponentContainer<Ignore> ignores;
+	ComponentContainer<EffectStack> effectStacks;
+
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -157,6 +159,7 @@ public:
 		registry_list.push_back(&menuOverlayUIs);
 		registry_list.push_back(&menuOverlayUITexts);
 		registry_list.push_back(&ignores);
+		registry_list.push_back(&effectStacks);
 	}
 
 	void clear_all_components() {

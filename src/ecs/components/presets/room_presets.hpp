@@ -156,18 +156,39 @@ const RoomPreset RestingRoom1{
     {SpecialEvent::RebootStation}};
 const RoomPreset TreasureRoom1{
     {},
-    {{threeBurst, {0.5f, 0.5f}}},
+    {numBulletsUpA, sizeUpA},
     {},
-    {},
+    {{PushConsole, {0.5f, 0.5f}}},
 {},
     0.0f,
     5,
 };
+
 const RoomPreset TreasureRoom2{
     {},
-    {{threeBurst, {0.5f, 0.5f}}},
+    {dashUpA},
     {},
+    {{PushConsole, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    5,
+};
+
+const RoomPreset TreasureRoom3{
     {},
+    {dmgUpM},
+    {},
+    {{PushConsole, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    5,
+};
+
+const RoomPreset TreasureRoom4{
+    {},
+    {dashCDRDownA},
+    {},
+    {{PushConsole, {0.5f, 0.5f}}},
 {},
     0.0f,
     5,
