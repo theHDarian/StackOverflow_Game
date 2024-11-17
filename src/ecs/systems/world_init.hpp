@@ -25,6 +25,10 @@ Entity createGardener(RenderSystem* renderer, vec2 pos);
 
 Entity createBibleTree(RenderSystem* renderer, vec2 pos);
 
+Entity createRamStick(RenderSystem* renderer, vec2 pos);
+
+Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item);
+
 Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
 Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);

@@ -63,6 +63,18 @@ void MapSystem::step(float elapsed_ms)
             createEnemyBullet(renderer,std::get<vec2>(e)* vec2(wS.width,wS.height),vec2(0.8,0.8),vec2(0),std::get<AttackData>(e));
         }
         map.currRoom.preset.treasures = {};
+
+        // for (auto &e : map.currRoom.preset.roomProps)
+        // {
+        //     createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<RoomProp>(e));
+        // }
+
+        for (auto &e : map.currRoom.preset.interactables)
+        {
+            createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e));
+        }
+        map.currRoom.preset.interactables = {};
+
     }
     
 
@@ -206,6 +218,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = roomTypeToSymbols.at(doors[spawnIndex].room);
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
+    int lockedRooms = 0;
     bool excludeNone = false;
     for (int i = 0; i < doors.size(); i++)
     {
@@ -215,12 +228,16 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
         registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         Door &d = registry.doors.components[i];
-        d.room = randomRoomType(excludeNone);
+        d.room = randomRoomType(excludeNone, lockedRooms + excludeNone <= 2, map.roomsTraversed);
         d.isPrev = false;
         if (d.room == RoomType::None) {
             excludeNone = true;
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
+        }
+        if (d.isLocked) {
+            registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+            lockedRooms++;
         }
         registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
     }
@@ -256,16 +273,20 @@ void MapSystem::resetMap()
         map.currRoom.type = TutorialRoom1;
     }
     else {
+        Map& map = registry.maps.components[0];
+        map.currRegion = MapRegion::Tutorial;
+        map.roomsTraversed = 0;
+
         bool excludeNone = false;
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
-            d.room = RoomType::TreasureRoom;
+            d.room = randomRoomType(excludeNone, false, map.roomsTraversed);
             if (d.room == RoomType::None)
                 excludeNone = true;
 
             registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
-            registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+            registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
 
@@ -274,26 +295,14 @@ void MapSystem::resetMap()
             d.isPrev = false;
         }
 
-        Map& map = registry.maps.components[0];
-        map.currRegion = MapRegion::Tutorial;
-        map.roomsTraversed = 0;
-
-        /*
-        // set initial room to enemy
-        map.currRoom = Room();
-        std::vector<RoomPreset> presets = roomDirectory.at(RoomType::EnemyRoomBee);
-        RoomPreset randomPreset = Random::ListItem(presets);
-        map.currRoom.preset = randomPreset;
-        */
-
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
         map.currRoom.preset = getRoomPreset(RoomType::RestRoom,map.roomsTraversed,false);
-        createPopConsole(renderer, vec2(500, 500));
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
-        createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
-        createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
+        // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
+        // createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
+        // createRamStick(renderer, vec2(500, 500));
 
     }
 }

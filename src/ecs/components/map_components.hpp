@@ -18,8 +18,15 @@ enum RoomType : int {
     TutorialRoom2,
     BossBigCRoom,
 };
-inline RoomType randomRoomType(bool excludeNone)
+
+//TODO edit to account for locked
+inline RoomType randomRoomType(bool excludeNone, bool includeLocked, int roomsTraversed)
 {
+    if (roomsTraversed == 4) {
+        //Room 5 is the boss level
+        return BossBigCRoom;
+    }
+    
     return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 
@@ -31,6 +38,7 @@ struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
     std::vector<std::tuple<AttackData,vec2>> treasures; //for treasure rooms
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
+    std::vector<std::tuple<InteractableItem, vec2>> interactables; //for interactables
     std::vector<SpecialEvent> specialEvents; 
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
