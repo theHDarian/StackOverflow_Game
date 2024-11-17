@@ -79,6 +79,7 @@ public:
 	ComponentContainer<NearbyInteractables> nearbyInteractables;
 	ComponentContainer<ScreenCutIn> screenCutIns;
 	ComponentContainer<Ignore> ignores;
+	ComponentContainer<Healer> healers;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -150,6 +151,7 @@ public:
 		registry_list.push_back(&nearbyInteractables);
 		registry_list.push_back(&screenCutIns);
 		registry_list.push_back(&ignores);
+		registry_list.push_back(&healers);
 	}
 
 	void clear_all_components() {

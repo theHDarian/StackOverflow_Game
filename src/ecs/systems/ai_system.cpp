@@ -41,10 +41,10 @@ void AISystem::step(float elapsed_ms)
 			movement.posA = motion.position;
 			movement.distanceTraveled = 0.0f;
 		}
-		else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB))
+		else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
 
-			movement.posA = movement.posB;
+			movement.posA = motion.position;
 			// ACTING
 			// std::cout << currPattern.name << "before getmove" << std::endl;
 			movement.posB = getMove(currPattern.type, entity);
@@ -77,7 +77,6 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	EnemyPattern &currPattern = enemy.currEnemyPattern();
 	bool reaction_found = false;
 
-	// this is potentially VERY costly, but idk where to put this
 	float closeToBeeDistance = 100.f;
 	bool closeToBee = false;
 
@@ -132,6 +131,10 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			}
 		}
 	}
+	if (registry.healers.has(entity))
+	{
+		reaction_found = updateHealerState(enemy, entity);
+	}
 
 	if (hpPercent < 0.25f)
 	{
@@ -170,7 +173,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
 		if (reaction)
 		{
-			//std::cout << "got reaction for follow player" << std::endl;
+			// std::cout << "got reaction for follow player" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
@@ -202,6 +205,60 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 }
 
+bool AISystem::updateHealerState(Enemy &enemy, Entity entity)
+{
+	EnemyPattern &currPattern = enemy.currEnemyPattern();
+	Healer &healer = registry.healers.get(entity);
+	bool reaction_found = false;
+	if (healer.targetEntity)
+	{
+		if (registry.enemies.has(healer.targetEntity))
+		{
+			Enemy &targetEnemy = registry.enemies.get(healer.targetEntity);
+			if (targetEnemy.currHealth > 0)
+			{
+				return true;
+			}
+		}
+	}
+    bool foundHurtEnemy = false;
+    for (Entity otherEntity : registry.enemies.entities)
+    {
+        if (otherEntity != entity)
+        {
+            Enemy &otherEnemy = registry.enemies.get(otherEntity);
+            float otherHpPercent = static_cast<float>(otherEnemy.currHealth) / static_cast<float>(otherEnemy.maxHealth);
+
+            // Look for an enemy that is hurt (health < max health)
+            if (otherHpPercent < 1.0f)
+            {
+                auto reaction = getReactions(currPattern.reactions, ReactionType::TEAM_HURT);
+                if (reaction)
+                {
+                    enemy.patternIndex = reaction->index;
+                    enemy.newPattern = true;
+                    reaction_found = true;
+                    healer.targetEntity = otherEntity;
+                    foundHurtEnemy = true;
+                }
+                break;
+            }
+        }
+    }
+	if (!foundHurtEnemy)
+    {
+
+        auto idleReaction = getReactions(currPattern.reactions, ReactionType::DURATION);
+        if (idleReaction)
+        {
+            enemy.patternIndex = idleReaction->index;
+            enemy.newPattern = true;
+            reaction_found = true;
+        }
+    }
+	return reaction_found;
+}
+
 vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 {
 	// path finding hasnt been implemented
@@ -222,10 +279,14 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getCurrentPos(entity);
 	case EnemyBehavior::IDLE:
 		return getCurrentPos(entity);
+	case EnemyBehavior::HEALING:
+		return getTeamPos(entity);
 	case EnemyBehavior::MERGE_BEE:
 		return getCurrentPos(entity);
 	case EnemyBehavior::SPAWNING:
 		return getCurrentPos(entity);
+	case EnemyBehavior::CHARGING:
+		return getCharginPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
@@ -233,7 +294,9 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 
 vec2 AISystem::getCurrentPos(Entity entity)
 {
-	EnemyMovement movement = registry.enemyMovement.get(entity);
+
+	EnemyMovement &movement = registry.enemyMovement.get(entity);
+	movement.speed = 100.f;
 	return movement.posA;
 }
 
@@ -275,6 +338,85 @@ vec2 AISystem::generateRandomPos(Entity entity)
 	pos_y = glm::clamp(pos_y, minY, maxY);
 	return vec2(pos_x, pos_y);
 }
+
+vec2 AISystem::getCharginPos(Entity entity)
+{
+	auto &window_registry = registry.windowStates;
+	WindowState &windowState = window_registry.components[0];
+	int width = windowState.width;
+	int height = windowState.height;
+	vec2 playerPos = getPlayerPos();
+	Motion &motion = registry.motions.get(entity);
+	vec2 scale = motion.scale;
+	// Calculate the direction from the enemy to the player
+	vec2 direction = playerPos - motion.position;
+
+	// Normalize the direction
+	if (glm::length(direction) > 0)
+	{
+		direction = glm::normalize(direction);
+	}
+
+	// Define a charge distance (how far beyond the player the enemy charges)
+	float chargeDistance = 100.0f; // Adjust this value as needed
+
+	// Calculate the goal position for charging past the player
+	vec2 goalPosition = playerPos + direction * chargeDistance;
+
+	// Increase the enemy's speed for the charge
+	EnemyMovement &movement = registry.enemyMovement.get(entity);
+	movement.speed = 500.0f;
+
+	float minX = 150.f + scale[0];
+	float minY = 100.f + scale[1];
+	float maxX = width - 150.f - scale[0];
+	float maxY = height - 60.f - scale[1];
+	goalPosition[0] = glm::clamp(goalPosition[0], minX, maxX);
+	goalPosition[1] = glm::clamp(goalPosition[1], minY, maxY);
+
+	return goalPosition;
+}
+
+vec2 AISystem::getTeamPos(Entity entity)
+{
+	auto &window_registry = registry.windowStates;
+	WindowState &windowState = window_registry.components[0];
+	int width = windowState.width;
+	int height = windowState.height;
+	Motion &motion = registry.motions.get(entity);
+	vec2 scale = motion.scale;
+	if (registry.healers.has(entity))
+	{
+		Healer &healComponent = registry.healers.get(entity);
+		Entity teammates = healComponent.targetEntity;
+		if (teammates && registry.motions.has(teammates))
+		{
+			Motion &teammateMotion = registry.motions.get(teammates);
+			Motion &healerMotion = registry.motions.get(entity);
+
+			vec2 direction = teammateMotion.position - healerMotion.position;
+			if (glm::length(direction) > 0)
+			{
+				direction = glm::normalize(direction);
+			}
+			float backDistance = 100.0f;
+
+			vec2 goalPosition = teammateMotion.position - direction * backDistance;
+
+			vec2 scale = healerMotion.scale;
+			float minX = 150.f + scale.x;
+			float minY = 100.f + scale.y;
+			float maxX = width - 150.f - scale.x;
+			float maxY = height - 60.f - scale.y;
+
+			goalPosition.x = glm::clamp(goalPosition.x, minX, maxX);
+			goalPosition.y = glm::clamp(goalPosition.y, minY, maxY);
+
+			return goalPosition;
+		}
+	}
+	return getCurrentPos(entity);
+};
 
 vec2 AISystem::getPlayerPos()
 {
@@ -352,7 +494,6 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	boidComputeAlignment(entity, boid);
 	boidKeepBound(entity, boid);
 
-
 	float maxSpeed = 300.f;
 	if (glm::length(boid.velocity) > maxSpeed)
 	{
@@ -360,32 +501,37 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	}
 }
 
-void AISystem::boidKeepBound(Entity entity, Boid &boid) {
-    WindowState &windowState = registry.windowStates.components[0];
-    int width = windowState.width;
-    int height = windowState.height;
+void AISystem::boidKeepBound(Entity entity, Boid &boid)
+{
+	WindowState &windowState = registry.windowStates.components[0];
+	int width = windowState.width;
+	int height = windowState.height;
 
-    vec2 scale = registry.motions.get(entity).scale;
-    float minX = 150.f + scale[0];
-    float minY = 100.f + scale[1];
-    float maxX = width - 150.f - scale[0];
-    float maxY = height - 100.f - scale[1];
-    float turnFactor = 1.0f;
+	vec2 scale = registry.motions.get(entity).scale;
+	float minX = 150.f + scale[0];
+	float minY = 100.f + scale[1];
+	float maxX = width - 150.f - scale[0];
+	float maxY = height - 100.f - scale[1];
+	float turnFactor = 1.0f;
 	float momentumFactor = 50.f;
-    vec2 position = boid.position;
+	vec2 position = boid.position;
 
-    if (position[0] < minX) {
-        boid.velocity[0] += glm::abs(boid.velocity[0]) * turnFactor + momentumFactor;
-    }
-    if (position[0] > maxX) {
-        boid.velocity[0] -= glm::abs(boid.velocity[0]) * turnFactor + momentumFactor;
-    }
-    if (position[1] < minY) {
-        boid.velocity[1] += glm::abs(boid.velocity[1]) * turnFactor + momentumFactor;
-    }
-    if (position[1] > maxY) {
-        boid.velocity[1] -= glm::abs(boid.velocity[1]) * turnFactor + momentumFactor;
-    }
+	if (position[0] < minX)
+	{
+		boid.velocity[0] += glm::abs(boid.velocity[0]) * turnFactor + momentumFactor;
+	}
+	if (position[0] > maxX)
+	{
+		boid.velocity[0] -= glm::abs(boid.velocity[0]) * turnFactor + momentumFactor;
+	}
+	if (position[1] < minY)
+	{
+		boid.velocity[1] += glm::abs(boid.velocity[1]) * turnFactor + momentumFactor;
+	}
+	if (position[1] > maxY)
+	{
+		boid.velocity[1] -= glm::abs(boid.velocity[1]) * turnFactor + momentumFactor;
+	}
 }
 
 void AISystem::boidComputeCoherence(Entity entity, Boid &boid)
@@ -421,7 +567,6 @@ void AISystem::boidComputeCoherence(Entity entity, Boid &boid)
 	}
 }
 
-
 void AISystem::boidComputeSeperation(Entity entity, Boid &boid)
 {
 	float minDistance = 20.f;
@@ -448,7 +593,8 @@ void AISystem::boidComputeSeperation(Entity entity, Boid &boid)
 	boid.velocity[1] += move[1] * avoidFactor;
 }
 
-void AISystem::boidComputeAlignment(Entity entity, Boid& boid) {
+void AISystem::boidComputeAlignment(Entity entity, Boid &boid)
+{
 	vec2 avgVelocity = vec2(0, 0);
 	int numNeighbors = 0;
 	float matchingFactor = 0.02;
@@ -483,32 +629,32 @@ void AISystem::boidComputeAlignment(Entity entity, Boid& boid) {
 	}
 }
 
-float getRandomInRange(float min, float max) {
-    static std::random_device rd; // Seed for the random number generator
-    static std::mt19937 gen(rd()); // Mersenne Twister RNG
-    std::uniform_real_distribution<float> dis(min, max);
-    return dis(gen);
+float getRandomInRange(float min, float max)
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> dis(min, max);
+	return dis(gen);
 }
 
-void AISystem::boidWander(Entity entity, Boid& boid)
+void AISystem::boidWander(Entity entity, Boid &boid)
 {
-    float wanderRadius = 50.0f;       
-    float wanderDistance = 100.0f;     
-    float wanderJitter = 5.0f;        
-    float wanderFactor = 0.1f;         
+	float wanderRadius = 50.0f;
+	float wanderDistance = 100.0f;
+	float wanderJitter = 5.0f;
+	float wanderFactor = 0.1f;
 
-    boid.wanderAngle += getRandomInRange(-wanderJitter, wanderJitter);
-    
-    vec2 wanderTarget = vec2(
-        cos(boid.wanderAngle) * wanderRadius,
-        sin(boid.wanderAngle) * wanderRadius
-    );
-    
-    vec2 ahead = boid.velocity;
-    ahead = glm::normalize(ahead) * wanderDistance;  
-    vec2 target = boid.position + ahead + wanderTarget;
+	boid.wanderAngle += getRandomInRange(-wanderJitter, wanderJitter);
 
-    vec2 desiredVelocity = target - boid.position;
+	vec2 wanderTarget = vec2(
+		cos(boid.wanderAngle) * wanderRadius,
+		sin(boid.wanderAngle) * wanderRadius);
 
-    boid.velocity += desiredVelocity * wanderFactor;
+	vec2 ahead = boid.velocity;
+	ahead = glm::normalize(ahead) * wanderDistance;
+	vec2 target = boid.position + ahead + wanderTarget;
+
+	vec2 desiredVelocity = target - boid.position;
+
+	boid.velocity += desiredVelocity * wanderFactor;
 }

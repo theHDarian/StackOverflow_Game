@@ -31,7 +31,7 @@ const BulletStackEffect lightning = {
 	Additive,
 	0,
 	"lightning",
-	"" };
+	""};
 
 const BulletStackEffect dmgDownA = {
 	BulletDamage,
@@ -157,7 +157,7 @@ const BulletStackEffect key = {
 	Additive,
 	0,
 	"Key",
-	"" };
+	""};
 
 //////////////////////////////////////////
 ///////////  AttackData  /////////////////
@@ -285,8 +285,7 @@ const AttackData missile{
 	0,
 	0,
 	0.01,
-	EnemyBulletDeath::CLUSTER
-};
+	EnemyBulletDeath::CLUSTER};
 
 const AttackData sixShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -470,20 +469,19 @@ const AttackData NoAttack{
 	0};
 
 const AttackData quadShot{
-		EnemyAttackPattern::RADIAL,
-		TRIANGLE,
-		{},
-		blunt,
-		4,
-		0.0,
-		{20, 20},
-		200,
-		3000,
-		{0.0, 0.0},
-		0,
-		0,
-		0 
-	};
+	EnemyAttackPattern::RADIAL,
+	TRIANGLE,
+	{},
+	blunt,
+	4,
+	0.0,
+	{20, 20},
+	200,
+	3000,
+	{0.0, 0.0},
+	0,
+	0,
+	0};
 
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
@@ -539,9 +537,9 @@ struct TestEnemy : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(-12, 0)};
 		scale = vec2({288.0f / 2, 240.f / 2});
+		rotatePower = 0.5f;
 	};
 };
-
 
 struct EnemyEasySentry : Enemy
 {
@@ -562,6 +560,7 @@ struct EnemyEasySentry : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(-12, 0)};
 		scale = vec2({240.0f / 2, 240.f / 2});
+		rotatePower = 0.f;
 	};
 };
 
@@ -570,57 +569,49 @@ struct EnemyMediumTank : Enemy
 
 	Reaction durationWalking = {
 		ReactionType::DURATION,
-		0
-	};
+		0};
 	Reaction durationShoot = {
 		ReactionType::DURATION,
-		1
-	};
+		1};
 	Reaction halfHP = {
 		ReactionType::FIFTY_HEALTH,
-		2
-	};
+		2};
 
 	Reaction durationWalkingRage = {
 		ReactionType::DURATION,
-		3
-	};
+		3};
 
 	Reaction durationAttackMissile = {
 		ReactionType::DURATION,
-		4
-	};
+		4};
 
 	Reaction durationAttackSniper = {
 		ReactionType::DURATION,
-		5
-	};
+		5};
 
 	Reaction durationSpiralShot = {
 		ReactionType::DURATION,
-		2
-	};
+		2};
 
-	EnemyPattern randomState ={"RANDOM POSITION", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {durationShoot, halfHP}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {durationShoot, halfHP}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern idleState = {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {durationWalking, halfHP}, 0, true, 0.f, 800.f, radialBurst};
 	EnemyPattern rageState = {"HALF HP", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {durationWalkingRage}, 3, true, 0.f, 500.f, twelveSpiralShot};
 	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {durationAttackMissile}, 4, false, 0.f, 0.f, NoAttack};
 	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {durationAttackSniper}, 5, true, 0.f, 300.f, missile};
-	EnemyPattern shootSniper = {"sniper", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {durationSpiralShot}, 2, true , 0.f, 300.f, SniperShot};
+	EnemyPattern shootSniper = {"sniper", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {durationSpiralShot}, 2, true, 0.f, 300.f, SniperShot};
 	EnemyMediumTank()
 	{
 		maxHealth = 500;
 		currHealth = maxHealth;
 		enemyPatterns = {
-			randomState, idleState, rageState, walkingRage, shootMisile, shootSniper
-		};
+			randomState, idleState, rageState, walkingRage, shootMisile, shootSniper};
 		patternIndex = 0;
 		sprite = {
 			"enemy_Crab.png",
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		};
+			GEOMETRY_BUFFER_ID::SPRITE};
 		scale = vec2({288.0f / 2, 240.f / 2});
+		rotatePower = 0.8f;
 	};
 };
 
@@ -641,6 +632,7 @@ struct EnemyBigC : Enemy
 				  EFFECT_ASSET_ID::MESH,
 				  GEOMETRY_BUFFER_ID::MESH_GB};
 		scale = vec2({700 * (1.923352 / 2.f), 700});
+		rotatePower = 1.f;
 	};
 };
 
@@ -672,9 +664,9 @@ struct EnemyMediumCharge : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({288.0f / 2, 240.f / 2});
+		rotatePower = 0.8f;
 	};
 };
-
 
 struct Bee1 : Enemy
 {
@@ -690,8 +682,7 @@ struct Bee1 : Enemy
 		2};
 	Reaction reactionNoBees = {
 		ReactionType::NO_BEES,
-		0
-	};
+		0};
 
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, NoAttack};
@@ -708,6 +699,7 @@ struct Bee1 : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0, 0)};
 		scale = vec2({864 / 8.f, 480 / 8.f});
+		rotatePower = 1.f;
 	};
 };
 
@@ -726,8 +718,7 @@ struct Bee2 : Enemy
 		2};
 	Reaction reactionNoBees = {
 		ReactionType::NO_BEES,
-		0
-	};
+		0};
 
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, SniperShot};
@@ -745,6 +736,7 @@ struct Bee2 : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({864 / 8.f, 480 / 8.f});
+		rotatePower = 1.f;
 	};
 };
 
@@ -760,24 +752,22 @@ struct Bee3 : Enemy
 
 	Reaction playerClose = {
 		ReactionType::PLAYER_CLOSE,
-		1
-	};
+		1};
 
 	const AttackData beeSpray{
-	EnemyAttackPattern::SPRAY,
-	TRIANGLE,
-	{},
-	blunt,
-	15,
-	M_PI,
-	{20, 20},
-	600,
-	3000,
-	{0, 0},
-	0,
-	0,
-	0 };
-
+		EnemyAttackPattern::SPRAY,
+		TRIANGLE,
+		{},
+		blunt,
+		15,
+		M_PI,
+		{20, 20},
+		600,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0};
 
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {reactionFollow}, 1, true, 0, 600.f, beeSpray};
 	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {reactionFollow}, 0, false, 0, 1000.f, none};
@@ -793,67 +783,66 @@ struct Bee3 : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({864 / 8.f, 720 / 8.f});
+		rotatePower = 1.f;
 	};
 };
 
-struct EnemyMediumBeeHive : Enemy {
+struct EnemyMediumBeeHive : Enemy
+{
 	Reaction Spawning{
 		ReactionType::DURATION,
-		1
-	};
-	Reaction idling {
+		1};
+	Reaction idling{
 		ReactionType::DURATION,
-		0
-	};
-	Reaction halfHP {
+		0};
+	Reaction halfHP{
 		ReactionType::FIFTY_HEALTH,
-		2
-	};
-	Reaction finalIdle {
+		2};
+	Reaction finalIdle{
 		ReactionType::DURATION,
-		3
-	};
+		3};
 	EnemyPattern idlingState = {"IDLING", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {Spawning, halfHP}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::SPAWNING, {}, 0, 3000.f , 3000.f, {idling, halfHP}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::SPAWNING, {}, 0, 3000.f, 3000.f, {idling, halfHP}, 0, false, 0.f, 0.f, NoAttack};
 	EnemyPattern halfHPState = {"SPAWN LOT BEES", EnemyBehavior::SPAWNING, {}, 0, 3000.f, 3000.f, {finalIdle}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyPattern deadHiveState = {"DEAD HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {finalIdle}, 3, false, 0.f, 0.f, NoAttack};
-	EnemyMediumBeeHive() {
+	EnemyMediumBeeHive()
+	{
 		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {idlingState, spawningState, halfHPState, deadHiveState};
 		sprite = {
 			"beehive_close.png",
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE,	
+			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		patternIndex = 0;
 		scale = vec2({240.0f / 2, 312.f / 2});
+		rotatePower = 0.f;
 	};
 };
 
-struct EnemyHardAngel : Enemy{
+struct EnemyHardAngel : Enemy
+{
 	Reaction Attack2{
 		ReactionType::DURATION,
-		3
-	};
-	Reaction Attack0 {
+		3};
+	Reaction Attack0{
 		ReactionType::DURATION,
-		1
-	};
-	Reaction Attack1 {
+		1};
+	Reaction Attack1{
 		ReactionType::DURATION,
 		2,
 	};
 
-	Reaction Attack3 {
+	Reaction Attack3{
 		ReactionType::DURATION,
-		0
-	};
+		0};
 	EnemyPattern attack1State = {"ATTACK 1", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {Attack0}, 1, true, 500.f, 500.f, SniperShot};
 	EnemyPattern attack2State = {"ATTACK 2", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {Attack1}, 2, true, 0.f, 500.f, wave};
 	EnemyPattern attack3State = {"ATTACK 3", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {Attack2}, 0, true, 0.f, 500.f, fourAllAround};
 	EnemyPattern followPlayerState = {"ATTACK4", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {Attack3}, 0, true, 0.f, 600.f, SniperShot};
-	EnemyHardAngel() {
+	EnemyHardAngel()
+	{
 		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {attack1State, attack2State, attack3State, followPlayerState};
@@ -864,36 +853,39 @@ struct EnemyHardAngel : Enemy{
 		};
 		patternIndex = 0;
 		scale = vec2({192 / 2.f, 216 / 2.f});
+		rotatePower = 0.f;
 	};
 };
 
-struct EnemyEasySkull : Enemy {
-	Reaction AttackLaser {
+struct EnemyEasySkull : Enemy
+{
+	Reaction AttackLaser{
 		ReactionType::DURATION,
-		0
-	};
-	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f , 10000.f, laserRotate};
-	EnemyEasySkull() {
+		0};
+	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f, 10000.f, laserRotate};
+	EnemyEasySkull()
+	{
 		maxHealth = 100;
 		currHealth = maxHealth;
 		enemyPatterns = {laserState};
 		sprite = {
 			"skull.png",
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE
-		};
+			GEOMETRY_BUFFER_ID::SPRITE};
 		patternIndex = 0;
 		scale = vec2({230.0f / 2, 240.f / 2});
+		rotatePower = 0.f;
 	};
 };
 
-struct EnemyHardBoid :  Enemy {
-	Reaction boid {
+struct EnemyHardBoid : Enemy
+{
+	Reaction boid{
 		ReactionType::DURATION,
-		0
-	};
+		0};
 	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyHardBoid() {
+	EnemyHardBoid()
+	{
 		maxHealth = 1;
 		currHealth = maxHealth;
 		enemyPatterns = {boidState};
@@ -904,6 +896,72 @@ struct EnemyHardBoid :  Enemy {
 		};
 		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
+		rotatePower = 1.f;
+	}
+};
+
+struct EnemyMediumBoar : Enemy
+{
+	Reaction noticePlayer{
+		ReactionType::PLAYER_CLOSE,
+		1};
+	Reaction reactionToIdle{
+		ReactionType::DURATION,
+		2};
+
+	Reaction reactionToRandom{
+		ReactionType::DURATION,
+		3};
+
+	Reaction reactionToRandom2{
+		ReactionType::DURATION,
+		0};
+
+	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 2000.f, 2000.f, {reactionToIdle}, 2, true, 0.f, 0.f, NoAttack};
+	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {noticePlayer}, 0, true, 0.f, 1000.f, wave};
+	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {reactionToRandom}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {reactionToRandom2}, 0, true, 0.f, 1000.f, wave};
+
+	EnemyMediumBoar()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+		enemyPatterns = {randomPos, chargingState, idleState, randomPosNoCharge};
+		sprite = {
+			"enemy_Snail.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({864 / 8.f, 480 / 8.f});
+		patternIndex = 0;
+		rotatePower = 0.5f;
+	}
+};
+
+struct EnemyMediumHeal : Enemy
+{
+
+	Reaction teamHurt{
+		ReactionType::TEAM_HURT,
+		1};
+	Reaction reactionToIdle{
+		ReactionType::DURATION,
+		0};
+	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {teamHurt}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyPattern healState = {"HEAL", EnemyBehavior::HEALING, {}, 0, 10000.f, 10000.f, {reactionToIdle, teamHurt}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyMediumHeal()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+		enemyPatterns = {idleState, healState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2({192 / 2.f, 216 / 2.f});
+		rotatePower = 0.f;
 	}
 };
 

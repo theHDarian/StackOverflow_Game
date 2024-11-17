@@ -61,6 +61,12 @@ void EnemySystem::step(float elapsed_ms)
             merge(entity, pattern, pendingDeletion);
         }
 
+        if (registry.healers.has(entity) && pattern.type == EnemyBehavior::HEALING) {
+            Healer& healer = registry.healers.get(entity);
+            healer.coolDown -= elapsed_ms;
+            heal(entity, pattern);
+        }
+
         // for (Entity deletedBee : pendingDeletion)
         //{
         //     //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
@@ -98,19 +104,19 @@ void EnemySystem::step(float elapsed_ms)
         // move enemy using lerp
         if (registry.enemyMovement.has(entity))
         {
+            
             EnemyMovement &movement = registry.enemyMovement.get(entity);
+            vec2 direction = movement.posB - movement.posA;
             if (pattern.type == EnemyBehavior::ROTATE_IN_PLACE)
             {
                 float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
                 float rotationChange = angularSpeed * elapsed_ms / 1000.f;
                 motion.angle += rotationChange;
-            }
-            vec2 direction = movement.posB - movement.posA;
-            if (direction != vec2(0, 0))
+            } else if (direction != vec2(0, 0))
             {
                 float targetAngle = atan2(direction.y, direction.x);
                 float deltaAngle = targetAngle - motion.angle;
-                float angularSpeedRad = movement.angularSpeed * 2 * M_PI / 360.0f;
+                float angularSpeedRad = movement.angularSpeed * enemy.rotatePower * 2 * M_PI / 360.0f;
                 float maxChange = angularSpeedRad * elapsed_ms / 1000.0f;
                 if (deltaAngle > M_PI)
                     deltaAngle -= 2 * M_PI;
@@ -548,3 +554,19 @@ void EnemySystem::beeHiveSpawn(Entity entity, EnemyPattern &currPattern, Hive &h
         hive.currSpawnCD = hive.maxSpawnCD;
     }
 }
+
+void EnemySystem::heal(Entity entity, EnemyPattern &currPattern) {
+    Healer& healer = registry.healers.get(entity);
+    if (healer.targetEntity && currPattern.type == EnemyBehavior::HEALING) {
+        Entity otherEntity = healer.targetEntity;
+        if (healer.coolDown < 0.f) {
+            Enemy& otherEnemy = registry.enemies.get(otherEntity);
+            Enemy& healerEnemy = registry.enemies.get(entity);
+
+            otherEnemy.currHealth = glm::min(otherEnemy.maxHealth, otherEnemy.currHealth + healer.healPower);
+            healerEnemy.currHealth = glm::min(healerEnemy.maxHealth, healerEnemy.currHealth + healer.healPower);
+
+            healer.coolDown = healer.maxCoolDown;
+        }
+    }
+}   
