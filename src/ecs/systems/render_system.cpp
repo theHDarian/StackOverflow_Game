@@ -576,12 +576,25 @@ void RenderSystem::drawGameElements()
 		drawAllColliders(entity, projection_2D);
 	}
 
-	for (Entity& entity : registry.enemies.entities)
+	for (Entity& entity : registry.bosses.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
-		if (!registry.boids.has(entity)) {
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
+			drawHPbar(entity, projection_2D);
+		}
+
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
+	}
+
+	for (Entity& entity : registry.enemies.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
+			continue;
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
 			drawHPbar(entity, projection_2D);
 		}
 	

@@ -65,6 +65,7 @@ public:
 	ComponentContainer<Bound> bounds; //room boundaries
 	ComponentContainer<MapRequest> mapRequests;
 	ComponentContainer<BossEnemy> bosses;
+	ComponentContainer<BossParts> bossParts;
 	ComponentContainer<Animation> animations;
 	ComponentContainer<BeeEnemy> bees;
 	ComponentContainer<AnimationSequence> animationSequences;
@@ -136,6 +137,7 @@ public:
 		registry_list.push_back(&menuUITexts);
 		registry_list.push_back(&damageds);
 		registry_list.push_back(&bosses);
+		registry_list.push_back(&bossParts);
 		registry_list.push_back(&animations);
 		registry_list.push_back(&sprites);
 		registry_list.push_back(&spriteTimers);
