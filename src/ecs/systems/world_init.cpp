@@ -232,8 +232,8 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 
 	// can use aabb as near player range for now for pseudo-offsetting
 	 AABBCollider& aabb = registry.aabbs.emplace(console);
-	 aabb.topLeft = vec2(-m.scale.x / 4, -m.scale.y / 9);
-	 aabb.bottomRight = vec2(m.scale.x / 4, m.scale.y / 2.5);
+	 aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	 aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
 
 	//CircleCollider &cc = registry.circleColliders.emplace(console);
 	//cc.radius = m.scale.y / 4;
