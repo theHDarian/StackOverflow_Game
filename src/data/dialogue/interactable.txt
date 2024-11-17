@@ -80,6 +80,20 @@ You decide not to pop your tack.
 ITEM PopStack -1 1
 You've already used this! Thinking back, why does a run-down lab have a machine like this anyway?
 
+ITEM PushStack -1 0
+This seems to be one of those machines that can directly link to robots and push data onto their stacks.
+Would you like to download data from this machine?
+CHOICES Yes\No
+
+ITEM PushStack 0 0
+You feel a surge of data being pushed onto your stack.
+
+ITEM PushStack 1 0
+You decide against downloading data from a machine in a run-down lab.
+
+ITEM PushStack -1 1
+You've already used this! You wonder if the data you got was worth it.
+
 ITEM Ram -1 0
 !This is a ram module! These things are a robot's favourite treat, installing it will allow you to store more data in your stack.
 Would you like to install the ram module?

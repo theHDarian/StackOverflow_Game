@@ -47,6 +47,20 @@ const BulletStackEffect dmgDownM = {
 	"dmgDownM",
 	""};
 
+const BulletStackEffect dmgUpA = {
+	BulletDamage,
+	Additive,
+	5.0,
+	"dmgUpA",
+	""};
+
+const BulletStackEffect dmgUpM = {
+	BulletDamage,
+	Multiplicative,
+	1.5,
+	"dmgUpM",
+	""};
+
 const BulletStackEffect numBulletsUpA = {
 	BulletNum,
 	Additive,
@@ -152,6 +166,77 @@ const BulletStackEffect dashUpM = {
 	"dashUpM",
 	""};
 
+const BulletStackEffect stackSizeUpA = {
+	PlayerStackSize,
+	Additive,
+	6,
+	"stackSizeUpA",
+	""};
+
+const BulletStackEffect stackSizeUpM = {
+	PlayerStackSize,
+	Multiplicative,
+	2,
+	"stackSizeUpM",
+	""};
+
+const BulletStackEffect dashCDRUpA = {
+	PlayerDashCDR,
+	Additive,
+	500,
+	"dashCDRUpA",
+	""};
+
+const BulletStackEffect dashCDRUpM = {
+	PlayerDashCDR,
+	Multiplicative,
+	1.25,
+	"dashCDRUpM",
+	""};
+
+const BulletStackEffect dashCDRDownA = {
+	PlayerDashCDR,
+	Additive,
+	-750,
+	"dashCDRDownA",
+	""};
+
+const BulletStackEffect dashCDRDownM = {
+	PlayerDashCDR,
+	Multiplicative,
+	0.5,
+	"dashCDRDownM",
+	""};
+
+const BulletStackEffect playerSpeedUpA = {
+	PlayerSpeed,
+	Additive,
+	100,
+	"playerSpeedUpA",
+	""};
+
+const BulletStackEffect playerSpeedUpM = {
+	PlayerSpeed,
+	Multiplicative,
+	1.5,
+	"playerSpeedUpM",
+	""};
+
+
+const BulletStackEffect ostrichWarrior = {
+	PlayerSpeed,
+	Multiplicative,
+	3,
+	"ostrichWarrior",
+	""};
+
+const BulletStackEffect ostrichWarriorDownside = {
+	PlayerDashCDR,
+	Multiplicative,
+	3,
+	"ostrichWarrior",
+	""};
+
 const BulletStackEffect key = {
 	Key,
 	Additive,
@@ -199,7 +284,7 @@ const AttackData none{
 const AttackData trail{
 	EnemyAttackPattern::TRAIL,
 	CIRCLE,
-	{},
+	{ dmgUpA },
 	blunt,
 	1,
 	0,
@@ -214,7 +299,7 @@ const AttackData trail{
 const AttackData wave{
 	EnemyAttackPattern::WAVE,
 	CIRCLE,
-	{},
+	{ dmgUpM },
 	blunt,
 	5,
 	0,
@@ -244,7 +329,7 @@ const AttackData laserNoRotate{
 const AttackData laserRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{},
+	{ },
 	blunt,
 	3,
 	0,
@@ -259,7 +344,7 @@ const AttackData laserRotate{
 const AttackData threeShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
-	{},
+	{ dashCDRDownM},
 	blunt,
 	3,
 	M_PI / 6.0,
@@ -274,7 +359,7 @@ const AttackData threeShot{
 const AttackData missile{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{},
+	{spreadUpA},
 	blunt,
 	1,
 	0,
@@ -427,7 +512,7 @@ const AttackData fiveBurst{
 const AttackData threeSpray{
 	EnemyAttackPattern::SPRAY,
 	CIRCLE,
-	{},
+	{ dmgUpA },
 	blunt,
 	3,
 	M_PI / 16,
@@ -442,7 +527,7 @@ const AttackData threeSpray{
 const AttackData SniperShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{},
+	{bulletPierceUpA},
 	blunt,
 	1,
 	0,
@@ -472,7 +557,7 @@ const AttackData NoAttack{
 const AttackData quadShot{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{},
+		{ bulletPierceUpM},
 		blunt,
 		4,
 		0.0,

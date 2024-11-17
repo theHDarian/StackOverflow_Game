@@ -59,10 +59,9 @@ void MapSystem::step(float elapsed_ms)
         map.currRoom.preset.enemies = {};
 
         //spawn treasures
-        for(auto& e : map.currRoom.preset.treasures) {
-            createEnemyBullet(renderer,std::get<vec2>(e)* vec2(wS.width,wS.height),vec2(0.8,0.8),vec2(0),std::get<AttackData>(e));
-        }
-        map.currRoom.preset.treasures = {};
+        // for(auto& e : map.currRoom.preset.treasures) {
+        //     createEnemyBullet(renderer,std::get<vec2>(e)* vec2(wS.width,wS.height),vec2(0.8,0.8),vec2(0),std::get<AttackData>(e));
+        // }
 
         // for (auto &e : map.currRoom.preset.roomProps)
         // {
@@ -71,9 +70,10 @@ void MapSystem::step(float elapsed_ms)
 
         for (auto &e : map.currRoom.preset.interactables)
         {
-            createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e));
+            createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e), map.currRoom.preset.treasures);
         }
         map.currRoom.preset.interactables = {};
+        map.currRoom.preset.treasures = {};
 
     }
     
@@ -353,6 +353,7 @@ void MapSystem::resetMap()
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
         // createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
         // createRamStick(renderer, vec2(500, 500));
+        // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
 
     }
 }

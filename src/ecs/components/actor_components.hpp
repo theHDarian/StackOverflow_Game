@@ -47,6 +47,10 @@ struct BulletStackEffect {
 
 };
 
+struct EffectStack {
+    std::vector<BulletStackEffect> stack;
+};
+
 // Player component
 struct Player
 {

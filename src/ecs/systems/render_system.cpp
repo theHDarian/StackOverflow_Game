@@ -1164,7 +1164,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	// Getting uniform locations for glUniform* calls
 	if (!isCharging) {
-		vec3 color = { 0.50, 0.50, 0.0 };
+		vec3 color = { 0.60, 0.59, 0.0 };
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
@@ -1183,7 +1183,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
 	else {
-		vec3 color = { 0.50, 0.50, 0.0 }; // grey
+		vec3 color = { 0.60, 0.59, 0.0 }; // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
