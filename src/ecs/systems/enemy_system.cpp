@@ -373,9 +373,10 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::TRAIL)
     {
-        sound->playEnemyShootSound(sfxNum, atkData.numBullets);
+        // Sound is kinda annoying yeah, and its not really "shooting? I guess?
+        //sound->playEnemyShootSound(sfxNum, atkData.numBullets);
         shootShotgun(velocity, pos, atkData);
-        currPattern.currAtkCD = 400;
+        currPattern.currAtkCD = 600;
     }
     else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)
     {

@@ -650,6 +650,42 @@ struct EnemyEasySentry : Enemy
 	};
 };
 
+struct EnemyEasyTrail : Enemy
+{
+	const AttackData snailTrail{
+	EnemyAttackPattern::TRAIL,
+	CIRCLE,
+	{ dmgUpA },
+	blunt,
+	1,
+	0,
+	{20, 20},
+	0,
+	20000,
+	{0, 0},
+	0,
+	0,
+	0 };
+
+	EnemyPattern rotateState = { "Follow Player", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, snailTrail };
+
+	EnemyEasyTrail()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { rotateState };
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_Snail.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(-12, 0) };
+		scale = vec2(336, 216) * 0.5f;
+	};
+};
+
 struct EnemyMediumTank : Enemy
 {
 
@@ -779,8 +815,8 @@ struct Bee1 : Enemy
 	};
 
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
-	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, NoAttack};
-	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, true, 0.f, 5000.f, NoAttack};
+	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM_NEAR, {}, 0, 1000.f, 1000.f, {reactionBeeClose, reactionIdle}, 0, false, 0, 2000.f, NoAttack};
+	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, false, 0.f, 5000.f, NoAttack};
 	Bee1()
 	{
 		maxHealth = 20;
@@ -796,6 +832,7 @@ struct Bee1 : Enemy
 			5
 		};
 		scale = vec2({864 / 8.f, 480 / 8.f});
+		speedMultiplier = 3.0f;
 	};
 };
 

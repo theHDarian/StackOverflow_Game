@@ -696,6 +696,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyEasySkull();
 		break;
 	}
+	case EnemyType::Snail:
+	{
+		enemy = EnemyEasyTrail();
+		break;
+	}
 	case EnemyType::HardEnemyBoid:
 	{
 		enemy = EnemyHardBoid();
@@ -729,7 +734,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	// std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
-	movement.speed = 100.0f;
+	movement.speed = 100.0f * enemy.speedMultiplier;
 	movement.distanceTraveled = 0.0f;
 
 	registry.bursts.emplace(entity);
