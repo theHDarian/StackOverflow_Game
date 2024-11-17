@@ -14,7 +14,3 @@ Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, 
 UI GameOver
 Game Over \npress R to restart
 
-# for simplicity, the name of the bullet will be based off of the name in the premades
-# the name to be displayed will be written at the top
-
-

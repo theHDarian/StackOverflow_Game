@@ -244,11 +244,19 @@ const BulletStackEffect key = {
 	"Key",
 	"" };
 
+const BulletStackEffect homingUpA = {
+	Homing,
+	Additive,
+	0.1,
+	"Homing Accuracy (A)",
+	""
+};
+
 const std::vector<BulletStackEffect> premadeBullets = {
 	blunt, lightning, dmgDownA, dmgDownM, dmgUpA, dmgUpM, numBulletsUpA, sizeUpA, spreadUpA, bulletSpeedUpA, 
 	bulletSpeedUpM, bulletRangeUpA, bulletRangeUpM, bulletBurstUpA, bulletBurstUpM, bulletPierceUpA, bulletPierceUpM,
 	bulletBounceUpA, bulletBounceUpM, dashUpA, dashUpM, stackSizeUpA, stackSizeUpM, dashCDRUpA, dashCDRUpM, dashCDRDownA,
-	dashCDRDownM, playerSpeedUpA, playerSpeedUpM, ostrichWarrior, ostrichWarriorDownside, key
+	dashCDRDownM, playerSpeedUpA, playerSpeedUpM, ostrichWarrior, ostrichWarriorDownside, key, homingUpA
 };
 
 //////////////////////////////////////////

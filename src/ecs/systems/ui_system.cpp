@@ -258,7 +258,7 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	else {
 		// need to generate text and tokenize it
 		std::string tooltip = makeBulletTooltip(bullet);
-		uiTexts.insert({ bullet.name, getTokenizedText(tooltip) });
+		uiTexts.insert({ "HoverBullet_" + bullet.name, getTokenizedText(tooltip) });
 		textReq.tokenizedText = uiTexts["HoverBullet_" + bullet.name];
 	}
 	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
@@ -780,9 +780,6 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 	else if (bullet.type == BulletEffectType::Lightning) {
 		tooltip += "Shifts the bullets in the stack over by 1.";
 	}
-	else if (bullet.type == BulletEffectType::Homing) {
-		tooltip += "No idea how to write this one.";
-	}
 	else {
 		// ordinary bullets
 		// format: [increases/decreases] [the] [effect] by [amount]
@@ -790,7 +787,37 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 		if (bullet.effectCalc == Additive) {
 			if (bullet.value < 0) {
 				modify = "Decreases ";
-				amount = std::to_string(abs((int)bullet.value));
+				if (abs(bullet.value) - abs((int)bullet.value) > 0) {
+					std::stringstream amountString;
+					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+					amount = amountString.str();
+				}
+				else {
+					amount = std::to_string(abs((int)bullet.value));
+				}
+				if (bullet.type == BulletEffectType::PlayerDashCDR) {
+					intermediaryAmount = abs(bullet.value / 1000.f);
+					std::stringstream amountString;
+					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+					amount = amountString.str();
+				}
+				if (bullet.type == BulletEffectType::Homing) {
+					intermediaryAmount = bullet.value * 100;
+					std::stringstream amountString;
+					amountString << (int)intermediaryAmount << "%";
+					amount = amountString.str();
+				}
+			}
+			else {
+				modify = "Increases ";
+				if (bullet.value - (int)bullet.value > 0) {
+					std::stringstream amountString;
+					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+					amount = amountString.str();
+				}
+				else {
+					amount = std::to_string(abs((int)bullet.value));
+				}
 				if (bullet.type == BulletEffectType::PlayerDashCDR) {
 					intermediaryAmount = abs(bullet.value / 1000.f);
 
@@ -798,15 +825,10 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
 					amount = amountString.str();
 				}
-			}
-			else {
-				modify = "Increases ";
-				amount = std::to_string((int)bullet.value);
-				if (bullet.type == BulletEffectType::PlayerDashCDR) {
-					intermediaryAmount = abs(bullet.value / 1000.f);
-
+				if (bullet.type == BulletEffectType::Homing) {
+					intermediaryAmount = bullet.value * 100;
 					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+					amountString << (int)intermediaryAmount << "%";
 					amount = amountString.str();
 				}
 			}
@@ -857,7 +879,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			effect = "the pierce of bullets ";
 			break;
 		case Homing:
-			effect = ""; // this seems to not be in premades
+			effect = "the homing accuracy of bullets "; // this seems to not be in premades
 			break;
 		case PlayerSpeed:
 			effect = "movement speed ";
