@@ -32,6 +32,7 @@ const RoomPreset TutorialRoom2Preset{
     {},
     {},
     {},
+{},
     0.0f,
     0 
 };
