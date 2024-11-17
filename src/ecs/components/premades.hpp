@@ -1352,15 +1352,27 @@ struct EnemyEasySkull : Enemy
 
 struct EnemyHardBoid : Enemy
 {
-	Reaction boid{
+	Reaction normalboid{
 		ReactionType::DURATION,
 		0};
-	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+	
+	Reaction singularityTransition {
+		ReactionType::DURATION,
+		1
+	};
+
+	Reaction supernovaTransition {
+		ReactionType::DURATION,
+		2
+	};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 15000.f, 15000.f, {singularityTransition}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern singularityState = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 3000.f, 3000.f, {supernovaTransition}, 2, false, 0.f, 0.f, NoAttack};
+	EnemyPattern supernovaState = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 0, false, 0.f, 0.f, NoAttack};
 	EnemyHardBoid()
 	{
 		maxHealth = 1;
 		currHealth = maxHealth;
-		enemyPatterns = {boidState};
+		enemyPatterns = {boidState, singularityState, supernovaState};
 		sprite = {
 			"hifi_boid.png",
 			EFFECT_ASSET_ID::TEXTURED,
@@ -1390,13 +1402,13 @@ struct EnemyMediumBoar : Enemy
 		0};
 
 	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 2000.f, 2000.f, {reactionToIdle}, 2, true, 0.f, 0.f, NoAttack};
-	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {noticePlayer}, 0, true, 0.f, 1000.f, wave};
+	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {noticePlayer}, 0, true, 0.f, 1000.f, NoAttack};
 	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {reactionToRandom}, 3, false, 0.f, 0.f, NoAttack};
-	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {reactionToRandom2}, 0, true, 0.f, 1000.f, wave};
+	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {reactionToRandom2}, 0, true, 0.f, 1000.f, NoAttack};
 
 	EnemyMediumBoar()
 	{
-		maxHealth = 300;
+		maxHealth = 250;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleState, randomPosNoCharge};
 		sprite = {
