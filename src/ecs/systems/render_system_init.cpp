@@ -172,12 +172,18 @@ void RenderSystem::initializeGlTextures()
 		int width = 1;
 		int height = 1;
 
+		std::vector<directory_entry> entries;
+
 		// simplest way to get number of images
 		for (const auto& entry : directory_iterator(folder)) {
 			image_count++;
+			entries.push_back(entry);
 		}
+		std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) {
+			return a.path().filename().string() < b.path().filename().string();
+		});
 
-		for (const auto& entry : directory_iterator(folder))
+		for (const auto& entry : entries)
 		{
 
 			const std::string& path = entry.path().string();

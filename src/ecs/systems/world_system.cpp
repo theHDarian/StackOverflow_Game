@@ -334,7 +334,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
 				extendStack( player, 10);
-				reaction.choice = 1;
+				object.dialogueCount++;
 				registry.deleteds.emplace(reaction.object);
 			}
 		}
@@ -342,7 +342,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			if (reaction.choice == 0) {
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
 				addEffect(player, stack.stack);
-				reaction.choice = 1;
+				object.dialogueCount++;
 			}
 		}
 	}
