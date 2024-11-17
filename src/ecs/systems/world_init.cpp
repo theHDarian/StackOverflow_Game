@@ -207,7 +207,7 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 
 	registry.renderRequests.insert(
 		console,
-		{"pop_console",
+		{ "push_console",
 		 EFFECT_ASSET_ID::ANIMATE,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
