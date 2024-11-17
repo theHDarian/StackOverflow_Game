@@ -155,23 +155,6 @@ void clearRoomActors()
     registry.emitParticles.emplace(Entity(),ParticleRequestType::ClearParticles, ParticleProps(),0.0f, 0);
 }
 
-RoomType randomRoomType(bool excludeNone)
-{
-    return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
-}
-int getSymbol(RoomType type) {
-    if (type >= enemyRoomTypeStart && type <= enemyRoomTypeEnd) {
-        return (int)enemyRoomTypeStart;
-    }
-    else if (type == RoomType::TutorialRoom1 || type == RoomType::TutorialRoom2) {
-        return (int)RoomType::TutorialRoom1 - (enemyRoomTypeEnd - enemyRoomTypeStart);
-    }
-    else if (type < enemyRoomTypeStart) {
-        return (int)type;
-    }
-    return (int)type - (enemyRoomTypeEnd - enemyRoomTypeStart);
-}
-
 void MapSystem::changeRoom(RoomType type, int doorIndex)
 {
     std::vector<Door> &doors = registry.doors.components;
@@ -180,10 +163,13 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     if (door.room == RoomType::None || (!map.currRoom.cleared && registry.interactables.get(registry.doors.entities[doorIndex]).name.compare("OpenDoor") != 0))
         return;
-    //play door sound
 
     //play door close sound
     soundPlayer->playDoorCloseSound();
+
+    if (map.currRoom.type != RoomType::TutorialRoom1 && map.currRoom.type != RoomType::TutorialRoom2) {
+        map.roomsTraversed++;
+    }
 
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
@@ -196,29 +182,20 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
     playerMotion.position = spawnPosition;
 
-    // printf("Changing Room %c, enter door %d spawn at %.1f %.1f\n", type, doorIndex,spawnPosition.x,spawnPosition.y);
-
     // clear enemies and obstacles
     clearRoomActors();
 
     // change current room in the map
     map.currRoom = Room();
     assert(door.room != RoomType::None);
-    if (door.room == RoomType::TutorialRoom2) {
-        map.currRoom.preset = TutorialRoom2Preset;
-    }
-    else {
-        std::vector<RoomPreset> presets = roomDirectory.at(door.room);
-        RoomPreset randomPreset = Random::ListItem(presets);
-        map.currRoom.preset = randomPreset;
-    }
+    map.currRoom.preset = getRoomPreset(door.room,map.roomsTraversed, door.isLocked);
     map.currRoom.type = door.room;
+
     if (map.currRoom.type == RoomType::BossBigCRoom) {
         soundPlayer->playBossMusic(0);
     } else if (map.currRoom.type == RoomType::TreasureRoom) {
         soundPlayer->playSpecialMusic(0);
-    }
-    else {
+    } else {
         soundPlayer->playNextMusic();
     }
 
@@ -226,7 +203,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
-    registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = getSymbol(doors[spawnIndex].room);
+    registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = roomTypeToSymbols.at(doors[spawnIndex].room);
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
     bool excludeNone = false;
@@ -245,11 +222,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
-        registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
-    }
-
-    if (map.currRoom.type != RoomType::TutorialRoom1 && map.currRoom.type != RoomType::TutorialRoom2) {
-        map.roomsTraversed++;
+        registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
     }
 }
 
@@ -265,12 +238,12 @@ void MapSystem::resetMap()
             Door& d = registry.doors.components[i];
             d.isPrev = false;
             d.room = RoomType::None;
-            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
+            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
         registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
-        registry.doorSymbols.get(registry.doorSymbols.entities[2]).doorType = getSymbol(registry.doors.components[2].room);
+        registry.doorSymbols.get(registry.doorSymbols.entities[2]).doorType = roomTypeToSymbols.at(registry.doors.components[2].room);
         registry.interactables.get(registry.doors.entities[2]).name = "ClosedTutorialDoor";
         registry.interactables.get(registry.doors.entities[2]).interactType = InteractableType::DialogueInteractable;
 
@@ -287,11 +260,11 @@ void MapSystem::resetMap()
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
-            d.room = randomRoomType(excludeNone);
+            d.room = RoomType::TreasureRoom;
             if (d.room == RoomType::None)
                 excludeNone = true;
 
-            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
+            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
@@ -315,9 +288,7 @@ void MapSystem::resetMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        std::vector<RoomPreset> presets = roomDirectory.at(RoomType::RestRoom);
-        RoomPreset randomPreset = Random::ListItem(presets);
-        map.currRoom.preset = randomPreset;
+        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,map.roomsTraversed,false);
         createPopConsole(renderer, vec2(500, 500));
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));

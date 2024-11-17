@@ -118,7 +118,7 @@ const RoomPreset EnemyRoomBees1{
     0.0f,
     5};
 
-const RoomPreset EnemyRoomTripleBuff1{
+const RoomPreset EnemyRoomAngelTank{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
      {EnemyType::MediumEnemyCharge, {0.8f, 0.2f}},
      {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
@@ -143,6 +143,42 @@ const RoomPreset TreasureRoom1{
     5,
 };
 
+const RoomPreset TreasureRoom2{
+    {},
+    {{fiveBurst, {0.5f, 0.5f}}},
+    {},
+    {},
+    0.0f,
+    5,
+};
+const RoomPreset TreasureRoom3{
+    {},
+    {{laserNoRotate, {0.5f, 0.5f}}},
+    {},
+    {},
+    0.0f,
+    5,
+};
+
+const RoomPreset TreasureRoom4{
+    {},
+    {{twelveSpiralShot, {0.5f, 0.5f}}},
+    {},
+    {},
+    0.0f,
+    5,
+};
+const RoomPreset TreasureRoomBad{
+    {},
+    {{threeHomingShot, {0.5f, 0.5f}}},
+    {},
+    {},
+    0.0f,
+    5,
+};
+
+
+
 const RoomPreset BossRoom1{
     {{EnemyType::BossBigC, {0.5f, 0.5f}}},
     {},
@@ -151,10 +187,52 @@ const RoomPreset BossRoom1{
     0.0f,
     2};
 
-const std::map<RoomType, std::vector<RoomPreset>> roomDirectory = {
-    {RoomType::EnemyRoomDash, {EnemyRoomDash1}},
-    {RoomType::EnemyRoomTripleBuff, {EnemyRoomTripleBuff1}},
-    {RoomType::EnemyRoomBee, {EnemyRoomBees1}},
-    {RoomType::RestRoom, {RestingRoom1}},
-    {RoomType::TreasureRoom, {TreasureRoom1}},
-    {RoomType::BossBigCRoom, {BossRoom1}}};
+//used by roomsTraversed to determine type of enemy to spawn, some enemies only spawn in certain difficulty regions
+enum DifficultyRegion {
+    Intro,
+    Easy,
+    Medium,
+    // Hard,
+};
+
+const std::map<DifficultyRegion,std::map<RoomType, std::vector<RoomPreset>>> roomDirectory = {
+    {DifficultyRegion::Intro,{
+        {RoomType::EnemyRoom, {EnemyRoomDash1}},
+        {RoomType::RestRoom, {RestingRoom1}},
+        {RoomType::TreasureRoom, {TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4}},
+    }},
+    {DifficultyRegion::Easy,{
+        {RoomType::EnemyRoom, {EnemyRoomBees1}},
+        {RoomType::RestRoom, {RestingRoom1}},
+        {RoomType::TreasureRoom, {TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4}},
+    }},
+    {DifficultyRegion::Medium,{
+        {RoomType::EnemyRoom, {EnemyRoomAngelTank}},
+        {RoomType::RestRoom, {RestingRoom1}},
+        {RoomType::TreasureRoom, {TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4}},
+    }},
+};
+
+//TODO add locked rarity items
+RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
+    if (type == RoomType::TutorialRoom2) {
+        return TutorialRoom2Preset;
+    }
+    if (roomsTraversed < 3) {
+        return Random::ListItem(roomDirectory.at(Intro).at(type));
+    } else if (roomsTraversed < 5) {
+        return Random::ListItem(roomDirectory.at(Easy).at(type));
+    } else {
+        return Random::ListItem(roomDirectory.at(Medium).at(type));
+    }
+}
+
+const std::map<RoomType,int> roomTypeToSymbols = {
+    {RoomType::EnemyRoom,3},
+    {RoomType::RestRoom,1},
+    {RoomType::BossBigCRoom,2},
+    {RoomType::TreasureRoom,0},
+    {RoomType::None,4},
+    {RoomType::TutorialRoom1,5},
+    {RoomType::TutorialRoom2,5}
+};
