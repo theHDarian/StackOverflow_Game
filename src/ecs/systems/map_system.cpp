@@ -49,8 +49,7 @@ void MapSystem::step(float elapsed_ms)
 
     // spawn enemy based on current time
     WindowState &wS = registry.windowStates.components[0];
-    if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay)
-    {
+    if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
             createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
@@ -67,14 +66,15 @@ void MapSystem::step(float elapsed_ms)
         // {
         //     createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<RoomProp>(e));
         // }
+        if (map.currRoom.cleared) {
+            for (auto &e : map.currRoom.preset.interactables)
+            {
+                createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e), map.currRoom.preset.treasures);
+            }
+            map.currRoom.preset.interactables = {};
+            map.currRoom.preset.treasures = {};
 
-        for (auto &e : map.currRoom.preset.interactables)
-        {
-            createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e), map.currRoom.preset.treasures);
         }
-        map.currRoom.preset.interactables = {};
-        map.currRoom.preset.treasures = {};
-
     }
     
 

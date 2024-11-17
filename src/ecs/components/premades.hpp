@@ -451,7 +451,7 @@ const AttackData fourAllAround{
 const AttackData twoPincerShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
-	{},
+	{ dmgUpA },
 	blunt,
 	2,
 	M_PI / 1.0,
@@ -572,7 +572,7 @@ const AttackData NoAttack{
 const AttackData quadShot{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{ bulletPierceUpM},
+		{ key },
 		blunt,
 		4,
 		0.0,
