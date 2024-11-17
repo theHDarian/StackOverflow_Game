@@ -35,3 +35,12 @@ std::unordered_map<std::string, SoundType> soundEffectNames ={
     {"DoorOpen", SoundType::DoorOpen}
 
 };
+
+std::unordered_map<std::string, InteractableItem> interactableItemNames = {
+    {"Ram", InteractableItem::Ram},
+    {"PopConsole", InteractableItem::PopConsole},
+    {"OpenDoor", InteractableItem::OpenDoor},
+    {"LockedDoor", InteractableItem::LockedDoor},
+    {"BibleTree", InteractableItem::BibleTree},
+    {"Gardener", InteractableItem::Gardener}
+};

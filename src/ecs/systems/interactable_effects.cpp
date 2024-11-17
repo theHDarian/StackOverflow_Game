@@ -15,6 +15,9 @@ void resetStack(Entity player, RenderSystem* renderer) {
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
+        if (reg.currStack.size() == 0) {
+            return;
+        }
         int size = reg.baseStackSize;
         int i = 0;
         for (BulletStackEffect b : reg.currStack) {
@@ -28,24 +31,25 @@ void resetStack(Entity player, RenderSystem* renderer) {
             createEnemyBullet( renderer, registry.motions.get(player).position, {cos(angle), sin(angle)}, {0, 0}, atkData);
             i++;
         }
-        registry.stackCompile.remove(player);
-        StackCompile& newreg = registry.stackCompile.emplace(player);
+        reg.currStack.clear();
+        // registry.stackCompile.remove(player);
+        // StackCompile& newreg = registry.stackCompile.emplace(player);
+        // newreg.baseStackSize = size;
         Player& pl = registry.players.get(player);
         pl.currDashCharges = pl.baseDashNum;
         pl.currDashCooldown = pl.baseDashCDR;
-
+        StackUI& ui = registry.stackUI.components[0];
+        ui.updateStackUISize(reg.baseStackSize);
 
     }
-}
-
-void unlockDoor(Entity door) {
-    //todo
 }
 
 void extendStack (Entity player, int extension) {
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
         reg.baseStackSize += extension;
+        StackUI& ui = registry.stackUI.components[0];
+        ui.updateStackUISize(reg.baseStackSize);
     }
 }
 

@@ -8,17 +8,25 @@ enum Side : char {
 
 enum RoomType : int {
     TreasureRoom,
+    LockedTreasureRoom,
     RestRoom,
     BossBigCRoom, //remove for now to prevent bug
     EnemyRoomDash,
     EnemyRoomTripleBuff,
+    LockedEnemyRoom,
     EnemyRoomBee,
     None, //Keep None at the end of the list to be compatible with existing get random function
     TutorialRoom1,
-    TutorialRoom2
+    TutorialRoom2,
 };
 const int enemyRoomTypeStart = RoomType::EnemyRoomDash; // add all enemy rooms after this one to make door textures work
-const int enemyRoomTypeEnd = RoomType::EnemyRoomBee; // add all enemy rooms after this one to make door textures work
+const int enemyRoomTypeEnd = RoomType::EnemyRoomBee; // add all enemy rooms before this one to make door textures work
+const int tutorialRoomTypeStart = RoomType::TutorialRoom1;
+const int tutorialRoomTypeEnd = RoomType::TutorialRoom2;
+const int treasureRoomTypeStart = RoomType::TreasureRoom;
+const int treasureRoomTypeEnd = RoomType::LockedTreasureRoom;
+const int restRoomTypeStart = RoomType::RestRoom;
+const int restRoomTypeEnd = RoomType::RestRoom;
 
 enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
@@ -28,6 +36,7 @@ struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
     std::vector<std::tuple<AttackData,vec2>> treasures; //for treasure rooms
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
+    std::vector<std::tuple<InteractableItem, vec2>> interactables; //for interactables
     std::vector<SpecialEvent> specialEvents; 
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;

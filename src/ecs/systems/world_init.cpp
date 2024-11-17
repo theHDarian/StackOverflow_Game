@@ -155,6 +155,22 @@ Entity createCursor()
 	return cursor;
 }
 
+Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item) {
+	switch ( item ) {
+		case InteractableItem::PopConsole:
+			return createPopConsole(renderer, pos);
+		case InteractableItem::Ram:
+			return createRamStick(renderer, pos);
+		case InteractableItem::Gardener:
+			return createGardener(renderer, pos);
+		case InteractableItem::BibleTree:
+			return createBibleTree(renderer, pos);
+		default:
+			return Entity();
+	}
+}
+
+
 Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 	const Entity console = Entity();
 
@@ -194,6 +210,27 @@ Entity createPopConsole(RenderSystem* renderer, vec2 pos) {
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return console;
+}
+
+Entity createRamStick (RenderSystem *renderer, vec2 pos) {
+	auto entity = Entity();
+	Motion &motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2(100, 50);
+	motion.angle = 0;
+	auto& object = registry.objects.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{"ram.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+	auto& interact = registry.interactables.emplace(entity);
+	interact.name = "Ram";
+	interact.item = InteractableItem::Ram;
+	registry.circleColliders.emplace(entity).radius = motion.scale.x / 2;
+
+	return entity;
+
 }
 
 Entity createGardener(RenderSystem* renderer, vec2 pos) {
