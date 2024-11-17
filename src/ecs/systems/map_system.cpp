@@ -167,8 +167,17 @@ void clearRoomActors()
     registry.emitParticles.emplace(Entity(),ParticleRequestType::ClearParticles, ParticleProps(),0.0f, 0);
 }
 
-RoomType randomRoomType(bool excludeNone)
+RoomType randomRoomType(bool excludeNone, bool excludeLocked)
 {
+    if (excludeLocked) {
+       while (true) {
+           int r = Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None);
+           if (r == LockedEnemyRoom || r == RoomType::LockedTreasureRoom) {
+                continue;
+           }
+           return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None - 2));
+       }
+    }
     return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 int getSymbol(RoomType type) {
@@ -249,6 +258,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = getSymbol(doors[spawnIndex].room);
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
+    int lockededRooms = 0;
     bool excludeNone = false;
     for (int i = 0; i < doors.size(); i++)
     {
@@ -258,7 +268,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
         registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         Door &d = registry.doors.components[i];
-        d.room = randomRoomType(excludeNone);
+        d.room = randomRoomType(excludeNone, lockededRooms + excludeNone <= 2);
         d.isPrev = false;
         if (d.room == RoomType::None) {
             excludeNone = true;
@@ -267,6 +277,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         }
         if (d.room == LockedEnemyRoom || d.room == RoomType::LockedTreasureRoom) {
             registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+            lockededRooms++;
         }
         registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
     }
@@ -306,7 +317,7 @@ void MapSystem::resetMap()
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
-            d.room = randomRoomType(excludeNone);
+            d.room = randomRoomType(excludeNone, false);
             if (d.room == RoomType::None)
                 excludeNone = true;
 
