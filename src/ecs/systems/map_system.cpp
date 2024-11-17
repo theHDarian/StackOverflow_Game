@@ -212,7 +212,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         RoomPreset randomPreset = Random::ListItem(presets);
         map.currRoom.preset = randomPreset;
     }
-    map.roomsTraversed++;
     map.currRoom.type = door.room;
     if (map.currRoom.type == RoomType::BossBigCRoom) {
         soundPlayer->playBossMusic(0);
@@ -247,6 +246,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
         registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = getSymbol(d.room);
+    }
+
+    if (map.currRoom.type != RoomType::TutorialRoom1 && map.currRoom.type != RoomType::TutorialRoom2) {
+        map.roomsTraversed++;
     }
 }
 

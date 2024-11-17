@@ -44,6 +44,8 @@ void UISystem::step(float elapsed_ms) {
 			ws.currUnixTime = Clock::now();
 			registry.textRenderRequests.get(fpsCounter).text = "FPS: " + std::to_string(ws.fps);
 		}
+		
+		registry.textRenderRequests.get(roomCounter).text = "Room " + std::to_string(registry.maps.components[0].roomsTraversed);
 
 		// update bullet ui positions
 		if (stack.currStack.size() > stackui.bulletPositions.size()) {
@@ -145,6 +147,7 @@ bool UISystem::init(GLFWwindow* window) {
 	bulletUI = createBulletUI();
 	bulletUIArrow = createBulletUIArrow();
 	fpsCounter = createFpsCounter();
+	roomCounter = createRoomCounter();
 
 	return true;
 }
@@ -760,6 +763,30 @@ Entity UISystem::createFpsCounter() {
 	vec2 dimensions = {100.f,25.f};
 	float padding = 25.f;
 	trr.text = "FPS: 0";
+	trr.color = vec3(1.0f);
+	trr.scale = 0.35f;
+	trr.x = windowState.width - dimensions.x - padding;
+	trr.y = windowState.height - (dimensions.y + padding) * 2.f; //appear below room count
+	trr.topRightBound = { windowState.width + 1000,windowState.height };
+	trr.bottomLeftBound = { 0,0 };
+
+	return entity;
+}
+
+Entity UISystem::createRoomCounter() {
+	WindowState& windowState = registry.windowStates.components[0];
+	auto entity = Entity();
+
+	registry.gameUITexts.emplace(entity);
+	auto& rr = registry.renderRequests.insert(
+		entity, { "none",
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
+	vec2 dimensions = {100.f,25.f};
+	float padding = 25.f;
+	trr.text = "Room 0";
 	trr.color = vec3(1.0f);
 	trr.scale = 0.35f;
 	trr.x = windowState.width - dimensions.x - padding;
