@@ -591,7 +591,7 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = vec2({2880 / 2, 1584 / 2});
+	motion.scale = vec2({2880 / 1.75, 1584 / 1.75});
 
 	registry.backgrounds.emplace(entity);
 
@@ -1137,6 +1137,7 @@ Entity createSkipDialogue() {
 	Entity entity = Entity();
 	InteractableObject& object = registry.interactables.emplace(entity);
 	object.name = "SkipTutorial";
+	registry.menuUIs.emplace(entity);
 	return entity;
 }
 

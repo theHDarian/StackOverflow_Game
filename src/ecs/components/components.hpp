@@ -297,6 +297,8 @@ struct TextRenderRequest {
 
 	// temp: add for now if it is preloaded
 	std::vector<std::string> tokenizedText = std::vector<std::string>();
+
+	TextAlignment alignment = TextAlignment::LeftAlign;
 };
 
 struct Dialogue {
