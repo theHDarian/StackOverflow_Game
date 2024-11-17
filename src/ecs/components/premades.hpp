@@ -23,203 +23,203 @@ const BulletStackEffect blunt = {
 	Inert,
 	Additive,
 	0,
-	"blunt",
+	"Inert",
 	""};
 
 const BulletStackEffect lightning = {
 	Lightning,
 	Additive,
 	0,
-	"lightning",
+	"Lightning",
 	"" };
 
 const BulletStackEffect dmgDownA = {
 	BulletDamage,
 	Additive,
 	-2.0,
-	"dmgDownA",
+	"Damage Down (A)",
 	""};
 
 const BulletStackEffect dmgDownM = {
 	BulletDamage,
 	Multiplicative,
 	0.7,
-	"dmgDownM",
+	"Damage Down (M)",
 	""};
 
 const BulletStackEffect dmgUpA = {
 	BulletDamage,
 	Additive,
 	5.0,
-	"dmgUpA",
+	"Damage Up (A)",
 	""};
 
 const BulletStackEffect dmgUpM = {
 	BulletDamage,
 	Multiplicative,
 	1.5,
-	"dmgUpM",
+	"Damage Up (M)",
 	""};
 
 const BulletStackEffect numBulletsUpA = {
 	BulletNum,
 	Additive,
 	1,
-	"numBulletsUpA",
+	"Bullet Count Up (A)",
 	""};
 
 const BulletStackEffect sizeUpA = {
 	ProjectileSize,
 	Additive,
 	10,
-	"sizeUpA",
+	"Bullet Size Up (A)",
 	""};
 
 const BulletStackEffect spreadUpA = {
 	BulletSpread,
 	Additive,
 	15,
-	"spreadUpA",
+	"Bullet Spread Up (A)",
 	""};
 
 const BulletStackEffect bulletSpeedUpA = {
 	ProjectileSpeed,
 	Additive,
 	50,
-	"speedUpA",
+	"Bullet Speed Up (A)",
 	""};
 
 const BulletStackEffect bulletSpeedUpM = {
 	ProjectileSpeed,
 	Multiplicative,
 	1.5,
-	"speedUpM",
+	"Bullet Speed Up (M)",
 	""};
 
 const BulletStackEffect bulletRangeUpA = {
 	BulletRange,
 	Additive,
 	500,
-	"rangeUpA",
+	"Range Up (A)",
 	""};
 
 const BulletStackEffect bulletRangeUpM = {
 	BulletRange,
 	Multiplicative,
 	1.5,
-	"rangeUpM",
+	"Range Up (M)",
 	""};
 
 const BulletStackEffect bulletBurstUpA = {
 	BulletBurst,
 	Additive,
 	1,
-	"burstUpA",
+	"Burst Up (A)",
 	""};
 
 const BulletStackEffect bulletBurstUpM = {
 	BulletBurst,
 	Multiplicative,
 	1.5,
-	"burstUpM",
+	"Burst Up (M)",
 	""};
 
 const BulletStackEffect bulletPierceUpA = {
 	Pierce,
 	Additive,
 	1,
-	"pierceUpA",
+	"Pierce Up (A)",
 	""};
 
 const BulletStackEffect bulletPierceUpM = {
 	Pierce,
 	Multiplicative,
 	1.5,
-	"pierceUpM",
+	"Pierce Up (M)",
 	""};
 
 const BulletStackEffect bulletBounceUpA = {
 	Bounce,
 	Additive,
 	1,
-	"bounceUpA",
+	"Bounce Up (A)",
 	""};
 
 const BulletStackEffect bulletBounceUpM = {
 	Bounce,
 	Multiplicative,
 	1.5,
-	"bounceUpM",
+	"Bounce Up (M)",
 	""};
 
 const BulletStackEffect dashUpA = {
 	PlayerNumDash,
 	Additive,
 	1,
-	"dashUpA",
+	"Dash Count Up (A)",
 	""};
 
 const BulletStackEffect dashUpM = {
 	PlayerNumDash,
 	Multiplicative,
 	2,
-	"dashUpM",
+	"Dash Count Up (M)",
 	""};
 
 const BulletStackEffect stackSizeUpA = {
 	PlayerStackSize,
 	Additive,
 	6,
-	"stackSizeUpA",
+	"Stack Size Up (A)",
 	""};
 
 const BulletStackEffect stackSizeUpM = {
 	PlayerStackSize,
 	Multiplicative,
 	2,
-	"stackSizeUpM",
+	"Stack Size Up (M)",
 	""};
 
 const BulletStackEffect dashCDRUpA = {
 	PlayerDashCDR,
 	Additive,
 	500,
-	"dashCDRUpA",
+	"Dash Cooldown Up (A)",
 	""};
 
 const BulletStackEffect dashCDRUpM = {
 	PlayerDashCDR,
 	Multiplicative,
 	1.25,
-	"dashCDRUpM",
+	"Dash Cooldown Up (M)",
 	""};
 
 const BulletStackEffect dashCDRDownA = {
 	PlayerDashCDR,
 	Additive,
 	-750,
-	"dashCDRDownA",
+	"Dash Cooldown Down (A)",
 	""};
 
 const BulletStackEffect dashCDRDownM = {
 	PlayerDashCDR,
 	Multiplicative,
 	0.5,
-	"dashCDRDownM",
+	"Dash Cooldown Down (M)",
 	""};
 
 const BulletStackEffect playerSpeedUpA = {
 	PlayerSpeed,
 	Additive,
 	100,
-	"playerSpeedUpA",
+	"Movement Speed Up (A)",
 	""};
 
 const BulletStackEffect playerSpeedUpM = {
 	PlayerSpeed,
 	Multiplicative,
 	1.5,
-	"playerSpeedUpM",
+	"Movement Speed Up (M)",
 	""};
 
 
@@ -227,14 +227,14 @@ const BulletStackEffect ostrichWarrior = {
 	PlayerSpeed,
 	Multiplicative,
 	3,
-	"ostrichWarrior",
+	"Ostrich Warrior",
 	""};
 
 const BulletStackEffect ostrichWarriorDownside = {
 	PlayerDashCDR,
 	Multiplicative,
 	3,
-	"ostrichWarrior",
+	"Ostrich Warrior Downside",
 	""};
 
 const BulletStackEffect key = {
@@ -243,6 +243,21 @@ const BulletStackEffect key = {
 	0,
 	"Key",
 	"" };
+
+const BulletStackEffect homingUpA = {
+	Homing,
+	Additive,
+	0.1,
+	"Homing Accuracy (A)",
+	""
+};
+
+const std::vector<BulletStackEffect> premadeBullets = {
+	blunt, lightning, dmgDownA, dmgDownM, dmgUpA, dmgUpM, numBulletsUpA, sizeUpA, spreadUpA, bulletSpeedUpA, 
+	bulletSpeedUpM, bulletRangeUpA, bulletRangeUpM, bulletBurstUpA, bulletBurstUpM, bulletPierceUpA, bulletPierceUpM,
+	bulletBounceUpA, bulletBounceUpM, dashUpA, dashUpM, stackSizeUpA, stackSizeUpM, dashCDRUpA, dashCDRUpM, dashCDRDownA,
+	dashCDRDownM, playerSpeedUpA, playerSpeedUpM, ostrichWarrior, ostrichWarriorDownside, key, homingUpA
+};
 
 //////////////////////////////////////////
 ///////////  AttackData  /////////////////

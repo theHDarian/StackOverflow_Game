@@ -2,7 +2,10 @@
 
 #include "sound_system.hpp"
 #include "text_system.hpp"
+#include "premades.hpp"
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -137,6 +140,7 @@ bool UISystem::init(GLFWwindow* window) {
 	WindowState& wS = registry.windowStates.components[0];
 
 	loadText();
+	loadBulletEffects();
 	
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2 + wS.height / 8), vec2(wS.width, wS.height / 4));
@@ -252,7 +256,10 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 		textReq.tokenizedText = uiTexts["HoverBullet_" + bullet.name];
 	}
 	else {
-		std::cout << "No ui text found for item: " << "HoverBullet_" + bullet.name << std::endl;
+		// need to generate text and tokenize it
+		std::string tooltip = makeBulletTooltip(bullet);
+		uiTexts.insert({ "HoverBullet_" + bullet.name, getTokenizedText(tooltip) });
+		textReq.tokenizedText = uiTexts["HoverBullet_" + bullet.name];
 	}
 	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
@@ -753,6 +760,156 @@ void UISystem::loadText() {
 	else
 	{
 		std::cout << "ERROR: failed to open file: " << filename << std::endl;
+	}
+}
+
+std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
+	std::string tooltip = bullet.name + "\n\n";
+	std::string modify = "";
+	std::string effect = "";
+	std::string amount = "";
+	float intermediaryAmount = 0;
+
+	// special cases
+	if (bullet.type == BulletEffectType::Inert) {
+		tooltip += "This bullet doesn't do anything.";
+	}
+	else if (bullet.type == BulletEffectType::Key) {
+		tooltip += "A keycard used for unlocking doors. Pops all subsequent bullets on the stack after use.";
+	}
+	else if (bullet.type == BulletEffectType::Lightning) {
+		tooltip += "Shifts the bullets in the stack over by 1.";
+	}
+	else {
+		// ordinary bullets
+		// format: [increases/decreases] [the] [effect] by [amount]
+
+		if (bullet.effectCalc == Additive) {
+			if (bullet.value < 0) {
+				modify = "Decreases ";
+				if (abs(bullet.value) - abs((int)bullet.value) > 0) {
+					std::stringstream amountString;
+					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+					amount = amountString.str();
+				}
+				else {
+					amount = std::to_string(abs((int)bullet.value));
+				}
+				if (bullet.type == BulletEffectType::PlayerDashCDR) {
+					intermediaryAmount = abs(bullet.value / 1000.f);
+					std::stringstream amountString;
+					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+					amount = amountString.str();
+				}
+				if (bullet.type == BulletEffectType::Homing) {
+					intermediaryAmount = bullet.value * 100;
+					std::stringstream amountString;
+					amountString << (int)intermediaryAmount << "%";
+					amount = amountString.str();
+				}
+			}
+			else {
+				modify = "Increases ";
+				if (bullet.value - (int)bullet.value > 0) {
+					std::stringstream amountString;
+					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+					amount = amountString.str();
+				}
+				else {
+					amount = std::to_string(abs((int)bullet.value));
+				}
+				if (bullet.type == BulletEffectType::PlayerDashCDR) {
+					intermediaryAmount = abs(bullet.value / 1000.f);
+
+					std::stringstream amountString;
+					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+					amount = amountString.str();
+				}
+				if (bullet.type == BulletEffectType::Homing) {
+					intermediaryAmount = bullet.value * 100;
+					std::stringstream amountString;
+					amountString << (int)intermediaryAmount << "%";
+					amount = amountString.str();
+				}
+			}
+		}
+		else if (bullet.effectCalc == Multiplicative) {
+			if (bullet.value < 1) {
+				modify = "Decreases ";
+				intermediaryAmount = bullet.value * 100;
+			}
+			else {
+				modify = "Increases ";
+				intermediaryAmount = (bullet.value - 1) * 100;
+			}
+			std::stringstream amountString;
+			amountString << (int)intermediaryAmount << "%";
+			amount = amountString.str();
+		}
+
+		switch (bullet.type) {
+		case BulletDamage:
+			effect = "the damage of bullets ";
+			break;
+		case ProjectileSpeed:
+			effect = "bullet speed ";
+			break;
+		case ProjectileSize:
+			effect = "the size of bullets ";
+			break;
+		case FireRate:
+			effect = "bullet fire rate ";
+			break;
+		case BulletRange:
+			effect = "bullet range ";
+			break;
+		case BulletSpread:
+			effect = "the spread of bullets ";
+			break;
+		case BulletNum:
+			effect = "the number of bullets shot at once ";
+			break;
+		case BulletBurst:
+			effect = "the number of bullets shot in a burst shot ";
+			break;
+		case Bounce:
+			effect = "the number of times bullets bounce ";
+			break;
+		case Pierce:
+			effect = "the pierce of bullets ";
+			break;
+		case Homing:
+			effect = "the homing accuracy of bullets "; // this seems to not be in premades
+			break;
+		case PlayerSpeed:
+			effect = "movement speed ";
+			break;
+		case PlayerNumDash:
+			effect = "the number of dashes ";
+			break;
+		case PlayerStackSize:
+			effect = "stack size ";
+			break;
+		case PlayerDashCDR:
+			effect = "dash cooldown ";
+			break;
+		default:
+			effect = "This bullet is not in the list?? Report immediately!";
+		}
+		tooltip += modify + effect + "by " + amount + ".";
+	}
+	return tooltip;
+}
+
+void UISystem::loadBulletEffects() {
+	for (BulletStackEffect bullet : premadeBullets) {
+		std::string tooltip = makeBulletTooltip(bullet);
+		std::vector<std::string> tokenizedTooltip;
+		if (tooltip.length() > 0) {
+			tokenizedTooltip = getTokenizedText(tooltip);
+			uiTexts.insert({ "HoverBullet_" + bullet.name, tokenizedTooltip});
+			std::cout << tooltip << std::endl;
+		}
 	}
 }
 
