@@ -130,15 +130,15 @@ int main() {
 		renderer.drawBackgroundElements();
 		particleSystem.render();
 		renderer.drawGameElements();
-		renderer.drawGameUI();
+		//renderer.drawGameUI();
 		textSystem.renderGameUIText();
-		renderer.drawDialogueUI();
+		//renderer.drawDialogueUI();
 		textSystem.renderDialogueUIText();
-		renderer.drawMenuUI();
+		//renderer.drawMenuUI();
 		textSystem.renderMenuUIText();
-		renderer.drawMenuOverlayUI();
+		//renderer.drawMenuOverlayUI();
 		textSystem.renderMenuOverlayUIText();
-		renderer.drawCursor();
+		//renderer.drawCursor();
 		renderer.drawToScreen(); //postprocessing
 
 		glfwSwapBuffers(window);

@@ -261,17 +261,33 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 						* glm::rotate(glm::mat4(1.0f),angle,axis) //rotate to be vertical on z axis
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
-		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, ws.height /6.575 + ws.width / 6.575); // Position above the XY plane
-		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f);
-		glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
+
+		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+		
+		/*
+		glm::vec3 cameraPos = glm::vec3(playerMotion.position.x, playerMotion.position.y - ws.height,
+			ws.height /6.575 + ws.width / 6.575); // Position above the XY plane
+		glm::vec3 cameraTarget = glm::vec3(playerMotion.position.x, playerMotion.position.y - ws.height, -1.0f);
+		*/
+		glm::vec3 cameraPos = glm::vec3(ws.width / 2, ws.height / 2, ws.height / 6.575 + ws.width / 6.575); // Position above the XY plane
+		glm::vec3 cameraTarget = glm::vec3(ws.width / 2, ws.height / 2, 0.0f);
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+		mat4 view2 = glm::lookAt(vec3(playerMotion.position.x - ws.width / 2, (playerMotion.position.y - ws.height/2) * -1, 0.0),
+			vec3(playerMotion.position.x - ws.width / 2, (playerMotion.position.y - ws.height / 2) * -1.f, -1), glm::vec3(0, 1, 0));
 
 		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
+		//glm::mat4 view = view2 ;
+		
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
+		
 		float fov = 125.0f; //makes walls appear larger the less there is
 		float aspectRatio = (ws.width) / (ws.height);
 		float near_var = 0.1f;
 		float far_var = 10000.0f;
 		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near_var, far_var);
+		//proj4 = glm::ortho(0.0f, (float)ws.width, (float)ws.height, 0.0f, -3.0f, 3.0f);
+		proj4 = glm::translate(proj4, vec3(-playerMotion.position.x + ws.width / 2, playerMotion.position.y - ws.height / 2, 0.0));
 		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float *)&proj4);
 	} 
 	else
@@ -335,11 +351,55 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
 	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
-		GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-		glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float *)&transform.mat);
-		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-		glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float *)&projection);
-		gl_has_errors();
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
+			WindowState& windowState = registry.windowStates.components[0];
+			mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
+			GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+			glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+			mat4 transform = glm::mat4(1.0);
+			
+			transform = glm::translate(transform, vec3(motion.position.x, motion.position.y, 0.0));
+			transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+			transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
+			GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+			glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+			Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+			//mat4 view = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
+			
+			Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+
+
+			glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+			//glm::vec3 cameraPos = glm::vec3(windowState.width / 2, windowState.height / 2, 0); // Position above the XY plane
+			//glm::vec3 cameraTarget = glm::vec3(windowState.width / 2, windowState.height / 2, 0.0f);
+			//glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+			//glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
+			//mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+			//mat4 view = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -100.0f, 100.0f);
+			//view = glm::translate(view, vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0));
+
+			mat4 view = glm::lookAt(vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0), 
+				vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0) + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+			//view = mat4(1.0);
+			glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+
+			gl_has_errors();
+		}
+		else {
+			GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+			glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+			GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+			glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+			gl_has_errors();
+		}
+		
 	}
 
 	// Drawing of num_indices/3 triangles specified in the index buffer
@@ -568,7 +628,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.enemies.entities)
@@ -733,14 +794,21 @@ mat3 RenderSystem::createProjectionMatrix()
 
 	gl_has_errors();
 	WindowState& windowState = registry.windowStates.components[0];
-	float right = (float) windowState.width;
-	float bottom = (float) windowState.height;
+	Camera& camera = registry.cameras.components[0];
+	float right = (float) (windowState.width);
+	float bottom = (float) (windowState.height);
 
 	float sx = 2.f / (right - left);
 	float sy = 2.f / (top - bottom);
 	float tx = -(right + left) / (right - left);
 	float ty = -(top + bottom) / (top - bottom);
-	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
+
+	mat3 projection = { {sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f} };
+	//mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, 0.0f, 1.0f);
+	mat4 trans = glm::mat3(1.0);
+	//trans = glm::translate(trans, glm::vec3(0.0, -0.5, 0.0));
+
+	return projection;
 }
 
 #if IMGUI_ENABLED

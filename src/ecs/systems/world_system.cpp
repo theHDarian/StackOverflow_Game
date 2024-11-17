@@ -79,7 +79,8 @@ GLFWwindow* WorldSystem::createWindow() {
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_REFRESH_RATE,60);
-	glfwWindowHint(GLFW_DECORATED,GLFW_FALSE); //make borderless window
+	//glfwWindowHint(GLFW_DECORATED,GLFW_FALSE); //make borderless window
+	//glfwWindowHint(GLFW_SAMPLES, 4);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
@@ -151,6 +152,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	// mock interactable call instead of proper ui for now
 	Entity skipDialogue = createSkipDialogue();
 	registry.dialogueRequests.emplace(skipDialogue);
+
+	registry.cameras.emplace(player);
 }
 #pragma endregion
 
