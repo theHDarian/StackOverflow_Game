@@ -15,12 +15,6 @@ void AISystem::step(float elapsed_ms)
 	// std::cout << enemy_registry.entities.size() << " is the size of enemy entity" << std::endl;
 	for (Entity entity : enemy_registry.entities)
 	{
-		if (registry.boids.has(entity))
-		{
-			Boid &boid = registry.boids.get(entity);
-			computeBoidVelocity(entity, boid);
-			continue;
-		}
 
 		Enemy &enemy = enemy_registry.get(entity);
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
@@ -33,7 +27,12 @@ void AISystem::step(float elapsed_ms)
 		// SENSING
 		updateState(enemy, movement, entity);
 		// std::cout << currPattern.name << "after update" << std::endl;
-
+		if (registry.boids.has(entity))
+		{
+			Boid &boid = registry.boids.get(entity);
+			computeBoidVelocity(entity, boid);
+			continue;
+		}
 		// THINKING
 		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
 		{
@@ -221,41 +220,41 @@ bool AISystem::updateHealerState(Enemy &enemy, Entity entity)
 			}
 		}
 	}
-    bool foundHurtEnemy = false;
-    for (Entity otherEntity : registry.enemies.entities)
-    {
-        if (otherEntity != entity)
-        {
-            Enemy &otherEnemy = registry.enemies.get(otherEntity);
-            float otherHpPercent = static_cast<float>(otherEnemy.currHealth) / static_cast<float>(otherEnemy.maxHealth);
+	bool foundHurtEnemy = false;
+	for (Entity otherEntity : registry.enemies.entities)
+	{
+		if (otherEntity != entity)
+		{
+			Enemy &otherEnemy = registry.enemies.get(otherEntity);
+			float otherHpPercent = static_cast<float>(otherEnemy.currHealth) / static_cast<float>(otherEnemy.maxHealth);
 
-            // Look for an enemy that is hurt (health < max health)
-            if (otherHpPercent < 1.0f)
-            {
-                auto reaction = getReactions(currPattern.reactions, ReactionType::TEAM_HURT);
-                if (reaction)
-                {
-                    enemy.patternIndex = reaction->index;
-                    enemy.newPattern = true;
-                    reaction_found = true;
-                    healer.targetEntity = otherEntity;
-                    foundHurtEnemy = true;
-                }
-                break;
-            }
-        }
-    }
+			// Look for an enemy that is hurt (health < max health)
+			if (otherHpPercent < 1.0f)
+			{
+				auto reaction = getReactions(currPattern.reactions, ReactionType::TEAM_HURT);
+				if (reaction)
+				{
+					enemy.patternIndex = reaction->index;
+					enemy.newPattern = true;
+					reaction_found = true;
+					healer.targetEntity = otherEntity;
+					foundHurtEnemy = true;
+				}
+				break;
+			}
+		}
+	}
 	if (!foundHurtEnemy)
-    {
+	{
 
-        auto idleReaction = getReactions(currPattern.reactions, ReactionType::DURATION);
-        if (idleReaction)
-        {
-            enemy.patternIndex = idleReaction->index;
-            enemy.newPattern = true;
-            reaction_found = true;
-        }
-    }
+		auto idleReaction = getReactions(currPattern.reactions, ReactionType::DURATION);
+		if (idleReaction)
+		{
+			enemy.patternIndex = idleReaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+		}
+	}
 	return reaction_found;
 }
 
@@ -345,7 +344,6 @@ vec2 AISystem::generateRandomPos(Entity entity)
 	return vec2(pos_x, pos_y);
 }
 
-
 vec2 AISystem::getCharginPos(Entity entity)
 {
 	auto &window_registry = registry.windowStates;
@@ -373,8 +371,8 @@ vec2 AISystem::getCharginPos(Entity entity)
 	// Increase the enemy's speed for the charge
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 500.0f;
-  
-  float minX = 150.f + scale[0];
+
+	float minX = 150.f + scale[0];
 	float minY = 100.f + scale[1];
 	float maxX = width - 150.f - scale[0];
 	float maxY = height - 60.f - scale[1];
@@ -387,30 +385,28 @@ vec2 AISystem::getCharginPos(Entity entity)
 
 vec2 AISystem::generateRandomPosInRadius(Entity entity, int radiusNear, int radiusFar)
 {
-	auto& window_registry = registry.windowStates;
-	WindowState& windowState = window_registry.components[0];
+	auto &window_registry = registry.windowStates;
+	WindowState &windowState = window_registry.components[0];
 	int width = windowState.width;
 	int height = windowState.height;
 	// std::cout << "width " << windowState.width << std::endl;
 	// std::cout << "height " << windowState.height << std::endl;
 	vec2 start = registry.motions.get(entity).position;
-	float angle = 2.0f * M_PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+	float angle = 2.0f * M_PI * (static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
 	float pos_x = cos(angle) * (radiusNear + rand() % (radiusFar - radiusNear)) + start.x;
 	float pos_y = sin(angle) * (radiusNear + rand() % (radiusFar - radiusNear)) + start.y;
 
 	vec2 scale = registry.motions.get(entity).scale;
-  
-  float minX = 150.f + scale[0];
+
+	float minX = 150.f + scale[0];
 	float minY = 100.f + scale[1];
 	float maxX = width - 150.f - scale[0];
 	float maxY = height - 60.f - scale[1];
-  
-  pos_x = glm::clamp(pos_x, minX, maxX);
+
+	pos_x = glm::clamp(pos_x, minX, maxX);
 	pos_y = glm::clamp(pos_y, minY, maxY);
 	return vec2(pos_x, pos_y);
 }
-
-
 
 vec2 AISystem::getTeamPos(Entity entity)
 {
@@ -452,7 +448,6 @@ vec2 AISystem::getTeamPos(Entity entity)
 	}
 	return getCurrentPos(entity);
 };
-
 
 vec2 AISystem::getPlayerPos()
 {
@@ -524,11 +519,28 @@ void AISystem::angryMode(Entity entity)
 
 void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 {
-	boidWander(entity, boid);
-	boidComputeCoherence(entity, boid);
-	boidComputeSeperation(entity, boid);
-	boidComputeAlignment(entity, boid);
-	boidKeepBound(entity, boid);
+	Enemy &enemy = registry.enemies.get(entity);
+	EnemyPattern &currentPattern = enemy.currEnemyPattern();
+	if (currentPattern.type == EnemyBehavior::BOIDSGROUP)
+	{
+		boidComputeCoherence(entity, boid, 1.f);
+		boidKeepBound(entity, boid);
+		boid.velocity *= 0.8f;
+	}
+	else if (currentPattern.type == EnemyBehavior::BOIDSEXPLODE)
+	{
+		boidComputeSeperation(entity, boid, 1.f);
+		boidKeepBound(entity, boid);
+		boid.velocity *= 2.f;
+	}
+	else
+	{
+		boidWander(entity, boid);
+		boidComputeCoherence(entity, boid, 0.01f);
+		boidComputeSeperation(entity, boid, 0.05f);
+		boidComputeAlignment(entity, boid, 0.02f);
+		boidKeepBound(entity, boid);
+	}
 
 	float maxSpeed = 300.f;
 	if (glm::length(boid.velocity) > maxSpeed)
@@ -570,9 +582,9 @@ void AISystem::boidKeepBound(Entity entity, Boid &boid)
 	}
 }
 
-void AISystem::boidComputeCoherence(Entity entity, Boid &boid)
+void AISystem::boidComputeCoherence(Entity entity, Boid &boid, float multiplier = 0.01f)
 {
-	float centeringFactor = 0.01;
+	float centeringFactor = multiplier;
 	vec2 center = vec2{0, 0};
 	int numNeighbors = 0;
 
@@ -603,10 +615,10 @@ void AISystem::boidComputeCoherence(Entity entity, Boid &boid)
 	}
 }
 
-void AISystem::boidComputeSeperation(Entity entity, Boid &boid)
+void AISystem::boidComputeSeperation(Entity entity, Boid &boid, float multiplier = 0.05f)
 {
 	float minDistance = 20.f;
-	float avoidFactor = 0.05;
+	float avoidFactor = multiplier;
 	vec2 move = vec2(0, 0);
 	vec2 position = boid.position;
 	for (Entity other : registry.boids.entities)
@@ -629,11 +641,11 @@ void AISystem::boidComputeSeperation(Entity entity, Boid &boid)
 	boid.velocity[1] += move[1] * avoidFactor;
 }
 
-void AISystem::boidComputeAlignment(Entity entity, Boid &boid)
+void AISystem::boidComputeAlignment(Entity entity, Boid &boid, float multiplier = 0.02f)
 {
 	vec2 avgVelocity = vec2(0, 0);
 	int numNeighbors = 0;
-	float matchingFactor = 0.02;
+	float matchingFactor = multiplier;
 
 	vec2 position = boid.position;
 	for (Entity other : registry.boids.entities)
