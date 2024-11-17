@@ -701,6 +701,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyEasyTrail();
 		break;
 	}
+	case EnemyType::EvilSnail:
+	{
+		enemy = EnemyHardTrail();
+		break;
+	}
 	case EnemyType::HardEnemyBoid:
 	{
 		enemy = EnemyHardBoid();

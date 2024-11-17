@@ -249,6 +249,7 @@ enum EnemyType {
     BossBeehiveGun,
     BossBeehiveMain,
     Snail,
+    EvilSnail,
     OneBee,
     TwoBee,
     ThreeBee,

@@ -671,7 +671,7 @@ struct EnemyEasyTrail : Enemy
 
 	EnemyEasyTrail()
 	{
-		maxHealth = 300;
+		maxHealth = 200;
 		currHealth = maxHealth;
 
 		enemyPatterns = { rotateState };
@@ -683,6 +683,45 @@ struct EnemyEasyTrail : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(-12, 0) };
 		scale = vec2(336, 216) * 0.5f;
+	};
+};
+
+struct EnemyHardTrail : Enemy
+{
+	const AttackData snailTrail{
+	EnemyAttackPattern::TRAIL,
+	CIRCLE,
+	{ dmgUpA },
+	blunt,
+	1,
+	0,
+	{20, 20},
+	0,
+	8000,
+	{0, 0},
+	0,
+	0,
+	0,
+	EnemyBulletDeath::CLUSTER
+	};
+
+	EnemyPattern rotateState = { "Follow Player", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, snailTrail };
+
+	EnemyHardTrail()
+	{
+		maxHealth = 350;
+		currHealth = maxHealth;
+
+		enemyPatterns = { rotateState };
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_EvilSnail.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(-12, 0) };
+		scale = vec2(336, 216) * 0.5f;
+		speedMultiplier = 1.15;
 	};
 };
 

@@ -28,7 +28,7 @@ const RoomPreset TutorialRoom1Preset{
 
 const RoomPreset TutorialRoom2Preset{
     {
-         {EnemyType::Snail, {0.5f, 0.5f}}},
+         {EnemyType::EvilSnail, {0.5f, 0.5f}}},
     {},
     {},
     {},
