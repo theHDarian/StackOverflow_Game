@@ -138,6 +138,9 @@ void PhysicsSystem::step(float elapsed_ms)
 		if (registry.circleColliders.has(interactable) && CircleToCircle(interactable, player)) {
 			registry.collisions.emplace_with_duplicates(player, interactable);
 		}
+		else if (registry.aabbs.has(interactable) && AABBToCircle(interactable, player)) { // note: aabb to aabb works fine, but not aabb to circle?
+			registry.collisions.emplace_with_duplicates(player, interactable);
+		}
 	}
 
 	// Player  -> EnemyBullets	(Circle to Circle for now)

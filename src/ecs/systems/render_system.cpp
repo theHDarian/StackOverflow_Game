@@ -573,7 +573,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.bosses.entities)
@@ -1016,7 +1017,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat3& pr
 	}
 	else if (shape == "rectangle.png") {
 		auto& aabb = registry.aabbs.get(entity);
-		transform.translate(motion.position);
+		transform.translate(vec2(motion.position.x + (abs(aabb.bottomRight.x) - abs(aabb.topLeft.x)) / 2, motion.position.y + (abs(aabb.bottomRight.y) - abs(aabb.topLeft.y)) / 2));
 		transform.rotate(motion.angle);
 		transform.scale({ aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y });
 	}

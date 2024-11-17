@@ -230,14 +230,13 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
 	registry.backgrounds.emplace(console);
 
-	// use aabb as near player range for now for pseudo-offsetting
-	// note: visuald doesn't seem to align with collider??? So use circle instead
-	// AABBCollider& aabb = registry.aabbs.emplace(console);
-	// aabb.topLeft = vec2(-m.scale.x / 10, -m.scale.y / 50);
-	// aabb.bottomRight = vec2(m.scale.x / 2, m.scale.y / 1.5);
+	// can use aabb as near player range for now for pseudo-offsetting
+	 AABBCollider& aabb = registry.aabbs.emplace(console);
+	 aabb.topLeft = vec2(-m.scale.x / 4, -m.scale.y / 9);
+	 aabb.bottomRight = vec2(m.scale.x / 4, m.scale.y / 2.5);
 
-	CircleCollider &cc = registry.circleColliders.emplace(console);
-	cc.radius = m.scale.y / 4;
+	//CircleCollider &cc = registry.circleColliders.emplace(console);
+	//cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PopStack";
