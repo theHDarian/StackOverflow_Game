@@ -24,11 +24,12 @@ void resetStack(Entity player, RenderSystem* renderer) {
             AttackData atkData = AttackData();
             atkData.defaultEffect = b;
             atkData.rareBulletEffects = {b};
-            atkData.speed = 100;
+            atkData.speed = 300;
             atkData.size *= 2;
             atkData.bulletRange = 7500;
+            atkData.bulletBounce = 3;
             float angle = (2 * M_PI / size) * i;
-            createEnemyBullet( renderer, registry.motions.get(player).position, {cos(angle), sin(angle)}, {0, 0}, atkData);
+            createEnemyBullet( renderer, registry.motions.get(player).position + 150.f * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
             i++;
         }
         // reg.currStack.clear();
