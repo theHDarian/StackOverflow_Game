@@ -248,6 +248,8 @@ enum EnemyType {
     BossBigC,
     BossBeehiveGun,
     BossBeehiveMain,
+    Snail,
+    EvilSnail,
     OneBee,
     TwoBee,
     ThreeBee,
@@ -310,6 +312,8 @@ struct AttackData {
 enum class EnemyBehavior {
     // this is the basic
     RANDOM,
+    RANDOM_NEAR,
+    RANDOM_FAR,
     FOLLOW_PLAYER,
     RETREAT,
     ANGRY,
@@ -394,13 +398,14 @@ struct Enemy {
     vec2 scale;
     SpriteData sprite;
     bool newPattern = false;
+    float speedMultiplier = 1.0f;
 };
 
 struct EnemyMovement {
     vec2 posA;
     vec2 posB;
     float distanceTraveled;
-    float speed;
+    float speed = 20000;
     float angularSpeed = 90.0f;
 };
 
