@@ -1,32 +1,36 @@
 #pragma once
 #include "common.hpp"
 #include "components/actor_components.hpp"
+#include "utils/random.hpp"
 
 enum Side : char {
     Left = 'L',Top = 'T',Bottom = 'B',Right = 'R'
 };
 
 enum RoomType : int {
+    EnemyRoom,
     TreasureRoom,
-    LockedTreasureRoom,
     RestRoom,
-    BossBigCRoom, //remove for now to prevent bug
-    EnemyRoomDash,
-    EnemyRoomTripleBuff,
-    LockedEnemyRoom,
-    EnemyRoomBee,
     None, //Keep None at the end of the list to be compatible with existing get random function
+
+    //Special rooms that are not spawned via getRandomRoomType function
     TutorialRoom1,
     TutorialRoom2,
+    BossBigCRoom,
 };
-const int enemyRoomTypeStart = RoomType::EnemyRoomDash; // add all enemy rooms after this one to make door textures work
-const int enemyRoomTypeEnd = RoomType::EnemyRoomBee; // add all enemy rooms before this one to make door textures work
-const int tutorialRoomTypeStart = RoomType::TutorialRoom1;
-const int tutorialRoomTypeEnd = RoomType::TutorialRoom2;
-const int treasureRoomTypeStart = RoomType::TreasureRoom;
-const int treasureRoomTypeEnd = RoomType::LockedTreasureRoom;
-const int restRoomTypeStart = RoomType::RestRoom;
-const int restRoomTypeEnd = RoomType::RestRoom;
+
+inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
+{
+    if (roomsTraversed % 5 == 4) {
+        //Make every 5 rooms the boss room
+        return BossBigCRoom;
+    }
+    if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
+        return RoomType::EnemyRoom;
+    }
+    
+    return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
+}
 
 enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
@@ -45,9 +49,16 @@ struct RoomPreset {
 struct Door {
 	RoomType room = None; //room the door leads to
     bool isPrev; //if is previous room, block it
+    bool isLocked;
     vec2 startPos, endPos;
     char side = 'L';
     int doorIndex = -1; // used by interactibles for now
+
+    void reset() {
+        room = None;
+        isPrev = false;
+        isLocked = false;
+    }
 };
 struct DoorSymbol {
     float angle;

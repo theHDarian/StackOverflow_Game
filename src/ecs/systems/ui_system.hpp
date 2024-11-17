@@ -42,6 +42,7 @@ private:
 
     std::unordered_map<std::string, std::vector<std::string>> uiTexts;
     Entity fpsCounter;
+    Entity roomCounter;
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
@@ -71,6 +72,7 @@ private:
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
 
     Entity createFpsCounter();
+    Entity createRoomCounter();
 
     SoundSystem* soundSystem;
 };
