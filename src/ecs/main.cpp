@@ -130,6 +130,7 @@ int main() {
 		renderer.drawBackgroundElements();
 		particleSystem.render();
 		renderer.drawGameElements();
+		renderer.drawToScreen1();
 		renderer.drawGameUI();
 		textSystem.renderGameUIText();
 		renderer.drawDialogueUI();
@@ -139,7 +140,7 @@ int main() {
 		renderer.drawMenuOverlayUI();
 		textSystem.renderMenuOverlayUIText();
 		renderer.drawCursor();
-		renderer.drawToScreen(); //postprocessing
+		renderer.drawToScreen2(); //postprocessing
 
 		glfwSwapBuffers(window);
 	}
