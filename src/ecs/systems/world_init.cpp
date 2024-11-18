@@ -1038,6 +1038,10 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	laser.growth = atkData.veer.x;
 	laser.rotation = atkData.veer.y;
 
+	ParticleProps props = enemyBulletDeathParticle;
+	props.colors.push_back(enemyBulletColors.at(FireRate));
+	registry.emitParticles.emplace(entity,PLaser,props,100000,1);
+
 	registry.renderRequests.insert(
 		entity,
 		{"enemy_bullet_square.png",

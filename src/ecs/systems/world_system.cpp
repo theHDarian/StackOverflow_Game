@@ -495,7 +495,7 @@ void WorldSystem::handleCollisions() {
 
 		// Enemy bullet centric handling
 		if (registry.enemyBullets.has(entity)) {
-			if (registry.walls.has(entity_other)) {
+			if (registry.walls.has(entity_other) && !registry.lasers.has(entity)) {
 				Motion& motion = registry.motions.get(entity);
 				WallCollider& wall = registry.walls.get(entity_other);
 				EnemyBullet& bullet = registry.enemyBullets.get(entity);

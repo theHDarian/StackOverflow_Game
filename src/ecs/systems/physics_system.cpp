@@ -82,6 +82,7 @@ void PhysicsSystem::step(float elapsed_ms)
 					vec2 intersectionPoint;
 					if (LineToLine(start.position, goal, wall.startPosition, wall.endPosition, intersectionPoint)) {
 						currLength = min(currLength, glm::distance(intersectionPoint, start.position));
+						registry.collisions.emplace_with_duplicates(entity,walls.entities[i]);
 					}
 				}
 				motion.position = start.position + vec2(cos(motion.angle), sin(motion.angle)) * min(laser.length, currLength) * 0.5f;

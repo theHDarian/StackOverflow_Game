@@ -259,6 +259,24 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             request.props.velocity.base += vec2(0,-20.f);
             request.props.velocity.variation += vec2(10,0);
             trail(request.props,emitCount);
+        } else if (request.requestType == PLaser && registry.lasers.has(ent)) {
+            const Motion& motion = registry.motions.get(ent);
+            const Laser& laser = registry.lasers.get(ent);
+            if (laser.length != motion.scale.x && registry.collisions.has(ent)) {
+                Collision& c = registry.collisions.get(ent);
+                if (registry.walls.has(c.other)) {
+                    WallCollider& wall = registry.walls.get(c.other);
+                    request.props.position.base = motion.position + vec2(cos(motion.angle), sin(motion.angle)) * motion.scale.x * 0.5f;
+                    request.props.position.variation = {40.f,40.f};
+                    vec2 a = wall.endPosition-wall.startPosition;
+                    vec2 b = -vec2(cos(motion.angle), sin(motion.angle));
+                    vec2 p = dot(a,b)/dot(a,a)*a;
+                    request.impactDirection = normalize(b-p);
+                }
+                
+                impact(request.props,emitCount,request.impactDirection);
+            }
+            
         }
     }
     if (shouldClear) {
