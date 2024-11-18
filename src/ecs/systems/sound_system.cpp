@@ -146,7 +146,7 @@ void SoundSystem::loadMusic()
         throw std::runtime_error("Failed to load background music");
     }
 
-    playSpecialMusic(0);
+    // playSpecialMusic(0);
 
 }
 
