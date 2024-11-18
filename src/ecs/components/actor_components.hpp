@@ -153,7 +153,7 @@ struct StackCompile {
         if (effect.effectCalc == Additive) {
             additives[effect.type] += effect.value;
         } else {
-            multiplicatives[effect.type] *= effect.value;
+            multiplicatives[effect.type] += effect.value;
         }
         currStack.push_back(effect);
         return true;
