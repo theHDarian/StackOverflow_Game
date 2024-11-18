@@ -221,7 +221,10 @@ void UISystem::playDialogue() {
 				soundSystem->playItemPickupSound();
 			} else if (nextLine.sfx == rareItemPickup) {
 				soundSystem->playRareItemPickupSound();
-			} else {
+			} else if (nextLine.sfx == explosion) {
+				soundSystem->playExplosionSound();
+			}
+			else {
 				soundSystem->stopIncomingDialogueSound();
 				soundSystem->playNextDialogueSound();
 			}

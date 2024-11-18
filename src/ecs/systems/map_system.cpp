@@ -258,6 +258,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 void MapSystem::resetMap()
 {
     clearRoomActors();
+    soundPlayer->playSpecialMusic(0);
 
     IOState& iostate = registry.ioStates.components[0];
     if (iostate.tutorialOn) {

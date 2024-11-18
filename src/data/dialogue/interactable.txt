@@ -74,7 +74,7 @@ CHOICES Yes\No
 
 ITEM PopStack 0 0
 Stack popped!
-SOUND incomingDialogue
+SOUND rareItemPickup
 
 ITEM PopStack 1 0
 You decide not to pop your stack.
@@ -89,6 +89,7 @@ CHOICES Yes\No
 
 ITEM PushStack 0 0
 You feel a surge of data being pushed onto your stack.
+SOUND itemPickup
 
 ITEM PushStack 1 0
 You decide against downloading data from a machine in a run-down lab.
@@ -104,6 +105,7 @@ CHOICES Yes\No
 ITEM Ram 0 0
 You install the ram module.
 [Stack capacity increased!]
+SOUND rareItemPickup
 
 ITEM Ram 1 0
 You decide not to install the ram module.

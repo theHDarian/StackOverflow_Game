@@ -38,6 +38,8 @@ public:
 
     void playRareItemPickupSound();
 
+    void playExplosionSound();
+
     void playDoorOpenSound();
 
     void playDoorCloseSound();
@@ -74,6 +76,7 @@ private:
     // Mix_Chunk* enemyHurtSound;
     // Mix_Chunk* enemyDeathSound;
     std::vector<Mix_Chunk*> enemyShootSounds;
+    Mix_Chunk* explosionSound;
 
     Mix_Chunk* doorOpenSound;
     Mix_Chunk* doorCloseSound;
