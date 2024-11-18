@@ -838,7 +838,7 @@ Entity UISystem::createTitleScreen() {
 	// copies code from draw line as a box for now
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "enemy_bullet_square.png",
+		{ "title_concept.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
@@ -850,22 +850,23 @@ Entity UISystem::createTitleScreen() {
 	motion.velocity = { 0, 0 };
 	motion.position = vec2(windowState.width / 2, windowState.height / 2);
 	motion.scale = vec2(windowState.width, windowState.height);
+	//motion.scale = { 1347 * 1.5, 953 * 1.5 };
 
 	// temp colour
-	auto& color = registry.colors.emplace(entity);
-	color.r = 0.0;
-	color.b = 0.0;
-	color.g = 0.0;
+	//auto& color = registry.colors.emplace(entity);
+	//color.r = 0.0;
+	//color.b = 0.0;
+	//color.g = 0.0;
 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
-	text.color = vec3(1, 1, 0);
+	text.color = COLOR_YELLOW;
 	text.topRightBound = { motion.scale.x, motion.scale.y };
 	text.bottomLeftBound = { 0, 0 };
 	text.text = "Stack Overflow";
 	text.x = windowState.width / 2 - 48 * 1.0 * text.text.length() / 2;
-	text.y = windowState.height - motion.position.y + motion.scale.y / 4;
+	text.y = windowState.height - 135;
 	text.scale = 1.0;
 	//text.text = "Game Over \npress R to restart";
 	text.topRightBound = { motion.scale.x - 25, motion.scale.y - 25 };
