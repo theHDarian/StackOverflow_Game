@@ -307,7 +307,7 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	textReq.topRightBound = { textReq.x + motion.scale.x - 25, textReq.y };
 
 	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
-	arrowMotion.position = { position.x, position.y + 50 };
+	arrowMotion.position = { position.x, position.y + 51 };
 	registry.renderRequests.get(bulletUIArrow).show = true;
 }
 
@@ -330,7 +330,7 @@ Entity UISystem::createBulletUIArrow() {
 	motion.scale = {-30, 30};
 
 	vec3& color = registry.colors.emplace(entity);
-	color = { 1,1,1 };
+	color = COLOR_RED;
 
 	return entity;
 }
