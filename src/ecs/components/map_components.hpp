@@ -21,7 +21,8 @@ enum RoomType : int {
 
 inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
 {
-    if (roomsTraversed % 5 == 4) {
+    const int bossRoomNum = 12;
+    if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
         //Make every 5 rooms the boss room
         return BossBigCRoom;
     }

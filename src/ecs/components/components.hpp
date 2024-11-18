@@ -108,6 +108,7 @@ enum SoundType {
 	normalBGM,
 	bossBGM,
 	specialBGM,
+	titleBGM,
 	PlayerHurt,
 	DashSound,
 	PlayerShoot,
@@ -115,6 +116,10 @@ enum SoundType {
 	IncomingDialogue,
 	NormalDialogue,
 	DoorOpen,
+	DoorClose,
+	itemPickup,
+	rareItemPickup,
+	explosion,
 };
 struct SoundRequest {
 	SoundType type;
@@ -184,8 +189,9 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	EGG = COLOURED + 1,
 	MESH = EGG + 1,
 	TEXTURED = MESH + 1,
-	POSTPROCESS = TEXTURED + 1,
-	DASH = POSTPROCESS + 1,
+	POSTPROCESS1 = TEXTURED + 1,
+	POSTPROCESS2 = POSTPROCESS1 + 1,
+	DASH = POSTPROCESS2 + 1,
 	HP_BAR = DASH + 1,
 	ROOM_BOUND = HP_BAR + 1,
 	ANIMATE = ROOM_BOUND + 1,
@@ -297,6 +303,8 @@ struct TextRenderRequest {
 
 	// temp: add for now if it is preloaded
 	std::vector<std::string> tokenizedText = std::vector<std::string>();
+
+	TextAlignment alignment = TextAlignment::LeftAlign;
 };
 
 struct Dialogue {

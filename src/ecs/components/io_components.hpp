@@ -30,6 +30,8 @@ struct IOState {
 	bool tutorialOn = false;
 	int hoveringDialogueChoice = -1;
 	int lastHoverDialogueChoice = -1;
+	int hoveringMenuChoice = 0;
+	int lastHoverMenuChoice = 0;
 	bool showFPS = true;
 
 	ExtendedStack<int> pressedHorizontal;
@@ -44,4 +46,7 @@ struct GameState {
 	int dialogueChoice = -1;
 	float currentVolume = 0.5f;
 	bool seenLockedDoor = false;
+	bool titleScreen = false;
+	bool loading = true; // this is ONLY here to prevent awkward half second of non-black screen on game start
+	// when fix ui later properly can remove
 };

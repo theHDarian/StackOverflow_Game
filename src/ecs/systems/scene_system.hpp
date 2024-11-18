@@ -20,6 +20,22 @@ public:
     //bool init(); // load all dialogue
     void step(float elapsed_ms);
 
+    std::unordered_map<std::string, SoundType> soundEffectNames = {
+        {"normalBGM", SoundType::normalBGM},
+        {"bossBGM", SoundType::bossBGM},
+        {"specialBGM", SoundType::specialBGM},
+        {"PlayerHurt", SoundType::PlayerHurt},
+        {"DashSound", SoundType::DashSound},
+        {"PlayerShoot", SoundType::PlayerShoot},
+        {"EnemyShoot", SoundType::EnemyShoot},
+        {"IncomingDialogue", SoundType::IncomingDialogue},
+        {"NormalDialogue", SoundType::NormalDialogue},
+        {"DoorOpen", SoundType::DoorOpen},
+        {"itemPickup", SoundType::itemPickup},
+        {"rareItemPickup", SoundType::rareItemPickup},
+        {"explosion", SoundType::explosion}
+    };
+
 private:
     SoundSystem* soundSystem;
     // fun fact: if you don't ask it to hash certain parts, it won't!

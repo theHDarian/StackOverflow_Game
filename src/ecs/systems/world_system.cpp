@@ -137,6 +137,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
+	gameState.titleScreen = true;
 
 	WindowState& wS = registry.windowStates.components[0];
 	wS.currUnixTime = Clock::now();
@@ -150,9 +151,15 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
 	createRoomBounds(renderer);
 
+	//Entity title = createSkipDialogue();
+	//registry.dialogueRequests.emplace(title);
+
 	// mock interactable call instead of proper ui for now
-	Entity skipDialogue = createSkipDialogue();
-	registry.dialogueRequests.emplace(skipDialogue);
+	skipDialogue = createSkipDialogue();
+	//registry.dialogueRequests.emplace(skipDialogue);
+
+	//Entity skipDialogue2 = createSkipDialogue();
+	//registry.dialogueRequests.emplace(skipDialogue2);
 }
 #pragma endregion
 
@@ -215,15 +222,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				}
 			}
 		}
-	}
 
-	if (registry.enemyBullets.entities.size() > 0) {
-		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
-			EnemyBullet& bullet = registry.enemyBullets.components[i];
-			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				// remove enemy bullet
-				if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
-					registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+		if (registry.enemyBullets.entities.size() > 0) {
+			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
+				EnemyBullet& bullet = registry.enemyBullets.components[i];
+				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+					// remove enemy bullet
+					if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+						registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+				}
 			}
 		}
 	}
@@ -333,7 +340,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (object.item == InteractableItem::Ram) {
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
-				extendStack( player, 10);
+				extendStack( player, 5);
 				object.dialogueCount++;
 				registry.deleteds.emplace(reaction.object);
 			}
@@ -373,7 +380,9 @@ void WorldSystem::restartGame() {
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
-	gameState.seenLockedDoor = false;
+	gameState.cutScene = false;
+	gameState.seenLockedDoor = false; 
+	gameState.loading = false;
 	gameState.dialogueChoice = -1;
 
 	//std::cout << ("MyString") << std::endl;
@@ -397,7 +406,7 @@ void WorldSystem::restartGame() {
 	registry.maps.components[0].currRoom.dialogueDone = true;
 
 	// mock interactable call instead of proper ui for now
-	Entity skipDialogue = createSkipDialogue();
+	//Entity skipDialogue2 = createSkipDialogue();
 	registry.dialogueRequests.emplace(skipDialogue);
 
 	//registry.mapRequests.emplace(player,MapRequestType::RestartGame);
@@ -811,6 +820,7 @@ void WorldSystem::enemyBulletDeath(Entity e) {
 	if (eb.onDeath == EnemyBulletDeath::NONE) return;
 	if (eb.onDeath == EnemyBulletDeath::EXPLODE) {
 		createEnemyBulletDeath(renderer, ebm.position, vec2(0), EnemyBulletDeath::EXPLODE);
+		soundPlayer->playExplosionSound(2);
 		return;
 	}
 	else if (eb.onDeath == EnemyBulletDeath::CLUSTER) {
@@ -818,6 +828,7 @@ void WorldSystem::enemyBulletDeath(Entity e) {
 		createEnemyBulletDeath(renderer, ebm.position, vec2( 1,-1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1, 1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1,-1), EnemyBulletDeath::CLUSTER);
+		soundPlayer->playExplosionSound(0);
 		return;
 	}
 }

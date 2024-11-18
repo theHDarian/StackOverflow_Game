@@ -93,7 +93,7 @@ int main() {
 		sceneSystem.step(elapsed_ms); // not sure if this should always be here
 		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
 
-		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
+		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isTitle()) {
 			// do nothing
 		}
 		else if (ioSystem.isCutscene()) { // should be in separate system, but lazy
@@ -114,7 +114,7 @@ int main() {
 			aiSystem.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
 			particleSystem.step(elapsed_ms);
-			// soundSystem.step(elapsed_ms);
+			soundSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
 		}
@@ -130,6 +130,7 @@ int main() {
 		renderer.drawBackgroundElements();
 		particleSystem.render();
 		renderer.drawGameElements();
+		renderer.drawToScreen1();
 		renderer.drawGameUI();
 		textSystem.renderGameUIText();
 		renderer.drawDialogueUI();
@@ -139,7 +140,7 @@ int main() {
 		renderer.drawMenuOverlayUI();
 		textSystem.renderMenuOverlayUIText();
 		renderer.drawCursor();
-		renderer.drawToScreen(); //postprocessing
+		renderer.drawToScreen2(); //postprocessing
 
 		glfwSwapBuffers(window);
 	}

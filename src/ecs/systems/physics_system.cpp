@@ -135,7 +135,8 @@ void PhysicsSystem::step(float elapsed_ms)
 	// Player to interactible ranges/objects
 	for (uint i = 0; i < registry.interactables.components.size(); i++) {
 		Entity interactable = registry.interactables.entities[i];
-		if (registry.circleColliders.has(interactable) && CircleToCircle(interactable, player)) {
+		if ((registry.circleColliders.has(interactable) && CircleToCircle(interactable, player)) ||
+			(registry.aabbs.has(interactable) && AABBToCircle(interactable, player))) {
 			registry.collisions.emplace_with_duplicates(player, interactable);
 		}
 	}
@@ -246,8 +247,8 @@ bool PhysicsSystem::AABBToCircle(Entity aabb, Entity circle) {
 	if (glm::dot(mB.position - bottomLeft, mB.position - bottomLeft) < c.radius * c.radius) return true;
 	if (glm::dot(mB.position - bottomRight, mB.position - bottomRight) < c.radius * c.radius) return true;
 
-	if (!PointInAABB(mB.position, topLeft + vec2(0, -c.radius), bottomRight + vec2(0, c.radius))) return true;
-	if (!PointInAABB(mB.position, topLeft + vec2(-c.radius, 0), bottomRight + vec2(c.radius, 0))) return true;
+	if (!PointInAABB(mB.position, bottomRight + vec2(0, c.radius), topLeft + vec2(0, -c.radius))) return true;
+	if (!PointInAABB(mB.position, bottomRight + vec2(c.radius, 0), topLeft + vec2(-c.radius, 0))) return true;
 
 	return false;
 }

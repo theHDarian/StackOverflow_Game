@@ -207,7 +207,7 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 
 	registry.renderRequests.insert(
 		console,
-		{"pop_console",
+		{ "push_console",
 		 EFFECT_ASSET_ID::ANIMATE,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
@@ -230,14 +230,13 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
 	registry.backgrounds.emplace(console);
 
-	// use aabb as near player range for now for pseudo-offsetting
-	// note: visuald doesn't seem to align with collider??? So use circle instead
-	// AABBCollider& aabb = registry.aabbs.emplace(console);
-	// aabb.topLeft = vec2(-m.scale.x / 10, -m.scale.y / 50);
-	// aabb.bottomRight = vec2(m.scale.x / 2, m.scale.y / 1.5);
+	// can use aabb as near player range for now for pseudo-offsetting
+	 AABBCollider& aabb = registry.aabbs.emplace(console);
+	 aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	 aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
 
-	CircleCollider &cc = registry.circleColliders.emplace(console);
-	cc.radius = m.scale.y / 4;
+	//CircleCollider &cc = registry.circleColliders.emplace(console);
+	//cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PopStack";
@@ -597,7 +596,7 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = vec2({2880 / 2, 1584 / 2});
+	motion.scale = vec2({2880 / 1.75, 1584 / 1.75});
 
 	registry.backgrounds.emplace(entity);
 
@@ -681,6 +680,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyMediumTank();
 		break;
 	}
+	case EnemyType::HardEnemyTank:
+	{
+		enemy = EnemyHardTank();
+		break;
+	}
 	case EnemyType::BeeHive:
 	{
 		enemy = EnemyMediumBeeHive();
@@ -690,11 +694,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = BossBeeHive();
 		registry.bosses.emplace(entity);
-		break;
-	}
-	case EnemyType::HardEnemyAngel:
-	{
-		enemy = EnemyHardAngel();
 		break;
 	}
 	case EnemyType::EasyEnemySkull:
@@ -785,8 +784,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			enemy.sprite.texturePath,
 			enemy.sprite.effectId,
 			enemy.sprite.geometryId,
-			// true,
-			// vec2(-12, 0) // manually set an offset for now
+			true,
+			enemy.sprite.offset // manually set an offset for now
 		});
 
 	// need to also add an animate component
@@ -798,8 +797,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		animate.animation_countdown = enemy.sprite.countdown;
 		animate.animation_countdown_base = animate.animation_countdown;
 	}
-
-	enemy.collisionBullet = blunt;
 
 	if (type == EnemyType::BossBeehiveMain)
 	{
@@ -1164,6 +1161,7 @@ Entity createSkipDialogue()
 	Entity entity = Entity();
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "SkipTutorial";
+	registry.menuUIs.emplace(entity);
 	return entity;
 }
 
@@ -1176,12 +1174,13 @@ float getModifiedValue(BulletEffectType bf, float value)
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
-	float prob = 0.1f * (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
+	float prob = (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
 	Map &map = registry.maps.components[0];
 
 	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
 		registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
+		if (Random::Float() < 0.15) return { key };
 		return atkData.rareBulletEffects;
 	}
 	return {atkData.defaultEffect};

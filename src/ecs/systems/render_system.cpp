@@ -432,11 +432,74 @@ void RenderSystem::drawMesh(Entity entity,
 
 // draw the intermediate texture to the screen, with some distortion to simulate
 // water
-void RenderSystem::drawToScreen()
+void RenderSystem::drawToScreen1()
 {
+	Frame& frame = registry.frames.components[0];
 	// Setting shaders
 	// get the water texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS]);
+	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS1]);
+	glBindVertexArray(vao);
+	gl_has_errors();
+	// Clearing backbuffer
+	int w, h;
+	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame.prevFrameBuffer += 1);
+	glViewport(0, 0, w, h);
+	glDepthRange(0, 10);
+	glClearColor(1.f, 0, 0, 1.0);
+	glClearDepth(1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gl_has_errors();
+	// Enabling alpha channel for textures
+	glDisable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+
+	// Draw the screen texture on the quad geometry
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]);
+	glBindBuffer(
+		GL_ELEMENT_ARRAY_BUFFER,
+		index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
+																	 // indices to the bound GL_ARRAY_BUFFER
+	gl_has_errors();
+	const GLuint postprocess_program = effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS1];
+	// Set clock
+	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
+	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
+	float intensity = (float)stack.currStack.size() / ((stack.baseStackSize + stack.additives[PlayerStackSize]) * stack.multiplicatives[PlayerStackSize]);
+	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
+	glUniform1f(chrom_abb_intensity_uloc, intensity);
+	gl_has_errors();
+	// Set the vertex position and vertex texture coordinates (both stored in the
+	// same VBO)
+	GLint in_position_loc = glGetAttribLocation(postprocess_program, "in_position");
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
+	gl_has_errors();
+
+	// Bind our texture in Texture Unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, frame.prevTexture);
+	gl_has_errors();
+	// Draw
+	glDrawElements(
+		GL_TRIANGLES, 3, GL_UNSIGNED_SHORT,
+		nullptr); // one triangle = 3 vertices; nullptr indicates that there is
+				  // no offset from the bound index buffer
+	glBindVertexArray(0);
+	gl_has_errors();
+
+	drawSetupFrame();
+}
+
+void RenderSystem::drawToScreen2()
+{
+
+	// Setting shaders
+	// get the water texture, sprite mesh, and program
+	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS2]);
 	glBindVertexArray(vao);
 	gl_has_errors();
 	// Clearing backbuffer
@@ -461,20 +524,16 @@ void RenderSystem::drawToScreen()
 		index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
 																	 // indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
-	const GLuint postprocess_program = effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS];
+	const GLuint postprocess_program = effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS2];
 	// Set clock
 	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
-	float intensity = (float)stack.currStack.size() / ((stack.baseStackSize + stack.additives[PlayerStackSize]) * stack.multiplicatives[PlayerStackSize]);
-	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
-	glUniform1f(chrom_abb_intensity_uloc, intensity);
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
 	GLint in_position_loc = glGetAttribLocation(postprocess_program, "in_position");
 	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 	gl_has_errors();
 
 	// Bind our texture in Texture Unit 0
@@ -573,7 +632,8 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		drawTexturedMesh(entity, projection_2D);
-		drawAllColliders(entity, projection_2D);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection_2D);
 	}
 
 	for (Entity& entity : registry.bosses.entities)
@@ -834,12 +894,18 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	
 	Entity stackEntity = registry.stackUI.entities[0];
 	StackUI& stackui = registry.stackUI.get(stackEntity);
-	
+
 	Transform transform;
 	transform.translate(stackui.stackPos);
 	transform.scale(stackui.stackSize);
 
-	vec3 color = { 11/255.f, 84/255.f, 87/255.f };
+	// for outline
+	Transform transformOutline;
+	transformOutline.translate(stackui.stackPos);
+	transformOutline.scale(vec2(stackui.stackSize.x + 10, stackui.stackSize.y + 10));
+	vec3 outlineColor = vec3(1.0);
+
+	vec3 color = vec3(0);
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
 	const GLuint program = (GLuint)effects[used_effect_enum];
 
@@ -871,7 +937,6 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 		(void*)sizeof(
 			vec3)); // note the stride to skip the preceeding vertex position
 
-	// Enabling and binding texture to slot 0
 	glActiveTexture(GL_TEXTURE0);
 	gl_has_errors();
 
@@ -882,8 +947,6 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	gl_has_errors();
 
 	// Getting uniform locations for glUniform* calls
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color_uloc, 1, (float*)&color);
 	// want to overwrite the colour with given; could also use a separate shader program
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 1);
@@ -904,22 +967,44 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 	gl_has_errors();
+
+	// draw outline here
+	GLuint transform2_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform2_loc, 1, GL_FALSE, (float*)&transformOutline.mat);
+	GLint color2_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color2_uloc, 1, (float*)&outlineColor);
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
+	// draw actual stack here
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
 	gl_has_errors();
 
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++) {
+		// defaults
+		std::string bulletShape = bulletEffectShapes[BulletEffectType::Inert];
+		vec3 bulletColor = COLOR_GREY_MED;
 		// no variance on shape for now
-		std::string bulletShape = bulletEffectShapes[stack.currStack[i].type];
+		if (bulletEffectShapes.count(stack.currStack[i].type) > 0) {
+			bulletShape = bulletEffectShapes[stack.currStack[i].type];
+		}
+		if (bulletEffectColors.count(stack.currStack[i].type) > 0) {
+			bulletColor = bulletEffectColors[stack.currStack[i].type];
+		}
+
 		// start from bottom to top
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
-			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
+			bulletColor, bulletShape, projection);
 	}
 }
 
@@ -1016,7 +1101,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat3& pr
 	}
 	else if (shape == "rectangle.png") {
 		auto& aabb = registry.aabbs.get(entity);
-		transform.translate(motion.position);
+		transform.translate(vec2(motion.position.x + (abs(aabb.bottomRight.x) - abs(aabb.topLeft.x)) / 2, motion.position.y + (abs(aabb.bottomRight.y) - abs(aabb.topLeft.y)) / 2));
 		transform.rotate(motion.angle);
 		transform.scale({ aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y });
 	}
@@ -1164,7 +1249,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	// Getting uniform locations for glUniform* calls
 	if (!isCharging) {
-		vec3 color = { 0.60, 0.59, 0.0 };
+		vec3 color = COLOR_YELLOW;
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
@@ -1174,7 +1259,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 	}
     //consider changing color later
 	else if (isCharging == -1) {
-		vec3 color = { 0.15, 0.15, 0.1}; // grey
+		vec3 color = COLOR_YELLOW * vec3(0.2, 0.2, 0.2); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
@@ -1183,7 +1268,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
 	else {
-		vec3 color = { 0.60, 0.59, 0.0 }; // grey
+		vec3 color = COLOR_YELLOW * vec3(0.60, 0.60, 0.60); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");

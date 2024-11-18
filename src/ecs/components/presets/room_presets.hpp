@@ -27,7 +27,7 @@ const RoomPreset TutorialRoom1Preset{
     0};
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::TestRevampedEnemy, {0.2, 0.4}}},
+    {{EnemyType::EasyEnemySentry, {0.5f, 0.8f}}},
     {},
     {},
     {},
@@ -140,13 +140,10 @@ const RoomPreset EnemyRoomSwarm{
     0.0f,
     0};
 
-const RoomPreset EnemyRoomDashIntro{
-        {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
-         {EnemyType::EasyEnemySentry, {0.8f, 0.8f}},
-         {EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
-         {EnemyType::EasyEnemySentry, {0.2f, 0.2f}},
-         {EnemyType::TestRevampedEnemy, {0.2, 0.4}},
-         {EnemyType::TestRevampedEnemy, {0.8, 0.4}},
+const RoomPreset EnemyRoomDashIntro1{
+        {{EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
+         {EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
+         {EnemyType::EasyEnemySkull, {0.5, 0.5}}
         },
        {},
        {},
@@ -154,6 +151,34 @@ const RoomPreset EnemyRoomDashIntro{
    {},
        0.0f,
        3};
+
+const RoomPreset EnemyRoomDashIntro2{
+        {{EnemyType::Snail, {0.2f, 0.8f}},
+         {EnemyType::Snail, {0.8f, 0.8f}},
+         {EnemyType::MediumEnemyTank, {0.5f, 0.5f}},
+        },
+       {},
+       {},
+       {},
+   {},
+       0.0f,
+       3 };
+
+const RoomPreset EnemyRoomDashIntro3{
+        {{EnemyType::HardEnemyBoidBio, {0.2f, 0.8f}},
+         {EnemyType::HardEnemyBoidBio, {0.2f, 0.8f}},
+         {EnemyType::HardEnemyBoidBio, {0.2f, 0.8f}},
+         {EnemyType::HardEnemyBoidBio, {0.8f, 0.2f}},
+         {EnemyType::HardEnemyBoidBio, {0.8f, 0.2f}},
+         {EnemyType::HardEnemyBoidBio, {0.8f, 0.2f}},
+         {EnemyType::ThreeBee, {0.5f, 0.5f}},
+        },
+       {},
+       {},
+       {},
+   {},
+       0.0f,
+       3 };
 
 const RoomPreset EnemyRoomDash1{
     {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
@@ -187,8 +212,7 @@ const RoomPreset EnemyRoomDash2{
     {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
     {EnemyType::TestRevampedEnemy, {0.3, 0.6}},
      {EnemyType::TestRevampedEnemy, {0.7, 0.4}},
-    {EnemyType::TestRevampedEnemy, {0.7, 0.2}},
-    {EnemyType::TestRevampedEnemy, {0.7, 0.6}},
+        {Snail, {0.5f, 0.7f}},
      {EnemyType::EasyEnemySkull, {0.5f, 0.5f}}
      },
     {},
@@ -204,8 +228,6 @@ const RoomPreset EnemyRoomDashHard{
      {EnemyType::EasyEnemySkull, {0.8f, 0.8f}},
      {EnemyType::EasyEnemySkull, {0.8f, 0.2f}},
      {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
-    {EnemyType::HardEnemyAngel, {0.4f, 0.5f}},
-    {EnemyType::HardEnemyAngel, {0.8f, 0.5f}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.6}},
@@ -255,6 +277,7 @@ const RoomPreset EnemyRoomBees2{
      {EnemyType::TwoBee, {0.8f, 0.8f}},
      {EnemyType::TwoBee, {0.8f, 0.2f}},
      {EnemyType::TwoBee, {0.2f, 0.2f}},
+        {EvilSnail, {0.5f, 0.6f}},
      {EnemyType::BeeHive, {0.2f, 0.4f}},
         {EnemyType::BeeHive, {0.5f, 0.4f}},
      {EnemyType::BeeHive, {0.8f, 0.4f}}},
@@ -269,8 +292,6 @@ const RoomPreset EnemyRoomAngelTank{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
      {EnemyType::MediumEnemyCharge, {0.8f, 0.2f}},
      {EnemyType::MediumEnemyTank, {0.5f, 0.5f}},
-     {EnemyType::HardEnemyAngel, {0.2f, 0.4f}},
-     {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
      {EnemyType::MediumEnemyHealer, {0.8, 0.8}},
      {EnemyType::MediumEnemyHealer, {0.2, 0.2}}},
      
@@ -286,10 +307,8 @@ const RoomPreset EnemyRoomTripleBuffEX{
         {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
     {EnemyType::MediumEnemyTank, {0.6f, 0.2f}},
     {EnemyType::MediumEnemyTank, {0.2f, 0.6f}},
-    {EnemyType::MediumEnemyTank, {0.4f, 0.4f}},
-        {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
-    {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
-        {EnemyType::HardEnemyAngel, {0.8f, 0.6f}}
+        {EvilSnail, {0.7f, 0.7f}},
+        {EvilSnail, {0.7f, 0.3f}},
     },
     {bulletBounceUpA, bulletPierceUpA},
     {},
@@ -298,11 +317,29 @@ const RoomPreset EnemyRoomTripleBuffEX{
     {},
     0.0f,
     35};
-const RoomPreset RestingRoom1{
+
+
+const RoomPreset RestingRoomPop{
     {},
     {},
     {},
     {{InteractableItem::PopConsole, {0.5f, 0.5f}}},
+    {SpecialEvent::RebootStation}
+};
+
+const RoomPreset RestingRoomGardener{
+        {},
+        {},
+        {},
+        {{InteractableItem::Gardener, {0.65f, 0.5f}}, {InteractableItem::BibleTree, {0.5f, 0.5f}}},
+        {SpecialEvent::RebootStation}
+};
+
+const RoomPreset RestRoomBibleTree{
+    {},
+    {},
+    {},
+    {{InteractableItem::BibleTree, {0.5f, 0.5f}}},
     {SpecialEvent::RebootStation}
 };
 
@@ -409,8 +446,8 @@ const RoomPreset TreasureRoomKeys{
 
 
 
-const RoomPreset BossRoom1{
-    {{EnemyType::BossBigC, {0.5f, 0.5f}}},
+const RoomPreset BossRoomBee{
+    {{BossBeehiveMain, {0.5f, 0.5f}}, {ThreeBee,{0.5f, 0.75f}}},
     {},
     {},
     {{Ram, {0.5f, 0.5f}}},
@@ -433,18 +470,18 @@ struct RoomPresets {
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{EnemyRoomDashIntro },{}}},
-        {RoomType::RestRoom, {{RestingRoom1},{RestingRoom1}}},
+        {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
+        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomOstrich, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoom1},{RestingRoom1}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomOstrich, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
-        {RoomType::RestRoom, {{RestingRoom1},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomOstrich, TreasureRoom5}}},
     }},
 };
@@ -467,7 +504,7 @@ inline bool hasLocked(RoomType type, int roomsTraversed) {
 RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
     //boss rooms
     if (type == RoomType::BossBigCRoom) {
-        return BossRoom1;
+        return BossRoomBee;
     }
 
     //tutorial rooms
@@ -499,4 +536,14 @@ const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::None,4},
     {RoomType::TutorialRoom1,5},
     {RoomType::TutorialRoom2,5}
+};
+
+const std::map<RoomType, SoundType> roomTypeToMusic = {
+    {RoomType::EnemyRoom, SoundType::normalBGM},
+    {RoomType::RestRoom, SoundType::specialBGM},
+    {RoomType::BossBigCRoom, SoundType::bossBGM},
+    {RoomType::TreasureRoom, SoundType::specialBGM},
+    {RoomType::None, normalBGM},
+    {RoomType::TutorialRoom1, SoundType::specialBGM},
+    {RoomType::TutorialRoom2, SoundType::normalBGM}
 };
