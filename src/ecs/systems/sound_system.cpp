@@ -21,10 +21,14 @@ void SoundSystem::step(float elapsed_ms)
             }
             else if (soundRequest.type == SoundType::bossBGM)
             {
+                if (soundRequest.songIndex == -1)
+                    playBossMusic(Random::Int(bossRoomMusic.size()));
                 playBossMusic(soundRequest.songIndex);
             }
             else if (soundRequest.type == SoundType::specialBGM)
             {
+                if (soundRequest.songIndex == -1)
+                    playSpecialMusic();
                 playSpecialMusic(soundRequest.songIndex);
             }
             else if (soundRequest.type == SoundType::PlayerHurt)
@@ -54,9 +58,13 @@ void SoundSystem::step(float elapsed_ms)
             else if (soundRequest.type == SoundType::DoorOpen)
             {
                 playDoorOpenSound();
+            } else if (soundRequest.type == SoundType::itemPickup) {
+                playItemPickupSound();
+            } else if (soundRequest.type == SoundType::rareItemPickup) {
+                playRareItemPickupSound();
             }
-        registry.soundRequests.remove(registry.soundRequests.entities[i]);
     }
+    registry.soundRequests.clear();
 }
 
 
@@ -203,10 +211,24 @@ void SoundSystem::loadSoundEffects() {
     }
     doorCloseSound->volume = 0.4f * MIX_MAX_VOLUME;
 
+    itemGetSound = Mix_LoadWAV(audio_path("sfx/item_get.wav").c_str());
+    if (!itemGetSound) {
+        fprintf(stderr, "Failed to load item get sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load item get sound");
+    }
+    itemGetSound->volume = 0.4f * MIX_MAX_VOLUME;
+
+    rareItemGetSound = Mix_LoadWAV(audio_path("sfx/rare_item_get.wav").c_str());
+    if (!rareItemGetSound) {
+        fprintf(stderr, "Failed to load rare item get sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load rare item get sound");
+    }
+    rareItemGetSound->volume = 0.4f * MIX_MAX_VOLUME;
+
 }
 
 void SoundSystem::playNextMusic() {
-    int nextMusicIndex = rand() % normalRoomMusic.size();
+    int nextMusicIndex = Random::Int(normalRoomMusic.size());
     playNextMusic(nextMusicIndex);
 }
 
@@ -227,7 +249,7 @@ void SoundSystem::playNextMusic(int songIndex)
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic(volume * MIX_MAX_VOLUME * currentBGM->volume);
+    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume);
 }
 
 
@@ -235,25 +257,43 @@ void SoundSystem::playNextMusic(int songIndex)
 void SoundSystem::playBossMusic(int songIndex)
 {
     currentBGM = &bossRoomMusic[songIndex];
+    Mix_FreeMusic(backgroundMusic);
     Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM->path.c_str());
     Mix_FadeInMusic(newbackgroundMusic, currentBGM->loops, 1000);
+    backgroundMusic = newbackgroundMusic;
     if (!backgroundMusic)
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic(volume * MIX_MAX_VOLUME * currentBGM->volume);
+    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume);
+}
+
+void SoundSystem::playSpecialMusic()
+{
+    // currentBGM = &specialRoomMusic[Random::Int(specialRoomMusic.size())];
+    Mix_Music *newbackgroundMusic = Mix_LoadMUS(audio_path("special/special-room.wav").c_str());
+    Mix_FreeMusic(backgroundMusic);
+    Mix_FadeInMusic(newbackgroundMusic,-1, 1000);
+    backgroundMusic = newbackgroundMusic;
+    if (!backgroundMusic)
+    {
+        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+    }
+    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume);
 }
 
 void SoundSystem::playSpecialMusic(int songIndex)
 {
     currentBGM = &specialRoomMusic[songIndex];
-    Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM->path.c_str());
-    Mix_FadeInMusic(newbackgroundMusic, currentBGM->loops, 1000);
+    Mix_Music *newbackgroundMusic = Mix_LoadMUS(audio_path("event/event-room.wav").c_str());
+    Mix_FreeMusic(backgroundMusic);
+    Mix_FadeInMusic(newbackgroundMusic,-1, 1000);
+    backgroundMusic = newbackgroundMusic;
     if (!backgroundMusic)
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic(volume * MIX_MAX_VOLUME * currentBGM->volume);
+    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume);
 }
 
 void SoundSystem::playPlayerHurtSound() {
@@ -325,6 +365,20 @@ void SoundSystem::playNextDialogueSound() {
 void SoundSystem::stopNextDialogueSound() {
     if (Mix_Playing(7))
         Mix_HaltChannel(7);
+}
+
+void SoundSystem::playItemPickupSound() {
+    if (!Mix_Playing(8)) {
+        Mix_PlayChannel(5, itemGetSound, 0);
+        Mix_Volume(5, itemGetSound->volume * volume);
+    }
+}
+
+void SoundSystem::playRareItemPickupSound() {
+    if (!Mix_Playing(8)) {
+        Mix_PlayChannel(5, rareItemGetSound, 0);
+        Mix_Volume(5, rareItemGetSound->volume * volume);
+    }
 }
 
 bool SoundSystem::setVolume(float volume) {

@@ -22,21 +22,8 @@ std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = {
     {Inert, "Inert"}
 };
 
-std::unordered_map<std::string, SoundType> soundEffectNames ={
-    {"normalBGM", SoundType::normalBGM},
-    {"bossBGM", SoundType::bossBGM},
-    {"specialBGM", SoundType::specialBGM},
-    {"PlayerHurt", SoundType::PlayerHurt},
-    {"DashSound", SoundType::DashSound},
-    {"PlayerShoot", SoundType::PlayerShoot},
-    {"EnemyShoot", SoundType::EnemyShoot},
-    {"IncomingDialogue", SoundType::IncomingDialogue},
-    {"NormalDialogue", SoundType::NormalDialogue},
-    {"DoorOpen", SoundType::DoorOpen}
 
-};
-
-std::unordered_map<std::string, InteractableItem> interactableItemNames = {
+const std::unordered_map<std::string, InteractableItem> interactableItemNames = {
     {"Ram", InteractableItem::Ram},
     {"PopConsole", InteractableItem::PopConsole},
     {"OpenDoor", InteractableItem::OpenDoor},

@@ -94,7 +94,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -222,15 +222,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				}
 			}
 		}
-	}
 
-	if (registry.enemyBullets.entities.size() > 0) {
-		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
-			EnemyBullet& bullet = registry.enemyBullets.components[i];
-			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				// remove enemy bullet
-				if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
-					registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+		if (registry.enemyBullets.entities.size() > 0) {
+			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
+				EnemyBullet& bullet = registry.enemyBullets.components[i];
+				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+					// remove enemy bullet
+					if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+						registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+				}
 			}
 		}
 	}

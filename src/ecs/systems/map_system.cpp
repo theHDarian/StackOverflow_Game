@@ -24,7 +24,6 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     this->renderer = renderer;
     this->soundPlayer = soundPlayer_arg;
     assert(registry.maps.components.size() > 0);
-    soundPlayer->playNextMusic();
     WindowState &ws = registry.windowStates.components[0];
     // create door colliders
     float offsetRightLeft = ws.width / (6 * ws.width/(float)ws.height);
@@ -183,6 +182,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         map.roomsTraversed++;
     }
 
+    SoundType old_s = roomTypeToMusic.at(map.currRoom.type);
+
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
     Motion &playerMotion = registry.motions.get(playerEntity);
@@ -203,14 +204,17 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom.preset = getRoomPreset(door.room,map.roomsTraversed, door.isLocked);
     map.currRoom.type = door.room;
 
-    if (map.currRoom.type == RoomType::BossBigCRoom) {
-        soundPlayer->playBossMusic(0);
-    } else if (map.currRoom.type == RoomType::TreasureRoom) {
-        soundPlayer->playSpecialMusic(0);
-    } else {
-        soundPlayer->playNextMusic();
-    }
 
+    SoundType s = roomTypeToMusic.at(map.currRoom.type);
+    if (s != old_s) {
+        if (s == SoundType::normalBGM) {
+            soundPlayer->playNextMusic();
+        } else if (s == SoundType::bossBGM) {
+            soundPlayer->playBossMusic(0);
+        } else if (s == SoundType::specialBGM) {
+            soundPlayer->playSpecialMusic(0);
+        }
+    }
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;

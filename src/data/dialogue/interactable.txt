@@ -58,6 +58,7 @@ SOUND IncomingDialogue
 There should be some single-use keycards scattered around the lab.
 You should be able to scrape the data off of them and store it on your stack.
 Some enemies might have done just that, and they might leak those keycodes in a pinch. See if you can get it off of them.
+Do keep in mind, using a key will also pop all the data pushed after the key off your stack.
 Good luck!
 
 ITEM PrevDoor -1 0
