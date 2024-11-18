@@ -268,9 +268,12 @@ const RoomPreset EnemyRoomBees2{
 const RoomPreset EnemyRoomAngelTank{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
      {EnemyType::MediumEnemyCharge, {0.8f, 0.2f}},
-     {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
+     {EnemyType::MediumEnemyTank, {0.5f, 0.5f}},
      {EnemyType::HardEnemyAngel, {0.2f, 0.4f}},
-     {EnemyType::HardEnemyAngel, {0.8f, 0.4f}}},
+     {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
+     {EnemyType::MediumEnemyHealer, {0.8, 0.8}},
+     {EnemyType::MediumEnemyHealer, {0.2, 0.2}}},
+     
     {},
     {},
     {},
