@@ -299,11 +299,29 @@ const RoomPreset EnemyRoomTripleBuffEX{
     {},
     0.0f,
     35};
-const RoomPreset RestingRoom1{
+
+
+const RoomPreset RestingRoomPop{
     {},
     {},
     {},
     {{InteractableItem::PopConsole, {0.5f, 0.5f}}},
+    {SpecialEvent::RebootStation}
+};
+
+const RoomPreset RestingRoomGardener{
+        {},
+        {},
+        {},
+        {{InteractableItem::Gardener, {0.65f, 0.5f}}, {InteractableItem::BibleTree, {0.5f, 0.5f}}},
+        {SpecialEvent::RebootStation}
+};
+
+const RoomPreset RestRoomBibleTree{
+    {},
+    {},
+    {},
+    {{InteractableItem::BibleTree, {0.5f, 0.5f}}},
     {SpecialEvent::RebootStation}
 };
 
@@ -435,17 +453,17 @@ struct RoomPresets {
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro },{}}},
-        {RoomType::RestRoom, {{RestingRoom1},{RestingRoom1}}},
+        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomOstrich, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoom1},{RestingRoom1}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomOstrich, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
-        {RoomType::RestRoom, {{RestingRoom1},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomOstrich, TreasureRoom5}}},
     }},
 };

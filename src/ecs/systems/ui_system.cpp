@@ -38,7 +38,7 @@ void UISystem::step(float elapsed_ms) {
 			createMenuChoice("Quit", choiceStartPos + offset);
 			ioState.hoveringMenuChoice = 0;
 			ioState.lastHoverMenuChoice = 0;
-
+			soundSystem->playTitleMusic();
 		}
 		else if (registry.menuChoices.entities.size() > 0) {
 			int lastChoice = registry.ioStates.components[0].lastHoverMenuChoice;

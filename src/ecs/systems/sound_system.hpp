@@ -21,6 +21,8 @@ public:
 
     void playNextMusic(int songIndex);
 
+    void playTitleMusic();
+
     void playBossMusic(int songIndex);
 
     void playSpecialMusic();
@@ -63,6 +65,7 @@ private:
     std::vector<SoundRequest> normalRoomMusic;
     std::vector<SoundRequest> bossRoomMusic;
     std::vector<SoundRequest> specialRoomMusic;
+    SoundRequest titleScreenMusic;
     Mix_Chunk* playerHurtSound;
     Mix_Chunk* playerShootSound;
     Mix_Chunk* playerDashSound;
