@@ -58,6 +58,7 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
         for (BulletStackEffect b : effects) {
+            printf("Adding: %s\n",b.name.c_str());
             reg.add(b);
         }
     }

@@ -346,14 +346,20 @@ void ParticleSystem::render() {
     gl_has_errors();
 
     Frame& frame = registry.frames.components[0];
-    if (frame.prevFrameBuffer != 0) {
+    if (frame.prevFrameBuffer != 0 ) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
 
-        // Copy contents of previous buffer to current
-        glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        gl_has_errors();
-        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+        if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE 
+        && glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+            // Copy contents of previous buffer to current
+            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            gl_has_errors();
+            glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+        } else {
+            printf("Warning failed to copy: Frame buffer status %d\n",glCheckFramebufferStatus(GL_FRAMEBUFFER));
+            return;
+        }
     }
     frame.prevFrameBuffer = frame_buffer;
     frame.prevTexture = off_screen_render_buffer_color;

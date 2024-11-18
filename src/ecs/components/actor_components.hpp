@@ -160,6 +160,7 @@ struct StackCompile {
     }
 
     BulletStackEffect remove(int index) {
+        printf("remove %d\n",index);
         assert(index < currStack.size() && index >= 0);
 
         BulletStackEffect effect = currStack[index];
@@ -172,6 +173,7 @@ struct StackCompile {
         return effect;
     }
     BulletStackEffect modify(int index) {
+        printf("modify %d\n",index);
         BulletStackEffect effect = remove(index);
         if (effect.effectCalc == EffectCalculation::Additive) {
             effect.value = -effect.value;

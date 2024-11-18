@@ -243,7 +243,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             lockedRooms++;
         }
         ds.doorType = roomTypeToSymbols.at(d.room);
-        printf("%d\n",ds.doorType);
     }
 }
 
