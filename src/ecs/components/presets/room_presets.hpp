@@ -27,7 +27,7 @@ const RoomPreset TutorialRoom1Preset{
     0};
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}}},
+    {{EnemyType::EasyEnemySentry, {0.5f, 0.8f}}},
     {},
     {},
     {},
@@ -140,13 +140,10 @@ const RoomPreset EnemyRoomSwarm{
     0.0f,
     0};
 
-const RoomPreset EnemyRoomDashIntro{
-        {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
-         {EnemyType::EasyEnemySentry, {0.8f, 0.8f}},
-         {EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
-         {EnemyType::EasyEnemySentry, {0.2f, 0.2f}},
-         {EnemyType::TestRevampedEnemy, {0.2, 0.4}},
-         {EnemyType::TestRevampedEnemy, {0.8, 0.4}},
+const RoomPreset EnemyRoomDashIntro1{
+        {{EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
+         {EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
+         {EnemyType::EasyEnemySkull, {0.5, 0.5}}
         },
        {},
        {},
@@ -154,6 +151,34 @@ const RoomPreset EnemyRoomDashIntro{
    {},
        0.0f,
        3};
+
+const RoomPreset EnemyRoomDashIntro2{
+        {{EnemyType::Snail, {0.2f, 0.8f}},
+         {EnemyType::Snail, {0.8f, 0.8f}},
+         {EnemyType::MediumEnemyTank, {0.5f, 0.5f}},
+        },
+       {},
+       {},
+       {},
+   {},
+       0.0f,
+       3 };
+
+const RoomPreset EnemyRoomDashIntro3{
+        {{EnemyType::HardEnemyBoidBio, {0.2f, 0.8f}},
+         {EnemyType::HardEnemyBoidBio, {0.2f, 0.8f}},
+         {EnemyType::HardEnemyBoidBio, {0.2f, 0.8f}},
+         {EnemyType::HardEnemyBoidBio, {0.8f, 0.2f}},
+         {EnemyType::HardEnemyBoidBio, {0.8f, 0.2f}},
+         {EnemyType::HardEnemyBoidBio, {0.8f, 0.2f}},
+         {EnemyType::ThreeBee, {0.5f, 0.5f}},
+        },
+       {},
+       {},
+       {},
+   {},
+       0.0f,
+       3 };
 
 const RoomPreset EnemyRoomDash1{
     {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
@@ -203,8 +228,6 @@ const RoomPreset EnemyRoomDashHard{
      {EnemyType::EasyEnemySkull, {0.8f, 0.8f}},
      {EnemyType::EasyEnemySkull, {0.8f, 0.2f}},
      {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
-    {EnemyType::HardEnemyAngel, {0.4f, 0.5f}},
-    {EnemyType::HardEnemyAngel, {0.8f, 0.5f}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.6}},
@@ -269,8 +292,6 @@ const RoomPreset EnemyRoomAngelTank{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
      {EnemyType::MediumEnemyCharge, {0.8f, 0.2f}},
      {EnemyType::MediumEnemyTank, {0.5f, 0.5f}},
-     {EnemyType::HardEnemyAngel, {0.2f, 0.4f}},
-     {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
      {EnemyType::MediumEnemyHealer, {0.8, 0.8}},
      {EnemyType::MediumEnemyHealer, {0.2, 0.2}}},
      
@@ -286,9 +307,6 @@ const RoomPreset EnemyRoomTripleBuffEX{
         {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
     {EnemyType::MediumEnemyTank, {0.6f, 0.2f}},
     {EnemyType::MediumEnemyTank, {0.2f, 0.6f}},
-        {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
-    {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
-        {EnemyType::HardEnemyAngel, {0.8f, 0.6f}},
         {EvilSnail, {0.7f, 0.7f}},
         {EvilSnail, {0.7f, 0.3f}},
     },
@@ -429,7 +447,7 @@ const RoomPreset TreasureRoomKeys{
 
 
 const RoomPreset BossRoomBee{
-    {{BossBeehiveMain, {0.5f, 0.5f}}, {ThreeBee,{0.25f, 0.25f}}, {ThreeBee,{0.75f, 0.75f}}, {ThreeBee,{0.75f, 0.25f}}, {ThreeBee,{0.5f, 0.75f}}},
+    {{BossBeehiveMain, {0.5f, 0.5f}}, {ThreeBee,{0.5f, 0.75f}}},
     {},
     {},
     {{Ram, {0.5f, 0.5f}}},
@@ -452,7 +470,7 @@ struct RoomPresets {
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{EnemyRoomDashIntro },{}}},
+        {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
         {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomOstrich, TreasureRoom5}}},
     }},

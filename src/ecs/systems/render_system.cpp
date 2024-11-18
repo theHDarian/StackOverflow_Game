@@ -894,10 +894,16 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	
 	Entity stackEntity = registry.stackUI.entities[0];
 	StackUI& stackui = registry.stackUI.get(stackEntity);
-	
+
 	Transform transform;
 	transform.translate(stackui.stackPos);
 	transform.scale(stackui.stackSize);
+
+	// for outline
+	Transform transformOutline;
+	transformOutline.translate(stackui.stackPos);
+	transformOutline.scale(vec2(stackui.stackSize.x + 10, stackui.stackSize.y + 10));
+	vec3 outlineColor = vec3(1.0);
 
 	vec3 color = vec3(0);
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
@@ -931,7 +937,6 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 		(void*)sizeof(
 			vec3)); // note the stride to skip the preceeding vertex position
 
-	// Enabling and binding texture to slot 0
 	glActiveTexture(GL_TEXTURE0);
 	gl_has_errors();
 
@@ -942,8 +947,6 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	gl_has_errors();
 
 	// Getting uniform locations for glUniform* calls
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color_uloc, 1, (float*)&color);
 	// want to overwrite the colour with given; could also use a separate shader program
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 1);
@@ -964,13 +967,26 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 	gl_has_errors();
+
+	// draw outline here
+	GLuint transform2_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform2_loc, 1, GL_FALSE, (float*)&transformOutline.mat);
+	GLint color2_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color2_uloc, 1, (float*)&outlineColor);
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
+	// draw actual stack here
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
 	gl_has_errors();
 
 	// draw bullet stack here for now, based on bullet effects
