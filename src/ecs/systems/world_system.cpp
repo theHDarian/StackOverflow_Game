@@ -226,10 +226,32 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.enemyBullets.entities.size() > 0) {
 			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 				EnemyBullet& bullet = registry.enemyBullets.components[i];
+				Entity entity = registry.enemyBullets.entities[i];
 				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
 					// remove enemy bullet
-					if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+					if (!registry.deleteds.has(registry.enemyBullets.entities[i])) {
+						Motion& motion = registry.motions.get(entity);
+						ParticleProps props = enemyBulletDeathParticle;
+						props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+						for (const BulletStackEffect &effect : bullet.bulletEffects)
+						{
+							BulletEffectType type = effect.type;
+							if (type == BulletEffectType::Inert)
+								continue;
+							if(enemyBulletColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletColors.at(type));
+							} else {
+								printf("Warning: enemy bullet color not defined\n");
+							}
+						}
+						if (!props.colors.empty())
+						{
+							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PExplode,props,150,2);
+							ep.defaultPos = motion.position;
+						}
 						registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+					}
 				}
 			}
 		}
@@ -474,11 +496,11 @@ void WorldSystem::handleCollisions() {
 		// Enemy bullet centric handling
 		if (registry.enemyBullets.has(entity)) {
 			if (registry.walls.has(entity_other)) {
+				Motion& motion = registry.motions.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
+				EnemyBullet& bullet = registry.enemyBullets.get(entity);
 				if (registry.enemyBullets.get(entity).bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
-					Motion& motion = registry.motions.get(entity);
-					WallCollider& wall = registry.walls.get(entity_other);
-
 					vec2 a = motion.position - wall.startPosition;
 					vec2 b = wall.endPosition - wall.startPosition;
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
@@ -493,8 +515,34 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					if (!registry.deleteds.has(entity))
+					if (!registry.deleteds.has(entity)) {
+						//emit wall collision particle
+						ParticleProps props = enemyBulletDeathParticle;
+						props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+						for (const BulletStackEffect &effect : bullet.bulletEffects)
+						{
+							BulletEffectType type = effect.type;
+							if (type == BulletEffectType::Inert)
+								continue;
+							if(enemyBulletColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletColors.at(type));
+							} else {
+								printf("Warning: enemy bullet color not defined\n");
+							}
+						}
+						if (!props.colors.empty())
+						{
+							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+							//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
+							ep.defaultPos = motion.position;
+							vec2 a = wall.endPosition-wall.startPosition;
+							vec2 b = -motion.velocity;
+							vec2 p = dot(a,b)/dot(a,a)*a;
+							ep.impactDirection = normalize(b-p);
+						}
 						registry.deleteds.emplace(entity);
+					}
 				}
 			}
 		}
@@ -520,17 +568,17 @@ void WorldSystem::handleCollisions() {
 					registry.ignores.get(entity).clear();
 				}
 				else {
-					//emit wall collision particle
-					ParticleProps props = playerBulletCollision;
-					props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
-					//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
-					ep.defaultPos = motion.position;
-					vec2 a = wall.endPosition-wall.startPosition;
-					vec2 b = -motion.velocity;
-					vec2 p = dot(a,b)/dot(a,a)*a;
-					ep.impactDirection = normalize(b-p);
 					if (!registry.deleteds.has(entity)) {
+						//emit wall collision particle
+						ParticleProps props = playerBulletCollision;
+						props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+						EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+						//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
+						ep.defaultPos = motion.position;
+						vec2 a = wall.endPosition-wall.startPosition;
+						vec2 b = -motion.velocity;
+						vec2 p = dot(a,b)/dot(a,a)*a;
+						ep.impactDirection = normalize(b-p);
 						registry.deleteds.emplace(entity);
 					}
 				}

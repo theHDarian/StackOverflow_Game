@@ -929,7 +929,11 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletColors.at(type));
+		} else {
+			printf("Warning: enemy bullet color not defined\n");
+		}
 	}
 	if (!props.colors.empty())
 	{
@@ -991,7 +995,11 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletColors.at(type));
+		} else {
+			printf("Warning: enemy bullet color not defined\n");
+		}
 	}
 	if (!props.colors.empty())
 	{
