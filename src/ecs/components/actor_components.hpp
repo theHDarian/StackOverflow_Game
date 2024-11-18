@@ -335,6 +335,14 @@ enum class EnemyBehavior {
     HEALING
 };
 
+enum class EnemyRotationBehavior {
+    NONE,
+    REGULAR,
+    FACE_UP,
+    FACE_CENTER,
+    FACE_PLAYER
+};
+
 
 enum class ReactionType {
     DURATION,
@@ -423,6 +431,7 @@ struct Enemy {
     SpriteData sprite;
     bool newPattern = false;
     float rotatePower;
+    EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
 };
 

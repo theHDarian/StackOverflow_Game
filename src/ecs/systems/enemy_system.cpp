@@ -103,7 +103,7 @@ void EnemySystem::step(float elapsed_ms)
                 float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
                 float rotationChange = angularSpeed * elapsed_ms / 1000.f;
                 motion.angle += rotationChange;
-            } else if (direction != vec2(0, 0))
+            } else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
             {
                 float targetAngle = atan2(direction.y, direction.x);
                 float deltaAngle = targetAngle - motion.angle;
@@ -119,15 +119,27 @@ void EnemySystem::step(float elapsed_ms)
                     deltaAngle = -maxChange;
 
                 motion.angle += deltaAngle;
+                motion.angle = motion.angle - 2.f * M_PI * floor(motion.angle / (2.f * M_PI));
 
                 // Keeps assets facing upwards regardless of rotation
-                //motion.angle = motion.angle - 2.f * M_PI * floor(motion.angle / (2.f * M_PI));
-                //if (motion.angle > M_PI / 2.f && motion.angle < 3.f * M_PI / 2.f) {
-                //    motion.scale = (motion.scale.y > 0) ? motion.scale * vec2(1, -1) : motion.scale;
-                //}
-                //else {
-                //    motion.scale = (motion.scale.y < 0) ? motion.scale * vec2(1, -1) : motion.scale;
-                //}
+                if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) {
+                    if (motion.angle > M_PI / 2.f && motion.angle < 3.f * M_PI / 2.f) {
+                        motion.scale = (motion.scale.y > 0) ? motion.scale * vec2(1, -1) : motion.scale;
+                    }
+                    else {
+                        motion.scale = (motion.scale.y < 0) ? motion.scale * vec2(1, -1) : motion.scale;
+                    }
+                } else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER) {
+                    WindowState& wS = registry.windowStates.components[0];
+                    vec2 mid = vec2(wS.width, wS.height) * 0.5f;
+                    mid = mid - motion.position;
+                    motion.angle = atan2(mid.y, mid.x);
+                } else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
+                    Motion& playerMotion = registry.motions.components[registry.players.entities[0]];
+                    vec2 mid = playerMotion.position - motion.position;
+                    motion.angle = atan2(mid.y, mid.x);
+                }
+
 
                 float totalDistance = glm::distance(movement.posA, movement.posB);
                 movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));

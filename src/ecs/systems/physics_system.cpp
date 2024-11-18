@@ -66,8 +66,14 @@ void PhysicsSystem::step(float elapsed_ms)
 		if (registry.lasers.has(entity)) {
 			Laser& laser = registry.lasers.get(entity);
 			if (registry.enemies.has(laser.start)) {
+				Enemy& enemy = registry.enemies.get(laser.start);
 				Motion& start = registry.motions.get(laser.start);
-				motion.angle += laser.rotation;
+				if (enemy.rotationBehaviour == EnemyRotationBehavior::NONE || enemy.rotationBehaviour == EnemyRotationBehavior::REGULAR || enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) {
+					motion.angle += laser.rotation;
+				}
+				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER || enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
+					motion.angle = start.angle;
+				}
 				vec2 goal = start.position + vec2(cos(motion.angle), sin(motion.angle)) * (laser.length + laser.growth);
 				laser.length += laser.growth;
 				float currLength = laser.length;

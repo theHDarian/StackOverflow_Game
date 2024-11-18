@@ -819,8 +819,48 @@ struct EnemyMediumTank : Enemy
 			"enemy_Crab.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE};
-		scale = vec2({288.0f / 2, 240.f / 2});
+		scale = vec2({336.0f / 2, 240.f / 2});
 		rotatePower = 0.8f;
+	};
+};
+
+struct EnemyLaserTank : Enemy
+{
+
+	const AttackData crabLaser{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{bulletBounceUpA},
+	blunt,
+	1,
+	0,
+	{20, 20},
+	0,
+	10000000,
+	{0.5, 0},
+	0,
+	0,
+	0 };
+
+	Reaction duration = {
+		ReactionType::FINISH_PATROL,
+		1 };
+
+	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.9,0.1},{0.9,0.9},{0.1,0.9},{0.1,0.1},{0.9,0.1}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	EnemyLaserTank()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_LaserCrab.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 336.0f / 2, 240.f / 2 });
+		rotatePower = 0.8f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
 	};
 };
 
@@ -861,7 +901,7 @@ struct EnemyHardTank : Enemy
 			"enemy_EvilCrab.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
-		scale = vec2({ 288.0f / 2, 240.f / 2 });
+		scale = vec2({ 336.0f / 2, 240.f / 2 });
 		rotatePower = 0.8f;
 		speedMultiplier = 1.5f;
 	};
