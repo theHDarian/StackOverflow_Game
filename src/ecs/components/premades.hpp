@@ -288,6 +288,27 @@ const BulletStackEffect ConcentratedFire = {
 	"Concentrated Fire",
 	"" };
 
+const BulletStackEffect SniperPower = {
+	BulletDamage,
+	Multiplicative,
+	10,
+	"Sniper's Prowess",
+	"" };
+
+const BulletStackEffect SniperSpeed = {
+	ProjectileSpeed,
+	Additive,
+	500,
+	"Sniper's Speed",
+	"" };
+
+const BulletStackEffect SniperPrice = {
+	FireRate,
+	Additive,
+	-750,
+	"Sniper's Lethargy",
+	"" };
+
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {

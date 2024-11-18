@@ -653,12 +653,6 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
 	}
-	int channel = 1;  // Use a specific channel, e.g., channel 1
-
-	soundPlayer->playPlayerShootSound(max(250.0f, min(
-			50.0f,
-			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst))));
 
 	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
 		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
@@ -673,6 +667,11 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 
 		if (cluster == 1) {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
+			soundPlayer->playPlayerShootSound(max(250.0f, min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst))));
+
 			return;
 		}
 
@@ -689,6 +688,11 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		if (cluster == 2) {
 			createPlayerBullet(renderer, bulletPos, bulletDir*rotationMatrix);
 			createPlayerBullet(renderer, bulletPos, bulletDir*glm::transpose(rotationMatrix));
+			soundPlayer->playPlayerShootSound(max(250.0f, min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst))));
+
 			return;
 		}
 
@@ -706,6 +710,11 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				}
 			}
 			createPlayerBullet(renderer, bulletPos, bulletDir);
+			soundPlayer->playPlayerShootSound(max(250.0f, min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst))));
+
 		}
 	}
 }
