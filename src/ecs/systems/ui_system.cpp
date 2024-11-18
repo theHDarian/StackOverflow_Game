@@ -736,7 +736,9 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 
 	StackUI& stackui = registry.stackUI.emplace(entity);
 
-	stackui.bulletStartPos = { 75, 100 };
+	vec2 outlinePosOffset = { 10, -10 }; // temp for now
+
+	stackui.bulletStartPos = vec2(75, 100) + outlinePosOffset;
 	stackui.bulletSize = { 20, 50 };
 	stackui.bulletOffset = 10; // space between bullets
 
