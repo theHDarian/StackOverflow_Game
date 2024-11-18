@@ -975,11 +975,20 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++) {
+		// defaults
+		std::string bulletShape = bulletEffectShapes[BulletEffectType::Inert];
+		vec3 bulletColor = COLOR_GREY_MED;
 		// no variance on shape for now
-		std::string bulletShape = bulletEffectShapes[stack.currStack[i].type];
+		if (bulletEffectShapes.count(stack.currStack[i].type) > 0) {
+			bulletShape = bulletEffectShapes[stack.currStack[i].type];
+		}
+		if (bulletEffectColors.count(stack.currStack[i].type) > 0) {
+			bulletColor = bulletEffectColors[stack.currStack[i].type];
+		}
+
 		// start from bottom to top
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
-			bulletEffectColors[stack.currStack[i].type], bulletShape, projection);
+			bulletColor, bulletShape, projection);
 	}
 }
 
