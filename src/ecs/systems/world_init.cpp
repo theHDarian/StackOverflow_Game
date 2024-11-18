@@ -803,8 +803,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		animate.animation_countdown_base = animate.animation_countdown;
 	}
 
-	enemy.collisionBullet = blunt;
-
 	if (type == EnemyType::BossBeehiveMain)
 	{
 		createEnemy(renderer, pos + vec2(97, -95), EnemyType::BossBeehiveGun);
@@ -1181,12 +1179,13 @@ float getModifiedValue(BulletEffectType bf, float value)
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
-	float prob = 0.1f * (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
+	float prob = (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
 	Map &map = registry.maps.components[0];
 
 	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
 		registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
+		if (Random::Float() < 0.15) return { key };
 		return atkData.rareBulletEffects;
 	}
 	return {atkData.defaultEffect};
