@@ -8,17 +8,7 @@
 #include "utils/random.hpp"
 
 //---------- PRESETS-------------------
-// struct RoomPreset {
-//     std::vector<std::tuple<EnemyType,vec2>> enemies;
-//     std::vector<std::tuple<AttackData,vec2>> treasures; //for treasure rooms
-//     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
-//     std::vector<SpecialEvent> specialEvents; 
-//     float spawnDelay; //in seconds - for enemies and bosses
-//     int numSpecialBulletsToSpawn = 5;
-// };
-
 const RoomPreset TutorialRoom1Preset{
-    {},
     {},
     {},
     {},
@@ -28,7 +18,6 @@ const RoomPreset TutorialRoom1Preset{
 
 const RoomPreset TutorialRoom2Preset{
     {{EnemyType::EasyEnemySentry, {0.5f, 0.5f}}},
-    {},
     {},
     {},
     {},
@@ -133,10 +122,9 @@ const RoomPreset EnemyRoomSwarm{
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}}},
-    {bulletPierceUpA},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{bulletPierceUpA}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     0};
 
@@ -148,7 +136,6 @@ const RoomPreset EnemyRoomDashIntro1{
        {},
        {},
        {},
-   {},
        0.0f,
        3};
 
@@ -160,7 +147,6 @@ const RoomPreset EnemyRoomDashIntro2{
        {},
        {},
        {},
-   {},
        0.0f,
        3 };
 
@@ -176,7 +162,6 @@ const RoomPreset EnemyRoomDashIntro3{
        {},
        {},
        {},
-   {},
        0.0f,
        3 };
 
@@ -194,7 +179,6 @@ const RoomPreset EnemyRoomDash1{
     {},
     {},
     {},
-{},
     0.0f,
     5};
 
@@ -208,7 +192,6 @@ const RoomPreset EnemyRoomDash2{
     {},
     {},
     {},
-{},
     0.0f,
     5};
 
@@ -221,7 +204,6 @@ const RoomPreset EnemyRoomDashHard{
 {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
      {EnemyType::EvilSnail, {0.5f, 0.5f}}
-
      },
     {},
     {},
@@ -252,7 +234,6 @@ const RoomPreset EnemyRoomBees1{
     {},
     {},
     {},
-    {},
     0.0f,
     5};
 
@@ -269,7 +250,6 @@ const RoomPreset EnemyRoomBees2{
     {},
     {},
     {},
-    {},
     };
 
 const RoomPreset EnemyRoomAngelTank{
@@ -279,7 +259,6 @@ const RoomPreset EnemyRoomAngelTank{
      {EnemyType::MediumEnemyHealer, {0.8, 0.8}},
      {EnemyType::MediumEnemyHealer, {0.2, 0.2}}},
      
-    {},
     {},
     {},
     {},
@@ -294,9 +273,8 @@ const RoomPreset EnemyRoomTripleBuffEX{
         {EvilSnail, {0.7f, 0.7f}},
         {EvilSnail, {0.7f, 0.3f}},
     },
-    {bulletBounceUpA, bulletPierceUpA},
     {},
-    {{PushConsole, {0.25f, 0.5f}}, {PopConsole, {0.75f, 0.5f}},
+    {{{PushConsole,{bulletBounceUpA, bulletPierceUpA}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
     },
     {},
     0.0f,
@@ -306,43 +284,37 @@ const RoomPreset EnemyRoomTripleBuffEX{
 const RoomPreset RestingRoomPop{
     {},
     {},
-    {},
-    {{InteractableItem::PopConsole, {0.5f, 0.5f}}},
+    {{{PopConsole,{}}, {0.5f, 0.5f}}},
     {SpecialEvent::RebootStation}
 };
 
 const RoomPreset RestingRoomGardener{
         {},
         {},
-        {},
-        {{InteractableItem::Gardener, {0.65f, 0.5f}}, {InteractableItem::BibleTree, {0.5f, 0.5f}}},
+        {{{Gardener,{}}, {0.65f, 0.5f}}, {{InteractableItem::BibleTree,{}}, {0.5f, 0.5f}}},
         {SpecialEvent::RebootStation}
 };
 
 const RoomPreset RestRoomBibleTree{
     {},
     {},
-    {},
-    {{InteractableItem::BibleTree, {0.5f, 0.5f}}},
+    {{{InteractableItem::BibleTree,{}}, {0.5f, 0.5f}}},
     {SpecialEvent::RebootStation}
 };
 
 const RoomPreset TreasureRoom1{
     {},
-    {numBulletsUpA, sizeUpA},
     {},
-
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{numBulletsUpA, sizeUpA}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoom2{
     {},
-    {dashUpA},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
+    {{{PushConsole,{dashUpA}}, {0.5f, 0.5f}}},
 {},
     0.0f,
     5,
@@ -350,49 +322,44 @@ const RoomPreset TreasureRoom2{
 
 const RoomPreset TreasureRoom3{
     {},
-    {dmgUpM},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{dmgUpM}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoom4{
     {},
-    {dashCDRDownA},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{dashCDRDownA}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoom5{
     {},
-    {dashCDRDownM},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{dashCDRDownM}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoomKey{
         {},
-        {key},
         {},
-        {{PushConsole, {0.5f, 0.5f}}},
-    {},
+        {{{PushConsole,{key}}, {0.5f, 0.5f}}},
+        {},
         0.0f,
         5,
     };
 
 const RoomPreset TreasureRoomBlunt{
     {},
-    {blunt, blunt, blunt},
     {},
-    { {PushConsole, {0.5f, 0.5f}}},
+    {{{PushConsole,{blunt, blunt, blunt}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     0,
@@ -401,8 +368,7 @@ const RoomPreset TreasureRoomBlunt{
 const RoomPreset TreasureRoomRam{
     {},
     {},
-    {},
-    { {InteractableItem::Ram, {0.5f, 0.5f}}},
+    {{{InteractableItem::Ram,{}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     0,
@@ -410,19 +376,17 @@ const RoomPreset TreasureRoomRam{
 
 const RoomPreset TreasureRoomSniper{
     {},
-    {SniperPower, SniperSpeed, SniperPrice},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{SniperPower, SniperSpeed, SniperPrice}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoomKeys{
     {},
-    {key},
     {},
-    {{PushConsole, {0.5f, 0.5f}}, {PushConsole, {0.25f, 0.5f}}, {PushConsole, {0.75f, 0.5f}}},
+    {{{PushConsole,{key}}, {0.5f, 0.5f}}, {{PushConsole,{key}}, {0.25f, 0.5f}}, {{PushConsole,{key}}, {0.75f, 0.5f}}},
 {},
     0.0f,
     5,
@@ -433,8 +397,7 @@ const RoomPreset TreasureRoomKeys{
 const RoomPreset BossRoomBee{
     {{BossBeehiveMain, {0.5f, 0.5f}}, {ThreeBee,{0.5f, 0.75f}}},
     {},
-    {},
-    {{Ram, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     2};
