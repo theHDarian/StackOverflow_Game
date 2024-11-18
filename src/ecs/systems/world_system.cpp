@@ -797,6 +797,8 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
 			if (!success) {
 				registry.gameStates.components[0].gameOver = true;
+			} else {
+				registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 			}
 		}
 	}
