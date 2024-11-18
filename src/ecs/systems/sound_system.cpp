@@ -228,12 +228,14 @@ void SoundSystem::loadSoundEffects() {
     }
     rareItemGetSound->volume = 0.6f * MIX_MAX_VOLUME;
 
-    explosionSound = Mix_LoadWAV(audio_path("sfx/explosion.wav").c_str());
-    if (!explosionSound) {
-        fprintf(stderr, "Failed to load explosion sound: %s\n", Mix_GetError());
-        throw std::runtime_error("Failed to load explosion sound");
+    for (int i = 0; i < 5; i++) {
+        explosionSounds.push_back(Mix_LoadWAV(audio_path("sfx/Explosion_0" + std::to_string(i) + ".wav").c_str()));
+        if (!explosionSounds[i]) {
+            fprintf(stderr, "Failed to load explosion sound: %s\n", Mix_GetError());
+            throw std::runtime_error("Failed to load explosion sound");
+        }
+        explosionSounds[i]->volume = 0.6f * MIX_MAX_VOLUME;
     }
-    explosionSound->volume = 0.6f * MIX_MAX_VOLUME;
 
 }
 
@@ -382,10 +384,11 @@ void SoundSystem::playRareItemPickupSound() {
     }
 }
 
-void SoundSystem::playExplosionSound() {
+void SoundSystem::playExplosionSound(int sfxNumber) {
+    int i = sfxNumber % 5;
     if (!Mix_Playing(9)) {
-        Mix_PlayChannel(9, explosionSound, 0);
-        Mix_Volume(9, explosionSound->volume * volume);
+        Mix_PlayChannel(9, explosionSounds[i], 0);
+        Mix_Volume(9, explosionSounds[i]->volume * volume);
     }
 }
 

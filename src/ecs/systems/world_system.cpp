@@ -820,7 +820,7 @@ void WorldSystem::enemyBulletDeath(Entity e) {
 	if (eb.onDeath == EnemyBulletDeath::NONE) return;
 	if (eb.onDeath == EnemyBulletDeath::EXPLODE) {
 		createEnemyBulletDeath(renderer, ebm.position, vec2(0), EnemyBulletDeath::EXPLODE);
-		soundPlayer->playExplosionSound();
+		soundPlayer->playExplosionSound(2);
 		return;
 	}
 	else if (eb.onDeath == EnemyBulletDeath::CLUSTER) {
@@ -828,7 +828,7 @@ void WorldSystem::enemyBulletDeath(Entity e) {
 		createEnemyBulletDeath(renderer, ebm.position, vec2( 1,-1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1, 1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1,-1), EnemyBulletDeath::CLUSTER);
-		soundPlayer->playExplosionSound();
+		soundPlayer->playExplosionSound(0);
 		return;
 	}
 }

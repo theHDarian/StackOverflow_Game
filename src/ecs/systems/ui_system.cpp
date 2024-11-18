@@ -38,6 +38,7 @@ void UISystem::step(float elapsed_ms) {
 			createMenuChoice("Quit", choiceStartPos + offset);
 			ioState.hoveringMenuChoice = 0;
 			ioState.lastHoverMenuChoice = 0;
+
 		}
 		else if (registry.menuChoices.entities.size() > 0) {
 			int lastChoice = registry.ioStates.components[0].lastHoverMenuChoice;
@@ -222,7 +223,7 @@ void UISystem::playDialogue() {
 			} else if (nextLine.sfx == rareItemPickup) {
 				soundSystem->playRareItemPickupSound();
 			} else if (nextLine.sfx == explosion) {
-				soundSystem->playExplosionSound();
+				soundSystem->playExplosionSound(2);
 			}
 			else {
 				soundSystem->stopIncomingDialogueSound();
