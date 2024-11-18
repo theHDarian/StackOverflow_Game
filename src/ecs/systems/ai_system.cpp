@@ -315,12 +315,31 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 		return getCurrentPos(entity);
 	}
 	// std::cout << "current state: " << pattern.name << std::endl;
-	pattern.pathIndex += 1;
-	if (pattern.path.size() - 1 <= pattern.pathIndex)
-	{
-		pattern.pathIndex = 0;
-	}
-	return pattern.path[pattern.pathIndex];
+    pattern.pathIndex += 1;
+    if (pattern.pathIndex >= pattern.path.size())
+    {
+        pattern.pathIndex = 0;
+    }
+
+	vec2 patrolFactor = pattern.path[pattern.pathIndex];
+
+	WindowState &windowState = registry.windowStates.components[0];
+    int width = windowState.width;
+    int height = windowState.height;
+
+    vec2 scale = registry.motions.get(entity).scale;
+    float minX = 150.f + scale[0];
+    float minY = 100.f + scale[1];
+    float maxX = width - 150.f - scale[0];
+    float maxY = height - 60.f - scale[1];
+
+    float posX = minX + patrolFactor.x * (maxX - minX);
+    float posY = minY + patrolFactor.y * (maxY - minY);
+
+    posX = glm::clamp(posX, minX, maxX);
+    posY = glm::clamp(posY, minY, maxY);
+
+    return vec2(posX, posY);
 }
 
 vec2 AISystem::generateRandomPos(Entity entity)
