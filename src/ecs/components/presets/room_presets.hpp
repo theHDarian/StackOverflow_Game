@@ -199,18 +199,8 @@ const RoomPreset EnemyRoomDash1{
     5};
 
 const RoomPreset EnemyRoomDash2{
-    {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
-     {EnemyType::EasyEnemySentry, {0.8f, 0.8f}},
-     {EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
-     {EnemyType::EasyEnemySentry, {0.2f, 0.2f}},
-    {EnemyType::EasyEnemySentry, {0.2f, 0.4f}},
+    {{EnemyType::EasyEnemySentry, {0.4f, 0.2f}},
     {EnemyType::EasyEnemySentry, {0.8f, 0.4f}},
-    {EnemyType::EasyEnemySentry, {0.8f, 0.6f}},
-    {EnemyType::EasyEnemySentry, {0.2f, 0.6f}},
-
-     {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
-    {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
-    {EnemyType::TestRevampedEnemy, {0.3, 0.6}},
      {EnemyType::TestRevampedEnemy, {0.7, 0.4}},
         {Snail, {0.5f, 0.7f}},
      {EnemyType::EasyEnemySkull, {0.5f, 0.5f}}
@@ -230,10 +220,6 @@ const RoomPreset EnemyRoomDashHard{
      {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
-{EnemyType::TestRevampedEnemy, {0.3, 0.6}},
-{EnemyType::TestRevampedEnemy, {0.7, 0.4}},
-{EnemyType::TestRevampedEnemy, {0.7, 0.2}},
-{EnemyType::TestRevampedEnemy, {0.7, 0.6}},
      {EnemyType::EvilSnail, {0.5f, 0.5f}}
 
      },
@@ -246,9 +232,7 @@ const RoomPreset EnemyRoomSnails {
     {
         {EnemyType::EvilSnail, {0.5f, 0.5f}},
         {Snail, {0.2f, 0.8f}},
-        {Snail, {0.8f, 0.8f}},
-        {Snail, {0.8f, 0.2f}},
-        {Snail, {0.2f, 0.2f}},
+        {EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
         {MediumEnemyCharge, {0.2f, 0.4f}},
         {MediumEnemyCharge, {0.8f, 0.4f}},
 },

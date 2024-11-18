@@ -255,6 +255,7 @@ enum EnemyType {
     ThreeBee,
     MediumEnemyTank,
     HardEnemyTank,
+    LaserEnemyTank,
     BeeHive,
     HardEnemyAngel,
     EasyEnemySkull,

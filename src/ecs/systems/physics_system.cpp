@@ -81,7 +81,7 @@ void PhysicsSystem::step(float elapsed_ms)
 					WallCollider& wall = walls.components[i];
 					vec2 intersectionPoint;
 					if (LineToLine(start.position, goal, wall.startPosition, wall.endPosition, intersectionPoint)) {
-						currLength = glm::distance(intersectionPoint, start.position);
+						currLength = min(currLength, glm::distance(intersectionPoint, start.position));
 					}
 				}
 				motion.position = start.position + vec2(cos(motion.angle), sin(motion.angle)) * min(laser.length, currLength) * 0.5f;
