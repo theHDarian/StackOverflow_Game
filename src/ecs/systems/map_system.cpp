@@ -91,7 +91,9 @@ void MapSystem::step(float elapsed_ms)
                 continue;
             }
             if(registry.doors.components[i].room != RoomType::None && !registry.doors.components[i].isPrev && registry.interactables.get(registry.doors.entities[i]).name != "LockedDoor") {
-                soundPlayer->playDoorOpenSound();
+                if (map.currRoom.type != RoomType::TutorialRoom1) {
+                    soundPlayer->playDoorOpenSound();
+                }
                 registry.interactables.get(registry.doors.entities[i]).name = "OpenDoor";
                 registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
             }

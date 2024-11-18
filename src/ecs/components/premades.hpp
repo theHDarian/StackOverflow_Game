@@ -288,6 +288,8 @@ const BulletStackEffect ConcentratedFire = {
 	"Concentrated Fire",
 	"" };
 
+// note: adding the effect to list is not necessary
+// but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
 	blunt, lightning, dmgDownA, dmgDownM, dmgUpA, dmgUpM, numBulletsUpA, sizeUpA, spreadUpA, bulletSpeedUpA, 
 	bulletSpeedUpM, bulletRangeUpA, bulletRangeUpM, bulletBurstUpA, bulletBurstUpM, bulletPierceUpA, bulletPierceUpM,
