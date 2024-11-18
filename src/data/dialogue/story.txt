@@ -74,7 +74,7 @@ I sure wonder how you'll make use of this stack... Perhaps you'll use it to modi
 Anyway, to get to the lab exit, I suggest you make your way to the Biology Wing. There should be less rogue robot activity there.
 Also, keep in mind of the symbols on top of the doors. They'll give you a rough idea of the encounters beyond.
 I'll contact you again when you get there. I wish you luck, little robot.
-[Press [P] to pause and hover over your stack to take a closer look at it!]
+[Press [ESC] to pause and hover over your stack to take a closer look at it!]
 SPEAKER N N
 # REMOVE LATER
 # notice how this line is too long so it overlaps with the choices
