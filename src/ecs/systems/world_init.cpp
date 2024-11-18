@@ -628,7 +628,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 	case EnemyType::TestRevampedEnemy:
 	{
-		enemy = TestEnemy();
+		enemy = EnemyTestPatrol();
 		break;
 	}
 	case EnemyType::EasyEnemySentry:

@@ -1469,6 +1469,24 @@ struct EnemyHardBoidBio : Enemy {
 	}
 };
 
+struct EnemyTestPatrol : Enemy {
+
+	EnemyPattern boidState = { "BOID", EnemyBehavior::PATROLLING, {{0.f, 0.f}, {0.5f, 0.5f}, {1.f, 0.f}}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
+	EnemyTestPatrol() {
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = { boidState };
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2({192 / 2.f, 216 / 2.f});
+		rotatePower = 0.f;
+	}
+};
+
 // struct EnemyHardSkull : {
 
 // 	EnemyHardSkull() {
