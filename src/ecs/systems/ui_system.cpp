@@ -1012,7 +1012,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 		else if (bullet.effectCalc == Multiplicative) {
 			if (bullet.value < 1) {
 				modify = "Decreases ";
-				intermediaryAmount = bullet.value * 100;
+				intermediaryAmount = (1 - bullet.value) * 100;
 			}
 			else {
 				modify = "Increases ";
