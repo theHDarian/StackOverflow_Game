@@ -863,7 +863,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		ParticleProps props = enemyBullet;
 		props.colors.push_back(enemyBulletColors.at(Key));
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
+		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
 		return entity;
 	}

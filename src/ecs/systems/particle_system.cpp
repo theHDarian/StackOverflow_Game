@@ -238,6 +238,18 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             const Motion& motion = registry.motions.get(ent);
             request.props.velocity.base = -motion.velocity * 0.4f;
             request.props.velocity.variation = normalize(-motion.velocity) * Random::Float(100.f);
+            
+            if (motion.velocity == vec2(0.f,0.f)) { //stationary trails have special emission
+                request.props.velocity.variation = {100,100};
+                for (Vec4StartEnd& color : request.props.colors) {
+                    color.start.w = 0.5f;
+                    color.end.w = 0.f;
+                }
+                request.props.size.end = 0.f;
+                emitCount = min(1,emitCount);
+            } else {
+                request.props.velocity.variation = normalize(-motion.velocity) * Random::Float(100.f);
+            }
             trail(request.props,emitCount);
         } else if (request.requestType == ParticleRequestType::PPlayerTrail) {
             const Motion& motion = registry.motions.get(ent);
