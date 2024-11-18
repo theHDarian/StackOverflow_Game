@@ -1,6 +1,6 @@
 # Team19
 ## M3 Creative Component
-- Advamced Feature: swarming behaviour in enemies using BOIDs.
+- Advanced Feature: swarming behaviour in enemies using BOIDs.
 - Advanced Feature: a wide variety of visually coherent sprites. All visual assets (aside from the font) is made by us. 
 
 ## M2 Creative Component
