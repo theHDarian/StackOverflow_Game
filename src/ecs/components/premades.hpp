@@ -1371,42 +1371,6 @@ struct BossBeehiveSentry : Enemy
 	};
 };
 
-struct EnemyHardAngel : Enemy
-{
-	Reaction Attack2{
-		ReactionType::DURATION,
-		3};
-	Reaction Attack0{
-		ReactionType::DURATION,
-		1};
-	Reaction Attack1{
-		ReactionType::DURATION,
-		2,
-	};
-
-	Reaction Attack3{
-		ReactionType::DURATION,
-		0};
-	EnemyPattern attack1State = {"ATTACK 1", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {Attack0}, 1, true, 500.f, 500.f, SniperShot};
-	EnemyPattern attack2State = {"ATTACK 2", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {Attack1}, 2, true, 0.f, 500.f, wave};
-	EnemyPattern attack3State = {"ATTACK 3", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {Attack2}, 0, true, 0.f, 500.f, fourAllAround};
-	EnemyPattern followPlayerState = {"ATTACK4", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {Attack3}, 0, true, 0.f, 600.f, SniperShot};
-	EnemyHardAngel()
-	{
-		maxHealth = 200;
-		currHealth = maxHealth;
-		enemyPatterns = {attack1State, attack2State, attack3State, followPlayerState};
-		sprite = {
-			"enemy_Sword.png",
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE,
-		};
-		patternIndex = 0;
-		scale = vec2({192 / 2.f, 216 / 2.f});
-		rotatePower = 0.f;
-	};
-};
-
 struct EnemyEasySkull : Enemy
 {
 	Reaction AttackLaser{
@@ -1490,7 +1454,7 @@ struct EnemyMediumBoar : Enemy
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleState, randomPosNoCharge};
 		sprite = {
-			"enemy_Snail.png",
+			"enemy_Sword.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
