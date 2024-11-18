@@ -660,7 +660,7 @@ struct EnemyEasySentry : Enemy
 			"enemy_QuadShooter.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
-			vec2(-12, 0)};
+			vec2(0, 0)};
 		scale = vec2({240.0f / 2, 240.f / 2});
 		rotatePower = 0.f;
 	};
@@ -697,7 +697,7 @@ struct EnemyEasyTrail : Enemy
 			"enemy_Snail.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
-			vec2(-12, 0) };
+			vec2(0, 0) };
 		scale = vec2(336, 216) * 0.5f;
 	};
 };
@@ -735,7 +735,7 @@ struct EnemyHardTrail : Enemy
 			"enemy_EvilSnail.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
-			vec2(-12, 0) };
+			vec2(0, 0) };
 		scale = vec2(336, 216) * 0.5f;
 		speedMultiplier = 1.15;
 	};
@@ -1288,7 +1288,7 @@ struct BossBeehiveSentry : Enemy
 			"bossBeehiveGun.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
-			vec2(-12, 0) };
+			vec2(0, 0) };
 		scale = vec2({ 200.0f, 200.f });
 	};
 };

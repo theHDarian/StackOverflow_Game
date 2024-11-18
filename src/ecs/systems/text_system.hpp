@@ -49,7 +49,7 @@ private:
     glm::mat4 projection;
 
     // lazy overloading
-    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
-    void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
+    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign);
+    void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign);
     void drawInstancedText(int length);
 };

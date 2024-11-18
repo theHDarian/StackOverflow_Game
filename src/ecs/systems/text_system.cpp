@@ -175,7 +175,9 @@ additional things added:
 - adapted to consider text wrapping
 - tokenized text beforehand to help with text wrapping
 */
-void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound) {
+void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, 
+    vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment) {
+    // temp put here to readjust sizes btween diff fonts
     scale *= FONT_ADJUST_FACTOR;
     scale *= 48.0f / 256.0f; // so letters still look as same as before after changing texture sizes
 
@@ -194,7 +196,7 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
     for (std::string text : tokenizedText) {
 
         // approximate next word length and compare with text box size
-        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x + 0.5f) * text.length() * scale) > topRightBound.x /*|| xpos < bottomLeftBound.x*/) {
+        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x + 0.5f) * text.length() * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
             y -= ((Characters[65].Size.y)) * 2.0 * scale;
             x = copyX;
         }
@@ -292,11 +294,12 @@ std::vector<std::string> getTokenizedText(std::string text) {
 }
 
 void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, 
-    vec2 topRightBound, vec2 bottomLeftBound)
+    vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment)
 {
     // consider saving this in the future w/ a dirty bit if it gets expensive
+    // or consider a universal string to tokenized string map w/ hash, but would hashing that also get expensive?
     std::vector<std::string> tokenizedText = getTokenizedText(text);
-    renderText(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound);
+    renderText(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound, alignment);
 }
 
 void TextSystem::renderMenuUIText() {
@@ -313,11 +316,22 @@ void TextSystem::renderMenuUIText() {
         // but assumption may not always hold
         if (registry.renderRequests.get(entity).show)
             if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
             else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
+    }
+
+    // workaround for now instead of having text have its own show
+    for (Entity entity : registry.menuChoices.entities) {
+        auto& textReq = registry.textRenderRequests.get(entity);
+        if (textReq.tokenizedText.size() > 0) {
+            renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
+        }
+        else {
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
+        }
     }
 
     glBindVertexArray(0);
@@ -332,10 +346,10 @@ void TextSystem::renderMenuOverlayUIText() {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show)
             if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
             else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
     }
 
@@ -351,10 +365,10 @@ void TextSystem::renderGameUIText() {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show) {
             if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
             else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
         }
     }
@@ -372,10 +386,10 @@ void TextSystem::renderDialogueUIText() {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show) {
             if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
             else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
             }
         }
             
@@ -385,10 +399,10 @@ void TextSystem::renderDialogueUIText() {
     for (Entity entity : registry.dialogueChoices.entities) {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (textReq.tokenizedText.size() > 0) {
-            renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+            renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
         }
         else {
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound);
+            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
         }
     }
 

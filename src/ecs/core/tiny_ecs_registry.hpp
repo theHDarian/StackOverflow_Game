@@ -86,7 +86,7 @@ public:
 	ComponentContainer<Ignore> ignores;
 	ComponentContainer<Healer> healers;
 	ComponentContainer<EffectStack> effectStacks;
-
+	ComponentContainer<MenuChoice> menuChoices;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -164,6 +164,7 @@ public:
 		registry_list.push_back(&ignores);
 		registry_list.push_back(&healers);
 		registry_list.push_back(&effectStacks);
+		registry_list.push_back(&menuChoices);
 	}
 
 	void clear_all_components() {

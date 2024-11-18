@@ -11,8 +11,7 @@
 #include "components.hpp"
 #include "actor_components.hpp"
 #include "tiny_ecs.hpp"
-
-//#include <experimental/filesystem>
+#include "utils/colours.hpp"
 
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
@@ -59,22 +58,22 @@ class RenderSystem {
 	std::array<Mesh, geometry_count> meshes;
 
 	std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
-			{BulletDamage,      {1.f, 0.f, 1.f}},
-			{ProjectileSpeed,   {1.f, 0.f, 0.f}},
-			{ProjectileSize,    {173.f / 255.f, 49.f / 255.f, 75.f / 255.f}},
-			{FireRate,          {1.f, 1.f, 1.f}},
-			{BulletRange,       {0.f, 0.f, 1.f}},
-			{BulletSpread,      {1.f, 0.f, 0.f}},
-			{BulletNum,         {0.f, 0.f, 1.f}},
-			{BulletBurst,       {0.f, 0.f, 0.f}},
-			{Bounce,            {0.f, 1.f, 0.f}},
-			{Pierce,            {1.f, 0.f, 0.f}},
+			{BulletDamage,      COLOR_RED},
+			{ProjectileSpeed,   COLOR_PINK},
+			{ProjectileSize,    COLOR_MAGENTA_DARK},
+			{FireRate,          COLOR_TEAL_DARK},
+			{BulletRange,       COLOR_TEAL_MED},
+			{BulletSpread,      COLOR_TEAL_LIGHT},
+			{BulletNum,         COLOR_GREEN_LIGHT},
+			{BulletBurst,       COLOR_TURQUOISE},
+			{Bounce,            COLOR_PURPLE_DARK},
+			{Pierce,            COLOR_PURPLE_MED},
 			{Homing,            {1.f, 0.f, 0.f}},
-			{PlayerSpeed,       {0.f, 0.f, 1.f}},
-			{PlayerNumDash,     {0.f, 1.f, 1.f}},
+			{PlayerSpeed,       COLOR_BLUE_SKY},
+			{PlayerNumDash,     COLOR_YELLOW},
 			{PlayerStackSize,   {0.f, 1.f, 0.f}},
-			{PlayerDashCDR,     {1.f, 0.f, 0.f}},
-			{Inert,             {91.f / 255.f, 99.f / 255.f, 128.f / 255.f}},
+			{PlayerDashCDR,     COLOR_ORANGE},
+			{Inert,             COLOR_GREY_MED},
 			{Key,				{1.0, 1.0, 1.0}}
 	};
 

@@ -3,6 +3,7 @@
 #include "sound_system.hpp"
 #include "text_system.hpp"
 #include "premades.hpp"
+#include "utils/colours.hpp"
 #include <fstream>
 #include <iomanip>
 #include <sstream>
@@ -22,11 +23,39 @@ void UISystem::step(float elapsed_ms) {
 	IOState& ioState = registry.ioStates.components[0];
 
 	registry.renderRequests.get(gameOverMenu).show = gameState.gameOver;
+	registry.renderRequests.get(titleScreen).show = gameState.loading || gameState.titleScreen;
 
 	//update FPS
 	WindowState& ws = registry.windowStates.components[0];
 	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
 	registry.renderRequests.get(fpsCounter).show = ioState.showFPS;
+
+	if (gameState.titleScreen) {
+		if (registry.menuChoices.components.size() == 0) {
+			vec2 choiceStartPos = { 800, 900 };
+			vec2 offset = { 0, 50 };
+			createMenuChoice("New Game", choiceStartPos);
+			createMenuChoice("Quit", choiceStartPos + offset);
+			ioState.hoveringMenuChoice = 0;
+			ioState.lastHoverMenuChoice = 0;
+		}
+		else if (registry.menuChoices.entities.size() > 0) {
+			int lastChoice = registry.ioStates.components[0].lastHoverMenuChoice;
+			int hoveringChoice = registry.ioStates.components[0].hoveringMenuChoice;
+			// unhighlight the last hovered choice
+			registry.renderRequests.get(registry.menuChoices.entities[lastChoice]).show = false;
+			registry.textRenderRequests.get(registry.menuChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+			// highlight current choice
+			registry.renderRequests.get(registry.menuChoices.entities[hoveringChoice]).show = true;
+			registry.textRenderRequests.get(registry.menuChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
+		}
+	}
+	else {
+		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+			Entity e = registry.menuChoices.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+	}
 
 	if (!gameState.gameOver) {
 		// toggling basic menu uis on/off
@@ -153,6 +182,7 @@ bool UISystem::init(GLFWwindow* window) {
 	bulletUIArrow = createBulletUIArrow();
 	fpsCounter = createFpsCounter();
 	roomCounter = createRoomCounter();
+	titleScreen = createTitleScreen();
 
 	return true;
 }
@@ -404,7 +434,7 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	motion.scale = {30, 30};
 
 	vec3& color = registry.colors.emplace(entity);
-	color = { 1,0,0 };
+	color = COLOR_RED;
 
 	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
 	auto& text = registry.textRenderRequests.emplace(entity);
@@ -419,6 +449,45 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	text.bottomLeftBound = { text.x + 25, 0 + 25 };
 
 	registry.dialogueChoices.emplace(entity);
+
+	return entity;
+}
+
+// should consolidate w/ create dialogue, because is largely the same
+Entity UISystem::createMenuChoice(std::string choice, vec2 position) {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_triangle.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.menuUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = { 40, 40 };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = COLOR_RED;
+
+	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	text.x = position.x + motion.scale.x;
+	text.y = windowState.height - position.y - motion.scale.y / 2;
+	text.scale = 0.55;
+	text.text = choice;
+	text.topRightBound = { windowState.width - 75, windowState.height - 25 };
+	text.bottomLeftBound = { text.x + 25, 0 + 25 };
+
+	registry.menuChoices.emplace(entity);
 
 	return entity;
 }
@@ -701,6 +770,100 @@ Entity UISystem::createScreenCutIn() {
 	return entity;
 }
 
+Entity UISystem::createFpsCounter() {
+	WindowState& windowState = registry.windowStates.components[0];
+	auto entity = Entity();
+
+	registry.menuOverlayUITexts.emplace(entity);
+	auto& rr = registry.renderRequests.insert(
+		entity, { "none",
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
+	vec2 dimensions = { 100.f,25.f };
+	float padding = 50.f;
+	trr.text = "FPS: 0";
+	trr.color = vec3(1.0f);
+	trr.scale = 0.35f;
+	trr.x = windowState.width - dimensions.x - padding;
+	trr.y = windowState.height - (dimensions.y + padding / 2) * 2.f; //appear below room count
+	trr.topRightBound = { windowState.width + 1000,windowState.height };
+	trr.bottomLeftBound = { 0,0 };
+
+	return entity;
+}
+
+Entity UISystem::createRoomCounter() {
+	WindowState& windowState = registry.windowStates.components[0];
+	auto entity = Entity();
+
+	registry.gameUITexts.emplace(entity);
+	auto& rr = registry.renderRequests.insert(
+		entity, { "none",
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
+	vec2 dimensions = { 100.f,25.f };
+	float padding = 50.f;
+	trr.text = "Room 0";
+	trr.color = vec3(1.0f);
+	trr.scale = 0.35f;
+	trr.x = windowState.width - dimensions.x - padding;
+	trr.y = windowState.height - (dimensions.y + padding);
+	trr.topRightBound = { windowState.width + 1000,windowState.height };
+	trr.bottomLeftBound = { 0,0 };
+
+	return entity;
+}
+
+Entity UISystem::createTitleScreen() {
+	Entity entity = Entity();
+
+	WindowState& windowState = registry.windowStates.components[0];
+
+	// copies code from draw line as a box for now
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	registry.menuUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = vec2(windowState.width / 2, windowState.height / 2);
+	motion.scale = vec2(windowState.width, windowState.height);
+
+	// temp colour
+	auto& color = registry.colors.emplace(entity);
+	color.r = 0.0;
+	color.b = 0.0;
+	color.g = 0.0;
+
+	// attach 1 text render request
+	registry.menuUITexts.emplace(entity);
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 0);
+	text.topRightBound = { motion.scale.x, motion.scale.y };
+	text.bottomLeftBound = { 0, 0 };
+	text.text = "Stack Overflow";
+	text.x = windowState.width / 2 - 48 * 1.0 * text.text.length() / 2;
+	text.y = windowState.height - motion.position.y + motion.scale.y / 4;
+	text.scale = 1.0;
+	//text.text = "Game Over \npress R to restart";
+	text.topRightBound = { motion.scale.x - 25, motion.scale.y - 25 };
+	text.bottomLeftBound = { text.x, 0 + 25 };
+	//text.tokenizedText = uiTexts["GameStart"];
+	
+
+	return entity;
+}
+
 void UISystem::loadText() {
 	std::string uiType = "uiText";
 	std::string filename = dialogue_path(uiType + ".txt").c_str();
@@ -913,50 +1076,3 @@ void UISystem::loadBulletEffects() {
 	}
 }
 
-Entity UISystem::createFpsCounter() {
-	WindowState& windowState = registry.windowStates.components[0];
-	auto entity = Entity();
-
-	registry.menuOverlayUITexts.emplace(entity);
-	auto& rr = registry.renderRequests.insert(
-		entity, { "none",
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
-
-	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
-	vec2 dimensions = {100.f,25.f};
-	float padding = 25.f;
-	trr.text = "FPS: 0";
-	trr.color = vec3(1.0f);
-	trr.scale = 0.35f;
-	trr.x = windowState.width - dimensions.x - padding;
-	trr.y = windowState.height - (dimensions.y + padding) * 2.f; //appear below room count
-	trr.topRightBound = { windowState.width + 1000,windowState.height };
-	trr.bottomLeftBound = { 0,0 };
-
-	return entity;
-}
-
-Entity UISystem::createRoomCounter() {
-	WindowState& windowState = registry.windowStates.components[0];
-	auto entity = Entity();
-
-	registry.gameUITexts.emplace(entity);
-	auto& rr = registry.renderRequests.insert(
-		entity, { "none",
-				 EFFECT_ASSET_ID::EGG,
-				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
-
-	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
-	vec2 dimensions = {100.f,25.f};
-	float padding = 25.f;
-	trr.text = "Room 0";
-	trr.color = vec3(1.0f);
-	trr.scale = 0.35f;
-	trr.x = windowState.width - dimensions.x - padding;
-	trr.y = windowState.height - (dimensions.y + padding);
-	trr.topRightBound = { windowState.width + 1000,windowState.height };
-	trr.bottomLeftBound = { 0,0 };
-
-	return entity;
-}

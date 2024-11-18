@@ -65,3 +65,13 @@ struct MenuOverlayUI {
 struct MenuOverlayUIText {
 
 };
+
+enum TextAlignment : int {
+	LeftAlign,
+	RightAlign,
+	CenteredAlign // not yet implemented
+};
+
+struct MenuChoice {
+
+};

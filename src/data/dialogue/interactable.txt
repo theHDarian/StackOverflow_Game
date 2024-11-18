@@ -32,7 +32,7 @@ CUT blackscreen.png
 
 ITEM ClosedTutorialDoor -1 0
 The door seems to be locked. Maybe the scientist could lend a hand?
-[Call the scientist by pressing [E] when you're done looking around the room.]
+[Step away from the door and call the scientist by pressing [E] when you're done looking around the room.]
 
 ITEM EmptyDoor -1 0
 This doesn't seem to lead to anywhere.
@@ -76,7 +76,7 @@ Stack popped!
 SOUND incomingDialogue
 
 ITEM PopStack 1 0
-You decide not to pop your tack.
+You decide not to pop your stack.
 
 ITEM PopStack -1 1
 You've already used this! Thinking back, why does a run-down lab have a machine like this anyway?
@@ -96,13 +96,13 @@ ITEM PushStack -1 1
 You've already used this! You wonder if the data you got was worth it.
 
 ITEM Ram -1 0
-!This is a ram module! These things are a robot's favourite treat, installing it will allow you to store more data in your stack.
+! This is a ram module! These things are a robot's favourite treat, installing it will allow you to store more data in your stack.
 Would you like to install the ram module?
 CHOICES Yes\No
 
 ITEM Ram 0 0
 You install the ram module.
-[stack capacity increased!]
+[Stack capacity increased!]
 
 ITEM Ram 1 0
 You decide not to install the ram module.

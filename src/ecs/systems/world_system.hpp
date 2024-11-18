@@ -74,6 +74,7 @@ private:
 	Entity player;
 	Entity aimIndicator;
 	Entity cursor;
+	Entity skipDialogue;
 
 	SoundSystem* soundPlayer;
 
