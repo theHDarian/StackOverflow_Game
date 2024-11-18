@@ -267,7 +267,7 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
                 if (registry.walls.has(c.other)) {
                     WallCollider& wall = registry.walls.get(c.other);
                     request.props.position.base = motion.position + vec2(cos(motion.angle), sin(motion.angle)) * motion.scale.x * 0.5f;
-                    request.props.position.variation = {40.f,40.f};
+                    request.props.position.variation = {10.f,10.f};
                     vec2 a = wall.endPosition-wall.startPosition;
                     vec2 b = -vec2(cos(motion.angle), sin(motion.angle));
                     vec2 p = dot(a,b)/dot(a,a)*a;

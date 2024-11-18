@@ -1039,6 +1039,8 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	laser.rotation = atkData.veer.y;
 
 	ParticleProps props = enemyBulletDeathParticle;
+	props.lifetime = 200.f;
+	props.velocity.variation = {200,200};
 	props.colors.push_back(enemyBulletColors.at(FireRate));
 	registry.emitParticles.emplace(entity,PLaser,props,100000,1);
 

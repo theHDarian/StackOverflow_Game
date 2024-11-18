@@ -1447,9 +1447,14 @@ struct EnemyEasySkull : Enemy
 		currHealth = maxHealth;
 		enemyPatterns = {laserState};
 		sprite = {
-			"skull.png",
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE};
+			"skull",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			4,
+			500
+			};
 		patternIndex = 0;
 		scale = vec2({230.0f / 2, 240.f / 2});
 		rotatePower = 0.f;
