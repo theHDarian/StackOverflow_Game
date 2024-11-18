@@ -461,6 +461,8 @@ struct EnemyBullet {
     std::vector<BulletStackEffect> bulletEffects;
     EnemyBulletShape shape;
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
+
+    bool isSpecial;
 };
 
 struct Burst {

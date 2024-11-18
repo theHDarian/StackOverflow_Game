@@ -824,7 +824,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
 	bullet.bulletPierce = atkData.bulletPierce;
-	bullet.bulletEffects = getBulletEffects(atkData);
+	bullet.bulletEffects = getBulletEffects(atkData,bullet.isSpecial);
 	bullet.shape = atkData.shape;
 	if (atkData.onDeath != EnemyBulletDeath::NONE)
 		bullet.onDeath = atkData.onDeath;
@@ -1014,7 +1014,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
-	bullet.bulletEffects = getBulletEffects(atkData);
+	bullet.bulletEffects = getBulletEffects(atkData,bullet.isSpecial);
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1176,7 +1176,7 @@ float getModifiedValue(BulletEffectType bf, float value)
 	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
 }
 
-std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
+std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial)
 {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
 	float prob = (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
@@ -1184,9 +1184,10 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 
 	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
-		registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
+		isSpecial = true;
 		if (Random::Float() < 0.15) return { key };
 		return atkData.rareBulletEffects;
 	}
+	isSpecial = false;
 	return {atkData.defaultEffect};
 }

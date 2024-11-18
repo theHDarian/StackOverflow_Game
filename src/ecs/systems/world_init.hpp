@@ -67,4 +67,4 @@ Entity createSkipDialogue();
 
 float getModifiedValue(BulletEffectType bf, float value);
 
-std::vector<BulletStackEffect> getBulletEffects(AttackData atkData);
+std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial);
