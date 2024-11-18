@@ -696,11 +696,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		registry.bosses.emplace(entity);
 		break;
 	}
-	case EnemyType::HardEnemyAngel:
-	{
-		enemy = EnemyHardAngel();
-		break;
-	}
 	case EnemyType::EasyEnemySkull:
 	{
 		enemy = EnemyEasySkull();

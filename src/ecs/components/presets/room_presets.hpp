@@ -27,7 +27,7 @@ const RoomPreset TutorialRoom1Preset{
     0};
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EasyEnemySentry, {0.5f, 0.5f}}},
+    {{EnemyType::BossBeehiveMain, {0.5f, 0.5f}}},
     {},
     {},
     {},
@@ -228,8 +228,6 @@ const RoomPreset EnemyRoomDashHard{
      {EnemyType::EasyEnemySkull, {0.8f, 0.8f}},
      {EnemyType::EasyEnemySkull, {0.8f, 0.2f}},
      {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
-    {EnemyType::HardEnemyAngel, {0.4f, 0.5f}},
-    {EnemyType::HardEnemyAngel, {0.8f, 0.5f}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.6}},
@@ -294,8 +292,6 @@ const RoomPreset EnemyRoomAngelTank{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
      {EnemyType::MediumEnemyCharge, {0.8f, 0.2f}},
      {EnemyType::MediumEnemyTank, {0.5f, 0.5f}},
-     {EnemyType::HardEnemyAngel, {0.2f, 0.4f}},
-     {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
      {EnemyType::MediumEnemyHealer, {0.8, 0.8}},
      {EnemyType::MediumEnemyHealer, {0.2, 0.2}}},
      
@@ -311,9 +307,6 @@ const RoomPreset EnemyRoomTripleBuffEX{
         {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
     {EnemyType::MediumEnemyTank, {0.6f, 0.2f}},
     {EnemyType::MediumEnemyTank, {0.2f, 0.6f}},
-        {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
-    {EnemyType::HardEnemyAngel, {0.8f, 0.4f}},
-        {EnemyType::HardEnemyAngel, {0.8f, 0.6f}},
         {EvilSnail, {0.7f, 0.7f}},
         {EvilSnail, {0.7f, 0.3f}},
     },
