@@ -185,6 +185,12 @@ void UISystem::playDialogue() {
 				soundSystem->playIncomingDialogueSound();
 			} else if (nextLine.sfx == DoorOpen) {
 				soundSystem->playDoorOpenSound();
+			} else if (nextLine.sfx == DoorClose) {
+				soundSystem->playDoorCloseSound();
+			} else if (nextLine.sfx == itemPickup) {
+				soundSystem->playItemPickupSound();
+			} else if (nextLine.sfx == rareItemPickup) {
+				soundSystem->playRareItemPickupSound();
 			} else {
 				soundSystem->stopIncomingDialogueSound();
 				soundSystem->playNextDialogueSound();

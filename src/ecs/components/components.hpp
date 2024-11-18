@@ -115,6 +115,9 @@ enum SoundType {
 	IncomingDialogue,
 	NormalDialogue,
 	DoorOpen,
+	DoorClose,
+	itemPickup,
+	rareItemPickup,
 };
 struct SoundRequest {
 	SoundType type;

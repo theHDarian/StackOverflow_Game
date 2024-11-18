@@ -23,6 +23,8 @@ public:
 
     void playBossMusic(int songIndex);
 
+    void playSpecialMusic();
+
     void playSpecialMusic(int songIndex);
 
     void playPlayerHurtSound();
@@ -31,6 +33,10 @@ public:
     void playPlayerShootSound(float ticks);
 
     void playEnemyShootSound(int sfxNumber, int loops);
+
+    void playItemPickupSound();
+
+    void playRareItemPickupSound();
 
     void playDoorOpenSound();
 
@@ -61,6 +67,8 @@ private:
 
     Mix_Chunk* incomingDialogueSound;
     Mix_Chunk* nextDialogueSound;
+    Mix_Chunk* itemGetSound;
+    Mix_Chunk* rareItemGetSound;
 
     // Mix_Chunk* playerDeathSound;
     // Mix_Chunk* enemyHurtSound;

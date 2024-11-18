@@ -410,8 +410,8 @@ const RoomPreset TreasureRoomKeys{
 
 
 
-const RoomPreset BossRoom1{
-    {{EnemyType::BossBigC, {0.5f, 0.5f}}},
+const RoomPreset BossRoomBee{
+    {{BossBeehiveMain, {0.5f, 0.5f}}, {ThreeBee,{0.25f, 0.25f}}, {ThreeBee,{0.75f, 0.75f}}, {ThreeBee,{0.75f, 0.25f}}, {ThreeBee,{0.5f, 0.75f}}},
     {},
     {},
     {{Ram, {0.5f, 0.5f}}},
@@ -468,7 +468,7 @@ inline bool hasLocked(RoomType type, int roomsTraversed) {
 RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
     //boss rooms
     if (type == RoomType::BossBigCRoom) {
-        return BossRoom1;
+        return BossRoomBee;
     }
 
     //tutorial rooms
@@ -500,4 +500,14 @@ const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::None,4},
     {RoomType::TutorialRoom1,5},
     {RoomType::TutorialRoom2,5}
+};
+
+const std::map<RoomType, SoundType> roomTypeToMusic = {
+    {RoomType::EnemyRoom, SoundType::normalBGM},
+    {RoomType::RestRoom, SoundType::specialBGM},
+    {RoomType::BossBigCRoom, SoundType::bossBGM},
+    {RoomType::TreasureRoom, SoundType::specialBGM},
+    {RoomType::None, normalBGM},
+    {RoomType::TutorialRoom1, SoundType::specialBGM},
+    {RoomType::TutorialRoom2, SoundType::normalBGM}
 };

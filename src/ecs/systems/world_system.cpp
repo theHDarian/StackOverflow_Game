@@ -215,15 +215,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				}
 			}
 		}
-	}
 
-	if (registry.enemyBullets.entities.size() > 0) {
-		for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
-			EnemyBullet& bullet = registry.enemyBullets.components[i];
-			if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
-				// remove enemy bullet
-				if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
-					registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+		if (registry.enemyBullets.entities.size() > 0) {
+			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
+				EnemyBullet& bullet = registry.enemyBullets.components[i];
+				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+					// remove enemy bullet
+					if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+						registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+				}
 			}
 		}
 	}

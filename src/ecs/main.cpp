@@ -114,7 +114,7 @@ int main() {
 			aiSystem.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
 			particleSystem.step(elapsed_ms);
-			// soundSystem.step(elapsed_ms);
+			soundSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
 		}

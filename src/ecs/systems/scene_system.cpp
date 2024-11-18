@@ -3,7 +3,8 @@
 #include "text_system.hpp"
 #include <fstream>		// for reading text files
 #include <iostream>
-#include <sstream>	
+#include <sstream>
+
 
 SceneSystem::SceneSystem( SoundSystem* soundSystem) {
 	this->soundSystem = soundSystem;
@@ -228,11 +229,10 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					ss_line >> action >> soundName;
 
 					// lazy way to deal with sound enums for now, fix later
-					if (soundName.compare("DoorOpen") == 0) {
-						lines.back().sfx = SoundType::DoorOpen;
-					}
-					else {
-						lines.back().sfx = SoundType::IncomingDialogue;
+					try {
+						lines.back().sfx = soundEffectNames.at(soundName);
+					} catch (const std::out_of_range& oor) {
+						std::cout << "ERROR: sound effect not found: " << soundName << std::endl;
 					}
 				}
 				else if (action.compare("CHOICES") == 0) {
