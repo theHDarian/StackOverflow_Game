@@ -120,6 +120,15 @@ void EnemySystem::step(float elapsed_ms)
 
                 motion.angle += deltaAngle;
 
+                // Keeps assets facing upwards regardless of rotation
+                //motion.angle = motion.angle - 2.f * M_PI * floor(motion.angle / (2.f * M_PI));
+                //if (motion.angle > M_PI / 2.f && motion.angle < 3.f * M_PI / 2.f) {
+                //    motion.scale = (motion.scale.y > 0) ? motion.scale * vec2(1, -1) : motion.scale;
+                //}
+                //else {
+                //    motion.scale = (motion.scale.y < 0) ? motion.scale * vec2(1, -1) : motion.scale;
+                //}
+
                 float totalDistance = glm::distance(movement.posA, movement.posB);
                 movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
                 motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);

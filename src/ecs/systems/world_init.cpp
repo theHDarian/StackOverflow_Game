@@ -680,6 +680,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyMediumTank();
 		break;
 	}
+	case EnemyType::HardEnemyTank:
+	{
+		enemy = EnemyHardTank();
+		break;
+	}
 	case EnemyType::BeeHive:
 	{
 		enemy = EnemyMediumBeeHive();

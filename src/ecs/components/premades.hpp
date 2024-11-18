@@ -386,7 +386,8 @@ const AttackData missile{
 	0,
 	0,
 	0.01,
-	EnemyBulletDeath::CLUSTER};
+	EnemyBulletDeath::EXPLODE
+};
 
 const AttackData sixShot{
 	EnemyAttackPattern::SHOTGUN,
@@ -691,6 +692,7 @@ struct EnemyEasyTrail : Enemy
 		currHealth = maxHealth;
 
 		enemyPatterns = { rotateState };
+		rotatePower = 0.5;
 
 		patternIndex = 0;
 		sprite = {
@@ -738,50 +740,42 @@ struct EnemyHardTrail : Enemy
 			vec2(-12, 0) };
 		scale = vec2(336, 216) * 0.5f;
 		speedMultiplier = 1.15;
+		rotatePower = 0.5;
 	};
 };
 
 struct EnemyMediumTank : Enemy
 {
 
-	Reaction durationWalking = {
-		ReactionType::DURATION,
-		0};
-	Reaction durationShoot = {
-		ReactionType::DURATION,
-		1};
-	Reaction halfHP = {
-		ReactionType::FIFTY_HEALTH,
-		2};
+	const AttackData twoPincerShot{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{ dmgUpA },
+		blunt,
+		2,
+		M_PI / 1.5,
+		{40, 40},
+		500,
+		1700,
+		{600, -2 * M_PI / 3.0},
+		0,
+		0,
+		0 };
 
-	Reaction durationWalkingRage = {
+	Reaction duration = {
 		ReactionType::DURATION,
-		3};
+		1 };
 
-	Reaction durationAttackMissile = {
-		ReactionType::DURATION,
-		4};
-
-	Reaction durationAttackSniper = {
-		ReactionType::DURATION,
-		5};
-
-	Reaction durationSpiralShot = {
-		ReactionType::DURATION,
-		2};
-
-	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {durationShoot, halfHP}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyPattern idleState = {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {durationWalking, halfHP}, 0, true, 0.f, 800.f, radialBurst};
-	EnemyPattern rageState = {"HALF HP", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {durationWalkingRage}, 3, true, 0.f, 500.f, twelveSpiralShot};
-	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {durationAttackMissile}, 4, false, 0.f, 0.f, NoAttack};
-	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {durationAttackSniper}, 5, true, 0.f, 300.f, missile};
-	EnemyPattern shootSniper = {"sniper", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {durationSpiralShot}, 2, true, 0.f, 300.f, SniperShot};
+	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM_NEAR, {}, 0, 3000.f, 3000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idleState =   {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 2, true, 0.f, 1000.f, twoPincerShot};
+	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 500.f, missile};
 	EnemyMediumTank()
 	{
 		maxHealth = 500;
 		currHealth = maxHealth;
 		enemyPatterns = {
-			randomState, idleState, rageState, walkingRage, shootMisile, shootSniper};
+			randomState, idleState, walkingRage, shootMisile};
 		patternIndex = 0;
 		sprite = {
 			"enemy_Crab.png",
@@ -789,6 +783,49 @@ struct EnemyMediumTank : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE};
 		scale = vec2({288.0f / 2, 240.f / 2});
 		rotatePower = 0.8f;
+	};
+};
+
+struct EnemyHardTank : Enemy
+{
+
+	const AttackData radialSquare{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	CIRCLE,
+	{numBulletsUpA, sizeUpA},
+	blunt,
+	5,
+	M_PI / 4,
+	{20, 20},
+	150,
+	3000,
+	{0,0},
+	0,
+	0,
+	0 };
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		1 };
+
+	EnemyPattern randomState = { "RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration}, 1, false, 0.f, 0.f, NoAttack };
+	EnemyPattern idleState = { "IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 1000.f, radialSquare };
+	EnemyPattern walkingRage = { "WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration}, 3, false, 0.f, 0.f, NoAttack };
+	EnemyPattern shootMisile = { "MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 300.f, missile };
+	EnemyHardTank()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState, idleState, walkingRage, shootMisile };
+		patternIndex = 0;
+		sprite = {
+			"enemy_EvilCrab.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 288.0f / 2, 240.f / 2 });
+		rotatePower = 0.8f;
+		speedMultiplier = 1.5f;
 	};
 };
 
@@ -1274,7 +1311,7 @@ struct BossBeehiveSentry : Enemy
 	};
 
 	// TODO Vincent add code to make rotate to face player, but not move
-	EnemyPattern rotateState = { "FACE PLAYER", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 2000.f, beehivesentry };
+	EnemyPattern rotateState = { "FACE PLAYER", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 2000.f, beehivesentry };
 
 	BossBeehiveSentry()
 	{
@@ -1282,6 +1319,8 @@ struct BossBeehiveSentry : Enemy
 		currHealth = maxHealth;
 
 		enemyPatterns = { rotateState };
+		speedMultiplier = 0.f;
+		rotatePower = 0.5;
 
 		patternIndex = 0;
 		sprite = {
