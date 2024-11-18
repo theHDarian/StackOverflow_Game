@@ -1319,7 +1319,7 @@ struct EnemyHardAngel : Enemy
 		currHealth = maxHealth;
 		enemyPatterns = {attack1State, attack2State, attack3State, followPlayerState};
 		sprite = {
-			"enemy_Angel.png",
+			"enemy_Sword.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
@@ -1365,7 +1365,7 @@ struct EnemyHardBoid : Enemy
 		ReactionType::DURATION,
 		2
 	};
-	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 15000.f, 15000.f, {singularityTransition}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 20000.f, 20000.f, {singularityTransition}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern singularityState = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 3000.f, 3000.f, {supernovaTransition}, 2, false, 0.f, 0.f, NoAttack};
 	EnemyPattern supernovaState = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 0, false, 0.f, 0.f, NoAttack};
 	EnemyHardBoid()
