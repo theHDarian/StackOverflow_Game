@@ -77,7 +77,7 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize = 10;
+    int baseStackSize = 16;
     std::vector<BulletStackEffect> currStack;
 
     std::map<BulletEffectType, float> additives = {
@@ -407,7 +407,13 @@ struct Enemy {
     int maxHealth;
     int currHealth;
     vec2 velocity;
-    BulletStackEffect collisionBullet;
+    BulletStackEffect collisionBullet = {
+        Inert,
+        Additive,
+        0,
+        "Inert",
+        "" 
+    };
     std::vector<EnemyPattern> enemyPatterns;
     int patternIndex;
     EnemyPattern& currEnemyPattern() {

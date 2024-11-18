@@ -253,6 +253,41 @@ const BulletStackEffect homingUpA = {
 	""
 };
 
+const BulletStackEffect buzz = {
+	PlayerSpeed,
+	Multiplicative,
+	1.5,
+	"Buzz",
+	"" };
+
+const BulletStackEffect sluggish = {
+	ProjectileSpeed,
+	Additive,
+	-20,
+	"Sluggish Bullets",
+	"" };
+
+const BulletStackEffect hardShell = {
+	Bounce,
+	Additive,
+	1,
+	"Hard Shell",
+	"" };
+
+const BulletStackEffect APRounds = {
+	Pierce,
+	Additive,
+	1,
+	"AP Rounds",
+	"" };
+
+const BulletStackEffect ConcentratedFire = {
+	BulletNum,
+	Additive,
+	-1,
+	"Concentrated Fire",
+	"" };
+
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
@@ -317,7 +352,7 @@ const AttackData trail{
 const AttackData wave{
 	EnemyAttackPattern::WAVE,
 	CIRCLE,
-	{ dmgUpM },
+	{ numBulletsUpA, dmgDownA },
 	blunt,
 	5,
 	0,
@@ -327,7 +362,8 @@ const AttackData wave{
 	{0, 0},
 	0,
 	0,
-	0};
+	0
+};
 
 const AttackData laserNoRotate{
 	EnemyAttackPattern::LASER,
@@ -377,8 +413,8 @@ const AttackData threeShot{
 const AttackData missile{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{spreadUpA},
-	blunt,
+	{spreadUpA, sizeUpA},
+	dmgDownA,
 	1,
 	0,
 	{50, 30},
@@ -469,7 +505,7 @@ const AttackData twoPincerShot{
 const AttackData twelveSpiralShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{key},
+	{numBulletsUpA, spreadUpA},
 	blunt,
 	12,
 	0.0,
@@ -545,11 +581,11 @@ const AttackData threeSpray{
 const AttackData SniperShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{bulletPierceUpA},
+	{APRounds, dmgUpM, ConcentratedFire},
 	blunt,
 	1,
 	0,
-	{20, 20},
+	{30, 20},
 	100,
 	3000,
 	{600, 0},
@@ -674,8 +710,8 @@ struct EnemyEasyTrail : Enemy
 	const AttackData snailTrail{
 	EnemyAttackPattern::TRAIL,
 	CIRCLE,
-	{ dmgUpA },
-	blunt,
+	{ hardShell },
+	sluggish,
 	1,
 	0,
 	{20, 20},
@@ -711,8 +747,8 @@ struct EnemyHardTrail : Enemy
 	const AttackData snailTrail{
 	EnemyAttackPattern::TRAIL,
 	CIRCLE,
-	{ dmgUpA },
-	blunt,
+	{ hardShell },
+	sluggish,
 	1,
 	0,
 	{20, 20},
@@ -752,7 +788,7 @@ struct EnemyMediumTank : Enemy
 	const AttackData twoPincerShot{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{ dmgUpA },
+		{ hardShell },
 		blunt,
 		2,
 		M_PI / 1.5,
@@ -794,8 +830,8 @@ struct EnemyHardTank : Enemy
 	const AttackData radialSquare{
 	EnemyAttackPattern::RADIAL_POLYGON,
 	CIRCLE,
-	{numBulletsUpA, sizeUpA},
-	blunt,
+	{sizeUpA},
+	sluggish,
 	5,
 	M_PI / 4,
 	{20, 20},
@@ -920,6 +956,7 @@ struct Bee1 : Enemy
 		scale = vec2({864 / 8.f, 480 / 8.f});
 		rotatePower = 1.f;
 		speedMultiplier = 3.0f;
+		collisionBullet = buzz;
 	};
 };
 
@@ -980,8 +1017,8 @@ struct Bee3 : Enemy
 	const AttackData beeSpray{
 	EnemyAttackPattern::SPRAY,
 	TRIANGLE,
-	{},
-	collisionBullet,
+	{numBulletsUpA, dmgDownA},
+	sluggish,
 	15,
 	M_PI,
 	{20, 20},
@@ -1188,7 +1225,7 @@ struct BossBeeHive : Enemy {
 	const AttackData radialHexagon{
 	EnemyAttackPattern::RADIAL_POLYGON,
 	CIRCLE,
-	{numBulletsUpA, sizeUpA},
+	{},
 	blunt,
 	6,
 	0,
@@ -1203,8 +1240,8 @@ struct BossBeeHive : Enemy {
 	const AttackData radialBeehiveBurst1{
 	EnemyAttackPattern::BURST_RADIAL,
 	TRIANGLE,
-	{numBulletsUpA, sizeUpA},
-	blunt,
+	{numBulletsUpA, dmgDownA},
+	buzz,
 	128,
 	M_PI / 20,
 	{20, 20},
@@ -1218,8 +1255,8 @@ struct BossBeeHive : Enemy {
 	const AttackData radialBeehiveBurst2{
 	EnemyAttackPattern::BURST_RADIAL,
 	TRIANGLE,
-	{numBulletsUpA, sizeUpA},
-	blunt,
+	{numBulletsUpA, dmgDownA},
+	sluggish,
 	192,
 	-M_PI/20,
 	{20, 20},
@@ -1299,7 +1336,7 @@ struct BossBeehiveSentry : Enemy
 	const AttackData beehivesentry{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{},
+		{APRounds, bulletSpeedUpA},
 		blunt,
 		1,
 		0.0,
@@ -1491,6 +1528,7 @@ struct EnemyMediumHeal : Enemy
 };
 
 struct EnemyHardBoidBio : Enemy {
+
 	Reaction boid{
 		ReactionType::DURATION,
 		0
@@ -1507,6 +1545,7 @@ struct EnemyHardBoidBio : Enemy {
 		};
 		scale = vec2({ 20.f, 20.f });
 		patternIndex = 0;
+		collisionBullet = buzz;
 	}
 };
 
