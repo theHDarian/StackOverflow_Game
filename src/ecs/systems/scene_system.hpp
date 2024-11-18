@@ -32,8 +32,8 @@ public:
         {"NormalDialogue", SoundType::NormalDialogue},
         {"DoorOpen", SoundType::DoorOpen},
         {"itemPickup", SoundType::itemPickup},
-        {"rareItemPickup", SoundType::rareItemPickup}
-
+        {"rareItemPickup", SoundType::rareItemPickup},
+        {"explosion", SoundType::explosion}
     };
 
 private:
