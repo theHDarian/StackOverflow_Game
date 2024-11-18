@@ -513,7 +513,6 @@ void EnemySystem::heal(Entity entity, EnemyPattern &currPattern) {
             Enemy& healerEnemy = registry.enemies.get(entity);
 
             otherEnemy.currHealth = glm::min(otherEnemy.maxHealth, otherEnemy.currHealth + healer.healPower);
-            healerEnemy.currHealth = glm::min(healerEnemy.maxHealth, healerEnemy.currHealth + healer.healPower);
 
             healer.coolDown = healer.maxCoolDown;
         }

@@ -384,7 +384,7 @@ struct Boid {
 struct Healer {
     float coolDown;
     float maxCoolDown = 3000.f;
-    int healPower = 90;
+    int healPower = 35;
     Entity targetEntity;
 };
 
