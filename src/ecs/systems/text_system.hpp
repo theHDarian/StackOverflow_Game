@@ -9,6 +9,12 @@
 
 std::vector<std::string> getTokenizedText(std::string text);
 
+const float FONT_ADJUST_FACTOR = 2.50;
+// manually change this for different fonts for now
+
+// for ByteBounce: 2.5
+// for Chicago: 1.5
+
 class TextSystem {
 public:
     TextSystem();
@@ -43,7 +49,7 @@ private:
     glm::mat4 projection;
 
     // lazy overloading
-    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
-    void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound);
+    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign);
+    void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign);
     void drawInstancedText(int length);
 };

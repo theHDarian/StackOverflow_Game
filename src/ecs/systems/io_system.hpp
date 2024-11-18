@@ -19,6 +19,7 @@ public:
     bool isGameOver()const;
     bool isDialogue()const;
     bool isCutscene()const;
+    bool isTitle()const;
 
 private:
 	GLFWwindow* window;
@@ -31,4 +32,6 @@ private:
     void handleMovementInput(int key, int action, IOState &state, GameState &gameState);
 
     void handleDialogueChoice(int key, int action, IOState& state, GameState& gameState);
+
+    void handleMenuChoice(int key, int action, IOState& state, GameState& gameState);
 };

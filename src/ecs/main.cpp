@@ -93,7 +93,7 @@ int main() {
 		sceneSystem.step(elapsed_ms); // not sure if this should always be here
 		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
 
-		if (ioSystem.isPaused() || ioSystem.isGameOver()) {
+		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isTitle()) {
 			// do nothing
 		}
 		else if (ioSystem.isCutscene()) { // should be in separate system, but lazy

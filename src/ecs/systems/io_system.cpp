@@ -36,7 +36,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	#endif
     IOState& ioState = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];
-	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_P && action == GLFW_PRESS && !gameState.titleScreen) {
 		gameState.gamePaused = !gameState.gamePaused;
 	}
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -55,6 +55,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		glfwGetWindowSize(window, &w, &h);
 
         ioState.shouldRestart = true;
+		gameState.titleScreen = true;
 	}
 
 	// Debug toggle for colliders
@@ -70,6 +71,17 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
+
+		if (gameState.titleScreen) {
+			if (ioState.hoveringMenuChoice == 0) {
+				gameState.titleScreen = false;
+				gameState.loading = true;
+				ioState.shouldRestart = true; // is setting it again ok?
+			}
+			else {
+				ioState.shouldEnd = true;
+			}
+		}
 
 		// take latest object
 		if (registry.nearbyInteractables.entities.size() > 0) {
@@ -94,8 +106,27 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (gameState.dialogueScene && !gameState.gamePaused) {
 		handleDialogueChoice(key, action, ioState, gameState);
 	}
+	if (gameState.titleScreen) {
+		// only for title for now, think of where else menus might appear
+		// menu state? or just pause?
+		handleMenuChoice(key, action, ioState, gameState);
+	}
 	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
+}
+
+void IOSystem::handleMenuChoice(int key, int action, IOState& state, GameState& gameState) {
+	if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_W) { // highlight choice above
+			state.lastHoverMenuChoice = state.hoveringMenuChoice;
+			state.hoveringMenuChoice = max(0, state.hoveringMenuChoice - 1);
+		}
+		else if (key == GLFW_KEY_S) { // highlight choice below
+			state.lastHoverMenuChoice = state.hoveringMenuChoice;
+			
+			state.hoveringMenuChoice = min(state.hoveringMenuChoice + 1, (int)registry.menuChoices.components.size() - 1);
+		}
+	}
 }
 
 void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameState& gameState) {
@@ -180,6 +211,10 @@ bool IOSystem::isPaused()const {
 };
 bool IOSystem::isGameOver()const {
 	return registry.gameStates.components[0].gameOver;
+}
+
+bool IOSystem::isTitle()const {
+	return registry.gameStates.components[0].titleScreen;
 }
 
 // snce dialogue triggers on keypress for now

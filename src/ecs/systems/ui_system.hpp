@@ -37,6 +37,7 @@ private:
     Entity screenCutIn;
     Entity bulletUI;
     Entity bulletUIArrow;
+    Entity titleScreen;
 
     int lastHoveredBullet = -1;
 
@@ -61,6 +62,10 @@ private:
     Entity createScreenCutIn();
 
     Entity createInteractIndicator(vec2 position);
+
+    Entity createTitleScreen();
+
+    Entity createMenuChoice(std::string choice, vec2 position);
 
     // assume will only ever have one
     Entity createBulletUI();

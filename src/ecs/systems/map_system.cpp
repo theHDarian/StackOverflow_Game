@@ -140,7 +140,7 @@ void clearRoomActors()
     }
     for (Entity ent : registry.interactables.entities)
     {
-        if (!registry.deleteds.has(ent) && !registry.doors.has(ent))
+        if (!registry.deleteds.has(ent) && !registry.doors.has(ent) && !registry.menuUIs.has(ent))
             registry.deleteds.emplace(ent);
     }
     for (Entity ent : registry.critters.entities)

@@ -899,7 +899,7 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 	transform.translate(stackui.stackPos);
 	transform.scale(stackui.stackSize);
 
-	vec3 color = { 11/255.f, 84/255.f, 87/255.f };
+	vec3 color = vec3(0);
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
 	const GLuint program = (GLuint)effects[used_effect_enum];
 
@@ -1224,7 +1224,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	// Getting uniform locations for glUniform* calls
 	if (!isCharging) {
-		vec3 color = { 0.60, 0.59, 0.0 };
+		vec3 color = COLOR_YELLOW;
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
@@ -1234,7 +1234,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 	}
     //consider changing color later
 	else if (isCharging == -1) {
-		vec3 color = { 0.15, 0.15, 0.1}; // grey
+		vec3 color = COLOR_YELLOW * vec3(0.2, 0.2, 0.2); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
@@ -1243,7 +1243,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
 	else {
-		vec3 color = { 0.60, 0.59, 0.0 }; // grey
+		vec3 color = COLOR_YELLOW * vec3(0.60, 0.60, 0.60); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float*)&color);
 		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");

@@ -137,6 +137,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
+	gameState.titleScreen = true;
 
 	WindowState& wS = registry.windowStates.components[0];
 	wS.currUnixTime = Clock::now();
@@ -150,9 +151,15 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
 	createRoomBounds(renderer);
 
+	//Entity title = createSkipDialogue();
+	//registry.dialogueRequests.emplace(title);
+
 	// mock interactable call instead of proper ui for now
-	Entity skipDialogue = createSkipDialogue();
-	registry.dialogueRequests.emplace(skipDialogue);
+	skipDialogue = createSkipDialogue();
+	//registry.dialogueRequests.emplace(skipDialogue);
+
+	//Entity skipDialogue2 = createSkipDialogue();
+	//registry.dialogueRequests.emplace(skipDialogue2);
 }
 #pragma endregion
 
@@ -373,7 +380,9 @@ void WorldSystem::restartGame() {
 	gameState.gameOver = false;
 	gameState.gamePaused = false;
 	gameState.dialogueScene = false;
-	gameState.seenLockedDoor = false;
+	gameState.cutScene = false;
+	gameState.seenLockedDoor = false; 
+	gameState.loading = false;
 	gameState.dialogueChoice = -1;
 
 	//std::cout << ("MyString") << std::endl;
@@ -397,7 +406,7 @@ void WorldSystem::restartGame() {
 	registry.maps.components[0].currRoom.dialogueDone = true;
 
 	// mock interactable call instead of proper ui for now
-	Entity skipDialogue = createSkipDialogue();
+	//Entity skipDialogue2 = createSkipDialogue();
 	registry.dialogueRequests.emplace(skipDialogue);
 
 	//registry.mapRequests.emplace(player,MapRequestType::RestartGame);
