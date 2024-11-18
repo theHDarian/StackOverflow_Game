@@ -270,7 +270,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (!registry.bosses.entities.size() > 0) 
 	{
 		for (int i = (int)registry.bossParts.components.size() - 1; i >= 0; --i) {
-			registry.deleteds.emplace(registry.bossParts.entities[i]);
+			if (!registry.deleteds.has(registry.bossParts.entities[i]))
+				registry.deleteds.emplace(registry.bossParts.entities[i]);
 		}
 	}
 
