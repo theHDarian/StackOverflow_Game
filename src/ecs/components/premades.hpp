@@ -1467,23 +1467,34 @@ struct EnemyHardBoid : Enemy
 		ReactionType::DURATION,
 		0};
 	
-	Reaction singularityTransition {
+	Reaction singularityTransition1 {
 		ReactionType::DURATION,
 		1
 	};
 
-	Reaction supernovaTransition {
+	Reaction supernovaTransition1 {
 		ReactionType::DURATION,
 		2
 	};
-	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 20000.f, 20000.f, {singularityTransition}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyPattern singularityState = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 3000.f, 3000.f, {supernovaTransition}, 2, false, 0.f, 0.f, NoAttack};
-	EnemyPattern supernovaState = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 0, false, 0.f, 0.f, NoAttack};
+	Reaction singularityTransition2 {
+		ReactionType::DURATION,
+		3
+	};
+
+	Reaction supernovaTransition2 {
+		ReactionType::DURATION,
+		4
+	};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 20000.f, 20000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern singularityState1 = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 1000.f, 1000.f, {supernovaTransition1}, 2, false, 0.f, 0.f, NoAttack};
+	// EnemyPattern supernovaState1 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 3000.f, 3000.f, {singularityTransition2}, 3, false, 0.f, 0.f, NoAttack};
+	// EnemyPattern singularityState2 = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 1000.f, 1000.f, {supernovaTransition2}, 4, false, 0.f, 0.f, NoAttack};
+	EnemyPattern supernovaState2 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 0, false, 0.f, 0.f, NoAttack};
 	EnemyHardBoid()
 	{
 		maxHealth = 1;
 		currHealth = maxHealth;
-		enemyPatterns = {boidState, singularityState, supernovaState};
+		enemyPatterns = {boidState, singularityState1, supernovaState2};
 		sprite = {
 			"hifi_boid.png",
 			EFFECT_ASSET_ID::TEXTURED,
@@ -1566,7 +1577,7 @@ struct EnemyHardBoidBio : Enemy {
 		ReactionType::DURATION,
 		0
 	};
-	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
 	EnemyHardBoidBio() {
 		maxHealth = 1;
 		currHealth = maxHealth;
@@ -1599,6 +1610,68 @@ struct EnemyTestPatrol : Enemy {
 		rotatePower = 0.f;
 	}
 };
+
+struct ScientistBossEnemy : Enemy {
+	ScientistBossEnemy () {
+
+	}
+};
+
+struct InvisibleTurretEnemy : Enemy {
+	InvisibleTurretEnemy() {
+
+	}
+};
+
+struct InvisibleRotateLaserEnemy : Enemy {
+	Reaction deathTransition {
+		ReactionType::DURATION,
+		1
+	};
+	EnemyPattern laserRotateState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 5000.f, laserRotate};
+	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition},1, false, 0.f, 0.f, NoAttack};
+	InvisibleRotateLaserEnemy() {
+		maxHealth = 1;
+		currHealth = 1;
+		enemyPatterns = {laserRotateState, DeathState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+
+
+	};
+};
+
+struct InvisibleLaserEnemy : Enemy {
+	Reaction deathTransition {
+		ReactionType::DURATION,
+		1
+	};
+	EnemyPattern laserState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 5000.f, laserNoRotate};
+	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition},1, false, 0.f, 0.f, NoAttack};
+	InvisibleLaserEnemy() {
+		maxHealth = 1;
+		currHealth = 1;
+		enemyPatterns = {laserState, DeathState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+
+
+	};
+};
+
+
 
 // struct EnemyHardSkull : {
 

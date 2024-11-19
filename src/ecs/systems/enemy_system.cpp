@@ -63,8 +63,9 @@ void EnemySystem::step(float elapsed_ms)
             merge(entity, pattern, pendingDeletion);
         }
 
-        if (registry.healers.has(entity) && pattern.type == EnemyBehavior::HEALING) {
-            Healer& healer = registry.healers.get(entity);
+        if (registry.healers.has(entity) && pattern.type == EnemyBehavior::HEALING)
+        {
+            Healer &healer = registry.healers.get(entity);
             healer.coolDown -= elapsed_ms;
             heal(entity, pattern);
         }
@@ -77,7 +78,6 @@ void EnemySystem::step(float elapsed_ms)
         //     registry.bees.remove(deletedBee);
         //     registry.enemies.remove(deletedBee);
         // }
-
         if (registry.boids.has(entity))
         {
             Boid &boid = registry.boids.get(entity);
@@ -95,7 +95,7 @@ void EnemySystem::step(float elapsed_ms)
         // move enemy using lerp
         if (registry.enemyMovement.has(entity))
         {
-            
+
             EnemyMovement &movement = registry.enemyMovement.get(entity);
             vec2 direction = movement.posB - movement.posA;
             if (pattern.type == EnemyBehavior::ROTATE_IN_PLACE)
@@ -103,7 +103,8 @@ void EnemySystem::step(float elapsed_ms)
                 float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
                 float rotationChange = angularSpeed * elapsed_ms / 1000.f;
                 motion.angle += rotationChange;
-            } else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
+            }
+            else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
             {
                 float targetAngle = atan2(direction.y, direction.x);
                 float deltaAngle = targetAngle - motion.angle;
@@ -122,24 +123,30 @@ void EnemySystem::step(float elapsed_ms)
                 motion.angle = motion.angle - 2.f * M_PI * floor(motion.angle / (2.f * M_PI));
 
                 // Keeps assets facing upwards regardless of rotation
-                if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) {
-                    if (motion.angle > M_PI / 2.f && motion.angle < 3.f * M_PI / 2.f) {
+                if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP)
+                {
+                    if (motion.angle > M_PI / 2.f && motion.angle < 3.f * M_PI / 2.f)
+                    {
                         motion.scale = (motion.scale.y > 0) ? motion.scale * vec2(1, -1) : motion.scale;
                     }
-                    else {
+                    else
+                    {
                         motion.scale = (motion.scale.y < 0) ? motion.scale * vec2(1, -1) : motion.scale;
                     }
-                } else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER) {
-                    WindowState& wS = registry.windowStates.components[0];
+                }
+                else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER)
+                {
+                    WindowState &wS = registry.windowStates.components[0];
                     vec2 mid = vec2(wS.width, wS.height) * 0.5f;
                     mid = mid - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
-                } else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
-                    Motion& playerMotion = registry.motions.components[registry.players.entities[0]];
+                }
+                else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
+                {
+                    Motion &playerMotion = registry.motions.components[registry.players.entities[0]];
                     vec2 mid = playerMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
-
 
                 float totalDistance = glm::distance(movement.posA, movement.posB);
                 movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
@@ -156,8 +163,10 @@ void EnemySystem::step(float elapsed_ms)
             if (pattern.currAtkCD < 0)
             {
                 AttackData atkData = pattern.atkData;
-                if (atkData.attackType != EnemyAttackPattern::SPAWNING) attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
-                else spawn(entity, pattern, pos, atkData);
+                if (atkData.attackType != EnemyAttackPattern::SPAWNING)
+                    attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
+                else
+                    spawn(entity, pattern, pos, atkData);
             }
         }
     }
@@ -167,11 +176,11 @@ void EnemySystem::step(float elapsed_ms)
     {
         const Collision &collision = registry.collisions.get(entity);
         Entity other_entity = collision.other;
-
         if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity) && !registry.deleteds.has(other_entity))
         {
             Enemy &enemyStat = registry.enemies.get(entity);
             PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
+            EnemyPattern &pattern = enemyStat.currEnemyPattern();
 
             enemyStat.currHealth -= bulletStat.damage;
             if (enemyStat.currHealth <= 0)
@@ -182,7 +191,7 @@ void EnemySystem::step(float elapsed_ms)
                     registry.deleteds.emplace(entity);
 
                     ParticleProps props = sparks;
-                    registry.emitParticles.replace(entity,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
+                    registry.emitParticles.replace(entity, PExplode, ParticleProps(), f.max, Random::Int(20) + 20);
                 }
 
                 // std::cout << "enemy " << entity << "has died" << std::endl;
@@ -200,6 +209,20 @@ void EnemySystem::step(float elapsed_ms)
             else if (registry.damageds.has(entity))
             {
                 registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
+            }
+        }
+    }
+    for (auto &entity : registry.invisibleEnemy.entities)
+    {
+        Enemy &enemyStat = registry.enemies.get(entity);
+        EnemyPattern &pattern = enemyStat.currEnemyPattern();
+        if (pattern.type == EnemyBehavior::DEATHSTATE)
+        {
+            std::cout << "got here" << std::endl;
+            if (!registry.deleteds.has(entity))
+            {
+                Fade &f = registry.fades.emplace(entity);
+                registry.deleteds.emplace(entity);
             }
         }
     }
@@ -270,7 +293,8 @@ void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData)
 
 void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
 {
-    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
+    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1
+                                                                                                              : 2;
     if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0)
     {
         return;
@@ -314,7 +338,8 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
 
 void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
 {
-    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
+    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1
+                                                                                                              : 2;
     // std::cout << burst.curBurst << std::endl;
     if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0)
     {
@@ -363,13 +388,14 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
 
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
 {
-    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
-
+    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1
+                                                                                                              : 2;
 
     Enemy &enemy = registry.enemies.get(entity);
     Motion &em = registry.motions.get(entity);
     vec2 velocity = (playerMotion.position + playerMotion.velocity / 2.0f) - pos;
-    if (((float)enemy.currHealth / enemy.maxHealth < 0.15) && (rand() % 1000 > 990)) {
+    if (((float)enemy.currHealth / enemy.maxHealth < 0.15) && (rand() % 1000 > 990))
+    {
         createLightningBullet(render, em.position);
     }
 
@@ -381,14 +407,14 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::RADIAL)
     {
-        //std::cout << em.angle << std::endl;
+        // std::cout << em.angle << std::endl;
         sound->playEnemyShootSound(sfxNum, 0);
         shootAllDirection(pos, em.angle, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::RADIAL_POLYGON)
     {
-        //std::cout << em.angle << std::endl;
+        // std::cout << em.angle << std::endl;
         sound->playEnemyShootSound(sfxNum, 0);
         shootRadialPolygon(pos, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
@@ -401,7 +427,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     else if (atkData.attackType == EnemyAttackPattern::TRAIL)
     {
         // Sound is kinda annoying yeah, and its not really "shooting? I guess?
-        //sound->playEnemyShootSound(sfxNum, atkData.numBullets);
+        // sound->playEnemyShootSound(sfxNum, atkData.numBullets);
         shootShotgun(velocity, pos, atkData);
         currPattern.currAtkCD = 600;
     }
@@ -447,10 +473,12 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
 }
 
-void EnemySystem::spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData)
+void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, AttackData atkData)
 {
-    if (registry.animations.has(entity)) registry.animations.get(entity).frame = 1;
-    for (uint i = 0; i < atkData.numBullets; i++) {
+    if (registry.animations.has(entity))
+        registry.animations.get(entity).frame = 1;
+    for (uint i = 0; i < atkData.numBullets; i++)
+    {
         createEnemy(render, pos, atkData.spawn);
     }
 
@@ -516,17 +544,25 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
     }
 }
 
-void EnemySystem::heal(Entity entity, EnemyPattern &currPattern) {
-    Healer& healer = registry.healers.get(entity);
-    if (healer.targetEntity && currPattern.type == EnemyBehavior::HEALING) {
+void EnemySystem::heal(Entity entity, EnemyPattern &currPattern)
+{
+    Healer &healer = registry.healers.get(entity);
+    if (healer.targetEntity && currPattern.type == EnemyBehavior::HEALING)
+    {
         Entity otherEntity = healer.targetEntity;
-        if (healer.coolDown < 0.f) {
-            Enemy& otherEnemy = registry.enemies.get(otherEntity);
-            Enemy& healerEnemy = registry.enemies.get(entity);
+        if (healer.coolDown < 0.f)
+        {
+            Enemy &otherEnemy = registry.enemies.get(otherEntity);
+            Enemy &healerEnemy = registry.enemies.get(entity);
 
             otherEnemy.currHealth = glm::min(otherEnemy.maxHealth, otherEnemy.currHealth + healer.healPower);
 
             healer.coolDown = healer.maxCoolDown;
         }
     }
-}   
+}
+
+void EnemySystem::destruct(Enemy &enemy)
+{
+    enemy.currHealth = -1;
+}

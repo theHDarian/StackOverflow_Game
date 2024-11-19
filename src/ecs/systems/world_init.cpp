@@ -747,6 +747,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		Healer &healer = registry.healers.emplace(entity);
 		healer.coolDown = 0.f;
 	}
+	case EnemyType::ScientistlaserAttack:
+	{
+		enemy = InvisibleRotateLaserEnemy();
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
 	};
 
 	Motion &motion = registry.motions.emplace(entity);

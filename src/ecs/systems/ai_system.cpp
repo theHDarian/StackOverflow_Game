@@ -559,28 +559,42 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 {
 	Enemy &enemy = registry.enemies.get(entity);
 	EnemyPattern &currentPattern = enemy.currEnemyPattern();
+	float maxSpeed = 470.f;
 	if (currentPattern.type == EnemyBehavior::BOIDSGROUP)
 	{
 		boidComputeCoherence(entity, boid, 1.f);
 		boidKeepBound(entity, boid);
 		boid.velocity *= 0.8f;
+		maxSpeed = 500.f;
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSEXPLODE)
 	{
 		boidComputeSeperation(entity, boid, 1.f);
 		boidKeepBound(entity, boid);
 		boid.velocity *= 2.f;
+		maxSpeed = 550.f;
+	}
+	else if (currentPattern.type == EnemyBehavior::BOIDSWARMPLAYER) {
+		boidFollowPlayer(entity, boid, 0.05f);
+		boidWander(entity, boid, 0.05f);
+		
+		// boidComputeCoherence(entity, boid, 0.01f);
+		boidComputeSeperation(entity, boid, 0.2f);
+		// boidComputeAlignment(entity, boid, 0.02f);
+		boidKeepBound(entity, boid);
+		maxSpeed = 470.f;
 	}
 	else
 	{
-		boidWander(entity, boid);
+		boidWander(entity, boid, 0.1f);
 		boidComputeCoherence(entity, boid, 0.01f);
 		boidComputeSeperation(entity, boid, 0.05f);
 		boidComputeAlignment(entity, boid, 0.02f);
 		boidKeepBound(entity, boid);
+		maxSpeed = 500.f;
 	}
 
-	float maxSpeed = 300.f;
+	
 	if (glm::length(boid.velocity) > maxSpeed)
 	{
 		boid.velocity = glm::normalize(boid.velocity) * maxSpeed;
@@ -723,12 +737,12 @@ float getRandomInRange(float min, float max)
 	return dis(gen);
 }
 
-void AISystem::boidWander(Entity entity, Boid &boid)
+void AISystem::boidWander(Entity entity, Boid &boid, float multiplier)
 {
 	float wanderRadius = 50.0f;
 	float wanderDistance = 100.0f;
 	float wanderJitter = 5.0f;
-	float wanderFactor = 0.1f;
+	float wanderFactor = multiplier;
 
 	boid.wanderAngle += getRandomInRange(-wanderJitter, wanderJitter);
 
@@ -743,4 +757,20 @@ void AISystem::boidWander(Entity entity, Boid &boid)
 	vec2 desiredVelocity = target - boid.position;
 
 	boid.velocity += desiredVelocity * wanderFactor;
+}
+
+void AISystem::boidFollowPlayer(Entity entity, Boid &boid, float multiplier)
+{
+    vec2 playerPos = getPlayerPos();
+    vec2 position = boid.position;
+	float swarmRadius = 300.f;
+
+    vec2 directionToPlayer = playerPos - position;
+    float distanceToPlayer = glm::length(directionToPlayer);
+
+	vec2 center = (boid.position + playerPos) * 0.5f ;
+    vec2 cohesionToPlayer = (center - position) * multiplier;
+
+
+    boid.velocity += cohesionToPlayer;
 }

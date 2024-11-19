@@ -27,5 +27,6 @@ private:
 	static void boidComputeCoherence(Entity entity, Boid& boid, float multiplier);
 	static void boidComputeSeperation(Entity entity, Boid& boid, float multiplier);
 	static void boidComputeAlignment(Entity entity, Boid& boid, float multiplier);
-	static void boidWander(Entity entity, Boid &boid);
+	static void boidWander(Entity entity, Boid &boid, float multiplier);
+	static void boidFollowPlayer(Entity entity, Boid &boid, float multiplier);
 };
