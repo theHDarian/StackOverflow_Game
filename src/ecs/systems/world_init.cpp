@@ -385,40 +385,46 @@ void createRoomBounds(RenderSystem *renderer)
 	// will just use approx. magic numbers
 	float ratio1 = ws.height / (float)ws.width;
 	float ratio2 = ws.width / (float)ws.height;
-	vec2 floorScale = { 2880 / 2.f, 1584 / 2.f };
-
+	vec2 floorScale = { 2880, 1584};
+	float wallThickness = 100.f;
 	std::vector<WallPos> wallPositions = {
-	{// top
-	 vec2(0, 100),
-	 vec2(floorScale.x * 2 / 3.f * 2, 100),
-	 vec2(floorScale.x * 2 / 3.f - 1, -1 * floorScale.y * 2 / 6.f), // not sure why it needs to be shifted 1 pixel over
-	 vec2(floorScale.y * 2, 100.f),
+	{// bottom
+	 vec2(0),vec2(0),
+	 /*vec2(0, 100),
+	 vec2(floorScale.x * 2 / 3.f * 2, 100),*/
+	 vec2(floorScale.y * 2 / 3 - wallThickness, -floorScale.y * 2 / 3), // not sure why it needs to be shifted 1 pixel over
+	 vec2(floorScale.y * 2, wallThickness),
 	 0,
 	 vec3(0, 0, 50),
 	 vec2(0, -spriteOffset)},
-	{// right
-	 vec2(1690, 0), // magic numbers...
-	 vec2(1690, ws.height),
-	 vec2(172, floorScale.y * 2 / 3.f), // again another magic number...
-	 vec2(floorScale.y * 2, 100),
+	{// left
+		vec2(0),vec2(0),
+	 /*vec2(1690, 0), // magic numbers...
+	 vec2(1690, ws.height),*/
+	 vec2(-floorScale.y * 2 / 3 / 2 - wallThickness, floorScale.y * 2 / 3 / 2), // again another magic number...
+	 vec2(floorScale.y * 2, wallThickness),
 	 glm::radians(270.f),
 	 vec3(0, 0, 50),
 	 vec2(-spriteOffset, 0)},
 	{													   
-	 // bottom
+	 // top
+		vec2(0),vec2(0),
+		/*
 	 vec2(floorScale.x * 2 / 3.f * 2, 940), // manually offset by mc feet
-	 vec2(0, 940),
-	 vec2(floorScale.x * 2 / 3.f - 1, floorScale.y * 2 - floorScale.y * 2 / 6.f),
-	 vec2(floorScale.y * 2, 100.f),
+	 vec2(0, 940),*/
+	 vec2(floorScale.y * 2 / 3 - wallThickness, floorScale.y * 2 -floorScale.y * 2 / 3),
+	 vec2(floorScale.y * 2, wallThickness),
 	 glm::radians(180.f),
 	 vec3(0, 0, 50),
 	 vec2(0, spriteOffset)},
 	 // NOTE: left and right wall require some weird z offset
-	 {// left
+	 {// right
+		 vec2(0),vec2(0),
+		 /*
 	  vec2(240, ws.height),
-	  vec2(240, 0),
-	  vec2(floorScale.y * 2 * 1.1, floorScale.y * 2 / 3.f), // not sure why 1.1, is magic number rn
-	  vec2(floorScale.y * 2, 100.f),
+	  vec2(240, 0),*/
+	  vec2(2450 + wallThickness, floorScale.y * 2 / 3 / 2), // not sure why 1.1, is magic number rn
+	  vec2(floorScale.y * 2, wallThickness),
 	  glm::radians(90.f),
 	  vec3(0, 0, 50),
 	  vec2(spriteOffset, 0)} };
@@ -467,8 +473,12 @@ void createRoomBounds(RenderSystem *renderer)
 		auto &motion = registry.motions.emplace(entity);
 		motion.position = p.spritePosition;
 		motion.scale = p.spriteScale;
-		std::cout << "Start: " << p.colliderStart.x << ", " << p.colliderStart.y << std::endl;
-		std::cout << "End: " << p.colliderEnd.x << ", " << p.colliderEnd.y << std::endl;
+
+		std::cout << "Position: " << p.spritePosition.x << ", " << p.spritePosition.y << std::endl;
+		std::cout << "Scale: " << p.spriteScale.x << ", " << p.spriteScale.y << std::endl;
+
+		//std::cout << "Start: " << p.colliderStart.x << ", " << p.colliderStart.y << std::endl;
+		//std::cout << "End: " << p.colliderEnd.x << ", " << p.colliderEnd.y << std::endl;
 		
 		motion.angle = p.spriteAngle;
 		//std::cout << motion.angle << std::endl;
@@ -575,7 +585,7 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = vec2({2880 / 2, 1584 / 2});
+	motion.scale = vec2({2880, 1584});
 
 	registry.backgrounds.emplace(entity);
 

@@ -270,8 +270,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		}
 		// because wall rotated to z axis, need to move down wall in z dir so that it's actually on the floor
 		// (everything else is on z = 0)
-		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x -playerMotion.position.x*1.1 + ws.width*1.1 / 2,
-			motion.position.y + playerMotion.position.y*2 - ws.height*2 / 2, -min(motion.scale.x / 2 + 20, motion.scale.y / 2 + 40))) // minor offset to close "gap" btween floor & wall
+		mat4 model = 	glm::translate(glm::mat4(1.0f),
+			vec3(clamp(motion.position.x -playerMotion.position.x*1.1f + ws.width*1.1f / 2.f, motion.position.x - 628, motion.position.x + 628),
+			clamp(motion.position.y + playerMotion.position.y*2.f - ws.height*2.f / 2.f, motion.position.y - 628, motion.position.y + 628), 
+				-min(motion.scale.x / 2 + 20, motion.scale.y / 2 + 40))) // minor offset to close "gap" btween floor & wall
 						* glm::rotate(glm::mat4(1.0f),motion.angle, vec3(0, 0, 1))
 						* glm::translate(glm::mat4(1.0f),vec3(0))
 						/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(playerMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
@@ -364,26 +366,35 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		if (render_request.used_effect != EFFECT_ASSET_ID::COLOURED && render_request.used_effect != EFFECT_ASSET_ID::EGG 
 			&& render_request.used_effect != EFFECT_ASSET_ID::MESH && render_request.used_effect) {
 			WindowState& windowState = registry.windowStates.components[0];
+			Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
 			// note: perspective seems to make no difference?
 			mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 			GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 			glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 			mat4 transform = glm::mat4(1.0);
-			transform = glm::translate(transform, vec3(motion.position.x, motion.position.y, 0.0));
+			transform = glm::translate(transform, 
+				vec3(clamp(motion.position.x - playerMotion.position.x + windowState.width / 2.f, motion.position.x - 628, motion.position.x + 628),
+					clamp(motion.position.y - playerMotion.position.y + windowState.height / 2.f, motion.position.y - 314, motion.position.y + 314), 0.0));
 			transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
 			transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 			GLuint transform_loc = glGetUniformLocation(currProgram, "model");
 			glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
 			Camera& camera = registry.cameras.get(registry.players.entities[0]);
-			Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+			
 			glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			mat4 view = glm::lookAt(vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0), 
-				vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0) + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+			mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 			glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
-
+			/*
+			if (abs(playerMotion.position.x - windowState.width / 2.f) < 628  && 
+				abs(playerMotion.position.y - windowState.height / 2.f) < 314) {
+				mat4 view = glm::lookAt(vec3(playerMotion.position.x - windowState.width / 2.f, playerMotion.position.y - windowState.height / 2, 0),
+					vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0) + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+				glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+			}*/
+				
 			gl_has_errors();
 		}
 		else {
