@@ -582,12 +582,25 @@ void RenderSystem::drawSetupFrame(){
 void RenderSystem::drawBackgroundElements() {
 	drawSetupFrame();
 	mat3 projection_2D = createProjectionMatrix();
+	IOState& ioState = registry.ioStates.components[0];
 	glBindVertexArray(vao);
 	for (Entity entity : registry.backgrounds.entities) {
 		if (!registry.renderRequests.get(entity).show)
 			continue;
 		drawTexturedMesh(entity, projection_2D);
 	}
+
+	for (Entity& entity : registry.objects.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
+			drawTexturedMesh(entity, projection_2D);
+			if (ioState.debugMode)
+				drawAllColliders(entity, projection_2D);
+		}
+	}
+
 	glBindVertexArray(0);
 }
 
@@ -606,17 +619,6 @@ void RenderSystem::drawGameElements()
 	// and won't render all render requests if not given the proper component
 	// Note, its not very efficient to access elements indirectly via the entity
 	// albeit iterating through all Sprites in sequence. A good point to optimize
-	
-	for (Entity& entity : registry.objects.entities)
-	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
-			continue;
-		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
-			drawTexturedMesh(entity, projection_2D);
-			if (ioState.debugMode)
-				drawAllColliders(entity, projection_2D);
-		}
-	}
 
 	for (Entity& entity : registry.enemyBullets.entities)
 	{

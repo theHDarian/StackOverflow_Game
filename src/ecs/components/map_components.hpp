@@ -48,6 +48,7 @@ struct RoomPreset {
     std::vector<SpecialEvent> specialEvents; 
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
+    int numKeyBulletsToSpawn = 2;
 };
 
 struct Door {
@@ -83,7 +84,8 @@ struct Room {
 };
 enum MapRequestType {
     RestartGame = 'R',
-    ChangeRoom = 'C'
+    ChangeRoom = 'C',
+    NewGame = 'N'
 };
 struct MapRequest {
     MapRequestType requestType;

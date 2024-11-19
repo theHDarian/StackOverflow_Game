@@ -971,7 +971,7 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		bullet.bulletSpeed = 0;
 		bullet.bulletRange = 200;
 		motion.velocity = velocity * bullet.bulletSpeed;
-		motion.scale = {240, 240}; // Ensure scale is initialized
+		motion.scale = {160, 160}; // Ensure scale is initialized
 	}
 	else if (onDeath == EnemyBulletDeath::CLUSTER)
 	{
@@ -990,9 +990,9 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 	registry.renderRequests.insert(
 		entity,
 		{// spriteComponent.sprites[SPRITE_STATE::BASE],
-		 "enemy_bullet_circle.png",
-		 EFFECT_ASSET_ID::BULLET,
-		 GEOMETRY_BUFFER_ID::SPRITE});
+		(onDeath != EnemyBulletDeath::EXPLODE) ? "enemy_bullet_circle.png" : "none.png",
+		EFFECT_ASSET_ID::BULLET,
+		GEOMETRY_BUFFER_ID::SPRITE});
 
 	// bullet trail (if we decide to add effects in the future)
 	ParticleProps props = enemyBullet;
@@ -1066,12 +1066,14 @@ Entity createLightningBullet(RenderSystem *renderer, vec2 pos)
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+	bool type = (rand() % 100 > 30);
+
 	EnemyBullet &bullet = registry.enemyBullets.emplace(entity);
 	bullet.bulletSpeed = 450;
 	bullet.bulletRange = 5000;
 	bullet.bulletBounce = 10;
 	bullet.bulletPierce = 10000;
-	bullet.bulletEffects = {lightning};
+	(type) ? bullet.bulletEffects = {lightning1} : bullet.bulletEffects = {lightning2};
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1098,9 +1100,55 @@ Entity createLightningBullet(RenderSystem *renderer, vec2 pos)
 
 	registry.renderRequests.insert(
 		entity,
-		{"lightning_bullet",
+		{ (type) ? "lightning_bullet_1" : "lightning_bullet_2",
 		 EFFECT_ASSET_ID::ANIMATE,
 		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	return entity;
+}
+
+Entity createKeyBullet(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = 450;
+	bullet.bulletRange = 5000;
+	bullet.bulletBounce = 10;
+	bullet.bulletPierce = 10000;
+	bullet.bulletEffects = { key };
+	bullet.shape = RECTANGLE;
+
+	Motion& motion = registry.motions.emplace(entity);
+	float angle = (rand() % 100 / 100.f) * 2 * M_PI;
+	motion.angle = angle;
+	motion.position = pos;
+	motion.velocity = 450.f * vec2(cos(angle), sin(angle));
+	motion.scale = 20.f * vec2(2.8, 1); // Ensure scale is initialized
+	motion.veer = { 0, 0 };
+
+	PolyCollider& pc = registry.polyColliders.emplace(entity);
+	pc.offsetVertices = {
+		{motion.scale.x / 2, motion.scale.y / 2},
+		{motion.scale.x / 2, -motion.scale.y / 2},
+		{-motion.scale.x / 2, -motion.scale.y / 2},
+		{-motion.scale.x / 2, motion.scale.y / 2} };
+	pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+
+	registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_key.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	ParticleProps props = enemyBullet;
+	props.colors.push_back(enemyBulletColors.at(Key));
+	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
 	return entity;
 }
@@ -1193,7 +1241,10 @@ Entity createSkipDialogue()
 float getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity &player = registry.players.entities[0];
-	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
+	return min(
+			registry.stackCompile.get(player).maximums[bf],
+			max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf])
+		);
 }
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial)
@@ -1205,7 +1256,6 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpec
 	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
 		isSpecial = true;
-		if (Random::Float() < 0.15) return { key };
 		return atkData.rareBulletEffects;
 	}
 	isSpecial = false;

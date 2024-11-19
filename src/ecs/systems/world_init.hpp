@@ -60,6 +60,8 @@ Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity st
 
 Entity createLightningBullet(RenderSystem* renderer, vec2 pos);
 
+Entity createKeyBullet(RenderSystem* renderer, vec2 pos);
+
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
