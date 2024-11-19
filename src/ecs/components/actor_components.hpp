@@ -286,7 +286,8 @@ enum EnemyType {
     HardEnemyBoid,
     MediumEnemyBoar,
     MediumEnemyHealer,
-    HardEnemyBoidBio
+    HardEnemyBoidBio,
+    ScientistlaserAttack
 };
 
 enum class EnemyAttackPattern {
@@ -357,7 +358,9 @@ enum class EnemyBehavior {
     BOIDSGROUP,
     BOIDSEXPLODE,
     CHARGING,
-    HEALING
+    HEALING,
+    DEATHSTATE,
+    BOIDSWARMPLAYER
 };
 
 enum class EnemyRotationBehavior {
@@ -385,6 +388,10 @@ enum class ReactionType {
 struct Reaction {
     ReactionType React;
     int index;
+};
+
+struct InvisibleEnemy {
+
 };
 
 // act like a state that can move depending on enemies reactions
