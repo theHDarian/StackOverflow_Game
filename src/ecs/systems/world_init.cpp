@@ -363,9 +363,48 @@ void createRoomBounds(RenderSystem *renderer)
 		vec3 offset;
 		vec2 symbolOffset;
 	};
-	vec2 windowDimensions = {ws.width - 80, ws.height + 270};
+	//vec2 windowDimensions = {ws.width - 80, ws.height + 270};
 	float ratio1 = ws.height / (float)ws.width;
 	float ratio2 = ws.width / (float)ws.height;
+	vec2 floorScale = { 2880 / 2, 1584 / 2 };
+
+	std::vector<WallPos> wallPositions = {
+	{// top
+
+	 vec2(0, ws.height / (6 * ratio2)), // manually offset by approx height of player sprite
+	 vec2(ws.width, ws.height / (6 * ratio2)),
+	 vec2(ws.width / 2.f, -ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
+	 vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
+	 0,
+	 vec3(0, 0, 50),
+	 vec2(0, -spriteOffset)},
+	{// right
+	 vec2(ws.width - ws.width / (6 * ratio2), 0),
+	 vec2(ws.width - ws.width / (6 * ratio2), ws.height),
+	 vec2(ws.width / (6 * (1 + ratio1 * 0.5)), ws.height / 2),
+	 vec2(ws.height + ws.height / (6 * ratio1), ws.width / (12 * ratio2)),
+	 glm::radians(270.f),
+	 vec3(0, 0, 50),
+	 vec2(-spriteOffset, 0)},
+	{													   // bottom
+	 vec2(ws.width, ws.height - ws.height / (6 * ratio2)), // manually offset by mc feet
+	 vec2(0, ws.height - ws.height / (6 * ratio2)),
+	 vec2(ws.width / 2, ws.height + ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
+	 vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
+	 glm::radians(180.f),
+	 vec3(0, 0, 50),
+	 vec2(0, spriteOffset)},
+	 // NOTE: left and righ wall require some weird z offset
+	 {// left
+	  vec2(ws.width / (6 * ratio2), ws.height),
+	  vec2(ws.width / (6 * ratio2), 0),
+	  vec2(ws.width - ws.width / (6 * (1 + ratio1 * 0.5)), ws.height / 2),
+	  vec2(ws.height + ws.height / (6 * ratio1), ws.width / (12 * ratio2)),
+	  glm::radians(90.f),
+	  vec3(0, 0, 50),
+	  vec2(spriteOffset, 0)} };
+
+	/*
 	std::vector<WallPos> wallPositions = {
 		{// top
 
@@ -374,7 +413,7 @@ void createRoomBounds(RenderSystem *renderer)
 		 vec2(ws.width / 2.f, -ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
 		 vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
 		 0,
-		 vec3(0),
+		 vec3(0, 0, 50),
 		 vec2(0, -spriteOffset)},
 		{// right
 		 vec2(ws.width - ws.width / (6 * ratio2), 0),
@@ -390,7 +429,7 @@ void createRoomBounds(RenderSystem *renderer)
 		 vec2(ws.width / 2, ws.height + ws.height / (6 * ratio1 * (1 + 0.5 * ratio1))),
 		 vec2(ws.width - ws.width / 6, ws.height / (6 * ratio2)),
 		 glm::radians(180.f),
-		 vec3(0),
+		 vec3(0, 0, 50),
 		 vec2(0, spriteOffset)},
 		// NOTE: left and righ wall require some weird z offset
 		{// left
@@ -401,6 +440,7 @@ void createRoomBounds(RenderSystem *renderer)
 		 glm::radians(90.f),
 		 vec3(0, 0, 50),
 		 vec2(spriteOffset, 0)}};
+	*/
 	for (auto &p : wallPositions)
 	{
 		auto entity = Entity();

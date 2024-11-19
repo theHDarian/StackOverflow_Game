@@ -255,15 +255,37 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
 		gl_has_errors();
 
-		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x,motion.position.y,0.0f))
-						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))
-						* glm::translate(glm::mat4(1.0f),offset)
-						* glm::rotate(glm::mat4(1.0f),angle,axis) //rotate to be vertical on z axis
+		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+
+		float angleRatio = 0.0f;
+		// vert wall
+		if (motion.scale.x == ws.width - ws.width / 6) {
+			angleRatio = -2 * (playerMotion.position.y - ws.height / 2.f) / (motion.position.y - ws.height / 2.f);
+		}
+		// horiz wall
+		else{
+			angleRatio = (playerMotion.position.x - ws.width / 2.f) / (motion.position.x - ws.width / 2.f);
+		}
+		//// top wall
+		//else if (motion.position.y > ws.height / 2) {
+		//	angleRatio = playerMotion.position.y / 2 / motion.position.y / 2;
+		//}
+		//// bottom wall
+		//else {
+		//	angleRatio = playerMotion.position.y / 2 / motion.position.y / 2;
+		//}
+
+		// because wall rotated to z axis, need to move down wall in z dir so that it's actually on the floor
+		// (everything else is on z = 0)
+		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x -playerMotion.position.x*1.1 + ws.width*1.1 / 2,
+			motion.position.y + playerMotion.position.y*2 - ws.height*2 / 2, -min(motion.scale.x / 2, motion.scale.y / 2)))
+						* glm::rotate(glm::mat4(1.0f),motion.angle, vec3(0, 0, 1))
+						* glm::translate(glm::mat4(1.0f),vec3(0))
+						/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(playerMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
+						* glm::rotate(glm::mat4(1.0f), angle + radians(40.f) * angleRatio, axis)
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
 
-		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-		
 		/*
 		glm::vec3 cameraPos = glm::vec3(playerMotion.position.x, playerMotion.position.y - ws.height,
 			ws.height /6.575 + ws.width / 6.575); // Position above the XY plane
@@ -287,7 +309,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		float far_var = 10000.0f;
 		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near_var, far_var);
 		//proj4 = glm::ortho(0.0f, (float)ws.width, (float)ws.height, 0.0f, -3.0f, 3.0f);
-		proj4 = glm::translate(proj4, vec3(-playerMotion.position.x + ws.width / 2, playerMotion.position.y - ws.height / 2, 0.0));
+		//proj4 = glm::translate(proj4, vec3(-playerMotion.position.x + ws.width / 2, playerMotion.position.y - ws.height / 2, 0.0));
 		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float *)&proj4);
 	} 
 	else
