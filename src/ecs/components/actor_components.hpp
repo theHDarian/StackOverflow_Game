@@ -146,7 +146,7 @@ struct StackCompile {
         {Bounce,            100},
         {Pierce,            100},
         {Homing,            1.0f},
-        {PlayerSpeed,       1000},
+        {PlayerSpeed,       350},
         {PlayerNumDash,     20},
         {PlayerStackSize,   100},
         {PlayerDashCDR,     100000}

@@ -1527,7 +1527,7 @@ struct EnemyMediumBoar : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
-		scale = vec2({864 / 8.f, 480 / 8.f});
+		scale = vec2({480 / 8.f, 864 / 8.f });
 		patternIndex = 0;
 		rotatePower = 0.5f;
 	}
