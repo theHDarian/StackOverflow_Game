@@ -391,6 +391,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// make player stop moving during dialogue
+	if (gameState.dialogueScene) {
+		RenderRequest& rr = registry.renderRequests.get(player);
+		rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+		rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::BASE];
+	}
+
 	return true;
 }
 
