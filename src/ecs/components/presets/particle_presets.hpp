@@ -36,6 +36,15 @@ const ParticleProps sparks {
     1000.f
 };
 
+const ParticleProps enemyBulletExplosion {
+    {{0,0},{30,30}},
+    {{0,0},{150,150}},
+    {{{ 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f },{ 51 / 255.0f, 43 / 255.0f, 42 / 255.0f, 1.0f }}},
+    {20.f,2.f,5.f},
+    -1,
+    500.f
+};
+
 const ParticleProps playerBulletTrail {
     {{0,0},{0,0}},
     {{0,0},{0,0}},
