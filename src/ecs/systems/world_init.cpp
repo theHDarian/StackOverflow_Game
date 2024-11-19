@@ -965,7 +965,7 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		bullet.bulletSpeed = 0;
 		bullet.bulletRange = 200;
 		motion.velocity = velocity * bullet.bulletSpeed;
-		motion.scale = {240, 240}; // Ensure scale is initialized
+		motion.scale = {160, 160}; // Ensure scale is initialized
 	}
 	else if (onDeath == EnemyBulletDeath::CLUSTER)
 	{
@@ -984,9 +984,9 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 	registry.renderRequests.insert(
 		entity,
 		{// spriteComponent.sprites[SPRITE_STATE::BASE],
-		 "enemy_bullet_circle.png",
-		 EFFECT_ASSET_ID::BULLET,
-		 GEOMETRY_BUFFER_ID::SPRITE});
+		(onDeath != EnemyBulletDeath::EXPLODE) ? "enemy_bullet_circle.png" : "none.png",
+		EFFECT_ASSET_ID::BULLET,
+		GEOMETRY_BUFFER_ID::SPRITE});
 
 	// bullet trail (if we decide to add effects in the future)
 	ParticleProps props = enemyBullet;
@@ -1187,7 +1187,10 @@ Entity createSkipDialogue()
 float getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity &player = registry.players.entities[0];
-	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
+	return min(
+			registry.stackCompile.get(player).maximums[bf],
+			max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf])
+		);
 }
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial)

@@ -134,6 +134,24 @@ struct StackCompile {
         {PlayerDashCDR,     1}
     };
 
+    std::map<BulletEffectType, float> maximums = {
+        {BulletDamage,      100000},
+        {ProjectileSpeed,   2000},
+        {ProjectileSize,    50},
+        {FireRate,          100000},
+        {BulletRange,       100000},
+        {BulletSpread,      100000},
+        {BulletNum,         50},
+        {BulletBurst,       50},
+        {Bounce,            100},
+        {Pierce,            100},
+        {Homing,            1.0f},
+        {PlayerSpeed,       1000},
+        {PlayerNumDash,     20},
+        {PlayerStackSize,   100},
+        {PlayerDashCDR,     100000}
+    };
+
     bool add(BulletStackEffect effect) {
         int maxStackSize = (baseStackSize + additives[PlayerStackSize]) * multiplicatives[PlayerStackSize];
         if (currStack.size() >= maxStackSize) {

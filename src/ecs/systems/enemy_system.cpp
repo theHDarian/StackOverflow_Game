@@ -181,7 +181,6 @@ void EnemySystem::step(float elapsed_ms)
                     Fade &f = registry.fades.emplace(entity);
                     registry.deleteds.emplace(entity);
 
-                    ParticleProps props = sparks;
                     registry.emitParticles.replace(entity,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
                 }
 

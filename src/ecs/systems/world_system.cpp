@@ -812,7 +812,10 @@ void WorldSystem::movePlayer() {
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity& pl = registry.players.entities[0];
-	return max(registry.stackCompile.get(pl).minimums[bf], (value + registry.stackCompile.get(pl).additives[bf]) * registry.stackCompile.get(pl).multiplicatives[bf]);
+	return min(
+			registry.stackCompile.get(pl).maximums[bf],
+			max(registry.stackCompile.get(pl).minimums[bf], (value + registry.stackCompile.get(pl).additives[bf]) * registry.stackCompile.get(pl).multiplicatives[bf])
+		);
 }
 
 void WorldSystem::handlePlayerHit(Entity& other) {
@@ -884,7 +887,11 @@ void WorldSystem::enemyBulletDeath(Entity e) {
 
 	if (eb.onDeath == EnemyBulletDeath::NONE) return;
 	if (eb.onDeath == EnemyBulletDeath::EXPLODE) {
-		createEnemyBulletDeath(renderer, ebm.position, vec2(0), EnemyBulletDeath::EXPLODE);
+		Entity ed = createEnemyBulletDeath(renderer, ebm.position, vec2(0), EnemyBulletDeath::EXPLODE);
+		Motion& edMotion = registry.motions.get(ed);
+		ParticleProps props = enemyBulletExplosion;
+		auto& ep = registry.emitParticles.emplace(Entity(),PExplode,props,100,400);
+		ep.defaultPos = edMotion.position;
 		soundPlayer->playExplosionSound(2);
 		return;
 	}
