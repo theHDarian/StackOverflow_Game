@@ -72,6 +72,14 @@ const ParticleProps enemyBullet {
     -1,
     300.f
 };
+const ParticleProps enemyBulletDeathParticle {
+    {{0,0},{0,0}},
+    {{0,0},{100,100}},
+    {},
+    {6.f,1.f,2.f},
+    -1,
+    800.f
+};
 
 const std::map<BulletEffectType, Vec4StartEnd> enemyBulletColors = {
     {BulletDamage, {{ 255 / 255.0f, 0 / 255.0f, 255 / 255.0f, 1.0f },{ 255 / 255.0f, 0 / 255.0f, 255 / 255.0f, .5f }}},

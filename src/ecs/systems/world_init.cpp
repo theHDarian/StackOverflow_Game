@@ -680,6 +680,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyMediumTank();
 		break;
 	}
+	case EnemyType::LaserEnemyTank:
+	{
+		enemy = EnemyLaserTank();
+		break;
+	}
 	case EnemyType::HardEnemyTank:
 	{
 		enemy = EnemyHardTank();
@@ -819,7 +824,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
 	bullet.bulletPierce = atkData.bulletPierce;
-	bullet.bulletEffects = getBulletEffects(atkData);
+	bullet.bulletEffects = getBulletEffects(atkData,bullet.isSpecial);
 	bullet.shape = atkData.shape;
 	if (atkData.onDeath != EnemyBulletDeath::NONE)
 		bullet.onDeath = atkData.onDeath;
@@ -858,7 +863,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		ParticleProps props = enemyBullet;
 		props.colors.push_back(enemyBulletColors.at(Key));
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
+		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
 		return entity;
 	}
@@ -924,7 +929,11 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletColors.at(type));
+		} else {
+			printf("Warning: enemy bullet color not defined\n");
+		}
 	}
 	if (!props.colors.empty())
 	{
@@ -986,7 +995,11 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletColors.at(type));
+		} else {
+			printf("Warning: enemy bullet color not defined\n");
+		}
 	}
 	if (!props.colors.empty())
 	{
@@ -1009,7 +1022,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
-	bullet.bulletEffects = getBulletEffects(atkData);
+	bullet.bulletEffects = getBulletEffects(atkData,bullet.isSpecial);
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1024,6 +1037,12 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	laser.length = 0;
 	laser.growth = atkData.veer.x;
 	laser.rotation = atkData.veer.y;
+
+	ParticleProps props = enemyBulletDeathParticle;
+	props.lifetime = 200.f;
+	props.velocity.variation = {200,200};
+	props.colors.push_back(enemyBulletColors.at(FireRate));
+	registry.emitParticles.emplace(entity,PLaser,props,100000,1);
 
 	registry.renderRequests.insert(
 		entity,
@@ -1171,7 +1190,7 @@ float getModifiedValue(BulletEffectType bf, float value)
 	return max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]);
 }
 
-std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
+std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial)
 {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
 	float prob = (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
@@ -1179,9 +1198,10 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData)
 
 	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
-		registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
+		isSpecial = true;
 		if (Random::Float() < 0.15) return { key };
 		return atkData.rareBulletEffects;
 	}
+	isSpecial = false;
 	return {atkData.defaultEffect};
 }

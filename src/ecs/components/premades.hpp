@@ -288,6 +288,27 @@ const BulletStackEffect ConcentratedFire = {
 	"Concentrated Fire",
 	"" };
 
+const BulletStackEffect SniperPower = {
+	BulletDamage,
+	Multiplicative,
+	10,
+	"Sniper's Prowess",
+	"" };
+
+const BulletStackEffect SniperSpeed = {
+	ProjectileSpeed,
+	Additive,
+	500,
+	"Sniper's Speed",
+	"" };
+
+const BulletStackEffect SniperPrice = {
+	FireRate,
+	Additive,
+	-750,
+	"Sniper's Lethargy",
+	"" };
+
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
@@ -731,6 +752,7 @@ struct EnemyEasyTrail : Enemy
 
 		enemyPatterns = { rotateState };
 		rotatePower = 0.5;
+		rotationBehaviour = EnemyRotationBehavior::FACE_UP;
 
 		patternIndex = 0;
 		sprite = {
@@ -769,6 +791,7 @@ struct EnemyHardTrail : Enemy
 		currHealth = maxHealth;
 
 		enemyPatterns = { rotateState };
+		rotationBehaviour = EnemyRotationBehavior::FACE_UP;
 
 		patternIndex = 0;
 		sprite = {
@@ -819,8 +842,49 @@ struct EnemyMediumTank : Enemy
 			"enemy_Crab.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE};
-		scale = vec2({288.0f / 2, 240.f / 2});
+		scale = vec2({336.0f / 2, 240.f / 2});
 		rotatePower = 0.8f;
+	};
+};
+
+struct EnemyLaserTank : Enemy
+{
+
+	const AttackData crabLaser{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{bulletBounceUpA},
+	blunt,
+	1,
+	0,
+	{20, 20},
+	0,
+	10000000,
+	{4, 0},
+	0,
+	0,
+	0 };
+
+	Reaction duration = {
+		ReactionType::FINISH_PATROL,
+		1 };
+
+	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	EnemyLaserTank()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_LaserCrab.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 240.0f / 2, 336.f / 2 });
+		rotatePower = 1.0f;
+		speedMultiplier = 1.6;
+		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
 	};
 };
 
@@ -861,7 +925,7 @@ struct EnemyHardTank : Enemy
 			"enemy_EvilCrab.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
-		scale = vec2({ 288.0f / 2, 240.f / 2 });
+		scale = vec2({ 336.0f / 2, 240.f / 2 });
 		rotatePower = 0.8f;
 		speedMultiplier = 1.5f;
 	};
@@ -1383,9 +1447,14 @@ struct EnemyEasySkull : Enemy
 		currHealth = maxHealth;
 		enemyPatterns = {laserState};
 		sprite = {
-			"skull.png",
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE};
+			"skull",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			4,
+			500
+			};
 		patternIndex = 0;
 		scale = vec2({230.0f / 2, 240.f / 2});
 		rotatePower = 0.f;
@@ -1510,6 +1579,24 @@ struct EnemyHardBoidBio : Enemy {
 		scale = vec2({ 20.f, 20.f });
 		patternIndex = 0;
 		collisionBullet = buzz;
+	}
+};
+
+struct EnemyTestPatrol : Enemy {
+
+	EnemyPattern boidState = { "BOID", EnemyBehavior::PATROLLING, {{0.f, 0.f}, {0.5f, 0.5f}, {1.f, 0.f}}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
+	EnemyTestPatrol() {
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = { boidState };
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2({192 / 2.f, 216 / 2.f});
+		rotatePower = 0.f;
 	}
 };
 

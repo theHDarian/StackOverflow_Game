@@ -56,22 +56,12 @@ void MapSystem::step(float elapsed_ms)
         }
         map.currRoom.preset.enemies = {};
 
-        //spawn treasures
-        // for(auto& e : map.currRoom.preset.treasures) {
-        //     createEnemyBullet(renderer,std::get<vec2>(e)* vec2(wS.width,wS.height),vec2(0.8,0.8),vec2(0),std::get<AttackData>(e));
-        // }
-
-        // for (auto &e : map.currRoom.preset.roomProps)
-        // {
-        //     createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<RoomProp>(e));
-        // }
         if (map.currRoom.cleared) {
             for (auto &e : map.currRoom.preset.interactables)
             {
-                createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<InteractableItem>(e), map.currRoom.preset.treasures);
+                createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
             }
             map.currRoom.preset.interactables = {};
-            map.currRoom.preset.treasures = {};
 
         }
     }
@@ -249,7 +239,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             lockedRooms++;
         }
         ds.doorType = roomTypeToSymbols.at(d.room);
-        printf("%d\n",ds.doorType);
     }
 }
 

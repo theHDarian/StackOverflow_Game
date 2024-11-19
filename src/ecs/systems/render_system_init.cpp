@@ -32,18 +32,18 @@ using namespace ghc::filesystem;
 
 
 void RenderSystem::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	if (width == 0 || height == 0)
-		return;
-	WindowState& windowState = registry.windowStates.components[0];
-	if (windowState.isRetinaDisplay) {
-		windowState.width = width / 2;
-		windowState.height = height / 2;
-	} else {
-		windowState.width = width;
-		windowState.height = height;
-	}
+	// if (width == 0 || height == 0)
+	// 	return;
+	// WindowState& windowState = registry.windowStates.components[0];
+	// if (windowState.isRetinaDisplay) {
+	// 	windowState.width = width / 2;
+	// 	windowState.height = height / 2;
+	// } else {
+	// 	windowState.width = width;
+	// 	windowState.height = height;
+	// }
 
-	glViewport(0, 0, windowState.width, windowState.height);
+	// glViewport(0, 0, windowState.width, windowState.height);
 }
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)

@@ -8,17 +8,7 @@
 #include "utils/random.hpp"
 
 //---------- PRESETS-------------------
-// struct RoomPreset {
-//     std::vector<std::tuple<EnemyType,vec2>> enemies;
-//     std::vector<std::tuple<AttackData,vec2>> treasures; //for treasure rooms
-//     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
-//     std::vector<SpecialEvent> specialEvents; 
-//     float spawnDelay; //in seconds - for enemies and bosses
-//     int numSpecialBulletsToSpawn = 5;
-// };
-
 const RoomPreset TutorialRoom1Preset{
-    {},
     {},
     {},
     {},
@@ -27,8 +17,7 @@ const RoomPreset TutorialRoom1Preset{
     0};
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EasyEnemySentry, {0.5f, 0.8f}}},
-    {},
+    {{EnemyType::EasyEnemySentry, {0.5f, 0.5f}}},
     {},
     {},
     {},
@@ -133,10 +122,9 @@ const RoomPreset EnemyRoomSwarm{
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}}},
-    {bulletPierceUpA},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{bulletPierceUpA}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     0};
 
@@ -148,7 +136,6 @@ const RoomPreset EnemyRoomDashIntro1{
        {},
        {},
        {},
-   {},
        0.0f,
        3};
 
@@ -160,7 +147,6 @@ const RoomPreset EnemyRoomDashIntro2{
        {},
        {},
        {},
-   {},
        0.0f,
        3 };
 
@@ -176,7 +162,6 @@ const RoomPreset EnemyRoomDashIntro3{
        {},
        {},
        {},
-   {},
        0.0f,
        3 };
 
@@ -194,23 +179,12 @@ const RoomPreset EnemyRoomDash1{
     {},
     {},
     {},
-{},
     0.0f,
     5};
 
 const RoomPreset EnemyRoomDash2{
-    {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
-     {EnemyType::EasyEnemySentry, {0.8f, 0.8f}},
-     {EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
-     {EnemyType::EasyEnemySentry, {0.2f, 0.2f}},
-    {EnemyType::EasyEnemySentry, {0.2f, 0.4f}},
+    {{EnemyType::EasyEnemySentry, {0.4f, 0.2f}},
     {EnemyType::EasyEnemySentry, {0.8f, 0.4f}},
-    {EnemyType::EasyEnemySentry, {0.8f, 0.6f}},
-    {EnemyType::EasyEnemySentry, {0.2f, 0.6f}},
-
-     {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
-    {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
-    {EnemyType::TestRevampedEnemy, {0.3, 0.6}},
      {EnemyType::TestRevampedEnemy, {0.7, 0.4}},
         {Snail, {0.5f, 0.7f}},
      {EnemyType::EasyEnemySkull, {0.5f, 0.5f}}
@@ -218,7 +192,6 @@ const RoomPreset EnemyRoomDash2{
     {},
     {},
     {},
-{},
     0.0f,
     5};
 
@@ -230,12 +203,7 @@ const RoomPreset EnemyRoomDashHard{
      {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.4}},
-{EnemyType::TestRevampedEnemy, {0.3, 0.6}},
-{EnemyType::TestRevampedEnemy, {0.7, 0.4}},
-{EnemyType::TestRevampedEnemy, {0.7, 0.2}},
-{EnemyType::TestRevampedEnemy, {0.7, 0.6}},
      {EnemyType::EvilSnail, {0.5f, 0.5f}}
-
      },
     {},
     {},
@@ -246,9 +214,7 @@ const RoomPreset EnemyRoomSnails {
     {
         {EnemyType::EvilSnail, {0.5f, 0.5f}},
         {Snail, {0.2f, 0.8f}},
-        {Snail, {0.8f, 0.8f}},
-        {Snail, {0.8f, 0.2f}},
-        {Snail, {0.2f, 0.2f}},
+        {EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
         {MediumEnemyCharge, {0.2f, 0.4f}},
         {MediumEnemyCharge, {0.8f, 0.4f}},
 },
@@ -268,7 +234,6 @@ const RoomPreset EnemyRoomBees1{
     {},
     {},
     {},
-    {},
     0.0f,
     5};
 
@@ -285,7 +250,6 @@ const RoomPreset EnemyRoomBees2{
     {},
     {},
     {},
-    {},
     };
 
 const RoomPreset EnemyRoomAngelTank{
@@ -295,7 +259,6 @@ const RoomPreset EnemyRoomAngelTank{
      {EnemyType::MediumEnemyHealer, {0.8, 0.8}},
      {EnemyType::MediumEnemyHealer, {0.2, 0.2}}},
      
-    {},
     {},
     {},
     {},
@@ -310,9 +273,8 @@ const RoomPreset EnemyRoomTripleBuffEX{
         {EvilSnail, {0.7f, 0.7f}},
         {EvilSnail, {0.7f, 0.3f}},
     },
-    {bulletBounceUpA, bulletPierceUpA},
     {},
-    {{PushConsole, {0.25f, 0.5f}}, {PopConsole, {0.75f, 0.5f}},
+    {{{PushConsole,{bulletBounceUpA, bulletPierceUpA}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
     },
     {},
     0.0f,
@@ -322,43 +284,37 @@ const RoomPreset EnemyRoomTripleBuffEX{
 const RoomPreset RestingRoomPop{
     {},
     {},
-    {},
-    {{InteractableItem::PopConsole, {0.5f, 0.5f}}},
+    {{{PopConsole,{}}, {0.5f, 0.5f}}},
     {SpecialEvent::RebootStation}
 };
 
 const RoomPreset RestingRoomGardener{
         {},
         {},
-        {},
-        {{InteractableItem::Gardener, {0.65f, 0.5f}}, {InteractableItem::BibleTree, {0.5f, 0.5f}}},
+        {{{Gardener,{}}, {0.65f, 0.5f}}, {{InteractableItem::BibleTree,{}}, {0.5f, 0.5f}}},
         {SpecialEvent::RebootStation}
 };
 
 const RoomPreset RestRoomBibleTree{
     {},
     {},
-    {},
-    {{InteractableItem::BibleTree, {0.5f, 0.5f}}},
+    {{{InteractableItem::BibleTree,{}}, {0.5f, 0.5f}}},
     {SpecialEvent::RebootStation}
 };
 
 const RoomPreset TreasureRoom1{
     {},
-    {numBulletsUpA, sizeUpA},
     {},
-
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{numBulletsUpA, sizeUpA}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoom2{
     {},
-    {dashUpA},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
+    {{{PushConsole,{dashUpA}}, {0.5f, 0.5f}}},
 {},
     0.0f,
     5,
@@ -366,49 +322,44 @@ const RoomPreset TreasureRoom2{
 
 const RoomPreset TreasureRoom3{
     {},
-    {dmgUpM},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{dmgUpM}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoom4{
     {},
-    {dashCDRDownA},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{dashCDRDownA}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoom5{
     {},
-    {dashCDRDownM},
     {},
-    {{PushConsole, {0.5f, 0.5f}}},
-{},
+    {{{PushConsole,{dashCDRDownM}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoomKey{
         {},
-        {key},
         {},
-        {{PushConsole, {0.5f, 0.5f}}},
-    {},
+        {{{PushConsole,{key}}, {0.5f, 0.5f}}},
+        {},
         0.0f,
         5,
     };
 
 const RoomPreset TreasureRoomBlunt{
     {},
-    {blunt, blunt, blunt},
     {},
-    { {PushConsole, {0.5f, 0.5f}}},
+    {{{PushConsole,{blunt, blunt, blunt}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     0,
@@ -417,28 +368,25 @@ const RoomPreset TreasureRoomBlunt{
 const RoomPreset TreasureRoomRam{
     {},
     {},
-    {},
-    { {InteractableItem::Ram, {0.5f, 0.5f}}},
+    {{{InteractableItem::Ram,{}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     0,
 };
 
-const RoomPreset TreasureRoomOstrich{
+const RoomPreset TreasureRoomSniper{
     {},
-    {ostrichWarrior, ostrichWarriorDownside},
     {},
-    {{PushConsole, {0.5f, 0.5f}}, {PushConsole, {0.25f, 0.5f}}, {PushConsole, {0.75f, 0.5f}}},
-{},
+    {{{PushConsole,{SniperPower, SniperSpeed, SniperPrice}}, {0.5f, 0.5f}}},
+    {},
     0.0f,
     5,
 };
 
 const RoomPreset TreasureRoomKeys{
     {},
-    {key},
     {},
-    {{PushConsole, {0.5f, 0.5f}}, {PushConsole, {0.25f, 0.5f}}, {PushConsole, {0.75f, 0.5f}}},
+    {{{PushConsole,{key}}, {0.5f, 0.5f}}, {{PushConsole,{key}}, {0.25f, 0.5f}}, {{PushConsole,{key}}, {0.75f, 0.5f}}},
 {},
     0.0f,
     5,
@@ -449,8 +397,7 @@ const RoomPreset TreasureRoomKeys{
 const RoomPreset BossRoomBee{
     {{BossBeehiveMain, {0.5f, 0.5f}}, {ThreeBee,{0.5f, 0.75f}}},
     {},
-    {},
-    {{Ram, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     2};
@@ -472,17 +419,17 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory =
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
         {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
-        {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomOstrich, TreasureRoom5}}},
+        {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
         {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
-        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomOstrich, TreasureRoom5}}},
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
         {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
-        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomOstrich, TreasureRoom5}}},
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
 

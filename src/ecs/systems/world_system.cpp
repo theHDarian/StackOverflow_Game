@@ -85,16 +85,16 @@ GLFWwindow* WorldSystem::createWindow() {
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	  //window_width_px = vidMode->width;
-	  //window_height_px = vidMode->height;
-	window_width_px = 1920;
-	window_height_px = 1080;
-	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	//window_width_px = vidMode->width;
+	//window_height_px = vidMode->height;
+	 window_width_px = 1920;
+	 window_height_px = 1080;
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -226,10 +226,32 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.enemyBullets.entities.size() > 0) {
 			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 				EnemyBullet& bullet = registry.enemyBullets.components[i];
+				Entity entity = registry.enemyBullets.entities[i];
 				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
 					// remove enemy bullet
-					if (!registry.deleteds.has(registry.enemyBullets.entities[i]))
+					if (!registry.deleteds.has(registry.enemyBullets.entities[i])) {
+						Motion& motion = registry.motions.get(entity);
+						ParticleProps props = enemyBulletDeathParticle;
+						props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+						for (const BulletStackEffect &effect : bullet.bulletEffects)
+						{
+							BulletEffectType type = effect.type;
+							if (type == BulletEffectType::Inert)
+								continue;
+							if(enemyBulletColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletColors.at(type));
+							} else {
+								printf("Warning: enemy bullet color not defined\n");
+							}
+						}
+						if (!props.colors.empty())
+						{
+							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PExplode,props,150,2);
+							ep.defaultPos = motion.position;
+						}
 						registry.deleteds.emplace(registry.enemyBullets.entities[i]);
+					}
 				}
 			}
 		}
@@ -270,7 +292,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (!registry.bosses.entities.size() > 0) 
 	{
 		for (int i = (int)registry.bossParts.components.size() - 1; i >= 0; --i) {
-			registry.deleteds.emplace(registry.bossParts.entities[i]);
+			if (!registry.deleteds.has(registry.bossParts.entities[i]))
+				registry.deleteds.emplace(registry.bossParts.entities[i]);
 		}
 	}
 
@@ -473,12 +496,12 @@ void WorldSystem::handleCollisions() {
 
 		// Enemy bullet centric handling
 		if (registry.enemyBullets.has(entity)) {
-			if (registry.walls.has(entity_other)) {
+			if (registry.walls.has(entity_other) && !registry.lasers.has(entity)) {
+				Motion& motion = registry.motions.get(entity);
+				WallCollider& wall = registry.walls.get(entity_other);
+				EnemyBullet& bullet = registry.enemyBullets.get(entity);
 				if (registry.enemyBullets.get(entity).bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
-					Motion& motion = registry.motions.get(entity);
-					WallCollider& wall = registry.walls.get(entity_other);
-
 					vec2 a = motion.position - wall.startPosition;
 					vec2 b = wall.endPosition - wall.startPosition;
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
@@ -493,8 +516,34 @@ void WorldSystem::handleCollisions() {
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
 				else {
-					if (!registry.deleteds.has(entity))
+					if (!registry.deleteds.has(entity)) {
+						//emit wall collision particle
+						ParticleProps props = enemyBulletDeathParticle;
+						props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+						for (const BulletStackEffect &effect : bullet.bulletEffects)
+						{
+							BulletEffectType type = effect.type;
+							if (type == BulletEffectType::Inert)
+								continue;
+							if(enemyBulletColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletColors.at(type));
+							} else {
+								printf("Warning: enemy bullet color not defined\n");
+							}
+						}
+						if (!props.colors.empty())
+						{
+							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+							//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
+							ep.defaultPos = motion.position;
+							vec2 a = wall.endPosition-wall.startPosition;
+							vec2 b = -motion.velocity;
+							vec2 p = dot(a,b)/dot(a,a)*a;
+							ep.impactDirection = normalize(b-p);
+						}
 						registry.deleteds.emplace(entity);
+					}
 				}
 			}
 		}
@@ -520,17 +569,17 @@ void WorldSystem::handleCollisions() {
 					registry.ignores.get(entity).clear();
 				}
 				else {
-					//emit wall collision particle
-					ParticleProps props = playerBulletCollision;
-					props.position.variation = VecOp::rotate(motion.scale,motion.angle);
-					EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
-					//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
-					ep.defaultPos = motion.position;
-					vec2 a = wall.endPosition-wall.startPosition;
-					vec2 b = -motion.velocity;
-					vec2 p = dot(a,b)/dot(a,a)*a;
-					ep.impactDirection = normalize(b-p);
 					if (!registry.deleteds.has(entity)) {
+						//emit wall collision particle
+						ParticleProps props = playerBulletCollision;
+						props.position.variation = VecOp::rotate(motion.scale,motion.angle);
+						EmitParticle& ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+						//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
+						ep.defaultPos = motion.position;
+						vec2 a = wall.endPosition-wall.startPosition;
+						vec2 b = -motion.velocity;
+						vec2 p = dot(a,b)/dot(a,a)*a;
+						ep.impactDirection = normalize(b-p);
 						registry.deleteds.emplace(entity);
 					}
 				}
@@ -653,12 +702,6 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
 	}
-	int channel = 1;  // Use a specific channel, e.g., channel 1
-
-	soundPlayer->playPlayerShootSound(max(250.0f, min(
-			50.0f,
-			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst))));
 
 	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
 		//convert interval from ms to rounds per second for getModifiedValue, then back to ms
@@ -673,6 +716,11 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 
 		if (cluster == 1) {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
+			soundPlayer->playPlayerShootSound(max(250.0f, min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst))));
+
 			return;
 		}
 
@@ -689,6 +737,11 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		if (cluster == 2) {
 			createPlayerBullet(renderer, bulletPos, bulletDir*rotationMatrix);
 			createPlayerBullet(renderer, bulletPos, bulletDir*glm::transpose(rotationMatrix));
+			soundPlayer->playPlayerShootSound(max(250.0f, min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst))));
+
 			return;
 		}
 
@@ -706,6 +759,11 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				}
 			}
 			createPlayerBullet(renderer, bulletPos, bulletDir);
+			soundPlayer->playPlayerShootSound(max(250.0f, min(
+			50.0f,
+			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+				BulletBurst, pl.maxBulletBurst))));
+
 		}
 	}
 }
@@ -788,6 +846,8 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
 			if (!success) {
 				registry.gameStates.components[0].gameOver = true;
+			} else {
+				registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 			}
 		}
 	}

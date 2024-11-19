@@ -58,6 +58,46 @@ void UISystem::step(float elapsed_ms) {
 		}
 	}
 
+	if (gameState.gamePaused || gameState.gameOver || gameState.dialogueScene) {
+		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+		StackUI& stackui = registry.stackUI.get(stackUI);
+
+		// is the player hovering over a stack ui bullet right now?
+		// bad: copies code from render system; consider making each bullet an entity
+		// may optimize using some other method like colour picking/just limiting search size
+		// in the future (since search space is pretty deterministic)
+		int bulletHoveredIndex = -1;
+		int count = -1;
+		vec2 bulletSize = stackui.bulletSize;
+		// should check first: is it in stack ui at all?
+		// this is point in aabb detection
+		if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+			&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+			for (vec2 bulletPos : stackui.bulletPositions) {
+				count++;
+				if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+					&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+					bulletHoveredIndex = count;
+					break;
+				}
+			}
+			if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
+				//std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
+				updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
+					stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+			}
+			else if (bulletHoveredIndex == -1){
+				registry.renderRequests.get(bulletUI).show = false;
+				registry.renderRequests.get(bulletUIArrow).show = false;
+			}
+			lastHoveredBullet = bulletHoveredIndex;
+		}
+		else {
+			registry.renderRequests.get(bulletUI).show = false;
+			registry.renderRequests.get(bulletUIArrow).show = false;
+		}
+	}
+
 	if (!gameState.gameOver) {
 		// toggling basic menu uis on/off
 		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
@@ -111,45 +151,7 @@ void UISystem::step(float elapsed_ms) {
 			}
 		
 		} 
-
-		if (gameState.gamePaused) { // paused ui here
-			// is the player hovering over a stack ui bullet right now?
-			// bad: copies code from render system; consider making each bullet an entity
-			// may optimize using some other method like colour picking/just limiting search size
-			// in the future (since search space is pretty deterministic)
-			int bulletHoveredIndex = -1;
-			int count = -1;
-			vec2 bulletSize = stackui.bulletSize;
-			// should check first: is it in stack ui at all?
-			// this is point in aabb detection
-			if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
-				&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
-				for (vec2 bulletPos : stackui.bulletPositions) {
-					count++;
-					if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
-						&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
-						bulletHoveredIndex = count;
-						break;
-					}
-				}
-				if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
-					//std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
-					updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
-						stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
-				}
-				else if (bulletHoveredIndex == -1){
-					registry.renderRequests.get(bulletUI).show = false;
-					registry.renderRequests.get(bulletUIArrow).show = false;
-				}
-				lastHoveredBullet = bulletHoveredIndex;
-			}
-			else {
-				registry.renderRequests.get(bulletUI).show = false;
-				registry.renderRequests.get(bulletUIArrow).show = false;
-			}
-			
-		}
-		else if (gameState.dialogueScene) {
+		if (gameState.dialogueScene) {
 			// update which dialogue choice is highlighted. Consider updating only when necessary?
 			if (registry.dialogueChoices.entities.size() > 0) {
 				int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
@@ -1012,7 +1014,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 		else if (bullet.effectCalc == Multiplicative) {
 			if (bullet.value < 1) {
 				modify = "Decreases ";
-				intermediaryAmount = bullet.value * 100;
+				intermediaryAmount = (1 - bullet.value) * 100;
 			}
 			else {
 				modify = "Increases ";

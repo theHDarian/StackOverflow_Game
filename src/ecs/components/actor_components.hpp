@@ -153,13 +153,14 @@ struct StackCompile {
         if (effect.effectCalc == Additive) {
             additives[effect.type] += effect.value;
         } else {
-            multiplicatives[effect.type] *= effect.value;
+            multiplicatives[effect.type] += effect.value;
         }
         currStack.push_back(effect);
         return true;
     }
 
     BulletStackEffect remove(int index) {
+        printf("remove %d\n",index);
         assert(index < currStack.size() && index >= 0);
 
         BulletStackEffect effect = currStack[index];
@@ -172,6 +173,7 @@ struct StackCompile {
         return effect;
     }
     BulletStackEffect modify(int index) {
+        printf("modify %d\n",index);
         BulletStackEffect effect = remove(index);
         if (effect.effectCalc == EffectCalculation::Additive) {
             effect.value = -effect.value;
@@ -255,6 +257,7 @@ enum EnemyType {
     ThreeBee,
     MediumEnemyTank,
     HardEnemyTank,
+    LaserEnemyTank,
     BeeHive,
     HardEnemyAngel,
     EasyEnemySkull,
@@ -333,6 +336,14 @@ enum class EnemyBehavior {
     BOIDSEXPLODE,
     CHARGING,
     HEALING
+};
+
+enum class EnemyRotationBehavior {
+    NONE,
+    REGULAR,
+    FACE_UP,
+    FACE_CENTER,
+    FACE_PLAYER
 };
 
 
@@ -423,6 +434,7 @@ struct Enemy {
     SpriteData sprite;
     bool newPattern = false;
     float rotatePower;
+    EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
 };
 
@@ -451,6 +463,8 @@ struct EnemyBullet {
     std::vector<BulletStackEffect> bulletEffects;
     EnemyBulletShape shape;
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
+
+    bool isSpecial;
 };
 
 struct Burst {

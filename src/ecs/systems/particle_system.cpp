@@ -238,6 +238,18 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             const Motion& motion = registry.motions.get(ent);
             request.props.velocity.base = -motion.velocity * 0.4f;
             request.props.velocity.variation = normalize(-motion.velocity) * Random::Float(100.f);
+            
+            if (motion.velocity == vec2(0.f,0.f)) { //stationary trails have special emission
+                request.props.velocity.variation = {100,100};
+                for (Vec4StartEnd& color : request.props.colors) {
+                    color.start.w = 0.5f;
+                    color.end.w = 0.f;
+                }
+                request.props.size.end = 0.f;
+                emitCount = min(1,emitCount);
+            } else {
+                request.props.velocity.variation = normalize(-motion.velocity) * Random::Float(100.f);
+            }
             trail(request.props,emitCount);
         } else if (request.requestType == ParticleRequestType::PPlayerTrail) {
             const Motion& motion = registry.motions.get(ent);
@@ -247,6 +259,24 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             request.props.velocity.base += vec2(0,-20.f);
             request.props.velocity.variation += vec2(10,0);
             trail(request.props,emitCount);
+        } else if (request.requestType == PLaser && registry.lasers.has(ent)) {
+            const Motion& motion = registry.motions.get(ent);
+            const Laser& laser = registry.lasers.get(ent);
+            if (laser.length != motion.scale.x && registry.collisions.has(ent)) {
+                Collision& c = registry.collisions.get(ent);
+                if (registry.walls.has(c.other)) {
+                    WallCollider& wall = registry.walls.get(c.other);
+                    request.props.position.base = motion.position + vec2(cos(motion.angle), sin(motion.angle)) * motion.scale.x * 0.5f;
+                    request.props.position.variation = {10.f,10.f};
+                    vec2 a = wall.endPosition-wall.startPosition;
+                    vec2 b = -vec2(cos(motion.angle), sin(motion.angle));
+                    vec2 p = dot(a,b)/dot(a,a)*a;
+                    request.impactDirection = normalize(b-p);
+                }
+                
+                impact(request.props,emitCount,request.impactDirection);
+            }
+            
         }
     }
     if (shouldClear) {
@@ -346,14 +376,20 @@ void ParticleSystem::render() {
     gl_has_errors();
 
     Frame& frame = registry.frames.components[0];
-    if (frame.prevFrameBuffer != 0) {
+    if (frame.prevFrameBuffer != 0 ) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
 
-        // Copy contents of previous buffer to current
-        glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        gl_has_errors();
-        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+        if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE 
+        && glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+            // Copy contents of previous buffer to current
+            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            gl_has_errors();
+            glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+        } else {
+            printf("Warning failed to copy: Frame buffer status %d\n",glCheckFramebufferStatus(GL_FRAMEBUFFER));
+            return;
+        }
     }
     frame.prevFrameBuffer = frame_buffer;
     frame.prevTexture = off_screen_render_buffer_color;

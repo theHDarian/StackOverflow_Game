@@ -37,11 +37,14 @@ enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
 enum BossType { BigCBoss };
 
+struct RoomInteractable {
+    InteractableItem item;
+    std::vector<BulletStackEffect> pushConsoleEffects;
+};
 struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
-    std::vector<BulletStackEffect> treasures; //for treasure rooms
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
-    std::vector<std::tuple<InteractableItem, vec2>> interactables; //for interactables
+    std::vector<std::tuple<RoomInteractable, vec2>> interactables; //for interactables
     std::vector<SpecialEvent> specialEvents; 
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
