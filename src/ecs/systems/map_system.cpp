@@ -112,6 +112,8 @@ void MapSystem::handleMapRequests()
         }
         else if (r.requestType == MapRequestType::RestartGame)
             resetMap();
+        else if (r.requestType == MapRequestType::NewGame)
+            newMap();
         registry.mapRequests.clear();
     }
 }
@@ -155,15 +157,9 @@ void clearRoomActors()
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
-    /*
-    // lame fix for splitting bullet persisting after reset
-    // doesnt work!!
-    for (Entity ent : registry.enemyBullets.entities)
-    {
-        if (!registry.deleteds.has(ent))
-            registry.deleteds.emplace(ent);
-    }
-    */
+    registry.invincibles.clear();
+    registry.spriteTimers.clear();
+    registry.dashes.clear();
 
     registry.emitParticles.emplace(Entity(),ParticleRequestType::ClearParticles, ParticleProps(),0.0f, 0);
 }
@@ -257,11 +253,13 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     }
 }
 
-void MapSystem::resetMap()
-{
+void MapSystem::resetMap() {
     clearRoomActors();
     soundPlayer->playSpecialMusic(0);
+}
 
+void MapSystem::newMap()
+{
     IOState& iostate = registry.ioStates.components[0];
     if (iostate.tutorialOn) {
         // preset doors for first tutorial room

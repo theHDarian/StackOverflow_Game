@@ -305,7 +305,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			else if (reaction.choice == 1) { // no
 				iostate.tutorialOn = true;
 			}
-			registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+			registry.mapRequests.emplace(player, MapRequestType::NewGame);
 		}
 
 		if (object.name.compare("LockedDoor") == 0) {
@@ -391,10 +391,6 @@ void WorldSystem::restartGame() {
 	// Reset the game speed
 	currentSpeed = 1.f;
 
-	Entity player = resetPlayer();
-	StackUI& stackUI = registry.stackUI.components[0];
-	stackUI.updateStackUISize(registry.stackCompile.get(player).baseStackSize);
-
 	// resetting dialogue related stuff
 	DialogueLines& lines = registry.dialogueLines.components[0];
 	lines = DialogueLines();
@@ -409,7 +405,12 @@ void WorldSystem::restartGame() {
 	//Entity skipDialogue2 = createSkipDialogue();
 	registry.dialogueRequests.emplace(skipDialogue);
 
-	//registry.mapRequests.emplace(player,MapRequestType::RestartGame);
+	if (!registry.mapRequests.has(player))
+		registry.mapRequests.emplace(player,MapRequestType::RestartGame);
+
+	Entity player = resetPlayer();
+	StackUI& stackUI = registry.stackUI.components[0];
+	stackUI.updateStackUISize(registry.stackCompile.get(player).baseStackSize);
 }
 
 // Compute collisions between entities
@@ -561,8 +562,8 @@ void WorldSystem::handleInput() {
 		closeGame();
 	}
 	if (input.shouldRestart) {
-		input.shouldRestart = false;
 		restartGame();
+		
 	}
 
 	//move cursor
@@ -572,8 +573,7 @@ void WorldSystem::handleInput() {
 	//change volume
 	GameState& gameState = registry.gameStates.components[0];
 	soundPlayer->setVolume(gameState.currentVolume);
-	
-	// clear nearby interactables here for now
+
 	registry.nearbyInteractables.clear();
 }
 
@@ -806,17 +806,22 @@ void WorldSystem::clearDeleteQueue() {
 		// right now, all our entities that fade will also emit particles (enemies)
 		// but should be generalized for more things in the future
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
-			if (registry.enemyBullets.has(e)) {
+			if (registry.enemyBullets.has(e) && !registry.ioStates.components[0].shouldRestart) {
 				enemyBulletDeath(e);
 			}
 			registry.deleteEntityAndRelatedEntities(e);
 		}
+	}
+
+	if (registry.ioStates.components[0].shouldRestart && registry.enemyBullets.entities.size() == 0) {
+		registry.ioStates.components[0].shouldRestart = false;
 	}
 }
 
 void WorldSystem::enemyBulletDeath(Entity e) {
 	auto& eb = registry.enemyBullets.get(e);
 	auto& ebm = registry.motions.get(e);
+
 	if (eb.onDeath == EnemyBulletDeath::NONE) return;
 	if (eb.onDeath == EnemyBulletDeath::EXPLODE) {
 		createEnemyBulletDeath(renderer, ebm.position, vec2(0), EnemyBulletDeath::EXPLODE);

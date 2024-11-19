@@ -80,7 +80,8 @@ struct Room {
 };
 enum MapRequestType {
     RestartGame = 'R',
-    ChangeRoom = 'C'
+    ChangeRoom = 'C',
+    NewGame = 'N'
 };
 struct MapRequest {
     MapRequestType requestType;
