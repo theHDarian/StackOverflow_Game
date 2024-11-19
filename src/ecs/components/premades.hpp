@@ -827,9 +827,9 @@ struct EnemyMediumTank : Enemy
 		ReactionType::DURATION,
 		1 };
 
-	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM_NEAR, {}, 0, 3000.f, 3000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern idleState =   {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 2, true, 0.f, 1000.f, twoPincerShot};
-	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 500.f, missile};
 	EnemyMediumTank()
 	{
@@ -966,7 +966,7 @@ struct EnemyMediumCharge : Enemy
 		ReactionType::DURATION,
 		0};
 	EnemyPattern idleState = {"IDLE ATTACKING", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {durationIdle}, 0, true, 0.f, 2000.f, missile};
-	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyMediumCharge()
 	{
 		maxHealth = 50;
@@ -979,7 +979,7 @@ struct EnemyMediumCharge : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
-		scale = vec2({288.0f / 2, 240.f / 2});
+		scale = vec2({144.f, 120.f});
 		rotatePower = 0.8f;
 	};
 };
