@@ -162,10 +162,14 @@ struct StackCompile {
             return true;
         }
         if (effect.type == Lightning && currStack.size() > 1) {
-            //std::random_device rd;
-            //std::mt19937 g(rd());
-            //std::shuffle(currStack.begin(), currStack.end(), g);
-            std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+            if (effect.effectCalc == Additive) {
+                std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+            }
+            else {
+                std::random_device rd;
+                std::mt19937 g(rd());
+                std::shuffle(currStack.begin(), currStack.end(), g);
+            }
             return true;
         }
         if (effect.effectCalc == Additive) {

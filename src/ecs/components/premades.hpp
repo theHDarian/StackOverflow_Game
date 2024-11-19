@@ -26,9 +26,16 @@ const BulletStackEffect blunt = {
 	"Inert",
 	""};
 
-const BulletStackEffect lightning = {
+const BulletStackEffect lightning1 = {
 	Lightning,
 	Additive,
+	0,
+	"Lightning",
+	"" };
+
+const BulletStackEffect lightning2 = {
+	Lightning,
+	Multiplicative,
 	0,
 	"Lightning",
 	"" };
@@ -312,7 +319,7 @@ const BulletStackEffect SniperPrice = {
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
-	blunt, lightning, dmgDownA, dmgDownM, dmgUpA, dmgUpM, numBulletsUpA, sizeUpA, spreadUpA, bulletSpeedUpA, 
+	blunt, dmgDownA, dmgDownM, dmgUpA, dmgUpM, numBulletsUpA, sizeUpA, spreadUpA, bulletSpeedUpA, 
 	bulletSpeedUpM, bulletRangeUpA, bulletRangeUpM, bulletBurstUpA, bulletBurstUpM, bulletPierceUpA, bulletPierceUpM,
 	bulletBounceUpA, bulletBounceUpM, dashUpA, dashUpM, stackSizeUpA, stackSizeUpM, dashCDRUpA, dashCDRUpM, dashCDRDownA,
 	dashCDRDownM, playerSpeedUpA, playerSpeedUpM, ostrichWarrior, ostrichWarriorDownside, key, homingUpA
@@ -632,7 +639,7 @@ const AttackData NoAttack{
 const AttackData quadShot{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{ key },
+		{ },
 		blunt,
 		4,
 		0.0,

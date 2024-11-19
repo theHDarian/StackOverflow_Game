@@ -34,7 +34,6 @@ EnemySystem::~EnemySystem() {
 
 void EnemySystem::step(float elapsed_ms)
 {
-
     Entity player = registry.players.entities[0];
     Motion &playerMotion = registry.motions.get(player);
     // std::cout << "current enemy :" << registry.enemies.entities.size() << std::endl;
@@ -54,6 +53,24 @@ void EnemySystem::step(float elapsed_ms)
         Motion &motion = registry.motions.get(entity);
         vec2 pos = motion.position;
         float angle = motion.angle;
+
+        // Lightning bullet creation
+        if (((float)enemy.currHealth / (float)enemy.maxHealth < 0.3) && (rand() % 1000 > 990)) {
+            createLightningBullet(render, motion.position);
+        }
+
+        // Key bullet creation
+        if (((float)enemy.currHealth / (float)enemy.maxHealth > 0.7) && (rand() % 1000 < 1)) {
+            bool shouldKey = (registry.enemyBullets.components.size() > 0);
+            for (EnemyBullet& eb : registry.enemyBullets.components) {
+                if (eb.bulletEffects[0].type == Key) {
+                    shouldKey = false;
+                    break;
+                }
+            }
+            if (shouldKey) createKeyBullet(render, motion.position);
+        }
+
 
         // merge bee logic
         EnemyPattern &pattern = enemy.currEnemyPattern();
@@ -368,9 +385,6 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     Enemy &enemy = registry.enemies.get(entity);
     Motion &em = registry.motions.get(entity);
     vec2 velocity = (playerMotion.position + playerMotion.velocity / 2.0f) - pos;
-    if (((float)enemy.currHealth / enemy.maxHealth < 0.15) && (rand() % 1000 > 990)) {
-        createLightningBullet(render, em.position);
-    }
 
     if (atkData.attackType == EnemyAttackPattern::SHOTGUN)
     {
