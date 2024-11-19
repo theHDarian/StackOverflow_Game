@@ -8,6 +8,23 @@
 #include <random>
 #include <glm/glm.hpp>
 
+vec2 boundPosition(vec2 position, Entity entity)
+{
+	WindowState &windowState = registry.windowStates.components[0];
+	int width = windowState.width;
+	int height = windowState.height;
+	float ratio1 =height / (float)width;
+	float ratio2 = width / (float)height;
+	vec2 scale = registry.motions.get(entity).scale;
+	float minX = width / (6 * ratio2);
+	float minY = height / (6 * ratio2) + scale.y / 2;
+	float maxX = width - width / (6 * ratio2);
+	float maxY = height - height / (6 * ratio2) - scale.y / 2;
+	vec2 returnValue = position;
+	returnValue.x = glm::clamp(position.x, minX, maxX);
+	returnValue.y = glm::clamp(position.y, minY, maxY);
+	return vec2(returnValue.x, returnValue.y);
+}
 void AISystem::step(float elapsed_ms)
 {
 	auto &movement_registry = registry.enemyMovement;
@@ -26,6 +43,8 @@ void AISystem::step(float elapsed_ms)
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING
 		updateState(enemy, movement, entity);
+		// std::cout << enemy.newPattern << std::endl;
+		// std::cout << currPattern.name << "after update" << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
 		if (registry.boids.has(entity))
 		{
@@ -34,19 +53,19 @@ void AISystem::step(float elapsed_ms)
 			continue;
 		}
 		// THINKING
-		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
+		// if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
+		// {
+		// 	movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
+		// 	movement.posA = motion.position;
+		// 	movement.distanceTraveled = 0.0f;
+		// }
+		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
-			movement.posB = getMove(currPattern.type, entity);
-			movement.posA = motion.position;
-			movement.distanceTraveled = 0.0f;
-		}
-		else if (movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
-		{
-
+			// std::cout << currPattern.name << "after update" << std::endl;
 			movement.posA = motion.position;
 			// ACTING
 			// std::cout << currPattern.name << "before getmove" << std::endl;
-			movement.posB = getMove(currPattern.type, entity);
+			movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
 		}
@@ -75,7 +94,6 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	float hpPercent = static_cast<float>(enemy.currHealth) / static_cast<float>(enemy.maxHealth);
 	EnemyPattern &currPattern = enemy.currEnemyPattern();
 	bool reaction_found = false;
-
 	float closeToBeeDistance = 100.f;
 	bool closeToBee = false;
 
@@ -301,8 +319,9 @@ vec2 AISystem::getCurrentPos(Entity entity)
 {
 
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
+	Motion &motion = registry.motions.get(entity);
 	movement.speed = 100.f;
-	return movement.posA;
+	return motion.position;
 }
 
 vec2 AISystem::getNextPatrolPos(Entity entity)
@@ -315,31 +334,31 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 		return getCurrentPos(entity);
 	}
 	// std::cout << "current state: " << pattern.name << std::endl;
-    pattern.pathIndex += 1;
-    if (pattern.pathIndex >= pattern.path.size())
-    {
-        pattern.pathIndex = 0;
-    }
+	pattern.pathIndex += 1;
+	if (pattern.pathIndex >= pattern.path.size())
+	{
+		pattern.pathIndex = 0;
+	}
 
 	vec2 patrolFactor = pattern.path[pattern.pathIndex];
 
 	WindowState &windowState = registry.windowStates.components[0];
-    int width = windowState.width;
-    int height = windowState.height;
+	int width = windowState.width;
+	int height = windowState.height;
 
-    vec2 scale = registry.motions.get(entity).scale;
-    float minX = 150.f + scale[0];
-    float minY = 100.f + scale[1];
-    float maxX = width - 150.f - scale[0];
-    float maxY = height - 60.f - scale[1];
+	vec2 scale = registry.motions.get(entity).scale;
+	float minX = 150.f + scale[0];
+	float minY = 100.f + scale[1];
+	float maxX = width - 150.f - scale[0];
+	float maxY = height - 60.f - scale[1];
 
-    float posX = minX + patrolFactor.x * (maxX - minX);
-    float posY = minY + patrolFactor.y * (maxY - minY);
+	float posX = minX + patrolFactor.x * (maxX - minX);
+	float posY = minY + patrolFactor.y * (maxY - minY);
 
-    posX = glm::clamp(posX, minX, maxX);
-    posY = glm::clamp(posY, minY, maxY);
+	posX = glm::clamp(posX, minX, maxX);
+	posY = glm::clamp(posY, minY, maxY);
 
-    return vec2(posX, posY);
+	return vec2(posX, posY);
 }
 
 vec2 AISystem::generateRandomPos(Entity entity)

@@ -17,7 +17,7 @@ const RoomPreset TutorialRoom1Preset{
     0};
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EasyEnemySentry, {0.5f, 0.5f}}},
+    {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}}},
     {},
     {},
     {},
