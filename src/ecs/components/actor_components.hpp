@@ -54,11 +54,11 @@ struct EffectStack {
 // Player component
 struct Player
 {
-    float baseSpeed = 250;
+    float baseSpeed = 2050;
     float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;
-    float baseDashSpeed = 2500.0f;
+    float baseDashSpeed = 250.0f;
 
     float dashSpeed = baseDashSpeed;
     int currDashCharges = 3;
@@ -146,7 +146,7 @@ struct StackCompile {
         {Bounce,            100},
         {Pierce,            100},
         {Homing,            1.0f},
-        {PlayerSpeed,       350},
+        {PlayerSpeed,       1000},
         {PlayerNumDash,     20},
         {PlayerStackSize,   100},
         {PlayerDashCDR,     100000}

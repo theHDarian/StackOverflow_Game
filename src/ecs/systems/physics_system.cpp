@@ -29,7 +29,7 @@ void PhysicsSystem::step(float elapsed_ms)
 	{
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
-		if (dash_registry.has(entity)) 
+		if (registry.players.has(entity)) 
 			continue;
 		motion.position += motion.velocity * step_seconds;
 		motion.velocity += motion.veer * step_seconds;
@@ -95,9 +95,9 @@ void PhysicsSystem::step(float elapsed_ms)
 	}
 
 	// Move dashing entities
-	for(uint i = 0; i< dash_registry.size(); i++)
+	for(uint i = 0; i< registry.players.size(); i++)
 	{
-		Entity entity = dash_registry.entities[i];
+		Entity entity = registry.players.entities[i];
 		Motion& motion = motion_registry.get(entity);
 		// check if dashing entity will intersect a wall
 		vec2 startPosition = motion.position;
