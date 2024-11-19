@@ -258,27 +258,20 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
 
 		float angleRatio = 0.0f;
+		// let's not rotate the walls for now
 		// vert wall
-		if (motion.scale.x == ws.width - ws.width / 6) {
-			angleRatio = -2 * (playerMotion.position.y - ws.height / 2.f) / (motion.position.y - ws.height / 2.f);
+		// 540 is currently a magic number
+		if (motion.position.y != 540) {
+			//angleRatio = -2 * (playerMotion.position.y - ws.height / 2.f) / (motion.position.y - ws.height / 2.f);
 		}
 		// horiz wall
 		else{
-			angleRatio = (playerMotion.position.x - ws.width / 2.f) / (motion.position.x - ws.width / 2.f);
+			//angleRatio = (playerMotion.position.x - ws.width / 2.f) / (motion.position.x - ws.width / 2.f);
 		}
-		//// top wall
-		//else if (motion.position.y > ws.height / 2) {
-		//	angleRatio = playerMotion.position.y / 2 / motion.position.y / 2;
-		//}
-		//// bottom wall
-		//else {
-		//	angleRatio = playerMotion.position.y / 2 / motion.position.y / 2;
-		//}
-
 		// because wall rotated to z axis, need to move down wall in z dir so that it's actually on the floor
 		// (everything else is on z = 0)
 		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x -playerMotion.position.x*1.1 + ws.width*1.1 / 2,
-			motion.position.y + playerMotion.position.y*2 - ws.height*2 / 2, -min(motion.scale.x / 2, motion.scale.y / 2)))
+			motion.position.y + playerMotion.position.y*2 - ws.height*2 / 2, -min(motion.scale.x / 2 + 20, motion.scale.y / 2 + 40))) // minor offset to close "gap" btween floor & wall
 						* glm::rotate(glm::mat4(1.0f),motion.angle, vec3(0, 0, 1))
 						* glm::translate(glm::mat4(1.0f),vec3(0))
 						/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(playerMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
@@ -295,11 +288,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glm::vec3 cameraTarget = glm::vec3(ws.width / 2, ws.height / 2, 0.0f);
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-		mat4 view2 = glm::lookAt(vec3(playerMotion.position.x - ws.width / 2, (playerMotion.position.y - ws.height/2) * -1, 0.0),
-			vec3(playerMotion.position.x - ws.width / 2, (playerMotion.position.y - ws.height / 2) * -1.f, -1), glm::vec3(0, 1, 0));
-
 		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
-		//glm::mat4 view = view2 ;
 		
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
 		
@@ -308,8 +297,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		float near_var = 0.1f;
 		float far_var = 10000.0f;
 		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near_var, far_var);
-		//proj4 = glm::ortho(0.0f, (float)ws.width, (float)ws.height, 0.0f, -3.0f, 3.0f);
-		//proj4 = glm::translate(proj4, vec3(-playerMotion.position.x + ws.width / 2, playerMotion.position.y - ws.height / 2, 0.0));
 		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float *)&proj4);
 	} 
 	else
@@ -374,42 +361,27 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	// Setting uniform values to the currently bound program
 	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
 
-		if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
+		if (render_request.used_effect != EFFECT_ASSET_ID::COLOURED && render_request.used_effect != EFFECT_ASSET_ID::EGG 
+			&& render_request.used_effect != EFFECT_ASSET_ID::MESH && render_request.used_effect) {
 			WindowState& windowState = registry.windowStates.components[0];
+			// note: perspective seems to make no difference?
 			mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 			GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 			glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 			mat4 transform = glm::mat4(1.0);
-			
 			transform = glm::translate(transform, vec3(motion.position.x, motion.position.y, 0.0));
 			transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
 			transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 			GLuint transform_loc = glGetUniformLocation(currProgram, "model");
 			glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
-
 			Camera& camera = registry.cameras.get(registry.players.entities[0]);
-
-			//mat4 view = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
-			
 			Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-
-
 			glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 			glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 			glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			//glm::vec3 cameraPos = glm::vec3(windowState.width / 2, windowState.height / 2, 0); // Position above the XY plane
-			//glm::vec3 cameraTarget = glm::vec3(windowState.width / 2, windowState.height / 2, 0.0f);
-			//glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-
-			//glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
-			//mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-			//mat4 view = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -100.0f, 100.0f);
-			//view = glm::translate(view, vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0));
-
-			mat4 view = glm::lookAt(vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0), 
+			mat4 view = glm::lookAt(vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0), 
 				vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0) + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
-			//view = mat4(1.0);
 			glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
 			gl_has_errors();
@@ -1292,7 +1264,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 	gl_has_errors();
 }
 
-void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
+void RenderSystem::drawHPbar(Entity& entity, const mat3& projection2) {
 	drawSetupFrame();
 	WindowState& windowState = registry.windowStates.components[0];
 	vec2 position = { windowState.width/2, windowState.height*0.92};
@@ -1311,9 +1283,9 @@ void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 
 	float max = registry.enemies.get(entity).maxHealth;
 	float current = registry.enemies.get(entity).currHealth;
-	Transform transform;
-	transform.translate(position);
-	transform.scale(scale);
+	//Transform transform;
+	//transform.translate(position);
+	//transform.scale(scale);
 
 	// for now, draw bullets using textures
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::HP_BAR;
@@ -1384,10 +1356,23 @@ void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	mat4 transform = glm::mat4(1.0);
+	transform = glm::translate(transform, vec3(position.x, position.y, 0.0));
+	transform = glm::scale(transform, vec3(scale.x, scale.y, 1.0));
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	mat4 view = glm::lookAt(vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0),
+		vec3(playerMotion.position.x - windowState.width / 2, playerMotion.position.y - windowState.height / 2, 0.0) + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 	gl_has_errors();
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);

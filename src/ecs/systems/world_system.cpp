@@ -146,7 +146,9 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	cursor = createCursor();
 
 	WindowState& ws = registry.windowStates.components[0];
+	createWallThickness({ ws.width / 2, ws.height / 2});
 	createTestFloor(renderer, { ws.width /2, ws.height/2 });
+
 	createRoomBounds(renderer);
 
 	// mock interactable call instead of proper ui for now

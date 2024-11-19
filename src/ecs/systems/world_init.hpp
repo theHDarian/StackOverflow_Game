@@ -31,6 +31,8 @@ Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);
 
 void createRoomBounds(RenderSystem* renderer);
 
+Entity createWallThickness(vec2 pos);
+
 // Poly for testing
 Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle);
 
