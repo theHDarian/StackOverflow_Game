@@ -757,6 +757,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		float randomX = getRandomFloat(-150.f, 150.f);
 		float randomY = getRandomFloat(-150.f, 150.f);
 		boid.velocity = vec2(randomX, randomY);
+		boid.maxSpeed = 500.f;
 		break;
 	}
 	case EnemyType::HardEnemyBoidBio:
@@ -767,6 +768,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		float randomX = getRandomFloat(-150.f, 150.f);
 		float randomY = getRandomFloat(-150.f, 150.f);
 		boid.velocity = vec2(randomX, randomY);
+		boid.maxSpeed = 500.f;
 		break;
 	}
 	case EnemyType::MediumEnemyBoar:
@@ -785,6 +787,16 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = InvisibleRotateLaserEnemy();
 		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
+	}
+	case EnemyType::HardEnemyBoidFish:
+	{
+		enemy = EnemyHardBoidFish();
+		Boid &boid = registry.boids.emplace(entity);
+		boid.position = pos;
+		float randomX = getRandomFloat(-35.f, 35.f);
+		float randomY = getRandomFloat(-35.f, 35.f);
+		boid.velocity = vec2(randomX, randomY);
+		boid.maxSpeed = 200.f;
 	}
 	};
 

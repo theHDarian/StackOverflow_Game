@@ -1608,6 +1608,27 @@ struct EnemyHardBoidBio : Enemy {
 	}
 };
 
+struct EnemyHardBoidFish : Enemy {
+
+	Reaction boid{
+		ReactionType::DURATION,
+		0
+	};
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
+	EnemyHardBoidFish() {
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = { boidState };
+		sprite = {
+			"hifi_boid.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({ 20.f, 20.f });
+		patternIndex = 0;
+	}
+};
+
 struct EnemyTestPatrol : Enemy {
 
 	EnemyPattern boidState = { "BOID", EnemyBehavior::PATROLLING, {{0.f, 0.f}, {0.5f, 0.5f}, {1.f, 0.f}}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
