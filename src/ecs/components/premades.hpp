@@ -298,7 +298,7 @@ const BulletStackEffect ConcentratedFire = {
 const BulletStackEffect SniperPower = {
 	BulletDamage,
 	Multiplicative,
-	10,
+	7,
 	"Sniper's Prowess",
 	"" };
 
@@ -309,11 +309,18 @@ const BulletStackEffect SniperSpeed = {
 	"Sniper's Speed",
 	"" };
 
-const BulletStackEffect SniperPrice = {
+const BulletStackEffect SniperLethargy = {
 	FireRate,
 	Additive,
 	-750,
 	"Sniper's Lethargy",
+	"" };
+
+const BulletStackEffect SniperBurden = {
+	PlayerSpeed,
+	Multiplicative,
+	0.6,
+	"Sniper's Burden",
 	"" };
 
 // note: adding the effect to list is not necessary

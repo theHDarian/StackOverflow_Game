@@ -272,6 +272,8 @@ Entity createRamStick(RenderSystem *renderer, vec2 pos)
 	interact.name = "Ram";
 	interact.item = InteractableItem::Ram;
 	registry.circleColliders.emplace(entity).radius = motion.scale.x / 2;
+	auto& effect = registry.emitParticles.emplace(entity, PBulletTrail, playerBulletTrail, 999999, 1);
+	// effect.props.colors = {{0.f, 1.f, 0.f,1.f},{0.f, 1.f, 0.f,1.f}}},
 
 	return entity;
 }

@@ -363,7 +363,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (object.item == InteractableItem::Ram) {
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
-				extendStack( player, 5);
+				extendStack( player, 8);
 				object.dialogueCount++;
 				registry.deleteds.emplace(reaction.object);
 			}

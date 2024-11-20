@@ -596,7 +596,7 @@ const RoomPreset TreasureRoomRam{
 const RoomPreset TreasureRoomSniper{
     {},
     {},
-    {{{PushConsole,{SniperPower, SniperSpeed, SniperPrice}}, {0.5f, 0.5f}}},
+    {{{PushConsole,{SniperPower, SniperBurden, SniperSpeed, SniperLethargy}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     5,
