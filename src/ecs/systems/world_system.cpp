@@ -700,9 +700,18 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
     Motion& player_motion = registry.motions.get(player);
     vec2 playerPos = player_motion.position;
     
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.components[0];
+	Room& room = registry.maps.components[0].currRoom;
+	float clampAmount = 1.0f;
+
 	// need to shift by player actual pos?
-	vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);
-    
+	// since aim indicator needs this too should only be calculated once
+	vec2 mousePositionWorld = input.mousePosition;
+	mousePositionWorld += vec2(mousePositionWorld.x - player_motion.position.x,
+		mousePositionWorld.y - player_motion.position.y);
+	
+	vec2 bulletDir = glm::normalize(mousePositionWorld - player_motion.position);
 	
 	player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
 	if (pl.currFiringInterval > 0) {
@@ -821,7 +830,19 @@ void WorldSystem::movePlayer() {
 
 	//move aim indicator
 	Motion& aimMotion = registry.motions.get(aimIndicator);
-	vec2 mousePos = input.mousePosition;
+
+	vec2 mousePositionWorld = input.mousePosition;
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.components[0];
+	Room& room = registry.maps.components[0].currRoom;
+	float clampAmount = 1.0f;
+	mousePositionWorld += vec2(mousePositionWorld.x - player_motion.position.x,
+		mousePositionWorld.y - player_motion.position.y);
+
+	std::cout << "Mouse pos: " << mousePositionWorld.x << ", " << mousePositionWorld.y << std::endl;
+	std::cout << "Player pos: " << player_motion.position.x << ", " << player_motion.position.y << std::endl;
+	
+	vec2 mousePos = mousePositionWorld;
 	vec2 diff = mousePos - player_motion.position;
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
