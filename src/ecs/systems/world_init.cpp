@@ -323,12 +323,12 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	return entity;
 }
 
-Entity createWallThickness(vec2 pos) {
+Entity createWallThickness(vec2 pos, vec2 scale) {
 	auto entity = Entity();
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = vec2({ 2880 / 2 + 50, 1584 / 2 + 50});
+	motion.scale = scale + vec2(200);
 
 	registry.backgrounds.emplace(entity);
 
@@ -364,7 +364,7 @@ Entity createDoorSymbol(RenderSystem *renderer, vec2 position, float angle, vec2
 	return entity;
 }
 
-void createRoomBounds(RenderSystem *renderer)
+void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 {
 	WindowState &ws = registry.windowStates.components[0];
 
@@ -385,15 +385,16 @@ void createRoomBounds(RenderSystem *renderer)
 	// will just use approx. magic numbers
 	float ratio1 = ws.height / (float)ws.width;
 	float ratio2 = ws.width / (float)ws.height;
-	vec2 floorScale = { 2880, 1584};
+	vec2 floorScale = roomSize;
+	vec2 floorPosition = roomCenter;
 	float wallThickness = 100.f;
 	std::vector<WallPos> wallPositions = {
 	{// bottom
 	 vec2(0),vec2(0),
 	 /*vec2(0, 100),
 	 vec2(floorScale.x * 2 / 3.f * 2, 100),*/
-	 vec2(floorScale.y * 2 / 3 - wallThickness, -floorScale.y * 2 / 3), // not sure why it needs to be shifted 1 pixel over
-	 vec2(floorScale.y * 2, wallThickness),
+	 vec2(floorPosition.x, floorPosition.y - floorScale.y), // not sure why it needs to be shifted 1 pixel over
+	 vec2(floorScale.x * 1.1, wallThickness),
 	 0,
 	 vec3(0, 0, 50),
 	 vec2(0, -spriteOffset)},
@@ -401,7 +402,7 @@ void createRoomBounds(RenderSystem *renderer)
 		vec2(0),vec2(0),
 	 /*vec2(1690, 0), // magic numbers...
 	 vec2(1690, ws.height),*/
-	 vec2(-floorScale.y * 2 / 3 / 2 - wallThickness, floorScale.y * 2 / 3 / 2), // again another magic number...
+	 vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), // again another magic number...
 	 vec2(floorScale.y * 2, wallThickness),
 	 glm::radians(270.f),
 	 vec3(0, 0, 50),
@@ -412,8 +413,8 @@ void createRoomBounds(RenderSystem *renderer)
 		/*
 	 vec2(floorScale.x * 2 / 3.f * 2, 940), // manually offset by mc feet
 	 vec2(0, 940),*/
-	 vec2(floorScale.y * 2 / 3 - wallThickness, floorScale.y * 2 -floorScale.y * 2 / 3),
-	 vec2(floorScale.y * 2, wallThickness),
+	 vec2(floorPosition.x, floorPosition.y + floorScale.y ),
+	 vec2(floorScale.x * 1.1, wallThickness),
 	 glm::radians(180.f),
 	 vec3(0, 0, 50),
 	 vec2(0, spriteOffset)},
@@ -423,7 +424,7 @@ void createRoomBounds(RenderSystem *renderer)
 		 /*
 	  vec2(240, ws.height),
 	  vec2(240, 0),*/
-	  vec2(2450 + wallThickness, floorScale.y * 2 / 3 / 2), // not sure why 1.1, is magic number rn
+	  vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
 	  vec2(floorScale.y * 2, wallThickness),
 	  glm::radians(90.f),
 	  vec3(0, 0, 50),
@@ -576,7 +577,7 @@ Entity createTestPoly(RenderSystem *renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-Entity createTestFloor(RenderSystem *renderer, vec2 pos)
+Entity createTestFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 {
 	auto entity = Entity();
 
@@ -585,7 +586,7 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos)
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = vec2({2880, 1584});
+	motion.scale = scale;
 
 	registry.backgrounds.emplace(entity);
 

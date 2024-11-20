@@ -88,12 +88,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 	  window_width_px = vidMode->width;
 	  window_height_px = vidMode->height;
-	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -145,11 +145,15 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	aimIndicator = createAimIndicator(renderer);
 	cursor = createCursor();
 
-	WindowState& ws = registry.windowStates.components[0];
-	//createWallThickness({ ws.width / 2, ws.height / 2});
-	createTestFloor(renderer, { ws.width /2, ws.height/2 });
+	vec2 roomSize = { 2000,2000 };
+	// note: walls only align to floor if fixed to middle of screen rn
+	vec2 roomCenter = { wS.width / 2, wS.height / 2 };
 
-	createRoomBounds(renderer);
+	WindowState& ws = registry.windowStates.components[0];
+	createWallThickness({ ws.width / 2, ws.height / 2}, roomSize);
+	createTestFloor(renderer, { ws.width /2, ws.height/2 }, roomSize);
+
+	createRoomBounds(renderer, roomCenter, roomSize);
 
 	// mock interactable call instead of proper ui for now
 	Entity skipDialogue = createSkipDialogue();

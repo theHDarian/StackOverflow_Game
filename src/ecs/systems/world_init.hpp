@@ -29,15 +29,15 @@ Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
 Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);
 
-void createRoomBounds(RenderSystem* renderer);
+void createRoomBounds(RenderSystem* renderer, vec2 roomCenter, vec2 roomSize);
 
-Entity createWallThickness(vec2 pos);
+Entity createWallThickness(vec2 pos, vec2 scale);
 
 // Poly for testing
 Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle);
 
 // Floor testing
-Entity createTestFloor(RenderSystem* renderer, vec2 pos);
+Entity createTestFloor(RenderSystem* renderer, vec2 pos, vec2 scale);
 
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);

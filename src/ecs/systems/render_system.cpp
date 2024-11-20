@@ -257,27 +257,25 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
 
-		float angleRatio = 0.0f;
-		// let's not rotate the walls for now
-		// vert wall
-		// 540 is currently a magic number
-		if (motion.position.y != 540) {
-			//angleRatio = -2 * (playerMotion.position.y - ws.height / 2.f) / (motion.position.y - ws.height / 2.f);
-		}
-		// horiz wall
-		else{
-			//angleRatio = (playerMotion.position.x - ws.width / 2.f) / (motion.position.x - ws.width / 2.f);
-		}
 		// because wall rotated to z axis, need to move down wall in z dir so that it's actually on the floor
 		// (everything else is on z = 0)
+		vec2 roomSize = { 2000,2000 };
+		vec2 roomCenter = { ws.width / 2.f, ws.height / 2.f };
+		float wallThickness = 100 + 50;
 		mat4 model = 	glm::translate(glm::mat4(1.0f),
-			vec3(clamp(motion.position.x -playerMotion.position.x*1.1f + ws.width*1.1f / 2.f, motion.position.x - 628, motion.position.x + 628),
-			clamp(motion.position.y + playerMotion.position.y*2.f - ws.height*2.f / 2.f, motion.position.y - 628, motion.position.y + 628), 
-				-min(motion.scale.x / 2 + 20, motion.scale.y / 2 + 40))) // minor offset to close "gap" btween floor & wall
+			vec3(/*motion.position.x - playerMotion.position.x * 1.1f + ws.width * 1.1f / 2.f,
+				motion.position.y + playerMotion.position.y * 2.f - ws.height * 2.f / 2.f,*/
+				clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 1.1f / 2.f, 
+					motion.position.x - roomSize.x / 2 + ws.width / 2 - wallThickness + 35,
+					motion.position.x + roomSize.x / 2 - ws.width / 2 + wallThickness - 35),
+			clamp(motion.position.y + playerMotion.position.y * 2.f - ws.height*2.f / 2.f, 
+				motion.position.y + ws.height - roomSize.y - wallThickness,
+				motion.position.y - ws.height + roomSize.y + wallThickness),
+				-min(motion.scale.x, motion.scale.y))) // minor offset to close "gap" btween floor & wall
 						* glm::rotate(glm::mat4(1.0f),motion.angle, vec3(0, 0, 1))
 						* glm::translate(glm::mat4(1.0f),vec3(0))
 						/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(playerMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
-						* glm::rotate(glm::mat4(1.0f), angle + radians(40.f) * angleRatio, axis)
+						* glm::rotate(glm::mat4(1.0f), angle, axis)
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
 
@@ -367,14 +365,25 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			&& render_request.used_effect != EFFECT_ASSET_ID::MESH && render_request.used_effect) {
 			WindowState& windowState = registry.windowStates.components[0];
 			Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+			vec2 roomSize = { 2000,2000 };
+			vec2 roomCenter = { windowState.width / 2, windowState.height / 2 };
+			float wallThickness = 100 + 50;
+
 			// note: perspective seems to make no difference?
 			mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 			GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 			glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 			mat4 transform = glm::mat4(1.0);
 			transform = glm::translate(transform, 
-				vec3(clamp(motion.position.x - playerMotion.position.x + windowState.width / 2.f, motion.position.x - 628, motion.position.x + 628),
-					clamp(motion.position.y - playerMotion.position.y + windowState.height / 2.f, motion.position.y - 314, motion.position.y + 314), 0.0));
+				vec3(clamp(motion.position.x - playerMotion.position.x + windowState.width / 2.f, 
+					motion.position.x - roomSize.x / 2 + windowState.width / 2.f - wallThickness + 50,
+					motion.position.x + roomSize.x / 2 - windowState.width / 2.f + wallThickness - 50),
+					clamp(motion.position.y - playerMotion.position.y + windowState.height / 2.f, 
+						motion.position.y + windowState.height / 2 - roomSize.y / 2 - wallThickness + 50,
+						motion.position.y - windowState.height / 2 + roomSize.y / 2 + wallThickness - 50),
+					//motion.position.x - playerMotion.position.x + windowState.width / 2.f,
+					//motion.position.y - playerMotion.position.y + windowState.height / 2.f,
+					0.0));
 			transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
 			transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 			GLuint transform_loc = glGetUniformLocation(currProgram, "model");
@@ -643,7 +652,7 @@ void RenderSystem::drawGameElements()
 			continue;
 		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
 		if (!registry.boids.has(entity)) {
-			drawHPbar(entity, projection_2D);
+			//drawHPbar(entity, projection_2D);
 		}
 	
 		if (ioState.debugMode)
