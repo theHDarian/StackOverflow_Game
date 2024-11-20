@@ -80,6 +80,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_REFRESH_RATE,60);
 	//glfwWindowHint(GLFW_DECORATED,GLFW_FALSE); //make borderless window
+	//glfwWindowHint(GLFW_SAMPLES, 4);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
 	int window_width_px,window_height_px;
@@ -89,12 +90,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	// window_height_px = 720;
 	 window_width_px = 1920;
 	 window_height_px = 1080;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -147,9 +148,16 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	aimIndicator = createAimIndicator(renderer);
 	cursor = createCursor();
 
+	Room& currRoom = registry.maps.components[0].currRoom;
+	vec2 roomSize = { 1920,1080 };
+	// note: walls only align to floor if fixed to middle of screen rn
+	vec2 roomCenter = { wS.width / 2, wS.height / 2 };
+
 	WindowState& ws = registry.windowStates.components[0];
-	createTestFloor(renderer, { ws.width /2, ws.height/2 });
-	createRoomBounds(renderer);
+	createWallThickness({ ws.width / 2, ws.height / 2}, roomSize);
+	createTestFloor(renderer, { ws.width /2, ws.height/2 }, roomSize);
+
+	createRoomBounds(renderer, roomCenter, roomSize);
 
 	//Entity title = createSkipDialogue();
 	//registry.dialogueRequests.emplace(title);
@@ -160,6 +168,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 	//Entity skipDialogue2 = createSkipDialogue();
 	//registry.dialogueRequests.emplace(skipDialogue2);
+	registry.cameras.emplace(player);
 }
 #pragma endregion
 

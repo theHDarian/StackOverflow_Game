@@ -75,3 +75,7 @@ enum TextAlignment : int {
 struct MenuChoice {
 
 };
+
+struct GameOverlayUIText {
+
+};

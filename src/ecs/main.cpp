@@ -69,7 +69,7 @@ int main() {
     textSystem.initFreetypeLib();
     mapSystem.init(&renderer, &soundSystem);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// variable timestep loop
 	const float frameDuration = (1000.f / (float) TARGET_FPS);

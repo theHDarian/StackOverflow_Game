@@ -434,9 +434,12 @@ void ParticleSystem::render() {
         glm::vec4 color = glm::lerp(particle.colorBegin, particle.colorEnd, lifePassed); //TODO
         float size = glm::lerp(particle.sizeBegin, particle.sizeEnd, lifePassed);
 
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), { particle.position.x, particle.position.y, 0.0f }) *
-                              glm::rotate(glm::mat4(1.0f), particle.rotation, { 0.0f, 0.0f, 1.0f }) *
-                              glm::scale(glm::mat4(1.0f), { size, size, 1.0f });
+        Motion motion = Motion();
+        motion.position = { particle.position.x, particle.position.y };
+        motion.angle = particle.rotation;
+        motion.scale = { size, size };
+
+        glm::mat4 transform = createFollowCameraModel(motion, vec2(0));
 
         buffer = createQuad(buffer,color,transform,particle.textureIndex); //-1 to use color, or any valid texture_handles index
         indexCount+=6;

@@ -89,6 +89,8 @@ public:
 	ComponentContainer<MenuChoice> menuChoices;
 	ComponentContainer<InvisibleEnemy> invisibleEnemy;
 	ComponentContainer<Parent> parents;
+	ComponentContainer<Camera> cameras;
+	ComponentContainer<GameOverlayUIText> gameOverlayUITexts;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -169,6 +171,8 @@ public:
 		registry_list.push_back(&menuChoices);
 		registry_list.push_back(&invisibleEnemy);
 		registry_list.push_back(&parents);
+		registry_list.push_back(&cameras);
+		registry_list.push_back(&gameOverlayUITexts);
 	}
 
 	void clear_all_components() {

@@ -166,7 +166,9 @@ void IOSystem::onMouseMove(vec2 mousePosition) {
 	ImGui_ImplGlfw_CursorPosCallback(window, mousePosition.x, mousePosition.y);
 	#endif
     IOState& state = registry.ioStates.components[0];
-    state.mousePosition = mousePosition;
+	state.mousePosition = mousePosition;
+	/*glfwSetCursorPos(window, 0, 0);*/
+	//std::cout << mousePosition.x << ", " << mousePosition.y << std::endl;
 }
 
 void IOSystem::handleMovementInput(int key, int action, IOState& state, GameState& gameState) {

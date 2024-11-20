@@ -6,6 +6,7 @@
 #include "common.hpp"
 #include "render_system_init.hpp"
 #include "tiny_ecs_registry.hpp"
+#include "render_system.hpp"
 
 std::vector<std::string> getTokenizedText(std::string text);
 
@@ -49,7 +50,7 @@ private:
     glm::mat4 projection;
 
     // lazy overloading
-    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign);
-    void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign);
+    void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign, bool isUI = true);
+    void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign, bool isUI = true);
     void drawInstancedText(int length);
 };

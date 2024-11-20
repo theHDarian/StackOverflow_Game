@@ -54,30 +54,31 @@ void RenderSystem::drawCursor() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
+
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 	Entity Cursor = registry.cursors.entities[0];
 	if (registry.renderRequests.has(Cursor) && registry.motions.has(Cursor)) {
-		drawTexturedMesh(Cursor, projection_2D);
+		drawTexturedMesh(Cursor, projection, view, true);
 	}
 	glBindVertexArray(0);
 }
 
 void RenderSystem::drawTexturedMesh(Entity entity,
-	const mat3& projection)
+	const mat4& projection, const mat4& view, bool isUI = false)
 {
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
 	Motion& motion = registry.motions.get(entity);
-	// Transformation code, see Rendering and Transformation in the template
-	// specification for more info Incrementally updates transformation matrix,
-	// thus ORDER IS IMPORTANT
-	Transform transform;
-	vec2 offset = registry.renderRequests.get(entity).offset;
-
-	transform.translate(motion.position);
-	transform.rotate(motion.angle);
-	transform.translate(offset * glm::normalize(motion.scale));
-	transform.scale(motion.scale);
-
+	vec2 offset = render_request.offset;
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
 	const GLuint program = (GLuint)effects[used_effect_enum];
@@ -260,18 +261,40 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
 		gl_has_errors();
 
-		mat4 model = 	glm::translate(glm::mat4(1.0f),vec3(motion.position.x,motion.position.y,0.0f))
-						* glm::rotate(glm::mat4(1.0f),motion.angle,vec3(0,0,1))
-						* glm::translate(glm::mat4(1.0f),offset)
-						* glm::rotate(glm::mat4(1.0f),angle,axis) //rotate to be vertical on z axis
+		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+
+		// because wall rotated to z axis, need to move down wall in z dir so that it's actually on the floor
+		// (everything else is on z = 0)
+		vec2 roomSize = { 1920,1080 };
+		vec2 roomCenter = { ws.width / 2.f, ws.height / 2.f };
+		float wallThickness = 100 + 50;
+		float zoom = 1;
+		mat4 model = 	
+			glm::translate(glm::mat4(1.0f), vec3(ws.width / 2, ws.height / 2, 0))
+			* glm::scale(glm::mat4(1.0f), vec3(zoom, zoom, 1.0f))
+			* glm::translate(glm::mat4(1.0f),
+			vec3(clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f, 
+					motion.position.x - roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - wallThickness * 1.1f / 2 - 25,
+					motion.position.x + roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + wallThickness * 1.1f / 2 + 25),
+			clamp(motion.position.y + playerMotion.position.y * 2.f - ws.height*2.f / 2.f - ws.height / 2.f,
+				motion.position.y + ws.height / clampAmount / 2.f - roomSize.y / clampAmount - wallThickness,
+				motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + roomSize.y + wallThickness),
+				-wallThickness + 50)) // minor offset to close "gap" btween floor & wall
+						* glm::rotate(glm::mat4(1.0f),motion.angle, vec3(0, 0, 1))
+						* glm::translate(glm::mat4(1.0f),vec3(0))
+						/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(playerMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
+						* glm::rotate(glm::mat4(1.0f), angle, axis)
 						* glm::scale(glm::mat4(1.0f),vec3(motion.scale,1.0f));
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
-		glm::vec3 cameraPos = glm::vec3(ws.width/2, ws.height/2, ws.height /6.575 + ws.width / 6.575); // Position above the XY plane
-		glm::vec3 cameraTarget = glm::vec3(ws.width/2, ws.height/2, 0.0f);
-		glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
 
-		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, up);
-		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view);
+		glm::vec3 cameraPos = glm::vec3(ws.width / 2, ws.height / 2, ws.height / 6.575 + ws.width / 6.575); // Position above the XY plane
+		glm::vec3 cameraTarget = glm::vec3(ws.width / 2, ws.height / 2, 0.0f);
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+		glm::mat4 view_roomBounds = glm::lookAt(cameraPos, cameraTarget, up);
+		
+		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view_roomBounds);
+		
 		float fov = 125.0f; //makes walls appear larger the less there is
 		float aspectRatio = (ws.width) / (ws.height);
 		float near_var = 0.1f;
@@ -340,12 +363,30 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
 	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
-		GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-		glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float *)&transform.mat);
+		WindowState& windowState = registry.windowStates.components[0];
+		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+		vec2 roomSize = { 1920,1080 };
+		vec2 roomCenter = { windowState.width / 2, windowState.height / 2 };
+		float wallThickness = 100 + 50;
+		float zoom = 1;
+		// note: perspective seems to make no difference?
 		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-		glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float *)&projection);
+		glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+		mat4 transform = glm::mat4(1.0);
+		if (!isUI) {
+			transform = createFollowCameraModel(motion, offset);
+		}
+		else {
+			transform = createNormalModel(motion, offset);
+		}
+		GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+
+		glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+				
 		gl_has_errors();
-	}
+	}		
 
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
@@ -353,7 +394,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 }
 
 void RenderSystem::drawMesh(Entity entity,
-	const mat3& projection)
+	const mat4& projection, const mat4& view)
 {
 
 	assert(registry.renderRequests.has(entity));
@@ -362,13 +403,8 @@ void RenderSystem::drawMesh(Entity entity,
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
-	Transform transform;
-	vec2 offset = registry.renderRequests.get(entity).offset;
 
-	transform.translate(motion.position);
-	transform.rotate(motion.angle);
-	transform.translate(offset * glm::normalize(motion.scale));
-	transform.scale(motion.scale);
+	vec2 offset = registry.renderRequests.get(entity).offset;
 
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
@@ -418,10 +454,15 @@ void RenderSystem::drawMesh(Entity entity,
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = createFollowCameraModel(motion, offset);
+
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 	gl_has_errors();
 
 	// Drawing of num_indices/3 triangles specified in the index buffer
@@ -581,13 +622,23 @@ void RenderSystem::drawSetupFrame(){
 
 void RenderSystem::drawBackgroundElements() {
 	drawSetupFrame();
-	mat3 projection_2D = createProjectionMatrix();
+	/*mat3 projection_2D = createProjectionMatrix();*/
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 	IOState& ioState = registry.ioStates.components[0];
 	glBindVertexArray(vao);
 	for (Entity entity : registry.backgrounds.entities) {
 		if (!registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.objects.entities)
@@ -595,9 +646,9 @@ void RenderSystem::drawBackgroundElements() {
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
-			drawTexturedMesh(entity, projection_2D);
+			drawTexturedMesh(entity, projection, view);
 			if (ioState.debugMode)
-				drawAllColliders(entity, projection_2D);
+				drawAllColliders(entity, projection, view);
 		}
 	}
 
@@ -611,6 +662,18 @@ void RenderSystem::drawGameElements()
 	drawSetupFrame();
 
 	mat3 projection_2D = createProjectionMatrix();
+
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
+
 	glBindVertexArray(vao);
 
 	IOState& ioState = registry.ioStates.components[0];
@@ -624,53 +687,55 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
-		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
+		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
+			drawTexturedMesh(entity, projection, view);
+			if (ioState.debugMode)
+				drawAllColliders(entity, projection, view);
+		}
 	}
 
 	for (Entity& entity : registry.playerBullets.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view);
 		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
+			drawAllColliders(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.bosses.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
-			drawHPbar(entity, projection_2D);
+			drawHPbar(entity, projection, view);
 		}
 
 		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
+			drawAllColliders(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.enemies.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
 			continue;
-		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection_2D) : drawMesh(entity, projection_2D);
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
-			drawHPbar(entity, projection_2D);
+			drawHPbar(entity, projection, view);
 		}
-	
+
 		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
+			drawAllColliders(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.players.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view);
 		if (ioState.debugMode)
-			drawAllColliders(entity, projection_2D);
+			drawAllColliders(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.objects.entities)
@@ -678,9 +743,9 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f < registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
-			drawTexturedMesh(entity, projection_2D);
+			drawTexturedMesh(entity, projection, view);
 			if (ioState.debugMode)
-				drawAllColliders(entity, projection_2D);
+				drawAllColliders(entity, projection, view);
 		}
 	}
 
@@ -689,7 +754,7 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.backgrounds.has(entity))
 			continue;
 		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
-			drawTexturedMesh(entity, projection_2D);
+			drawTexturedMesh(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.doors.entities)
@@ -697,14 +762,14 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
-			drawTexturedMesh(entity, projection_2D);
+			drawTexturedMesh(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.critters.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view);
 	}
 
 	glBindVertexArray(0);
@@ -717,7 +782,20 @@ void RenderSystem::drawGameUI() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(vao);
+	//mat3 projection_2D = createProjectionMatrix();
+
 	mat3 projection_2D = createProjectionMatrix();
+
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
 	for (Entity& entity : registry.gameUIs.entities)
 	{
@@ -726,14 +804,14 @@ void RenderSystem::drawGameUI() {
 
 		// figure out how to modularize drawing this later; maybe each bullet is an entity
 		if (registry.stackUI.has(entity)) {
-			drawBulletStack(projection_2D);
+			drawBulletStack(projection, view);
 		}
 		else {
-			drawTexturedMesh(entity, projection_2D);
+			drawTexturedMesh(entity, projection, view, false);
 		}
 	}
 
-	drawDashes(projection_2D);
+	drawDashes(projection, view);
 
 	glBindVertexArray(0);
 	gl_has_errors();
@@ -746,18 +824,29 @@ void RenderSystem::drawDialogueUI() {
 	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
 
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
+
 	for (Entity entity : registry.screenCutIns.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view, true);
 	}
 	
 	for (Entity& entity : registry.dialogueUIs.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view, true);
 	}
 
 	glBindVertexArray(0);
@@ -771,11 +860,22 @@ void RenderSystem::drawMenuUI() {
 	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
 
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
+
 	for (Entity& entity : registry.menuUIs.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view, true);
 	}
 
 	glBindVertexArray(0);
@@ -794,11 +894,22 @@ void RenderSystem::drawMenuOverlayUI() {
 	glBindVertexArray(vao);
 	mat3 projection_2D = createProjectionMatrix();
 
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
+
 	for (Entity& entity : registry.menuOverlayUIs.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, projection, view, true);
 	}
 
 	glBindVertexArray(0);
@@ -813,14 +924,21 @@ mat3 RenderSystem::createProjectionMatrix()
 
 	gl_has_errors();
 	WindowState& windowState = registry.windowStates.components[0];
-	float right = (float) windowState.width;
-	float bottom = (float) windowState.height;
+	Camera& camera = registry.cameras.components[0];
+	float right = (float) (windowState.width);
+	float bottom = (float) (windowState.height);
 
 	float sx = 2.f / (right - left);
 	float sy = 2.f / (top - bottom);
 	float tx = -(right + left) / (right - left);
 	float ty = -(top + bottom) / (top - bottom);
-	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
+
+	mat3 projection = { {sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f} };
+	//mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, 0.0f, 1.0f);
+	mat4 trans = glm::mat3(1.0);
+	//trans = glm::translate(trans, glm::vec3(0.0, -0.5, 0.0));
+
+	return projection;
 }
 
 #if IMGUI_ENABLED
@@ -882,29 +1000,28 @@ void RenderSystem::drawImGui() {
 #endif
 
 // bandaid fix to draw all colliders an entity has right now
-void RenderSystem::drawAllColliders(Entity entity, const mat3& projection_2D) {
+void RenderSystem::drawAllColliders(Entity entity, const mat4& projection, const mat4& view) {
 	if (registry.circleColliders.has(entity))
-		drawCollider(entity, "circle.png", projection_2D);
+		drawCollider(entity, "circle.png", projection, view);
 	if (registry.aabbs.has(entity))
-		drawCollider(entity, "rectangle.png", projection_2D);
+		drawCollider(entity, "rectangle.png", projection, view);
 }
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI
 // currently just draws a box as a container
-void RenderSystem::drawBulletStack(const mat3& projection) {
+void RenderSystem::drawBulletStack(const mat4& projection, const mat4& view) {
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	
 	Entity stackEntity = registry.stackUI.entities[0];
 	StackUI& stackui = registry.stackUI.get(stackEntity);
+	
+	Motion motion = Motion();
+	motion.scale = stackui.stackSize;
+	motion.position = stackui.stackPos;
 
-	Transform transform;
-	transform.translate(stackui.stackPos);
-	transform.scale(stackui.stackSize);
-
-	// for outline
-	Transform transformOutline;
-	transformOutline.translate(stackui.stackPos);
-	transformOutline.scale(vec2(stackui.stackSize.x + 10, stackui.stackSize.y + 10));
+	Motion motionOutline = Motion();
+	motionOutline.scale = motion.scale + vec2(10);
+	motionOutline.position = motion.position;
 	vec3 outlineColor = vec3(1.0);
 
 	vec3 color = vec3(0);
@@ -968,22 +1085,28 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Setting uniform values to the currently bound program
+
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+
 	gl_has_errors();
 
+	mat4 transform = createNormalModel(motion, vec2(0));
+	mat4 transformOutline = createNormalModel(motionOutline, vec2(0));
+
 	// draw outline here
-	GLuint transform2_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform2_loc, 1, GL_FALSE, (float*)&transformOutline.mat);
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transformOutline);
 	GLint color2_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color2_uloc, 1, (float*)&outlineColor);
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 
 	// draw actual stack here
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint transform2_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform2_loc, 1, GL_FALSE, (float*)&transform);
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color_uloc, 1, (float*)&color);
 	// Drawing of num_indices/3 triangles specified in the index buffer
@@ -1006,14 +1129,14 @@ void RenderSystem::drawBulletStack(const mat3& projection) {
 
 		// start from bottom to top
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
-			bulletColor, bulletShape, projection);
+			bulletColor, bulletShape, projection, view);
 	}
 }
 
-void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat3& projection) {
-	Transform transform;
-	transform.translate(position);
-	transform.scale(bullet_size);
+void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat4& projection, const mat4& view) {
+	Motion motion = Motion();
+	motion.scale = bullet_size;
+	motion.position = position;
 
 	// for now, draw bullets using textures
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
@@ -1078,10 +1201,15 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = createNormalModel(motion, vec2(0));
+
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 	gl_has_errors();
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
@@ -1091,21 +1219,20 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 // draw collider shape based on shape texture passed
 // only draws circles and boxes for now
 // (more work required to include polygons)
-void RenderSystem::drawCollider(Entity entity, std::string shape, const mat3& projection) {
+void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4& projection, const mat4& view) {
 	Motion& motion = registry.motions.get(entity);
-
-	Transform transform;
+	Motion colliderMotion = Motion();
+	colliderMotion.position = motion.position;
+	colliderMotion.angle = motion.angle;
 	if (shape == "circle.png") {
 		auto& circle = registry.circleColliders.get(entity);
-		transform.translate(motion.position);
-		transform.rotate(motion.angle);
-		transform.scale({ circle.radius * 2, circle.radius * 2 });
+		colliderMotion.scale = { circle.radius * 2, circle.radius * 2 };
 	}
 	else if (shape == "rectangle.png") {
 		auto& aabb = registry.aabbs.get(entity);
-		transform.translate(vec2(motion.position.x + (abs(aabb.bottomRight.x) - abs(aabb.topLeft.x)) / 2, motion.position.y + (abs(aabb.bottomRight.y) - abs(aabb.topLeft.y)) / 2));
-		transform.rotate(motion.angle);
-		transform.scale({ aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y });
+		colliderMotion.position = vec2(motion.position.x + (abs(aabb.bottomRight.x) - abs(aabb.topLeft.x)) / 2, motion.position.y + (abs(aabb.bottomRight.y) - abs(aabb.topLeft.y)) / 2);
+		colliderMotion.angle = motion.angle;
+		colliderMotion.scale = {aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y };
 	}
 
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
@@ -1161,22 +1288,24 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat3& pr
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = createFollowCameraModel(colliderMotion, vec2(0));
+
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 	gl_has_errors();
+
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 }
 
-void RenderSystem::drawDashes(const mat3& projection) {
-	drawSetupFrame();
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+void RenderSystem::drawDashes(const mat4& projection, const mat4& view) {
 	vec2 pos = { 75,210 };
 	vec2 scale = { 50, 50 };
 	float offset = 10;
@@ -1185,29 +1314,27 @@ void RenderSystem::drawDashes(const mat3& projection) {
 
 	// draw all filled dash charges first
     for (int i = 0; i < player.currDashCharges; ++i) {
-        drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, false, 0, 0, projection);
+        drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, false, 0, 0, projection, view);
     }
 
 	// draw currently charging dash charge, if any
 	if (player.currDashCharges < WorldSystem::getModifiedValue(PlayerNumDash,player.maxDashCharges)) {
-		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, WorldSystem::getModifiedValue(PlayerDashCDR, player.baseDashCDR), projection);
+		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, WorldSystem::getModifiedValue(PlayerDashCDR, player.baseDashCDR), projection, view);
 	}
 
 	// draw empty dash charges last, if any
 	for (int i = player.currDashCharges + 1; i < WorldSystem::getModifiedValue(PlayerNumDash,player.maxDashCharges); ++i) {
-		drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, -1, 0, 0, projection);
+		drawDashCharges(vec2(pos.x + i * (scale.x + offset), pos.y), scale, -1, 0, 0, projection, view);
 	}
 
 	gl_has_errors();
 }
 
-void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat3& projection) {
+void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat4& projection, const mat4& view) {
+	Motion motion = Motion();
+	motion.scale = scale;
+	motion.position = position;
 
-	Transform transform;
-	transform.translate(position);
-	transform.scale(scale);
-
-	// for now, draw bullets using textures
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::DASH;
 	const GLuint program = (GLuint)effects[used_effect_enum];
 
@@ -1296,39 +1423,40 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = createNormalModel(motion, vec2(0));
+
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 	gl_has_errors();
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 }
 
-void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
-	drawSetupFrame();
+void RenderSystem::drawHPbar(Entity& entity, const mat4& projection, const mat4& view) {
 	WindowState& windowState = registry.windowStates.components[0];
-	vec2 position = { windowState.width/2, windowState.height*0.92};
-	vec2 scale = { 600, 30 };
 	Motion& motion = registry.motions.get(entity);
+	Motion HPBarMotion = Motion();
+	HPBarMotion.scale = { 600, 30 };
+	HPBarMotion.position = { windowState.width / 2, windowState.height * 0.92 };
 
 	if (!registry.bosses.has(entity)) {
-		position = motion.position + vec2(0, motion.scale.y / 2 + 10);
-		scale = { 100, 10 };
+		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
+		HPBarMotion.scale = { 100, 10 };
 	}
 
 	if (registry.damageds.has(entity)) {
-		position.x += (rand() % 10) - 5;
-		position.y += (rand() % 10) - 5;
+		HPBarMotion.position.x += (rand() % 10) - 5;
+		HPBarMotion.position.y += (rand() % 10) - 5;
 	}
 
 	float max = registry.enemies.get(entity).maxHealth;
 	float current = registry.enemies.get(entity).currHealth;
-	Transform transform;
-	transform.translate(position);
-	transform.scale(scale);
 
 	// for now, draw bullets using textures
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::HP_BAR;
@@ -1399,13 +1527,78 @@ void RenderSystem::drawHPbar(Entity& entity, const mat3& projection) {
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = createFollowCameraModel(HPBarMotion, vec2(0));
+
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 	gl_has_errors();
+
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
 
+}
+
+mat4 createNormalModel(Motion& motion, vec2 offset = vec2(0)) {
+	mat4 transform = glm::mat4(1.0);
+	transform = glm::translate(transform, vec3(motion.position, 0.0f));
+	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
+	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
+
+	return transform;
+}
+
+mat4 createFollowCameraModel(Motion& motion, vec2 offset = vec2(0)) {
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	Camera& camera = registry.cameras.components[0];
+	Room& room = registry.maps.components[0].currRoom;
+
+	mat4 transform = glm::mat4(1.0);
+	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
+	transform = glm::scale(transform, vec3(camera.zoom));
+	transform = glm::translate(transform,
+		vec3(clamp(motion.position.x - playerMotion.position.x,
+			motion.position.x - room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
+			motion.position.x + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
+			clamp(motion.position.y - playerMotion.position.y,
+				motion.position.y - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
+				motion.position.y - windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75),
+			0.0));
+	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
+	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
+
+	return transform;
+}
+
+// note: clamp amount currently not working for text
+mat4 createFollowCameraModelText(Motion& motion, vec2 offset) {
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	Camera& camera = registry.cameras.components[0];
+	Room& room = registry.maps.components[0].currRoom;
+	mat4 transform = glm::mat4(1.0);
+	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
+	transform = glm::scale(transform, vec3(camera.zoom));
+	transform = glm::translate(transform,
+		vec3(clamp(motion.position.x - playerMotion.position.x,
+			motion.position.x - room.roomSize.x / clampAmount / 2 - room.wallThickness * 1.5f + 50,
+			motion.position.x + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
+			clamp(motion.position.y - (windowState.height - playerMotion.position.y),
+				motion.position.y - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
+				motion.position.y - windowState.height * clampAmount + room.roomSize.y / 2 + room.wallThickness * 1.5f - 75),
+			0.0));
+	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
+	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
+
+	return transform;
 }

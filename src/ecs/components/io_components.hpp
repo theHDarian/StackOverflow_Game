@@ -50,3 +50,7 @@ struct GameState {
 	bool loading = true; // this is ONLY here to prevent awkward half second of non-black screen on game start
 	// when fix ui later properly can remove
 };
+
+struct Camera {
+	float zoom = 1.0f;
+};
