@@ -353,6 +353,11 @@ struct Deleted {
 	// this entity is marked for deletion
 };
 
+// If parent is deleted, delete children
+struct Parent {
+	std::vector<Entity> children;
+};
+
 struct DialogueChoice {
 
 };

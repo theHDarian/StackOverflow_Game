@@ -304,6 +304,9 @@ Entity createGardener(RenderSystem *renderer, vec2 pos)
 	CircleCollider &cc = registry.circleColliders.emplace(gardener);
 	cc.radius = m.scale.y / 4;
 
+	createProp(renderer, pos + vec2(-400, 0), "lily_planter.png", vec2(264,480), vec2(0.8,0.9));
+	createProp(renderer, pos + vec2(+400, 0), "carrot_planter.png", vec2(264, 480), vec2(0.8,0.9));
+
 	return gardener;
 }
 
@@ -351,6 +354,34 @@ Entity createBibleTree(RenderSystem *renderer, vec2 pos)
 	cc.radius = 200; // hard code for now, can't seem to see if use scale??
 
 	return tree;
+}
+
+Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink) {
+	Entity e = Entity();
+
+	Motion& m = registry.motions.emplace(e);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = scale;
+
+	scale *= shrink;
+	Entity ew = createWall(renderer, pos + vec2(+scale.x / 2.f, +scale.y / 2.f), pos + vec2(+scale.x / 2.f, -scale.y / 2.f));
+	createWall(renderer, pos + vec2(-scale.x / 2.f, +scale.y / 2.f), pos + vec2(-scale.x / 2.f, -scale.y / 2.f));
+	createWall(renderer, pos + vec2(+scale.x / 2.f, +scale.y / 2.f), pos + vec2(-scale.x / 2.f, +scale.y / 2.f));
+	createWall(renderer, pos + vec2(+scale.x / 2.f, -scale.y / 2.f), pos + vec2(-scale.x / 2.f, -scale.y / 2.f));
+
+	Parent& p = registry.parents.emplace(ew);
+	p.children.push_back(e);
+
+	auto& object = registry.objects.emplace(e);
+	object.baseOffset;
+
+	registry.renderRequests.insert(
+		e,
+		{ filename,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	return e;
 }
 
 Entity createWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)

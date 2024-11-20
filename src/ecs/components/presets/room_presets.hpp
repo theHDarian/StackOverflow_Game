@@ -510,7 +510,7 @@ const RoomPreset RestingRoomPop{
 const RoomPreset RestingRoomGardener{
         {},
         {},
-        {{{Gardener,{}}, {0.65f, 0.5f}}, {{InteractableItem::BibleTree,{}}, {0.5f, 0.5f}}},
+        {{{Gardener,{}}, {0.5f, 0.5f}}},
         {SpecialEvent::RebootStation}
 };
 

@@ -88,6 +88,7 @@ public:
 	ComponentContainer<EffectStack> effectStacks;
 	ComponentContainer<MenuChoice> menuChoices;
 	ComponentContainer<InvisibleEnemy> invisibleEnemy;
+	ComponentContainer<Parent> parents;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -167,6 +168,7 @@ public:
 		registry_list.push_back(&effectStacks);
 		registry_list.push_back(&menuChoices);
 		registry_list.push_back(&invisibleEnemy);
+		registry_list.push_back(&parents);
 	}
 
 	void clear_all_components() {
@@ -200,6 +202,11 @@ public:
 		if (collisionShapes.has(entity)) {
 			for (Entity shape : collisionShapes.get(entity).shapes) {
 				remove_all_components_of(shape);
+			}
+		}
+		if (parents.has(entity)) {
+			for (Entity child : parents.get(entity).children) {
+				if (!deleteds.has(child)) remove_all_components_of(child);
 			}
 		}
 		remove_all_components_of(entity);

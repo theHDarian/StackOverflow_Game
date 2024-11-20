@@ -25,6 +25,8 @@ Entity createGardener(RenderSystem* renderer, vec2 pos);
 
 Entity createBibleTree(RenderSystem* renderer, vec2 pos);
 
+Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink = vec2(1.f));
+
 Entity createRamStick(RenderSystem* renderer, vec2 pos);
 
 Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);

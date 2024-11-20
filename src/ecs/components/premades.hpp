@@ -263,7 +263,7 @@ const BulletStackEffect homingUpA = {
 const BulletStackEffect buzz = {
 	PlayerSpeed,
 	Multiplicative,
-	1.5,
+	1.1,
 	"Buzz",
 	"" };
 
@@ -1547,7 +1547,8 @@ struct EnemyMediumBoar : Enemy
 		};
 		scale = vec2({480 / 8.f, 864 / 8.f });
 		patternIndex = 0;
-		rotatePower = 0.5f;
+		rotatePower = 0.9f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	}
 };
 
