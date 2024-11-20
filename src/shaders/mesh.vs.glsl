@@ -8,13 +8,14 @@ out vec3 vcolor;
 out vec2 vpos;
 
 // Application data
-uniform mat3 transform;
-uniform mat3 projection;
+uniform mat4 model;
+uniform mat4 projection;
+uniform mat4 view;
 
 void main()
 {
-	vpos = in_position.xy; // local coordinated before transform
+	vpos = in_position.xy;
 	vcolor = in_color;
-	vec3 pos = projection * transform * vec3(in_position.xy, 1.0); // why not simply *in_position.xyz ?
+	vec4 pos = projection * view * model * vec4(in_position, 1.0);
 	gl_Position = vec4(pos.xy, in_position.z, 1.0);
 }

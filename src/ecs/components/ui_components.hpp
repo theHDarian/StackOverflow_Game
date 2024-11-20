@@ -65,3 +65,7 @@ struct MenuOverlayUI {
 struct MenuOverlayUIText {
 
 };
+
+struct GameOverlayUI {
+
+};

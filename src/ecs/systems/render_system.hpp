@@ -133,7 +133,6 @@ public:
 
 	void drawCursor();
 
-
 	mat3 createProjectionMatrix();
 
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -141,18 +140,17 @@ public:
 
 private:
 	// Internal drawing functions for each entity type
-	void drawTexturedMesh(Entity entity, const mat3& projection);
-	void drawMesh(Entity entity, const mat3& projection);
-	void drawDashes(const mat3& projection);
-	void drawHPbar(::Entity &entity, const mat3 & projection);
-	//glm::mat4 createTransform(float x, float y, float scaleX, float scaleY);
+	void drawTexturedMesh(Entity entity, const mat4& projection, const mat4& view, bool isUI);
+	void drawMesh(Entity entity, const mat4& projection, const mat4& view);
+	void drawDashes(const mat4& projection, const mat4& view);
+	void drawHPbar(Entity& entity, const mat4& projection, const mat4& view);
 
 	//void drawDashCharges(GLuint &VAO, GLuint &VBO, GLuint &EBO);
-	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat3 & projection);
-	void drawAllColliders(Entity entity, const mat3& projection_2D);
-	void drawCollider(Entity entity, std::string shape,  const mat3& projection);
-	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat3& projection);
-	void drawBulletStack(const mat3& projection);
+	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat4& projection, const mat4& view);
+	void drawAllColliders(Entity entity, const mat4& projection, const mat4& view);
+	void drawCollider(Entity entity, std::string shape, const mat4& projection, const mat4& view);
+	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat4& projection, const mat4& view);
+	void drawBulletStack(const mat4& projection, const mat4& view);
 
 	// Window handle
 	GLFWwindow* window;
@@ -175,3 +173,5 @@ private:
 
 bool loadEffectFromFile(
 	const std::string& vs_path, const std::string& fs_path, GLuint& out_program);
+mat4 createFollowCameraModel(Motion& motion, vec2 offset);
+mat4 createNormalModel(Motion& motion, vec2 offset);

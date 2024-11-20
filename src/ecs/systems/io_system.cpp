@@ -134,7 +134,12 @@ void IOSystem::onMouseMove(vec2 mousePosition) {
 	ImGui_ImplGlfw_CursorPosCallback(window, mousePosition.x, mousePosition.y);
 	#endif
     IOState& state = registry.ioStates.components[0];
-    state.mousePosition = mousePosition;
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	WindowState& windowState = registry.windowStates.components[0];
+	vec2 roomSize = { 1920,1080 };
+	float wallThickness = 100 + 50;
+	state.mousePosition = mousePosition;
+	//std::cout << mousePosition.x << ", " << mousePosition.y << std::endl;
 }
 
 void IOSystem::handleMovementInput(int key, int action, IOState& state, GameState& gameState) {
