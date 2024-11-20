@@ -269,11 +269,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			* glm::scale(glm::mat4(1.0f), vec3(zoom, zoom, 1.0f))
 			* glm::translate(glm::mat4(1.0f),
 			vec3(clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f, 
-					motion.position.x - roomSize.x * 1.1f / 2 + ws.width * 0.1f / 2 - wallThickness * 1.1f / 2 - 25,
-					motion.position.x + roomSize.x * 1.1f / 2 - ws.width * 1.1f / 2 - ws.width / 2 + wallThickness * 1.1f / 2 + 25),
+					motion.position.x - roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - wallThickness * 1.1f / 2 - 25,
+					motion.position.x + roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + wallThickness * 1.1f / 2 + 25),
 			clamp(motion.position.y + playerMotion.position.y * 2.f - ws.height*2.f / 2.f - ws.height / 2.f,
-				motion.position.y + ws.height / 2.f - roomSize.y - wallThickness,
-				motion.position.y - ws.height * 2.f + ws.height / 2.f + roomSize.y + wallThickness),
+				motion.position.y + ws.height / clampAmount / 2.f - roomSize.y / clampAmount - wallThickness,
+				motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + roomSize.y + wallThickness),
 				-wallThickness + 50)) // minor offset to close "gap" btween floor & wall
 						* glm::rotate(glm::mat4(1.0f),motion.angle, vec3(0, 0, 1))
 						* glm::translate(glm::mat4(1.0f),vec3(0))
@@ -1441,9 +1441,9 @@ void RenderSystem::drawHPbar(Entity& entity, const mat4& projection, const mat4&
 
 mat4 createNormalModel(Motion& motion, vec2 offset = vec2(0)) {
 	mat4 transform = glm::mat4(1.0);
-	transform = glm::translate(transform, vec3(motion.position, 1.0f));
+	transform = glm::translate(transform, vec3(motion.position, 0.0f));
 	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
-	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 1.0f));
+	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
 	return transform;
@@ -1460,14 +1460,38 @@ mat4 createFollowCameraModel(Motion& motion, vec2 offset = vec2(0)) {
 	transform = glm::scale(transform, vec3(camera.zoom));
 	transform = glm::translate(transform,
 		vec3(clamp(motion.position.x - playerMotion.position.x,
-			motion.position.x - room.roomSize.x / 2 - room.wallThickness * 1.5f + 50,
-			motion.position.x + room.roomSize.x / 2 - windowState.width + room.wallThickness * 1.5f - 50),
+			motion.position.x - room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
+			motion.position.x + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
 			clamp(motion.position.y - playerMotion.position.y,
-				motion.position.y - room.roomSize.y / 2 - room.wallThickness * 1.5f + 75,
-				motion.position.y - windowState.height + room.roomSize.y / 2 + room.wallThickness * 1.5f - 75),
+				motion.position.y - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
+				motion.position.y - windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75),
 			0.0));
 	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
-	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 1.0f));
+	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
+	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
+
+	return transform;
+}
+
+// note: clamp amount currently not working for text
+mat4 createFollowCameraModelText(Motion& motion, vec2 offset) {
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	Camera& camera = registry.cameras.components[0];
+	Room& room = registry.maps.components[0].currRoom;
+	mat4 transform = glm::mat4(1.0);
+	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
+	transform = glm::scale(transform, vec3(camera.zoom));
+	transform = glm::translate(transform,
+		vec3(clamp(motion.position.x - playerMotion.position.x,
+			motion.position.x - room.roomSize.x / clampAmount / 2 - room.wallThickness * 1.5f + 50,
+			motion.position.x + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
+			clamp(motion.position.y - (windowState.height - playerMotion.position.y),
+				motion.position.y - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
+				motion.position.y - windowState.height * clampAmount + room.roomSize.y / 2 + room.wallThickness * 1.5f - 75),
+			0.0));
+	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
 	return transform;

@@ -351,7 +351,7 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	vec3& color = registry.colors.emplace(entity);
 	color = { 0.3,0.3,0.3 };
 
-	registry.gameUITexts.emplace(entity);
+	registry.gameOverlayUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 	text.text = "E";

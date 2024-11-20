@@ -174,4 +174,6 @@ private:
 bool loadEffectFromFile(
 	const std::string& vs_path, const std::string& fs_path, GLuint& out_program);
 mat4 createFollowCameraModel(Motion& motion, vec2 offset);
+mat4 createFollowCameraModelText(Motion& motion, vec2 offset);
 mat4 createNormalModel(Motion& motion, vec2 offset);
+const float clampAmount = 1.f;

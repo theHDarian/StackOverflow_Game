@@ -85,6 +85,7 @@ public:
 	ComponentContainer<MenuOverlayUIText> menuOverlayUITexts;
 	ComponentContainer<Ignore> ignores;
 	ComponentContainer<Camera> cameras;
+	ComponentContainer<GameOverlayUIText> gameOverlayUITexts;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -161,6 +162,7 @@ public:
 		registry_list.push_back(&menuOverlayUITexts);
 		registry_list.push_back(&ignores);
 		registry_list.push_back(&cameras);
+		registry_list.push_back(&gameOverlayUITexts);
 	}
 
 	void clear_all_components() {

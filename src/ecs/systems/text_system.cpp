@@ -175,7 +175,7 @@ additional things added:
 - adapted to consider text wrapping
 - tokenized text beforehand to help with text wrapping
 */
-void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound) {
+void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, bool isUI = true) {
     // temp put here to readjust sizes btween diff fonts
     scale *= 2.50; // for bytebounce
     scale *= 48.0f / 256.0f; // so letters still look as same as before after changing texture sizes
@@ -191,6 +191,7 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
+    Motion motion = Motion(); // placeholder for text motion info
 
     for (std::string text : tokenizedText) {
 
@@ -225,8 +226,19 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
                 // this will be where we want to draw our text (translate) and how big (Scale)
                 // but since generic rect = 0 and 1, need to also put in actual char size data for scale
                 // remember we need to take text bearings into account too
-                transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
-                    * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
+                motion.position = { xpos, ypos };
+                motion.scale = { 256 * scale, 256 * scale };
+                if (isUI) {
+                    transforms[currentIndex] = createNormalModel(motion, vec2(0));
+                }
+                else {
+                    // need to do more stuff to make position work, unfortunately...
+                    WindowState& windowState = registry.windowStates.components[0];
+                    transforms[currentIndex] = createFollowCameraModelText(motion, vec2(0));
+                }
+
+                //transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
+                //    * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
                 // which letter are we drawing?
                 letterMap[currentIndex] = ch.TextureID;
 
@@ -292,12 +304,12 @@ std::vector<std::string> getTokenizedText(std::string text) {
     return tokenizedText;
 }
 
-void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, 
-    vec2 topRightBound, vec2 bottomLeftBound)
+void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color,
+    vec2 topRightBound, vec2 bottomLeftBound, bool isUI = true)
 {
     // consider saving this in the future w/ a dirty bit if it gets expensive
     std::vector<std::string> tokenizedText = getTokenizedText(text);
-    renderText(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound);
+    renderText(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound, isUI);
 }
 
 void TextSystem::renderMenuUIText() {
@@ -346,6 +358,19 @@ void TextSystem::renderMenuOverlayUIText() {
 
 void TextSystem::renderGameUIText() {
     glBindVertexArray(VAO);
+
+    for (Entity entity : registry.gameOverlayUITexts.entities)
+    {
+        auto& textReq = registry.textRenderRequests.get(entity);
+        if (registry.renderRequests.get(entity).show) {
+            if (textReq.tokenizedText.size() > 0) {
+                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, false);
+            }
+            else {
+                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, false);
+            }
+        }
+    }
 
     for (Entity entity : registry.gameUITexts.entities)
     {
