@@ -287,7 +287,8 @@ enum EnemyType {
     MediumEnemyBoar,
     MediumEnemyHealer,
     HardEnemyBoidBio,
-    ScientistlaserAttack
+    ScientistlaserAttack,
+    HardEnemyBoidFish
 };
 
 enum class EnemyAttackPattern {
@@ -360,7 +361,8 @@ enum class EnemyBehavior {
     CHARGING,
     HEALING,
     DEATHSTATE,
-    BOIDSWARMPLAYER
+    BOIDSWARMPLAYER,
+    BOIDSFISH
 };
 
 enum class EnemyRotationBehavior {
@@ -416,9 +418,7 @@ struct Boid {
     vec2 velocity;
     vec2 position;
     float wanderAngle;
-    float coherence;
-    float seperation;
-    float alignment;
+    float maxSpeed;
 };
 
 struct Healer {
