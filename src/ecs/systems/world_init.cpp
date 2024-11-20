@@ -504,10 +504,27 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 	float wallThickness = 100.f;
 	float doorwidth = 100.f;
 	std::vector<WallPos> wallPositions = {
-	{// bottom
+		{
+			// top
+			vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+			vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+			vec2(floorPosition.x, floorPosition.y + floorScale.y),
+			vec2(floorScale.x * 1.1, wallThickness),
+			glm::radians(180.f),
+			vec3(0, 0, 50),
+			vec2(0, spriteOffset)},
+			 {// right
+	  vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
+	  vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
+	  vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
+	  vec2(floorScale.y * 2, wallThickness),
+	  glm::radians(90.f),
+	  vec3(0, 0, 50),
+	  vec2(spriteOffset, 0)},
+		{// bottom
 	 vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
 	 vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-	 vec2(floorPosition.x, floorPosition.y - floorScale.y), // not sure why it needs to be shifted 1 pixel over
+	 vec2(floorPosition.x, floorPosition.y - floorScale.y), 
 	 vec2(floorScale.x * 1.1, wallThickness),
 	 0,
 	 vec3(0, 0, 50),
@@ -515,29 +532,13 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 	{// left
      vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
 	 vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
-	 vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), // again another magic number...
+	 vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), 
 	 vec2(floorScale.y * 2, wallThickness),
 	 glm::radians(270.f),
 	 vec3(0, 0, 50),
 	 vec2(-spriteOffset, 0)},
-	{													   
-	 // top
-	 vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
-	 vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
-	 vec2(floorPosition.x, floorPosition.y + floorScale.y ),
-	 vec2(floorScale.x * 1.1, wallThickness),
-	 glm::radians(180.f),
-	 vec3(0, 0, 50),
-	 vec2(0, spriteOffset)},
-	 // NOTE: left and right wall require some weird z offset
-	 {// right
-	  vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
-	  vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
-	  vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
-	  vec2(floorScale.y * 2, wallThickness),
-	  glm::radians(90.f),
-	  vec3(0, 0, 50),
-	  vec2(spriteOffset, 0)} };
+
+ };
 	for (auto &p : wallPositions)
 	{
 		auto entity = Entity();
@@ -563,7 +564,7 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		b.angle = glm::radians(-90.f);
 		b.axis = vec3(1, 0, 0);
 		b.offset = p.offset;
-		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'R' : 'L';
+		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
 
 		auto &anim = registry.animations.emplace(entity);
 		anim.animate = false;
@@ -579,10 +580,17 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		// add door symbol for each wall
 		createDoorSymbol(renderer, motion.position, motion.angle, motion.scale, b.angle, b.axis, b.offset, p.symbolOffset);
 	}
-	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y - 30 }, {ws.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y - 30 });
-	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y + 45 }, { ws.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y + 45 });
-	createDoor(renderer, { wallPositions[1].colliderStart.x + 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[1].colliderStart.x + 30,  ws.height / 2 + doorwidth / 2 });
-	createDoor(renderer, { wallPositions[3].colliderStart.x - 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[3].colliderStart.x - 30,  ws.height / 2 + doorwidth / 2 });
+
+	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, offsetTop + 10 }, { ws.width / 2 + doorWidthX / 2, offsetTop + 10 });
+	//createDoor(renderer, { ws.width - offsetRightLeft - 10, ws.height / 2 - doorWidthY / 2 }, { ws.width - offsetRightLeft - 10, ws.height / 2 + doorWidthY / 2 });
+	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, ws.height - offsetBot - 10 }, { ws.width / 2 + doorWidthX / 2, ws.height - offsetBot - 10 });
+	//createDoor(renderer, { offsetRightLeft + 10, ws.height / 2 - doorWidthY / 2 }, { offsetRightLeft + 10, ws.height / 2 + doorWidthY / 2 });
+
+	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y + 45 }, { ws.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y + 45 });
+	createDoor(renderer, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 + doorwidth / 2 });
+	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y - 30 }, { ws.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y - 30 });
+	createDoor(renderer, { wallPositions[3].colliderStart.x + 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[3].colliderStart.x + 30,  ws.height / 2 + doorwidth / 2 });
+
 }
 
 // draw a line from point A to B

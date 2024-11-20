@@ -699,8 +699,12 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	PlayerAttackData& pl = registry.shoots.get(player);
     Motion& player_motion = registry.motions.get(player);
     vec2 playerPos = player_motion.position;
-    vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);
-    player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
+    
+	// need to shift by player actual pos?
+	vec2 bulletDir = glm::normalize(input.mousePosition - player_motion.position);
+    
+	
+	player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
 	if (pl.currFiringInterval > 0) {
 		pl.currFiringInterval -= elapsed_ms_since_last_update;
 	}

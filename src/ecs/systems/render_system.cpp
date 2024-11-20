@@ -56,14 +56,9 @@ void RenderSystem::drawCursor() {
 	mat3 projection_2D = createProjectionMatrix();
 
 	WindowState& windowState = registry.windowStates.components[0];
-	Camera& camera = registry.cameras.get(registry.players.entities[0]);
 
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	mat4 view = mat4(1.0);
 
-	// note: this camera doesn't really do anything rn
-	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 	Entity Cursor = registry.cursors.entities[0];
 	if (registry.renderRequests.has(Cursor) && registry.motions.has(Cursor)) {
@@ -687,11 +682,9 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset) {
-			drawTexturedMesh(entity, projection, view);
-			if (ioState.debugMode)
-				drawAllColliders(entity, projection, view);
-		}
+		drawTexturedMesh(entity, projection, view);
+		if (ioState.debugMode)
+			drawAllColliders(entity, projection, view);
 	}
 
 	for (Entity& entity : registry.playerBullets.entities)
