@@ -24,7 +24,7 @@ private:
 	static void angryMode(Entity entity);
 	static void computeBoidVelocity(Entity entity , Boid& boid);
 	static void boidKeepBound(Entity entity, Boid& boid);
-	static void boidComputeCoherence(Entity entity, Boid& boid, float multiplier);
+	static void boidComputeCoherence(Entity entity, Boid& boid, float multiplier, float range);
 	static void boidComputeSeperation(Entity entity, Boid& boid, float multiplier);
 	static void boidComputeAlignment(Entity entity, Boid& boid, float multiplier);
 	static void boidWander(Entity entity, Boid &boid, float multiplier);

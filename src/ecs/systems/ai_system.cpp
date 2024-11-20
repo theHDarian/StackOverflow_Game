@@ -562,7 +562,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	float maxSpeed = 470.f;
 	if (currentPattern.type == EnemyBehavior::BOIDSGROUP)
 	{
-		boidComputeCoherence(entity, boid, 1.f);
+		boidComputeCoherence(entity, boid, 1.f, 400.f);
 		boidKeepBound(entity, boid);
 		boid.velocity *= 0.8f;
 		maxSpeed = 500.f;
@@ -572,7 +572,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		boidComputeSeperation(entity, boid, 1.f);
 		boidKeepBound(entity, boid);
 		boid.velocity *= 2.f;
-		maxSpeed = 550.f;
+		maxSpeed = 1000.f;
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSWARMPLAYER) {
 		boidFollowPlayer(entity, boid, 0.05f);
@@ -587,7 +587,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	else
 	{
 		boidWander(entity, boid, 0.1f);
-		boidComputeCoherence(entity, boid, 0.01f);
+		boidComputeCoherence(entity, boid, 0.01f, 700.f);
 		boidComputeSeperation(entity, boid, 0.05f);
 		boidComputeAlignment(entity, boid, 0.02f);
 		boidKeepBound(entity, boid);
@@ -634,7 +634,7 @@ void AISystem::boidKeepBound(Entity entity, Boid &boid)
 	}
 }
 
-void AISystem::boidComputeCoherence(Entity entity, Boid &boid, float multiplier = 0.01f)
+void AISystem::boidComputeCoherence(Entity entity, Boid &boid, float multiplier = 0.01f, float range = 1000.f)
 {
 	float centeringFactor = multiplier;
 	vec2 center = vec2{0, 0};
@@ -649,7 +649,7 @@ void AISystem::boidComputeCoherence(Entity entity, Boid &boid, float multiplier 
 		};
 		Boid &otherBoid = registry.boids.get(other);
 		vec2 otherPos = otherBoid.position;
-		float neighborRnge = 1000.f;
+		float neighborRnge = range;
 		float distance = glm::distance(position, otherPos);
 
 		if (distance < neighborRnge)
