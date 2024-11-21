@@ -257,31 +257,22 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 
 		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-
-		// because wall rotated to z axis, need to move down wall in z dir so that it's actually on the floor
-		// (everything else is on z = 0)
-		//WindowState& windowState = registry.windowStates.components[0];
-		//Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
 		Camera& camera = registry.cameras.components[0];
 		Room& room = registry.maps.components[0].currRoom;
 
-		//vec2 roomSize = { 1920,1080 };
-		//vec2 roomCenter = { ws.width / 2.f, ws.height / 2.f };
-		float wallThickness = 100 + 50;
-		float zoom = 1;
 		vec3 clampedTranslate = vec3(clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f, 
-					motion.position.x - room.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - wallThickness * 1.1f / 2 - 25,
-					motion.position.x + room.roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + wallThickness * 1.1f / 2 + 25),
+					motion.position.x - room.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - room.wallThickness * 1.5f * 1.1f / 2 - 25,
+					motion.position.x + room.roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + room.wallThickness * 1.5f * 1.1f / 2 + 25),
 			clamp(motion.position.y + playerMotion.position.y * 2.f - ws.height*2.f / 2.f - ws.height / 2.f,
-				motion.position.y + ws.height / clampAmount / 2.f - room.roomSize.y / clampAmount - wallThickness,
-				motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + room.roomSize.y + wallThickness),
-				-wallThickness + 50);
+				motion.position.y + ws.height / clampAmount / 2.f - room.roomSize.y / clampAmount - room.wallThickness * 1.5f,
+				motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + room.roomSize.y + room.wallThickness * 1.5f),
+				-room.wallThickness * 1.5f + 50);
 		vec3 unclampedTranslate = vec3(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f,
 				motion.position.y + playerMotion.position.y * 2.f - ws.height*2.f / 2.f - ws.height / 2.f,
-				-wallThickness + 50);
+				-room.wallThickness * 1.5f + 50);
 		mat4 model = 	
 			glm::translate(glm::mat4(1.0f), vec3(ws.width / 2, ws.height / 2, 0))
-			* glm::scale(glm::mat4(1.0f), vec3(zoom, zoom, 1.0f))
+			* glm::scale(glm::mat4(1.0f), vec3(camera.zoom, camera.zoom, 1.0f))
 			* glm::translate(glm::mat4(1.0f),clampedTranslate)
 			 // minor offset to close "gap" btween floor & wall
 						* glm::rotate(glm::mat4(1.0f),motion.angle, vec3(0, 0, 1))
@@ -300,7 +291,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view_roomBounds);
 		vec3 clampOffset = unclampedTranslate - clampedTranslate;
 		glm::mat4 translateAfterClamp = glm::translate(glm::mat4(1.0f),
-			(clampOffset * vec3(1.8f,1,1)) * vec3(room.roomSize.x / ws.width , room.roomSize.y / ws.height, 1) /vec3(room.roomSize.x, room.roomSize.y,1));
+			(clampOffset * vec3(1.8f,1,1)) * camera.zoom * vec3(room.roomSize.x / ws.width , room.roomSize.y / ws.height, 1) /vec3(room.roomSize.x, room.roomSize.y,1));
 
 		glUniformMatrix4fv(glGetUniformLocation(program, "translateAfterClamp"),1,GL_FALSE,(float *)&translateAfterClamp);
 		
