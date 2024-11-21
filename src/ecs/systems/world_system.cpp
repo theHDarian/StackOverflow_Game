@@ -5,13 +5,15 @@
 // stlib
 #include <cassert>
 #include <sstream>
-#include <glm/detail/func_trigonometric.inl>
+//#include <glm/detail/func_trigonometric.inl>
 #include <SDL.h>
 #include <time.h>
 #include "sound_system.hpp"
 #include "physics_system.hpp"
 #include "interactable_effects.h"
 #include "components/presets/particle_presets.hpp"
+
+#include <glm/gtx/compatibility.hpp>
 
 // include these for now
 // but may change to handle like render system does
@@ -149,15 +151,15 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	cursor = createCursor();
 
 	Room& currRoom = registry.maps.components[0].currRoom;
-	vec2 roomSize = { 1920,1080 };
+	/*vec2 roomSize = { 1920,1080 };*/
 	// note: walls only align to floor if fixed to middle of screen rn
 	vec2 roomCenter = { wS.width / 2, wS.height / 2 };
 
 	WindowState& ws = registry.windowStates.components[0];
-	createWallThickness({ ws.width / 2, ws.height / 2}, roomSize);
-	createTestFloor(renderer, { ws.width /2, ws.height/2 }, roomSize);
+	createWallThickness({ ws.width / 2, ws.height / 2}, currRoom.roomSize);
+	createTestFloor(renderer, { ws.width /2, ws.height/2 }, currRoom.roomSize);
 
-	createRoomBounds(renderer, roomCenter, roomSize);
+	createRoomBounds(renderer, roomCenter, currRoom.roomSize);
 
 	//Entity title = createSkipDialogue();
 	//registry.dialogueRequests.emplace(title);
@@ -707,11 +709,38 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 
 	// need to shift by player actual pos?
 	// since aim indicator needs this too should only be calculated once
-	vec2 mousePositionWorld = input.mousePosition;
-	mousePositionWorld += vec2(mousePositionWorld.x - player_motion.position.x,
-		mousePositionWorld.y - player_motion.position.y);
+	//vec2 mousePositionWorld = input.mousePosition;
+	//mousePositionWorld *= vec2(windowState.width / 2, windowState.height / 2);
+	//mousePositionWorld = vec2(mousePositionWorld.x - player_motion.position.x,
+	//	mousePositionWorld.y - player_motion.position.y);
+
+	//vec2 bulletDir = glm::normalize(mousePositionWorld - player_motion.position);
+	//mat4 transform = mat4(1.0);
+	//transform = glm::translate(transform,
+	//	vec3(clamp(windowState.width - player_motion.position.x,
+	//		windowState.width - room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
+	//		windowState.width + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
+	//		clamp(windowState.height- player_motion.position.y,
+	//			windowState.height - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
+	//			windowState.height - windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75), 0.f));
 	
+	//vec3 mousePositionWorld = transform * vec4(input.mousePosition, 0.f, 0.f);
+	
+	
+	
+	//vec2 playerWorldPosition = vec2(clamp(player_motion.position.x,
+	//	player_motion.position.x - room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
+	//	player_motion.position.x + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
+	//	clamp(player_motion.position.y,
+	//		player_motion.position.y - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
+	//		player_motion.position.y - windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75));
+	
+	vec2 offset = { windowState.width / 2, windowState.height / 2 };
+	vec2 mousePositionWorld = input.mousePosition - offset + player_motion.position;
 	vec2 bulletDir = glm::normalize(mousePositionWorld - player_motion.position);
+
+	std::cout << "Mouse pos: " << mousePositionWorld.x << ", " << mousePositionWorld.y << std::endl;
+	std::cout << "Player pos: " << player_motion.position.x << ", " << player_motion.position.y << std::endl;
 	
 	player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
 	if (pl.currFiringInterval > 0) {
@@ -831,19 +860,14 @@ void WorldSystem::movePlayer() {
 	//move aim indicator
 	Motion& aimMotion = registry.motions.get(aimIndicator);
 
-	vec2 mousePositionWorld = input.mousePosition;
 	WindowState& windowState = registry.windowStates.components[0];
 	Camera& camera = registry.cameras.components[0];
 	Room& room = registry.maps.components[0].currRoom;
 	float clampAmount = 1.0f;
-	mousePositionWorld += vec2(mousePositionWorld.x - player_motion.position.x,
-		mousePositionWorld.y - player_motion.position.y);
-
-	std::cout << "Mouse pos: " << mousePositionWorld.x << ", " << mousePositionWorld.y << std::endl;
-	std::cout << "Player pos: " << player_motion.position.x << ", " << player_motion.position.y << std::endl;
-	
-	vec2 mousePos = mousePositionWorld;
-	vec2 diff = mousePos - player_motion.position;
+	vec2 offset = { windowState.width / 2, windowState.height / 2 };
+	vec2 mousePositionWorld = input.mousePosition - offset + player_motion.position;
+	vec2 bulletDir = glm::normalize(mousePositionWorld - player_motion.position);
+	vec2 diff = mousePositionWorld - player_motion.position;
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
