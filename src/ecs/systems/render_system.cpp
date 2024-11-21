@@ -260,6 +260,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		Camera& camera = registry.cameras.components[0];
 		Room& room = registry.maps.components[0].currRoom;
 
+		vec2 roomCenterOffset = vec2(0);
+		if ((room.roomSize.x / 2) < (ws.width / 2) || (room.roomSize.y / 2) < (ws.height / 2))
+			roomCenterOffset = -1.f*camera.zoom*vec2(ws.width / 2 - room.roomSize.x / 2, ws.height / 2 - room.roomSize.y / 2);
+
 		vec3 clampedTranslate = vec3(clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f, 
 					motion.position.x - room.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - room.wallThickness * 1.5f * 1.1f / 2 - 25,
 					motion.position.x + room.roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + room.wallThickness * 1.5f * 1.1f / 2 + 25),
@@ -283,7 +287,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"),1,GL_FALSE,(float *)&model);
 
 		glm::vec3 cameraPos = glm::vec3(ws.width / 2, ws.height / 2, ws.height / 6.575 + ws.width / 6.575); // Position above the XY plane
+		cameraPos += vec3(roomCenterOffset, 0);
 		glm::vec3 cameraTarget = glm::vec3(ws.width / 2, ws.height / 2, 0.0f);
+		cameraTarget += vec3(roomCenterOffset, 0);
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 		glm::mat4 view_roomBounds = glm::lookAt(cameraPos, cameraTarget, up);
@@ -292,6 +298,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		vec3 clampOffset = unclampedTranslate - clampedTranslate;
 		glm::mat4 translateAfterClamp = glm::translate(glm::mat4(1.0f),
 			(clampOffset * vec3(1.8f,1,1)) * camera.zoom * vec3(room.roomSize.x / ws.width , room.roomSize.y / ws.height, 1) /vec3(room.roomSize.x, room.roomSize.y,1));
+		translateAfterClamp = glm::translate(translateAfterClamp, (vec3(roomCenterOffset, 0) * vec3(1.8f, 1, 1)) * vec3(room.roomSize.x / ws.width, room.roomSize.y / ws.height, 1) / vec3(room.roomSize.x, room.roomSize.y, 1));
 
 		glUniformMatrix4fv(glGetUniformLocation(program, "translateAfterClamp"),1,GL_FALSE,(float *)&translateAfterClamp);
 		
