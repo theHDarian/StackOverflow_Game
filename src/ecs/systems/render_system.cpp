@@ -290,6 +290,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		glm::vec3 cameraPos = glm::vec3(ws.width / 2, ws.height / 2, ws.height / 6.575 + ws.width / 6.575); // Position above the XY plane
 		glm::vec3 cameraTarget = glm::vec3(ws.width / 2, ws.height / 2, 0.0f);
+		//vec3 cameraPos = glm::vec3(playerMotion.position.x, playerMotion.position.y, ws.height / 6.575 + ws.width / 6.575);
+		//glm::vec3 cameraTarget = glm::vec3(playerMotion.position.x, playerMotion.position.y, 0.0f);
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 		glm::mat4 view_roomBounds = glm::lookAt(cameraPos, cameraTarget, up);

@@ -725,18 +725,17 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	//			windowState.height - windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75), 0.f));
 	
 	//vec3 mousePositionWorld = transform * vec4(input.mousePosition, 0.f, 0.f);
+
+	vec2 playerWorldPosition = vec2(windowState.width / 2, windowState.height / 2) + vec2(clamp(windowState.width - player_motion.position.x,
+		windowState.width -room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
+		windowState.width+room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
+		clamp(windowState.height - player_motion.position.y,
+			windowState.height - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
+			windowState.height + windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75));
 	
-	
-	
-	//vec2 playerWorldPosition = vec2(clamp(player_motion.position.x,
-	//	player_motion.position.x - room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
-	//	player_motion.position.x + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
-	//	clamp(player_motion.position.y,
-	//		player_motion.position.y - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
-	//		player_motion.position.y - windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75));
-	
+
 	vec2 offset = { windowState.width / 2, windowState.height / 2 };
-	vec2 mousePositionWorld = input.mousePosition - offset + player_motion.position;
+	vec2 mousePositionWorld = input.mousePosition - offset + playerWorldPosition;
 	vec2 bulletDir = glm::normalize(mousePositionWorld - player_motion.position);
 
 	std::cout << "Mouse pos: " << mousePositionWorld.x << ", " << mousePositionWorld.y << std::endl;
