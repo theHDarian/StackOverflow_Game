@@ -300,9 +300,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view_roomBounds);
 		vec3 clampOffset = unclampedTranslate - clampedTranslate;
 		glm::mat4 translateAfterClamp = glm::translate(glm::mat4(1.0f),
-			clampOffset * vec3(room.roomSize.x / ws.width, room.roomSize.y / ws.height, 1) /vec3(room.roomSize.x, room.roomSize.y,1));
+			(clampOffset * vec3(1.8f,1,1)) * vec3(room.roomSize.x / ws.width , room.roomSize.y / ws.height, 1) /vec3(room.roomSize.x, room.roomSize.y,1));
 
-		printf("%.1f %.1f %.1f\n", clampOffset.x,clampOffset.y,clampOffset.z);
 		glUniformMatrix4fv(glGetUniformLocation(program, "translateAfterClamp"),1,GL_FALSE,(float *)&translateAfterClamp);
 		
 		float fov = 125.0f; //makes walls appear larger the less there is
