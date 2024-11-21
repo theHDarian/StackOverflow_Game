@@ -11,10 +11,11 @@ out vec2 texcoord;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+uniform mat4 translateAfterClamp;
 
 void main()
 {
-   vec4 pos = projection * view * model * vec4(in_position, 1.0);
+   vec4 pos = translateAfterClamp * projection * view * model * vec4(in_position, 1.0);
    gl_Position = pos;
    texcoord = in_texcoord;
 }
