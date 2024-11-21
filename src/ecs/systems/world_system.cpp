@@ -709,39 +709,15 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	Room& room = registry.maps.components[0].currRoom;
 	float clampAmount = 1.0f;
 
-	// need to shift by player actual pos?
-	// since aim indicator needs this too should only be calculated once
-	//vec2 mousePositionWorld = input.mousePosition;
-	//mousePositionWorld *= vec2(windowState.width / 2, windowState.height / 2);
-	//mousePositionWorld = vec2(mousePositionWorld.x - player_motion.position.x,
-	//	mousePositionWorld.y - player_motion.position.y);
-
-	//vec2 bulletDir = glm::normalize(mousePositionWorld - player_motion.position);
-	//mat4 transform = mat4(1.0);
-	//transform = glm::translate(transform,
-	//	vec3(clamp(windowState.width - player_motion.position.x,
-	//		windowState.width - room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
-	//		windowState.width + room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
-	//		clamp(windowState.height- player_motion.position.y,
-	//			windowState.height - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
-	//			windowState.height - windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75), 0.f));
-	
-	//vec3 mousePositionWorld = transform * vec4(input.mousePosition, 0.f, 0.f);
-
-	vec2 playerWorldPosition = vec2(windowState.width / 2, windowState.height / 2) + vec2(clamp(windowState.width - player_motion.position.x,
-		windowState.width -room.roomSize.x / 2 / clampAmount - room.wallThickness * 1.5f + 50,
-		windowState.width+room.roomSize.x / 2 - windowState.width * clampAmount + room.wallThickness * 1.5f - 50),
-		clamp(windowState.height - player_motion.position.y,
-			windowState.height - room.roomSize.y / clampAmount / 2 - room.wallThickness * 1.5f + 75,
-			windowState.height + windowState.height * clampAmount + room.roomSize.y * clampAmount / 2 + room.wallThickness * 1.5f - 75));
-	
-
+	// need to shift mouse by player actual pos -> translate into world pos
+	// ideally, this is only done once in the move player and the mouse position is passed to shoot
+	// (actual mouse position shouldn't be changed though, the ui mouse picking needs it to be w/ respect to window)
 	vec2 offset = { windowState.width / 2, windowState.height / 2 };
-	vec2 mousePositionWorld = input.mousePosition - offset + playerWorldPosition;
+	vec2 mousePositionWorld = input.mousePosition - offset + player_motion.position;
 	vec2 bulletDir = glm::normalize(mousePositionWorld - player_motion.position);
 
-	std::cout << "Mouse pos: " << mousePositionWorld.x << ", " << mousePositionWorld.y << std::endl;
-	std::cout << "Player pos: " << player_motion.position.x << ", " << player_motion.position.y << std::endl;
+	//std::cout << "Mouse pos: " << mousePositionWorld.x << ", " << mousePositionWorld.y << std::endl;
+	//std::cout << "Player pos: " << player_motion.position.x << ", " << player_motion.position.y << std::endl;
 	
 	player_motion.scale.x = bulletDir.x < 0 ? -abs(player_motion.scale.x) : abs(player_motion.scale.x);
 	if (pl.currFiringInterval > 0) {
