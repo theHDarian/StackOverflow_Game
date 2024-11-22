@@ -13,7 +13,7 @@ vec2 boundPosition(vec2 position, Entity entity)
 	WindowState &windowState = registry.windowStates.components[0];
 	int width = windowState.width;
 	int height = windowState.height;
-	float ratio1 =height / (float)width;
+	float ratio1 = height / (float)width;
 	float ratio2 = width / (float)height;
 	vec2 scale = registry.motions.get(entity).scale;
 	float minX = width / (6 * ratio2);
@@ -563,57 +563,79 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	if (currentPattern.type == EnemyBehavior::BOIDSGROUP)
 	{
 		boidComputeCoherence(entity, boid, 1.f, 400.f);
-		boidKeepBound(entity, boid);
 		boid.velocity *= 0.8f;
-		maxSpeed = 500.f;
+		if (glm::length(boid.velocity) > boid.maxSpeed)
+		{
+			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
+		}
+		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSEXPLODE)
 	{
 		boidComputeSeperation(entity, boid, 1.f);
-		boidKeepBound(entity, boid);
 		boid.velocity *= 2.f;
-		maxSpeed = 1000.f;
+		maxSpeed = 700.f;
+		if (glm::length(boid.velocity) > maxSpeed)
+		{
+			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
+		}
+		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
 	}
-	else if (currentPattern.type == EnemyBehavior::BOIDSWARMPLAYER) {
+	else if (currentPattern.type == EnemyBehavior::BOIDSWARMPLAYER)
+	{
 		boidFollowPlayer(entity, boid, 0.05f);
 		boidWander(entity, boid, 0.05f);
-		
+
 		// boidComputeCoherence(entity, boid, 0.01f);
 		boidComputeSeperation(entity, boid, 0.2f);
 		// boidComputeAlignment(entity, boid, 0.02f);
-		boidKeepBound(entity, boid);
-		maxSpeed = 470.f;
+		if (glm::length(boid.velocity) > boid.maxSpeed)
+		{
+			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
+		}
+		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
+	}
+	else if (currentPattern.type == EnemyBehavior::BOIDSFISH)
+	{
+		boidCircleRoom(entity, boid, 0.1f, 0.05f);
+		boidComputeCoherence(entity, boid, 0.015f, 1000.f);
+		boidComputeSeperation(entity, boid, 0.5f);
+		boidComputeAlignment(entity, boid, 0.01f);
+		
+		if (glm::length(boid.velocity) > boid.maxSpeed)
+		{
+			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
+		}
+		boidEvadePlayer(entity,boid, 100.0f);
+		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
 	}
 	else
 	{
 		boidWander(entity, boid, 0.1f);
-		boidComputeCoherence(entity, boid, 0.01f, 700.f);
+		boidComputeCoherence(entity, boid, 0.02f, 700.f);
 		boidComputeSeperation(entity, boid, 0.05f);
 		boidComputeAlignment(entity, boid, 0.02f);
-		boidKeepBound(entity, boid);
-		maxSpeed = 500.f;
-	}
-
-	
-	if (glm::length(boid.velocity) > maxSpeed)
-	{
-		boid.velocity = glm::normalize(boid.velocity) * maxSpeed;
+		if (glm::length(boid.velocity) > boid.maxSpeed)
+		{
+			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
+		}
+		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
 	}
 }
 
-void AISystem::boidKeepBound(Entity entity, Boid &boid)
+void AISystem::boidKeepBound(Entity entity, Boid &boid, float minx, float miny, float maxx, float maxy)
 {
 	WindowState &windowState = registry.windowStates.components[0];
 	int width = windowState.width;
 	int height = windowState.height;
 
 	vec2 scale = registry.motions.get(entity).scale;
-	float minX = 150.f + scale[0];
-	float minY = 100.f + scale[1];
-	float maxX = width - 150.f - scale[0];
-	float maxY = height - 100.f - scale[1];
+	float minX = minx + scale[0];
+	float minY = miny + scale[1];
+	float maxX = width - maxx - scale[0];
+	float maxY = height - maxy - scale[1];
 	float turnFactor = 1.0f;
-	float momentumFactor = 50.f;
+	float momentumFactor = 150.f;
 	vec2 position = boid.position;
 
 	if (position[0] < minX)
@@ -761,16 +783,67 @@ void AISystem::boidWander(Entity entity, Boid &boid, float multiplier)
 
 void AISystem::boidFollowPlayer(Entity entity, Boid &boid, float multiplier)
 {
-    vec2 playerPos = getPlayerPos();
-    vec2 position = boid.position;
-	float swarmRadius = 300.f;
+	vec2 playerPos = getPlayerPos();
+	vec2 position = boid.position;
 
-    vec2 directionToPlayer = playerPos - position;
-    float distanceToPlayer = glm::length(directionToPlayer);
+	vec2 directionToPlayer = playerPos - position;
+	float distanceToPlayer = glm::length(directionToPlayer);
 
-	vec2 center = (boid.position + playerPos) * 0.5f ;
-    vec2 cohesionToPlayer = (center - position) * multiplier;
+	vec2 center = (boid.position + playerPos) * 0.5f;
+	vec2 cohesionToPlayer = (center - position) * multiplier;
 
+	boid.velocity += cohesionToPlayer;
+}
 
-    boid.velocity += cohesionToPlayer;
+void AISystem::boidEvadePlayer(Entity entity, Boid &boid, float multiplier)
+{
+	vec2 playerPos = getPlayerPos();
+	vec2 position = boid.position;
+	float evadeRadius = 150.f;
+
+	vec2 directionToPlayer = playerPos - position;
+	float distanceToPlayer = glm::length(directionToPlayer);
+
+	if (distanceToPlayer < evadeRadius)
+	{
+		vec2 fleeDirection = -glm::normalize(directionToPlayer);
+
+		vec2 fleeVelocity = fleeDirection * multiplier;
+
+		boid.velocity += fleeVelocity;
+
+		float panicBoost = 2.5f;
+		if (glm::length(boid.velocity) < panicBoost * multiplier)
+		{
+			boid.velocity = glm::normalize(boid.velocity) * panicBoost * multiplier;
+		}
+		
+		float maxSpeed = 400.f;
+		if (glm::length(boid.velocity) > maxSpeed)
+		{
+			boid.velocity = glm::normalize(boid.velocity) * maxSpeed;
+		}
+	}
+}
+
+void AISystem::boidCircleRoom(Entity entity, Boid &boid, float multiplier, float angularSpeed)
+{
+
+	WindowState &windowState = registry.windowStates.components[0];
+	int width = windowState.width;
+	int height = windowState.height;
+
+	vec2 roomCenter = vec2(width / 2.0f, height / 2.0f);
+	float radius = glm::min(width, height) / 2.75f;
+
+	vec2 position = boid.position;
+	vec2 directionToCenter = position - roomCenter;
+
+	float currentAngle = atan2(directionToCenter.y, directionToCenter.x);
+
+	float newAngle = currentAngle + angularSpeed;
+
+	vec2 targetPosition = roomCenter + vec2(cos(newAngle) * radius, sin(newAngle) * radius);
+	vec2 desiredVelocity = targetPosition - position;
+	boid.velocity += desiredVelocity * multiplier;
 }
