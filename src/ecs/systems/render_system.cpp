@@ -236,6 +236,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 						else if (registry.interactables.get(d).name == "EmptyDoor")		{ frame = 0; }
 						else if (registry.interactables.get(d).name == "PrevDoor")		{ frame = 0; }
 						else if (registry.interactables.get(d).name == "LockedDoor")	{ frame = 1; }
+						else if (registry.interactables.get(d).name == "OpenDoor") { frame = 2; }
 					}
 					break;
 				}

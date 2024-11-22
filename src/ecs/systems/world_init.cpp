@@ -420,7 +420,7 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	auto &door = registry.doors.emplace(entity);
 	door.startPos = startPos;
 	door.endPos = endPos;
-	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'T' : 'B' : (door.startPos.x < ws.width / 2.f) ? 'L'
+	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'B' : 'T' : (door.startPos.x < ws.width / 2.f) ? 'L'
 																																		  : 'R';
 	std::cout << glm::to_string(startPos) << ", " << glm::to_string(endPos) << ", " << door.side << std::endl;
 

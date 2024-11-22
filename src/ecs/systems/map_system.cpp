@@ -224,6 +224,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         }
         if (d.isLocked) {
             registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+            registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
             lockedRooms++;
         }
         ds.doorType = roomTypeToSymbols.at(d.room);
