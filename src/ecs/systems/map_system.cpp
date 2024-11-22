@@ -232,6 +232,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 }
 
 void MapSystem::resetMap() {
+    registry.maps.components[0].currRoom = Room();
     clearRoomActors();
     soundPlayer->playSpecialMusic(0);
 }
