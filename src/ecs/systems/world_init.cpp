@@ -444,7 +444,7 @@ Entity createWallThickness(vec2 pos, vec2 scale) {
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = scale + vec2(200);
+	motion.scale = scale + vec2(200, 200/1.33);
 
 	registry.backgrounds.emplace(entity);
 
