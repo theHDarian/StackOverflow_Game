@@ -464,18 +464,6 @@ const RoomPreset BossRoomBee{
     0.0f,
     2};
 
-//used by roomsTraversed to determine type of enemy to spawn, some enemies only spawn in certain difficulty regions
-enum DifficultyRegion {
-    Intro = 3,
-    Easy = 10,
-    Medium = 20,
-    // Hard,
-};
-
-struct RoomPresets {
-    std::vector<RoomPreset> unlocked;
-    std::vector<RoomPreset> locked;
-};
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory = {
     {DifficultyRegion::Intro,{
@@ -495,22 +483,22 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory =
     }},
 };
 
-inline bool hasLocked(RoomType type, int roomsTraversed) {
+inline bool hasLocked(RoomType type, int roomsTraversed, std::map<DifficultyRegion,std::map<RoomType, RoomPresets>>& Directory) {
     if (type >= RoomType::None) {
         return false;
     }
     if (roomsTraversed < DifficultyRegion::Intro) {
-        return !roomDirectory.at(Intro).at(type).locked.empty();
+        return !Directory.at(Intro).at(type).locked.empty();
     } else if (roomsTraversed < DifficultyRegion::Easy) {
-        return !roomDirectory.at(Easy).at(type).locked.empty();
+        return !Directory.at(Easy).at(type).locked.empty();
     } else if (roomsTraversed < DifficultyRegion::Medium) {
-        return !roomDirectory.at(Medium).at(type).locked.empty();
+        return !Directory.at(Medium).at(type).locked.empty();
     } else {
-        return !roomDirectory.at(Medium).at(type).locked.empty();
+        return !Directory.at(Medium).at(type).locked.empty();
     }
 }
 
-RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
+inline RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked, std::map<DifficultyRegion,std::map<RoomType, RoomPresets>>& Directory) {
     //boss rooms
     if (type == RoomType::BossBigCRoom) {
         return BossRoomBee;
@@ -522,17 +510,17 @@ RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
     }
 
     //regular rooms
-    if(!hasLocked(type,roomsTraversed) && locked) {
+    if(!hasLocked(type,roomsTraversed, Directory) && locked) {
         assert(false);
     }
     if (roomsTraversed < DifficultyRegion::Intro) {
-        return Random::ListItem(locked ? roomDirectory.at(Intro).at(type).locked : roomDirectory.at(Intro).at(type).unlocked);
+        return Random::ListItem(locked ? Directory.at(Intro).at(type).locked : Directory.at(Intro).at(type).unlocked);
     } else if (roomsTraversed < DifficultyRegion::Easy) {
-        return Random::ListItem(locked ? roomDirectory.at(Easy).at(type).locked : roomDirectory.at(Easy).at(type).unlocked);
+        return Random::ListItem(locked ? Directory.at(Easy).at(type).locked : Directory.at(Easy).at(type).unlocked);
     } else if (DifficultyRegion::Medium) {
-        return Random::ListItem(locked ? roomDirectory.at(Medium).at(type).locked : roomDirectory.at(Medium).at(type).unlocked);
+        return Random::ListItem(locked ? Directory.at(Medium).at(type).locked : Directory.at(Medium).at(type).unlocked);
     } else {
-        return Random::ListItem(locked ? roomDirectory.at(Medium).at(type).locked : roomDirectory.at(Medium).at(type).unlocked);
+        return Random::ListItem(locked ? Directory.at(Medium).at(type).locked : Directory.at(Medium).at(type).unlocked);
     }
 }
 

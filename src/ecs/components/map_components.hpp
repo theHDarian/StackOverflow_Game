@@ -1,7 +1,17 @@
 #pragma once
 #include "common.hpp"
 #include "components/actor_components.hpp"
+
 #include "utils/random.hpp"
+
+
+//used by roomsTraversed to determine type of enemy to spawn, some enemies only spawn in certain difficulty regions
+enum DifficultyRegion {
+    Intro = 3,
+    Easy = 10,
+    Medium = 20,
+    // Hard,
+};
 
 enum Side : char {
     Left = 'L',Top = 'T',Bottom = 'B',Right = 'R'
@@ -45,10 +55,15 @@ struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
     std::vector<std::tuple<RoomInteractable, vec2>> interactables; //for interactables
-    std::vector<SpecialEvent> specialEvents; 
+    std::vector<SpecialEvent> specialEvents;
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
     int numKeyBulletsToSpawn = 2;
+};
+
+struct RoomPresets {
+    std::vector<RoomPreset> unlocked;
+    std::vector<RoomPreset> locked;
 };
 
 struct Door {
@@ -111,6 +126,7 @@ struct Map {
     Room currRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
     MapRegion currRegion;
+    std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> Directory;
 };
 
 struct Scene {
