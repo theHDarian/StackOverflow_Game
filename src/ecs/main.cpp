@@ -127,6 +127,7 @@ int main() {
 		// (or maybe just check each item manually for now...)
 		// Q: what about finer grain order? like where does hover over bullet stack ui go?
 		registry.frames.components[0].prevFrameBuffer = 0;
+		registry.frames.components[0].prevTexture = 0;
 		renderer.drawBackgroundElements();
 		particleSystem.render();
 		renderer.drawGameElements();

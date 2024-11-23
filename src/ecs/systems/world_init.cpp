@@ -1132,7 +1132,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	ParticleProps props = enemyBulletDeathParticle;
 	props.lifetime = 200.f;
 	props.velocity.variation = {200,200};
-	props.colors.push_back(enemyBulletColors.at(FireRate));
+	props.colors.push_back({{1,1,1,1},{1,1,1,1}});
 	registry.emitParticles.emplace(entity,PLaser,props,100000,1);
 
 	registry.renderRequests.insert(
@@ -1203,7 +1203,7 @@ Entity createKeyBullet(RenderSystem* renderer, vec2 pos)
 	bullet.bulletSpeed = 450;
 	bullet.bulletRange = 5000;
 	bullet.bulletBounce = 10;
-	bullet.bulletPierce = 10000;
+	bullet.bulletPierce = 0;
 	bullet.bulletEffects = { key };
 	bullet.shape = RECTANGLE;
 
