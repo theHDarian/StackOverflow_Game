@@ -292,6 +292,7 @@ void MapSystem::newMap()
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
         map.currRoom.preset = getRoomPreset(RoomType::RestRoom,false);
+        map.roomDir = roomDirectory;
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);

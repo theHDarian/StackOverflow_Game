@@ -108,10 +108,25 @@ enum MapRegion {
     Final
 };
 
+struct RoomPresets {
+    std::vector<RoomPreset> unlocked;
+    std::vector<RoomPreset> locked;
+};
+
+//used by roomsTraversed to determine type of enemy to spawn, some enemies only spawn in certain difficulty regions
+enum DifficultyRegion {
+    Intro = 3,
+    Easy = 10,
+    Medium = 20,
+    // Hard,
+};
+
+
 struct Map {
     Room currRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
     MapRegion currRegion;
+    std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDir;
 };
 
 struct Scene {
