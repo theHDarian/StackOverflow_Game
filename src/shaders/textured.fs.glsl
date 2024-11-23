@@ -9,13 +9,15 @@ uniform vec3 fcolor;
 uniform int changeColor = 0;
 uniform float alpha = 1.0;
 uniform float effectAlpha = 1.0;
+uniform bool tile = false;
+uniform vec2 tiling = vec2(1.0, 1.0);
 
 // Output color
 layout(location = 0) out  vec4 color;
 
 void main()
 {
-	color = vec4(fcolor, alpha) * texture(sampler0, texcoord);
+	color = vec4(fcolor, alpha) * ((!tile) ? texture(sampler0, texcoord) : texture(sampler0, texcoord * tiling));
 	// note: branches are expensive, consider using another shader instead?
 	if (changeColor == 1){
 		color.r = fcolor.r * effectAlpha + color.r * (1.0 - effectAlpha);

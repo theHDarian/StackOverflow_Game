@@ -358,6 +358,7 @@ Entity createBibleTree(RenderSystem *renderer, vec2 pos)
 	return tree;
 }
 
+// For creating top-down props with four walls (like planters)
 Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink) {
 	Entity e = Entity();
 
@@ -377,6 +378,31 @@ Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 s
 
 	auto& object = registry.objects.emplace(e);
 	object.baseOffset;
+
+	registry.renderRequests.insert(
+		e,
+		{ filename,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	return e;
+}
+
+
+// For creating side-on props with a wall (like pop console or tree)
+Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset) {
+	Entity e = Entity();
+
+	Motion& m = registry.motions.emplace(e);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = scale;
+
+	Entity ew = createWall(renderer, pos + wallOffset * vec2(-1,1), pos + wallOffset);
+	Parent& p = registry.parents.emplace(ew);
+	p.children.push_back(e);
+
+	auto& object = registry.objects.emplace(e);
+	object.baseOffset = baseOffset;
 
 	registry.renderRequests.insert(
 		e,
@@ -481,6 +507,37 @@ Entity createDoorSymbol(RenderSystem *renderer, vec2 position, float angle, vec2
 														GEOMETRY_BUFFER_ID::SPRITE});
 	return entity;
 }
+Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side)
+{
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.angle = angle;
+	float angleOffset = 0.66;
+	if (angle == (M_PI / 2) || angle == (M_PI / 2 + M_PI))
+		angleOffset = 1.0f;
+	//motion.scale = vec2(80.f * angleOffset, 120 * angleOffset) * normalize(vec2(2 * scale.x / 120.f, 2 * scale.y / 66.f)) * 2.f;
+	motion.scale = vec2(336,264) * vec2(1,0.1);
+
+	DoorSymbol& symbol = registry.doorSymbols.emplace(entity);
+	symbol.angle = doorAngle;
+	symbol.axis = axis;
+	symbol.offset = offset;
+	symbol.door = true;
+	symbol.side = side;
+
+	registry.backgrounds.emplace(entity);
+
+	auto& anim = registry.animations.emplace(entity);
+	anim.animate = false;
+	anim.max_frames = 3;
+
+	RenderRequest& rr = registry.renderRequests.insert(entity,
+		{ "doors",
+		 EFFECT_ASSET_ID::ROOM_BOUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
 
 void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 {
@@ -566,17 +623,17 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		b.offset = p.offset;
 		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
 
-		auto &anim = registry.animations.emplace(entity);
-		anim.animate = false;
-		anim.max_frames = 3;
-
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
-			{(p.colliderStart.y == p.colliderEnd.y) ? "wall_horizontal" : "wall_vertical",
+			{"walls",
 			 EFFECT_ASSET_ID::ROOM_BOUND,
-			 GEOMETRY_BUFFER_ID::SPRITE});
+			 GEOMETRY_BUFFER_ID::SPRITE,
+			true,
+			vec2(0),
+			vec2(168,384)});
 		registry.backgrounds.emplace(entity);
 
+		createDoors(renderer, motion.position, motion.angle, motion.scale, b.angle, b.axis, b.offset, b.side);
 		// add door symbol for each wall
 		createDoorSymbol(renderer, motion.position, motion.angle, motion.scale, b.angle, b.axis, b.offset, p.symbolOffset);
 	}
@@ -660,7 +717,7 @@ Entity createTestPoly(RenderSystem *renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-Entity createTestFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
+Entity createFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 {
 	auto entity = Entity();
 
@@ -675,9 +732,12 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 
 	registry.renderRequests.insert(
 		entity,
-		{"blankFloor.png",
+		{"Floor.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE});
+		 GEOMETRY_BUFFER_ID::SPRITE,
+		true,
+		vec2(0),
+		vec2(1440.f/1.5f)});
 
 	return entity;
 };

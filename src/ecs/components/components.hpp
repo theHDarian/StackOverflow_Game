@@ -221,6 +221,7 @@ struct RenderRequest {
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 	bool show = true;
 	vec2 offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
+	vec2 idealScale = vec2(-1); //Used for tiling textures. Tiling is based on difference between idealScale and motion.scale
 };
 
 enum AnimationTypes {

@@ -70,6 +70,8 @@ struct DoorSymbol {
     vec3 axis;
     vec3 offset;
     int doorType;
+    bool door = false;
+    char side = 'L';
 };
 
 struct Room {

@@ -159,7 +159,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 	WindowState& ws = registry.windowStates.components[0];
 	createWallThickness({ ws.width / 2, ws.height / 2}, currRoom.roomSize);
-	createTestFloor(renderer, { ws.width /2, ws.height/2 }, currRoom.roomSize);
+	createFloor(renderer, { ws.width /2, ws.height/2 }, currRoom.roomSize);
 
 	createRoomBounds(renderer, roomCenter, currRoom.roomSize);
 
