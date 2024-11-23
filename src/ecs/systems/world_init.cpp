@@ -358,6 +358,7 @@ Entity createBibleTree(RenderSystem *renderer, vec2 pos)
 	return tree;
 }
 
+// For creating top-down props with four walls (like planters)
 Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink) {
 	Entity e = Entity();
 
@@ -377,6 +378,31 @@ Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 s
 
 	auto& object = registry.objects.emplace(e);
 	object.baseOffset;
+
+	registry.renderRequests.insert(
+		e,
+		{ filename,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	return e;
+}
+
+
+// For creating side-on props with a wall (like pop console or tree)
+Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset) {
+	Entity e = Entity();
+
+	Motion& m = registry.motions.emplace(e);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = scale;
+
+	Entity ew = createWall(renderer, pos + wallOffset * vec2(-1,1), pos + wallOffset);
+	Parent& p = registry.parents.emplace(ew);
+	p.children.push_back(e);
+
+	auto& object = registry.objects.emplace(e);
+	object.baseOffset = baseOffset;
 
 	registry.renderRequests.insert(
 		e,
@@ -457,28 +483,85 @@ Entity createWallThickness(vec2 pos, vec2 scale) {
 	return entity;
 }
 
-Entity createDoorSymbol(RenderSystem *renderer, vec2 position, float angle, vec2 scale, float symbolAngle, vec3 axis, vec3 offset, vec2 spriteOffset)
+Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 scale, float symbolAngle, vec3 axis, vec3 offset, vec2 spriteOffset)
 {
 	auto entity = Entity();
 	Motion &motion = registry.motions.emplace(entity);
-	motion.position = position + spriteOffset;
-	motion.angle = angle;
-	float angleOffset = 0.66;
-	if (angle == (M_PI / 2) || angle == (M_PI / 2 + M_PI))
-		angleOffset = 1.0f;
-	motion.scale = vec2(80.f * angleOffset, 120 * angleOffset) * normalize(vec2(2 * scale.x / 120.f, 2 * scale.y / 66.f)) * 2.f;
+	Map& map = registry.maps.components[0];
+	WindowState& ws = registry.windowStates.components[0];
+	vec2 position = vec2(ws.width,ws.height)/2.f;
+	float of = 200.f;
+	if(side == 'T') position += vec2(0,map.currRoom.roomSize.y/2+of);
+	if (side == 'R') position += vec2(map.currRoom.roomSize.x/2+of,0);
+	if (side == 'B') position += vec2(0,-map.currRoom.roomSize.y/2-of);
+	if (side == 'L') position += vec2(-map.currRoom.roomSize.x/2-of,0);
+	motion.position = position;
+	motion.angle = 0;
+	motion.scale = vec2(120.f, 120);
 
 	DoorSymbol &symbol = registry.doorSymbols.emplace(entity);
-	symbol.angle = symbolAngle;
+	symbol.angle = 0;
 	symbol.axis = axis;
-	symbol.offset = offset;
+	symbol.offset = vec3(0);
 
 	registry.backgrounds.emplace(entity);
 
 	RenderRequest &rr = registry.renderRequests.insert(entity,
 													   {"door_symbols",
-														EFFECT_ASSET_ID::ROOM_BOUND,
+														EFFECT_ASSET_ID::ANIMATE,
 														GEOMETRY_BUFFER_ID::SPRITE});
+
+	Animation& anim = registry.animations.emplace(entity);
+	anim.max_frames = 100;
+	anim.animate = false;
+	anim.animation_countdown = 1000;
+	anim.animation_countdown_base = 1000;
+	return entity;
+}
+Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side)
+{
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	float offsetAmount = -40.f;
+	vec2 offsetPos = vec2(0);
+	vec2 scaleOffset;
+	if(side == 'T') offsetPos.y = -offsetAmount;
+	if (side == 'R') offsetPos.x = offsetAmount;
+	if (side == 'B') offsetPos.y = offsetAmount;
+	if (side == 'L') offsetPos.x = -offsetAmount;
+	motion.position = position + offsetPos;
+	motion.angle = angle;
+	float angleOffset = 0.66;
+	if (angle == (M_PI / 2) || angle == (M_PI / 2 + M_PI))
+		angleOffset = 1.0f;
+	//this is a factor of the wall's scaling, the wall's dimensions are 120x66 so if we want the door to be 4 tiles long it should be
+	// motion.scale = vec2(336,400.f) * vec2(1,tan(radians(125.f)/2))* normalize(vec2(2 * scale.x / 120.f, 2 * scale.y / 66.f));
+	// if (side == 'R' || side == 'L') motion.scale.x *= 6.5f/3.8f;
+	if (side == 'L' || side == 'R') {
+        motion.scale = vec2(336, 264) * normalize(vec2(3,0.5555)) * 1.07f;
+    }
+    else {
+        motion.scale = vec2(336, 264) * normalize(vec2(1920, 1080)) * 0.7f;
+    }
+	// motion.scale = vec2(336,264) * vec2(1,0.1);
+
+	DoorSymbol& symbol = registry.doorSymbols.emplace(entity);
+	symbol.angle = doorAngle;
+	symbol.axis = axis;
+	symbol.offset = offset;
+	symbol.door = true;
+	symbol.side = side;
+
+	registry.backgrounds.emplace(entity);
+
+	auto& anim = registry.animations.emplace(entity);
+	anim.animate = false;
+	anim.max_frames = 3;
+
+	RenderRequest& rr = registry.renderRequests.insert(entity,
+		{ "doors",
+		 EFFECT_ASSET_ID::ROOM_BOUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
 
@@ -566,19 +649,27 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		b.offset = p.offset;
 		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
 
-		auto &anim = registry.animations.emplace(entity);
-		anim.animate = false;
-		anim.max_frames = 3;
-
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
-			{(p.colliderStart.y == p.colliderEnd.y) ? "wall_horizontal" : "wall_vertical",
+			{"walls",
 			 EFFECT_ASSET_ID::ROOM_BOUND,
-			 GEOMETRY_BUFFER_ID::SPRITE});
+			 GEOMETRY_BUFFER_ID::SPRITE,
+			true,
+			vec2(0),
+			vec2(168,384)});
 		registry.backgrounds.emplace(entity);
 
 		// add door symbol for each wall
-		createDoorSymbol(renderer, motion.position, motion.angle, motion.scale, b.angle, b.axis, b.offset, p.symbolOffset);
+		createDoorSymbol(renderer, b.side, motion.angle, motion.scale, b.angle, b.axis, b.offset, p.symbolOffset);
+	}
+	for (auto& p : wallPositions)
+	{
+		float angle = -M_PI/2.f;
+		vec3 axis = vec3(1, 0, 0);
+		vec3 offset = p.offset;
+		char side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+
+		createDoors(renderer, p.spritePosition, p.spriteAngle, p.spriteScale, angle, axis, offset, side);
 	}
 
 	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, offsetTop + 10 }, { ws.width / 2 + doorWidthX / 2, offsetTop + 10 });
@@ -660,7 +751,7 @@ Entity createTestPoly(RenderSystem *renderer, vec2 position, std::vector<vec2> p
 	return entity;
 }
 
-Entity createTestFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
+Entity createFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 {
 	auto entity = Entity();
 
@@ -675,9 +766,12 @@ Entity createTestFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 
 	registry.renderRequests.insert(
 		entity,
-		{"blankFloor.png",
+		{"Floor.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE});
+		 GEOMETRY_BUFFER_ID::SPRITE,
+		true,
+		vec2(0),
+		vec2(1440.f/1.5f)});
 
 	return entity;
 };

@@ -27,6 +27,8 @@ Entity createBibleTree(RenderSystem* renderer, vec2 pos);
 
 Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink = vec2(1.f));
 
+Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset);
+
 Entity createRamStick(RenderSystem* renderer, vec2 pos);
 
 Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);
@@ -37,6 +39,8 @@ Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
 Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);
 
+Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side);
+
 void createRoomBounds(RenderSystem* renderer, vec2 roomCenter, vec2 roomSize);
 
 Entity createWallThickness(vec2 pos, vec2 scale);
@@ -45,7 +49,7 @@ Entity createWallThickness(vec2 pos, vec2 scale);
 Entity createTestPoly(RenderSystem* renderer, vec2 position, std::vector<vec2> points, float angle);
 
 // Floor testing
-Entity createTestFloor(RenderSystem* renderer, vec2 pos, vec2 scale);
+Entity createFloor(RenderSystem* renderer, vec2 pos, vec2 scale);
 
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);

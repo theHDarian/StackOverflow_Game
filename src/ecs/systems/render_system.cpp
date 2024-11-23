@@ -107,6 +107,17 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
+			GLint tile_uloc = glGetUniformLocation(program, "tile");
+			glUniform1i(tile_uloc, render_request.idealScale.x > 0);
+			gl_has_errors();
+
+			vec2 tiling = registry.maps.components[0].currRoom.roomSize / render_request.idealScale;
+			GLint tiling_uloc = glGetUniformLocation(program, "tiling");
+			glUniform2fv(tiling_uloc, 1, (float*)&tiling);
+		}
+
 		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE) {
 			GLint frame_uloc = glGetUniformLocation(program, "frame");
 			glUniform1i(frame_uloc, registry.animations.get(entity).frame);
@@ -220,33 +231,37 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		float angle;
 		vec3 axis;
 		vec3 offset;
-		int frame;
+		int frame = 0;
+		vec2 tiling = vec2(1.0);
 		if (registry.bounds.has(entity)) {
 			Bound& b = registry.bounds.get(entity);
 			angle = b.angle;
 			axis = b.axis;
 			offset = b.offset;
+			tiling = vec2(registry.maps.components[0].currRoom.roomSize.x / render_request.idealScale.x, 1);
+			//tiling = vec2(5, 1);
 
-			frame = 2;
-			for (Entity& d : registry.doors.entities) {
-				if (registry.doors.get(d).side == b.side) {
-					if (registry.interactables.has(d)) {
-						if (registry.interactables.get(d).name == "ClosedDoor")			{ frame = 0; }
-						else if (registry.interactables.get(d).name == "ClosedTutorialDoor") { frame = 0; }
-						else if (registry.interactables.get(d).name == "EmptyDoor")		{ frame = 0; }
-						else if (registry.interactables.get(d).name == "PrevDoor")		{ frame = 0; }
-						else if (registry.interactables.get(d).name == "LockedDoor")	{ frame = 1; }
-						else if (registry.interactables.get(d).name == "OpenDoor") { frame = 2; }
-					}
-					break;
-				}
-			}
 		} else if (registry.doorSymbols.has(entity)) {
 			DoorSymbol& d = registry.doorSymbols.get(entity);
 			angle = d.angle;
 			axis = d.axis;
 			offset = d.offset;
-			frame = d.doorType;
+			if (d.door) {
+				frame = 2;
+				for (Entity& d1 : registry.doors.entities) {
+					if (registry.doors.get(d1).side == d.side) {
+						if (registry.interactables.has(d1)) {	
+							if (registry.interactables.get(d1).name == "ClosedDoor")				{ frame = 0; }
+							else if (registry.interactables.get(d1).name == "ClosedTutorialDoor")	{ frame = 0; }
+							else if (registry.interactables.get(d1).name == "EmptyDoor")			{ frame = 0; }
+							else if (registry.interactables.get(d1).name == "PrevDoor")				{ frame = 0; }
+							else if (registry.interactables.get(d1).name == "LockedDoor")			{ frame = 1; }
+							else if (registry.interactables.get(d1).name == "OpenDoor")				{ frame = 2; }
+						}
+						break;
+					}
+				}
+			}
 		} else {
 			assert(false);
 		}
@@ -255,6 +270,14 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+		gl_has_errors();
+
+		GLint tile_uloc = glGetUniformLocation(program, "tile");
+		glUniform1i(tile_uloc, render_request.idealScale.x > 0);
+		gl_has_errors();
+
+		GLint tiling_uloc = glGetUniformLocation(program, "tiling");
+		glUniform2fv(tiling_uloc, 1, (float*)&tiling);
 		gl_has_errors();
 
 		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);

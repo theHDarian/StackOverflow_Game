@@ -485,23 +485,23 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory =
 
 inline bool hasLocked(RoomType type, int roomsTraversed) {
     Map& map = registry.maps.components[0];
+    
     if (type >= RoomType::None) {
         return false;
     }
     if (roomsTraversed < DifficultyRegion::Intro) {
-        return !map.roomDir.at(Intro).at(type).locked.empty();
+        return !map.directory.at(Intro).at(type).locked.empty();
     } else if (roomsTraversed < DifficultyRegion::Easy) {
-        return !map.roomDir.at(Easy).at(type).locked.empty();
+        return !map.directory.at(Easy).at(type).locked.empty();
     } else if (roomsTraversed < DifficultyRegion::Medium) {
-        return !map.roomDir.at(Medium).at(type).locked.empty();
+        return !map.directory.at(Medium).at(type).locked.empty();
     } else {
-        return !map.roomDir.at(Medium).at(type).locked.empty();
+        return !map.directory.at(Medium).at(type).locked.empty();
     }
 }
 
-RoomPreset getRoomPreset(RoomType type, bool locked) {
+inline RoomPreset getRoomPreset(RoomType type, bool locked) {
     Map& map = registry.maps.components[0];
-    
     //boss rooms
     if (type == RoomType::BossRoom && map.currRegion == MapRegion::Biology) {
         return BossRoomBee;
@@ -517,13 +517,13 @@ RoomPreset getRoomPreset(RoomType type, bool locked) {
         assert(false);
     }
     if (map.roomsTraversed < DifficultyRegion::Intro) {
-        return Random::ListItem(locked ? map.roomDir.at(Intro).at(type).locked : map.roomDir.at(Intro).at(type).unlocked);
+        return Random::ListItem(locked ? map.directory.at(Intro).at(type).locked : map.directory.at(Intro).at(type).unlocked);
     } else if (map.roomsTraversed < DifficultyRegion::Easy) {
-        return Random::ListItem(locked ? map.roomDir.at(Easy).at(type).locked : map.roomDir.at(Easy).at(type).unlocked);
+        return Random::ListItem(locked ? map.directory.at(Easy).at(type).locked : map.directory.at(Easy).at(type).unlocked);
     } else if (DifficultyRegion::Medium) {
-        return Random::ListItem(locked ? map.roomDir.at(Medium).at(type).locked : map.roomDir.at(Medium).at(type).unlocked);
+        return Random::ListItem(locked ? map.directory.at(Medium).at(type).locked : map.directory.at(Medium).at(type).unlocked);
     } else {
-        return Random::ListItem(locked ? map.roomDir.at(Medium).at(type).locked : map.roomDir.at(Medium).at(type).unlocked);
+        return Random::ListItem(locked ? map.directory.at(Medium).at(type).locked : map.directory.at(Medium).at(type).unlocked);
     }
 }
 
