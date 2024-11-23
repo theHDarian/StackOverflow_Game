@@ -12,7 +12,8 @@ MapSystem::MapSystem()
 {
     if (registry.maps.components.size() == 0)
     {
-        registry.maps.emplace(Entity());
+        auto& map = registry.maps.emplace(Entity());
+        map.Directory = roomDirectory;
     }
 }
 MapSystem::~MapSystem()
@@ -177,7 +178,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // change current room in the map
     map.currRoom = Room();
     assert(door.room != RoomType::None);
-    map.currRoom.preset = getRoomPreset(door.room,map.roomsTraversed, door.isLocked);
+    map.currRoom.preset = getRoomPreset(door.room,map.roomsTraversed, door.isLocked, map.Directory);
     map.currRoom.type = door.room;
 
 
@@ -213,7 +214,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.reset();
 
         d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
-        if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1)) {
+        if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1, map.Directory)) {
             //have a chance of spawning locked rooms
             d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
         }
@@ -262,11 +263,13 @@ void MapSystem::newMap()
         map.currRoom = Room();
         map.currRoom.preset = TutorialRoom1Preset;
         map.currRoom.type = TutorialRoom1;
+        map.Directory = roomDirectory;
     }
     else {
         Map& map = registry.maps.components[0];
         map.currRegion = MapRegion::Tutorial;
         map.roomsTraversed = 0;
+        map.Directory = roomDirectory;
 
         bool excludeNone = false;
         for (int i = 0; i < 4; i++)
@@ -284,7 +287,7 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,map.roomsTraversed,false);
+        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,map.roomsTraversed,false, map.Directory);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
