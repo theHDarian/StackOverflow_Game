@@ -230,6 +230,28 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         }
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }
+
+    // Create floor decorations
+    WindowState& ws = registry.windowStates.components[0];
+    std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : "bio_floor_addons";
+    vec2 placements = vec2(floor(0.8 * map.currRoom.roomSize.x / 192.f), floor( 0.8 * map.currRoom.roomSize.x / 192.f));
+    vec2 dividers = vec2(0.9090 * map.currRoom.roomSize.x / placements.x, 0.9090 * map.currRoom.roomSize.y / placements.y);
+    vec2 roomOffset = vec2(-map.currRoom.roomSize.x / 2.2f, -map.currRoom.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
+    vec2 wiggle = (dividers - vec2(192)) / 2.f;
+    for (int i = 0; i < placements.x; i++) {
+        for (int j = 0; j < placements.y; j++) {
+            // Controls how many will be spawned
+            if (rand() % 100 < 70) continue;
+            vec2 midPosition = roomOffset + dividers / 2.f + dividers * vec2(i,j);
+            midPosition += wiggle * vec2((rand()%100 - 50) / 50.f, (rand() % 100 - 50) / 50.f);
+            createFloorDeco(renderer, midPosition, filename);
+
+            if (map.currRegion == Biology && rand() % 100 < 20) {
+                createCritter(renderer, midPosition);
+            }
+
+        }
+    }
 }
 
 void MapSystem::resetMap() {
