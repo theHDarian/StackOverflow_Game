@@ -167,7 +167,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     // index of door to spawn at
     int spawnIndex = doorIndex == 0 ? 2 : doorIndex == 1 ? 3
-                                      : doorIndex == 2   ? 0
+                                        : doorIndex == 2 ? 0
                                                          : 1;
     vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
     playerMotion.position = spawnPosition;
@@ -197,7 +197,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     doors[spawnIndex].isPrev = true;
     doors[spawnIndex].isLocked = false;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
-    registry.animations.get(registry.doorSymbols.entities[spawnIndex]).frame = roomTypeToSymbols.at(doors[spawnIndex].room);
+    registry.animations.get(registry.doorSymbols.entities[spawnIndex]).frame = 4;
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
     int lockedRooms = 0;

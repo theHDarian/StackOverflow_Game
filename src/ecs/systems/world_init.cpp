@@ -491,9 +491,9 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	WindowState& ws = registry.windowStates.components[0];
 	vec2 position = vec2(ws.width,ws.height)/2.f;
 	float of = 200.f;
-	if(side == 'T') position += vec2(0,-map.currRoom.roomSize.y/2-of);
+	if(side == 'T') position += vec2(0,map.currRoom.roomSize.y/2+of);
 	if (side == 'R') position += vec2(map.currRoom.roomSize.x/2+of,0);
-	if (side == 'B') position += vec2(0,map.currRoom.roomSize.y/2+of);
+	if (side == 'B') position += vec2(0,-map.currRoom.roomSize.y/2-of);
 	if (side == 'L') position += vec2(-map.currRoom.roomSize.x/2-of,0);
 	motion.position = position;
 	motion.angle = 0;
@@ -514,6 +514,8 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	Animation& anim = registry.animations.emplace(entity);
 	anim.max_frames = 100;
 	anim.animate = false;
+	anim.animation_countdown = 1000;
+	anim.animation_countdown_base = 1000;
 	return entity;
 }
 Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side)
@@ -521,7 +523,7 @@ Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scal
 	auto entity = Entity();
 	Motion& motion = registry.motions.emplace(entity);
 	float offsetAmount = -40.f;
-	vec2 offsetPos;
+	vec2 offsetPos = vec2(0);
 	vec2 scaleOffset;
 	if(side == 'T') offsetPos.y = -offsetAmount;
 	if (side == 'R') offsetPos.x = offsetAmount;
@@ -657,9 +659,17 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 			vec2(168,384)});
 		registry.backgrounds.emplace(entity);
 
-		createDoors(renderer, motion.position, motion.angle, motion.scale, b.angle, b.axis, b.offset, b.side);
 		// add door symbol for each wall
 		createDoorSymbol(renderer, b.side, motion.angle, motion.scale, b.angle, b.axis, b.offset, p.symbolOffset);
+	}
+	for (auto& p : wallPositions)
+	{
+		float angle = -M_PI/2.f;
+		vec3 axis = vec3(1, 0, 0);
+		vec3 offset = p.offset;
+		char side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+
+		createDoors(renderer, p.spritePosition, p.spriteAngle, p.spriteScale, angle, axis, offset, side);
 	}
 
 	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, offsetTop + 10 }, { ws.width / 2 + doorWidthX / 2, offsetTop + 10 });
