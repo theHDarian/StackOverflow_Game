@@ -12,6 +12,9 @@
 
 #endif //INTERACTABLE_EFFECTS_H
 
+class SoundSystem;
+
 void resetStack(Entity player, RenderSystem* renderer);
 void extendStack (Entity player, int extension);
 void addEffect(Entity player, std::vector<BulletStackEffect> effects);
+void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer);

@@ -430,7 +430,7 @@ const RoomPreset TreasureRoomBlunt{
 const RoomPreset TreasureRoomRam{
     {},
     {},
-    {{{InteractableItem::Ram,{}}, {0.5f, 0.5f}}},
+    {{{InteractableItem::PushConsole,{stackSizeUpA}}, {0.5f, 0.5f}}},
     {},
     0.0f,
     0,

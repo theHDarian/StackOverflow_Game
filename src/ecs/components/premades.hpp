@@ -177,14 +177,14 @@ const BulletStackEffect dashUpM = {
 const BulletStackEffect stackSizeUpA = {
 	PlayerStackSize,
 	Additive,
-	6,
+	4,
 	"Stack Size Up (A)",
 	""};
 
 const BulletStackEffect stackSizeUpM = {
 	PlayerStackSize,
 	Multiplicative,
-	2,
+	1.5,
 	"Stack Size Up (M)",
 	""};
 
@@ -323,13 +323,22 @@ const BulletStackEffect SniperBurden = {
 	"Sniper's Burden",
 	"" };
 
+const BulletStackEffect DataCompression = {
+	PlayerStackSize,
+	Multiplicative,
+	1.5,
+	"Data Compression",
+	"" };
+
+
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
 	blunt, dmgDownA, dmgDownM, dmgUpA, dmgUpM, numBulletsUpA, sizeUpA, spreadUpA, bulletSpeedUpA, 
 	bulletSpeedUpM, bulletRangeUpA, bulletRangeUpM, bulletBurstUpA, bulletBurstUpM, bulletPierceUpA, bulletPierceUpM,
 	bulletBounceUpA, bulletBounceUpM, dashUpA, dashUpM, stackSizeUpA, stackSizeUpM, dashCDRUpA, dashCDRUpM, dashCDRDownA,
-	dashCDRDownM, playerSpeedUpA, playerSpeedUpM, ostrichWarrior, ostrichWarriorDownside, key, homingUpA
+	dashCDRDownM, playerSpeedUpA, playerSpeedUpM, ostrichWarrior, ostrichWarriorDownside, key, homingUpA, buzz, sluggish, hardShell, APRounds, ConcentratedFire,
+	SniperPower, SniperSpeed, SniperLethargy, SniperBurden, DataCompression, SniperBurden,
 };
 
 //////////////////////////////////////////
