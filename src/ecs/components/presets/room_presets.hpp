@@ -510,9 +510,11 @@ inline bool hasLocked(RoomType type, int roomsTraversed) {
     }
 }
 
-RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
+RoomPreset getRoomPreset(RoomType type, bool locked) {
+    Map& map = registry.maps.components[0];
+    
     //boss rooms
-    if (type == RoomType::BossBigCRoom) {
+    if (type == RoomType::BossRoom && map.currRegion == MapRegion::Biology) {
         return BossRoomBee;
     }
 
@@ -522,12 +524,12 @@ RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
     }
 
     //regular rooms
-    if(!hasLocked(type,roomsTraversed) && locked) {
+    if(!hasLocked(type,map.roomsTraversed) && locked) {
         assert(false);
     }
-    if (roomsTraversed < DifficultyRegion::Intro) {
+    if (map.roomsTraversed < DifficultyRegion::Intro) {
         return Random::ListItem(locked ? roomDirectory.at(Intro).at(type).locked : roomDirectory.at(Intro).at(type).unlocked);
-    } else if (roomsTraversed < DifficultyRegion::Easy) {
+    } else if (map.roomsTraversed < DifficultyRegion::Easy) {
         return Random::ListItem(locked ? roomDirectory.at(Easy).at(type).locked : roomDirectory.at(Easy).at(type).unlocked);
     } else if (DifficultyRegion::Medium) {
         return Random::ListItem(locked ? roomDirectory.at(Medium).at(type).locked : roomDirectory.at(Medium).at(type).unlocked);
@@ -540,7 +542,7 @@ RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked) {
 const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::EnemyRoom,3},
     {RoomType::RestRoom,1},
-    {RoomType::BossBigCRoom,2},
+    {RoomType::BossRoom,2},
     {RoomType::TreasureRoom,0},
     {RoomType::None,4},
     {RoomType::TutorialRoom1,5},
@@ -550,7 +552,7 @@ const std::map<RoomType,int> roomTypeToSymbols = {
 const std::map<RoomType, SoundType> roomTypeToMusic = {
     {RoomType::EnemyRoom, SoundType::normalBGM},
     {RoomType::RestRoom, SoundType::specialBGM},
-    {RoomType::BossBigCRoom, SoundType::bossBGM},
+    {RoomType::BossRoom, SoundType::bossBGM},
     {RoomType::TreasureRoom, SoundType::specialBGM},
     {RoomType::None, normalBGM},
     {RoomType::TutorialRoom1, SoundType::specialBGM},

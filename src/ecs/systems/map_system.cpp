@@ -158,6 +158,13 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         map.roomsTraversed++;
     }
 
+    //update Map Region
+    if (map.currRoom.type == TutorialRoom2) {
+        map.currRegion = Biology; //Go to bio region at end of tutorial
+    } else if (map.currRoom.type == BossRoom && map.currRegion == Biology) {
+        map.currRegion = Hifi;
+    }
+
     SoundType old_s = roomTypeToMusic.at(map.currRoom.type);
 
     // move player to the starting side of the room
@@ -177,7 +184,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // change current room in the map
     map.currRoom = Room();
     assert(door.room != RoomType::None);
-    map.currRoom.preset = getRoomPreset(door.room,map.roomsTraversed, door.isLocked);
+    map.currRoom.preset = getRoomPreset(door.room, door.isLocked);
     map.currRoom.type = door.room;
 
 
@@ -284,7 +291,7 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,map.roomsTraversed,false);
+        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,false);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);

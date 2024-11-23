@@ -16,7 +16,7 @@ enum RoomType : int {
     //Special rooms that are not spawned via getRandomRoomType function
     TutorialRoom1,
     TutorialRoom2,
-    BossBigCRoom,
+    BossRoom,
 };
 
 inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
@@ -24,7 +24,7 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
     const int bossRoomNum = 12;
     if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
         //Make every 5 rooms the boss room
-        return BossBigCRoom;
+        return BossRoom;
     }
     if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
         return RoomType::EnemyRoom;
@@ -104,6 +104,7 @@ struct MapRequest {
 enum MapRegion {
     Tutorial,
     Biology,
+    Hifi,
     Final
 };
 
