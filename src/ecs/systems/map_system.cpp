@@ -197,7 +197,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     doors[spawnIndex].isPrev = true;
     doors[spawnIndex].isLocked = false;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
-    registry.doorSymbols.get(registry.doorSymbols.entities[spawnIndex]).doorType = roomTypeToSymbols.at(doors[spawnIndex].room);
+    registry.animations.get(registry.doorSymbols.entities[spawnIndex]).frame = roomTypeToSymbols.at(doors[spawnIndex].room);
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
     int lockedRooms = 0;
@@ -228,7 +228,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
             lockedRooms++;
         }
-        ds.doorType = roomTypeToSymbols.at(d.room);
+        registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }
 }
 
@@ -247,12 +247,12 @@ void MapSystem::newMap()
         {
             Door& d = registry.doors.components[i];
             d.reset();
-            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
+            registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
         registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
-        registry.doorSymbols.get(registry.doorSymbols.entities[2]).doorType = roomTypeToSymbols.at(registry.doors.components[2].room);
+        registry.animations.get(registry.doorSymbols.entities[2]).frame = roomTypeToSymbols.at(registry.doors.components[2].room);
         registry.interactables.get(registry.doors.entities[2]).name = "ClosedTutorialDoor";
         registry.interactables.get(registry.doors.entities[2]).interactType = InteractableType::DialogueInteractable;
 
@@ -280,7 +280,7 @@ void MapSystem::newMap()
             if (d.room == RoomType::None)
                 excludeNone = true;
 
-            registry.doorSymbols.get(registry.doorSymbols.entities[i]).doorType = roomTypeToSymbols.at(d.room);
+            registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }

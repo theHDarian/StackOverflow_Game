@@ -98,7 +98,7 @@ struct Room {
     int cutsceneCount = 0;
     bool dialogueDone = true;
     bool cutSceneDone = true;
-    vec2 roomSize = { 1920, 1080 };
+    vec2 roomSize = { 1500, 1700 };
     vec2 roomPosition = { 1920 / 2, 1080 / 2 };
     float wallThickness = 100.f;
 };

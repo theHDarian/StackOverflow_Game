@@ -246,7 +246,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			angle = d.angle;
 			axis = d.axis;
 			offset = d.offset;
-			frame = d.doorType;
 			if (d.door) {
 				frame = 2;
 				for (Entity& d1 : registry.doors.entities) {
