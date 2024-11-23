@@ -1,6 +1,8 @@
 #pragma once
 
 #include "components/particle_components.hpp"
+#include "render_system.hpp"
+#include "./enemy_bullet_properties.hpp"
 
 /**
  * Presets for individual particles - set colors, size, and durations. Velocity and positions are determined by emission request type
@@ -90,22 +92,3 @@ const ParticleProps enemyBulletDeathParticle {
     800.f
 };
 
-const std::map<BulletEffectType, Vec4StartEnd> enemyBulletColors = {
-    {BulletDamage, {{ 255 / 255.0f, 0 / 255.0f, 255 / 255.0f, 1.0f },{ 255 / 255.0f, 0 / 255.0f, 255 / 255.0f, .5f }}},
-    {ProjectileSpeed,   {{1.f, 0.f, 0.f,1.f},{1.f, 0.f, 0.f,1.f}}},
-    {ProjectileSize,    {{173.f / 255.f, 49.f / 255.f, 75.f / 255.f,1.f},{173.f / 255.f, 49.f / 255.f, 75.f / 255.f,1.f}}},
-    {FireRate,          {{1.f, 1.f, 1.f,1.f},{1.f, 1.f, 1.f,1.f}}},
-    {BulletRange,       {{0.f, 0.f, 1.f,1.f},{0.f, 0.f, 1.f,1.f}}},
-    {BulletSpread,      {{1.f, 0.f, 0.f,1.f},{1.f, 0.f, 0.f,1.f}}},
-    {BulletNum,         {{0.f, 0.f, 1.f,1.f},{1.f, 0.f, 0.f,1.f}}},
-    {BulletBurst,       {{0.f, 0.f, 0.f,1.f},{0.f, 0.f, 0.f,1.f}}},
-    {Bounce,            {{0.f, 1.f, 0.f,1.f},{0.f, 1.f, 0.f,1.f}}},
-    {Pierce,            {{1.f, 0.f, 0.f,1.f},{1.f, 0.f, 0.f,1.f}}},
-    {Homing,            {{1.f, 0.f, 0.f,1.f},{1.f, 0.f, 0.f,1.f}}},
-    {PlayerSpeed,       {{0.f, 0.f, 1.f,1.f},{0.f, 0.f, 1.f,1.f}}},
-    {PlayerNumDash,     {{0.f, 1.f, 1.f,1.f},{0.f, 1.f, 1.f,1.f}}},
-    {PlayerStackSize,   {{0.f, 1.f, 0.f,1.f},{0.f, 1.f, 0.f,1.f}}},
-    {PlayerDashCDR,     {{1.f, 0.f, 0.f,1.f},{1.f, 0.f, 0.f,1.f}}},
-    {Inert,             {{0,0,0,0},{0,0,0,0}}},
-    {Key, {{ 255 / 255.0f, 215 / 255.0f, 0 / 255.0f, 1.0f },{ 250 / 255.0f, 250 / 255.0f, 210 / 255.0f, .9f }}},
-};

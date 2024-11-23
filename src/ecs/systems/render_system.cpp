@@ -135,11 +135,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			glUniform2fv(scale_uloc, 1, (float*)&registry.motions.get(entity).scale);
 			
 			vec3 c1, c2, c3, c4, c5;
-			c1 = (size > 0) ? bulletEffectColors[bse[0].type] : vec3(-1.0);
-			c2 = (size > 1) ? bulletEffectColors[bse[1].type] : vec3(-1.0);
-			c3 = (size > 2) ? bulletEffectColors[bse[2].type] : vec3(-1.0);
-			c4 = (size > 3) ? bulletEffectColors[bse[3].type] : vec3(-1.0);
-			c5 = (size > 4) ? bulletEffectColors[bse[4].type] : vec3(-1.0);
+			c1 = (size > 0) ? bulletEffectColors.at(bse[0].type) : vec3(-1.0);
+			c2 = (size > 1) ? bulletEffectColors.at(bse[1].type) : vec3(-1.0);
+			c3 = (size > 2) ? bulletEffectColors.at(bse[2].type) : vec3(-1.0);
+			c4 = (size > 3) ? bulletEffectColors.at(bse[3].type) : vec3(-1.0);
+			c5 = (size > 4) ? bulletEffectColors.at(bse[4].type) : vec3(-1.0);
 
 			GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
 			glUniform3fv(bcolor1_uloc, 1, (float*)&c1);
@@ -588,6 +588,7 @@ void RenderSystem::drawToScreen2()
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
 	Frame& frame = registry.frames.components[0];
+	assert(frame.prevTexture != 0);
 	glBindTexture(GL_TEXTURE_2D, frame.prevTexture);
 	gl_has_errors();
 	// Draw
@@ -1123,14 +1124,14 @@ void RenderSystem::drawBulletStack(const mat4& projection, const mat4& view) {
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++) {
 		// defaults
-		std::string bulletShape = bulletEffectShapes[BulletEffectType::Inert];
+		std::string bulletShape = bulletEffectShapes.at(BulletEffectType::Inert);
 		vec3 bulletColor = COLOR_GREY_MED;
 		// no variance on shape for now
 		if (bulletEffectShapes.count(stack.currStack[i].type) > 0) {
-			bulletShape = bulletEffectShapes[stack.currStack[i].type];
+			bulletShape = bulletEffectShapes.at(stack.currStack[i].type);
 		}
 		if (bulletEffectColors.count(stack.currStack[i].type) > 0) {
-			bulletColor = bulletEffectColors[stack.currStack[i].type];
+			bulletColor = bulletEffectColors.at(stack.currStack[i].type);
 		}
 
 		// start from bottom to top
