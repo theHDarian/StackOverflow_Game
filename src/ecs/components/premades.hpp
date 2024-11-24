@@ -645,7 +645,7 @@ const AttackData HifiSniperShot{
 	4,
 	0,
 	{30, 20},
-	300,
+	200,
 	10000,
 	{600, 0},
 	0,

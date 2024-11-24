@@ -1125,7 +1125,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			 GEOMETRY_BUFFER_ID::SPRITE});
 
 		ParticleProps props = enemyBullet;
-		props.colors.push_back(enemyBulletColors.at(Key));
+		props.colors.push_back(enemyBulletParticleColors.at(Key));
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
@@ -1193,8 +1193,8 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		if(enemyBulletColors.count(type) > 0) {
-			props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletParticleColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletParticleColors.at(type));
 		} else {
 			printf("Warning: enemy bullet color not defined\n");
 		}
@@ -1259,8 +1259,8 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		if(enemyBulletColors.count(type) > 0) {
-			props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletParticleColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletParticleColors.at(type));
 		} else {
 			printf("Warning: enemy bullet color not defined\n");
 		}
@@ -1404,7 +1404,7 @@ Entity createKeyBullet(RenderSystem* renderer, vec2 pos)
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	ParticleProps props = enemyBullet;
-	props.colors.push_back(enemyBulletColors.at(Key));
+	props.colors.push_back(enemyBulletParticleColors.at(Key));
 	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 

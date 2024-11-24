@@ -251,8 +251,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 							BulletEffectType type = effect.type;
 							if (type == BulletEffectType::Inert)
 								continue;
-							if(enemyBulletColors.count(type) > 0) {
-								props.colors.push_back(enemyBulletColors.at(type));
+							if(enemyBulletParticleColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletParticleColors.at(type));
 							} else {
 								printf("Warning: enemy bullet color not defined\n");
 							}
@@ -465,8 +465,8 @@ void WorldSystem::handleCollisions() {
 							BulletEffectType type = effect.type;
 							if (type == BulletEffectType::Inert)
 								continue;
-							if(enemyBulletColors.count(type) > 0) {
-								props.colors.push_back(enemyBulletColors.at(type));
+							if(enemyBulletParticleColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletParticleColors.at(type));
 							} else {
 								printf("Warning: enemy bullet color not defined\n");
 							}
