@@ -168,6 +168,13 @@ void SoundSystem::loadSoundEffects() {
     }
     playerHurtSound->volume = 0.7f * MIX_MAX_VOLUME;
 
+    playerZappedSound = Mix_LoadWAV(audio_path("sfx/player_zapped.wav").c_str());
+    if (!playerHurtSound) {
+        fprintf(stderr, "Failed to load player zap sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load player zap sound");
+    }
+    playerZappedSound->volume = 0.4f * MIX_MAX_VOLUME;
+
     playerDashSound = Mix_LoadWAV(audio_path("sfx/dash.wav").c_str());
     if (!playerDashSound) {
         fprintf(stderr, "Failed to load player dash sound: %s\n", Mix_GetError());
@@ -316,6 +323,11 @@ void SoundSystem::playSpecialMusic(int songIndex)
 void SoundSystem::playPlayerHurtSound() {
     Mix_PlayChannel(3, playerHurtSound, 0);
     Mix_Volume(3, playerHurtSound->volume * volume);
+}
+
+void SoundSystem::playPlayerZappedSound() {
+    Mix_PlayChannel(3, playerZappedSound, 0);
+    Mix_Volume(3, playerZappedSound->volume * volume);
 }
 
 void SoundSystem::playPlayerDashSound() {

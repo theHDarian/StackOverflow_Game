@@ -795,7 +795,10 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	}
 
 	//play hit sound
-	soundPlayer->playPlayerHurtSound();
+	if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
+		soundPlayer->playPlayerZappedSound();
+	} else
+		soundPlayer->playPlayerHurtSound();
 
 	//add player invincibility frames
 	if (!registry.invincibles.has(player)) {
