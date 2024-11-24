@@ -464,6 +464,15 @@ const RoomPreset BossRoomBee{
     0.0f,
     2};
 
+const RoomPreset HifiRoomTwinLaser {
+    {{EnemyType::HifiEnemyTwinLaser, {0.5f,0.5f}},{EnemyType::HifiEnemyTwinLaser, {0.5f, 0.5f}}},
+    {},
+    {},
+    {},
+    0.0f,
+    5
+};
+
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory = {
     {DifficultyRegion::Intro,{

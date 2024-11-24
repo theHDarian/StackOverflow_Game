@@ -1716,6 +1716,46 @@ struct InvisibleLaserEnemy : Enemy {
 	};
 };
 
+//----------------------------------------- HIFI REGION ENEMIES ---------------------------------
+struct TwinLaserEnemy : Enemy {
+	const AttackData crabLaser{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{bulletBounceUpA},
+	blunt,
+	1,
+	0,
+	{20, 20},
+	0,
+	10000000,
+	{4, 0},
+	0,
+	0,
+	0 };
+
+	Reaction duration = {
+		ReactionType::FINISH_PATROL,
+		1 };
+
+	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemy()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_004.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 240.0f / 2, 240.f / 2 });
+		rotatePower = 1.0f;
+		speedMultiplier = 1.6;
+		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
+	};
+};
+
 
 
 // struct EnemyHardSkull : {

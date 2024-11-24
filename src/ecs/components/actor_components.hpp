@@ -288,7 +288,8 @@ enum EnemyType {
     MediumEnemyHealer,
     HardEnemyBoidBio,
     ScientistlaserAttack,
-    HardEnemyBoidFish
+    HardEnemyBoidFish,
+    HifiEnemyTwinLaser
 };
 
 enum class EnemyAttackPattern {

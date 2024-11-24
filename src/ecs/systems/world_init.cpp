@@ -960,6 +960,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boid.velocity = vec2(randomX, randomY);
 		boid.maxSpeed = 200.f;
 	}
+	case EnemyType::HifiEnemyTwinLaser:
+	{
+		enemy = TwinLaserEnemy();
+		break;
+	}
 	};
 
 	Motion &motion = registry.motions.emplace(entity);

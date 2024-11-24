@@ -6,6 +6,7 @@
 #include "SDL.h"
 #include "components/presets/room_presets.hpp"
 #include "sound_system.hpp"
+#include <glm/gtx/compatibility.hpp>
 
 
 MapSystem::MapSystem()
@@ -37,10 +38,12 @@ void MapSystem::step(float elapsed_ms)
 
     // spawn enemy based on current time
     WindowState &wS = registry.windowStates.components[0];
+    vec2 roomStartPos = vec2(wS.width,wS.height)/2.f-map.currRoom.roomSize/2.f;
+    vec2 roomEndPos = vec2(wS.width,wS.height)/2.f+map.currRoom.roomSize/2.f;
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
-            createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
+            createEnemy(renderer, glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e)), std::get<EnemyType>(e));
 
         }
         map.currRoom.preset.enemies = {};
@@ -48,7 +51,7 @@ void MapSystem::step(float elapsed_ms)
         if (map.currRoom.cleared) {
             for (auto &e : map.currRoom.preset.interactables)
             {
-                createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+                createInteractable(renderer, glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e)), std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
             }
             map.currRoom.preset.interactables = {};
 
