@@ -161,7 +161,8 @@ struct StackCompile {
             currStack.push_back(effect);
             return true;
         }
-        if (effect.type == Lightning && currStack.size() > 1) {
+        if (effect.type == Lightning) {
+            if (currStack.size() < 1) return true;
             if (effect.effectCalc == Additive) {
                 std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
             }
