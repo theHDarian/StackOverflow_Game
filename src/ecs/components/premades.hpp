@@ -331,16 +331,16 @@ const BulletStackEffect DataCompression = {
 	"" };
 
 const BulletStackEffect WarMachine = {
-	BulletDamage,
-	Multiplicative,
-	3,
+	Homing,
+	Additive,
+	0.5,
 	"War Machine",
 	"" };
 
 const BulletStackEffect WeaponOfWar = {
-	FireRate,
-	Multiplicative,
-	3,
+	BulletBurst,
+	Additive,
+	2,
 	"Weapon of War",
 	"" };
 
