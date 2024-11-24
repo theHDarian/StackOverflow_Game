@@ -216,6 +216,11 @@ void EnemySystem::step(float elapsed_ms)
 
 
                     registry.emitParticles.replace(entity,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
+                    if (registry.enemyGroups.has(entity)) {
+                        for (Entity other : registry.enemyGroups.get(entity).others) {
+                            registry.emitParticles.replace(other,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
+                        }
+                    }
                 }
 
                 // std::cout << "enemy " << entity << "has died" << std::endl;

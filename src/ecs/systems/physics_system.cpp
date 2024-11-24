@@ -83,6 +83,8 @@ void PhysicsSystem::step(float elapsed_ms)
 						Motion& otherMotion = registry.motions.get(group.others[0]);
 						float dist = glm::distance(otherMotion.position,start.position);
 						laser.length = min(dist,laser.length);
+						vec2 diff = otherMotion.position-start.position;
+						laser.rotation = atan2(diff.y,diff.x);
 					}
 				}
 				float currLength = laser.length;

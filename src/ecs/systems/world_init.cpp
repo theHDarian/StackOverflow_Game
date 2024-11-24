@@ -970,6 +970,16 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = TwinLaserEnemyVertical2();
 		break;
 	}
+	case EnemyType::HifiEnemyTwinLaserHorizontal1:
+	{
+		enemy = TwinLaserEnemyHorizontal1();
+		break;
+	}
+	case EnemyType::HifiEnemyTwinLaserHorizontal2:
+	{
+		enemy = TwinLaserEnemyHorizontal2();
+		break;
+	}
 	};
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1041,9 +1051,16 @@ void createEnemyGroup(RenderSystem * renderer, vec2 pos, EnemyType type) {
 	WindowState& ws =  registry.windowStates.components[0];
 	if (type == EnemyType::HifiEnemyTwinLaserVertical1) {
 		//should spawn twin on the side perpendicular to patrol direction
-		vec2 twinPos = vec2(ws.width,ws.height) - pos; //normalized position
+		vec2 twinPos = pos; //normalized position
+		twinPos.x = ws.width - pos.x;
 		groupMembers.push_back(createEnemy(renderer,pos,type));
 		groupMembers.push_back(createEnemy(renderer,twinPos,HifiEnemyTwinLaserVertical2));
+	} else if (type == EnemyType::HifiEnemyTwinLaserHorizontal1) {
+		//should spawn twin on the side perpendicular to patrol direction
+		vec2 twinPos = pos; //normalized position
+		twinPos.y = ws.height - twinPos.y;
+		groupMembers.push_back(createEnemy(renderer,pos,type));
+		groupMembers.push_back(createEnemy(renderer,twinPos,HifiEnemyTwinLaserHorizontal2));
 	}
 	for (Entity gm : groupMembers) {
 		EnemyGroup& eg = registry.enemyGroups.emplace(gm);

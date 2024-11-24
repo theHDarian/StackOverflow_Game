@@ -1762,6 +1762,19 @@ struct TwinLaserEnemyVertical2 : TwinLaserEnemyVertical1 {
 	}
 };
 
+struct TwinLaserEnemyHorizontal1 : TwinLaserEnemyVertical1 {
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyHorizontal1() : TwinLaserEnemyVertical1() {
+		enemyPatterns = { randomState};
+	}
+};
+struct TwinLaserEnemyHorizontal2 : TwinLaserEnemyHorizontal1 {
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.99},{0.01,0.99},{0.99,0.99}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyHorizontal2() : TwinLaserEnemyHorizontal1() {
+		enemyPatterns = { randomState};
+	}
+};
+
 
 
 // struct EnemyHardSkull : {
