@@ -113,7 +113,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			glUniform1i(tile_uloc, render_request.idealScale.x > 0);
 			gl_has_errors();
 
-			vec2 tiling = registry.maps.components[0].currRoom.roomSize / render_request.idealScale;
+			vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
 			GLint tiling_uloc = glGetUniformLocation(program, "tiling");
 			glUniform2fv(tiling_uloc, 1, (float*)&tiling);
 		}
@@ -238,7 +238,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			angle = b.angle;
 			axis = b.axis;
 			offset = b.offset;
-			tiling = vec2(registry.maps.components[0].currRoom.roomSize.x / render_request.idealScale.x, 1);
+			tiling = vec2(registry.maps.components[0].currRoom.preset.roomSize.x / render_request.idealScale.x, 1);
 			//tiling = vec2(5, 1);
 
 		} else if (registry.doorSymbols.has(entity)) {
@@ -285,19 +285,19 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		Room& room = registry.maps.components[0].currRoom;
 
 		vec2 roomCenterOffset = vec2(0);
-		if ((room.roomSize.x / 2) < (ws.width / 2) || (room.roomSize.y / 2) < (ws.height / 2))
-			roomCenterOffset += -1.f *camera.zoom*vec2((ws.width / 2 - room.roomSize.x / 2)*(1 - ((room.roomSize.x * 0.33f) / 2.f / (ws.width / 2.f))),
+		if ((room.preset.roomSize.x / 2) < (ws.width / 2) || (room.preset.roomSize.y / 2) < (ws.height / 2))
+			roomCenterOffset += -1.f *camera.zoom*vec2((ws.width / 2 - room.preset.roomSize.x / 2)*(1 - ((room.preset.roomSize.x * 0.33f) / 2.f / (ws.width / 2.f))),
 				0);
-		if ((room.roomSize.y / 2) < (ws.height / 2))
+		if ((room.preset.roomSize.y / 2) < (ws.height / 2))
 			roomCenterOffset += -1.f * camera.zoom * vec2(0,
-				(ws.height / 2 - room.roomSize.y / 2) * 1.8f * (1 - ((room.roomSize.y * 0.33f) / 2.f / (ws.height / 2))));
+				(ws.height / 2 - room.preset.roomSize.y / 2) * 1.8f * (1 - ((room.preset.roomSize.y * 0.33f) / 2.f / (ws.height / 2))));
 
 		vec3 clampedTranslate = vec3(clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f, 
-					motion.position.x - room.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - room.wallThickness * 1.5f * 1.1f / 2 - 25,
-					motion.position.x + room.roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + room.wallThickness * 1.5f * 1.1f / 2 + 25),
+					motion.position.x - room.preset.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - room.wallThickness * 1.5f * 1.1f / 2 - 25,
+					motion.position.x + room.preset.roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + room.wallThickness * 1.5f * 1.1f / 2 + 25),
 			clamp(motion.position.y + playerMotion.position.y * 2.f - ws.height*2.f / 2.f - ws.height / 2.f,
-				motion.position.y + ws.height / clampAmount / 2.f - room.roomSize.y / clampAmount - room.wallThickness * 1.5f,
-				motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + room.roomSize.y + room.wallThickness * 1.5f),
+				motion.position.y + ws.height / clampAmount / 2.f - room.preset.roomSize.y / clampAmount - room.wallThickness * 1.5f,
+				motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + room.preset.roomSize.y + room.wallThickness * 1.5f),
 				-room.wallThickness * 1.5f + 50);
 		vec3 unclampedTranslate = vec3(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f,
 				motion.position.y + playerMotion.position.y * 2.f - ws.height*2.f / 2.f - ws.height / 2.f,
@@ -325,8 +325,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"),1,GL_FALSE,(float *)&view_roomBounds);
 		vec3 clampOffset = unclampedTranslate - clampedTranslate;
 		glm::mat4 translateAfterClamp = glm::translate(glm::mat4(1.0f),
-			(clampOffset * vec3(1.8f,1,1)) * camera.zoom * vec3(room.roomSize.x / ws.width , room.roomSize.y / ws.height, 1) /vec3(room.roomSize.x, room.roomSize.y,1));
-		translateAfterClamp = glm::translate(translateAfterClamp, (vec3(roomCenterOffset, 0) * vec3(1.8f, 1, 1)) * vec3(room.roomSize.x / ws.width, room.roomSize.y / ws.height, 1) / vec3(room.roomSize.x, room.roomSize.y, 1));
+			(clampOffset * vec3(1.8f,1,1)) * camera.zoom * vec3(room.preset.roomSize.x / ws.width , room.preset.roomSize.y / ws.height, 1) /vec3(room.preset.roomSize.x, room.preset.roomSize.y,1));
+		translateAfterClamp = glm::translate(translateAfterClamp, (vec3(roomCenterOffset, 0) * vec3(1.8f, 1, 1)) * vec3(room.preset.roomSize.x / ws.width, room.preset.roomSize.y / ws.height, 1) / vec3(room.preset.roomSize.x, room.preset.roomSize.y, 1));
 
 		glUniformMatrix4fv(glGetUniformLocation(program, "translateAfterClamp"),1,GL_FALSE,(float *)&translateAfterClamp);
 		

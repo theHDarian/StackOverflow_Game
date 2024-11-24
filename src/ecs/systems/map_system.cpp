@@ -36,11 +36,11 @@ void MapSystem::step(float elapsed_ms)
     handleMapRequests();
 
     // spawn enemy based on current time
-    WindowState &wS = registry.windowStates.components[0];
+    // WindowState &wS = registry.windowStates.components[0];
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
-            createEnemy(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<EnemyType>(e));
+            createEnemy(renderer, std::get<vec2>(e) * map.currRoom.preset.roomSize, std::get<EnemyType>(e));
 
         }
         map.currRoom.preset.enemies = {};
@@ -48,7 +48,7 @@ void MapSystem::step(float elapsed_ms)
         if (map.currRoom.cleared) {
             for (auto &e : map.currRoom.preset.interactables)
             {
-                createInteractable(renderer, std::get<vec2>(e) * vec2(wS.width, wS.height), std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+                createInteractable(renderer, std::get<vec2>(e) * map.currRoom.preset.roomSize, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
             }
             map.currRoom.preset.interactables = {};
 
@@ -234,9 +234,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // Create floor decorations
     WindowState& ws = registry.windowStates.components[0];
     std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : "bio_floor_addons";
-    vec2 placements = vec2(floor(0.8 * map.currRoom.roomSize.x / 192.f), floor( 0.8 * map.currRoom.roomSize.x / 192.f));
-    vec2 dividers = vec2(0.9090 * map.currRoom.roomSize.x / placements.x, 0.9090 * map.currRoom.roomSize.y / placements.y);
-    vec2 roomOffset = vec2(-map.currRoom.roomSize.x / 2.2f, -map.currRoom.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
+    vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor( 0.8 * map.currRoom.preset.roomSize.x / 192.f));
+    vec2 dividers = vec2(0.9090 * map.currRoom.preset.roomSize.x / placements.x, 0.9090 * map.currRoom.preset.roomSize.y / placements.y);
+    vec2 roomOffset = vec2(-map.currRoom.preset.roomSize.x / 2.2f, -map.currRoom.preset.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
     vec2 wiggle = (dividers - vec2(192)) / 2.f;
     for (int i = 0; i < placements.x; i++) {
         for (int j = 0; j < placements.y; j++) {

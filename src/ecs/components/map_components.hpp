@@ -59,6 +59,12 @@ struct RoomPreset {
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
     int numKeyBulletsToSpawn = 2;
+    std::string ID;
+    bool oneTime = false; //if true, room will not appear again
+    vec2 roomSize = { 2560, 1600 };
+    bool operator==(const RoomPreset& other) const {
+        return ID == other.ID;
+    }
 };
 
 struct RoomPresets {
@@ -98,7 +104,6 @@ struct Room {
     int cutsceneCount = 0;
     bool dialogueDone = true;
     bool cutSceneDone = true;
-    vec2 roomSize = { 1500, 1700 };
     vec2 roomPosition = { 1920 / 2, 1080 / 2 };
     float wallThickness = 100.f;
 };

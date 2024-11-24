@@ -8,6 +8,7 @@
 #include "tiny_ecs.hpp"
 #include "tiny_ecs_registry.hpp"
 #include "world_init.hpp"
+#include "premades.hpp"
 
 
 void resetStack(Entity player, RenderSystem* renderer) {
@@ -47,12 +48,28 @@ void resetStack(Entity player, RenderSystem* renderer) {
     }
 }
 
+void clearStack(Entity player) {
+	StackCompile& reg = registry.stackCompile.get(player);
+	if (reg.currStack.size() == 0) {
+		return;
+	}
+	int size = reg.baseStackSize;
+	registry.stackCompile.remove(player);
+	StackCompile& newreg = registry.stackCompile.emplace(player);
+	newreg.baseStackSize = size;
+	Player& pl = registry.players.get(player);
+	pl.currDashCharges = pl.baseDashNum;
+	pl.currDashCooldown = pl.baseDashCDR;
+	StackUI& ui = registry.stackUI.components[0];
+	ui.updateStackUISize(reg.baseStackSize);
+}
+
 void extendStack (Entity player, int extension) {
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
         reg.baseStackSize += extension;
         StackUI& ui = registry.stackUI.components[0];
-        ui.updateStackUISize(reg.baseStackSize);
+    	ui.updateStackUISize(getModifiedValue( PlayerStackSize, reg.baseStackSize));
     }
 }
 
@@ -64,6 +81,15 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
             reg.add(b);
         }
     }
+}
+
+void grantWish (Entity player, RenderSystem* renderer, int choice) {
+	if (registry.stackCompile.has(player)) {
+		StackCompile& reg = registry.stackCompile.get(player);
+		reg.baseStackSize = 8;
+		StackUI& ui = registry.stackUI.components[0];
+		ui.updateStackUISize(getModifiedValue( PlayerStackSize, reg.baseStackSize));
+	}
 }
 
 void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
@@ -85,6 +111,11 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 		if (object.name.compare("BibleTree") == 0) {
 			if (reaction.choice == 0) { // yes
 				object.dialogueCount++;
+				if (!registry.keyItems.has(player)) {
+					registry.keyItems.emplace(player);
+				}
+				KeyItems& keyItems = registry.keyItems.get(player);
+				keyItems.fruits++;
 			}
 			else if (reaction.choice == 1) { // no
 				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
@@ -144,6 +175,50 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
 				addEffect(player, stack.stack);
 				object.dialogueCount++;
+			}
+		}
+
+		if (object.item == HoneyCanister) {
+			if (reaction.choice == 0) {
+				if (!registry.keyItems.has(player)) {
+					registry.keyItems.emplace(player);
+				}
+				KeyItems& keyItems = registry.keyItems.get(player);
+				keyItems.honey++;
+				Map& map = registry.maps.components[0];
+				map.currRoom.cleared = false;
+				map.currRoom.preset.enemies = {{EnemyType::TwoBee, {0.2f, 0.8f}},
+				{EnemyType::ThreeBee, {0.8f, 0.8f}},
+					{EnemyType::TwoBee, {0.8f, 0.2f}},
+				{EnemyType::ThreeBee, {0.2f, 0.2f}},
+			};
+			}
+		}
+		if (object.item == WishGranter) {
+			grantWish( player, renderer, reaction.choice);
+		}
+		if (object.item == Baru) {
+			int currentDialogue = object.dialogueCount;
+			switch (currentDialogue) {
+				case 0 : {
+					if (reaction.choice == 0) {
+						// DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+						// req.choice = 1;
+						object.dialogueCount++;
+					}
+					break;
+				}
+				case 1 : {
+					if (reaction.choice == 0) {
+						clearStack(player);
+						extendStack(player, -8);
+						object.dialogueCount++;
+					}
+					if (reaction.choice == 0) {
+						addEffect(player, {WarMachine, WeaponOfWar, stackSizeUpA});
+					}
+					break;
+				}
 			}
 		}
 	}

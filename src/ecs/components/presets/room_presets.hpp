@@ -14,7 +14,11 @@ const RoomPreset TutorialRoom1Preset{
     {},
     {},
     100000.0f,
-    0};
+    0,
+    0,
+    "TutorialRoom1"
+
+};
 
 const RoomPreset TutorialRoom2Preset{
     {{EnemyType::TestRevampedEnemy, {0.5, 0.5}}},
@@ -22,7 +26,9 @@ const RoomPreset TutorialRoom2Preset{
     {},
     {},
     0.0f,
-    0 
+    0 ,
+    0,
+    "TutorialRoom2"
 };
 
 const RoomPreset EnemyRoomSwarm{
@@ -188,7 +194,12 @@ const RoomPreset EnemyRoomSwarm{
     {{{PushConsole,{bulletPierceUpA}}, {0.5f, 0.5f}}},
     {},
     0.0f,
-    0};
+    0,
+0,
+"EnemyRoomSwarm",
+    false,
+    {3000, 3000}
+};
 
 const RoomPreset EnemyRoomDashIntro1{
         {{EnemyType::EasyEnemySentry, {0.8f, 0.2f}},
@@ -199,7 +210,10 @@ const RoomPreset EnemyRoomDashIntro1{
        {},
        {},
        0.0f,
-       3};
+       3,
+    1,
+    "EnemyRoomDashIntro1",
+};
 
 const RoomPreset EnemyRoomDashIntro2{
         {{EnemyType::Snail, {0.2f, 0.8f}},
@@ -210,7 +224,10 @@ const RoomPreset EnemyRoomDashIntro2{
        {},
        {},
        0.0f,
-       3 };
+       3,
+    1,
+    "EnemyRoomDashIntro2",
+};
 
 const RoomPreset EnemyRoomDashIntro3{
         {{EnemyType::HardEnemyBoidBio, {0.2f, 0.8f}},
@@ -225,7 +242,10 @@ const RoomPreset EnemyRoomDashIntro3{
        {},
        {},
        0.0f,
-       3 };
+       3,
+         1,
+            "EnemyRoomDashIntro3",
+};
 
 const RoomPreset EnemyRoomDash1{
     {{EnemyType::EasyEnemySentry, {0.2f, 0.8f}},
@@ -242,7 +262,10 @@ const RoomPreset EnemyRoomDash1{
     {},
     {},
     0.0f,
-    5};
+    5,
+    2,
+    "EnemyRoomDash1",
+};
 
 const RoomPreset EnemyRoomDash2{
     {{EnemyType::EasyEnemySentry, {0.4f, 0.2f}},
@@ -255,7 +278,10 @@ const RoomPreset EnemyRoomDash2{
     {},
     {},
     0.0f,
-    5};
+    5,
+    2,
+    "EnemyRoomDash2",
+};
 
 
 const RoomPreset EnemyRoomDashHard{
@@ -270,6 +296,10 @@ const RoomPreset EnemyRoomDashHard{
     {},
     {},
     {},
+    0.0f,
+    5,
+    2,
+    "EnemyRoomDashHard",
 };
 
 const RoomPreset EnemyRoomSnails {
@@ -283,6 +313,10 @@ const RoomPreset EnemyRoomSnails {
 {},
 {},
 {},
+0.0f,
+    5,
+    2,
+    "EnemyRoomSnails",
 
 };
 
@@ -297,7 +331,10 @@ const RoomPreset EnemyRoomBees1{
     {},
     {},
     0.0f,
-    5};
+    5,
+    2,
+    "EnemyRoomBees1",
+};
 
 const RoomPreset EnemyRoomBees2{
     {{EnemyType::TwoBee, {0.2f, 0.8f}},
@@ -312,6 +349,10 @@ const RoomPreset EnemyRoomBees2{
     {},
     {},
     {},
+    0.5f,
+    7,
+    2,
+    "EnemyRoomBees2",
     };
 
 const RoomPreset EnemyRoomAngelTank{
@@ -324,8 +365,11 @@ const RoomPreset EnemyRoomAngelTank{
     {},
     {},
     {},
-    0.0f,
-    5};
+    0.25f,
+    5,
+    2,
+    "EnemyRoomAngelTank",
+};
 
 const RoomPreset EnemyRoomTripleBuffEX{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
@@ -340,29 +384,72 @@ const RoomPreset EnemyRoomTripleBuffEX{
     },
     {},
     0.0f,
-    35};
+    35,
+    5,
+    "EnemyRoomTripleBuffEX"
+};
 
 
 const RoomPreset RestingRoomPop{
     {},
     {},
     {{{PopConsole,{}}, {0.5f, 0.5f}}},
-    {SpecialEvent::RebootStation}
+    {SpecialEvent::RebootStation},
+    0.0f,
+    0,
+    0,
+    "RestingRoomPop",
 };
 
 const RoomPreset RestingRoomGardener{
         {},
         {},
         {{{Gardener,{}}, {0.5f, 0.5f}}},
-        {SpecialEvent::RebootStation}
+        {SpecialEvent::RebootStation},
+    0.0f,
+    0,
+    0,
+    "RestingRoomGardener",
+    true
 };
 
 const RoomPreset RestRoomBibleTree{
     {},
     {},
     {{{InteractableItem::BibleTree,{}}, {0.5f, 0.5f}}},
-    {SpecialEvent::RebootStation}
+    {SpecialEvent::RebootStation},
+    0.0f,
+    0,
+    0,
+    "RestRoomBibleTree",
+    true
 };
+
+const RoomPreset RestRoomBaru{
+        {},
+        {},
+{{{Baru,{key}}, {0.35f, 0.1f}}},
+    {},
+        0.0f,
+        5,
+        0,
+    "RestRoomBaru",
+        true,
+    {3000, 4000}
+    };
+
+const RoomPreset RestRoomOracleCrab{
+        {},
+        {},
+        {{{OracleCrab,{key}}, {0.5f, 0.3f}}},
+        {},
+        0.0f,
+        5,
+        0,
+    "RestRoomOracleCrab",
+        true
+    };
+
 
 const RoomPreset TreasureRoom1{
     {},
@@ -371,6 +458,8 @@ const RoomPreset TreasureRoom1{
     {},
     0.0f,
     5,
+    0,
+    "TreasureRoom1",
 };
 
 const RoomPreset TreasureRoom2{
@@ -380,6 +469,8 @@ const RoomPreset TreasureRoom2{
 {},
     0.0f,
     5,
+    0,
+    "TreasureRoom2",
 };
 
 const RoomPreset TreasureRoom3{
@@ -389,6 +480,8 @@ const RoomPreset TreasureRoom3{
     {},
     0.0f,
     5,
+    0,
+    "TreasureRoom3",
 };
 
 const RoomPreset TreasureRoom4{
@@ -398,6 +491,8 @@ const RoomPreset TreasureRoom4{
     {},
     0.0f,
     5,
+    0,
+    "TreasureRoom4",
 };
 
 const RoomPreset TreasureRoom5{
@@ -407,6 +502,8 @@ const RoomPreset TreasureRoom5{
     {},
     0.0f,
     5,
+    0,
+    "TreasureRoom5",
 };
 
 const RoomPreset TreasureRoomKey{
@@ -416,6 +513,8 @@ const RoomPreset TreasureRoomKey{
         {},
         0.0f,
         5,
+    0,
+    "TreasureRoomKey",
     };
 
 const RoomPreset TreasureRoomBlunt{
@@ -425,6 +524,8 @@ const RoomPreset TreasureRoomBlunt{
     {},
     0.0f,
     0,
+    0,
+    "TreasureRoomBlunt",
 };
 
 const RoomPreset TreasureRoomRam{
@@ -434,6 +535,8 @@ const RoomPreset TreasureRoomRam{
     {},
     0.0f,
     0,
+    0,
+    "TreasureRoomRam",
 };
 
 const RoomPreset TreasureRoomSniper{
@@ -443,6 +546,20 @@ const RoomPreset TreasureRoomSniper{
     {},
     0.0f,
     5,
+    0,
+    "TreasureRoomSniper",
+};
+
+const RoomPreset TreasureRoomHoney{
+    {},
+    {},
+    {{{HoneyCanister,{}}, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    5,
+    0,
+    "TreasureRoomHoney",
+    true
 };
 
 const RoomPreset TreasureRoomKeys{
@@ -452,7 +569,25 @@ const RoomPreset TreasureRoomKeys{
 {},
     0.0f,
     5,
+    0,
+    "TreasureRoomKeys",
+    false
 };
+
+
+const RoomPreset TreasureRoomWish{
+    {},
+    {},
+    {{{WishGranter,{key}}, {0.5f, 0.5f}}},
+{},
+    0.0f,
+    5,
+    0,
+    "TreasureRoomWish",
+    true
+};
+
+
 
 
 
@@ -462,7 +597,11 @@ const RoomPreset BossRoomBee{
     {{{Ram,{}}, {0.5f, 0.5f}}},
     {},
     0.0f,
-    2};
+    20,
+    5,
+    "BossRoomBee",
+
+};
 
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory = {
@@ -498,31 +637,60 @@ inline bool hasLocked(RoomType type, int roomsTraversed, std::map<DifficultyRegi
     }
 }
 
-inline RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked, std::map<DifficultyRegion,std::map<RoomType, RoomPresets>>& Directory) {
-    //boss rooms
+inline RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked, std::map<DifficultyRegion, std::map<RoomType, RoomPresets>>& Directory) {
+    // Boss rooms
     if (type == RoomType::BossBigCRoom) {
         return BossRoomBee;
     }
 
-    //tutorial rooms
+    // Tutorial rooms
     if (type == RoomType::TutorialRoom2) {
         return TutorialRoom2Preset;
     }
 
-    //regular rooms
-    if(!hasLocked(type,roomsTraversed, Directory) && locked) {
+    RoomPreset nextRoom;
+
+    // Regular rooms
+    if (!hasLocked(type, roomsTraversed, Directory) && locked) {
         assert(false);
     }
-    if (roomsTraversed < DifficultyRegion::Intro) {
-        return Random::ListItem(locked ? Directory.at(Intro).at(type).locked : Directory.at(Intro).at(type).unlocked);
-    } else if (roomsTraversed < DifficultyRegion::Easy) {
-        return Random::ListItem(locked ? Directory.at(Easy).at(type).locked : Directory.at(Easy).at(type).unlocked);
-    } else if (DifficultyRegion::Medium) {
-        return Random::ListItem(locked ? Directory.at(Medium).at(type).locked : Directory.at(Medium).at(type).unlocked);
+
+    DifficultyRegion currentRegion;
+    if (roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
+        currentRegion = DifficultyRegion::Intro;
+    } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
+        currentRegion = DifficultyRegion::Easy;
+    } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
+        currentRegion = DifficultyRegion::Medium;
     } else {
-        return Random::ListItem(locked ? Directory.at(Medium).at(type).locked : Directory.at(Medium).at(type).unlocked);
+        currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
     }
+
+    nextRoom = Random::ListItem(locked ? Directory.at(currentRegion).at(type).locked : Directory.at(currentRegion).at(type).unlocked);
+
+    // Remove the one-time room from all relevant regions
+    if (nextRoom.oneTime) {
+        for (auto it = Directory.begin(); it != Directory.end(); ++it) {
+            if (it->first >= currentRegion) { // Remove from current and future regions
+                std::map<RoomType, RoomPresets>& roomMap = it->second;
+                std::vector<RoomPreset>& roomList = roomMap.at(type).locked;
+                roomList.erase(std::remove(roomList.begin(), roomList.end(), nextRoom), roomList.end());
+
+                // Repeat the process for unlocked rooms if applicable
+                std::vector<RoomPreset>& unlockedRoomList = roomMap.at(type).unlocked;
+                unlockedRoomList.erase(std::remove(unlockedRoomList.begin(), unlockedRoomList.end(), nextRoom), unlockedRoomList.end());
+            }
+        }
+    }
+
+    return nextRoom;
 }
+
+// Define the comparison operator for DifficultyRegion
+bool operator>=(DifficultyRegion lhs, DifficultyRegion rhs) {
+    return static_cast<int>(lhs) >= static_cast<int>(rhs);
+}
+
 
 
 const std::map<RoomType,int> roomTypeToSymbols = {

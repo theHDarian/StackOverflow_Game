@@ -549,3 +549,9 @@ struct Critter {
     vec2 flee = vec2(0);
     float life = 10000;
 };
+
+struct KeyItems {
+    int fruits = 0;
+    int honey = 0;
+
+};

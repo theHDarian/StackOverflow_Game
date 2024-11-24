@@ -158,10 +158,10 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	vec2 roomCenter = { wS.width / 2, wS.height / 2 };
 
 	WindowState& ws = registry.windowStates.components[0];
-	createWallThickness({ ws.width / 2, ws.height / 2}, currRoom.roomSize);
-	createFloor(renderer, { ws.width /2, ws.height/2 }, currRoom.roomSize);
+	createWallThickness({ ws.width / 2, ws.height / 2}, currRoom.preset.roomSize);
+	createFloor(renderer, { ws.width /2, ws.height/2 }, currRoom.preset.roomSize);
 
-	createRoomBounds(renderer, roomCenter, currRoom.roomSize);
+	createRoomBounds(renderer, roomCenter, currRoom.preset.roomSize);
 
 	//Entity title = createSkipDialogue();
 	//registry.dialogueRequests.emplace(title);
