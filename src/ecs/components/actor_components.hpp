@@ -293,6 +293,7 @@ enum EnemyType {
     HifiEnemyTwinLaserVertical2,
     HifiEnemyTwinLaserHorizontal1,
     HifiEnemyTwinLaserHorizontal2,
+    HifiEnemySniper
 };
 
 enum class EnemyAttackPattern {

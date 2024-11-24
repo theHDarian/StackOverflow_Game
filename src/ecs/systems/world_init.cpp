@@ -980,6 +980,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = TwinLaserEnemyHorizontal2();
 		break;
 	}
+	case EnemyType::HifiEnemySniper:
+	{
+		enemy = EnemyHifiSniper();
+		break;
+	}
 	};
 
 	Motion &motion = registry.motions.emplace(entity);

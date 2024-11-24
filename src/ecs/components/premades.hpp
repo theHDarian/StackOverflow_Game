@@ -637,6 +637,21 @@ const AttackData SniperShot{
 	0,
 	0};
 
+const AttackData HifiSniperShot{
+	EnemyAttackPattern::BURST,
+	TRIANGLE,
+	{APRounds, dmgUpM, ConcentratedFire},
+	blunt,
+	4,
+	0,
+	{30, 20},
+	300,
+	10000,
+	{600, 0},
+	0,
+	2,
+	0};
+
 const AttackData NoAttack{
 	EnemyAttackPattern::NONE,
 	CIRCLE,
@@ -1775,6 +1790,32 @@ struct TwinLaserEnemyHorizontal2 : TwinLaserEnemyHorizontal1 {
 	}
 };
 
+
+struct EnemyHifiSniper : Enemy
+{
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0};
+
+
+	EnemyPattern random = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {reactionIdle}, 0, true, 0, 2000.f, HifiSniperShot};
+
+	EnemyHifiSniper()
+	{
+		maxHealth = 90;
+		currHealth = maxHealth;
+		enemyPatterns = {random};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_000.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({160.f / 2.f, 160.f / 2.f});
+		rotatePower = 90.f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+	};
+};
 
 
 // struct EnemyHardSkull : {
