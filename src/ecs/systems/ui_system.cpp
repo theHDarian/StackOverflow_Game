@@ -393,17 +393,18 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	motion.position = { position.x, position.y };
 	
 	// hard code these offsets to make the doors look nice
-	if (position.y < windowState.height / 2 - 10) {
+	Room room = registry.maps.components[0].currRoom;
+	if (position.y <= registry.motions.get(registry.doors.entities[0]).position.y) { // bottom door
 		motion.position.y -= 50;
 	}
-	else if (position.y > windowState.height / 2 + 10) {
+	else if (position.y >= registry.motions.get(registry.doors.entities[2]).position.y) { // top door
 		motion.position.y += 50;
 	}
 
-	if (position.x < windowState.width / 10) {
+	if (position.x <= registry.motions.get(registry.doors.entities[3]).position.x) { // left door
 		motion.position.x -= 50;
 	}
-	else if (position.x > windowState.width - windowState.width / 10) {
+	else if (position.x >= registry.motions.get(registry.doors.entities[1]).position.x) { // right door
 		motion.position.x += 50;
 	}
 
@@ -415,7 +416,7 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	text.color = vec3(1, 1, 1);
 	text.text = "E";
 	text.scale = 0.40;
-	text.topRightBound = { windowState.width, windowState.height };
+	text.topRightBound = { room.preset.roomSize.x,  room.preset.roomSize.y };
 	text.bottomLeftBound = { 0, 0 };
 	text.y = windowState.height - motion.position.y - 15;
 	text.x = motion.position.x - 10;

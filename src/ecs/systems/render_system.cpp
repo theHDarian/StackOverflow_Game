@@ -1609,7 +1609,6 @@ mat4 createFollowCameraModel(Motion& motion, vec2 offset = vec2(0)) {
 	return transform;
 }
 
-// note: clamp amount currently not working for text
 mat4 createFollowCameraModelText(Motion& motion, vec2 offset) {
 	WindowState& windowState = registry.windowStates.components[0];
 	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
