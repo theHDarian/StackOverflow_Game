@@ -82,7 +82,6 @@ void PhysicsSystem::step(float elapsed_ms)
 						//this is a twin laser
 						Motion& otherMotion = registry.motions.get(group.others[0]);
 						float dist = glm::distance(otherMotion.position,start.position);
-						printf("%.1f\n",dist);
 						laser.length = min(dist,laser.length);
 					}
 				}

@@ -115,10 +115,22 @@ void UISystem::step(float elapsed_ms) {
 			ws.fps = ws.numFramesThisSecond;
 			ws.numFramesThisSecond = 0;
 			ws.currUnixTime = Clock::now();
-			registry.textRenderRequests.get(fpsCounter).text = "FPS: " + std::to_string(ws.fps);
+			TextRenderRequest& fpsText = registry.textRenderRequests.get(fpsCounter);
+			fpsText.text = "FPS: " + std::to_string(ws.fps);
+			fpsText.x = ws.width - 15*fpsText.text.length() - 50.f;
+
 		}
 		
-		registry.textRenderRequests.get(roomCounter).text = "Room " + std::to_string(registry.maps.components[0].roomsTraversed);
+		Map& map = registry.maps.components[0];
+		TextRenderRequest& roomCounterText = registry.textRenderRequests.get(roomCounter);
+		std::string region;
+		if (map.currRegion == Tutorial) region = "Tutorial";
+		if (map.currRegion == Biology) region = "Biology";
+		if (map.currRegion == Physics) region = "Physics";
+		roomCounterText.text = region + " Room " + std::to_string(map.roomsTraversed);
+		roomCounterText.x = ws.width - 17*roomCounterText.text.length() - 50.f;
+		
+		
 
 		// update bullet ui positions
 		if (stack.currStack.size() > stackui.bulletPositions.size()) {
@@ -819,7 +831,7 @@ Entity UISystem::createRoomCounter() {
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
 	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
-	vec2 dimensions = { 100.f,25.f };
+	vec2 dimensions = { 240.f,25.f };
 	float padding = 50.f;
 	trr.text = "Room 0";
 	trr.color = vec3(1.0f);

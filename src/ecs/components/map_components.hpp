@@ -128,7 +128,7 @@ enum MapRegion {
 struct Map {
     Room currRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
-    MapRegion currRegion;
+    MapRegion currRegion; //default region is set in newGame()
     std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> directory;
 };
 

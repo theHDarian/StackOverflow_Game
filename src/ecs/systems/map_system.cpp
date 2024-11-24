@@ -14,7 +14,6 @@ MapSystem::MapSystem()
     if (registry.maps.components.size() == 0)
     {
         auto& map = registry.maps.emplace(Entity());
-        map.directory = roomDirectory;
     }
 }
 MapSystem::~MapSystem()
@@ -162,7 +161,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     //play door close sound
     soundPlayer->playDoorCloseSound();
 
-    if (map.currRoom.type != RoomType::TutorialRoom1 && map.currRoom.type != RoomType::TutorialRoom2) {
+    if (map.currRoom.type != RoomType::TutorialRoom1) {
         map.roomsTraversed++;
     }
 
@@ -299,13 +298,13 @@ void MapSystem::newMap()
         map.currRoom = Room();
         map.currRoom.preset = TutorialRoom1Preset;
         map.currRoom.type = TutorialRoom1;
-        map.directory = roomDirectory;
+        map.directory = getDirectory(map.currRegion);
     }
     else {
         Map& map = registry.maps.components[0];
-        map.currRegion = MapRegion::Biology;
+        map.currRegion = MapRegion::Physics;
         map.roomsTraversed = 0;
-        map.directory = roomDirectory;
+        map.directory = getDirectory(map.currRegion);
 
         bool excludeNone = false;
         for (int i = 0; i < 4; i++)
@@ -324,7 +323,7 @@ void MapSystem::newMap()
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
         map.currRoom.preset = getRoomPreset(RoomType::RestRoom,false);
-        map.directory = roomDirectory;
+        map.directory = getDirectory(map.currRegion);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
