@@ -40,7 +40,7 @@ void MapSystem::step(float elapsed_ms)
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
-            createEnemy(renderer, (std::get<vec2>(e) * map.currRoom.preset.roomSize - (map.currRoom.preset.roomSize - map.currRoom.roomPosition) / 2.f) * 2.f, std::get<EnemyType>(e));
+            createEnemy(renderer, (std::get<vec2>(e) * map.currRoom.preset.roomSize - (map.currRoom.preset.roomSize - map.currRoom.roomPosition) / 2.f) + map.currRoom.roomPosition / 2.f, std::get<EnemyType>(e));
 
         }
         map.currRoom.preset.enemies = {};
@@ -48,7 +48,7 @@ void MapSystem::step(float elapsed_ms)
         if (map.currRoom.cleared) {
             for (auto &e : map.currRoom.preset.interactables)
             {
-                createInteractable(renderer, (std::get<vec2>(e) * map.currRoom.preset.roomSize - (map.currRoom.preset.roomSize - map.currRoom.roomPosition) / 2.f) * 2.f, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+                createInteractable(renderer, (std::get<vec2>(e) * map.currRoom.preset.roomSize - (map.currRoom.preset.roomSize - map.currRoom.roomPosition) / 2.f) + map.currRoom.roomPosition / 2.f, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
             }
             map.currRoom.preset.interactables = {};
 

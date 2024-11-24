@@ -57,10 +57,24 @@ void UISystem::step(float elapsed_ms) {
 			registry.deleteEntityAndRelatedEntities(e);
 		}
 	}
+	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+	StackUI& stackui = registry.stackUI.get(stackUI);
+	// update bullet ui positions
+	if (stack.currStack.size() > stackui.bulletPositions.size()) {
+		int diff = stack.currStack.size() - stackui.bulletPositions.size();
+		for (int i = 0; i < diff; i++) {
+			int index = i + stack.currStack.size() - diff;
+			stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
+				stackui.bulletStartPos.y));
+		}
+	}
+	else if (stack.currStack.size() < stackui.bulletPositions.size()) {
+		stackui.bulletPositions.resize(stack.currStack.size());
+	}
 
-	if (gameState.gamePaused || gameState.gameOver || gameState.dialogueScene) {
-		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-		StackUI& stackui = registry.stackUI.get(stackUI);
+	if (gameState.gamePaused || gameState.gameOver || gameState.dialogueScene || true) {
+		
+		
 
 		// is the player hovering over a stack ui bullet right now?
 		// bad: copies code from render system; consider making each bullet an entity
@@ -85,17 +99,25 @@ void UISystem::step(float elapsed_ms) {
 				//std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
 				updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
 					stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+				//std::cout << "updated!" << std::endl;
 			}
 			else if (bulletHoveredIndex == -1){
 				registry.renderRequests.get(bulletUI).show = false;
 				registry.renderRequests.get(bulletUIArrow).show = false;
+				//std::cout << "empty!" << std::endl;
+			}
+			else {
+				//std::cout << "nope3 " << bulletHoveredIndex << ", " << lastHoveredBullet << std::endl;
 			}
 			lastHoveredBullet = bulletHoveredIndex;
+			std::cout << registry.renderRequests.get(bulletUI).show << std::endl;
 		}
 		else {
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
+			//std::cout << "nope" << std::endl;
 		}
+		//std::cout << "mouse pos" << ioState.mousePosition.x << ", "<< ioState.mousePosition.y<< std::endl;
 	}
 
 	if (!gameState.gameOver) {
@@ -120,24 +142,11 @@ void UISystem::step(float elapsed_ms) {
 		
 		registry.textRenderRequests.get(roomCounter).text = "Room " + std::to_string(registry.maps.components[0].roomsTraversed);
 
-		// update bullet ui positions
-		if (stack.currStack.size() > stackui.bulletPositions.size()) {
-			int diff = stack.currStack.size() - stackui.bulletPositions.size();
-			for (int i = 0; i < diff; i++) {
-				int index = i + stack.currStack.size() - diff;
-				stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
-					stackui.bulletStartPos.y));
-			}
-		}
-		else if (stack.currStack.size() < stackui.bulletPositions.size()) {
-			stackui.bulletPositions.resize(stack.currStack.size());
-		}
-
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
-			registry.renderRequests.get(bulletUI).show = false;
-			registry.renderRequests.get(bulletUIArrow).show = false;
+			//registry.renderRequests.get(bulletUI).show = false;
+			//registry.renderRequests.get(bulletUIArrow).show = false;
 			// clear prev frame's e indicators
 			for (Entity entity : registry.interactIndicators.entities) {
 				if (!registry.deleteds.has(entity)) {

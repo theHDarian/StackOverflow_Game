@@ -1258,6 +1258,8 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4& pr
 	Motion colliderMotion = Motion();
 	colliderMotion.position = motion.position;
 	colliderMotion.angle = motion.angle;
+
+	// note: because of repeat, circles display wierdly rn
 	if (shape == "circle.png") {
 		auto& circle = registry.circleColliders.get(entity);
 		colliderMotion.scale = { circle.radius * 2, circle.radius * 2 };

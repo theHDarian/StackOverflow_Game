@@ -765,11 +765,6 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		createDoors(renderer, p.spritePosition, p.spriteAngle, p.spriteScale, angle, axis, offset, side);
 	}
 
-	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, offsetTop + 10 }, { ws.width / 2 + doorWidthX / 2, offsetTop + 10 });
-	//createDoor(renderer, { ws.width - offsetRightLeft - 10, ws.height / 2 - doorWidthY / 2 }, { ws.width - offsetRightLeft - 10, ws.height / 2 + doorWidthY / 2 });
-	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, ws.height - offsetBot - 10 }, { ws.width / 2 + doorWidthX / 2, ws.height - offsetBot - 10 });
-	//createDoor(renderer, { offsetRightLeft + 10, ws.height / 2 - doorWidthY / 2 }, { offsetRightLeft + 10, ws.height / 2 + doorWidthY / 2 });
-
 	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y + 45 }, { ws.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y + 45 });
 	createDoor(renderer, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 + doorwidth / 2 });
 	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y - 30 }, { ws.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y - 30 });
