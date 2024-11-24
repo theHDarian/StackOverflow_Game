@@ -591,7 +591,7 @@ const RoomPreset HifiRoomTwinLaserHorizontal {
 };
 
 const RoomPreset HifiRoomSnipers {
-    {{EnemyType::HifiEnemySniper, {0.1f,0.1f}}},
+    {{EnemyType::HifiEnemySniper, {0.5f,0.01f}}},
     {},
     {},
     0.0f,
@@ -631,7 +631,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{EnemyRoomSwarm},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomSnipers},{}}},
         {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},

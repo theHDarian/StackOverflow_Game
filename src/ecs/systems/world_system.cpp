@@ -768,7 +768,6 @@ void WorldSystem::movePlayer() {
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
-
 }
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)

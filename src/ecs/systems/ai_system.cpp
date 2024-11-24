@@ -628,13 +628,11 @@ void AISystem::boidKeepBound(Entity entity, Boid &boid, float minx, float miny, 
     vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
 	vec2 scale = registry.motions.get(entity).scale;
-	vec2 min = roomStartPos + scale/2.f;
-	vec2 max = roomEndPos - scale/2.f;
 
-	float minX = min.x + minx + scale[0];
-	float minY = min.y + miny + scale[1];
-	float maxX = max.x - maxx - scale[0];
-	float maxY = max.y - maxy - scale[1];
+	float minX = roomStartPos.x + minx + scale[0];
+	float minY = roomStartPos.y + miny + scale[1];
+	float maxX = roomEndPos.x - maxx - scale[0];
+	float maxY = roomEndPos.y - maxy - scale[1];
 	float turnFactor = 1.0f;
 	float momentumFactor = 150.f;
 	vec2 position = boid.position;
