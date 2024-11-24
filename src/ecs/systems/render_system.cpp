@@ -286,7 +286,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		vec2 roomCenterOffset = vec2(0);
 		if ((room.roomSize.x / 2) < (ws.width / 2) || (room.roomSize.y / 2) < (ws.height / 2))
-			roomCenterOffset = -1.f*camera.zoom*vec2(ws.width / 2 - room.roomSize.x / 2, ws.height / 2 - room.roomSize.y / 2);
+			roomCenterOffset += -1.f *camera.zoom*vec2((ws.width / 2 - room.roomSize.x / 2)*(1 - ((room.roomSize.x * 0.33f) / 2.f / (ws.width / 2.f))),
+				0);
+		if ((room.roomSize.y / 2) < (ws.height / 2))
+			roomCenterOffset += -1.f * camera.zoom * vec2(0,
+				(ws.height / 2 - room.roomSize.y / 2) * 1.8f * (1 - ((room.roomSize.y * 0.33f) / 2.f / (ws.height / 2))));
 
 		vec3 clampedTranslate = vec3(clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f, 
 					motion.position.x - room.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - room.wallThickness * 1.5f * 1.1f / 2 - 25,

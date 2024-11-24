@@ -24,8 +24,8 @@ class RenderSystem {
 	 * Whenever possible, add to these lists instead of creating dynamic state
 	 * it is easier to debug and faster to execute for the computer.
 	 */
-	std::array<GLuint, 100> texture_gl_handles;
-	std::array<ivec2, 100> texture_dimensions;
+	std::array<GLuint, 256> texture_gl_handles;
+	std::array<ivec2, 256> texture_dimensions;
 	GLuint vao;
 
 	std::map<std::string, int> name_to_texture;
