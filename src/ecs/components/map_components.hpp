@@ -43,7 +43,6 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
     return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 
-enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
 enum BossType { BigCBoss };
 
@@ -55,7 +54,6 @@ struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
     std::vector<std::tuple<RoomInteractable, vec2>> interactables; //for interactables
-    std::vector<SpecialEvent> specialEvents;
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
     int numKeyBulletsToSpawn = 2;
