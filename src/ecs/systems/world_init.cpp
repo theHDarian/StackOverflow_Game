@@ -985,6 +985,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyHifiSniper();
 		break;
 	}
+	case EnemyType::HifiEnemyCharger: enemy = EnemyHifiCharger();break;
 	};
 
 	Motion &motion = registry.motions.emplace(entity);

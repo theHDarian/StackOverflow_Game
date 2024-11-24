@@ -1817,6 +1817,35 @@ struct EnemyHifiSniper : Enemy
 	};
 };
 
+struct EnemyHifiCharger : Enemy
+{
+	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::PLAYER_CLOSE,1}}, 0, true, 0.f, 1000.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 0.f, 0.f, {{ReactionType::DURATION,2}}, 2, true, 0.f, 0.f, NoAttack};
+	EnemyPattern idleStateCD1 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,3}}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingMidState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 0.f, 1000.f, {{ReactionType::DURATION,4}}, 4, true, 0.f, 0.f, NoAttack};
+	EnemyPattern idleStateCD2 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,5}}, 5, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingEndState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 0.f, 0.f, {{ReactionType::DURATION,6}}, 6, true, 0.f, 0.f, NoAttack};
+	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,7}}, 7, false, 0.f, 0.f, NoAttack};
+	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 1000.f, NoAttack};
+
+	EnemyHifiCharger()
+	{
+		maxHealth = 120;
+		currHealth = maxHealth;
+		enemyPatterns = {randomPos, chargingState, idleStateCD1,chargingMidState, idleStateCD2,chargingEndState, idleState, randomPosNoCharge};
+		sprite = {
+			"enemy_hifi_002.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({480 / 8.f, 480 / 8.f });
+		patternIndex = 0;
+		rotatePower = 90.f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 1.6f;
+	}
+};
+
 
 // struct EnemyHardSkull : {
 

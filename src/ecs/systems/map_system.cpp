@@ -302,7 +302,7 @@ void MapSystem::newMap()
     }
     else {
         Map& map = registry.maps.components[0];
-        map.currRegion = MapRegion::Physics;
+        map.currRegion = MapRegion::Biology;
         map.roomsTraversed = 0;
         map.directory = getDirectory(map.currRegion);
 

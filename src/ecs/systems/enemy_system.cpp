@@ -160,7 +160,7 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    Motion &playerMotion = registry.motions.components[registry.players.entities[0]];
+                    Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
                     vec2 mid = playerMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
