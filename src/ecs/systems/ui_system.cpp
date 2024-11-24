@@ -110,7 +110,7 @@ void UISystem::step(float elapsed_ms) {
 				//std::cout << "nope3 " << bulletHoveredIndex << ", " << lastHoveredBullet << std::endl;
 			}
 			lastHoveredBullet = bulletHoveredIndex;
-			std::cout << registry.renderRequests.get(bulletUI).show << std::endl;
+			//std::cout << registry.renderRequests.get(bulletUI).show << std::endl;
 		}
 		else {
 			registry.renderRequests.get(bulletUI).show = false;
