@@ -121,7 +121,7 @@ struct MapRequest {
 enum MapRegion {
     Tutorial,
     Biology,
-    Hifi,
+    Physics,
     Final
 };
 

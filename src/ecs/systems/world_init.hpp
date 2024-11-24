@@ -35,6 +35,8 @@ Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem ite
 
 Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects);
 
+Entity createFloorDeco(RenderSystem* renderer, vec2 pos, std::string filename);
+
 Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
 Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);

@@ -396,8 +396,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
 		WindowState& windowState = registry.windowStates.components[0];
 		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-		vec2 roomSize = { 1920,1080 };
-		vec2 roomCenter = { windowState.width / 2, windowState.height / 2 };
 		float wallThickness = 100 + 50;
 		float zoom = 1;
 		// note: perspective seems to make no difference?
@@ -1589,7 +1587,6 @@ mat4 createFollowCameraModel(Motion& motion, vec2 offset = vec2(0)) {
 	WindowState& windowState = registry.windowStates.components[0];
 	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
 	Camera& camera = registry.cameras.components[0];
-	Room& room = registry.maps.components[0].currRoom;
 
 	mat4 transform = glm::mat4(1.0);
 	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));

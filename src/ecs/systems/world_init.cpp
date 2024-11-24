@@ -412,6 +412,34 @@ Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2
 	return e;
 }
 
+// For creating side-on props with a wall (like pop console or tree)
+Entity createFloorDeco(RenderSystem* renderer, vec2 pos, std::string filename) {
+	Entity e = Entity();
+
+	Motion& m = registry.motions.emplace(e);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = vec2(192 * ((rand() % 2 == 1) ? -1 : 1), 192);
+
+	Entity ew = createWall(renderer, vec2(-1000000), vec2(-100000));
+	Parent& p = registry.parents.emplace(ew);
+	p.children.push_back(e);
+
+	registry.backgrounds.emplace(e);
+
+	auto& anim = registry.animations.emplace(e);
+	anim.animate = false;
+	anim.max_frames = 16;
+	anim.frame = rand() % 16;
+
+	registry.renderRequests.insert(
+		e,
+		{ filename,
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	return e;
+}
+
 Entity createWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)
 {
 	auto entity = Entity();
