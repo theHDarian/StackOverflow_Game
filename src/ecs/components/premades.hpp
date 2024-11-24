@@ -262,8 +262,8 @@ const BulletStackEffect homingUpA = {
 
 const BulletStackEffect buzz = {
 	PlayerSpeed,
-	Multiplicative,
-	1.1,
+	Additive,
+	15,
 	"Buzz",
 	"" };
 
@@ -298,7 +298,7 @@ const BulletStackEffect ConcentratedFire = {
 const BulletStackEffect SniperPower = {
 	BulletDamage,
 	Multiplicative,
-	7,
+	2.5,
 	"Sniper's Prowess",
 	"" };
 
@@ -333,14 +333,14 @@ const BulletStackEffect DataCompression = {
 const BulletStackEffect WarMachine = {
 	BulletDamage,
 	Multiplicative,
-	3,
+	1.75,
 	"War Machine",
 	"" };
 
 const BulletStackEffect WeaponOfWar = {
 	FireRate,
 	Multiplicative,
-	3,
+	2,
 	"Weapon of War",
 	"" };
 
@@ -426,8 +426,8 @@ const AttackData wave{
 const AttackData laserNoRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{bulletBounceUpA},
-	blunt,
+	{dashUpA},
+	dashCDRDownA,
 	3,
 	0,
 	{20, 20},
@@ -441,8 +441,8 @@ const AttackData laserNoRotate{
 const AttackData laserRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{ },
-	blunt,
+	{ APRounds },
+	dashCDRDownA,
 	3,
 	0,
 	{0, 20},
@@ -870,7 +870,7 @@ struct EnemyMediumTank : Enemy
 	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 500.f, missile};
 	EnemyMediumTank()
 	{
-		maxHealth = 500;
+		maxHealth = 300;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState, idleState, walkingRage, shootMisile};
@@ -890,8 +890,8 @@ struct EnemyLaserTank : Enemy
 	const AttackData crabLaser{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{bulletBounceUpA},
-	blunt,
+	{ APRounds },
+	dashCDRDownA,
 	1,
 	0,
 	{20, 20},
@@ -909,7 +909,7 @@ struct EnemyLaserTank : Enemy
 	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
 	EnemyLaserTank()
 	{
-		maxHealth = 500;
+		maxHealth = 250;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
@@ -920,7 +920,7 @@ struct EnemyLaserTank : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 240.0f / 2, 336.f / 2 });
 		rotatePower = 1.0f;
-		speedMultiplier = 1.6;
+		speedMultiplier = 2.6;
 		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
 	};
 };
@@ -953,7 +953,7 @@ struct EnemyHardTank : Enemy
 	EnemyPattern shootMisile = { "MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 300.f, missile };
 	EnemyHardTank()
 	{
-		maxHealth = 500;
+		maxHealth = 400;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState, idleState, walkingRage, shootMisile };
@@ -1575,9 +1575,9 @@ struct EnemyMediumBoar : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
-		scale = vec2({480 / 8.f, 864 / 8.f });
+		scale = vec2({864 / 8.f, 480 / 8.f }) * 1.5f;
 		patternIndex = 0;
-		rotatePower = 0.9f;
+		rotatePower = 1.0f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	}
 };
