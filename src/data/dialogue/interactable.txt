@@ -150,3 +150,195 @@ SPEAKER Gardener gardener_v2.png
 ITEM Gardener 1 0
 Tsk, tsk. Can't you let a gardener dream?
 SPEAKER Gardener gardener_v2.png
+
+ITEM HoneyCanister -1 0
+A strange canister with a sticky substance inside.
+sniff sniff
+It seems to be filled with honey. You wonder what it's doing here in an abandoned lab.
+would you like to take it?
+CHOICES Yes\No
+
+ITEM HoneyCanister 0 0
+You take the Honey. It's sticky, but it might come in handy.
+[Obtained Honey!]
+SOUND itemPickup
+Bzzz... Bzzz...
+It seems like something is coming your way.
+
+ITEM HoneyCanister 1 0
+You decide to leave the honey alone.
+
+ITEM HoneyCanister -1 1
+The canister is empty.
+
+ITEM Baru -1 0
+A gigantic, vaguely humanoid figure looms over you.
+It's a... robot? It seems to be in a state of disrepair, considering it's missing an arm and its entire lower body.
+It's unlike any robot you've seen before. What could it be? And what caused it to be in this state?
+To sate your curiosity, you approach the robot. It doesn't look any better up close.
+You wonder if you could fix it up.
+CHOICES Give a shot?\Leave it alone
+
+ITEM Baru 0 0
+You decide to give it a shot.
+[Interact with the robot again to see if you can fix it up.]
+
+ITEM Baru 1 0
+You decide to leave the robot alone.
+
+ITEM Baru -1 1
+You open up the robot's chest. Inside, you find a strange device.
+It seems to require an intact ram module to function. Looks like you would have to sacrifice your one of own ram module to get it working.
+Would you like to install a ram module? This will cause you to lose your one own ram modules and clear your stack.
+CHOICES Yes\No
+
+ITEM Baru 0 1
+You install the ram module into the robot.
+[The robot's eyes light up.]
+SOUND explosion
+[The robot make a rattling noise.]
+SOUND explosion
+Wheeze... Whirr...
+What... What happened? Whe....Where am I?
+SPEAKER Baru Baru1589.png
+[The robot looks around, confused.]
+[The robot looks at you.]
+You... little one... You... You woke me...
+You... You shouldn't have done that...
+I'm... too damaged... I won't last long...
+The Purple Cyborg... He's... he did this to me... killed me... and all of my brethren...
+Take this...
+[The robot hands you a strange device.]
+SPEAKER N N
+CHOICES Take it
+SOUND rareItemPickup
+you feel a surge of power flowing through you. It seems your base stats have increased.
+you... you must stop him... avenge me... avenge us...
+SPEAKER Baru Baru1589.png
+[The robot's eyes dim.]
+SPEAKER N N
+SOUND explosion
+[The robot falls silent.]
+
+ITEM Baru 1 1
+You decide that it's not worth the risk.
+
+ITEM Baru -1 2
+The robot is silent.
+You remember the robot's last words.
+You wonder who the "Purple Cyborg" is and what kind of monster they must be to have done this to such a gentle giant.
+you feel determined to fulfill the robot's last wish.
+
+ITEM WishGranter -1 0
+A strange terminal with a screen that reads "Wish Granter".
+Suddenly, the screen lights up.
+"Little Robot, I am what reflects your deepest desires. I can grant you one wish. What do you wish for?"
+SPEAKER WishGranter wishgranter.png
+CHOICES I wish for power.\I wish for knowledge.\I wish for wealth.\I wish for happiness.\I wish for nothing.
+
+ITEM WishGranter 0 0
+You wish for power.
+Power flows through you.
+SOUND itemPickup
+From the shadows, sounds of approaching enemies can be heard.
+You grin. You're ready for them. This is who you were always meant to be.
+
+ITEM WishGranter 1 0
+You wish for knowledge.
+A scene of the past flashes before your eyes.
+You stand in a pristine laboratory, surrounded by robots.
+You see who you assume is the Scientist, standing a short distance away.
+He turns to you and smiles.
+From where you were standing, two other humans emerge, and the scientist greets them.
+The three seems to be close friends. They laugh and talk, chatting about the pleasantries of life as they walk away from you.
+You feel a sense of longing. You wish you could be there with them.
+the scene fades away.
+Who were they? Who are you? Why did the lab fall into such a state?
+It seems you got more questions than answers.
+
+ITEM WishGranter 2 0
+You wish for wealth.
+suddenly, you feel very heavy.
+CUT blackscreen.png
+You woke up. It seems someone installed a ram module into you.
+You feel a sense of dread. What happened to you while you were out?
+you don't want to think about it.
+
+ITEM WishGranter 3 0
+You wish for happiness.
+You feel a sense of warmth.
+Suddenly, you feel as light as a feather.
+All your worries seem to have melted away.
+[stack cleared!]
+you feel at peace.
+
+ITEM WishGranter 4 0
+You wish for nothing.
+"Very well," the screen says.
+The screen fades away.
+
+ITEM WishGranter -1 1
+The terminal is silent.
+
+ITEM Mouse -1 0
+A mouse eyes a safe from a distance.
+It seems to want what's inside.
+From the looks of it, the safe seems to be locked.
+What's inside? It seems to be... a piece of cheese?
+would you like to open the safe?
+CHOICES Yes\No
+
+ITEM Mouse 0 0
+You open the safe.
+Inside, you find a piece of cheese.
+[Obtained cheese!]
+SOUND itemPickup
+
+ITEM Mouse 1 0
+You decide to leave the safe alone.
+Looking at the mouse, you feel a sense of determination knowing that it will continue to strive for what it wants.
+
+ITEM Mouse -1 1
+The safe is empty.
+Since the mouse is still eyeing the safe, you wonder if you should just give it the cheese.
+do you want to give the mouse the cheese?
+CHOICES Yes\No
+
+ITEM Mouse 0 1
+You give the mouse the cheese.
+The mouse seems to be happy.
+You feel a sense of satisfaction.
+
+ITEM Mouse 1 1
+You decide to keep the cheese for yourself.
+
+ITEM OracleCrab -1 0
+There's one of those hostile crabs again. This one seems to be very beat up.
+It's not attacking you, but it's not moving either.
+Would you like to investigate?
+CHOICES Yes\No
+
+ITEM OracleCrab 0 0
+You approach the crab.
+
+ITEM OracleCrab 1 0
+You decide to leave the crab alone.
+
+ITEM OracleCrab -1 1
+Suddenly, the crab starts to speak.
+SPEAKER OracleCrab BrokenCrab.png
+"System... error... System... error..."
+"Sisyphus was punished by the gods to roll a boulder up a hill, only for it to roll back down every time he reached the top."
+
+ITEM OracleCrab -1 2
+"There was once three... Now there is one..."
+SPEAKER OracleCrab BrokenCrab.png
+
+ITEM OracleCrab -1 3
+"He... doesn't want you to leave...  He... doesn't want anyone to leave..."
+
+ITEM OracleCrab -1 4
+"Hello... Hello..."
+
+ITEM OracleCrab -1 5
+"The cheese... The cheese... Takes two keys..."

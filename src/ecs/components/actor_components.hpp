@@ -161,7 +161,8 @@ struct StackCompile {
             currStack.push_back(effect);
             return true;
         }
-        if (effect.type == Lightning && currStack.size() > 1) {
+        if (effect.type == Lightning) {
+            if (currStack.size() < 1) return true;
             if (effect.effectCalc == Additive) {
                 std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
             }
@@ -558,4 +559,10 @@ struct Critter {
     bool startled = false;
     vec2 flee = vec2(0);
     float life = 10000;
+};
+
+struct KeyItems {
+    int fruits = 0;
+    int honey = 0;
+
 };

@@ -35,10 +35,12 @@ void MapSystem::step(float elapsed_ms)
 
     handleMapRequests();
 
-    // spawn enemy based on current time
+    // WindowState &wS = registry.windowStates.components[0];
     WindowState &wS = registry.windowStates.components[0];
-    vec2 roomStartPos = vec2(wS.width,wS.height)/2.f-map.currRoom.roomSize/2.f;
-    vec2 roomEndPos = vec2(wS.width,wS.height)/2.f+map.currRoom.roomSize/2.f;
+    vec2 roomCenter = vec2(wS.width,wS.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
+
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
@@ -54,7 +56,8 @@ void MapSystem::step(float elapsed_ms)
         if (map.currRoom.cleared) {
             for (auto &e : map.currRoom.preset.interactables)
             {
-                createInteractable(renderer, glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e)), std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+                vec2 pos = glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e));
+                createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
             }
             map.currRoom.preset.interactables = {};
 
@@ -247,9 +250,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // Create floor decorations
     WindowState& ws = registry.windowStates.components[0];
     std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : "bio_floor_addons";
-    vec2 placements = vec2(floor(0.8 * map.currRoom.roomSize.x / 192.f), floor( 0.8 * map.currRoom.roomSize.x / 192.f));
-    vec2 dividers = vec2(0.9090 * map.currRoom.roomSize.x / placements.x, 0.9090 * map.currRoom.roomSize.y / placements.y);
-    vec2 roomOffset = vec2(-map.currRoom.roomSize.x / 2.2f, -map.currRoom.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
+    vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor( 0.8 * map.currRoom.preset.roomSize.x / 192.f));
+    vec2 dividers = vec2(0.9090 * map.currRoom.preset.roomSize.x / placements.x, 0.9090 * map.currRoom.preset.roomSize.y / placements.y);
+    vec2 roomOffset = vec2(-map.currRoom.preset.roomSize.x / 2.2f, -map.currRoom.preset.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
     vec2 wiggle = (dividers - vec2(192)) / 2.f;
     for (int i = 0; i < placements.x; i++) {
         for (int j = 0; j < placements.y; j++) {
@@ -302,7 +305,7 @@ void MapSystem::newMap()
     }
     else {
         Map& map = registry.maps.components[0];
-        map.currRegion = MapRegion::Biology;
+        map.currRegion = MapRegion::Physics;
         map.roomsTraversed = 0;
         map.directory = getDirectory(map.currRegion);
 

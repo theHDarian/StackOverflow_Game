@@ -31,6 +31,14 @@ Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2
 
 Entity createRamStick(RenderSystem* renderer, vec2 pos);
 
+Entity createBaru(RenderSystem *renderer, vec2 pos);
+
+Entity createWishGranter(RenderSystem *renderer, vec2 pos);
+
+Entity createOracleCrab(RenderSystem *renderer, vec2 pos);
+
+Entity createHoneyCanister(RenderSystem *renderer, vec2 pos);
+
 Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);
 
 Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects);

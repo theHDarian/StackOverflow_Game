@@ -8,6 +8,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include "world_init.hpp"
+
 using Clock = std::chrono::high_resolution_clock;
 
 UISystem::UISystem(SoundSystem* soundSystem) {
@@ -57,10 +59,24 @@ void UISystem::step(float elapsed_ms) {
 			registry.deleteEntityAndRelatedEntities(e);
 		}
 	}
+	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+	StackUI& stackui = registry.stackUI.get(stackUI);
+	// update bullet ui positions
+	if (stack.currStack.size() > stackui.bulletPositions.size()) {
+		int diff = stack.currStack.size() - stackui.bulletPositions.size();
+		for (int i = 0; i < diff; i++) {
+			int index = i + stack.currStack.size() - diff;
+			stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
+				stackui.bulletStartPos.y));
+		}
+	}
+	else if (stack.currStack.size() < stackui.bulletPositions.size()) {
+		stackui.bulletPositions.resize(stack.currStack.size());
+	}
 
-	if (gameState.gamePaused || gameState.gameOver || gameState.dialogueScene) {
-		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-		StackUI& stackui = registry.stackUI.get(stackUI);
+	if (gameState.gamePaused || gameState.gameOver || gameState.dialogueScene || true) {
+		
+		
 
 		// is the player hovering over a stack ui bullet right now?
 		// bad: copies code from render system; consider making each bullet an entity
@@ -85,17 +101,25 @@ void UISystem::step(float elapsed_ms) {
 				//std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
 				updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
 					stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+				//std::cout << "updated!" << std::endl;
 			}
 			else if (bulletHoveredIndex == -1){
 				registry.renderRequests.get(bulletUI).show = false;
 				registry.renderRequests.get(bulletUIArrow).show = false;
+				//std::cout << "empty!" << std::endl;
+			}
+			else {
+				//std::cout << "nope3 " << bulletHoveredIndex << ", " << lastHoveredBullet << std::endl;
 			}
 			lastHoveredBullet = bulletHoveredIndex;
+			//std::cout << registry.renderRequests.get(bulletUI).show << std::endl;
 		}
 		else {
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
+			//std::cout << "nope" << std::endl;
 		}
+		//std::cout << "mouse pos" << ioState.mousePosition.x << ", "<< ioState.mousePosition.y<< std::endl;
 	}
 
 	if (!gameState.gameOver) {
@@ -108,7 +132,7 @@ void UISystem::step(float elapsed_ms) {
 		StackUI& stackui = registry.stackUI.get(stackUI);
 
 		// update stack ui
-		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string(stack.baseStackSize);
+		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string((int)getModifiedValue(PlayerStackSize, stack.baseStackSize));
 
 		ws.numFramesThisSecond++;
 		if (elapsed > 1000.0f) {
@@ -132,24 +156,11 @@ void UISystem::step(float elapsed_ms) {
 		
 		
 
-		// update bullet ui positions
-		if (stack.currStack.size() > stackui.bulletPositions.size()) {
-			int diff = stack.currStack.size() - stackui.bulletPositions.size();
-			for (int i = 0; i < diff; i++) {
-				int index = i + stack.currStack.size() - diff;
-				stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
-					stackui.bulletStartPos.y));
-			}
-		}
-		else if (stack.currStack.size() < stackui.bulletPositions.size()) {
-			stackui.bulletPositions.resize(stack.currStack.size());
-		}
-
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
-			registry.renderRequests.get(bulletUI).show = false;
-			registry.renderRequests.get(bulletUIArrow).show = false;
+			//registry.renderRequests.get(bulletUI).show = false;
+			//registry.renderRequests.get(bulletUIArrow).show = false;
 			// clear prev frame's e indicators
 			for (Entity entity : registry.interactIndicators.entities) {
 				if (!registry.deleteds.has(entity)) {
@@ -405,17 +416,18 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	motion.position = { position.x, position.y };
 	
 	// hard code these offsets to make the doors look nice
-	if (position.y < windowState.height / 2 - 10) {
+	Room room = registry.maps.components[0].currRoom;
+	if (position.y <= registry.motions.get(registry.doors.entities[0]).position.y) { // bottom door
 		motion.position.y -= 50;
 	}
-	else if (position.y > windowState.height / 2 + 10) {
+	else if (position.y >= registry.motions.get(registry.doors.entities[2]).position.y) { // top door
 		motion.position.y += 50;
 	}
 
-	if (position.x < windowState.width / 10) {
+	if (position.x <= registry.motions.get(registry.doors.entities[3]).position.x) { // left door
 		motion.position.x -= 50;
 	}
-	else if (position.x > windowState.width - windowState.width / 10) {
+	else if (position.x >= registry.motions.get(registry.doors.entities[1]).position.x) { // right door
 		motion.position.x += 50;
 	}
 
@@ -427,7 +439,7 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	text.color = vec3(1, 1, 1);
 	text.text = "E";
 	text.scale = 0.40;
-	text.topRightBound = { windowState.width, windowState.height };
+	text.topRightBound = { room.preset.roomSize.x,  room.preset.roomSize.y };
 	text.bottomLeftBound = { 0, 0 };
 	text.y = windowState.height - motion.position.y - 15;
 	text.x = motion.position.x - 10;

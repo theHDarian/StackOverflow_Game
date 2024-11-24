@@ -330,6 +330,20 @@ const BulletStackEffect DataCompression = {
 	"Data Compression",
 	"" };
 
+const BulletStackEffect WarMachine = {
+	Homing,
+	Additive,
+	0.5,
+	"War Machine",
+	"" };
+
+const BulletStackEffect WeaponOfWar = {
+	BulletBurst,
+	Additive,
+	2,
+	"Weapon of War",
+	"" };
+
 
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load

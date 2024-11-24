@@ -92,6 +92,7 @@ public:
 	ComponentContainer<Camera> cameras;
 	ComponentContainer<GameOverlayUIText> gameOverlayUITexts;
 	ComponentContainer<EnemyGroup> enemyGroups;
+	ComponentContainer<KeyItems> keyItems;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -175,6 +176,7 @@ public:
 		registry_list.push_back(&cameras);
 		registry_list.push_back(&gameOverlayUITexts);
 		registry_list.push_back(&enemyGroups);
+		registry_list.push_back(&keyItems);
 	}
 
 	void clear_all_components() {

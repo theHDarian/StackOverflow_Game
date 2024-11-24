@@ -376,6 +376,10 @@ enum InteractableItem {
 	LockedDoor,
 	BibleTree,
 	Gardener,
+	HoneyCanister,
+	Baru,
+	OracleCrab,
+	WishGranter,
 	NA,
 };
 

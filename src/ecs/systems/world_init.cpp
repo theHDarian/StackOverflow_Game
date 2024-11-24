@@ -170,6 +170,14 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createBibleTree(renderer, pos);
 	case InteractableItem::PushConsole:
 		return createPushConsole(renderer, pos, effects);
+	case InteractableItem::HoneyCanister:
+		return createHoneyCanister(renderer, pos);
+	case InteractableItem::Baru:
+		return createBaru(renderer, pos);
+	case InteractableItem::WishGranter:
+		return createWishGranter(renderer, pos);
+	case InteractableItem::OracleCrab:
+		return createOracleCrab(renderer, pos);
 	default:
 		return Entity();
 	}
@@ -254,6 +262,63 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 
 	return console;
 }
+
+Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
+{
+	auto entity = createProp3D( renderer, pos, "HoneyCanisterFull.png", vec2(200, 300), vec2(0, 100), 50);
+	InteractableObject &object = registry.interactables.emplace(entity);
+	object.name = "HoneyCanister";
+	object.item = InteractableItem::HoneyCanister;
+	registry.circleColliders.emplace(entity).radius = 100;
+	AABBCollider &aabb = registry.aabbs.emplace(entity);
+	aabb.topLeft = vec2(-100, -150);
+	aabb.bottomRight = vec2(100, 150);
+
+	return entity;
+}
+
+Entity createBaru(RenderSystem *renderer, vec2 pos)
+{
+	auto entity = createProp3D( renderer, pos, "Brau1589.png", vec2(1500, 750), vec2(0, 50), 50);
+	InteractableObject &object = registry.interactables.emplace(entity);
+	object.name = "Baru";
+	object.item = InteractableItem::Baru;
+	registry.circleColliders.emplace(entity).radius = 100;
+	AABBCollider &aabb = registry.aabbs.emplace(entity);
+	aabb.topLeft = vec2(-750, -375);
+	aabb.bottomRight = vec2(750, 375);
+
+	return entity;
+}
+
+Entity createWishGranter(RenderSystem *renderer, vec2 pos)
+{
+	auto entity = createProp3D( renderer, pos, "WishGranter.png", vec2(200, 200), vec2(0, 0), 0);
+	InteractableObject &object = registry.interactables.emplace(entity);
+	object.name = "WishGranter";
+	object.item = InteractableItem::WishGranter;
+	registry.circleColliders.emplace(entity).radius = 100;
+	AABBCollider &aabb = registry.aabbs.emplace(entity);
+	aabb.topLeft = vec2(-100, -150);
+	aabb.bottomRight = vec2(100, 150);
+
+	return entity;
+}
+
+Entity createOracleCrab(RenderSystem *renderer, vec2 pos)
+{
+	auto entity = createProp3D( renderer, pos, "OracleCrab.png", vec2(200, 200), vec2(0, 0), 0);
+	InteractableObject &object = registry.interactables.emplace(entity);
+	object.name = "OracleCrab";
+	object.item = InteractableItem::OracleCrab;
+	registry.circleColliders.emplace(entity).radius = 100;
+	AABBCollider &aabb = registry.aabbs.emplace(entity);
+	aabb.topLeft = vec2(-100, -150);
+	aabb.bottomRight = vec2(100, 150);
+
+	return entity;
+}
+
 
 Entity createRamStick(RenderSystem *renderer, vec2 pos)
 {
@@ -519,10 +584,10 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	WindowState& ws = registry.windowStates.components[0];
 	vec2 position = vec2(ws.width,ws.height)/2.f;
 	float of = 200.f;
-	if(side == 'T') position += vec2(0,map.currRoom.roomSize.y/2+of);
-	if (side == 'R') position += vec2(map.currRoom.roomSize.x/2+of,0);
-	if (side == 'B') position += vec2(0,-map.currRoom.roomSize.y/2-of);
-	if (side == 'L') position += vec2(-map.currRoom.roomSize.x/2-of,0);
+	if(side == 'T') position += vec2(0,map.currRoom.preset.roomSize.y/2+of);
+	if (side == 'R') position += vec2(map.currRoom.preset.roomSize.x/2+of,0);
+	if (side == 'B') position += vec2(0,-map.currRoom.preset.roomSize.y/2-of);
+	if (side == 'L') position += vec2(-map.currRoom.preset.roomSize.x/2-of,0);
 	motion.position = position;
 	motion.angle = 0;
 	motion.scale = vec2(120.f, 120);
@@ -699,11 +764,6 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 
 		createDoors(renderer, p.spritePosition, p.spriteAngle, p.spriteScale, angle, axis, offset, side);
 	}
-
-	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, offsetTop + 10 }, { ws.width / 2 + doorWidthX / 2, offsetTop + 10 });
-	//createDoor(renderer, { ws.width - offsetRightLeft - 10, ws.height / 2 - doorWidthY / 2 }, { ws.width - offsetRightLeft - 10, ws.height / 2 + doorWidthY / 2 });
-	//createDoor(renderer, { ws.width / 2 - doorWidthX / 2, ws.height - offsetBot - 10 }, { ws.width / 2 + doorWidthX / 2, ws.height - offsetBot - 10 });
-	//createDoor(renderer, { offsetRightLeft + 10, ws.height / 2 - doorWidthY / 2 }, { offsetRightLeft + 10, ws.height / 2 + doorWidthY / 2 });
 
 	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y + 45 }, { ws.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y + 45 });
 	createDoor(renderer, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 + doorwidth / 2 });
