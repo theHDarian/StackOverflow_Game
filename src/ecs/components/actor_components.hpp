@@ -289,7 +289,8 @@ enum EnemyType {
     HardEnemyBoidBio,
     ScientistlaserAttack,
     HardEnemyBoidFish,
-    HifiEnemyTwinLaser
+    HifiEnemyTwinLaserVertical1,
+    HifiEnemyTwinLaserVertical2
 };
 
 enum class EnemyAttackPattern {
@@ -302,6 +303,7 @@ enum class EnemyAttackPattern {
     SPRAY,
     WAVE,
     LASER,
+    TWIN_LASER,
     TRAIL,
     SPAWNING,
     NONE
@@ -323,7 +325,6 @@ enum EnemyBulletShape {
 
 struct AttackData {
     EnemyAttackPattern attackType;
-
     EnemyBulletShape shape = EnemyBulletShape::CIRCLE;
     std::vector<BulletStackEffect> rareBulletEffects;
     BulletStackEffect defaultEffect;
@@ -371,7 +372,8 @@ enum class EnemyRotationBehavior {
     REGULAR,
     FACE_UP,
     FACE_CENTER,
-    FACE_PLAYER
+    FACE_PLAYER,
+    FACE_TWIN
 };
 
 
@@ -466,6 +468,10 @@ struct Enemy {
     float rotatePower;
     EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
+};
+
+struct EnemyGroup {
+    std::vector<Entity> others;
 };
 
 struct EnemyMovement {

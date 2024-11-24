@@ -76,6 +76,16 @@ void PhysicsSystem::step(float elapsed_ms)
 				}
 				vec2 goal = start.position + vec2(cos(motion.angle), sin(motion.angle)) * (laser.length + laser.growth);
 				laser.length += laser.growth;
+				if (registry.enemyGroups.has(laser.start)) {
+					EnemyGroup& group = registry.enemyGroups.get(laser.start);
+					if (group.others.size() == 1) {
+						//this is a twin laser
+						Motion& otherMotion = registry.motions.get(group.others[0]);
+						float dist = glm::distance(otherMotion.position,start.position);
+						printf("%.1f\n",dist);
+						laser.length = min(dist,laser.length);
+					}
+				}
 				float currLength = laser.length;
 				for (uint i = 0; i < walls.components.size(); i++) {
 					WallCollider& wall = walls.components[i];

@@ -464,8 +464,8 @@ const RoomPreset BossRoomBee{
     0.0f,
     2};
 
-const RoomPreset HifiRoomTwinLaser {
-    {{EnemyType::HifiEnemyTwinLaser, {0.5f,0.5f}},{EnemyType::HifiEnemyTwinLaser, {0.5f, 0.5f}}},
+const RoomPreset HifiRoomTwinLaserVertical {
+    {{EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.5f}}},
     {},
     {},
     {},

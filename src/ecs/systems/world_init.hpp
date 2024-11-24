@@ -61,6 +61,8 @@ Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b);
 // the enemy
 Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type);
 
+void createEnemyGroup(RenderSystem * renderer, vec2 pos, EnemyType type);
+
 // Entity createBulletEnemy(RenderSystem* renderer, vec2 pos, vec2 velocity, float angle);
 Entity createEnemyBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData);
 

@@ -1716,19 +1716,19 @@ struct InvisibleLaserEnemy : Enemy {
 	};
 };
 
-//----------------------------------------- HIFI REGION ENEMIES ---------------------------------
-struct TwinLaserEnemy : Enemy {
+//----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------
+struct TwinLaserEnemyVertical1 : Enemy {
 	const AttackData crabLaser{
-	EnemyAttackPattern::LASER,
+	EnemyAttackPattern::TWIN_LASER,
 	CIRCLE,
-	{bulletBounceUpA},
+	{},
 	blunt,
 	1,
 	0,
 	{20, 20},
 	0,
 	10000000,
-	{4, 0},
+	{100, 0},
 	0,
 	0,
 	0 };
@@ -1737,8 +1737,8 @@ struct TwinLaserEnemy : Enemy {
 		ReactionType::FINISH_PATROL,
 		1 };
 
-	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserEnemy()
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.01,0.01},{0.01,0.99},{0.01,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyVertical1()
 	{
 		maxHealth = 500;
 		currHealth = maxHealth;
@@ -1749,11 +1749,17 @@ struct TwinLaserEnemy : Enemy {
 			"enemy_hifi_004.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
-		scale = vec2({ 240.0f / 2, 240.f / 2 });
-		rotatePower = 1.0f;
-		speedMultiplier = 1.6;
-		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
+		scale = vec2({ 160.0f / 2, 160.f / 2 });
+		rotatePower = 90.0f;
+		speedMultiplier = 1.3;
+		rotationBehaviour = EnemyRotationBehavior::FACE_TWIN;
 	};
+};
+struct TwinLaserEnemyVertical2 : TwinLaserEnemyVertical1 {
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyVertical2() : TwinLaserEnemyVertical1() {
+		enemyPatterns = { randomState};
+	}
 };
 
 

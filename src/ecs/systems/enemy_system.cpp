@@ -164,6 +164,12 @@ void EnemySystem::step(float elapsed_ms)
                     vec2 mid = playerMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
+                else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_TWIN)
+                {
+                    Motion &twinMotion = registry.motions.get(registry.enemyGroups.get(entity).others[0]);
+                    vec2 mid = twinMotion.position - motion.position;
+                    motion.angle = atan2(mid.y, mid.x);
+                }
 
                 float totalDistance = glm::distance(movement.posA, movement.posB);
                 movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
@@ -403,6 +409,16 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
 }
+void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
+{
+        //shoot towards the twin
+        Entity other = registry.enemyGroups.get(enemy).others[0];
+        Motion& otherMotion = registry.motions.get(other);
+        Motion& motion = registry.motions.get(enemy);
+        vec2 diff = otherMotion.position - motion.position;
+        float angle = atan2(diff.y, diff.x);
+        Entity e = createEnemyLaser(render, pos, angle, enemy, atkData);
+}
 
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
 {
@@ -436,6 +452,11 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     else if (atkData.attackType == EnemyAttackPattern::LASER)
     {
         shootLaser(pos, entity, atkData);
+        currPattern.currAtkCD = currPattern.maxAtkCD;
+    }
+    else if (atkData.attackType == EnemyAttackPattern::TWIN_LASER)
+    {
+        shootTwinLaser(pos, entity, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::TRAIL)

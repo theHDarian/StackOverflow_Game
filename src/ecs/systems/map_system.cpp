@@ -43,8 +43,12 @@ void MapSystem::step(float elapsed_ms)
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
-            createEnemy(renderer, glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e)), std::get<EnemyType>(e));
-
+            vec2 pos = glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e));
+            if (std::get<EnemyType>(e) == EnemyType::HifiEnemyTwinLaserVertical1) {
+                createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
+            } else {
+                createEnemy(renderer, pos, std::get<EnemyType>(e));
+            }
         }
         map.currRoom.preset.enemies = {};
 

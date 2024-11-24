@@ -342,6 +342,8 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 
 	vec2 patrolFactor = pattern.path[pattern.pathIndex];
 
+	// printf("%.1f %.1f\n", patrolFactor.x,patrolFactor.y);
+
 	WindowState &windowState = registry.windowStates.components[0];
 	int width = windowState.width;
 	int height = windowState.height;

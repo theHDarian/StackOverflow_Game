@@ -960,9 +960,14 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boid.velocity = vec2(randomX, randomY);
 		boid.maxSpeed = 200.f;
 	}
-	case EnemyType::HifiEnemyTwinLaser:
+	case EnemyType::HifiEnemyTwinLaserVertical1:
 	{
-		enemy = TwinLaserEnemy();
+		enemy = TwinLaserEnemyVertical1();
+		break;
+	}
+	case EnemyType::HifiEnemyTwinLaserVertical2:
+	{
+		enemy = TwinLaserEnemyVertical2();
 		break;
 	}
 	};
@@ -1029,6 +1034,25 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 
 	return entity;
 };
+
+void createEnemyGroup(RenderSystem * renderer, vec2 pos, EnemyType type) {
+	std::vector<Entity> groupMembers;
+	Map& map = registry.maps.components[0];
+	WindowState& ws =  registry.windowStates.components[0];
+	if (type == EnemyType::HifiEnemyTwinLaserVertical1) {
+		//should spawn twin on the side perpendicular to patrol direction
+		vec2 twinPos = vec2(ws.width,ws.height) - pos; //normalized position
+		groupMembers.push_back(createEnemy(renderer,pos,type));
+		groupMembers.push_back(createEnemy(renderer,twinPos,HifiEnemyTwinLaserVertical2));
+	}
+	for (Entity gm : groupMembers) {
+		EnemyGroup& eg = registry.enemyGroups.emplace(gm);
+		for (Entity other : groupMembers) {
+			if (other == gm) continue;
+			eg.others.push_back(other);
+		}
+	}
+}
 
 Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData)
 {
