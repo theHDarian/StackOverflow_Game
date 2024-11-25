@@ -564,7 +564,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
-		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
+		boidKeepBound(entity, boid, 0, 0, 0, 0);
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSEXPLODE)
 	{
@@ -575,7 +575,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
-		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
+		boidKeepBound(entity, boid, 0, 0, 0, 0);
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSWARMPLAYER)
 	{
@@ -589,7 +589,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
-		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
+		boidKeepBound(entity, boid, 0, 0, 0, 0);
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSFISH)
 	{
@@ -603,7 +603,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
 		boidEvadePlayer(entity,boid, 100.0f);
-		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
+		boidKeepBound(entity, boid, 0, 0, 0, 0);
 	}
 	else
 	{
@@ -615,7 +615,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
-		boidKeepBound(entity, boid, 150.f, 100.f, 150.f, 100.f);
+		boidKeepBound(entity, boid, 0, 0, 0, 0);
 	}
 }
 
@@ -624,8 +624,8 @@ void AISystem::boidKeepBound(Entity entity, Boid &boid, float minx, float miny, 
 	WindowState &windowState = registry.windowStates.components[0];
 	Map& map = registry.maps.components[0];
 	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
-    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
-    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
+	vec2 roomStartPos = map.currRoom.roomStart;
+    vec2 roomEndPos = map.currRoom.roomEnd;
 
 	vec2 scale = registry.motions.get(entity).scale;
 

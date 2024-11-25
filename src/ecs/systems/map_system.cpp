@@ -38,13 +38,13 @@ void MapSystem::step(float elapsed_ms)
     // WindowState &wS = registry.windowStates.components[0];
     WindowState &wS = registry.windowStates.components[0];
     vec2 roomCenter = vec2(wS.width,wS.height)/2.f;
-    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
-    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
+    //vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    //vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
-            vec2 pos = glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e));
+            vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
             if (std::get<EnemyType>(e) == EnemyType::HifiEnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::HifiEnemyTwinLaserHorizontal1) {
                 createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
             } else {
@@ -56,7 +56,7 @@ void MapSystem::step(float elapsed_ms)
         if (map.currRoom.cleared) {
             for (auto &e : map.currRoom.preset.interactables)
             {
-                vec2 pos = glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e));
+                vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
                 createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
             }
             map.currRoom.preset.interactables = {};
@@ -185,11 +185,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     int spawnIndex = doorIndex == 0 ? 2 : doorIndex == 1 ? 3
                                         : doorIndex == 2 ? 0
                                                          : 1;
-    vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
-    playerMotion.position = spawnPosition;
-
-    // clear enemies and obstacles
-    clearRoomActors();
 
     // change current room in the map
     map.currRoom = Room();
@@ -197,6 +192,14 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom.preset = getRoomPreset(door.room, door.isLocked);
     updateBgPositions();
     map.currRoom.type = door.room;
+
+    vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
+    playerMotion.position = spawnPosition;
+
+    // clear enemies and obstacles
+    clearRoomActors();
+
+
 
 
     SoundType s = roomTypeToMusic.at(map.currRoom.type);
@@ -380,7 +383,7 @@ void MapSystem::updateBgPositions() {
         vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), 
         vec2(floorScale.y * 2, wallThickness)},
     };
-    char sides[4] = {'T','R','B','L'};
+    char sides[4] = {'B','R','T','L'};
 
     int wallIndex = 0;
     int symbolIndex = 0;
@@ -414,7 +417,7 @@ void MapSystem::updateBgPositions() {
             char side = sides[doorSpriteIndex];
             if(side == 'T') offsetPos.y = -offsetAmount;
             if (side == 'R') offsetPos.x = offsetAmount;
-            if (side == 'B') offsetPos.y = offsetAmount;
+            if (side == 'B') offsetPos.y = +offsetAmount;
             if (side == 'L') offsetPos.x = -offsetAmount;
             motion.position = position + offsetPos; 
             doorSpriteIndex++;
@@ -443,5 +446,10 @@ void MapSystem::updateBgPositions() {
             doorIndex++;
         }
     }
+
+    // update room start/end pos based on colliders
+    Room& room = registry.maps.components[0].currRoom;
+    room.roomStart = vec2(wallPositions[3].colliderStart.x, wallPositions[0].colliderStart.y);
+    room.roomEnd = vec2(wallPositions[1].colliderStart.x, wallPositions[2].colliderStart.y);
 }
 

@@ -684,6 +684,7 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 	vec2 floorPosition = roomCenter;
 	float wallThickness = 100.f;
 	float doorwidth = 100.f;
+
 	std::vector<WallPos> wallPositions = {
 		{
 			// top
@@ -747,7 +748,7 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		b.angle = glm::radians(-90.f);
 		b.axis = vec3(1, 0, 0);
 		b.offset = p.offset;
-		b.side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+		b.side = (p.colliderStart.y == p.colliderEnd.y) ? ((p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T') : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
@@ -767,7 +768,7 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		float angle = -M_PI/2.f;
 		vec3 axis = vec3(1, 0, 0);
 		vec3 offset = p.offset;
-		char side = (p.colliderStart.y == p.colliderEnd.y) ? (p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T' : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+		char side = (p.colliderStart.y == p.colliderEnd.y) ? ((p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T') : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
 
 		createDoors(renderer, p.spritePosition, p.spriteAngle, p.spriteScale, angle, axis, offset, side);
 	}
@@ -777,6 +778,10 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y - 30 }, { ws.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y - 30 });
 	createDoor(renderer, { wallPositions[3].colliderStart.x + 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[3].colliderStart.x + 30,  ws.height / 2 + doorwidth / 2 });
 
+	// update room start/end pos based on colliders
+	Room& room = registry.maps.components[0].currRoom;
+	room.roomStart = vec2(wallPositions[3].colliderStart.x, wallPositions[0].colliderStart.y);
+	room.roomEnd = vec2(wallPositions[1].colliderStart.x, wallPositions[2].colliderStart.y);
 }
 
 // draw a line from point A to B

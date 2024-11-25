@@ -103,6 +103,8 @@ struct Room {
     bool dialogueDone = true;
     bool cutSceneDone = true;
     float wallThickness = 100.f;
+    vec2 roomStart = vec2(0.f);
+    vec2 roomEnd = vec2(0.f);
 };
 enum MapRequestType {
     RestartGame = 'R',
