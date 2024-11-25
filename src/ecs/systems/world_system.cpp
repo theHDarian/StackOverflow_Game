@@ -88,12 +88,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	// window_width_px = vidMode->width;
-	// window_height_px = vidMode->height;
+	window_width_px = vidMode->width;
+	window_height_px = window_width_px * (1080.f/1920.f);
 	// window_width_px = 1280;
 	// window_height_px = 720;
-	 window_width_px = 1920;
-	 window_height_px = 1080;
+	//  window_width_px = 1920;
+	//  window_height_px = 1080;
 	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
@@ -251,8 +251,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 							BulletEffectType type = effect.type;
 							if (type == BulletEffectType::Inert)
 								continue;
-							if(enemyBulletColors.count(type) > 0) {
-								props.colors.push_back(enemyBulletColors.at(type));
+							if(enemyBulletParticleColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletParticleColors.at(type));
 							} else {
 								printf("Warning: enemy bullet color not defined\n");
 							}
@@ -465,8 +465,8 @@ void WorldSystem::handleCollisions() {
 							BulletEffectType type = effect.type;
 							if (type == BulletEffectType::Inert)
 								continue;
-							if(enemyBulletColors.count(type) > 0) {
-								props.colors.push_back(enemyBulletColors.at(type));
+							if(enemyBulletParticleColors.count(type) > 0) {
+								props.colors.push_back(enemyBulletParticleColors.at(type));
 							} else {
 								printf("Warning: enemy bullet color not defined\n");
 							}
@@ -768,7 +768,6 @@ void WorldSystem::movePlayer() {
 	float range = 50.0f;
 	aimMotion.angle = atan(diff.y,diff.x)+M_PI/4;
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
-
 }
 
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
@@ -795,7 +794,10 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	}
 
 	//play hit sound
-	soundPlayer->playPlayerHurtSound();
+	if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
+		soundPlayer->playPlayerZappedSound();
+	} else
+		soundPlayer->playPlayerHurtSound();
 
 	//add player invincibility frames
 	if (!registry.invincibles.has(player)) {

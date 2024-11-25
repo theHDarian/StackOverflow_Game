@@ -541,6 +541,8 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	door.endPos = endPos;
 	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'B' : 'T' : (door.startPos.x < ws.width / 2.f) ? 'L'
 																																		  : 'R';
+
+	registry.roomSizeScaleds.emplace(entity,"Door");
 	std::cout << glm::to_string(startPos) << ", " << glm::to_string(endPos) << ", " << door.side << std::endl;
 
 	InteractableObject &object = registry.interactables.emplace(entity);
@@ -566,6 +568,7 @@ Entity createWallThickness(vec2 pos, vec2 scale) {
 	motion.scale = scale + vec2(200, 200/1.33);
 
 	registry.backgrounds.emplace(entity);
+	registry.roomSizeScaleds.emplace(entity,"WallThickness");
 
 	registry.renderRequests.insert(
 		entity,
@@ -591,6 +594,7 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	motion.position = position;
 	motion.angle = 0;
 	motion.scale = vec2(120.f, 120);
+	registry.roomSizeScaleds.emplace(entity,"DoorSymbol");
 
 	DoorSymbol &symbol = registry.doorSymbols.emplace(entity);
 	symbol.angle = 0;
@@ -644,6 +648,7 @@ Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scal
 	symbol.offset = offset;
 	symbol.door = true;
 	symbol.side = side;
+	registry.roomSizeScaleds.emplace(entity,"DoorSprite");
 
 	registry.backgrounds.emplace(entity);
 
@@ -718,6 +723,8 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 	for (auto &p : wallPositions)
 	{
 		auto entity = Entity();
+
+		registry.roomSizeScaleds.emplace(entity,"Bound");
 
 		auto &motion = registry.motions.emplace(entity);
 		motion.position = p.spritePosition;
@@ -851,6 +858,7 @@ Entity createFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 	motion.scale = scale;
 
 	registry.backgrounds.emplace(entity);
+	registry.roomSizeScaleds.emplace(entity,"Floor");
 
 	registry.renderRequests.insert(
 		entity,
@@ -1020,6 +1028,32 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boid.velocity = vec2(randomX, randomY);
 		boid.maxSpeed = 200.f;
 	}
+	case EnemyType::HifiEnemyTwinLaserVertical1:
+	{
+		enemy = TwinLaserEnemyVertical1();
+		break;
+	}
+	case EnemyType::HifiEnemyTwinLaserVertical2:
+	{
+		enemy = TwinLaserEnemyVertical2();
+		break;
+	}
+	case EnemyType::HifiEnemyTwinLaserHorizontal1:
+	{
+		enemy = TwinLaserEnemyHorizontal1();
+		break;
+	}
+	case EnemyType::HifiEnemyTwinLaserHorizontal2:
+	{
+		enemy = TwinLaserEnemyHorizontal2();
+		break;
+	}
+	case EnemyType::HifiEnemySniper:
+	{
+		enemy = EnemyHifiSniper();
+		break;
+	}
+	case EnemyType::HifiEnemyCharger: enemy = EnemyHifiCharger();break;
 	};
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1085,6 +1119,32 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	return entity;
 };
 
+void createEnemyGroup(RenderSystem * renderer, vec2 pos, EnemyType type) {
+	std::vector<Entity> groupMembers;
+	Map& map = registry.maps.components[0];
+	WindowState& ws =  registry.windowStates.components[0];
+	if (type == EnemyType::HifiEnemyTwinLaserVertical1) {
+		//should spawn twin on the side perpendicular to patrol direction
+		vec2 twinPos = pos; //normalized position
+		twinPos.x = ws.width - pos.x;
+		groupMembers.push_back(createEnemy(renderer,pos,type));
+		groupMembers.push_back(createEnemy(renderer,twinPos,HifiEnemyTwinLaserVertical2));
+	} else if (type == EnemyType::HifiEnemyTwinLaserHorizontal1) {
+		//should spawn twin on the side perpendicular to patrol direction
+		vec2 twinPos = pos; //normalized position
+		twinPos.y = ws.height - twinPos.y;
+		groupMembers.push_back(createEnemy(renderer,pos,type));
+		groupMembers.push_back(createEnemy(renderer,twinPos,HifiEnemyTwinLaserHorizontal2));
+	}
+	for (Entity gm : groupMembers) {
+		EnemyGroup& eg = registry.enemyGroups.emplace(gm);
+		for (Entity other : groupMembers) {
+			if (other == gm) continue;
+			eg.others.push_back(other);
+		}
+	}
+}
+
 Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData)
 {
 	auto entity = Entity();
@@ -1134,7 +1194,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			 GEOMETRY_BUFFER_ID::SPRITE});
 
 		ParticleProps props = enemyBullet;
-		props.colors.push_back(enemyBulletColors.at(Key));
+		props.colors.push_back(enemyBulletParticleColors.at(Key));
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
@@ -1202,8 +1262,8 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		if(enemyBulletColors.count(type) > 0) {
-			props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletParticleColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletParticleColors.at(type));
 		} else {
 			printf("Warning: enemy bullet color not defined\n");
 		}
@@ -1268,8 +1328,8 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		if(enemyBulletColors.count(type) > 0) {
-			props.colors.push_back(enemyBulletColors.at(type));
+		if(enemyBulletParticleColors.count(type) > 0) {
+			props.colors.push_back(enemyBulletParticleColors.at(type));
 		} else {
 			printf("Warning: enemy bullet color not defined\n");
 		}
@@ -1413,7 +1473,7 @@ Entity createKeyBullet(RenderSystem* renderer, vec2 pos)
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	ParticleProps props = enemyBullet;
-	props.colors.push_back(enemyBulletColors.at(Key));
+	props.colors.push_back(enemyBulletParticleColors.at(Key));
 	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 

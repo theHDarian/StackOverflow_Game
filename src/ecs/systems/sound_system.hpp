@@ -30,6 +30,7 @@ public:
     void playSpecialMusic(int songIndex);
 
     void playPlayerHurtSound();
+    void playPlayerZappedSound();
     void playPlayerDashSound();
 
     void playPlayerShootSound(float ticks);
@@ -69,6 +70,7 @@ private:
     Mix_Chunk* playerHurtSound;
     Mix_Chunk* playerShootSound;
     Mix_Chunk* playerDashSound;
+    Mix_Chunk* playerZappedSound; //hit by lightning bullet
 
     Mix_Chunk* incomingDialogueSound;
     Mix_Chunk* nextDialogueSound;

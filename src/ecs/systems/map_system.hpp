@@ -18,6 +18,7 @@ class MapSystem {
         void changeRoom(RoomType type,int doorIndex);
         void handleMapRequests();
         void newMap();
+        void updateBgPositions();
 
     void loadMusic();
 

@@ -7,23 +7,20 @@
 #include <iostream>
 #include <random>
 #include <glm/glm.hpp>
+#include <glm/gtx/compatibility.hpp>
 
 vec2 boundPosition(vec2 position, Entity entity)
 {
 	WindowState &windowState = registry.windowStates.components[0];
-	int width = windowState.width;
-	int height = windowState.height;
-	float ratio1 = height / (float)width;
-	float ratio2 = width / (float)height;
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
+
 	vec2 scale = registry.motions.get(entity).scale;
-	float minX = width / (6 * ratio2);
-	float minY = height / (6 * ratio2) + scale.y / 2;
-	float maxX = width - width / (6 * ratio2);
-	float maxY = height - height / (6 * ratio2) - scale.y / 2;
-	vec2 returnValue = position;
-	returnValue.x = glm::clamp(position.x, minX, maxX);
-	returnValue.y = glm::clamp(position.y, minY, maxY);
-	return vec2(returnValue.x, returnValue.y);
+	vec2 min = roomStartPos + scale/2.f;
+	vec2 max = roomEndPos - scale/2.f;
+	return glm::clamp(position, min, max);
 }
 void AISystem::step(float elapsed_ms)
 {
@@ -342,52 +339,41 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 
 	vec2 patrolFactor = pattern.path[pattern.pathIndex];
 
+	// printf("%.1f %.1f\n", patrolFactor.x,patrolFactor.y);
+
 	WindowState &windowState = registry.windowStates.components[0];
-	int width = windowState.width;
-	int height = windowState.height;
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
 	vec2 scale = registry.motions.get(entity).scale;
-	float minX = 150.f + scale[0];
-	float minY = 100.f + scale[1];
-	float maxX = width - 150.f - scale[0];
-	float maxY = height - 60.f - scale[1];
+	vec2 min = roomStartPos + scale + 100.f;
+	vec2 max = roomEndPos - scale - 100.f;
 
-	float posX = minX + patrolFactor.x * (maxX - minX);
-	float posY = minY + patrolFactor.y * (maxY - minY);
-
-	posX = glm::clamp(posX, minX, maxX);
-	posY = glm::clamp(posY, minY, maxY);
-
-	return vec2(posX, posY);
+	return glm::lerp(min,max,patrolFactor);
 }
 
 vec2 AISystem::generateRandomPos(Entity entity)
 {
 	auto &window_registry = registry.windowStates;
 	WindowState &windowState = window_registry.components[0];
-	int width = windowState.width;
-	int height = windowState.height;
-	// std::cout << "width " << windowState.width << std::endl;
-	// std::cout << "height " << windowState.height << std::endl;
-	float pos_x = rand() % width;
-	float pos_y = rand() % height;
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
 	vec2 scale = registry.motions.get(entity).scale;
-	float minX = 150.f + scale[0];
-	float minY = 100.f + scale[1];
-	float maxX = width - 150.f - scale[0];
-	float maxY = height - 60.f - scale[1];
-	pos_x = glm::clamp(pos_x, minX, maxX);
-	pos_y = glm::clamp(pos_y, minY, maxY);
-	return vec2(pos_x, pos_y);
+	vec2 min = roomStartPos + scale + 100.f;
+	vec2 max = roomEndPos - scale - 100.f;
+
+	return glm::lerp(min,max,Random::Vec2(vec2(1)));
 }
 
 vec2 AISystem::getCharginPos(Entity entity)
 {
 	auto &window_registry = registry.windowStates;
 	WindowState &windowState = window_registry.components[0];
-	int width = windowState.width;
-	int height = windowState.height;
 	vec2 playerPos = getPlayerPos();
 	Motion &motion = registry.motions.get(entity);
 	vec2 scale = motion.scale;
@@ -410,13 +396,15 @@ vec2 AISystem::getCharginPos(Entity entity)
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 500.0f;
 
-	float minX = 150.f + scale[0];
-	float minY = 100.f + scale[1];
-	float maxX = width - 150.f - scale[0];
-	float maxY = height - 60.f - scale[1];
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
-	goalPosition[0] = glm::clamp(goalPosition[0], minX, maxX);
-	goalPosition[1] = glm::clamp(goalPosition[1], minY, maxY);
+	vec2 min = roomStartPos + scale + 100.f;
+	vec2 max = roomEndPos - scale - 100.f;
+
+	goalPosition = glm::clamp(goalPosition, min,max);
 
 	return goalPosition;
 }
@@ -436,14 +424,15 @@ vec2 AISystem::generateRandomPosInRadius(Entity entity, int radiusNear, int radi
 
 	vec2 scale = registry.motions.get(entity).scale;
 
-	float minX = 150.f + scale[0];
-	float minY = 100.f + scale[1];
-	float maxX = width - 150.f - scale[0];
-	float maxY = height - 60.f - scale[1];
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
-	pos_x = glm::clamp(pos_x, minX, maxX);
-	pos_y = glm::clamp(pos_y, minY, maxY);
-	return vec2(pos_x, pos_y);
+	vec2 min = roomStartPos + scale + 100.f;
+	vec2 max = roomEndPos - scale - 100.f;
+
+	return glm::clamp(vec2(pos_x, pos_y),min,max);
 }
 
 vec2 AISystem::getTeamPos(Entity entity)
@@ -473,13 +462,15 @@ vec2 AISystem::getTeamPos(Entity entity)
 			vec2 goalPosition = teammateMotion.position - direction * backDistance;
 
 			vec2 scale = healerMotion.scale;
-			float minX = 150.f + scale.x;
-			float minY = 100.f + scale.y;
-			float maxX = width - 150.f - scale.x;
-			float maxY = height - 60.f - scale.y;
+			Map& map = registry.maps.components[0];
+			vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+			vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+			vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
-			goalPosition.x = glm::clamp(goalPosition.x, minX, maxX);
-			goalPosition.y = glm::clamp(goalPosition.y, minY, maxY);
+			vec2 min = roomStartPos + scale + 100.f;
+			vec2 max = roomEndPos - scale - 100.f;
+
+			goalPosition = glm::clamp(goalPosition, min, max);
 
 			return goalPosition;
 		}
@@ -546,8 +537,13 @@ vec2 AISystem::evadeBullet(Entity entity)
 		}
 	}
 	vec2 scale = motion_register.get(entity).scale;
-	bestEscapePos[0] = glm::clamp(bestEscapePos[0], 0.f + scale[0], static_cast<float>(windowState.width) - scale[0]);
-	bestEscapePos[1] = glm::clamp(bestEscapePos[1], 0.f + scale[1], static_cast<float>(windowState.height) - scale[1]);
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
+	vec2 min = roomStartPos + scale;
+	vec2 max = roomEndPos - scale;
+	bestEscapePos = glm::clamp(bestEscapePos, min, max);
 	return bestEscapePos;
 }
 
@@ -626,14 +622,17 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 void AISystem::boidKeepBound(Entity entity, Boid &boid, float minx, float miny, float maxx, float maxy)
 {
 	WindowState &windowState = registry.windowStates.components[0];
-	int width = windowState.width;
-	int height = windowState.height;
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
 	vec2 scale = registry.motions.get(entity).scale;
-	float minX = minx + scale[0];
-	float minY = miny + scale[1];
-	float maxX = width - maxx - scale[0];
-	float maxY = height - maxy - scale[1];
+
+	float minX = roomStartPos.x + minx + scale[0];
+	float minY = roomStartPos.y + miny + scale[1];
+	float maxX = roomEndPos.x - maxx - scale[0];
+	float maxY = roomEndPos.y - maxy - scale[1];
 	float turnFactor = 1.0f;
 	float momentumFactor = 150.f;
 	vec2 position = boid.position;
@@ -830,11 +829,9 @@ void AISystem::boidCircleRoom(Entity entity, Boid &boid, float multiplier, float
 {
 
 	WindowState &windowState = registry.windowStates.components[0];
-	int width = windowState.width;
-	int height = windowState.height;
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
 
-	vec2 roomCenter = vec2(width / 2.0f, height / 2.0f);
-	float radius = glm::min(width, height) / 2.75f;
+	float radius = glm::min(windowState.width,windowState.height) / 2.75f;
 
 	vec2 position = boid.position;
 	vec2 directionToCenter = position - roomCenter;

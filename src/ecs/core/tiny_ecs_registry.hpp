@@ -91,7 +91,9 @@ public:
 	ComponentContainer<Parent> parents;
 	ComponentContainer<Camera> cameras;
 	ComponentContainer<GameOverlayUIText> gameOverlayUITexts;
+	ComponentContainer<EnemyGroup> enemyGroups;
 	ComponentContainer<KeyItems> keyItems;
+	ComponentContainer<RoomSizeScaled> roomSizeScaleds;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -174,7 +176,9 @@ public:
 		registry_list.push_back(&parents);
 		registry_list.push_back(&cameras);
 		registry_list.push_back(&gameOverlayUITexts);
+		registry_list.push_back(&enemyGroups);
 		registry_list.push_back(&keyItems);
+		registry_list.push_back(&roomSizeScaleds);
 	}
 
 	void clear_all_components() {
@@ -213,6 +217,11 @@ public:
 		if (parents.has(entity)) {
 			for (Entity child : parents.get(entity).children) {
 				if (!deleteds.has(child)) remove_all_components_of(child);
+			}
+		}
+		if (enemyGroups.has(entity)) {
+			for (Entity other : enemyGroups.get(entity).others) {
+				if (!deleteds.has(other)) remove_all_components_of(other);
 			}
 		}
 		remove_all_components_of(entity);

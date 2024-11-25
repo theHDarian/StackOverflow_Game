@@ -6,6 +6,7 @@
 #include "SDL.h"
 #include "components/presets/room_presets.hpp"
 #include "sound_system.hpp"
+#include <glm/gtx/compatibility.hpp>
 
 
 MapSystem::MapSystem()
@@ -13,7 +14,6 @@ MapSystem::MapSystem()
     if (registry.maps.components.size() == 0)
     {
         auto& map = registry.maps.emplace(Entity());
-        map.Directory = roomDirectory;
     }
 }
 MapSystem::~MapSystem()
@@ -35,20 +35,29 @@ void MapSystem::step(float elapsed_ms)
 
     handleMapRequests();
 
-    // spawn enemy based on current time
     // WindowState &wS = registry.windowStates.components[0];
+    WindowState &wS = registry.windowStates.components[0];
+    vec2 roomCenter = vec2(wS.width,wS.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
+
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
         for (auto &e : map.currRoom.preset.enemies)
         {
-            createEnemy(renderer, (std::get<vec2>(e) * map.currRoom.preset.roomSize - (map.currRoom.preset.roomSize - map.currRoom.roomPosition) / 2.f) + map.currRoom.roomPosition / 2.f, std::get<EnemyType>(e));
-
+            vec2 pos = glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e));
+            if (std::get<EnemyType>(e) == EnemyType::HifiEnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::HifiEnemyTwinLaserHorizontal1) {
+                createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
+            } else {
+                createEnemy(renderer, pos, std::get<EnemyType>(e));
+            }
         }
         map.currRoom.preset.enemies = {};
 
         if (map.currRoom.cleared) {
             for (auto &e : map.currRoom.preset.interactables)
             {
-                createInteractable(renderer, (std::get<vec2>(e) * map.currRoom.preset.roomSize - (map.currRoom.preset.roomSize - map.currRoom.roomPosition) / 2.f) + map.currRoom.roomPosition / 2.f, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+                vec2 pos = glm::lerp(roomStartPos,roomEndPos,std::get<vec2>(e));
+                createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
             }
             map.currRoom.preset.interactables = {};
 
@@ -155,8 +164,15 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     //play door close sound
     soundPlayer->playDoorCloseSound();
 
-    if (map.currRoom.type != RoomType::TutorialRoom1 && map.currRoom.type != RoomType::TutorialRoom2) {
+    if (map.currRoom.type != RoomType::TutorialRoom1) {
         map.roomsTraversed++;
+    }
+
+    //update Map Region
+    if (map.currRoom.type == TutorialRoom2) {
+        map.currRegion = Biology; //Go to bio region at end of tutorial
+    } else if (map.currRoom.type == BossRoom && map.currRegion == Biology) {
+        map.currRegion = Physics;
     }
 
     SoundType old_s = roomTypeToMusic.at(map.currRoom.type);
@@ -178,7 +194,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // change current room in the map
     map.currRoom = Room();
     assert(door.room != RoomType::None);
-    map.currRoom.preset = getRoomPreset(door.room,map.roomsTraversed, door.isLocked, map.Directory);
+    map.currRoom.preset = getRoomPreset(door.room, door.isLocked);
+    updateBgPositions();
     map.currRoom.type = door.room;
 
 
@@ -214,7 +231,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.reset();
 
         d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
-        if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1, map.Directory)) {
+        if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1)) { //check if next room has locked
             //have a chance of spawning locked rooms
             d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
         }
@@ -284,14 +301,15 @@ void MapSystem::newMap()
 
         map.currRoom = Room();
         map.currRoom.preset = TutorialRoom1Preset;
+        updateBgPositions();
         map.currRoom.type = TutorialRoom1;
-        map.Directory = roomDirectory;
+        map.directory = getDirectory(map.currRegion);
     }
     else {
         Map& map = registry.maps.components[0];
-        map.currRegion = MapRegion::Tutorial;
+        map.currRegion = MapRegion::Physics;
         map.roomsTraversed = 0;
-        map.Directory = roomDirectory;
+        map.directory = getDirectory(map.currRegion);
 
         bool excludeNone = false;
         for (int i = 0; i < 4; i++)
@@ -309,7 +327,9 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,map.roomsTraversed,false, map.Directory);
+        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,false);
+        updateBgPositions();
+        map.directory = getDirectory(map.currRegion);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
@@ -317,6 +337,111 @@ void MapSystem::newMap()
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
 
+    }
+}
+
+void MapSystem::updateBgPositions() {
+    //update floor scale
+    Map& map = registry.maps.components[0];
+    WindowState &windowState = registry.windowStates.components[0];
+    vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+
+    struct WallPos
+    {
+        vec2 colliderStart;
+        vec2 colliderEnd;
+        vec2 spritePosition;
+        vec2 spriteScale;
+    };
+    vec2 floorScale = map.currRoom.preset.roomSize;
+    
+    vec2 floorPosition = roomCenter;
+    float wallThickness = 100.f;
+    std::vector<WallPos> wallPositions = {
+    {
+        // top
+        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+        vec2(floorPosition.x, floorPosition.y + floorScale.y),
+        vec2(floorScale.x * 1.1, wallThickness)},
+        {// right
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
+        vec2(floorScale.y * 2, wallThickness)},
+            {// bottom
+        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+        vec2(floorPosition.x, floorPosition.y - floorScale.y), 
+        vec2(floorScale.x * 1.1, wallThickness)},
+        {// left
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), 
+        vec2(floorScale.y * 2, wallThickness)},
+    };
+    char sides[4] = {'T','R','B','L'};
+
+    int wallIndex = 0;
+    int symbolIndex = 0;
+    float doorwidth = 100.f;
+    int doorSpriteIndex = 0;
+    int doorIndex = 0;
+    for(Entity e : registry.roomSizeScaleds.entities) {
+        RoomSizeScaled& rss = registry.roomSizeScaleds.get(e);
+        Motion& motion = registry.motions.get(e);
+
+        if (rss.name == "Floor") {
+            motion.scale = map.currRoom.preset.roomSize;
+        } else if (rss.name == "WallThickness") {
+            motion.scale = map.currRoom.preset.roomSize + vec2(200, 200/1.33);
+        } else if (rss.name == "DoorSymbol") {
+            char side = sides[symbolIndex];
+            vec2 position = vec2(windowState.width,windowState.height)/2.f;
+            float of = 200.f;
+            if(side == 'T') position += vec2(0,map.currRoom.preset.roomSize.y/2+of);
+            if (side == 'R') position += vec2(map.currRoom.preset.roomSize.x/2+of,0);
+            if (side == 'B') position += vec2(0,-map.currRoom.preset.roomSize.y/2-of);
+            if (side == 'L') position += vec2(-map.currRoom.preset.roomSize.x/2-of,0);
+            motion.position = position;
+            symbolIndex++;
+        } else if (rss.name == "DoorSprite") {
+            float offsetAmount = -40.f;
+            vec2 offsetPos = vec2(0);
+            vec2 scaleOffset;
+            auto& p = wallPositions[doorSpriteIndex];
+            vec2 position = p.spritePosition;
+            char side = sides[doorSpriteIndex];
+            if(side == 'T') offsetPos.y = -offsetAmount;
+            if (side == 'R') offsetPos.x = offsetAmount;
+            if (side == 'B') offsetPos.y = offsetAmount;
+            if (side == 'L') offsetPos.x = -offsetAmount;
+            motion.position = position + offsetPos; 
+            doorSpriteIndex++;
+        } else if (rss.name == "Bound") {
+            auto& p = wallPositions[wallIndex];
+            motion.position = p.spritePosition;
+            motion.scale = p.spriteScale;
+            auto & wall = registry.walls.get(e);
+            wall.startPosition = p.colliderStart;
+		    wall.endPosition = p.colliderEnd;
+            wallIndex++;
+        } else if (rss.name == "Door") {
+            std::vector<std::vector<vec2>> doorPositions = {
+                {{ windowState.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y + 45 }, { windowState.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y + 45 }},
+                {{ wallPositions[1].colliderStart.x - 30,  windowState.height / 2 - doorwidth / 2 }, { wallPositions[1].colliderStart.x - 30,  windowState.height / 2 + doorwidth / 2 }},
+                {{ windowState.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y - 30 }, { windowState.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y - 30 }},
+                {{ wallPositions[3].colliderStart.x + 30,  windowState.height / 2 - doorwidth / 2 }, { wallPositions[3].colliderStart.x + 30,  windowState.height / 2 + doorwidth / 2 }}
+            };
+            vec2 startPos = doorPositions[doorIndex][0];
+            vec2 endPos = doorPositions[doorIndex][1];
+            motion.position = (startPos + endPos) / 2.0f;
+            motion.scale = vec2(glm::distance(startPos, endPos), 5);
+            auto &door = registry.doors.get(e);
+            door.startPos = startPos;
+            door.endPos = endPos;
+            doorIndex++;
+        }
     }
 }
 

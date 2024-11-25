@@ -47,7 +47,7 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
 			{Key,				"enemy_bullet_key (2).png"} 
 	};
 
-const std::map<BulletEffectType, Vec4StartEnd> enemyBulletColors = {
+const std::map<BulletEffectType, Vec4StartEnd> enemyBulletParticleColors = {
     {BulletDamage, {{ bulletEffectColors.at(BulletDamage), 1.0f },{ bulletEffectColors.at(BulletDamage), 1.0f }}},
     {ProjectileSpeed,   {{bulletEffectColors.at(ProjectileSpeed),1.f},{bulletEffectColors.at(ProjectileSpeed),1.f}}},
     {ProjectileSize,    {{bulletEffectColors.at(ProjectileSize),1.f},{bulletEffectColors.at(ProjectileSize),1.f}}},

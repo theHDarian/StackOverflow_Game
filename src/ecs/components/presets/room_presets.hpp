@@ -12,7 +12,6 @@ const RoomPreset TutorialRoom1Preset{
     {},
     {},
     {},
-    {},
     100000.0f,
     0,
     0,
@@ -22,7 +21,6 @@ const RoomPreset TutorialRoom1Preset{
 
 const RoomPreset TutorialRoom2Preset{
     {{EnemyType::TestRevampedEnemy, {0.5, 0.5}}},
-    {},
     {},
     {},
     0.0f,
@@ -192,7 +190,6 @@ const RoomPreset EnemyRoomSwarm{
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}}},
     {},
     {{{PushConsole,{bulletPierceUpA}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     0,
 0,
@@ -208,7 +205,6 @@ const RoomPreset EnemyRoomDashIntro1{
         },
        {},
        {},
-       {},
        0.0f,
        3,
     1,
@@ -220,7 +216,6 @@ const RoomPreset EnemyRoomDashIntro2{
          {EnemyType::Snail, {0.8f, 0.8f}},
          {EnemyType::MediumEnemyTank, {0.5f, 0.5f}},
         },
-       {},
        {},
        {},
        0.0f,
@@ -238,7 +233,6 @@ const RoomPreset EnemyRoomDashIntro3{
          {EnemyType::HardEnemyBoidBio, {0.8f, 0.2f}},
          {EnemyType::ThreeBee, {0.5f, 0.5f}},
         },
-       {},
        {},
        {},
        0.0f,
@@ -260,7 +254,6 @@ const RoomPreset EnemyRoomDash1{
      },
     {},
     {},
-    {},
     0.0f,
     5,
     2,
@@ -274,7 +267,6 @@ const RoomPreset EnemyRoomDash2{
         {Snail, {0.5f, 0.7f}},
      {EnemyType::EasyEnemySkull, {0.5f, 0.5f}}
      },
-    {},
     {},
     {},
     0.0f,
@@ -295,7 +287,6 @@ const RoomPreset EnemyRoomDashHard{
      },
     {},
     {},
-    {},
     0.0f,
     5,
     2,
@@ -312,7 +303,6 @@ const RoomPreset EnemyRoomSnails {
 },
 {},
 {},
-{},
 0.0f,
     5,
     2,
@@ -327,7 +317,6 @@ const RoomPreset EnemyRoomBees1{
      {EnemyType::OneBee, {0.2f, 0.2f}},
      {EnemyType::BeeHive, {0.2f, 0.4f}},
      {EnemyType::BeeHive, {0.8f, 0.4f}}},
-    {},
     {},
     {},
     0.0f,
@@ -348,7 +337,6 @@ const RoomPreset EnemyRoomBees2{
 
     {},
     {},
-    {},
     0.5f,
     7,
     2,
@@ -362,7 +350,6 @@ const RoomPreset EnemyRoomAngelTank{
      {EnemyType::MediumEnemyHealer, {0.8, 0.8}},
      {EnemyType::MediumEnemyHealer, {0.2, 0.2}}},
      
-    {},
     {},
     {},
     0.25f,
@@ -382,7 +369,6 @@ const RoomPreset EnemyRoomTripleBuffEX{
     {},
     {{{PushConsole,{bulletBounceUpA, bulletPierceUpA}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
     },
-    {},
     0.0f,
     35,
     5,
@@ -394,7 +380,6 @@ const RoomPreset RestingRoomPop{
     {},
     {},
     {{{PopConsole,{}}, {0.5f, 0.5f}}},
-    {SpecialEvent::RebootStation},
     0.0f,
     0,
     0,
@@ -405,7 +390,6 @@ const RoomPreset RestingRoomGardener{
         {},
         {},
         {{{Gardener,{}}, {0.5f, 0.5f}}},
-        {SpecialEvent::RebootStation},
     0.0f,
     0,
     0,
@@ -417,7 +401,6 @@ const RoomPreset RestRoomBibleTree{
     {},
     {},
     {{{InteractableItem::BibleTree,{}}, {0.5f, 0.5f}}},
-    {SpecialEvent::RebootStation},
     0.0f,
     0,
     0,
@@ -429,7 +412,6 @@ const RoomPreset RestRoomBaru{
         {},
         {},
 {{{Baru,{key}}, {0.35f, 0.1f}}},
-    {},
         0.0f,
         5,
         0,
@@ -442,7 +424,6 @@ const RoomPreset RestRoomOracleCrab{
         {},
         {},
         {{{OracleCrab,{key}}, {0.5f, 0.3f}}},
-        {},
         0.0f,
         5,
         0,
@@ -455,7 +436,6 @@ const RoomPreset TreasureRoom1{
     {},
     {},
     {{{PushConsole,{numBulletsUpA, sizeUpA}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     5,
     0,
@@ -466,7 +446,6 @@ const RoomPreset TreasureRoom2{
     {},
     {},
     {{{PushConsole,{dashUpA}}, {0.5f, 0.5f}}},
-{},
     0.0f,
     5,
     0,
@@ -477,7 +456,6 @@ const RoomPreset TreasureRoom3{
     {},
     {},
     {{{PushConsole,{dmgUpM}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     5,
     0,
@@ -488,7 +466,6 @@ const RoomPreset TreasureRoom4{
     {},
     {},
     {{{PushConsole,{dashCDRDownA}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     5,
     0,
@@ -499,7 +476,6 @@ const RoomPreset TreasureRoom5{
     {},
     {},
     {{{PushConsole,{dashCDRDownM}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     5,
     0,
@@ -510,7 +486,6 @@ const RoomPreset TreasureRoomKey{
         {},
         {},
         {{{PushConsole,{key}}, {0.5f, 0.5f}}},
-        {},
         0.0f,
         5,
     0,
@@ -521,7 +496,6 @@ const RoomPreset TreasureRoomBlunt{
     {},
     {},
     {{{PushConsole,{blunt, blunt, blunt}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     0,
     0,
@@ -532,7 +506,6 @@ const RoomPreset TreasureRoomRam{
     {},
     {},
     {{{InteractableItem::PushConsole,{stackSizeUpA}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     0,
     0,
@@ -543,7 +516,6 @@ const RoomPreset TreasureRoomSniper{
     {},
     {},
     {{{PushConsole,{SniperPower, SniperBurden, SniperSpeed, SniperLethargy}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     5,
     0,
@@ -554,7 +526,6 @@ const RoomPreset TreasureRoomHoney{
     {},
     {},
     {{{HoneyCanister,{}}, {0.5f, 0.5f}}},
-{},
     0.0f,
     5,
     0,
@@ -566,7 +537,6 @@ const RoomPreset TreasureRoomKeys{
     {},
     {},
     {{{PushConsole,{key}}, {0.5f, 0.5f}}, {{PushConsole,{key}}, {0.25f, 0.5f}}, {{PushConsole,{key}}, {0.75f, 0.5f}}},
-{},
     0.0f,
     5,
     0,
@@ -579,7 +549,6 @@ const RoomPreset TreasureRoomWish{
     {},
     {},
     {{{WishGranter,{key}}, {0.5f, 0.5f}}},
-{},
     0.0f,
     5,
     0,
@@ -595,7 +564,6 @@ const RoomPreset BossRoomBee{
     {{BossBeehiveMain, {0.5f, 0.5f}}, {ThreeBee,{0.5f, 0.75f}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
-    {},
     0.0f,
     20,
     5,
@@ -603,8 +571,47 @@ const RoomPreset BossRoomBee{
 
 };
 
+const RoomPreset HifiRoomTwinLaserVertical {
+    {{EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.5f}}},
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiLaserVertical",
+};
+const RoomPreset HifiRoomTwinLaserHorizontal {
+    {{EnemyType::HifiEnemyTwinLaserHorizontal1, {0.5f,0.1f}}},
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiLaserHo"
+};
 
-const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory = {
+const RoomPreset HifiRoomSnipers {
+    {{EnemyType::HifiEnemySniper, {0.5f,0.01f}}},
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiSnipers"
+};
+const RoomPreset HifiRoomChargers {
+    {{EnemyType::HifiEnemyCharger, {0.5f,0.5f}}},
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiChargers"
+};
+
+
+
+const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
         {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
@@ -622,24 +629,53 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> roomDirectory =
     }},
 };
 
-inline bool hasLocked(RoomType type, int roomsTraversed, std::map<DifficultyRegion,std::map<RoomType, RoomPresets>>& Directory) {
+const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
+    {DifficultyRegion::Intro,{
+        {RoomType::EnemyRoom, {{EnemyRoomSwarm},{}}},
+        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
+    }},
+    {DifficultyRegion::Easy,{
+        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
+    }},
+    {DifficultyRegion::Medium,{
+        {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
+    }},
+};
+
+inline std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> getDirectory(MapRegion region) {
+    if (region == Biology || region == Tutorial) {
+        return bioRoomDirectory;
+    } else if (region == Physics) {
+        return physicsRoomDirectory;
+    }
+}
+
+inline bool hasLocked(RoomType type, int roomsTraversed) {
+    Map& map = registry.maps.components[0];
+    
     if (type >= RoomType::None) {
         return false;
     }
     if (roomsTraversed < DifficultyRegion::Intro) {
-        return !Directory.at(Intro).at(type).locked.empty();
+        return !map.directory.at(Intro).at(type).locked.empty();
     } else if (roomsTraversed < DifficultyRegion::Easy) {
-        return !Directory.at(Easy).at(type).locked.empty();
+        return !map.directory.at(Easy).at(type).locked.empty();
     } else if (roomsTraversed < DifficultyRegion::Medium) {
-        return !Directory.at(Medium).at(type).locked.empty();
+        return !map.directory.at(Medium).at(type).locked.empty();
     } else {
-        return !Directory.at(Medium).at(type).locked.empty();
+        return !map.directory.at(Medium).at(type).locked.empty();
     }
 }
 
-inline RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked, std::map<DifficultyRegion, std::map<RoomType, RoomPresets>>& Directory) {
-    // Boss rooms
-    if (type == RoomType::BossBigCRoom) {
+inline RoomPreset getRoomPreset(RoomType type, bool locked) {
+    Map& map = registry.maps.components[0];
+    //boss rooms
+    if (type == RoomType::BossRoom && map.currRegion == MapRegion::Biology) {
         return BossRoomBee;
     }
 
@@ -651,26 +687,26 @@ inline RoomPreset getRoomPreset(RoomType type, int roomsTraversed, bool locked, 
     RoomPreset nextRoom;
 
     // Regular rooms
-    if (!hasLocked(type, roomsTraversed, Directory) && locked) {
+    if (!hasLocked(type,map.roomsTraversed) && locked) {
         assert(false);
     }
 
     DifficultyRegion currentRegion;
-    if (roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
+    if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
         currentRegion = DifficultyRegion::Intro;
-    } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
+    } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
         currentRegion = DifficultyRegion::Easy;
-    } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
+    } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
         currentRegion = DifficultyRegion::Medium;
     } else {
         currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
     }
 
-    nextRoom = Random::ListItem(locked ? Directory.at(currentRegion).at(type).locked : Directory.at(currentRegion).at(type).unlocked);
+    nextRoom = Random::ListItem(locked ? map.directory.at(currentRegion).at(type).locked : map.directory.at(currentRegion).at(type).unlocked);
 
     // Remove the one-time room from all relevant regions
     if (nextRoom.oneTime) {
-        for (auto it = Directory.begin(); it != Directory.end(); ++it) {
+        for (auto it = map.directory.begin(); it != map.directory.end(); ++it) {
             if (it->first >= currentRegion) { // Remove from current and future regions
                 std::map<RoomType, RoomPresets>& roomMap = it->second;
                 std::vector<RoomPreset>& roomList = roomMap.at(type).locked;
@@ -696,7 +732,7 @@ bool operator>=(DifficultyRegion lhs, DifficultyRegion rhs) {
 const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::EnemyRoom,3},
     {RoomType::RestRoom,1},
-    {RoomType::BossBigCRoom,2},
+    {RoomType::BossRoom,2},
     {RoomType::TreasureRoom,0},
     {RoomType::None,4},
     {RoomType::TutorialRoom1,5},
@@ -706,7 +742,7 @@ const std::map<RoomType,int> roomTypeToSymbols = {
 const std::map<RoomType, SoundType> roomTypeToMusic = {
     {RoomType::EnemyRoom, SoundType::normalBGM},
     {RoomType::RestRoom, SoundType::specialBGM},
-    {RoomType::BossBigCRoom, SoundType::bossBGM},
+    {RoomType::BossRoom, SoundType::bossBGM},
     {RoomType::TreasureRoom, SoundType::specialBGM},
     {RoomType::None, normalBGM},
     {RoomType::TutorialRoom1, SoundType::specialBGM},

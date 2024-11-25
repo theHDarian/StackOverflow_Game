@@ -160,14 +160,27 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    Motion &playerMotion = registry.motions.components[registry.players.entities[0]];
+                    Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
                     vec2 mid = playerMotion.position - motion.position;
+                    motion.angle = atan2(mid.y, mid.x);
+                }
+                else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_TWIN)
+                {
+                    Motion &twinMotion = registry.motions.get(registry.enemyGroups.get(entity).others[0]);
+                    vec2 mid = twinMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
 
                 float totalDistance = glm::distance(movement.posA, movement.posB);
                 movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
                 motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
+            } else {
+                if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
+                {
+                    Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
+                    vec2 mid = playerMotion.position - motion.position;
+                    motion.angle = atan2(mid.y, mid.x);
+                }
             }
         }
 
@@ -210,6 +223,11 @@ void EnemySystem::step(float elapsed_ms)
 
 
                     registry.emitParticles.replace(entity,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
+                    if (registry.enemyGroups.has(entity)) {
+                        for (Entity other : registry.enemyGroups.get(entity).others) {
+                            registry.emitParticles.replace(other,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
+                        }
+                    }
                 }
 
                 // std::cout << "enemy " << entity << "has died" << std::endl;
@@ -325,7 +343,6 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         // Generate a random offset within the range
         double offset = (2 * (static_cast<double>(rand()) / RAND_MAX) - 1) * range;
         offset = burst.burstDirection + offset;
-        sound->playEnemyShootSound(sfxNum, 0);
         createEnemyBullet(render, pos, {cos(offset), sin(offset)}, atkData.veer.x * vec2(cos(offset + atkData.veer.y), sin(offset + atkData.veer.y)), atkData);
     }
     else if (burst.curBurst != atkData.numBullets)
@@ -350,6 +367,7 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
         // std::cout << angle << std::endl;
         createEnemyBullet(render, pos, {cos(angle), sin(angle)}, atkData.veer.x * vec2(cos(angle + atkData.veer.y), sin(angle + atkData.veer.y)), atkData);
     }
+    sound->playEnemyShootSound(sfxNum, 0);
     burst.curBurst--;
     burst.burstCooldown = 150;
 }
@@ -403,6 +421,16 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
 }
+void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
+{
+        //shoot towards the twin
+        Entity other = registry.enemyGroups.get(enemy).others[0];
+        Motion& otherMotion = registry.motions.get(other);
+        Motion& motion = registry.motions.get(enemy);
+        vec2 diff = otherMotion.position - motion.position;
+        float angle = atan2(diff.y, diff.x);
+        Entity e = createEnemyLaser(render, pos, angle, enemy, atkData);
+}
 
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
 {
@@ -436,6 +464,11 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     else if (atkData.attackType == EnemyAttackPattern::LASER)
     {
         shootLaser(pos, entity, atkData);
+        currPattern.currAtkCD = currPattern.maxAtkCD;
+    }
+    else if (atkData.attackType == EnemyAttackPattern::TWIN_LASER)
+    {
+        shootTwinLaser(pos, entity, atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::TRAIL)

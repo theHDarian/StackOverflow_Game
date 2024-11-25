@@ -26,7 +26,7 @@ enum RoomType : int {
     //Special rooms that are not spawned via getRandomRoomType function
     TutorialRoom1,
     TutorialRoom2,
-    BossBigCRoom,
+    BossRoom,
 };
 
 inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
@@ -34,7 +34,7 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
     const int bossRoomNum = 12;
     if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
         //Make every 5 rooms the boss room
-        return BossBigCRoom;
+        return BossRoom;
     }
     if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
         return RoomType::EnemyRoom;
@@ -43,7 +43,6 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
     return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 
-enum SpecialEvent { BouncingDisc,RebootStation };
 enum RoomProp { Plant1 };
 enum BossType { BigCBoss };
 
@@ -55,7 +54,6 @@ struct RoomPreset {
     std::vector<std::tuple<EnemyType,vec2>> enemies;
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
     std::vector<std::tuple<RoomInteractable, vec2>> interactables; //for interactables
-    std::vector<SpecialEvent> specialEvents;
     float spawnDelay; //in seconds - for enemies and bosses
     int numSpecialBulletsToSpawn = 5;
     int numKeyBulletsToSpawn = 2;
@@ -104,7 +102,6 @@ struct Room {
     int cutsceneCount = 0;
     bool dialogueDone = true;
     bool cutSceneDone = true;
-    vec2 roomPosition = { 1920 / 2, 1080 / 2 };
     float wallThickness = 100.f;
 };
 enum MapRequestType {
@@ -133,8 +130,8 @@ enum MapRegion {
 struct Map {
     Room currRoom;
     int roomsTraversed; //for procedural linking rooms, the more rooms progress, tougher enemies, tougher rooms
-    MapRegion currRegion;
-    std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> Directory;
+    MapRegion currRegion; //default region is set in newGame()
+    std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> directory;
 };
 
 struct Scene {
@@ -198,4 +195,9 @@ struct std::hash<InteractibleDialogue>
 
         return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1);
     }
+};
+
+struct RoomSizeScaled { 
+    std::string name;
+    RoomSizeScaled(std::string name) : name(name) {};
 };

@@ -651,6 +651,21 @@ const AttackData SniperShot{
 	0,
 	0};
 
+const AttackData HifiSniperShot{
+	EnemyAttackPattern::BURST,
+	TRIANGLE,
+	{APRounds, dmgUpM, ConcentratedFire},
+	blunt,
+	4,
+	0,
+	{30, 20},
+	200,
+	10000,
+	{600, 0},
+	0,
+	2,
+	0};
+
 const AttackData NoAttack{
 	EnemyAttackPattern::NONE,
 	CIRCLE,
@@ -1730,6 +1745,120 @@ struct InvisibleLaserEnemy : Enemy {
 	};
 };
 
+//----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------
+struct TwinLaserEnemyVertical1 : Enemy {
+	const AttackData crabLaser{
+	EnemyAttackPattern::TWIN_LASER,
+	CIRCLE,
+	{},
+	blunt,
+	1,
+	0,
+	{20, 20},
+	0,
+	10000000,
+	{100, 0},
+	0,
+	0,
+	0 };
+
+	Reaction duration = {
+		ReactionType::FINISH_PATROL,
+		1 };
+
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.01,0.01},{0.01,0.99},{0.01,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyVertical1()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_004.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 160.0f / 2, 160.f / 2 });
+		rotatePower = 90.0f;
+		speedMultiplier = 1.3;
+		rotationBehaviour = EnemyRotationBehavior::FACE_TWIN;
+	};
+};
+struct TwinLaserEnemyVertical2 : TwinLaserEnemyVertical1 {
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyVertical2() : TwinLaserEnemyVertical1() {
+		enemyPatterns = { randomState};
+	}
+};
+
+struct TwinLaserEnemyHorizontal1 : TwinLaserEnemyVertical1 {
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyHorizontal1() : TwinLaserEnemyVertical1() {
+		enemyPatterns = { randomState};
+	}
+};
+struct TwinLaserEnemyHorizontal2 : TwinLaserEnemyHorizontal1 {
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.99},{0.01,0.99},{0.99,0.99}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	TwinLaserEnemyHorizontal2() : TwinLaserEnemyHorizontal1() {
+		enemyPatterns = { randomState};
+	}
+};
+
+
+struct EnemyHifiSniper : Enemy
+{
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		0};
+
+
+	EnemyPattern random = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {reactionIdle}, 0, true, 0, 2000.f, HifiSniperShot};
+
+	EnemyHifiSniper()
+	{
+		maxHealth = 90;
+		currHealth = maxHealth;
+		enemyPatterns = {random};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_000.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({160.f / 2.f, 160.f / 2.f});
+		rotatePower = 90.f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+	};
+};
+
+struct EnemyHifiCharger : Enemy
+{
+	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::PLAYER_CLOSE,1}}, 0, true, 0.f, 1000.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 0.f, 0.f, {{ReactionType::DURATION,2}}, 2, true, 0.f, 0.f, NoAttack};
+	EnemyPattern idleStateCD1 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,3}}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingMidState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 0.f, 1000.f, {{ReactionType::DURATION,4}}, 4, true, 0.f, 0.f, NoAttack};
+	EnemyPattern idleStateCD2 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,5}}, 5, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingEndState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 0.f, 0.f, {{ReactionType::DURATION,6}}, 6, true, 0.f, 0.f, NoAttack};
+	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,7}}, 7, false, 0.f, 0.f, NoAttack};
+	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 1000.f, NoAttack};
+
+	EnemyHifiCharger()
+	{
+		maxHealth = 120;
+		currHealth = maxHealth;
+		enemyPatterns = {randomPos, chargingState, idleStateCD1,chargingMidState, idleStateCD2,chargingEndState, idleState, randomPosNoCharge};
+		sprite = {
+			"enemy_hifi_002.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({480 / 8.f, 480 / 8.f });
+		patternIndex = 0;
+		rotatePower = 90.f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 1.6f;
+	}
+};
 
 
 // struct EnemyHardSkull : {
