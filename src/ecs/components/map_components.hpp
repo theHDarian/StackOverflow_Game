@@ -196,3 +196,8 @@ struct std::hash<InteractibleDialogue>
         return h1 ^ ((h2 << 1) >> 1) ^ (h3 << 1);
     }
 };
+
+struct RoomSizeScaled { 
+    std::string name;
+    RoomSizeScaled(std::string name) : name(name) {};
+};

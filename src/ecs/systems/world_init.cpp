@@ -566,6 +566,7 @@ Entity createWallThickness(vec2 pos, vec2 scale) {
 	motion.scale = scale + vec2(200, 200/1.33);
 
 	registry.backgrounds.emplace(entity);
+	registry.roomSizeScaleds.emplace(entity,"WallThickness");
 
 	registry.renderRequests.insert(
 		entity,
@@ -591,6 +592,7 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	motion.position = position;
 	motion.angle = 0;
 	motion.scale = vec2(120.f, 120);
+	registry.roomSizeScaleds.emplace(entity,"DoorSymbol");
 
 	DoorSymbol &symbol = registry.doorSymbols.emplace(entity);
 	symbol.angle = 0;
@@ -644,6 +646,7 @@ Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scal
 	symbol.offset = offset;
 	symbol.door = true;
 	symbol.side = side;
+	registry.roomSizeScaleds.emplace(entity,"DoorSprite");
 
 	registry.backgrounds.emplace(entity);
 
@@ -718,6 +721,8 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 	for (auto &p : wallPositions)
 	{
 		auto entity = Entity();
+
+		registry.roomSizeScaleds.emplace(entity,"Bound");
 
 		auto &motion = registry.motions.emplace(entity);
 		motion.position = p.spritePosition;
@@ -851,6 +856,7 @@ Entity createFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 	motion.scale = scale;
 
 	registry.backgrounds.emplace(entity);
+	registry.roomSizeScaleds.emplace(entity,"Floor");
 
 	registry.renderRequests.insert(
 		entity,
