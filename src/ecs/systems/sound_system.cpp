@@ -323,11 +323,12 @@ void SoundSystem::playPlayerDashSound() {
     Mix_Volume(2, playerDashSound->volume * volume);
 }
 void SoundSystem::playPlayerShootSound(float ticks) {
-    if (!Mix_Playing(1)) {
+    // if (!Mix_Playing(1)) {
         // Check if the channel is not playing
-        Mix_PlayChannelTimed(1, playerShootSound, 0, ticks);  // Play sound on specified channel);
+        // Mix_PlayChannelTimed(1, playerShootSound, 0, ticks);  // Play sound on specified channel);
+        Mix_PlayChannel(1, playerShootSound, 0);
         Mix_Volume(1, playerShootSound->volume * volume);
-    }
+    // }
 }
 void SoundSystem::playEnemyShootSound(int sfxNumber, int loops) {
     if (!Mix_Playing(4)) {

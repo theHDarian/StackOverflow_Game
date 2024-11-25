@@ -79,6 +79,10 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
         for (BulletStackEffect b : effects) {
             printf("Adding: %s\n",b.name.c_str());
             reg.add(b);
+        	if (b.type == BulletEffectType::PlayerStackSize) {
+				StackUI& ui = registry.stackUI.components[0];
+				ui.updateStackUISize(getModifiedValue( PlayerStackSize, reg.baseStackSize));
+			}
         }
     }
 }
@@ -215,7 +219,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						object.dialogueCount++;
 					}
 					if (reaction.choice == 0) {
-						addEffect(player, {WarMachine, WeaponOfWar, stackSizeUpA});
+						addEffect(player, {WarMachine});
 					}
 					break;
 				}
