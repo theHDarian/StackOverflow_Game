@@ -1887,6 +1887,62 @@ struct EnemyHifiCharger : Enemy
 	}
 };
 
+struct EnemyHifiTrail : Enemy
+{
+	const AttackData snailTrail{
+	EnemyAttackPattern::TRAIL,
+	CIRCLE,
+	{ lightning2 },
+	buzz,
+	1,
+	0,
+	{20, 20},
+	0,
+	8000,
+	{0, 0},
+	0,
+	0,
+	0,
+	EnemyBulletDeath::CLUSTER
+	};
+
+	EnemyPattern rotateState = { 
+		"Follow Player", 
+		EnemyBehavior::RANDOM, 
+		{}, 
+		0, 
+		4000.f, 
+		4000.f, 
+		{{ReactionType::PLAYER_CLOSE,1},}, 
+		0, 
+		true, 
+		0.f, 5000.f, snailTrail };
+
+	EnemyPattern chargingState = {
+		"CHARGE", 
+		EnemyBehavior::CHARGING, 
+		{}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 0.f, snailTrail};
+
+	EnemyHifiTrail()
+	{
+		maxHealth = 350;
+		currHealth = maxHealth;
+
+		enemyPatterns = { rotateState,chargingState };
+		rotationBehaviour = EnemyRotationBehavior::SPIN;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_010.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 2.0;
+		rotatePower = 0.5;
+	};
+};
+
 
 // struct EnemyHardSkull : {
 

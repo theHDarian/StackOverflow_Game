@@ -151,6 +151,11 @@ void EnemySystem::step(float elapsed_ms)
                         motion.scale = (motion.scale.y < 0) ? motion.scale * vec2(1, -1) : motion.scale;
                     }
                 }
+                else if (enemy.rotationBehaviour == EnemyRotationBehavior::SPIN) {
+                    float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
+                    float rotationChange = angularSpeed * elapsed_ms / 1000.f;
+                    motion.angle += rotationChange;
+                }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER)
                 {
                     WindowState &wS = registry.windowStates.components[0];

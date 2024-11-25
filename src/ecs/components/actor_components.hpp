@@ -296,6 +296,7 @@ enum EnemyType {
     HifiEnemyTwinLaserHorizontal2,
     HifiEnemySniper,
     HifiEnemyCharger,
+    HifiEnemyTrail,
 };
 
 enum class EnemyAttackPattern {
@@ -378,7 +379,8 @@ enum class EnemyRotationBehavior {
     FACE_UP,
     FACE_CENTER,
     FACE_PLAYER,
-    FACE_TWIN
+    FACE_TWIN,
+    SPIN
 };
 
 
