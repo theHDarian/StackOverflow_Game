@@ -310,6 +310,25 @@ const RoomPreset EnemyRoomSnails {
 
 };
 
+const RoomPreset EnemyRoomSnailsHard {
+        {
+            {EnemyType::EvilSnail, {0.5f, 0.5f}},
+            {Snail, {0.3f, 0.7f}},
+            {Snail, {0.4f, 0.6f}},
+            {EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
+            {MediumEnemyCharge, {0.8f, 0.4f}},
+    },
+    {},
+    {},
+    0.0f,
+        5,
+        2,
+        "EnemyRoomSnailsHard",
+        false,
+        {1000, 750}
+
+    };
+
 const RoomPreset EnemyRoomBees1{
     {{EnemyType::OneBee, {0.2f, 0.8f}},
      {EnemyType::OneBee, {0.8f, 0.8f}},
@@ -408,16 +427,27 @@ const RoomPreset RestRoomBibleTree{
     true
 };
 
+const RoomPreset RestRoomEmpty{
+    {},
+    {},
+    {},
+    0.0f,
+    5,
+    0,
+    "RestRoomEmpty",
+    false
+};
+
 const RoomPreset RestRoomBaru{
         {},
         {},
-{{{Baru,{key}}, {0.35f, 0.1f}}},
+{{{Baru,{key}}, {0.5f, 0.5f}}},
         0.0f,
         5,
         0,
     "RestRoomBaru",
         true,
-    {3000, 4000}
+    {3000, 2000}
     };
 
 const RoomPreset RestRoomOracleCrab{
@@ -440,6 +470,8 @@ const RoomPreset TreasureRoom1{
     5,
     0,
     "TreasureRoom1",
+    false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoom2{
@@ -450,6 +482,8 @@ const RoomPreset TreasureRoom2{
     5,
     0,
     "TreasureRoom2",
+    false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoom3{
@@ -460,6 +494,8 @@ const RoomPreset TreasureRoom3{
     5,
     0,
     "TreasureRoom3",
+    false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoom4{
@@ -470,6 +506,8 @@ const RoomPreset TreasureRoom4{
     5,
     0,
     "TreasureRoom4",
+    false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoom5{
@@ -480,6 +518,8 @@ const RoomPreset TreasureRoom5{
     5,
     0,
     "TreasureRoom5",
+    false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoomKey{
@@ -490,6 +530,8 @@ const RoomPreset TreasureRoomKey{
         5,
     0,
     "TreasureRoomKey",
+    false,
+     {1300, 1300},
     };
 
 const RoomPreset TreasureRoomBlunt{
@@ -499,7 +541,8 @@ const RoomPreset TreasureRoomBlunt{
     0.0f,
     0,
     0,
-    "TreasureRoomBlunt",
+    "TreasureRoomBlunt",false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoomRam{
@@ -510,6 +553,8 @@ const RoomPreset TreasureRoomRam{
     0,
     0,
     "TreasureRoomRam",
+    false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoomSniper{
@@ -520,6 +565,8 @@ const RoomPreset TreasureRoomSniper{
     5,
     0,
     "TreasureRoomSniper",
+    false,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoomHoney{
@@ -530,7 +577,8 @@ const RoomPreset TreasureRoomHoney{
     5,
     0,
     "TreasureRoomHoney",
-    true
+    true,
+     {1300, 1300},
 };
 
 const RoomPreset TreasureRoomKeys{
@@ -541,7 +589,8 @@ const RoomPreset TreasureRoomKeys{
     5,
     0,
     "TreasureRoomKeys",
-    false
+    false,
+     {1300, 1300},
 };
 
 
@@ -553,7 +602,8 @@ const RoomPreset TreasureRoomWish{
     5,
     0,
     "TreasureRoomWish",
-    true
+    true,
+     {1300, 1300},
 };
 
 
@@ -614,35 +664,35 @@ const RoomPreset HifiRoomChargers {
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
-        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomEmpty,RestRoomBibleTree, RestRoomEmpty},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestRoomEmpty,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestRoomEmpty,RestingRoomGardener, RestRoomBibleTree,},{}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{EnemyRoomSwarm},{}}},
-        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EnemyRoom, {{EnemyRoomSwarm, HifiRoomTwinLaserVertical},{}}},
+        {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty,RestRoomBibleTree,},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty, RestRoomBibleTree,},{}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
@@ -656,6 +706,7 @@ inline std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> getDirectory(M
     else {
         return bioRoomDirectory;
     }
+    return bioRoomDirectory;
 }
 
 inline bool hasLocked(RoomType type, int roomsTraversed) {

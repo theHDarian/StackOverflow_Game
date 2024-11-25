@@ -153,7 +153,10 @@ SPEAKER Gardener gardener_v2.png
 
 ITEM HoneyCanister -1 0
 A strange canister with a sticky substance inside.
-sniff sniff
+You initiate a scan.
+[Scanning...]
+[Scan complete.]
+SOUND explosion
 It seems to be filled with honey. You wonder what it's doing here in an abandoned lab.
 would you like to take it?
 CHOICES Yes\No
@@ -181,10 +184,10 @@ CHOICES Give a shot?\Leave it alone
 
 ITEM Baru 0 0
 You decide to give it a shot.
-[Interact with the robot again to see if you can fix it up.]
-
-ITEM Baru 1 0
-You decide to leave the robot alone.
+You open up the robot's chest. Inside, you find a strange device.
+It seems to require an intact ram module to function. Looks like you would have to sacrifice your one of own ram module to get it working.
+Would you like to install a ram module? This will cause you to lose your one own ram modules and clear your stack.
+CHOICES Yes\No
 
 ITEM Baru -1 1
 You open up the robot's chest. Inside, you find a strange device.
@@ -200,30 +203,34 @@ SOUND explosion
 SOUND explosion
 Wheeze... Whirr...
 What... What happened? Whe....Where am I?
-SPEAKER Baru Baru1589.png
+SPEAKER ? Brau1589.png
 [The robot looks around, confused.]
 [The robot looks at you.]
 You... little one... You... You woke me...
 You... You shouldn't have done that...
 I'm... too damaged... I won't last long...
+SOUND explosion
 The Purple Cyborg... He's... he did this to me... killed me... and all of my brethren...
 Take this...
 [The robot hands you a strange device.]
 SPEAKER N N
 CHOICES Take it
+you feel a surge of power flowing through you. It seems this data is for a powerful ability.
 SOUND rareItemPickup
-you feel a surge of power flowing through you. It seems your base stats have increased.
 you... you must stop him... avenge me... avenge us...
-SPEAKER Baru Baru1589.png
+SPEAKER ? Brau1589.png
 [The robot's eyes dim.]
 SPEAKER N N
 SOUND explosion
 [The robot falls silent.]
 
+ITEM Baru 1 0
+You decide to leave the robot alone.
+
 ITEM Baru 1 1
 You decide that it's not worth the risk.
 
-ITEM Baru -1 2
+ITEM Baru -1 4
 The robot is silent.
 You remember the robot's last words.
 You wonder who the "Purple Cyborg" is and what kind of monster they must be to have done this to such a gentle giant.
@@ -234,46 +241,58 @@ A strange terminal with a screen that reads "Wish Granter".
 Suddenly, the screen lights up.
 "Little Robot, I am what reflects your deepest desires. I can grant you one wish. What do you wish for?"
 SPEAKER WishGranter wishgranter.png
+
 CHOICES I wish for power.\I wish for knowledge.\I wish for wealth.\I wish for happiness.\I wish for nothing.
 
 ITEM WishGranter 0 0
 You wish for power.
+CUT blackscreen.png
+SPEAKER N N
 Power flows through you.
 SOUND itemPickup
 From the shadows, sounds of approaching enemies can be heard.
-You grin. You're ready for them. This is who you were always meant to be.
+Your engines are raring in anticipation. This is who you were always meant to be.
 
 ITEM WishGranter 1 0
 You wish for knowledge.
+CUT blackscreen.png
+SPEAKER N N
 A scene of the past flashes before your eyes.
 You stand in a pristine laboratory, surrounded by robots.
 You see who you assume is the Scientist, standing a short distance away.
 He turns to you and smiles.
 From where you were standing, two other humans emerge, and the scientist greets them.
+CUT sciandpals.png
 The three seems to be close friends. They laugh and talk, chatting about the pleasantries of life as they walk away from you.
 You feel a sense of longing. You wish you could be there with them.
 the scene fades away.
-Who were they? Who are you? Why did the lab fall into such a state?
+CUT blackscreen.png
+Who were they? Who are you? Why did the lab fall into such a state of disrepair?
 It seems you got more questions than answers.
 
 ITEM WishGranter 2 0
 You wish for wealth.
-suddenly, you feel very heavy.
 CUT blackscreen.png
+SPEAKER N N
+suddenly, you feel very heavy.
 You woke up. It seems someone installed a ram module into you.
 You feel a sense of dread. What happened to you while you were out?
 you don't want to think about it.
 
 ITEM WishGranter 3 0
 You wish for happiness.
+CUT blackscreen.png
+SPEAKER N N
 You feel a sense of warmth.
 Suddenly, you feel as light as a feather.
 All your worries seem to have melted away.
 [stack cleared!]
+SOUND rareItemPickup
 you feel at peace.
 
 ITEM WishGranter 4 0
 You wish for nothing.
+SPEAKER N N
 "Very well," the screen says.
 The screen fades away.
 

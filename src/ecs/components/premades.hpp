@@ -226,10 +226,37 @@ const BulletStackEffect playerSpeedUpA = {
 const BulletStackEffect playerSpeedUpM = {
 	PlayerSpeed,
 	Multiplicative,
-	1.5,
+	1.1,
 	"Movement Speed Up (M)",
 	""};
 
+const BulletStackEffect playerSpeedDownA = {
+	PlayerSpeed,
+	Additive,
+	-100,
+	"Movement Speed Down (A)",
+	""};
+
+const BulletStackEffect playerSpeedDownM = {
+	PlayerSpeed,
+	Multiplicative,
+	0.8,
+	"Movement Speed Down (M)",
+	""};
+
+const BulletStackEffect fireRateUpA = {
+	FireRate,
+	Additive,
+	1.5,
+	"Fire Rate Up (A)",
+	""};
+
+const BulletStackEffect fireRateUpM = {
+	FireRate,
+	Multiplicative,
+	1.2,
+	"Fire Rate Up (M)",
+	""};
 
 const BulletStackEffect ostrichWarrior = {
 	PlayerSpeed,

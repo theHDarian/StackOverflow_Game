@@ -73,7 +73,26 @@ void extendStack (Entity player, int extension) {
     }
 }
 
+void closeDoors (SoundSystem* soundPlayer) {
+	Map& map = registry.maps.components[0];
+	map.currRoom.cleared = false;
+	// make all doors locked doors
+	for (int i = 0; i < 4; i++) {
+		if (registry.interactables.get(registry.doors.entities[i]).name == "LockedDoor" || registry.interactables.get(registry.doors.entities[i]).name == "ClosedDoor") {
+			continue;
+		}
+		if(registry.doors.components[i].room != RoomType::None && !registry.doors.components[i].isPrev && registry.interactables.get(registry.doors.entities[i]).name != "LockedDoor") {
+			if (map.currRoom.type != RoomType::TutorialRoom1) {
+				soundPlayer->playDoorCloseSound();
+			}
+			registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
+			registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
+		}
+	}
+}
+
 void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
+
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
         for (BulletStackEffect b : effects) {
@@ -87,13 +106,41 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
     }
 }
 
-void grantWish (Entity player, RenderSystem* renderer, int choice) {
-	if (registry.stackCompile.has(player)) {
-		StackCompile& reg = registry.stackCompile.get(player);
-		reg.baseStackSize = 8;
-		StackUI& ui = registry.stackUI.components[0];
-		ui.updateStackUISize(getModifiedValue( PlayerStackSize, reg.baseStackSize));
+void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* soundPlayer) {
+	switch (choice) {
+		case 0: {
+			addEffect(player, {fireRateUpA, dmgUpM});
+			closeDoors( soundPlayer);
+			Map& map = registry.maps.components[0];
+			map.currRoom.preset.enemies ={{EnemyType::EasyEnemySkull, {0.2f, 0.8f}},
+	 {EnemyType::EasyEnemySkull, {0.8f, 0.8f}},
+	 {EnemyType::EasyEnemySkull, {0.8f, 0.2f}},
+	 {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
+{EnemyType::TestRevampedEnemy, {0.3, 0.2}},
+{EnemyType::TestRevampedEnemy, {0.3, 0.4}},
+	 {EnemyType::EvilSnail, {0.5f, 0.5f}}
+			};
+			registry.invincibles.emplace(player);
+			break;
+		}
+		case 1: {
+			//plays a cutscene
+			break;
+		}
+		case 2: {
+			extendStack(player, 4);
+			addEffect(player, {playerSpeedDownA});
+			break;
+		}
+		case 3: {
+			clearStack(player);
+			break;
+		}
+		case 4: {
+			break;
+		}
 	}
+
 }
 
 void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
@@ -189,6 +236,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				}
 				KeyItems& keyItems = registry.keyItems.get(player);
 				keyItems.honey++;
+				RenderRequest& req = registry.renderRequests.get(reaction.object);
+				req.texture_name = "HoneyCanisterEmpty.png";
+
 				Map& map = registry.maps.components[0];
 				map.currRoom.cleared = false;
 				map.currRoom.preset.enemies = {{EnemyType::TwoBee, {0.2f, 0.8f}},
@@ -199,7 +249,8 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			}
 		}
 		if (object.item == WishGranter) {
-			grantWish( player, renderer, reaction.choice);
+			grantWish( player, renderer, reaction.choice, soundPlayer);
+			object.dialogueCount++;
 		}
 		if (object.item == Baru) {
 			int currentDialogue = object.dialogueCount;
@@ -218,8 +269,14 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						extendStack(player, -8);
 						object.dialogueCount++;
 					}
+					break;
+				}
+				case 2 : {
 					if (reaction.choice == 0) {
-						addEffect(player, {WarMachine});
+						if (reaction.choice == 0) {
+							addEffect(player, {WarMachine});
+						}
+						object.dialogueCount = 4;
 					}
 					break;
 				}

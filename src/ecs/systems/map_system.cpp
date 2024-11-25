@@ -69,6 +69,9 @@ void MapSystem::step(float elapsed_ms)
     if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
     {
         map.currRoom.cleared = true;
+        if (map.currRoom.type == BossRoom) {
+            soundPlayer->playNextMusic();
+        }
     }
 
     if (map.currRoom.cleared) {
@@ -202,16 +205,23 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
 
 
-    SoundType s = roomTypeToMusic.at(map.currRoom.type);
+    SoundType s = roomTypeToMusic.at(type);
     if (s != old_s) {
         if (s == SoundType::normalBGM) {
+            std::cout << "Playing normal music" << std::endl;
             soundPlayer->playNextMusic();
         } else if (s == SoundType::bossBGM) {
+            std::cout << "Playing boss music" << std::endl;
             soundPlayer->playBossMusic(0);
         } else if (s == SoundType::specialBGM) {
+            std::cout << "Playing special music" << std::endl;
             soundPlayer->playSpecialMusic(0);
         }
+    } else {
+        std::cout << "Not changing music" << std::endl;
     }
+
+
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
@@ -333,6 +343,7 @@ void MapSystem::newMap()
         map.currRoom.preset = getRoomPreset(RoomType::RestRoom,false);
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
+        map.currRoom.type = RoomType::RestRoom;
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
@@ -357,7 +368,7 @@ void MapSystem::updateBgPositions() {
         vec2 spriteScale;
     };
     vec2 floorScale = map.currRoom.preset.roomSize;
-    
+
     vec2 floorPosition = roomCenter;
     float wallThickness = 100.f;
     std::vector<WallPos> wallPositions = {
@@ -375,12 +386,12 @@ void MapSystem::updateBgPositions() {
             {// bottom
         vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
         vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-        vec2(floorPosition.x, floorPosition.y - floorScale.y), 
+        vec2(floorPosition.x, floorPosition.y - floorScale.y),
         vec2(floorScale.x * 1.1, wallThickness)},
         {// left
         vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
         vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
-        vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), 
+        vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y),
         vec2(floorScale.y * 2, wallThickness)},
     };
     char sides[4] = {'B','R','T','L'};
@@ -419,7 +430,7 @@ void MapSystem::updateBgPositions() {
             if (side == 'R') offsetPos.x = offsetAmount;
             if (side == 'B') offsetPos.y = +offsetAmount;
             if (side == 'L') offsetPos.x = -offsetAmount;
-            motion.position = position + offsetPos; 
+            motion.position = position + offsetPos;
             doorSpriteIndex++;
         } else if (rss.name == "Bound") {
             auto& p = wallPositions[wallIndex];
