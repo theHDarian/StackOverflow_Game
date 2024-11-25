@@ -4,6 +4,7 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 #include "tiny_ecs_registry.hpp"
+#include "components/presets/enemy_bullet_properties.hpp"
 
 #include <unordered_map>
 #include <string>
@@ -38,6 +39,8 @@ private:
     Entity bulletUI;
     Entity bulletUIArrow;
     Entity titleScreen;
+    Entity stackAddBubble; // seems like bad practice; what's the best way for multi-part ui?
+    Entity stackAddTail;
 
     int lastHoveredBullet = -1;
 
@@ -71,6 +74,14 @@ private:
     Entity createBulletUI();
 
     Entity createBulletUIArrow();
+
+    Entity createStackAddBubble();
+
+    Entity createStackAddTail();
+
+    Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet);
+
+    void updateStackAddBubble(vec2 playerPosition, int bulletNum);
 
     void loadText();
 

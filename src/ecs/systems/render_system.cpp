@@ -17,10 +17,28 @@
 #endif
 
 void RenderSystem::step(float elapsed_ms) {
+	if (registry.showTimers.entities.size() > 0) {
+		for (int i = (int)registry.showTimers.entities.size() - 1; i >= 0; --i) {
+			ShowTimer& timer = registry.showTimers.components[i];
+			Entity entity = registry.showTimers.entities[i];
+			if ((timer.timer -= elapsed_ms) <= 0) {
+				registry.showTimers.remove(entity);
+				// add a little fade
+				registry.fades.emplace(entity);
+			}
+		}
+	}
+
 	if (registry.fades.entities.size() > 0) {
-		for (auto& fadeEntity : registry.fades.entities) {
+		for (int i = (int)registry.fades.entities.size() - 1; i >= 0; --i) {
+			Entity fadeEntity = registry.fades.entities[i];
 			auto& fade = registry.fades.get(fadeEntity);
 			fade.time -= elapsed_ms;
+			if (fade.time <= 0) {
+				assert(registry.renderRequests.has(fadeEntity));
+				registry.renderRequests.get(fadeEntity).show = false; 
+				registry.fades.remove(fadeEntity); // not sure if should remove here? Although seems to be fine
+			}
 		}
 	}
 
@@ -342,25 +360,36 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		assert(false && "Type of render request not supported");
 	}
 
-	float alpha = 1;
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
 
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float *)&color);
+
+	float alpha = 1;
+
+
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
 	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
-    glUniform1f(effectAlpha, 1);
+	glUniform1f(effectAlpha, 1);
 
 	// fade out entity if needed
 	if (registry.fades.has(entity)) {
 		Fade& fade = registry.fades.get(entity);
 		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
-		vec3 color = { 1.2, 0.5, 0.5 }; // red
-		glUniform3fv(color_uloc, 1, (float*)&color);
-		glUniform1i(change_color_uloc, 1);
-		glUniform1f(effectAlpha, alpha);
+		if (registry.enemies.has(entity)) {
+			vec3 color = { 1.2, 0.5, 0.5 }; // red
+			glUniform3fv(color_uloc, 1, (float*)&color);
+			glUniform1f(effectAlpha, alpha);
+			glUniform1i(change_color_uloc, 1);
+		}
 	}
 	else if (registry.interactIndicators.has(entity)) { // hard code here for now
 		alpha = 0.7;
@@ -368,6 +397,56 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, alpha);
+
+	// Setting uniform values to the currently bound program
+	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
+		WindowState& windowState = registry.windowStates.components[0];
+		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+		float wallThickness = 100 + 50;
+		float zoom = 1;
+		// note: perspective seems to make no difference?
+		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+		glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+		// draw the border first
+		if (registry.uiBorders.has(entity) && registry.uiBorders.get(entity).border == UIBorderType::Outlined) {
+			UIBorder& uiBorder = registry.uiBorders.get(entity);
+			mat4 border_transform = glm::mat4(1.0);
+			Motion borderMotion = motion;
+			borderMotion.scale += vec2(uiBorder.borderThickness);
+
+			
+			GLuint border_transform_loc = glGetUniformLocation(currProgram, "model");
+			if (!isUI) {
+				border_transform = createFollowCameraModel(borderMotion, offset);
+			}
+			else {
+				border_transform = createNormalModel(borderMotion, offset);
+			}
+			glUniformMatrix4fv(border_transform_loc, 1, GL_FALSE, (float*)&border_transform);
+			GLint border_color_uloc = glGetUniformLocation(program, "fcolor");
+			glUniform3fv(border_color_uloc, 1, (float*)&uiBorder.borderColour);
+			glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+		}
+
+		mat4 transform = glm::mat4(1.0);
+		if (!isUI) {
+			transform = createFollowCameraModel(motion, offset);
+		}
+		else {
+			transform = createNormalModel(motion, offset);
+		}
+		GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+		glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+
+		gl_has_errors();
+	}
+
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
+
+
 	gl_has_errors();
 
 	// change opacity of entity if needed
@@ -385,44 +464,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		alpha = glm::lerp(0.5f, 0.f, ( damaged.max - damaged.countdown) / damaged.max);
 		glUniform1f(effectAlpha, alpha);
 	}
-
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
 	// GLsizei num_triangles = num_indices / 3;
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Setting uniform values to the currently bound program
-	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
-		WindowState& windowState = registry.windowStates.components[0];
-		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-		float wallThickness = 100 + 50;
-		float zoom = 1;
-		// note: perspective seems to make no difference?
-		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-		glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
-
-		mat4 transform = glm::mat4(1.0);
-		if (!isUI) {
-			transform = createFollowCameraModel(motion, offset);
-		}
-		else {
-			transform = createNormalModel(motion, offset);
-		}
-		GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-
-		glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
-		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
-				
-		gl_has_errors();
-	}		
 
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
 	gl_has_errors();
 }
 
