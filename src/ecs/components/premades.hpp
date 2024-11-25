@@ -686,11 +686,11 @@ const AttackData HifiSniperShot{
 	4,
 	0,
 	{30, 20},
-	200,
+	100,
 	10000,
 	{600, 0},
 	0,
-	2,
+	1,
 	0};
 
 const AttackData NoAttack{

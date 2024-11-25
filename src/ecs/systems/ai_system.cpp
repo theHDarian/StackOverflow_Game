@@ -401,8 +401,8 @@ vec2 AISystem::getCharginPos(Entity entity)
     vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
     vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
-	vec2 min = roomStartPos + scale + 100.f;
-	vec2 max = roomEndPos - scale - 100.f;
+	vec2 min = roomStartPos + scale;
+	vec2 max = roomEndPos - scale;
 
 	goalPosition = glm::clamp(goalPosition, min,max);
 
