@@ -17,10 +17,28 @@
 #endif
 
 void RenderSystem::step(float elapsed_ms) {
+	if (registry.showTimers.entities.size() > 0) {
+		for (int i = (int)registry.showTimers.entities.size() - 1; i >= 0; --i) {
+			ShowTimer& timer = registry.showTimers.components[i];
+			Entity entity = registry.showTimers.entities[i];
+			if ((timer.timer -= elapsed_ms) <= 0) {
+				registry.showTimers.remove(entity);
+				// add a little fade
+				registry.fades.emplace(entity);
+			}
+		}
+	}
+
 	if (registry.fades.entities.size() > 0) {
-		for (auto& fadeEntity : registry.fades.entities) {
+		for (int i = (int)registry.fades.entities.size() - 1; i >= 0; --i) {
+			Entity fadeEntity = registry.fades.entities[i];
 			auto& fade = registry.fades.get(fadeEntity);
 			fade.time -= elapsed_ms;
+			if (fade.time <= 0) {
+				assert(registry.renderRequests.has(fadeEntity));
+				registry.renderRequests.get(fadeEntity).show = false; 
+				registry.fades.remove(fadeEntity); // not sure if should remove here? Although seems to be fine
+			}
 		}
 	}
 
@@ -351,6 +369,35 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	GLsizei num_indices = size / sizeof(uint16_t);
 
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+
+	float alpha = 1;
+
+
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 0);
+	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
+	glUniform1f(effectAlpha, 1);
+
+	// fade out entity if needed
+	if (registry.fades.has(entity)) {
+		Fade& fade = registry.fades.get(entity);
+		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
+		if (registry.enemies.has(entity)) {
+			vec3 color = { 1.2, 0.5, 0.5 }; // red
+			glUniform3fv(color_uloc, 1, (float*)&color);
+			glUniform1f(effectAlpha, alpha);
+			glUniform1i(change_color_uloc, 1);
+		}
+	}
+	else if (registry.interactIndicators.has(entity)) { // hard code here for now
+		alpha = 0.7;
+	}
+
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, alpha);
+
 	// Setting uniform values to the currently bound program
 	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND) {
 		WindowState& windowState = registry.windowStates.components[0];
@@ -398,32 +445,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 	}
 
-	float alpha = 1;
-
-	// Getting uniform locations for glUniform* calls
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
 	glUniform3fv(color_uloc, 1, (float*)&color);
-	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-	glUniform1i(change_color_uloc, 0);
-	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
-	glUniform1f(effectAlpha, 1);
 
-	// fade out entity if needed
-	if (registry.fades.has(entity)) {
-		Fade& fade = registry.fades.get(entity);
-		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
-		vec3 color = { 1.2, 0.5, 0.5 }; // red
-		glUniform3fv(color_uloc, 1, (float*)&color);
-		glUniform1i(change_color_uloc, 1);
-		glUniform1f(effectAlpha, alpha);
-	}
-	else if (registry.interactIndicators.has(entity)) { // hard code here for now
-		alpha = 0.7;
-	}
 
-	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, alpha);
 	gl_has_errors();
 
 	// change opacity of entity if needed

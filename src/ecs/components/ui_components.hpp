@@ -91,3 +91,12 @@ struct MenuChoice {
 struct GameOverlayUIText {
 
 };
+
+struct ShowTimer {
+	float timer = 1000.f;
+	float base = timer;
+};
+
+struct StackAddNotif {
+
+};

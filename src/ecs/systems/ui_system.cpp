@@ -61,24 +61,66 @@ void UISystem::step(float elapsed_ms) {
 	}
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	StackUI& stackui = registry.stackUI.get(stackUI);
+
 	// update bullet ui positions
 	if (stack.currStack.size() > stackui.bulletPositions.size()) {
+
+		// clean up stack add notifs
+		for (int i = registry.stackAddNotifs.size() - 1; i >= 0; i--) {
+			Entity e = registry.stackAddNotifs.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
 
 		int diff = stack.currStack.size() - stackui.bulletPositions.size();
 		// set up bubble first
 		vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+		registry.renderRequests.get(stackAddBubble).show = true;
+		registry.renderRequests.get(stackAddTail).show = true;
 		updateStackAddBubble(playerPos, diff);
+		
+		if (!registry.showTimers.has(stackAddBubble)) {
+			if (registry.fades.has(stackAddBubble)) {
+				registry.fades.remove(stackAddBubble);
+				registry.fades.remove(stackAddTail);
+			}
+			registry.showTimers.emplace(stackAddBubble);
+			registry.showTimers.emplace(stackAddTail);
+		}
+		else {
+			registry.showTimers.get(stackAddBubble).timer += registry.showTimers.get(stackAddBubble).base;
+			registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
+		}
+		
 		vec2 bulletStartPos = playerPos + vec2(20, -10);
 		for (int i = 0; i < diff; i++) {
 			int index = i + stack.currStack.size() - diff;
 			stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
 				stackui.bulletStartPos.y));
 			// can notify player when stack has changed here
-			// (assumption seems to be safe)
-			//std::cout << stack.currStack[index].name << std::endl;
+			// NOTE: does not work for lightning bullets. Do we want to let the player know they got hit? -> if yes, need to do this elsewhere.
+			// this spawn position is also v incorrect, corrected later in usual update
 			createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y), stack.currStack[index]);
 		}
 	}
+
+	// clean up stack add notifs that have faded out
+	for (int i = registry.stackAddNotifs.size() - 1; i >= 0; i--) {
+		Entity e = registry.stackAddNotifs.entities[i];
+		if (!registry.renderRequests.get(e).show)
+			registry.deleteEntityAndRelatedEntities(e);
+	}
+	// move position of bullet add notif
+	if (registry.stackAddNotifs.entities.size() > 0) {
+		vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+		vec2 bulletStartPos = playerPos + registry.motions.get(stackAddBubble).scale * vec2(1, -1) + vec2(10, -5);
+		updateStackAddBubble(bulletStartPos, registry.stackAddNotifs.entities.size());
+		int index = 0;
+		for (Entity entity : registry.stackAddNotifs.entities) {
+			registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * 0.75 + index * stackui.bulletOffset * 0.75, bulletStartPos.y);
+			index++;
+		}
+	}
+
 	else if (stack.currStack.size() < stackui.bulletPositions.size()) {
 		// much harder to know what bullets got removed from stack though
 		// need to rely on interact system for that (seems to be the only way bullets are popped?)
@@ -106,28 +148,21 @@ void UISystem::step(float elapsed_ms) {
 				}
 			}
 			if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
-				//std::cout << "bullet " << bulletHoveredIndex << " is hovered!" << std::endl;
 				updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
 					stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
-				//std::cout << "updated!" << std::endl;
 			}
 			else if (bulletHoveredIndex == -1){
 				registry.renderRequests.get(bulletUI).show = false;
 				registry.renderRequests.get(bulletUIArrow).show = false;
-				//std::cout << "empty!" << std::endl;
 			}
 			else {
-				//std::cout << "nope3 " << bulletHoveredIndex << ", " << lastHoveredBullet << std::endl;
 			}
 			lastHoveredBullet = bulletHoveredIndex;
-			//std::cout << registry.renderRequests.get(bulletUI).show << std::endl;
 		}
 		else {
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
-			//std::cout << "nope" << std::endl;
 		}
-		//std::cout << "mouse pos" << ioState.mousePosition.x << ", "<< ioState.mousePosition.y<< std::endl;
 	}
 
 	if (!gameState.gameOver) {
@@ -204,6 +239,7 @@ bool UISystem::init(GLFWwindow* window) {
 	roomCounter = createRoomCounter();
 	titleScreen = createTitleScreen();
 	stackAddBubble = createStackAddBubble();
+	stackAddTail = createStackAddTail();
 
 	return true;
 }
@@ -300,6 +336,30 @@ void UISystem::playDialogue() {
 	}
 }
 
+Entity UISystem::createStackAddTail() {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_triangle.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.gameUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = M_PI - M_PI / 4.f;
+	motion.velocity = { 0, 0 };
+	motion.position = { 0,0 };
+	motion.scale = { 12.5 , 12.5 };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = vec3(1.f);
+
+	return entity;
+}
+
 Entity UISystem::createStackAddBubble() {
 	Entity entity = Entity();
 
@@ -316,7 +376,7 @@ Entity UISystem::createStackAddBubble() {
 	motion.angle = 0;
 	motion.velocity = { 0, 0 };
 	motion.position = { 0,0 };
-	motion.scale = { 50, 50 };
+	motion.scale = { 50 * 0.75f, 50 * 0.75f } ;
 
 	vec3& color = registry.colors.emplace(entity);
 	color = vec3(0.f);
@@ -334,7 +394,7 @@ Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
 
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ "enemy_bullet_square.png",
+		{ bulletEffectShapes.at(bullet.type),
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
@@ -345,29 +405,28 @@ Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
 	motion.angle = 0;
 	motion.velocity = { 0, 0 };
 	motion.position = position;
-	motion.scale = registry.stackUI.components[0].bulletSize; // make same as UI for now
+	motion.scale = registry.stackUI.components[0].bulletSize * 0.75f; // make same as UI for now
 	// but honestly this should be constant, not a field tied to stack ui??
 
 	vec3& color = registry.colors.emplace(entity);
 	color = bulletEffectColors.at(bullet.type);
-
-	//Fade& fade = registry.fades.emplace(entity);
-	//fade.time = 5000.f;
-	//fade.max = fade.time;
-	//registry.deleteds.emplace(entity);
+	
+	registry.showTimers.emplace(entity);
+	registry.stackAddNotifs.emplace(entity);
 
 	return entity;
 }
 
-void UISystem::updateStackAddBubble(vec2 playerPosition, int bulletNum) {
-	registry.renderRequests.get(stackAddBubble).show = true;
-
+void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 	Motion& motion = registry.motions.get(stackAddBubble);
 	vec2 bulletSize = registry.stackUI.components[0].bulletSize;
 	float bulletOffset = registry.stackUI.components[0].bulletOffset;
-	vec2 bulletStartPos = playerPosition + vec2(20, -10);
-	motion.scale = vec2(bulletNum * bulletSize.x + bulletNum * bulletOffset + 2 * bulletOffset, bulletSize.y + 2 * bulletOffset);
-	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x - bulletOffset / 2, bulletStartPos.y);
+	vec2 bulletStartPos = position;
+	motion.scale = vec2(bulletNum * bulletSize.x * 0.75 + bulletNum * bulletOffset * 0.75 + 2 * bulletOffset * 0.75, bulletSize.y * 0.75 + 2 * bulletOffset * 0.75);
+	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x * 0.75 - bulletOffset * 0.75 / 2, bulletStartPos.y);
+
+	Motion& tailMotion = registry.motions.get(stackAddTail);
+	tailMotion.position = motion.position - motion.scale * vec2(0.5, -0.5) - tailMotion.scale / 2.f * vec2(0.5, -0.5);
 }
 
 // update bullet ui and its arrow

@@ -93,6 +93,8 @@ public:
 	ComponentContainer<GameOverlayUIText> gameOverlayUITexts;
 	ComponentContainer<KeyItems> keyItems;
 	ComponentContainer<UIBorder> uiBorders;
+	ComponentContainer<ShowTimer> showTimers;
+	ComponentContainer<StackAddNotif> stackAddNotifs;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -177,6 +179,8 @@ public:
 		registry_list.push_back(&gameOverlayUITexts);
 		registry_list.push_back(&keyItems);
 		registry_list.push_back(&uiBorders);
+		registry_list.push_back(&showTimers);
+		registry_list.push_back(&stackAddNotifs);
 	}
 
 	void clear_all_components() {

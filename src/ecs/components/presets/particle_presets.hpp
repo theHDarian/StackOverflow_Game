@@ -70,7 +70,7 @@ const ParticleProps playerDamaged {
     {{0,0},{100,100}},
     {{{1,1,1,1},{1,1,1,1}}},
     {20.f,5.f,2.f},
-    0, //row 1 of textures
+    1, //row 1 of textures
     800.f
 };
 
