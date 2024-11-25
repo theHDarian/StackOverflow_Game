@@ -277,6 +277,15 @@ void EnemySystem::step(float elapsed_ms)
     {
         creatingMergeBee(newBee.z, vec2(newBee.x, newBee.y));
     }
+
+    // Clear straggler boids
+    // 0 < #boids <= 5, #non-boid == 0
+    if (registry.boids.components.size() > 0 && registry.boids.components.size() <= 5 && registry.enemies.components.size() - registry.boids.components.size() == 0) {
+        for (auto& boid : registry.boids.entities) {
+            if (!registry.deleteds.has(boid)) registry.deleteds.emplace(boid);
+        }
+    }
+
 }
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData)
