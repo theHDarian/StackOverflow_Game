@@ -653,6 +653,9 @@ inline std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> getDirectory(M
     } else if (region == Physics) {
         return physicsRoomDirectory;
     }
+    else {
+        return bioRoomDirectory;
+    }
 }
 
 inline bool hasLocked(RoomType type, int roomsTraversed) {
