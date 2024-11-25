@@ -118,7 +118,7 @@ vec3 circle() {
 
 float laserColoring() {
 	if (texcoord.y <= 0.5) return pow(1.8 * texcoord.y, 4);
-	return pow(pow(1.8 * (texcoord.y - 1), 2), 2);
+	return 0.5 * pow(pow(1.8 * (texcoord.y - 1), 2), 2);
 }
 
 
