@@ -17,6 +17,18 @@ struct StackUI {
 	}
 };
 
+enum UIBorderType {
+	NoBorder,
+	Outlined,
+	Fancy
+};
+
+struct UIBorder {
+	UIBorderType border = NoBorder;
+	vec3 borderColour = vec3(1.f);
+	float borderThickness = 0;
+};
+
 struct GameUI {
 	// this is ui used for displaying game stats
 };

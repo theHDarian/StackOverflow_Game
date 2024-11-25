@@ -63,21 +63,29 @@ void UISystem::step(float elapsed_ms) {
 	StackUI& stackui = registry.stackUI.get(stackUI);
 	// update bullet ui positions
 	if (stack.currStack.size() > stackui.bulletPositions.size()) {
+
 		int diff = stack.currStack.size() - stackui.bulletPositions.size();
+		// set up bubble first
+		vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+		updateStackAddBubble(playerPos, diff);
+		vec2 bulletStartPos = playerPos + vec2(20, -10);
 		for (int i = 0; i < diff; i++) {
 			int index = i + stack.currStack.size() - diff;
 			stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
 				stackui.bulletStartPos.y));
+			// can notify player when stack has changed here
+			// (assumption seems to be safe)
+			//std::cout << stack.currStack[index].name << std::endl;
+			createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y), stack.currStack[index]);
 		}
 	}
 	else if (stack.currStack.size() < stackui.bulletPositions.size()) {
+		// much harder to know what bullets got removed from stack though
+		// need to rely on interact system for that (seems to be the only way bullets are popped?)
 		stackui.bulletPositions.resize(stack.currStack.size());
 	}
 
 	if (gameState.gamePaused || gameState.gameOver || gameState.dialogueScene || true) {
-		
-		
-
 		// is the player hovering over a stack ui bullet right now?
 		// bad: copies code from render system; consider making each bullet an entity
 		// may optimize using some other method like colour picking/just limiting search size
@@ -147,8 +155,6 @@ void UISystem::step(float elapsed_ms) {
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
-			//registry.renderRequests.get(bulletUI).show = false;
-			//registry.renderRequests.get(bulletUIArrow).show = false;
 			// clear prev frame's e indicators
 			for (Entity entity : registry.interactIndicators.entities) {
 				if (!registry.deleteds.has(entity)) {
@@ -197,6 +203,7 @@ bool UISystem::init(GLFWwindow* window) {
 	fpsCounter = createFpsCounter();
 	roomCounter = createRoomCounter();
 	titleScreen = createTitleScreen();
+	stackAddBubble = createStackAddBubble();
 
 	return true;
 }
@@ -291,6 +298,76 @@ void UISystem::playDialogue() {
 			soundSystem->stopNextDialogueSound();
 		}
 	}
+}
+
+Entity UISystem::createStackAddBubble() {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = false;
+
+	registry.gameUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0;
+	motion.velocity = { 0, 0 };
+	motion.position = { 0,0 };
+	motion.scale = { 50, 50 };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = vec3(0.f);
+
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderColour = vec3(1.f);
+	border.border = UIBorderType::Outlined;
+	border.borderThickness = 5.f;
+
+	return entity;
+}
+
+Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	registry.gameUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = registry.stackUI.components[0].bulletSize; // make same as UI for now
+	// but honestly this should be constant, not a field tied to stack ui??
+
+	vec3& color = registry.colors.emplace(entity);
+	color = bulletEffectColors.at(bullet.type);
+
+	//Fade& fade = registry.fades.emplace(entity);
+	//fade.time = 5000.f;
+	//fade.max = fade.time;
+	//registry.deleteds.emplace(entity);
+
+	return entity;
+}
+
+void UISystem::updateStackAddBubble(vec2 playerPosition, int bulletNum) {
+	registry.renderRequests.get(stackAddBubble).show = true;
+
+	Motion& motion = registry.motions.get(stackAddBubble);
+	vec2 bulletSize = registry.stackUI.components[0].bulletSize;
+	float bulletOffset = registry.stackUI.components[0].bulletOffset;
+	vec2 bulletStartPos = playerPosition + vec2(20, -10);
+	motion.scale = vec2(bulletNum * bulletSize.x + bulletNum * bulletOffset + 2 * bulletOffset, bulletSize.y + 2 * bulletOffset);
+	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x - bulletOffset / 2, bulletStartPos.y);
 }
 
 // update bullet ui and its arrow
@@ -866,12 +943,6 @@ Entity UISystem::createTitleScreen() {
 	motion.scale = vec2(windowState.width, windowState.height);
 	//motion.scale = { 1347 * 1.5, 953 * 1.5 };
 
-	// temp colour
-	//auto& color = registry.colors.emplace(entity);
-	//color.r = 0.0;
-	//color.b = 0.0;
-	//color.g = 0.0;
-
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
@@ -882,10 +953,8 @@ Entity UISystem::createTitleScreen() {
 	text.x = windowState.width / 2 - 48 * 1.0 * text.text.length() / 2;
 	text.y = windowState.height - 135;
 	text.scale = 1.0;
-	//text.text = "Game Over \npress R to restart";
 	text.topRightBound = { motion.scale.x - 25, motion.scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
-	//text.tokenizedText = uiTexts["GameStart"];
 	
 
 	return entity;
@@ -972,7 +1041,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 	}
 	else {
 		// ordinary bullets
-		// format: [increases/decreases] [the] [effect] by [amount]
+		// format: [increases/decreases] [effect] by [amount]
 
 		if (bullet.effectCalc == Additive) {
 			if (bullet.value < 0) {
@@ -1069,7 +1138,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			effect = "the pierce of bullets ";
 			break;
 		case Homing:
-			effect = "the homing accuracy of bullets "; // this seems to not be in premades
+			effect = "the homing accuracy of bullets ";
 			break;
 		case PlayerSpeed:
 			effect = "movement speed ";
