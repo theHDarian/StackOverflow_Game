@@ -346,7 +346,47 @@ void MapSystem::updateBgPositions() {
     WindowState &windowState = registry.windowStates.components[0];
     vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
 
+    struct WallPos
+    {
+        vec2 colliderStart;
+        vec2 colliderEnd;
+        vec2 spritePosition;
+        vec2 spriteScale;
+    };
+    vec2 floorScale = map.currRoom.preset.roomSize;
+    
+    vec2 floorPosition = roomCenter;
+    float wallThickness = 100.f;
+    std::vector<WallPos> wallPositions = {
+    {
+        // top
+        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+        vec2(floorPosition.x, floorPosition.y + floorScale.y),
+        vec2(floorScale.x * 1.1, wallThickness)},
+        {// right
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
+        vec2(floorScale.y * 2, wallThickness)},
+            {// bottom
+        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+        vec2(floorPosition.x, floorPosition.y - floorScale.y), 
+        vec2(floorScale.x * 1.1, wallThickness)},
+        {// left
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), 
+        vec2(floorScale.y * 2, wallThickness)},
+    };
+    char sides[4] = {'T','R','B','L'};
+
     int wallIndex = 0;
+    int symbolIndex = 0;
+    float doorwidth = 100.f;
+    int doorSpriteIndex = 0;
+    int doorIndex = 0;
     for(Entity e : registry.roomSizeScaleds.entities) {
         RoomSizeScaled& rss = registry.roomSizeScaleds.get(e);
         Motion& motion = registry.motions.get(e);
@@ -354,48 +394,31 @@ void MapSystem::updateBgPositions() {
         if (rss.name == "Floor") {
             motion.scale = map.currRoom.preset.roomSize;
         } else if (rss.name == "WallThickness") {
-
+            motion.scale = map.currRoom.preset.roomSize + vec2(200, 200/1.33);
         } else if (rss.name == "DoorSymbol") {
-            
+            char side = sides[symbolIndex];
+            vec2 position = vec2(windowState.width,windowState.height)/2.f;
+            float of = 200.f;
+            if(side == 'T') position += vec2(0,map.currRoom.preset.roomSize.y/2+of);
+            if (side == 'R') position += vec2(map.currRoom.preset.roomSize.x/2+of,0);
+            if (side == 'B') position += vec2(0,-map.currRoom.preset.roomSize.y/2-of);
+            if (side == 'L') position += vec2(-map.currRoom.preset.roomSize.x/2-of,0);
+            motion.position = position;
+            symbolIndex++;
         } else if (rss.name == "DoorSprite") {
-            
+            float offsetAmount = -40.f;
+            vec2 offsetPos = vec2(0);
+            vec2 scaleOffset;
+            auto& p = wallPositions[doorSpriteIndex];
+            vec2 position = p.spritePosition;
+            char side = sides[doorSpriteIndex];
+            if(side == 'T') offsetPos.y = -offsetAmount;
+            if (side == 'R') offsetPos.x = offsetAmount;
+            if (side == 'B') offsetPos.y = offsetAmount;
+            if (side == 'L') offsetPos.x = -offsetAmount;
+            motion.position = position + offsetPos; 
+            doorSpriteIndex++;
         } else if (rss.name == "Bound") {
-            printf("updating\n");
-            struct WallPos
-            {
-                vec2 colliderStart;
-                vec2 colliderEnd;
-                vec2 spritePosition;
-                vec2 spriteScale;
-            };
-            vec2 floorScale = map.currRoom.preset.roomSize;
-            
-            vec2 floorPosition = roomCenter;
-            float wallThickness = 100.f;
-            float doorwidth = 100.f;
-            std::vector<WallPos> wallPositions = {
-            {
-                // top
-                vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
-                vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
-                vec2(floorPosition.x, floorPosition.y + floorScale.y),
-                vec2(floorScale.x * 1.1, wallThickness)},
-                {// right
-                vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
-                vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
-                vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
-                vec2(floorScale.y * 2, wallThickness)},
-                    {// bottom
-                vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-                vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-                vec2(floorPosition.x, floorPosition.y - floorScale.y), 
-                vec2(floorScale.x * 1.1, wallThickness)},
-                {// left
-                vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
-                vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
-                vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), 
-                vec2(floorScale.y * 2, wallThickness)},
-            };
             auto& p = wallPositions[wallIndex];
             motion.position = p.spritePosition;
             motion.scale = p.spriteScale;
@@ -403,6 +426,21 @@ void MapSystem::updateBgPositions() {
             wall.startPosition = p.colliderStart;
 		    wall.endPosition = p.colliderEnd;
             wallIndex++;
+        } else if (rss.name == "Door") {
+            std::vector<std::vector<vec2>> doorPositions = {
+                {{ windowState.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y + 45 }, { windowState.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y + 45 }},
+                {{ wallPositions[1].colliderStart.x - 30,  windowState.height / 2 - doorwidth / 2 }, { wallPositions[1].colliderStart.x - 30,  windowState.height / 2 + doorwidth / 2 }},
+                {{ windowState.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y - 30 }, { windowState.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y - 30 }},
+                {{ wallPositions[3].colliderStart.x + 30,  windowState.height / 2 - doorwidth / 2 }, { wallPositions[3].colliderStart.x + 30,  windowState.height / 2 + doorwidth / 2 }}
+            };
+            vec2 startPos = doorPositions[doorIndex][0];
+            vec2 endPos = doorPositions[doorIndex][1];
+            motion.position = (startPos + endPos) / 2.0f;
+            motion.scale = vec2(glm::distance(startPos, endPos), 5);
+            auto &door = registry.doors.get(e);
+            door.startPos = startPos;
+            door.endPos = endPos;
+            doorIndex++;
         }
     }
 }
