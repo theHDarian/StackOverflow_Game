@@ -732,6 +732,23 @@ const RoomPreset HifiRoomBoidSnipers{
     "HifiBoidSnipers"
 };
 
+const RoomPreset HifiRoomCannons{
+    {
+        {EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
+        {EnemyType::HifiEnemyCannon, {0.9f,0.5f}},
+        {EnemyType::HifiEnemyCannon, {0.9f,0.8f}},
+        {EnemyType::HifiEnemyCannon, {0.1f,0.2f}},
+        {EnemyType::HifiEnemyCannon, {0.1f,0.5f}},
+        {EnemyType::HifiEnemyCannon, {0.1f,0.8f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiBoidCannons"
+};
+
 
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
@@ -754,7 +771,8 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{HifiRoomTwinLasers,HifiRoomBasicEnemy,HifiRoomBoidSnipers},{}}},
+        // {RoomType::EnemyRoom, {{HifiRoomTwinLasers,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannons},{}}},
         {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},

@@ -307,6 +307,8 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getCurrentPos(entity);
 	case EnemyBehavior::CHARGING:
 		return getCharginPos(entity);
+	case EnemyBehavior::RECOIL:
+		return getRecoilPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
@@ -395,6 +397,45 @@ vec2 AISystem::getCharginPos(Entity entity)
 	// Increase the enemy's speed for the charge
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 500.0f;
+
+	Map& map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+    vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
+    vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
+
+	vec2 min = roomStartPos + scale;
+	vec2 max = roomEndPos - scale;
+
+	goalPosition = glm::clamp(goalPosition, min,max);
+
+	return goalPosition;
+}
+
+vec2 AISystem::getRecoilPos(Entity entity)
+{
+	auto &window_registry = registry.windowStates;
+	WindowState &windowState = window_registry.components[0];
+	vec2 playerPos = getPlayerPos();
+	Motion &motion = registry.motions.get(entity);
+	vec2 scale = motion.scale;
+	// Calculate the direction from the enemy to the player
+	vec2 direction = motion.position - playerPos;
+
+	// Normalize the direction
+	if (glm::length(direction) > 0)
+	{
+		direction = glm::normalize(direction);
+	}
+
+	// Define a charge distance (how far beyond the player the enemy charges)
+	float chargeDistance = 300.0f; // Adjust this value as needed
+
+	// Calculate the goal position for charging past the player
+	vec2 goalPosition = motion.position + direction * chargeDistance;
+
+	// Increase the enemy's speed for the charge
+	EnemyMovement &movement = registry.enemyMovement.get(entity);
+	movement.speed = 300.0f;
 
 	Map& map = registry.maps.components[0];
 	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;

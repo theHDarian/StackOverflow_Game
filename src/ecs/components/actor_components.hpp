@@ -297,6 +297,7 @@ enum EnemyType {
     HifiEnemySniper,
     HifiEnemyCharger,
     HifiEnemyTrail,
+    HifiEnemyCannon,
 };
 
 enum class EnemyAttackPattern {
@@ -354,6 +355,7 @@ enum class EnemyBehavior {
     RANDOM_FAR,
     FOLLOW_PLAYER,
     RETREAT,
+    RECOIL,
     ANGRY,
     PATROLLING,
     EVADEBULLET,

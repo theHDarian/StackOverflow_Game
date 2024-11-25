@@ -51,7 +51,7 @@ const BulletStackEffect dmgDownA = {
 const BulletStackEffect dmgDownM = {
 	BulletDamage,
 	Multiplicative,
-	0.7,
+	-0.3,
 	"Damage Down (M)",
 	""};
 
@@ -65,7 +65,7 @@ const BulletStackEffect dmgUpA = {
 const BulletStackEffect dmgUpM = {
 	BulletDamage,
 	Multiplicative,
-	1.5,
+	0.5,
 	"Damage Up (M)",
 	""};
 
@@ -80,6 +80,12 @@ const BulletStackEffect sizeUpA = {
 	ProjectileSize,
 	Additive,
 	10,
+	"Bullet Size Up (A)",
+	""};
+const BulletStackEffect sizeUpM = {
+	ProjectileSize,
+	Multiplicative,
+	0.5,
 	"Bullet Size Up (A)",
 	""};
 
@@ -100,7 +106,7 @@ const BulletStackEffect bulletSpeedUpA = {
 const BulletStackEffect bulletSpeedUpM = {
 	ProjectileSpeed,
 	Multiplicative,
-	1.5,
+	0.5,
 	"Bullet Speed Up (M)",
 	""};
 
@@ -114,7 +120,7 @@ const BulletStackEffect bulletRangeUpA = {
 const BulletStackEffect bulletRangeUpM = {
 	BulletRange,
 	Multiplicative,
-	1.5,
+	0.5,
 	"Range Up (M)",
 	""};
 
@@ -128,7 +134,7 @@ const BulletStackEffect bulletBurstUpA = {
 const BulletStackEffect bulletBurstUpM = {
 	BulletBurst,
 	Multiplicative,
-	1.5,
+	.5,
 	"Burst Up (M)",
 	""};
 
@@ -142,7 +148,7 @@ const BulletStackEffect bulletPierceUpA = {
 const BulletStackEffect bulletPierceUpM = {
 	Pierce,
 	Multiplicative,
-	1.5,
+	0.5,
 	"Pierce Up (M)",
 	""};
 
@@ -156,7 +162,7 @@ const BulletStackEffect bulletBounceUpA = {
 const BulletStackEffect bulletBounceUpM = {
 	Bounce,
 	Multiplicative,
-	1.5,
+	.5,
 	"Bounce Up (M)",
 	""};
 
@@ -170,7 +176,7 @@ const BulletStackEffect dashUpA = {
 const BulletStackEffect dashUpM = {
 	PlayerNumDash,
 	Multiplicative,
-	2,
+	1,
 	"Dash Count Up (M)",
 	""};
 
@@ -184,7 +190,7 @@ const BulletStackEffect stackSizeUpA = {
 const BulletStackEffect stackSizeUpM = {
 	PlayerStackSize,
 	Multiplicative,
-	1.5,
+	.5,
 	"Stack Size Up (M)",
 	""};
 
@@ -198,7 +204,7 @@ const BulletStackEffect dashCDRUpA = {
 const BulletStackEffect dashCDRUpM = {
 	PlayerDashCDR,
 	Multiplicative,
-	1.25,
+	.25,
 	"Dash Cooldown Up (M)",
 	""};
 
@@ -212,7 +218,7 @@ const BulletStackEffect dashCDRDownA = {
 const BulletStackEffect dashCDRDownM = {
 	PlayerDashCDR,
 	Multiplicative,
-	0.5,
+	-0.5,
 	"Dash Cooldown Down (M)",
 	""};
 
@@ -226,7 +232,7 @@ const BulletStackEffect playerSpeedUpA = {
 const BulletStackEffect playerSpeedUpM = {
 	PlayerSpeed,
 	Multiplicative,
-	1.1,
+	.1,
 	"Movement Speed Up (M)",
 	""};
 
@@ -240,7 +246,7 @@ const BulletStackEffect playerSpeedDownA = {
 const BulletStackEffect playerSpeedDownM = {
 	PlayerSpeed,
 	Multiplicative,
-	0.8,
+	-0.2,
 	"Movement Speed Down (M)",
 	""};
 
@@ -254,21 +260,27 @@ const BulletStackEffect fireRateUpA = {
 const BulletStackEffect fireRateUpM = {
 	FireRate,
 	Multiplicative,
-	1.2,
+	.2,
 	"Fire Rate Up (M)",
+	""};
+const BulletStackEffect fireRateDownM = {
+	FireRate,
+	Multiplicative,
+	-0.2,
+	"Fire Rate Down (M)",
 	""};
 
 const BulletStackEffect ostrichWarrior = {
 	PlayerSpeed,
 	Multiplicative,
-	3,
+	2,
 	"Ostrich Warrior",
 	""};
 
 const BulletStackEffect ostrichWarriorDownside = {
 	PlayerDashCDR,
 	Multiplicative,
-	3,
+	2,
 	"Ostrich Warrior Downside",
 	""};
 
@@ -325,7 +337,7 @@ const BulletStackEffect ConcentratedFire = {
 const BulletStackEffect SniperPower = {
 	BulletDamage,
 	Multiplicative,
-	2.5,
+	1.5,
 	"Sniper's Prowess",
 	"" };
 
@@ -346,14 +358,14 @@ const BulletStackEffect SniperLethargy = {
 const BulletStackEffect SniperBurden = {
 	PlayerSpeed,
 	Multiplicative,
-	0.6,
+	-0.6,
 	"Sniper's Burden",
 	"" };
 
 const BulletStackEffect DataCompression = {
 	PlayerStackSize,
 	Multiplicative,
-	1.5,
+	.5,
 	"Data Compression",
 	"" };
 
@@ -681,7 +693,7 @@ const AttackData SniperShot{
 const AttackData HifiSniperShot{
 	EnemyAttackPattern::BURST,
 	TRIANGLE,
-	{APRounds, dmgUpM, ConcentratedFire},
+	{APRounds, dmgUpM, bulletRangeUpM},
 	blunt,
 	4,
 	0,
@@ -692,6 +704,22 @@ const AttackData HifiSniperShot{
 	0,
 	1,
 	0};
+const AttackData HifiCannonShot{
+	EnemyAttackPattern::SPRAY,
+	CIRCLE,
+	{dmgUpM, bulletBounceUpM,sizeUpM},
+	{fireRateDownM},
+	3,
+	M_PI/16,
+	{70, 70},
+	60,
+	10000,
+	{600, 0},
+	0,
+	0,
+	0,
+	EnemyBulletDeath::EXPLODE,
+	HifiEnemyCharger};
 
 const AttackData NoAttack{
 	EnemyAttackPattern::NONE,
@@ -1858,6 +1886,7 @@ struct EnemyHifiSniper : Enemy
 	};
 };
 
+
 struct EnemyHifiCharger : Enemy
 {
 	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::PLAYER_CLOSE,1}}, 0, true, 0.f, 1000.f, NoAttack};
@@ -1940,6 +1969,33 @@ struct EnemyHifiTrail : Enemy
 		scale = vec2(240, 240) * 0.5f;
 		speedMultiplier = 2.0;
 		rotatePower = 0.5;
+	};
+};
+
+struct EnemyHifiCannon : Enemy
+{
+	Reaction reactionIdle = {
+		ReactionType::DURATION,
+		1};
+
+
+	EnemyPattern chargingState = {"RETREAT", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {{ReactionType::DURATION,0}}, 0, true, 4000.f, 4000.f, HifiCannonShot};
+
+	EnemyHifiCannon()
+	{
+		maxHealth = 350;
+		currHealth = maxHealth;
+		enemyPatterns = {chargingState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_003.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({240.f / 2.f, 240.f / 2.f});
+		rotatePower = 0.5f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 0.5;
 	};
 };
 
