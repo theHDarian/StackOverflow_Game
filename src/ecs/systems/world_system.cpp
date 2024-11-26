@@ -351,6 +351,8 @@ void WorldSystem::restartGame() {
 	// Reset the game speed
 	currentSpeed = 1.f;
 
+	registry.maps.components[0].currRoom.dialogueDone = true;
+
 	// mock interactable call instead of proper ui for now
 	registry.dialogueRequests.emplace(skipDialogue);
 
