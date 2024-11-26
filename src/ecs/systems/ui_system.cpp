@@ -74,6 +74,7 @@ void UISystem::step(float elapsed_ms) {
 			registry.deleteEntityAndRelatedEntities(e);
 		}
 	}
+
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	StackUI& stackui = registry.stackUI.get(stackUI);
 
@@ -106,7 +107,7 @@ void UISystem::step(float elapsed_ms) {
 			registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
 		}
 		
-		vec2 bulletStartPos = playerPos + vec2(20, -10);
+		vec2 bulletStartPos = playerPos;
 		for (int i = 0; i < diff; i++) {
 			int index = i + stack.currStack.size() - diff;
 			stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
@@ -124,14 +125,47 @@ void UISystem::step(float elapsed_ms) {
 		if (!registry.renderRequests.get(e).show)
 			registry.deleteEntityAndRelatedEntities(e);
 	}
+
+	// handle ui requests
+	for (UIRequest& uiRequest : registry.uiRequests.components) {
+		if (uiRequest.type == UIRequestType::StackNotifReqShift || UIRequestType::StackNotifReqShuffle) {
+			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+			registry.renderRequests.get(stackAddBubble).show = true;
+			registry.renderRequests.get(stackAddTail).show = true;
+			updateStackAddBubble(playerPos, 1);
+
+			if (!registry.showTimers.has(stackAddBubble)) {
+				if (registry.fades.has(stackAddBubble)) {
+					registry.fades.remove(stackAddBubble);
+					registry.fades.remove(stackAddTail);
+				}
+				registry.showTimers.emplace(stackAddBubble);
+				registry.showTimers.emplace(stackAddTail);
+			}
+			else {
+				registry.showTimers.get(stackAddBubble).timer += registry.showTimers.get(stackAddBubble).base;
+				registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
+			}
+			vec2 bulletStartPos = playerPos;
+			BulletStackEffect bullet = lightning1;
+			if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
+				bullet = lightning2;
+			}
+
+			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), bullet);
+		}
+	}
+
+	registry.uiRequests.clear();
+
 	// move position of bullet add notif
 	if (registry.stackAddNotifs.entities.size() > 0) {
 		vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
-		vec2 bulletStartPos = playerPos + registry.motions.get(stackAddBubble).scale * vec2(1, -1) + vec2(10, -5);
+		vec2 bulletStartPos = playerPos + abs(registry.motions.get(registry.players.entities[0]).scale) * vec2(1, -1);
 		updateStackAddBubble(bulletStartPos, registry.stackAddNotifs.entities.size());
 		int index = 0;
 		for (Entity entity : registry.stackAddNotifs.entities) {
-			registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * 0.75 + index * stackui.bulletOffset * 0.75, bulletStartPos.y);
+			registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * STACK_NOTIF_SCALE + index * stackui.bulletOffset * STACK_NOTIF_SCALE, bulletStartPos.y);
 			index++;
 		}
 	}
@@ -266,12 +300,6 @@ bool UISystem::init(GLFWwindow* window) {
 	stackAddTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
 
-	return true;
-}
-
-bool UISystem::resetStackUI() {
-	WindowState& wS = registry.windowStates.components[0];
-	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	return true;
 }
 
@@ -437,7 +465,7 @@ Entity UISystem::createStackAddBubble() {
 	motion.angle = 0;
 	motion.velocity = { 0, 0 };
 	motion.position = { 0,0 };
-	motion.scale = { 50 * 0.75f, 50 * 0.75f } ;
+	motion.scale = { 50 * STACK_NOTIF_SCALE, 50 * STACK_NOTIF_SCALE } ;
 
 	vec3& color = registry.colors.emplace(entity);
 	color = vec3(0.f);
@@ -453,21 +481,35 @@ Entity UISystem::createStackAddBubble() {
 Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
 	Entity entity = Entity();
 
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = registry.stackUI.components[0].bulletSize * STACK_NOTIF_SCALE; // make same as UI for now
+	// but honestly this should be constant, not a field tied to stack ui??
+
+	std::string shape = "";
+	if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Multiplicative) {
+		shape = "stackNotifShuffle.png";
+		motion.scale = vec2(192) * (motion.scale.y / 192.f);
+	}
+	else if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Additive){
+		shape = "stackNotifShift.png";
+		motion.scale = vec2(192) * (motion.scale.y / 192.f);
+	}
+	else{
+		assert(bulletEffectShapes.count(bullet.type) > 0);
+		shape = bulletEffectShapes.at(bullet.type);
+	}
+
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ bulletEffectShapes.at(bullet.type),
+		{ shape,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
 
 	registry.gameUIs.emplace(entity);
-
-	Motion& motion = registry.motions.emplace(entity);
-	motion.angle = 0;
-	motion.velocity = { 0, 0 };
-	motion.position = position;
-	motion.scale = registry.stackUI.components[0].bulletSize * 0.75f; // make same as UI for now
-	// but honestly this should be constant, not a field tied to stack ui??
 
 	vec3& color = registry.colors.emplace(entity);
 	color = bulletEffectColors.at(bullet.type);
@@ -483,8 +525,8 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 	vec2 bulletSize = registry.stackUI.components[0].bulletSize;
 	float bulletOffset = registry.stackUI.components[0].bulletOffset;
 	vec2 bulletStartPos = position;
-	motion.scale = vec2(bulletNum * bulletSize.x * 0.75 + bulletNum * bulletOffset * 0.75 + 2 * bulletOffset * 0.75, bulletSize.y * 0.75 + 2 * bulletOffset * 0.75);
-	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x * 0.75 - bulletOffset * 0.75 / 2, bulletStartPos.y);
+	motion.scale = vec2(bulletNum * bulletSize.x * STACK_NOTIF_SCALE + bulletNum * bulletOffset * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE, bulletSize.y * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE);
+	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x * STACK_NOTIF_SCALE - bulletOffset * STACK_NOTIF_SCALE / 2, bulletStartPos.y);
 
 	Motion& tailMotion = registry.motions.get(stackAddTail);
 	tailMotion.position = motion.position - motion.scale * vec2(0.5, -0.5) - tailMotion.scale / 2.f * vec2(0.5, -0.5);

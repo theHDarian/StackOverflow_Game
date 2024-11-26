@@ -100,3 +100,12 @@ struct ShowTimer {
 struct StackAddNotif {
 
 };
+
+enum UIRequestType {
+	StackNotifReqShift,
+	StackNotifReqShuffle
+};
+
+struct UIRequest {
+	UIRequestType type;
+};

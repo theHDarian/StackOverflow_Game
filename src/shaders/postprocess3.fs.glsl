@@ -12,9 +12,9 @@ uniform sampler2D screen_texture;
 uniform float time;
 in vec2 texcoord;
 
-float distortion = 0.6;
+float distortion = 0.3;
 
-float distortion2 = 0.4;
+float distortion2 = 0.2;
 
 float speed = 0.01;
 
