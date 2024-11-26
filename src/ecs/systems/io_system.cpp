@@ -68,6 +68,22 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.showFPS = !ioState.showFPS;
 	}
 
+	// other options for progressing dialogue: Enter (not sure about space)
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ENTER && (gameState.dialogueScene || gameState.titleScreen)) {
+		ioState.nextDialogue = true;
+
+		if (gameState.titleScreen) {
+			if (ioState.hoveringMenuChoice == 0) {
+				gameState.titleScreen = false;
+				gameState.loading = true;
+				ioState.shouldRestart = true; // is setting it again ok?
+			}
+			else {
+				ioState.shouldEnd = true;
+			}
+		}
+	}
+
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
@@ -117,11 +133,11 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 
 void IOSystem::handleMenuChoice(int key, int action, IOState& state, GameState& gameState) {
 	if (action == GLFW_PRESS) {
-		if (key == GLFW_KEY_W) { // highlight choice above
+		if (key == GLFW_KEY_W || key == GLFW_KEY_UP) { // highlight choice above
 			state.lastHoverMenuChoice = state.hoveringMenuChoice;
 			state.hoveringMenuChoice = max(0, state.hoveringMenuChoice - 1);
 		}
-		else if (key == GLFW_KEY_S) { // highlight choice below
+		else if (key == GLFW_KEY_S || key == GLFW_KEY_DOWN) { // highlight choice below
 			state.lastHoverMenuChoice = state.hoveringMenuChoice;
 			
 			state.hoveringMenuChoice = min(state.hoveringMenuChoice + 1, (int)registry.menuChoices.components.size() - 1);
@@ -131,11 +147,11 @@ void IOSystem::handleMenuChoice(int key, int action, IOState& state, GameState& 
 
 void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameState& gameState) {
 	if (action == GLFW_PRESS) {
-		if (key == GLFW_KEY_W) { // highlight choice above
+		if (key == GLFW_KEY_W || key == GLFW_KEY_UP) { // highlight choice above
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
 			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
 		}
-		else if (key == GLFW_KEY_S) { // highlight choice below
+		else if (key == GLFW_KEY_S || key == GLFW_KEY_DOWN) { // highlight choice below
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
 			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
 			

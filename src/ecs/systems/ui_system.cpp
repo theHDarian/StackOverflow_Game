@@ -62,7 +62,7 @@ void UISystem::step(float elapsed_ms) {
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	StackUI& stackui = registry.stackUI.get(stackUI);
 
-	// update bullet ui positions
+	// update bullet ui positions, add stack notifs
 	if (stack.currStack.size() > stackui.bulletPositions.size()) {
 
 		// clean up stack add notifs
@@ -127,42 +127,40 @@ void UISystem::step(float elapsed_ms) {
 		stackui.bulletPositions.resize(stack.currStack.size());
 	}
 
-	if (gameState.gamePaused || gameState.gameOver || gameState.dialogueScene || true) {
-		// is the player hovering over a stack ui bullet right now?
-		// bad: copies code from render system; consider making each bullet an entity
-		// may optimize using some other method like colour picking/just limiting search size
-		// in the future (since search space is pretty deterministic)
-		int bulletHoveredIndex = -1;
-		int count = -1;
-		vec2 bulletSize = stackui.bulletSize;
-		// should check first: is it in stack ui at all?
-		// this is point in aabb detection
-		if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
-			&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
-			for (vec2 bulletPos : stackui.bulletPositions) {
-				count++;
-				if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
-					&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
-					bulletHoveredIndex = count;
-					break;
-				}
+	// is the player hovering over a stack ui bullet right now?
+	// bad: copies code from render system; consider making each bullet an entity
+	// may optimize using some other method like colour picking/just limiting search size
+	// in the future (since search space is pretty deterministic)
+	int bulletHoveredIndex = -1;
+	int count = -1;
+	vec2 bulletSize = stackui.bulletSize;
+	// should check first: is it in stack ui at all?
+	// this is point in aabb detection
+	if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+		&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+		for (vec2 bulletPos : stackui.bulletPositions) {
+			count++;
+			if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+				&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+				bulletHoveredIndex = count;
+				break;
 			}
-			if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
-				updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
-					stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
-			}
-			else if (bulletHoveredIndex == -1){
-				registry.renderRequests.get(bulletUI).show = false;
-				registry.renderRequests.get(bulletUIArrow).show = false;
-			}
-			else {
-			}
-			lastHoveredBullet = bulletHoveredIndex;
 		}
-		else {
+		if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
+			updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
+				stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+		}
+		else if (bulletHoveredIndex == -1){
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
 		}
+		else {
+		}
+		lastHoveredBullet = bulletHoveredIndex;
+	}
+	else {
+		registry.renderRequests.get(bulletUI).show = false;
+		registry.renderRequests.get(bulletUIArrow).show = false;
 	}
 
 	if (!gameState.gameOver) {
@@ -170,6 +168,7 @@ void UISystem::step(float elapsed_ms) {
 		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
 		registry.renderRequests.get(controlsGuide).show = gameState.gamePaused;
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
+		registry.renderRequests.get(dialogueReminder).show = gameState.dialogueScene;
 
 		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 		StackUI& stackui = registry.stackUI.get(stackUI);
@@ -197,8 +196,6 @@ void UISystem::step(float elapsed_ms) {
 		roomCounterText.text = region + " Room " + std::to_string(map.roomsTraversed);
 		roomCounterText.x = ws.width - 17*roomCounterText.text.length() - 50.f;
 		
-		
-
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
 			registry.renderRequests.get(screenCutIn).show = false;
@@ -252,6 +249,7 @@ bool UISystem::init(GLFWwindow* window) {
 	titleScreen = createTitleScreen();
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
+	dialogueReminder = createDialogueReminder();
 
 	return true;
 }
@@ -323,11 +321,12 @@ void UISystem::playDialogue() {
 				}
 			}
 
-			vec2 startingPosition = vec2(400, wS.height - 100);
+			vec2 startingPosition = vec2(400, wS.height - 35);
 			// display options for player if there is one
 			for (int i = nextLine.choices.size() - 1; i >= 0 ; i--) {
-				std::cout << nextLine.choices[i] << std::endl;
-				vec2 nextPosition = vec2(startingPosition.x, startingPosition.y + i * 50);
+				//std::cout << nextLine.choices[i] << std::endl;
+				vec2 nextPosition = vec2(startingPosition.x, startingPosition.y - (nextLine.choices.size() - 1 - i) * 50);
+				//std::cout << nextPosition.y << std::endl;
 				createDialogueChoice(nextLine.choices[i], nextPosition);
 			}
 			// set first choice to highlighted by default
@@ -346,6 +345,31 @@ void UISystem::playDialogue() {
 			soundSystem->stopNextDialogueSound();
 		}
 	}
+}
+
+Entity UISystem::createDialogueReminder() {
+	WindowState& windowState = registry.windowStates.components[0];
+	Entity entity = Entity();
+
+	registry.dialogueUIs.emplace(entity);
+	auto& rr = registry.renderRequests.insert(
+		entity, { "none",
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+	rr.show = false;
+
+	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
+
+	float padding = 35.f;
+	trr.text = "[E] Next";
+	trr.color = vec3(1.0f);
+	trr.scale = 0.35f;
+	trr.x = windowState.width - trr.text.length() * trr.scale * 48 - padding;
+	trr.y = padding;
+	trr.topRightBound = { windowState.width + 1000,windowState.height };
+	trr.bottomLeftBound = { 0,0 };
+
+	return entity;
 }
 
 Entity UISystem::createStackAddTail() {
@@ -575,8 +599,8 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	text.color = vec3(1, 1, 1);
 	text.text = "E";
 	text.scale = 0.40;
-	text.topRightBound = { room.preset.roomSize.x,  room.preset.roomSize.y };
-	text.bottomLeftBound = { 0, 0 };
+	text.topRightBound = { room.preset.roomSize.x * 1.5,  room.preset.roomSize.y * 1.5 };
+	text.bottomLeftBound = { -room.preset.roomSize.x * 1.5, -room.preset.roomSize.y * 1.5 };
 	text.y = windowState.height - motion.position.y - 15;
 	text.x = motion.position.x - 10;
 

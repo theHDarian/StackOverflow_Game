@@ -148,6 +148,11 @@ void clearRoomActors()
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
     }
+    for (Entity ent : registry.stackAddNotifs.entities)
+    {
+        if (!registry.deleteds.has(ent))
+            registry.deleteds.emplace(ent);
+    }
     registry.invincibles.clear();
     registry.spriteTimers.clear();
     registry.dashes.clear();
@@ -350,7 +355,7 @@ void MapSystem::newMap()
         // createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
-
+        createWishGranter(renderer, vec2(500,500));
     }
 }
 

@@ -259,7 +259,7 @@ void EnemySystem::step(float elapsed_ms)
         EnemyPattern &pattern = enemyStat.currEnemyPattern();
         if (pattern.type == EnemyBehavior::DEATHSTATE)
         {
-            std::cout << "got here" << std::endl;
+            //std::cout << "got here" << std::endl;
             if (!registry.deleteds.has(entity))
             {
                 Fade &f = registry.fades.emplace(entity);

@@ -241,7 +241,7 @@ A strange terminal with a screen that reads "Wish Granter".
 Suddenly, the screen lights up.
 "Little Robot, I am what reflects your deepest desires. I can grant you one wish. What do you wish for?"
 SPEAKER WishGranter wishgranter.png
-
+ 
 CHOICES I wish for power.\I wish for knowledge.\I wish for wealth.\I wish for happiness.\I wish for nothing.
 
 ITEM WishGranter 0 0

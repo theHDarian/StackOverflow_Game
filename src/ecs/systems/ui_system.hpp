@@ -41,6 +41,7 @@ private:
     Entity titleScreen;
     Entity stackAddBubble; // seems like bad practice; what's the best way for multi-part ui?
     Entity stackAddTail;
+    Entity dialogueReminder;
 
     int lastHoveredBullet = -1;
 
@@ -80,6 +81,8 @@ private:
     Entity createStackAddTail();
 
     Entity createStackAddNotif(vec2 position, BulletStackEffect bullet);
+
+    Entity createDialogueReminder();
 
     void updateStackAddBubble(vec2 playerPosition, int bulletNum);
 

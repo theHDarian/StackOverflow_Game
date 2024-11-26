@@ -17,7 +17,12 @@
 #endif
 
 void RenderSystem::step(float elapsed_ms) {
-	if (registry.showTimers.entities.size() > 0) {
+	// quick fix: make stack add notifs persist throughout game pause/dialogue
+	// may need to change for future things that need to fade during those times
+
+	GameState& gameState = registry.gameStates.components[0];
+
+	if (registry.showTimers.entities.size() > 0 && !gameState.dialogueScene && !gameState.gamePaused) {
 		for (int i = (int)registry.showTimers.entities.size() - 1; i >= 0; --i) {
 			ShowTimer& timer = registry.showTimers.components[i];
 			Entity entity = registry.showTimers.entities[i];
