@@ -348,24 +348,10 @@ void WorldSystem::restartGame() {
 	gameState.loading = false;
 	gameState.dialogueChoice = -1;
 
-	//std::cout << ("MyString") << std::endl;
-	//std::cout << std::hash<std::string>{}("MyString") << std::endl;
-
 	// Reset the game speed
 	currentSpeed = 1.f;
 
-	// resetting dialogue related stuff
-	DialogueLines& lines = registry.dialogueLines.components[0];
-	lines = DialogueLines();
-	// clear choices here for now
-	for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
-		Entity e = registry.dialogueChoices.entities[i];
-		registry.deleteEntityAndRelatedEntities(e);
-	}
-	registry.maps.components[0].currRoom.dialogueDone = true;
-
 	// mock interactable call instead of proper ui for now
-	//Entity skipDialogue2 = createSkipDialogue();
 	registry.dialogueRequests.emplace(skipDialogue);
 
 	if (!registry.mapRequests.has(player))

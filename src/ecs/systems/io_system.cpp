@@ -68,8 +68,8 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.showFPS = !ioState.showFPS;
 	}
 
-	// other options for progressing dialogue: Enter (not sure about space)
-	if (action == GLFW_RELEASE && key == GLFW_KEY_ENTER && (gameState.dialogueScene || gameState.titleScreen)) {
+	// other options for progressing dialogue: Enter, space
+	if (action == GLFW_RELEASE && (key == GLFW_KEY_ENTER || key == GLFW_KEY_SPACE) && (gameState.dialogueScene || gameState.titleScreen)) {
 		ioState.nextDialogue = true;
 
 		if (gameState.titleScreen) {

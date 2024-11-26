@@ -105,7 +105,6 @@ int main() {
 			mapSystem.step(elapsed_ms); // just so the tutorial room can spawn an enemy right away
 			uiSystem.playDialogue();
 			world.step(elapsed_ms);
-			particleSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms); // not sure if this was needed?
 		}
 		else {

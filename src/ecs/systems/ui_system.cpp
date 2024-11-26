@@ -32,6 +32,21 @@ void UISystem::step(float elapsed_ms) {
 	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
 	registry.renderRequests.get(fpsCounter).show = ioState.showFPS;
 
+	if (ioState.shouldRestart) {
+		// clear UI stuff here for now
+		// resetting dialogue related stuff
+		DialogueLines& lines = registry.dialogueLines.components[0];
+		lines = DialogueLines();
+
+		// clear choices here for now
+		for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+			Entity e = registry.dialogueChoices.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+		registry.renderRequests.get(stackAddBubble).show = false;
+		registry.renderRequests.get(stackAddTail).show = false;	
+	}
+
 	if (gameState.titleScreen) {
 		if (registry.menuChoices.components.size() == 0) {
 			vec2 choiceStartPos = { 800, 900 };
@@ -333,6 +348,16 @@ void UISystem::playDialogue() {
 			if (registry.dialogueChoices.components.size() > 0) {
 				input.hoveringDialogueChoice = registry.dialogueChoices.components.size() - 1 - 0;
 				input.lastHoverDialogueChoice = registry.dialogueChoices.components.size() - 1 - 0;
+				// change dialogue reminder text
+				TextRenderRequest& reminderText = registry.textRenderRequests.get(dialogueReminder);
+				reminderText.text = "[W, S] Select, [E] Confirm";
+				reminderText.x = registry.windowStates.components[0].width - reminderText.text.length() * reminderText.scale * 48 - 35;
+			}
+			else {
+				// change dialogue reminder text
+				TextRenderRequest& reminderText = registry.textRenderRequests.get(dialogueReminder);
+				reminderText.text = "[E] Next";
+				reminderText.x = registry.windowStates.components[0].width - reminderText.text.length() * reminderText.scale * 48 - 35;
 			}
 		}
 		// no more lines of dialogue
@@ -351,7 +376,7 @@ Entity UISystem::createDialogueReminder() {
 	WindowState& windowState = registry.windowStates.components[0];
 	Entity entity = Entity();
 
-	registry.dialogueUIs.emplace(entity);
+	registry.dialogueUITexts.emplace(entity);
 	auto& rr = registry.renderRequests.insert(
 		entity, { "none",
 				 EFFECT_ASSET_ID::EGG,
