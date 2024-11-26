@@ -226,11 +226,11 @@ void EnemySystem::step(float elapsed_ms)
                     registry.deleteds.emplace(entity);
 
 
-
-                    registry.emitParticles.replace(entity,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
+                    ParticleProps props = enemyDeath;
+                    registry.emitParticles.replace(entity,PExplode, props,f.max, Random::Int(20) + 20);
                     if (registry.enemyGroups.has(entity)) {
                         for (Entity other : registry.enemyGroups.get(entity).others) {
-                            registry.emitParticles.replace(other,PExplode, ParticleProps(),f.max, Random::Int(20) + 20);
+                            registry.emitParticles.replace(other,PExplode, props,f.max, Random::Int(20) + 20);
                         }
                     }
                 }

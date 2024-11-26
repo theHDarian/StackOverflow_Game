@@ -80,5 +80,5 @@ void main()
 
 	offset += snoise(vec2(yt*50.0,0.0))*distortion2*0.001;
 	//combine distortion on X with roll on Y
-	FragColor = texture2D(screen_texture,  vec2(fract(p.x + offset),fract(p.y)));
+	FragColor = texture(screen_texture,  vec2(fract(p.x + offset),fract(p.y)));
 }

@@ -79,7 +79,7 @@ private:
 
     Entity createStackAddTail();
 
-    Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet);
+    Entity createStackAddNotif(vec2 position, BulletStackEffect bullet);
 
     void updateStackAddBubble(vec2 playerPosition, int bulletNum);
 

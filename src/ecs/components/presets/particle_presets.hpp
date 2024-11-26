@@ -70,10 +70,35 @@ const ParticleProps playerDamaged {
     {{0,0},{100,100}},
     {{{1,1,1,1},{1,1,1,1}}},
     {20.f,5.f,2.f},
-    1, //row 1 of textures
+    0, //row 1 of textures
+    800.f
+};
+const ParticleProps enemyDeath {
+    {{0,0},{0,0}},
+    {{0,0},{50,50}},
+    {{{1,1,1,1},{1,1,1,1}}},
+    {20.f,5.f,2.f},
+    5, //row 3 of textures
+    1200.f
+};
+
+const ParticleProps playerZappedYellow {
+    {{0,0},{0,0}},
+    {{0,0},{100,100}},
+    {{{1,1,1,1},{1,1,1,1}}},
+    {20.f,5.f,2.f},
+    2, //row 3 of textures
     800.f
 };
 
+const ParticleProps playerZappedBlue {
+    {{0,0},{0,0}},
+    {{0,0},{100,100}},
+    {{{1,1,1,1},{1,1,1,1}}},
+    {20.f,5.f,2.f},
+    3, 
+    800.f
+};
 
 const ParticleProps enemyBullet {
     {{0,0},{0,0}},

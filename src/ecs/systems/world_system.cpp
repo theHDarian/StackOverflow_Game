@@ -802,7 +802,18 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	//add player invincibility frames
 	if (!registry.invincibles.has(player)) {
 		registry.invincibles.emplace(player);
-		ParticleProps props = playerDamaged;
+		ParticleProps props;
+		if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
+			if (registry.enemyBullets.get(other).bulletEffects[0].effectCalc == Multiplicative) {
+				//yellow is multiplicative
+				props = playerZappedYellow;
+			} else {
+				props = playerZappedBlue;
+			}
+
+		} else {
+			props = playerDamaged;
+		}
 		registry.emitParticles.replace(player,PExplode, props,100, 1);
 	}
 
