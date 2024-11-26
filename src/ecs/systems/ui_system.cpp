@@ -34,15 +34,7 @@ void UISystem::step(float elapsed_ms) {
 
 	if (ioState.shouldRestart) {
 		// clear UI stuff here for now
-		// resetting dialogue related stuff
-		DialogueLines& lines = registry.dialogueLines.components[0];
-		lines = DialogueLines();
 
-		// clear choices here for now
-		for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.dialogueChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
 		registry.renderRequests.get(stackAddBubble).show = false;
 		registry.renderRequests.get(stackAddTail).show = false;	
 	}
@@ -269,11 +261,11 @@ bool UISystem::init(GLFWwindow* window) {
 	return true;
 }
 
-bool UISystem::resetStackUI() {
-	WindowState& wS = registry.windowStates.components[0];
-	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
-	return true;
-}
+//bool UISystem::resetStackUI() {
+//	WindowState& wS = registry.windowStates.components[0];
+//	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
+//	return true;
+//}
 
 void UISystem::playDialogue() {
 	IOState& input = registry.ioStates.components[0];

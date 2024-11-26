@@ -21,7 +21,7 @@ public:
     // Initialize the window
     bool init(GLFWwindow* window);
 
-    bool resetStackUI();
+    //bool resetStackUI();
 
     void step(float elapsed_ms);
     void playDialogue();

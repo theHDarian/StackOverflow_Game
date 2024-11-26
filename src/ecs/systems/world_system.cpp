@@ -94,12 +94,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	// window_height_px = 720;
 	//  window_width_px = 1920;
 	//  window_height_px = 1080;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
+	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr, nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -352,7 +352,8 @@ void WorldSystem::restartGame() {
 	currentSpeed = 1.f;
 
 	// mock interactable call instead of proper ui for now
-	registry.dialogueRequests.emplace(skipDialogue);
+	if (!registry.dialogueRequests.has(skipDialogue))
+		registry.dialogueRequests.emplace(skipDialogue);
 
 	if (!registry.mapRequests.has(player))
 		registry.mapRequests.emplace(player,MapRequestType::RestartGame);
