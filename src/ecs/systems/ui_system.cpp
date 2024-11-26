@@ -1164,13 +1164,13 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			}
 		}
 		else if (bullet.effectCalc == Multiplicative) {
-			if (bullet.value < 1) {
+			if (bullet.value < 0) {
 				modify = "Decreases ";
-				intermediaryAmount = (1 - bullet.value) * 100;
+				intermediaryAmount = (-bullet.value) * 100;
 			}
 			else {
 				modify = "Increases ";
-				intermediaryAmount = (bullet.value - 1) * 100;
+				intermediaryAmount = (bullet.value) * 100;
 			}
 			std::stringstream amountString;
 			amountString << (int)intermediaryAmount << "%";
