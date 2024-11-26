@@ -552,12 +552,12 @@ void RenderSystem::drawMesh(Entity entity,
 
 // draw the intermediate texture to the screen, with some distortion to simulate
 // water
-void RenderSystem::drawToScreen1()
+void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 {
 	Frame& frame = registry.frames.components[0];
 	// Setting shaders
 	// get the water texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS1]);
+	glUseProgram(effects[(GLuint)effect]);
 	glBindVertexArray(vao);
 	gl_has_errors();
 	// Clearing backbuffer
@@ -583,7 +583,7 @@ void RenderSystem::drawToScreen1()
 		index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
 																	 // indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
-	const GLuint postprocess_program = effects[(GLuint)EFFECT_ASSET_ID::POSTPROCESS1];
+	const GLuint postprocess_program = effects[(GLuint)effect];
 	// Set clock
 	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
@@ -614,7 +614,7 @@ void RenderSystem::drawToScreen1()
 	drawSetupFrame();
 }
 
-void RenderSystem::drawToScreen2()
+void RenderSystem::drawToScreenFinal()
 {
 
 	// Setting shaders

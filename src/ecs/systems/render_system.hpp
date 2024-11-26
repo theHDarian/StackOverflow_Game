@@ -47,6 +47,7 @@ class RenderSystem {
 		shader_path("textured"),
 		shader_path("postprocess1"),
 		shader_path("postprocess2"),
+		shader_path("postprocess3"),
 		shader_path("dash"),
 		shader_path("healthbar"),
 		shader_path("roombound"),
@@ -88,8 +89,8 @@ public:
 	void drawMenuOverlayUI();
 	void drawDialogueUI();
 	void drawBackgroundElements();
-	void drawToScreen1();
-	void drawToScreen2();
+	void drawToScreenExtra(EFFECT_ASSET_ID effect);
+	void drawToScreenFinal();
 	void step(float elapsed_ms);
 
 	void drawCursor();

@@ -131,7 +131,7 @@ int main() {
 		renderer.drawBackgroundElements();
 		particleSystem.render();
 		renderer.drawGameElements();
-		renderer.drawToScreen1();
+		renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS1));
 		renderer.drawGameUI();
 		textSystem.renderGameUIText();
 		renderer.drawDialogueUI();
@@ -141,7 +141,8 @@ int main() {
 		renderer.drawMenuOverlayUI();
 		textSystem.renderMenuOverlayUIText();
 		renderer.drawCursor();
-		renderer.drawToScreen2(); //postprocessing
+		if (ioSystem.isPaused()) renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS3));
+		renderer.drawToScreenFinal(); //postprocessing
 
 		glfwSwapBuffers(window);
 	}
