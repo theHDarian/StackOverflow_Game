@@ -1176,6 +1176,13 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	motion.scale = atkData.size; // Ensure scale is initialized
 	motion.veer = veer;
 
+	// Make special bullets easier to hit
+	if (bullet.isSpecial) {
+		bullet.bulletSpeed *= 0.8;
+		bullet.bulletRange *= 1.5;
+		motion.scale *= 1.2f;
+	}
+
 	if (bullet.bulletEffects[0].type == BulletEffectType::Key)
 	{
 		motion.scale = 16.f * vec2(2.8, 1);
