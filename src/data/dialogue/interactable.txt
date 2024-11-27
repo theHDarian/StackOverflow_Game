@@ -163,6 +163,7 @@ CHOICES Yes\No
 
 ITEM HoneyCanister 0 0
 You take the Honey. It's sticky, but it might come in handy.
+CUT blackscreen.png
 [Obtained Honey!]
 SOUND itemPickup
 Bzzz... Bzzz...
@@ -361,3 +362,24 @@ ITEM OracleCrab -1 4
 
 ITEM OracleCrab -1 5
 "The cheese... The cheese... Takes two keys..."
+
+ITEM FightConsole -1 0
+This seems to be one of those machines that can directly link to robots and push data onto their stacks... But why is it red?
+"Solider, are you ready to fight?"
+SPEAKER Fight Console fight_console.png
+"Prove you are worthy this data! Use it to fight for your life!"
+Well, it seems using this machine will grant you powerful data, but you will have to fight to keep it.
+Would you like to download data from this machine?
+CHOICES I've got this\On second thought...
+
+ITEM FightConsole 0 0
+You feel a surge of data being pushed onto your stack.
+CUT blackscreen.png
+SOUND itemPickup
+The sound of approaching enemies can be heard.
+
+ITEM FightConsole 1 0
+You decide against downloading data from a machine in a run-down lab, especially one that tells you to fight for your life.
+
+ITEM FightConsole -1 1
+You've already used this! You wonder if the data you got was worth the fight.

@@ -373,6 +373,7 @@ enum InteractableItem {
 	Ram,
 	PopConsole,
 	PushConsole,
+	FightConsole,
 	OpenDoor,
 	LockedDoor,
 	BibleTree,

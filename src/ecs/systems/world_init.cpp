@@ -178,6 +178,8 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createWishGranter(renderer, pos);
 	case InteractableItem::OracleCrab:
 		return createOracleCrab(renderer, pos);
+	case InteractableItem::FightConsole:
+		return createFightConsole(renderer, pos, effects);
 	default:
 		return Entity();
 	}
@@ -216,6 +218,50 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 	registry.renderRequests.insert(
 		console,
 		{ "push_console",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	return console;
+}
+
+Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects)
+{
+	const Entity console = Entity();
+
+	Motion &m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 200.f * vec2(1, 1.4166666);
+
+	auto &o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	CircleCollider &c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	registry.backgrounds.emplace(console);
+
+	// can use aabb as near player range for now for pseudo-offsetting
+	AABBCollider &aabb = registry.aabbs.emplace(console);
+	aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
+
+	//CircleCollider &cc = registry.circleColliders.emplace(console);
+	//cc.radius = m.scale.y / 4;
+
+	InteractableObject &object = registry.interactables.emplace(console);
+	object.name = "FightConsole";
+	object.item = InteractableItem::FightConsole;
+
+	Animation &a = registry.animations.emplace(console);
+	a.max_frames = 1;
+	a.animation_countdown_base = 100;
+
+	EffectStack &stack = registry.effectStacks.emplace(console);
+	stack.stack = std::move(effects);
+
+	registry.renderRequests.insert(
+		console,
+		{"fight_console",
 		 EFFECT_ASSET_ID::ANIMATE,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
@@ -279,14 +325,14 @@ Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 
 Entity createBaru(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "Brau1589.png", vec2(1500, 750), vec2(0, 50), 50);
+	auto entity = createProp3D( renderer, pos, "Brau1589.png", vec2(1380, 960), vec2(1380, 960), 50);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "Baru";
 	object.item = InteractableItem::Baru;
-	registry.circleColliders.emplace(entity).radius = 100;
-	AABBCollider &aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-750, -375);
-	aabb.bottomRight = vec2(750, 375);
+	registry.circleColliders.emplace(entity).radius = 200;
+	// AABBCollider &aabb = registry.aabbs.emplace(entity);
+	// aabb.topLeft = vec2(-750, -375);
+	// aabb.bottomRight = vec2(750, 375);
 
 	return entity;
 }
