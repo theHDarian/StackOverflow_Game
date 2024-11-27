@@ -168,11 +168,19 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 	#endif
 
 	IOState& state = registry.ioStates.components[0];
+	GameState& gameState = registry.gameStates.components[0];
 	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
 		state.shouldDash = true;
 	}
+
+	// have it check when in menu in the future
 	if (button == GLFW_MOUSE_BUTTON_1) {
-		state.shouldShoot = (action == GLFW_PRESS  || action == GLFW_REPEAT);
+		if (!gameState.titleScreen) {
+			state.shouldShoot = (action == GLFW_PRESS || action == GLFW_REPEAT);
+		}
+		else { // click buttons
+
+		}
 	}
 
 }

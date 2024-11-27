@@ -109,3 +109,7 @@ enum UIRequestType {
 struct UIRequest {
 	UIRequestType type;
 };
+
+struct Button {
+	float padding = 30.f;
+};

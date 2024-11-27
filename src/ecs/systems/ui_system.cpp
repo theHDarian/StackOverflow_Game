@@ -48,29 +48,29 @@ void UISystem::step(float elapsed_ms) {
 	}
 
 	if (gameState.titleScreen) {
-		if (registry.menuChoices.components.size() == 0) {
-			vec2 choiceStartPos = { 800, 900 };
-			vec2 offset = { 0, 50 };
-			createMenuChoice("New Game", choiceStartPos);
-			createMenuChoice("Quit", choiceStartPos + offset);
+		if (registry.buttons.components.size() == 0) {
+			vec2 choiceStartPos = { ws.width/2.f, ws.height - 150 };
+			vec2 offset = { 0, 50 + 30 };
+			createButton("New Game", choiceStartPos);
+			createButton("Quit", choiceStartPos + offset);
 			ioState.hoveringMenuChoice = 0;
 			ioState.lastHoverMenuChoice = 0;
 			soundSystem->playTitleMusic();
 		}
-		else if (registry.menuChoices.entities.size() > 0) {
+		else if (registry.buttons.entities.size() > 0) { // not sure how to highlight here
 			int lastChoice = registry.ioStates.components[0].lastHoverMenuChoice;
 			int hoveringChoice = registry.ioStates.components[0].hoveringMenuChoice;
-			// unhighlight the last hovered choice
-			registry.renderRequests.get(registry.menuChoices.entities[lastChoice]).show = false;
-			registry.textRenderRequests.get(registry.menuChoices.entities[lastChoice]).color = vec3(1, 1, 1);
-			// highlight current choice
-			registry.renderRequests.get(registry.menuChoices.entities[hoveringChoice]).show = true;
-			registry.textRenderRequests.get(registry.menuChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
+			//// unhighlight the last hovered choice
+			//registry.renderRequests.get(registry.menuChoices.entities[lastChoice]).show = false;
+			//registry.textRenderRequests.get(registry.menuChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+			//// highlight current choice
+			//registry.renderRequests.get(registry.menuChoices.entities[hoveringChoice]).show = true;
+			//registry.textRenderRequests.get(registry.menuChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
 		}
 	}
 	else {
-		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.menuChoices.entities[i];
+		for (int i = registry.buttons.size() - 1; i >= 0; i--) {
+			Entity e = registry.buttons.entities[i];
 			registry.deleteEntityAndRelatedEntities(e);
 		}
 	}
@@ -398,6 +398,43 @@ void UISystem::playDialogue() {
 			soundSystem->stopNextDialogueSound();
 		}
 	}
+}
+
+Entity UISystem::createButton(std::string label, vec2 position) {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	Button& button = registry.buttons.emplace(entity);
+
+	registry.menuOverlayUIs.emplace(entity);
+	registry.menuOverlayUITexts.emplace(entity);
+
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.scale = 0.40;
+	text.text = label;
+	text.topRightBound = { windowState.width, windowState.height };
+	text.bottomLeftBound = { 0, 0 };
+	text.y = windowState.height - position.y - button.padding;
+	text.x = position.x - label.length() * text.scale * 48.f + button.padding;
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = { position.x - label.length() * text.scale * 48.f + button.padding * 2, text.scale * 48.f + button.padding * 2 }; // hard code size for now; consider scaling to text in future (tho maybe not needed?)
+	motion.position = position;
+
+	vec3& color = registry.colors.emplace(entity);
+	color = COLOR_TEAL_MED;
+
+	return entity;
 }
 
 Entity UISystem::createDialogueReminder() {
