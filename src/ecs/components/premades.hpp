@@ -1921,7 +1921,7 @@ struct EnemyHifiTrail : Enemy
 	const AttackData snailTrail{
 	EnemyAttackPattern::TRAIL,
 	CIRCLE,
-	{ lightning2 },
+	{ },
 	buzz,
 	1,
 	0,
