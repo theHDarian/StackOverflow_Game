@@ -72,32 +72,23 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (action == GLFW_RELEASE && (key == GLFW_KEY_ENTER || key == GLFW_KEY_SPACE) && (gameState.dialogueScene || gameState.titleScreen)) {
 		ioState.nextDialogue = true;
 
-		if (gameState.titleScreen) {
-			if (ioState.hoveringMenuChoice == 0) {
-				gameState.titleScreen = false;
-				gameState.loading = true;
-				ioState.shouldRestart = true; // is setting it again ok?
-			}
-			else {
-				ioState.shouldEnd = true;
-			}
-		}
+
 	}
 
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
 
-		if (gameState.titleScreen) {
-			if (ioState.hoveringMenuChoice == 0) {
-				gameState.titleScreen = false;
-				gameState.loading = true;
-				ioState.shouldRestart = true; // is setting it again ok?
-			}
-			else {
-				ioState.shouldEnd = true;
-			}
-		}
+		//if (gameState.titleScreen) {
+		//	if (ioState.hoveringMenuChoice == 0) {
+		//		gameState.titleScreen = false;
+		//		gameState.loading = true;
+		//		ioState.shouldRestart = true; // is setting it again ok?
+		//	}
+		//	else {
+		//		ioState.shouldEnd = true;
+		//	}
+		//}
 
 		// take latest object
 		if (registry.nearbyInteractables.entities.size() > 0) {
@@ -175,11 +166,11 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 
 	// have it check when in menu in the future
 	if (button == GLFW_MOUSE_BUTTON_1) {
-		if (!gameState.titleScreen) {
-			state.shouldShoot = (action == GLFW_PRESS || action == GLFW_REPEAT);
+		if (gameState.titleScreen && action == GLFW_PRESS) {
+			state.clickedButton = true;
 		}
 		else { // click buttons
-
+			state.shouldShoot = (action == GLFW_PRESS || action == GLFW_REPEAT);
 		}
 	}
 

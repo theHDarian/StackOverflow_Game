@@ -33,7 +33,7 @@ struct IOState {
 	int hoveringMenuChoice = 0;
 	int lastHoverMenuChoice = 0;
 	bool showFPS = true;
-	bool clickedButton;
+	bool clickedButton = false;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;

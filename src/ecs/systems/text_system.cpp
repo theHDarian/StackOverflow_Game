@@ -161,6 +161,19 @@ int TextSystem::initFreetypeLib() {
     return 1;
 }
 
+// for a single line?
+float TextSystem::getTextLength(std::string text, float scale) {
+    std::string::const_iterator c;
+    float length = 0;
+    for (c = text.begin(); c != text.end(); c++)
+    {
+        Character ch = Characters[*c];
+        length += (ch.Advance >> 6) * scale * 48.0f / 256.0f * FONT_ADJUST_FACTOR;
+    }
+    Character lastChar = Characters[text.at(text.length() - 1)];
+    return length - (lastChar.Advance >> 6) * scale * 48.0f / 256.0f * FONT_ADJUST_FACTOR + (lastChar.Size.x) * scale * 48.0f / 256.0f * FONT_ADJUST_FACTOR;
+}
+
 /*
 ref: https://learnopengl.com/In-Practice/Text-Rendering
 optimizations made based on: https://www.youtube.com/watch?v=S0PyZKX4lyI
@@ -192,12 +205,13 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
+
     Motion motion = Motion(); // placeholder for text motion info
 
     for (std::string text : tokenizedText) {
 
         // approximate next word length and compare with text box size
-        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x + 0.5f) * text.length() * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
+        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x) * text.length() * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
             y -= ((Characters[65].Size.y)) * 2.0 * scale;
             x = copyX;
         }
@@ -216,6 +230,7 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
             else {
                 float xpos = x + ch.Bearing.x * scale;
                 float ypos = y - (256 - ch.Bearing.y) * scale;
+                
 
                 if (*c == ' ') { // skip "blank space characters" by not actually drawing them
                     x += (ch.Advance >> 6) * scale;
@@ -310,8 +325,15 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
 {
     // consider saving this in the future w/ a dirty bit if it gets expensive
     // or consider a universal string to tokenized string map w/ hash, but would hashing that also get expensive?
+
+    float textLength = 0;
+
+    if (alignment == TextAlignment::CenteredAlign) {
+        textLength = getTextLength(text, scale);
+    }
+
     std::vector<std::string> tokenizedText = getTokenizedText(text);
-    renderText(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound, alignment, isUI);
+    renderText(tokenizedText, x - textLength / 2.f, y, scale, color, topRightBound, bottomLeftBound, alignment, isUI);
 }
 
 void TextSystem::renderMenuUIText() {

@@ -111,5 +111,5 @@ struct UIRequest {
 };
 
 struct Button {
-	float padding = 30.f;
+	float padding = 15.f;
 };

@@ -49,23 +49,43 @@ void UISystem::step(float elapsed_ms) {
 
 	if (gameState.titleScreen) {
 		if (registry.buttons.components.size() == 0) {
+
 			vec2 choiceStartPos = { ws.width/2.f, ws.height - 150 };
 			vec2 offset = { 0, 50 + 30 };
-			createButton("New Game", choiceStartPos);
-			createButton("Quit", choiceStartPos + offset);
-			ioState.hoveringMenuChoice = 0;
-			ioState.lastHoverMenuChoice = 0;
+			std::string longestButton = "New Game";
+			createButton("New Game", choiceStartPos, { longestButton.length() * 0.40 * 48.f + 60, 0.40 * 48.f + 15.f * 2 });
+			createButton("Quit", choiceStartPos + offset, { longestButton.length() * 0.40 * 48.f  + 60, 0.40 * 48.f + 15.f * 2 });
+
 			soundSystem->playTitleMusic();
 		}
+		// currently only have title screen buttons -- need a menu state!!
 		else if (registry.buttons.entities.size() > 0) { // not sure how to highlight here
-			int lastChoice = registry.ioStates.components[0].lastHoverMenuChoice;
-			int hoveringChoice = registry.ioStates.components[0].hoveringMenuChoice;
-			//// unhighlight the last hovered choice
-			//registry.renderRequests.get(registry.menuChoices.entities[lastChoice]).show = false;
-			//registry.textRenderRequests.get(registry.menuChoices.entities[lastChoice]).color = vec3(1, 1, 1);
-			//// highlight current choice
-			//registry.renderRequests.get(registry.menuChoices.entities[hoveringChoice]).show = true;
-			//registry.textRenderRequests.get(registry.menuChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
+			// process clicked
+			if (ioState.clickedButton) {
+				int clickedButtonIndex = -1;
+				int count = 0;
+				for (Entity button : registry.buttons.entities) {
+					Motion& buttonMotion = registry.motions.get(button);
+					if (ioState.mousePosition.x > (buttonMotion.position.x - buttonMotion.scale.x / 2) && ioState.mousePosition.x < (buttonMotion.position.x + buttonMotion.scale.x / 2)
+						&& ioState.mousePosition.y > (buttonMotion.position.y - buttonMotion.scale.y / 2) && ioState.mousePosition.y < (buttonMotion.position.y + buttonMotion.scale.y / 2)) {
+						clickedButtonIndex = count;
+						break;
+					}
+					count++;
+				}
+				// button was pressed
+				if (clickedButtonIndex > -1) {
+					if (clickedButtonIndex == 0) {
+						gameState.titleScreen = false;
+						gameState.loading = true;
+						ioState.shouldRestart = true; // is setting it again ok?
+					}
+					else {
+						ioState.shouldEnd = true;
+					}
+				}
+				ioState.clickedButton = false;
+			}
 		}
 	}
 	else {
@@ -400,7 +420,7 @@ void UISystem::playDialogue() {
 	}
 }
 
-Entity UISystem::createButton(std::string label, vec2 position) {
+Entity UISystem::createButton(std::string label, vec2 position, vec2 scale) {
 	Entity entity = Entity();
 	WindowState& windowState = registry.windowStates.components[0];
 
@@ -423,12 +443,13 @@ Entity UISystem::createButton(std::string label, vec2 position) {
 	text.topRightBound = { windowState.width, windowState.height };
 	text.bottomLeftBound = { 0, 0 };
 	text.y = windowState.height - position.y - button.padding;
-	text.x = position.x - label.length() * text.scale * 48.f + button.padding;
+	text.x = position.x ;
+	text.alignment = TextAlignment::CenteredAlign;
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-	motion.scale = { position.x - label.length() * text.scale * 48.f + button.padding * 2, text.scale * 48.f + button.padding * 2 }; // hard code size for now; consider scaling to text in future (tho maybe not needed?)
+	motion.scale = scale;
 	motion.position = position;
 
 	vec3& color = registry.colors.emplace(entity);
@@ -1148,12 +1169,13 @@ Entity UISystem::createTitleScreen() {
 	text.color = COLOR_YELLOW;
 	text.topRightBound = { motion.scale.x, motion.scale.y };
 	text.bottomLeftBound = { 0, 0 };
-	text.text = "Stack Overflow";
-	text.x = windowState.width / 2 - 48 * 1.0 * text.text.length() / 2;
+	text.text = "Stack Overfasdasdsdasdsssssssssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaalow";
+	text.x = motion.position.x;
 	text.y = windowState.height - 135;
 	text.scale = 1.0;
 	text.topRightBound = { motion.scale.x - 25, motion.scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.alignment = TextAlignment::CenteredAlign;
 	
 
 	return entity;
