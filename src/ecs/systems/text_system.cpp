@@ -161,7 +161,8 @@ int TextSystem::initFreetypeLib() {
     return 1;
 }
 
-// for a single line?
+// for a single line ONLY
+// note: scale is the scale defined in a textrenderreq, so assume it's small! 
 float TextSystem::getTextLength(std::string text, float scale) {
     //std::string::const_iterator c;
     //float length = 0;
@@ -214,7 +215,7 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
     for (std::string text : tokenizedText) {
 
         // approximate next word length and compare with text box size
-        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x) * text.length() * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
+        if ((x + text.length() * (Characters[65].Advance >> 6) * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
             y -= ((Characters[65].Size.y)) * 2.0 * scale;
             x = copyX;
         }
