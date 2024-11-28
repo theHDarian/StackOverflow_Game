@@ -37,7 +37,7 @@ int TextSystem::initFreetypeLib() {
     }
 
     // find path to font
-    std::string font_name = font_path("Flexi_IBM_VGA_True.ttf").c_str();
+    std::string font_name = font_path(FONT_FILE).c_str();
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;

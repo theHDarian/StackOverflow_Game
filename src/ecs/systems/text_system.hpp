@@ -10,11 +10,12 @@
 
 std::vector<std::string> getTokenizedText(std::string text);
 
-const float FONT_ADJUST_FACTOR = 2.50;
+const float FONT_ADJUST_FACTOR = 1.50;
+const std::string FONT_FILE = "DepartureMono-Regular.otf";
 // manually change this for different fonts for now
 
-// for ByteBounce: 2.5
-// for Chicago: 1.5
+// adjust factor 2.5 - for bytebounce, departuremono-regular
+// adjust factor 1.5 - for chicago, home video, monocraft, monogram
 
 class TextSystem {
 public:
