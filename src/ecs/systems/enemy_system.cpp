@@ -536,13 +536,19 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
 
 void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, AttackData atkData)
 {
-    if (registry.enemies.components.size() > MAX_ENEMY_SPAWN) return;
-    
     if (registry.animations.has(entity))
         registry.animations.get(entity).frame = 1;
+    Map & mapComponent = registry.maps.components[0];
+    vec2 roomSize = mapComponent.currRoom.preset.roomSize;
+
+
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        createEnemy(render, pos, atkData.spawn);
+        if (atkData.spawnPosition.size() == atkData.numBullets) {
+            createEnemy(render, atkData.spawnPosition[i] * roomSize, atkData.spawn);
+        } else {
+            createEnemy(render, pos, atkData.spawn);
+        }
     }
 
     currPattern.currAtkCD = currPattern.maxAtkCD;

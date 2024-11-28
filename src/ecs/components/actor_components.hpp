@@ -289,6 +289,10 @@ enum EnemyType {
     MediumEnemyHealer,
     HardEnemyBoidBio,
     ScientistlaserAttack,
+    ScientistradialAttack,
+    ScientistexplosiveAttack,
+    ScientistHomingAttack,
+    ScientistBoss,
     HardEnemyBoidFish,
     HifiEnemyTwinLaserVertical1,
     HifiEnemyTwinLaserVertical2,
@@ -350,6 +354,7 @@ struct AttackData {
     float homing = 0;
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
     EnemyType spawn;
+    std::vector<vec2> spawnPosition = {};
 };
 
 enum class EnemyBehavior {

@@ -1017,12 +1017,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		Healer &healer = registry.healers.emplace(entity);
 		healer.coolDown = 0.f;
 	}
-	case EnemyType::ScientistlaserAttack:
-	{
-		enemy = InvisibleRotateLaserEnemy();
-		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
-		break;
-	}
 	case EnemyType::HardEnemyBoidFish:
 	{
 		enemy = EnemyHardBoidFish();
@@ -1065,6 +1059,36 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::HifiEnemySniperHard: enemy = EnemyHifiSniperHard();break;
 	case EnemyType::HifiEnemyTrailHard: enemy = EnemyHifiTrailHard();break;
 	case EnemyType::HifiEnemyCannonHard: enemy = EnemyHifiCannonHard();break;
+	case EnemyType::ScientistlaserAttack:
+	{
+		enemy = InvisibleRotateLaserEnemy();
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistradialAttack:
+	{
+		enemy = InvisibleTurretEnemy();
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistexplosiveAttack:
+	{
+		enemy = InvisibleExplosiveEnemy();
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistHomingAttack:
+	{
+		enemy = InvisibleHomingEnemy();
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistBoss: 
+	{
+		enemy = ScientistBossEnemy();
+		registry.bosses.emplace(entity);
+		break;
+	}
 	};
 
 	Motion &motion = registry.motions.emplace(entity);

@@ -1709,65 +1709,6 @@ struct EnemyTestPatrol : Enemy {
 	}
 };
 
-struct ScientistBossEnemy : Enemy {
-	ScientistBossEnemy () {
-
-	}
-};
-
-struct InvisibleTurretEnemy : Enemy {
-	InvisibleTurretEnemy() {
-
-	}
-};
-
-struct InvisibleRotateLaserEnemy : Enemy {
-	Reaction deathTransition {
-		ReactionType::DURATION,
-		1
-	};
-	EnemyPattern laserRotateState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 5000.f, laserRotate};
-	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition},1, false, 0.f, 0.f, NoAttack};
-	InvisibleRotateLaserEnemy() {
-		maxHealth = 1;
-		currHealth = 1;
-		enemyPatterns = {laserRotateState, DeathState};
-		sprite = {
-			"enemy_Angel.png",
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE,
-		};
-		patternIndex = 0;
-		scale = vec2(0, 0);
-		rotatePower = 0.f;
-
-
-	};
-};
-
-struct InvisibleLaserEnemy : Enemy {
-	Reaction deathTransition {
-		ReactionType::DURATION,
-		1
-	};
-	EnemyPattern laserState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 5000.f, laserNoRotate};
-	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition},1, false, 0.f, 0.f, NoAttack};
-	InvisibleLaserEnemy() {
-		maxHealth = 1;
-		currHealth = 1;
-		enemyPatterns = {laserState, DeathState};
-		sprite = {
-			"enemy_Angel.png",
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE,
-		};
-		patternIndex = 0;
-		scale = vec2(0, 0);
-		rotatePower = 0.f;
-
-
-	};
-};
 
 //----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------
 struct TwinLaserEnemyVertical1 : Enemy {
@@ -2309,6 +2250,258 @@ struct EnemyHifiCannonHard : Enemy
 	};
 };
 
+
+struct ScientistBossEnemy : Enemy
+{
+	Reaction spawningLaser{
+		ReactionType::DURATION,
+		0};
+
+	Reaction spawningHoming{
+		ReactionType::DURATION,
+		1};
+	
+	Reaction spawningBoids {
+		ReactionType::DURATION,
+		2
+	};
+
+	const AttackData spawnLaserRotating{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{sizeUpA},
+		blunt,
+		4,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{0.5, 0.5},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::ScientistlaserAttack,
+		{{0.2f, 0.2f}, {0.2f, 0.8f}, {0.8f, 0.2f}, {0.8f, 0.8f}}};
+
+	const AttackData spawnHomingAtk{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		3,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{0, 0.5},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::ScientistHomingAttack,
+		{{0.5, 0.5}, {0.8, 0.2}, {0.2, 0.8}}};
+
+	const AttackData spawnBoids{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		10,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::HardEnemyBoid,{}};
+
+
+	EnemyPattern spawnLaserState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {spawningHoming}, 1, true, 0.f, 5000.f, spawnLaserRotating};
+	EnemyPattern spawnHomingState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {spawningBoids}, 2, true, 0.f, 5000.f, spawnHomingAtk};
+	EnemyPattern spawnBoidState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {spawningLaser}, 0, true, 0.f, 2500.f, spawnBoids};
+	ScientistBossEnemy()
+	{
+		maxHealth = 1000;
+		currHealth = 1000;
+		enemyPatterns = {spawnLaserState, spawnHomingState, spawnBoidState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(100, 100);
+		rotatePower = 0.f;
+	}
+};
+
+struct InvisibleTurretEnemy : Enemy
+{
+
+	const AttackData radialScientistBurst{
+		EnemyAttackPattern::BURST_RADIAL,
+		TRIANGLE,
+		{numBulletsUpA, dmgDownA},
+		sluggish,
+		192,
+		-M_PI / 20,
+		{20, 20},
+		150,
+		9000,
+		{5, 200},
+		0,
+		0,
+		0};
+
+	Reaction deathTransition{
+		ReactionType::DURATION,
+		1};
+	EnemyPattern RotateState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 600.f, radialScientistBurst};
+	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition}, 1, false, 0.f, 0.f, NoAttack};
+	InvisibleTurretEnemy()
+	{
+		maxHealth = 1;
+		currHealth = 1;
+		enemyPatterns = {RotateState, DeathState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	}
+};
+
+struct InvisibleRotateLaserEnemy : Enemy
+{
+	Reaction deathTransition{
+		ReactionType::DURATION,
+		1};
+	EnemyPattern laserRotateState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 5000.f, laserRotate};
+	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition}, 1, false, 0.f, 0.f, NoAttack};
+	InvisibleRotateLaserEnemy()
+	{
+		maxHealth = 1;
+		currHealth = 1;
+		enemyPatterns = {laserRotateState, DeathState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct InvisibleLaserEnemy : Enemy
+{
+	Reaction deathTransition{
+		ReactionType::DURATION,
+		1};
+	EnemyPattern laserState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 5000.f, laserNoRotate};
+	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition}, 1, false, 0.f, 0.f, NoAttack};
+	InvisibleLaserEnemy()
+	{
+		maxHealth = 1;
+		currHealth = 1;
+		enemyPatterns = {laserState, DeathState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct InvisibleExplosiveEnemy : Enemy
+{
+
+	const AttackData ScientistCannonShot{
+		EnemyAttackPattern::BURST,
+		CIRCLE,
+		{dmgUpM, bulletBounceUpM, sizeUpM},
+		{fireRateDownM},
+		3,
+		M_PI / 16,
+		{70, 70},
+		60,
+		10000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE};
+
+	Reaction deathTransition{
+		ReactionType::DURATION,
+		1};
+	EnemyPattern ShootState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 600.f, ScientistCannonShot};
+	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition}, 1, false, 0.f, 0.f, NoAttack};
+	InvisibleExplosiveEnemy()
+	{
+		maxHealth = 1;
+		currHealth = 1;
+		enemyPatterns = {ShootState, DeathState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct InvisibleHomingEnemy : Enemy
+{
+
+	const AttackData ScientistHomingPiercingShot{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{bulletBounceUpM, sizeUpM},
+		{fireRateDownM},
+		1,
+		M_PI / 16,
+		{20, 20},
+		350,
+		10000,
+		{600, 0},
+		1,
+		2,
+		0.02};
+
+	Reaction deathTransition{
+		ReactionType::DURATION,
+		1};
+	EnemyPattern ShootState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 600.f, ScientistHomingPiercingShot};
+	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition}, 1, false, 0.f, 0.f, NoAttack};
+	InvisibleHomingEnemy()
+	{
+		maxHealth = 1;
+		currHealth = 1;
+		enemyPatterns = {ShootState, DeathState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
 
 // struct EnemyHardSkull : {
 
