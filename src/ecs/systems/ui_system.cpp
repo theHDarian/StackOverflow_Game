@@ -118,7 +118,7 @@ void UISystem::step(float elapsed_ms) {
 			int currHover = 0;
 			// process mouse hovered
 			for (Entity button : registry.buttons.entities) {
-				Button& buttonComponent = registry.buttons.get(button);
+				UIButton& buttonComponent = registry.buttons.get(button);
 				if (ioState.mousePosition.x > (buttonComponent.position.x - buttonComponent.buttonSize.x / 2) && ioState.mousePosition.x < (buttonComponent.position.x + buttonComponent.buttonSize.x / 2)
 					&& ioState.mousePosition.y > (buttonComponent.position.y - buttonComponent.buttonSize.y / 2) && ioState.mousePosition.y < (buttonComponent.position.y + buttonComponent.buttonSize.y / 2)) {
 					if (hoveringChoice != currHover) {
@@ -149,7 +149,7 @@ void UISystem::step(float elapsed_ms) {
 			if (ioState.clickedButton) {
 				int count = 0;
 				for (Entity button : registry.buttons.entities) {
-					Button& buttonComponent = registry.buttons.get(button);
+					UIButton& buttonComponent = registry.buttons.get(button);
 					if (ioState.mousePosition.x > (buttonComponent.position.x - buttonComponent.buttonSize.x / 2) && ioState.mousePosition.x < (buttonComponent.position.x + buttonComponent.buttonSize.x / 2)
 						&& ioState.mousePosition.y >(buttonComponent.position.y - buttonComponent.buttonSize.y / 2) && ioState.mousePosition.y < (buttonComponent.position.y + buttonComponent.buttonSize.y / 2)) {
 						clickedButtonIndex = count;
@@ -558,7 +558,7 @@ Entity UISystem::createButton(std::string label, vec2 position, vec2 scale) {
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
 
-	Button& button = registry.buttons.emplace(entity);
+	UIButton& button = registry.buttons.emplace(entity);
 
 	registry.menuOverlayUIs.emplace(entity);
 	registry.menuOverlayUITexts.emplace(entity);
@@ -940,7 +940,7 @@ Entity UISystem::createMenuChoice(std::string choice, vec2 position) {
 	text.y = windowState.height - position.y - motion.scale.y / 2;
 
 	// also make it a button
-	Button& button = registry.buttons.emplace(entity);
+	UIButton& button = registry.buttons.emplace(entity);
 	button.padding = 15.f;
 	button.buttonSize = vec2(text.text.length() * text.scale * 48, motion.scale.y);
 	button.position = vec2(text.x, position.y);
@@ -1188,10 +1188,9 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	text.bottomLeftBound = { 0, 0 };
 
 	WindowState& windowState = registry.windowStates.components[0];
-	text.x = windowState.width - scale.x + 25;
-	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 1.2;
-	//text.text = "Game Over \npress R to restart";
+	text.x = windowState.width - scale.x + 25;
+	text.y = windowState.height - position.y + text.scale * DEFAULT_FONT_SIZE / 2.f;
 	text.topRightBound = { scale.x - 25, scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
 	text.tokenizedText = uiTexts["GameOver"];
