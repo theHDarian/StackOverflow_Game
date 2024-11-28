@@ -15,7 +15,9 @@ const RoomPreset TutorialRoom1Preset{
     100000.0f,
     0,
     0,
-    "TutorialRoom1"
+    "TutorialRoom1",
+    false,
+    {1280,720}
 
 };
 
@@ -26,7 +28,9 @@ const RoomPreset TutorialRoom2Preset{
     0.0f,
     0 ,
     0,
-    "TutorialRoom2"
+    "TutorialRoom2",
+    false,
+    {1920,1080}
 };
 
 const RoomPreset EnemyRoomSwarm{
@@ -771,8 +775,8 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{HifiRoomTwinLasers,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
-        // {RoomType::EnemyRoom, {{HifiRoomCannons},{}}},
+        // {RoomType::EnemyRoom, {{HifiRoomTwinLasers,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomBoidSnipers},{}}},
         {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
