@@ -15,7 +15,9 @@ const RoomPreset TutorialRoom1Preset{
     100000.0f,
     0,
     0,
-    "TutorialRoom1"
+    "TutorialRoom1",
+    false,
+    {1280,720}
 
 };
 
@@ -26,7 +28,9 @@ const RoomPreset TutorialRoom2Preset{
     0.0f,
     0 ,
     0,
-    "TutorialRoom2"
+    "TutorialRoom2",
+    false,
+    {1920,1080}
 };
 
 const RoomPreset EnemyRoomSwarm{
@@ -624,7 +628,7 @@ const RoomPreset BossRoomBee{
 
 };
 
-const RoomPreset HifiRoomTwinLasers {
+const RoomPreset HifiRoomTwinLaserShurikens {
     {
         {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
         {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.99f,0.1f}},
@@ -637,8 +641,27 @@ const RoomPreset HifiRoomTwinLasers {
     0.0f,
     5,
     2,
-    "HifiLaserHo"
+    "HifiLaserShurikens"
 };
+const RoomPreset HifiRoomTwinLaserChargers {
+    {
+        {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
+        {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.3f}},
+        {EnemyType::HifiEnemyChargerHard, {0.8f,0.2f}},
+        {EnemyType::HifiEnemyChargerHard, {0.8f,0.8f}},
+        {EnemyType::HifiEnemyChargerHard, {0.2f,0.2f}},
+        {EnemyType::HifiEnemyChargerHard, {0.2f,0.8f}},
+        {EnemyType::HifiEnemyChargerHard, {0.4f,0.6f}},
+        {EnemyType::HifiEnemyChargerHard, {0.6f,0.4f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiLaserChargersHard"
+};
+
 
 const RoomPreset HifiRoomBasicEnemy {
     {
@@ -658,7 +681,7 @@ const RoomPreset HifiRoomBasicEnemy {
     0.0f,
     5,
     2,
-    "HifiChargers"
+    "HifiBasic"
 };
 const RoomPreset HifiRoomBoidSnipers{
     {
@@ -735,14 +758,72 @@ const RoomPreset HifiRoomBoidSnipers{
     "HifiBoidSnipers"
 };
 
-const RoomPreset HifiRoomCannons{
+const RoomPreset HifiRoomCannonLasers{
     {
         {EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
-        {EnemyType::HifiEnemyCannon, {0.9f,0.5f}},
         {EnemyType::HifiEnemyCannon, {0.9f,0.8f}},
         {EnemyType::HifiEnemyCannon, {0.1f,0.2f}},
-        {EnemyType::HifiEnemyCannon, {0.1f,0.5f}},
         {EnemyType::HifiEnemyCannon, {0.1f,0.8f}},
+        {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
+        {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.3f}},
+        {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.3f,0.1f}},
+        {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.7f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiBoidCannons"
+};
+
+const RoomPreset HifiRoomSniperShurikens{
+    {
+        {EnemyType::HifiEnemySniperHard, {0.8f,0.2f}},
+        {EnemyType::HifiEnemySniperHard, {0.2f,0.2f}},
+        {EnemyType::HifiEnemySniperHard, {0.8f,0.8f}},
+        {EnemyType::HifiEnemySniperHard, {0.2f,0.8f}},
+        {EnemyType::HifiEnemyTrailHard, {0.6f,0.6f}},
+        {EnemyType::HifiEnemyTrailHard, {0.4f,0.4f}}
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiBoidCannons"
+};
+
+const RoomPreset HifiRoomCannonBoids{
+    {
+        {EnemyType::HifiEnemyCannonHard, {0.7f,0.5f}},
+        {EnemyType::HifiEnemyCannonHard, {0.3f,0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+        {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
     },
     {},
     {},
@@ -774,18 +855,18 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{HifiRoomTwinLasers,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
-        // {RoomType::EnemyRoom, {{HifiRoomCannons},{}}},
+        // {RoomType::EnemyRoom, {{HifiRoomTwinLaserShurikens,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{}}},
         {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
         {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty,RestRoomBibleTree,},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
         {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty, RestRoomBibleTree,},{}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
@@ -826,7 +907,7 @@ inline RoomPreset getRoomPreset(RoomType type, bool locked) {
     if (type == RoomType::BossRoom && map.currRegion == MapRegion::Biology) {
         return BossRoomBee;
     } else if (type == RoomType::BossRoom && map.currRegion == MapRegion::Physics) {
-        return BossRoomBee;
+        return BossRoomBee; //TODO change to physics boss
     }
 
     // Tutorial rooms
