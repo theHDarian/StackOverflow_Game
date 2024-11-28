@@ -625,7 +625,7 @@ const RoomPreset BossRoomBee{
 
 };
 
-const RoomPreset HifiRoomTwinLasers {
+const RoomPreset HifiRoomTwinLaserShurikens {
     {
         {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
         {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.99f,0.1f}},
@@ -638,8 +638,27 @@ const RoomPreset HifiRoomTwinLasers {
     0.0f,
     5,
     2,
-    "HifiLaserHo"
+    "HifiLaserShurikens"
 };
+const RoomPreset HifiRoomTwinLaserChargers {
+    {
+        {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
+        {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.3f}},
+        {EnemyType::HifiEnemyChargerHard, {0.8f,0.2f}},
+        {EnemyType::HifiEnemyChargerHard, {0.8f,0.8f}},
+        {EnemyType::HifiEnemyChargerHard, {0.2f,0.2f}},
+        {EnemyType::HifiEnemyChargerHard, {0.2f,0.8f}},
+        {EnemyType::HifiEnemyChargerHard, {0.4f,0.6f}},
+        {EnemyType::HifiEnemyChargerHard, {0.6f,0.4f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiLaserChargersHard"
+};
+
 
 const RoomPreset HifiRoomBasicEnemy {
     {
@@ -659,7 +678,7 @@ const RoomPreset HifiRoomBasicEnemy {
     0.0f,
     5,
     2,
-    "HifiChargers"
+    "HifiBasic"
 };
 const RoomPreset HifiRoomBoidSnipers{
     {
@@ -776,7 +795,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
         // {RoomType::EnemyRoom, {{HifiRoomTwinLasers,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
-        {RoomType::EnemyRoom, {{HifiRoomBoidSnipers},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannons},{}}},
         {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},

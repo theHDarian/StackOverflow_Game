@@ -690,23 +690,6 @@ const AttackData SniperShot{
 	0,
 	0};
 
-const AttackData HifiCannonShot{
-	EnemyAttackPattern::SPRAY,
-	CIRCLE,
-	{dmgUpM, bulletBounceUpM,sizeUpM},
-	{fireRateDownM},
-	3,
-	M_PI/16,
-	{70, 70},
-	60,
-	10000,
-	{600, 0},
-	0,
-	0,
-	0,
-	EnemyBulletDeath::EXPLODE,
-	HifiEnemyCharger};
-
 const AttackData NoAttack{
 	EnemyAttackPattern::NONE,
 	CIRCLE,
@@ -1931,6 +1914,53 @@ struct EnemyHifiCharger : Enemy
 	}
 };
 
+struct EnemyHifiChargerHard : Enemy
+{
+	const AttackData explode{
+		EnemyAttackPattern::TRAIL,
+		CIRCLE,
+		{},
+		{blunt},
+		3,
+		M_PI/16,
+		{70, 70},
+		60,
+		0,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE};
+
+	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::PLAYER_CLOSE,1},{ReactionType::DURATION,1}}, 1, true, 0.f, 1000.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION,2}}, 2, true, 50.f, 50.f, explode};
+	EnemyPattern idleStateCD1 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,3}}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingMidState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION,4}}, 4, true, 50.f, 50.f, explode};
+	EnemyPattern idleStateCD2 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,5}}, 5, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingEndState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION,6}}, 6, true, 50.f, 50.f, explode};
+	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,7}}, 7, false, 0.f, 0.f, NoAttack};
+	EnemyPattern explodingCharge = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION,8}}, 8, true, 50.f, 50.f, explode};
+	EnemyPattern idleState3 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,9}}, 9, false, 0.f, 0.f, NoAttack};
+	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 1000.f, NoAttack};
+
+	EnemyHifiChargerHard()
+	{
+		maxHealth = 120;
+		currHealth = maxHealth;
+		enemyPatterns = {randomPos, chargingState, idleStateCD1,chargingMidState, idleStateCD2,chargingEndState, idleState, explodingCharge,idleState3,randomPosNoCharge};
+		sprite = {
+			"enemy_hifi_002_hard.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({480 / 8.f, 480 / 8.f });
+		patternIndex = 0;
+		rotatePower = 90.f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 2.6f;
+	}
+};
+
 struct EnemyHifiTrail : Enemy
 {
 	const AttackData snailTrail{
@@ -2015,18 +2045,50 @@ struct EnemyHifiTrail : Enemy
 
 struct EnemyHifiCannon : Enemy
 {
-	Reaction reactionIdle = {
-		ReactionType::DURATION,
-		1};
+	const AttackData cannonShot{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{SniperPower,SniperSpeed,sizeUpM},
+		{fireRateDownM},
+		2,
+		M_PI/2,
+		{60, 60},
+		60,
+		10000,
+		{600, -M_PI/4},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE};
+	const AttackData cluster{
+		EnemyAttackPattern::BURST,
+		CIRCLE,
+		{numBulletsUpA,bulletSpeedUpM},
+		blunt,
+		4,
+		0,
+		{30, 30},
+		600,
+		1000,
+		{-400, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER,
+		HifiEnemyCharger};
 
 
-	EnemyPattern chargingState = {"RETREAT", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {{ReactionType::DURATION,0}}, 0, true, 4000.f, 4000.f, HifiCannonShot};
+	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,1},{ReactionType::PLAYER_CLOSE,4}}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,2}}, 2, false, 0.f, 0.f, NoAttack};
+	EnemyPattern backUp = {"RECOIL", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,3}}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, cannonShot};
+	EnemyPattern shootCluster = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, cluster};
 
 	EnemyHifiCannon()
 	{
 		maxHealth = 350;
 		currHealth = maxHealth;
-		enemyPatterns = {chargingState};
+		enemyPatterns = {random1,chargingState, backUp,shootCannon,shootCluster};
 		patternIndex = 0;
 		sprite = {
 			"enemy_hifi_003.png",
@@ -2036,7 +2098,7 @@ struct EnemyHifiCannon : Enemy
 		scale = vec2({240.f / 2.f, 240.f / 2.f});
 		rotatePower = 0.5f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
-		speedMultiplier = 0.5;
+		speedMultiplier = 0.3;
 	};
 };
 

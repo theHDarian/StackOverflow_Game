@@ -1061,6 +1061,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::HifiEnemyCharger: enemy = EnemyHifiCharger();break;
 	case EnemyType::HifiEnemyTrail: enemy = EnemyHifiTrail();break;
 	case EnemyType::HifiEnemyCannon: enemy = EnemyHifiCannon();break;
+	case EnemyType::HifiEnemyChargerHard: enemy = EnemyHifiChargerHard();break;
 	};
 
 	Motion &motion = registry.motions.emplace(entity);
