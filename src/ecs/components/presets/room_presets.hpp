@@ -351,7 +351,6 @@ const RoomPreset EnemyRoomBees2{
      {EnemyType::TwoBee, {0.2f, 0.2f}},
         {EvilSnail, {0.5f, 0.6f}},
      {EnemyType::BeeHive, {0.2f, 0.4f}},
-        {EnemyType::BeeHive, {0.5f, 0.4f}},
      {EnemyType::BeeHive, {0.8f, 0.4f}}},
 
     {},
@@ -403,6 +402,8 @@ const RoomPreset RestingRoomPop{
     0,
     0,
     "RestingRoomPop",
+    false,
+    {1000,1000}
 };
 
 const RoomPreset RestingRoomGardener{
@@ -413,7 +414,8 @@ const RoomPreset RestingRoomGardener{
     0,
     0,
     "RestingRoomGardener",
-    true
+    true,
+    {1800, 1000}
 };
 
 const RoomPreset RestRoomBibleTree{
@@ -424,7 +426,8 @@ const RoomPreset RestRoomBibleTree{
     0,
     0,
     "RestRoomBibleTree",
-    true
+    true,
+    {2000,2000}
 };
 
 const RoomPreset RestRoomEmpty{
