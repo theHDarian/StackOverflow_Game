@@ -10,11 +10,14 @@
 
 std::vector<std::string> getTokenizedText(std::string text);
 
-const float FONT_ADJUST_FACTOR = 2.50;
+const float FONT_ADJUST_FACTOR = 1.50;
+const std::string FONT_FILE = "HomeVideo.ttf";
+const float DEFAULT_FONT_SIZE = 48.f;
+
 // manually change this for different fonts for now
 
-// for ByteBounce: 2.5
-// for Chicago: 1.5
+// adjust factor 2.5 - for bytebounce, departuremono-regular
+// adjust factor 1.5 - for chicago, home video, monocraft, monogram
 
 class TextSystem {
 public:
@@ -53,4 +56,5 @@ private:
     void renderText(std::string text, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign, bool isUI = true);
     void renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment = TextAlignment::LeftAlign, bool isUI = true);
     void drawInstancedText(int length);
+    float getTextLength(std::string text, float scale);
 };

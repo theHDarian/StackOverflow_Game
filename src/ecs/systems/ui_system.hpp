@@ -11,6 +11,7 @@
 #include <sstream>
 
 class SoundSystem;
+const float STACK_NOTIF_SCALE = 0.90f;
 
 // System responsible for handling user input
 class UISystem {
@@ -20,8 +21,6 @@ public:
     ~UISystem();
     // Initialize the window
     bool init(GLFWwindow* window);
-
-    bool resetStackUI();
 
     void step(float elapsed_ms);
     void playDialogue();
@@ -96,6 +95,7 @@ private:
 
     Entity createFpsCounter();
     Entity createRoomCounter();
+    Entity createButton(std::string label, vec2 position, vec2 scale);
 
     SoundSystem* soundSystem;
 };

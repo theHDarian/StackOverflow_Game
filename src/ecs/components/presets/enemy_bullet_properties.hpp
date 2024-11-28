@@ -23,7 +23,7 @@ const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{PlayerStackSize,   {0.f, 0.f, 0.f}},
 			{PlayerDashCDR,     COLOR_BROWN},
 			{Inert,             COLOR_GREY_LIGHT},
-			{Lightning,			{0.f,0.f,0.f}},
+			{Lightning,			{1.f,1.f,1.f}},
 			{Key,				{1.0, 1.0, 1.0}}
 	};
 

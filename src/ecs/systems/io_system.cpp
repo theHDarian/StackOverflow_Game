@@ -69,35 +69,19 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	}
 
 	// other options for progressing dialogue: Enter, space
-	if (action == GLFW_RELEASE && (key == GLFW_KEY_ENTER || key == GLFW_KEY_SPACE) && (gameState.dialogueScene || gameState.titleScreen)) {
+	if (action == GLFW_RELEASE && (key == GLFW_KEY_ENTER || key == GLFW_KEY_SPACE) && (gameState.dialogueScene || ioState.activeMenu > -1)) {
 		ioState.nextDialogue = true;
+		if (ioState.activeMenu > -1)
+			ioState.confirmedOption = true;
+	}
 
-		if (gameState.titleScreen) {
-			if (ioState.hoveringMenuChoice == 0) {
-				gameState.titleScreen = false;
-				gameState.loading = true;
-				ioState.shouldRestart = true; // is setting it again ok?
-			}
-			else {
-				ioState.shouldEnd = true;
-			}
-		}
+	if (action == GLFW_RELEASE && key == GLFW_KEY_E && ioState.activeMenu > -1) {
+		ioState.confirmedOption = true;
 	}
 
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
-
-		if (gameState.titleScreen) {
-			if (ioState.hoveringMenuChoice == 0) {
-				gameState.titleScreen = false;
-				gameState.loading = true;
-				ioState.shouldRestart = true; // is setting it again ok?
-			}
-			else {
-				ioState.shouldEnd = true;
-			}
-		}
 
 		// take latest object
 		if (registry.nearbyInteractables.entities.size() > 0) {
@@ -119,14 +103,15 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		}
 	}
 	
-	if (gameState.dialogueScene && !gameState.gamePaused) {
-		handleDialogueChoice(key, action, ioState, gameState);
-	}
-	if (gameState.titleScreen) {
+	if (ioState.activeMenu > -1) {
 		// only for title for now, think of where else menus might appear
 		// menu state? or just pause?
 		handleMenuChoice(key, action, ioState, gameState);
 	}
+	else if (gameState.dialogueScene && !gameState.gamePaused) {
+		handleDialogueChoice(key, action, ioState, gameState);
+	}
+
 	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
 }
@@ -156,9 +141,6 @@ void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameSta
 			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
 			
 		}
-		//else if (key == GLFW_KEY_SPACE) { // progress through dialogue
-		//	state.nextDialogue = true;
-		//}
 	}
 }
 
@@ -168,11 +150,19 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 	#endif
 
 	IOState& state = registry.ioStates.components[0];
+	GameState& gameState = registry.gameStates.components[0];
 	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
 		state.shouldDash = true;
 	}
+
+	// have it check when in menu in the future
 	if (button == GLFW_MOUSE_BUTTON_1) {
-		state.shouldShoot = (action == GLFW_PRESS  || action == GLFW_REPEAT);
+		if (state.activeMenu > -1 && action == GLFW_PRESS) {
+			state.clickedButton = true;
+		}
+		else { // click buttons
+			state.shouldShoot = (action == GLFW_PRESS || action == GLFW_REPEAT);
+		}
 	}
 
 }
