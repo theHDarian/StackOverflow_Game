@@ -58,7 +58,7 @@ struct RoomPreset {
     int numKeyBulletsToSpawn = 2;
     std::string ID;
     bool oneTime = false; //if true, room will not appear again
-    vec2 roomSize = { 2560, 1600 };
+    vec2 roomSize = { 1600, 1600 };
     bool operator==(const RoomPreset& other) const {
         return ID == other.ID;
     }

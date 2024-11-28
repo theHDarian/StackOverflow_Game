@@ -823,7 +823,7 @@ struct EnemyEasyTrail : Enemy
 
 	EnemyEasyTrail()
 	{
-		maxHealth = 200;
+		maxHealth = 150;
 		currHealth = maxHealth;
 
 		enemyPatterns = { rotateState };
@@ -863,7 +863,7 @@ struct EnemyHardTrail : Enemy
 
 	EnemyHardTrail()
 	{
-		maxHealth = 350;
+		maxHealth = 200;
 		currHealth = maxHealth;
 
 		enemyPatterns = { rotateState };
@@ -909,7 +909,7 @@ struct EnemyMediumTank : Enemy
 	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 500.f, missile};
 	EnemyMediumTank()
 	{
-		maxHealth = 300;
+		maxHealth = 150;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState, idleState, walkingRage, shootMisile};
@@ -948,7 +948,7 @@ struct EnemyLaserTank : Enemy
 	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
 	EnemyLaserTank()
 	{
-		maxHealth = 250;
+		maxHealth = 150;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
@@ -992,7 +992,7 @@ struct EnemyHardTank : Enemy
 	EnemyPattern shootMisile = { "MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 300.f, missile };
 	EnemyHardTank()
 	{
-		maxHealth = 400;
+		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState, idleState, walkingRage, shootMisile };

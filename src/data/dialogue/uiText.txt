@@ -3,7 +3,17 @@
 # followed by a body of text
 
 UI ControlsGuide
-Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[ESC] to pause, [R] to return to title, [L] to leave game, [E] to progress dialogue\n[C] to toggle collider visuals, [F] to toggle FPS counter
+Controls:\n
+[WASD] to move
+[SPACE]/[RMB] to dash
+[LMB] to shoot
+[E] to progress dialogue
+[ESC] to pause
+[R] to return to title
+[L] to leave game
+[=/-] to increase/decrease volume
+[C] to toggle collider visuals
+[F] to toggle FPS counter
 
 UI GameOver
 Game Over \npress R to restart

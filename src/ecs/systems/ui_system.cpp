@@ -33,6 +33,8 @@ void UISystem::step(float elapsed_ms) {
 	registry.renderRequests.get(fpsCounter).show = ioState.showFPS;
 
 	if (ioState.shouldRestart) {
+		//std::cout << "yep restart ui" << std::endl;
+
 		// clear UI stuff here for now
 		// resetting dialogue related stuff
 		DialogueLines& lines = registry.dialogueLines.components[0];
@@ -43,35 +45,164 @@ void UISystem::step(float elapsed_ms) {
 			Entity e = registry.dialogueChoices.entities[i];
 			registry.deleteEntityAndRelatedEntities(e);
 		}
+		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+			Entity e = registry.menuChoices.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+
+		registry.activeMenus.clear();
+		ioState.activeMenu = -1;
 		registry.renderRequests.get(stackAddBubble).show = false;
 		registry.renderRequests.get(stackAddTail).show = false;	
+		registry.renderRequests.get(controlsGuide).show = false;
+
+		// feels like should be unnecessary, but because of early reset below, must do this
+		gameState.gamePaused = false;
+		gameState.gameOver = false;
 	}
 
-	if (gameState.titleScreen) {
+	// check: should menu be opened?
+	if (gameState.titleScreen && !registry.activeMenus.has(registry.menus.entities[MenuType::TitleMenu])) {
+		ioState.shouldRestart = false; // not sure if this should be here, but prevents continuous resets (weird)
+		registry.activeMenus.emplace(registry.menus.entities[MenuType::TitleMenu]);
+		ioState.activeMenu++;
+	}
+	if (gameState.gamePaused && !gameState.gameOver && !registry.activeMenus.has(registry.menus.entities[MenuType::PauseMenu])) {
+		registry.activeMenus.emplace(registry.menus.entities[MenuType::PauseMenu]);
+		ioState.activeMenu++;
+		//std::cout << "pause meny!" << std::endl;
+	}
+
+	// need to make sure when unpauses, all current menus closed
+	if (!gameState.gamePaused && ioState.activeMenu > -1 && registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu) {
+		registry.activeMenus.clear();
+		ioState.activeMenu = -1;
+
+		// clear current menu choices
+		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+			Entity e = registry.menuChoices.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+	}
+
+	if (ioState.activeMenu > -1) {
 		if (registry.menuChoices.components.size() == 0) {
-			vec2 choiceStartPos = { 800, 900 };
-			vec2 offset = { 0, 50 };
-			createMenuChoice("New Game", choiceStartPos);
-			createMenuChoice("Quit", choiceStartPos + offset);
+			Menu& menu = registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]);
+			//std::cout << "active: " << ioState.activeMenu << ", id: " << menu.type << std::endl;
+
+			for (int i = 0; i < menu.options.size(); i++) {
+				createMenuChoice(menu.options[i], menu.startPos + (float)i * menu.offset);
+			}
+
 			ioState.hoveringMenuChoice = 0;
 			ioState.lastHoverMenuChoice = 0;
-			soundSystem->playTitleMusic();
 		}
-		else if (registry.menuChoices.entities.size() > 0) {
+		if (registry.menuChoices.entities.size() > 0) {
+			// process hovered
 			int lastChoice = registry.ioStates.components[0].lastHoverMenuChoice;
 			int hoveringChoice = registry.ioStates.components[0].hoveringMenuChoice;
+			
+			int currHover = 0;
+			// process mouse hovered
+			for (Entity button : registry.buttons.entities) {
+				Button& buttonComponent = registry.buttons.get(button);
+				if (ioState.mousePosition.x > (buttonComponent.position.x - buttonComponent.buttonSize.x / 2) && ioState.mousePosition.x < (buttonComponent.position.x + buttonComponent.buttonSize.x / 2)
+					&& ioState.mousePosition.y > (buttonComponent.position.y - buttonComponent.buttonSize.y / 2) && ioState.mousePosition.y < (buttonComponent.position.y + buttonComponent.buttonSize.y / 2)) {
+					if (hoveringChoice != currHover) {
+						registry.ioStates.components[0].lastHoverMenuChoice = hoveringChoice;
+						hoveringChoice = currHover;
+						registry.ioStates.components[0].hoveringMenuChoice = hoveringChoice;
+						break;
+					}
+				}
+				currHover++;
+			}
+
 			// unhighlight the last hovered choice
 			registry.renderRequests.get(registry.menuChoices.entities[lastChoice]).show = false;
 			registry.textRenderRequests.get(registry.menuChoices.entities[lastChoice]).color = vec3(1, 1, 1);
 			// highlight current choice
 			registry.renderRequests.get(registry.menuChoices.entities[hoveringChoice]).show = true;
 			registry.textRenderRequests.get(registry.menuChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
-		}
-	}
-	else {
-		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.menuChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
+
+			int clickedButtonIndex = -1;
+
+			// process key press
+			if (ioState.confirmedOption) {
+				clickedButtonIndex = hoveringChoice;
+			}
+
+			// process clicked
+			if (ioState.clickedButton) {
+				int count = 0;
+				for (Entity button : registry.buttons.entities) {
+					Button& buttonComponent = registry.buttons.get(button);
+					if (ioState.mousePosition.x > (buttonComponent.position.x - buttonComponent.buttonSize.x / 2) && ioState.mousePosition.x < (buttonComponent.position.x + buttonComponent.buttonSize.x / 2)
+						&& ioState.mousePosition.y >(buttonComponent.position.y - buttonComponent.buttonSize.y / 2) && ioState.mousePosition.y < (buttonComponent.position.y + buttonComponent.buttonSize.y / 2)) {
+						clickedButtonIndex = count;
+						break;
+					}
+					count++;
+				}
+			}
+
+			// button was pressed
+			if (clickedButtonIndex > -1) {
+				//std::cout << "button pressed: " << clickedButtonIndex << std::endl;
+				//std::cout << "total choices " << registry.menuChoices.entities.size() << std::endl;
+
+				ioState.confirmedOption = false;
+				ioState.clickedButton = false;
+				registry.ioStates.components[0].lastHoverMenuChoice = -1;
+				registry.ioStates.components[0].hoveringMenuChoice = -1;
+				
+				if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::TitleMenu) {
+					if (clickedButtonIndex == 0) {
+						gameState.titleScreen = false;
+						gameState.loading = true;
+						ioState.shouldRestart = true; // is setting it again ok?
+					}
+					else {
+						ioState.shouldEnd = true;
+					}
+					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+					ioState.activeMenu--;
+				}
+				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu)
+				{
+					if (clickedButtonIndex == 0) {
+						//std::cout << "show controls!" << std::endl;
+						registry.activeMenus.emplace(registry.menus.entities[MenuType::ControlsMenu]);
+						ioState.activeMenu++;
+						registry.renderRequests.get(controlsGuide).show = true;
+					}
+					else if (clickedButtonIndex == 1) {
+						ioState.shouldRestart = true;
+						gameState.titleScreen = true;
+						//std::cout << "to title!" << std::endl;
+					}
+					else {
+						ioState.shouldEnd = true;
+						//std::cout << "quit!" << std::endl;
+					}
+					if (clickedButtonIndex != 0) {
+						registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+						ioState.activeMenu--;
+					}
+				}
+				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::ControlsMenu) {
+					// only one choice
+					registry.renderRequests.get(controlsGuide).show = false;
+					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+					ioState.activeMenu--;
+				}
+
+				// clear current menu choices
+				for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+					Entity e = registry.menuChoices.entities[i];
+					registry.deleteEntityAndRelatedEntities(e);
+				}
+			}
 		}
 	}
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
@@ -106,13 +237,13 @@ void UISystem::step(float elapsed_ms) {
 			registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
 		}
 		
-		vec2 bulletStartPos = playerPos + vec2(20, -10);
+		vec2 bulletStartPos = playerPos;
 		for (int i = 0; i < diff; i++) {
 			int index = i + stack.currStack.size() - diff;
 			stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
 				stackui.bulletStartPos.y));
 			// can notify player when stack has changed here
-			// NOTE: does not work for lightning bullets. Do we want to let the player know they got hit? -> if yes, need to do this elsewhere.
+			// NOTE: does not work for lightning bullets. Lightning bullets detected in handle player collision 
 			// this spawn position is also v incorrect, corrected later in usual update
 			createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y), stack.currStack[index]);
 		}
@@ -124,14 +255,47 @@ void UISystem::step(float elapsed_ms) {
 		if (!registry.renderRequests.get(e).show)
 			registry.deleteEntityAndRelatedEntities(e);
 	}
+
+	// handle ui requests
+	for (UIRequest& uiRequest : registry.uiRequests.components) {
+		if (uiRequest.type == UIRequestType::StackNotifReqShift || UIRequestType::StackNotifReqShuffle) {
+			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+			registry.renderRequests.get(stackAddBubble).show = true;
+			registry.renderRequests.get(stackAddTail).show = true;
+			updateStackAddBubble(playerPos, 1);
+
+			if (!registry.showTimers.has(stackAddBubble)) {
+				if (registry.fades.has(stackAddBubble)) {
+					registry.fades.remove(stackAddBubble);
+					registry.fades.remove(stackAddTail);
+				}
+				registry.showTimers.emplace(stackAddBubble);
+				registry.showTimers.emplace(stackAddTail);
+			}
+			else {
+				registry.showTimers.get(stackAddBubble).timer += registry.showTimers.get(stackAddBubble).base;
+				registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
+			}
+			vec2 bulletStartPos = playerPos;
+			BulletStackEffect bullet = lightning1;
+			if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
+				bullet = lightning2;
+			}
+
+			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), bullet);
+		}
+	}
+
+	registry.uiRequests.clear();
+
 	// move position of bullet add notif
 	if (registry.stackAddNotifs.entities.size() > 0) {
 		vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
-		vec2 bulletStartPos = playerPos + registry.motions.get(stackAddBubble).scale * vec2(1, -1) + vec2(10, -5);
+		vec2 bulletStartPos = playerPos + abs(registry.motions.get(registry.players.entities[0]).scale) * vec2(1, -1);
 		updateStackAddBubble(bulletStartPos, registry.stackAddNotifs.entities.size());
 		int index = 0;
 		for (Entity entity : registry.stackAddNotifs.entities) {
-			registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * 0.75 + index * stackui.bulletOffset * 0.75, bulletStartPos.y);
+			registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * STACK_NOTIF_SCALE + index * stackui.bulletOffset * STACK_NOTIF_SCALE, bulletStartPos.y);
 			index++;
 		}
 	}
@@ -180,8 +344,8 @@ void UISystem::step(float elapsed_ms) {
 
 	if (!gameState.gameOver) {
 		// toggling basic menu uis on/off
-		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
-		registry.renderRequests.get(controlsGuide).show = gameState.gamePaused;
+		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused && !registry.renderRequests.get(controlsGuide).show;
+		registry.renderRequests.get(controlsGuide).show = registry.renderRequests.get(controlsGuide).show && gameState.gamePaused;
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
 		registry.renderRequests.get(dialogueReminder).show = gameState.dialogueScene;
 
@@ -198,8 +362,6 @@ void UISystem::step(float elapsed_ms) {
 			ws.currUnixTime = Clock::now();
 			TextRenderRequest& fpsText = registry.textRenderRequests.get(fpsCounter);
 			fpsText.text = "FPS: " + std::to_string(ws.fps);
-			fpsText.x = ws.width - 15*fpsText.text.length() - 50.f;
-
 		}
 		
 		Map& map = registry.maps.components[0];
@@ -209,7 +371,6 @@ void UISystem::step(float elapsed_ms) {
 		if (map.currRegion == Biology) region = "Biology";
 		if (map.currRegion == Physics) region = "Physics";
 		roomCounterText.text = region + " Room " + std::to_string(map.roomsTraversed);
-		roomCounterText.x = ws.width - 17*roomCounterText.text.length() - 50.f;
 		
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
@@ -250,8 +411,8 @@ bool UISystem::init(GLFWwindow* window) {
 	loadText();
 	loadBulletEffects();
 	
-	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
-	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2 + wS.height / 8), vec2(wS.width, wS.height / 4));
+	
+	
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
@@ -262,16 +423,12 @@ bool UISystem::init(GLFWwindow* window) {
 	fpsCounter = createFpsCounter();
 	roomCounter = createRoomCounter();
 	titleScreen = createTitleScreen();
+	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 200.f));
+	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
 
-	return true;
-}
-
-bool UISystem::resetStackUI() {
-	WindowState& wS = registry.windowStates.components[0];
-	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	return true;
 }
 
@@ -372,6 +529,44 @@ void UISystem::playDialogue() {
 	}
 }
 
+Entity UISystem::createButton(std::string label, vec2 position, vec2 scale) {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	Button& button = registry.buttons.emplace(entity);
+
+	registry.menuOverlayUIs.emplace(entity);
+	registry.menuOverlayUITexts.emplace(entity);
+
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.scale = 0.40;
+	text.text = label;
+	text.topRightBound = { windowState.width, windowState.height };
+	text.bottomLeftBound = { 0, 0 };
+	text.y = windowState.height - position.y - button.padding;
+	text.x = position.x ;
+	text.alignment = TextAlignment::CenteredAlign;
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = scale;
+	motion.position = position;
+
+	vec3& color = registry.colors.emplace(entity);
+	color = COLOR_TEAL_MED;
+
+	return entity;
+}
+
 Entity UISystem::createDialogueReminder() {
 	WindowState& windowState = registry.windowStates.components[0];
 	Entity entity = Entity();
@@ -437,7 +632,7 @@ Entity UISystem::createStackAddBubble() {
 	motion.angle = 0;
 	motion.velocity = { 0, 0 };
 	motion.position = { 0,0 };
-	motion.scale = { 50 * 0.75f, 50 * 0.75f } ;
+	motion.scale = { 50 * STACK_NOTIF_SCALE, 50 * STACK_NOTIF_SCALE } ;
 
 	vec3& color = registry.colors.emplace(entity);
 	color = vec3(0.f);
@@ -453,21 +648,35 @@ Entity UISystem::createStackAddBubble() {
 Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
 	Entity entity = Entity();
 
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = registry.stackUI.components[0].bulletSize * STACK_NOTIF_SCALE; // make same as UI for now
+	// but honestly this should be constant, not a field tied to stack ui??
+
+	std::string shape = "";
+	if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Multiplicative) {
+		shape = "stackNotifShuffle.png";
+		motion.scale = vec2(192) * (motion.scale.y / 192.f);
+	}
+	else if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Additive){
+		shape = "stackNotifShift.png";
+		motion.scale = vec2(192) * (motion.scale.y / 192.f);
+	}
+	else{
+		assert(bulletEffectShapes.count(bullet.type) > 0);
+		shape = bulletEffectShapes.at(bullet.type);
+	}
+
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ bulletEffectShapes.at(bullet.type),
+		{ shape,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
 
 	registry.gameUIs.emplace(entity);
-
-	Motion& motion = registry.motions.emplace(entity);
-	motion.angle = 0;
-	motion.velocity = { 0, 0 };
-	motion.position = position;
-	motion.scale = registry.stackUI.components[0].bulletSize * 0.75f; // make same as UI for now
-	// but honestly this should be constant, not a field tied to stack ui??
 
 	vec3& color = registry.colors.emplace(entity);
 	color = bulletEffectColors.at(bullet.type);
@@ -483,8 +692,8 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 	vec2 bulletSize = registry.stackUI.components[0].bulletSize;
 	float bulletOffset = registry.stackUI.components[0].bulletOffset;
 	vec2 bulletStartPos = position;
-	motion.scale = vec2(bulletNum * bulletSize.x * 0.75 + bulletNum * bulletOffset * 0.75 + 2 * bulletOffset * 0.75, bulletSize.y * 0.75 + 2 * bulletOffset * 0.75);
-	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x * 0.75 - bulletOffset * 0.75 / 2, bulletStartPos.y);
+	motion.scale = vec2(bulletNum * bulletSize.x * STACK_NOTIF_SCALE + bulletNum * bulletOffset * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE, bulletSize.y * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE);
+	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x * STACK_NOTIF_SCALE - bulletOffset * STACK_NOTIF_SCALE / 2, bulletStartPos.y);
 
 	Motion& tailMotion = registry.motions.get(stackAddTail);
 	tailMotion.position = motion.position - motion.scale * vec2(0.5, -0.5) - tailMotion.scale / 2.f * vec2(0.5, -0.5);
@@ -495,7 +704,7 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	Motion& motion = registry.motions.get(bulletUI);
 	WindowState& windowState = registry.windowStates.components[0];
-	motion.position = vec2(position.x, position.y + motion.scale.y / 2 + 50);
+	motion.position = vec2(position.x, position.y + motion.scale.y / 2 + 50 + 10);
 	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
 		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
 	}
@@ -565,7 +774,7 @@ Entity UISystem::createBulletUI() {
 	motion.position = { 0, 0 };
 
 	vec3& color = registry.colors.emplace(entity);
-	color = { 11 / 255.f, 84 / 255.f, 87 / 255.f };
+	color = vec3(0.f);
 
 	registry.menuOverlayUITexts.emplace(entity);
 	auto& text = registry.textRenderRequests.emplace(entity);
@@ -575,6 +784,11 @@ Entity UISystem::createBulletUI() {
 	text.bottomLeftBound = { 0, 0 };
 	text.y = windowState.height - motion.position.y - 15;
 	text.x = motion.position.x - 10;
+
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderThickness = 5.f;
+	border.borderColour = COLOR_WHITE;
+	border.border = UIBorderType::Outlined;
 
 	return entity;
 }
@@ -674,7 +888,8 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	return entity;
 }
 
-// should consolidate w/ create dialogue, because is largely the same
+// should consolidate w/ create dialogue, because is largely the same?
+// Difference: menu choices are hoverable/clickable too (but performance cost)
 Entity UISystem::createMenuChoice(std::string choice, vec2 position) {
 	Entity entity = Entity();
 
@@ -687,26 +902,37 @@ Entity UISystem::createMenuChoice(std::string choice, vec2 position) {
 
 	registry.menuUIs.emplace(entity);
 
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.scale = 0.55;
+	text.text = choice;
+	text.topRightBound = { windowState.width - 75, windowState.height - 25 };
+	text.bottomLeftBound = { text.x + 25, 0 + 25 };
+	text.alignment = TextAlignment::CenteredAlign;
+
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-	motion.position = position;
 	motion.scale = { 40, 40 };
+	motion.position = vec2(position.x - text.text.length() * text.scale * 48 / 2 - motion.scale.x, position.y);
+
+	text.x = position.x;
+	text.y = windowState.height - position.y - motion.scale.y / 2;
+
+	// also make it a button
+	Button& button = registry.buttons.emplace(entity);
+	button.padding = 15.f;
+	button.buttonSize = vec2(text.text.length() * text.scale * 48, motion.scale.y);
+	button.position = vec2(text.x, position.y);
 
 	vec3& color = registry.colors.emplace(entity);
 	color = COLOR_RED;
 
 	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
-	auto& text = registry.textRenderRequests.emplace(entity);
-	text.color = vec3(1, 1, 1);
 
-	WindowState& windowState = registry.windowStates.components[0];
-	text.x = position.x + motion.scale.x;
-	text.y = windowState.height - position.y - motion.scale.y / 2;
-	text.scale = 0.55;
-	text.text = choice;
-	text.topRightBound = { windowState.width - 75, windowState.height - 25 };
-	text.bottomLeftBound = { text.x + 25, 0 + 25 };
+
 
 	registry.menuChoices.emplace(entity);
 
@@ -737,7 +963,7 @@ Entity UISystem::createDialogueAvatar(vec2 position, vec2 scale) {
 	text.color = vec3(1, 1, 1);
 
 	WindowState& windowState = registry.windowStates.components[0];
-	text.x = position.x - scale.x / 2;				
+	text.x = position.x;				
 	text.y = windowState.height - position.y - scale.y / 2 - 40;
 	text.scale = 0.45;
 	text.text = "speaker name";
@@ -745,6 +971,7 @@ Entity UISystem::createDialogueAvatar(vec2 position, vec2 scale) {
 	// so just set it to some big number
 	text.topRightBound = { 1000, 1000 };
 	text.bottomLeftBound = { 0, 0 };
+	text.alignment = TextAlignment::CenteredAlign;
 
 	return entity;
 }
@@ -830,13 +1057,23 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.color = vec3(1, 1, 1);
 
 	WindowState& windowState = registry.windowStates.components[0];
-	text.x = windowState.width - scale.x + 25;
-	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 0.5;
-	//text.text = "Controls:\n[WASD] to move, [SPACE]/[RMB] to dash, [LMB] to shoot\n[P] to pause, [R] to restart, [ESC] to quit, [E] to progress dialogue\n[C] to toggle collider visuals";
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
+	text.x = position.x - scale.x/2.f + 25;
+	text.y = position.y + scale.y / 2.f - 25.f - text.scale * DEFAULT_FONT_SIZE;
+	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
 	text.tokenizedText = uiTexts["ControlsGuide"];
+
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderColour = vec3(1.f);
+	border.border = UIBorderType::Outlined;
+	border.borderThickness = 10.f;
+
+	Menu& menu = registry.menus.emplace(entity);
+	menu.options = { "Back" };
+	menu.startPos = { position.x, position.y + scale.y / 2.f - 50 };
+	menu.offset = { 0, 50 + 30 };
+	menu.type = MenuType::ControlsMenu;
 
 	return entity;
 }
@@ -876,12 +1113,24 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	// note: position is not center, but start of text rendering
 	// need a mechanism to figure out text line size
 	WindowState& windowState = registry.windowStates.components[0];
-	text.x = windowState.width - scale.x + 25;
-	text.y = windowState.height - position.y;
-	text.scale = 1.5;
+	text.x = position.x;
+	text.scale = 0.70;
+	text.y = windowState.height - (position.y - motion.scale.y / 2.f + 25.f + text.scale * DEFAULT_FONT_SIZE);
 	text.text = "Game Paused";
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
-	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.topRightBound = { position.x + scale.x - 25, position.y - scale.y - 25 };
+	text.bottomLeftBound = { text.x - 25, 0 + 25 };
+	text.alignment = TextAlignment::CenteredAlign;
+
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderColour = vec3(1.f);
+	border.border = UIBorderType::Outlined;
+	border.borderThickness = 10.f;
+
+	Menu& menu = registry.menus.emplace(entity);
+	menu.options = { "Controls", "Title", "Quit"};
+	menu.startPos = { text.x,  windowState.height - text.y + 100};
+	menu.offset = { 0, 50 + 30 };
+	menu.type = MenuType::PauseMenu;
 
 	return entity;
 }
@@ -929,6 +1178,11 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	text.bottomLeftBound = { text.x, 0 + 25 };
 	text.tokenizedText = uiTexts["GameOver"];
 
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderColour = vec3(1.f);
+	border.border = UIBorderType::Outlined;
+	border.borderThickness = 10.f;
+
 	return entity;
 }
 
@@ -960,8 +1214,8 @@ Entity UISystem::createStackUI(WindowState& windowState, StackCompile& stack)
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 	text.x = stackui.bulletStartPos.x - stackui.bulletSize.x - stackui.bulletOffset / 2;
-	text.y = (stackui.bulletStartPos.y - windowState.height) * -1 - 2 * stackui.bulletOffset - stackui.bulletSize.y;
-	text.scale = 0.3;
+	text.scale = 0.35;
+	text.y = (stackui.bulletStartPos.y - windowState.height) * -1 - 2 * DEFAULT_FONT_SIZE * text.scale - stackui.bulletSize.y;
 	// too lazy to calculate fitting text box size, and it prob won't overflow
 	// so just set it to some big number
 	text.topRightBound = { 1000, 1000 };
@@ -1004,15 +1258,15 @@ Entity UISystem::createFpsCounter() {
 				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
 	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
-	vec2 dimensions = { 100.f,25.f };
 	float padding = 50.f;
 	trr.text = "FPS: 0";
 	trr.color = vec3(1.0f);
 	trr.scale = 0.35f;
-	trr.x = windowState.width - dimensions.x - padding;
-	trr.y = windowState.height - (dimensions.y + padding / 2) * 2.f; //appear below room count
+	trr.x = windowState.width - padding;
+	trr.y = windowState.height - (trr.scale * DEFAULT_FONT_SIZE + padding / 2) * 3.f; //appear below room count
 	trr.topRightBound = { windowState.width + 1000,windowState.height };
 	trr.bottomLeftBound = { 0,0 };
+	trr.alignment = TextAlignment::RightAlign;
 
 	return entity;
 }
@@ -1033,10 +1287,11 @@ Entity UISystem::createRoomCounter() {
 	trr.text = "Room 0";
 	trr.color = vec3(1.0f);
 	trr.scale = 0.35f;
-	trr.x = windowState.width - dimensions.x - padding;
+	trr.x = windowState.width - padding;
 	trr.y = windowState.height - (dimensions.y + padding);
 	trr.topRightBound = { windowState.width + 1000,windowState.height };
 	trr.bottomLeftBound = { 0,0 };
+	trr.alignment = TextAlignment::RightAlign;
 
 	return entity;
 }
@@ -1061,7 +1316,6 @@ Entity UISystem::createTitleScreen() {
 	motion.velocity = { 0, 0 };
 	motion.position = vec2(windowState.width / 2, windowState.height / 2);
 	motion.scale = vec2(windowState.width, windowState.height);
-	//motion.scale = { 1347 * 1.5, 953 * 1.5 };
 
 	// attach 1 text render request
 	registry.menuUITexts.emplace(entity);
@@ -1070,12 +1324,18 @@ Entity UISystem::createTitleScreen() {
 	text.topRightBound = { motion.scale.x, motion.scale.y };
 	text.bottomLeftBound = { 0, 0 };
 	text.text = "Stack Overflow";
-	text.x = windowState.width / 2 - 48 * 1.0 * text.text.length() / 2;
+	text.x = motion.position.x;
 	text.y = windowState.height - 135;
 	text.scale = 1.0;
 	text.topRightBound = { motion.scale.x - 25, motion.scale.y - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.alignment = TextAlignment::CenteredAlign;
 	
+	Menu& menu = registry.menus.emplace(entity);
+	menu.options = { "New Game", "Quit" };
+	menu.startPos = { windowState.width / 2.f, windowState.height - 150 };
+	menu.offset = { 0, 50 + 30 };
+	menu.type = MenuType::TitleMenu;
 
 	return entity;
 }
