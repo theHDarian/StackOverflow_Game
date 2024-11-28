@@ -19,6 +19,7 @@ class MapSystem {
         void handleMapRequests();
         void newMap();
         void updateBgPositions();
+        void decorateFloor();
 
     void loadMusic();
 

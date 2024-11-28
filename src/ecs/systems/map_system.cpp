@@ -207,9 +207,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // clear enemies and obstacles
     clearRoomActors();
 
-
-
-
     SoundType s = roomTypeToMusic.at(type);
     if (s != old_s) {
         if (s == SoundType::normalBGM) {
@@ -266,10 +263,15 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }
 
+    decorateFloor();
+}
+
+void MapSystem::decorateFloor() {
     // Create floor decorations
+    Map& map = registry.maps.components[0];
     WindowState& ws = registry.windowStates.components[0];
     std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : "bio_floor_addons";
-    vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor( 0.8 * map.currRoom.preset.roomSize.x / 192.f));
+    vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor(0.8 * map.currRoom.preset.roomSize.x / 192.f));
     vec2 dividers = vec2(0.9090 * map.currRoom.preset.roomSize.x / placements.x, 0.9090 * map.currRoom.preset.roomSize.y / placements.y);
     vec2 roomOffset = vec2(-map.currRoom.preset.roomSize.x / 2.2f, -map.currRoom.preset.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
     vec2 wiggle = (dividers - vec2(192)) / 2.f;
@@ -277,18 +279,18 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         for (int j = 0; j < placements.y; j++) {
             // Controls how many will be spawned
             if (rand() % 100 < 70) continue;
-            vec2 midPosition = roomOffset + dividers / 2.f + dividers * vec2(i,j);
-            midPosition += wiggle * vec2((rand()%100 - 50) / 50.f, (rand() % 100 - 50) / 50.f);
+            vec2 midPosition = roomOffset + dividers / 2.f + dividers * vec2(i, j);
+            midPosition += wiggle * vec2((rand() % 100 - 50) / 50.f, (rand() % 100 - 50) / 50.f);
             createFloorDeco(renderer, midPosition, filename);
 
-            if (map.currRegion == Biology && rand() % 100 < 20) {
+            if (map.currRegion == Biology && (rand() % 100 < 20) && map.currRoom.type != RoomType::EnemyRoom && map.currRoom.type != RoomType::BossRoom) {
                 createCritter(renderer, midPosition);
             }
 
         }
     }
 }
-
+ 
 void MapSystem::resetMap() {
     registry.maps.components[0].currRoom = Room();
     clearRoomActors();
@@ -357,6 +359,7 @@ void MapSystem::newMap()
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
         //createWishGranter(renderer, vec2(500,500));
     }
+    decorateFloor();
 }
 
 void MapSystem::updateBgPositions() {

@@ -11,7 +11,9 @@
 std::vector<std::string> getTokenizedText(std::string text);
 
 const float FONT_ADJUST_FACTOR = 1.50;
-const std::string FONT_FILE = "DepartureMono-Regular.otf";
+const std::string FONT_FILE = "HomeVideo.ttf";
+const float DEFAULT_FONT_SIZE = 48.f;
+
 // manually change this for different fonts for now
 
 // adjust factor 2.5 - for bytebounce, departuremono-regular
