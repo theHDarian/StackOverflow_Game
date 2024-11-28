@@ -153,6 +153,8 @@ void UISystem::step(float elapsed_ms) {
 					else {
 						ioState.shouldEnd = true;
 					}
+					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+					ioState.activeMenu--;
 				}
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu)
 				{
@@ -171,13 +173,14 @@ void UISystem::step(float elapsed_ms) {
 						ioState.shouldEnd = true;
 						//std::cout << "quit!" << std::endl;
 					}
+					if (clickedButtonIndex != 0) {
+						registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+						ioState.activeMenu--;
+					}
 				}
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::ControlsMenu) {
 					// only one choice
 					registry.renderRequests.get(controlsGuide).show = false;
-				}
-
-				if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type != MenuType::PauseMenu || clickedButtonIndex != 0) {
 					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
 					ioState.activeMenu--;
 				}
