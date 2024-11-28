@@ -952,7 +952,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBigC:
 	{
 		enemy = EnemyBigC();
-		registry.bosses.emplace(entity);
+		auto& boss = registry.bosses.emplace(entity);
+		boss.name = "BigC";
 		movement.angularSpeed = 20;
 		break;
 	}
@@ -1012,7 +1013,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBeehiveMain:
 	{
 		enemy = BossBeeHive();
-		registry.bosses.emplace(entity);
+		auto& boss = registry.bosses.emplace(entity);
+		boss.name = "Grand Hive, the Queen's Throne";
 		break;
 	}
 	case EnemyType::EasyEnemySkull:

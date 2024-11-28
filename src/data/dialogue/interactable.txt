@@ -332,35 +332,35 @@ You feel a sense of satisfaction.
 ITEM Mouse 1 1
 You decide to keep the cheese for yourself.
 
-ITEM OracleCrab -1 0
+ITEM OracleTurret -1 0
 There's one of those hostile crabs again. This one seems to be very beat up.
 It's not attacking you, but it's not moving either.
 Would you like to investigate?
 CHOICES Yes\No
 
-ITEM OracleCrab 0 0
+ITEM OracleTurret 0 0
 You approach the crab.
 
-ITEM OracleCrab 1 0
+ITEM OracleTurret 1 0
 You decide to leave the crab alone.
 
-ITEM OracleCrab -1 1
+ITEM OracleTurret -1 1
 Suddenly, the crab starts to speak.
-SPEAKER OracleCrab BrokenCrab.png
+SPEAKER OracleTurret BrokenCrab.png
 "System... error... System... error..."
 "Sisyphus was punished by the gods to roll a boulder up a hill, only for it to roll back down every time he reached the top."
 
-ITEM OracleCrab -1 2
+ITEM OracleTurret -1 2
 "There was once three... Now there is one..."
-SPEAKER OracleCrab BrokenCrab.png
+SPEAKER OracleTurret BrokenCrab.png
 
-ITEM OracleCrab -1 3
+ITEM OracleTurret -1 3
 "He... doesn't want you to leave...  He... doesn't want anyone to leave..."
 
-ITEM OracleCrab -1 4
+ITEM OracleTurret -1 4
 "Hello... Hello..."
 
-ITEM OracleCrab -1 5
+ITEM OracleTurret -1 5
 "The cheese... The cheese... Takes two keys..."
 
 ITEM FightConsole -1 0
