@@ -61,6 +61,31 @@ void UISystem::step(float elapsed_ms) {
 		gameState.gameOver = false;
 	}
 
+	// check: should game be paused right now?
+	// if already paused, then close latest menu
+	// if latest menu is the pause menu, then unpause
+	if (ioState.pressedEsc) {
+		if (!gameState.gamePaused) {
+			gameState.gamePaused = true;
+		}
+		else {
+			Entity currMenu = registry.activeMenus.entities[registry.activeMenus.entities.size() - 1];
+			registry.renderRequests.get(currMenu).show = false;
+			registry.activeMenus.remove(currMenu);
+			ioState.activeMenu--;
+			// clear current menu choices
+			for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+				Entity e = registry.menuChoices.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+
+			if (ioState.activeMenu < 0) {
+				gameState.gamePaused = false;
+			}
+		}
+		ioState.pressedEsc = false;
+	}
+
 	// check: should menu be opened?
 	if (gameState.titleScreen && !registry.activeMenus.has(registry.menus.entities[MenuType::TitleMenu])) {
 		ioState.shouldRestart = false; // not sure if this should be here, but prevents continuous resets (weird)
@@ -71,18 +96,6 @@ void UISystem::step(float elapsed_ms) {
 		registry.activeMenus.emplace(registry.menus.entities[MenuType::PauseMenu]);
 		ioState.activeMenu++;
 		//std::cout << "pause meny!" << std::endl;
-	}
-
-	// need to make sure when unpauses, all current menus closed
-	if (!gameState.gamePaused && ioState.activeMenu > -1 && registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu) {
-		registry.activeMenus.clear();
-		ioState.activeMenu = -1;
-
-		// clear current menu choices
-		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.menuChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
 	}
 
 	if (ioState.activeMenu > -1) {
@@ -181,10 +194,15 @@ void UISystem::step(float elapsed_ms) {
 						gameState.titleScreen = true;
 						//std::cout << "to title!" << std::endl;
 					}
-					else {
+					else if (clickedButtonIndex == 2) {
 						ioState.shouldEnd = true;
 						//std::cout << "quit!" << std::endl;
 					}
+					else {
+						gameState.gamePaused = false;
+						registry.renderRequests.get(pauseMenu).show = false;
+					}
+
 					if (clickedButtonIndex != 0) {
 						registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
 						ioState.activeMenu--;
@@ -1127,7 +1145,7 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	border.borderThickness = 10.f;
 
 	Menu& menu = registry.menus.emplace(entity);
-	menu.options = { "Controls", "Title", "Quit"};
+	menu.options = { "Controls", "Title", "Quit", "Resume"};
 	menu.startPos = { text.x,  windowState.height - text.y + 100};
 	menu.offset = { 0, 50 + 30 };
 	menu.type = MenuType::PauseMenu;

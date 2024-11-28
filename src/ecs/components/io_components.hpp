@@ -36,6 +36,7 @@ struct IOState {
 	bool clickedButton = false;
 	int activeMenu = -1;
 	bool confirmedOption = false;
+	bool pressedEsc = false;
 
 	ExtendedStack<int> pressedHorizontal;
 	ExtendedStack<int> pressedVertical;
