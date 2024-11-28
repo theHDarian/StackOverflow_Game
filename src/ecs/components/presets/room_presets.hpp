@@ -777,7 +777,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDire
         {RoomType::EnemyRoom, {{HifiRoomTwinLasers,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
         // {RoomType::EnemyRoom, {{HifiRoomCannons},{}}},
         {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
-        {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
+        {RoomType::TreasureRoom, {{TreasureRoomWish},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},

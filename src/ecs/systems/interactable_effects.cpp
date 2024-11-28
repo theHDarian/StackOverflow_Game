@@ -284,6 +284,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 		if (object.item == WishGranter) {
 			grantWish( player, renderer, reaction.choice, soundPlayer);
 			object.dialogueCount++;
+			RenderRequest& req = registry.renderRequests.get(reaction.object);
+			req.texture_name = "wishGranter_granted.png";
+			req.used_effect = EFFECT_ASSET_ID::TEXTURED;
 		}
 		if (object.item == Baru) {
 			int currentDialogue = object.dialogueCount;

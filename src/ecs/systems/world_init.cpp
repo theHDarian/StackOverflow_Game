@@ -339,7 +339,7 @@ Entity createBaru(RenderSystem *renderer, vec2 pos)
 
 Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "WishGranter.png", vec2(200, 200), vec2(0, 0), 0);
+	auto entity = createProp3D( renderer, pos, "wishGranter", vec2(132, 200), vec2(0, 0), 0, ANIMATE);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "WishGranter";
 	object.item = InteractableItem::WishGranter;
@@ -347,6 +347,9 @@ Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 	AABBCollider &aabb = registry.aabbs.emplace(entity);
 	aabb.topLeft = vec2(-100, -150);
 	aabb.bottomRight = vec2(100, 150);
+	Animation &a = registry.animations.emplace(entity);
+	a.max_frames = 4;
+	a.animation_countdown_base = 200;
 
 	return entity;
 }
@@ -500,7 +503,7 @@ Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 s
 
 
 // For creating side-on props with a wall (like pop console or tree)
-Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset) {
+Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect) {
 	Entity e = Entity();
 
 	Motion& m = registry.motions.emplace(e);
@@ -518,7 +521,7 @@ Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2
 	registry.renderRequests.insert(
 		e,
 		{ filename,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 effect,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	return e;
 }
