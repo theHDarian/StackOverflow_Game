@@ -478,10 +478,11 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
+			PlayerBullet &bullet = registry.playerBullets.get(entity);
 			if (registry.walls.has(entity_other)) {
 				Motion& motion = registry.motions.get(entity);
 				WallCollider& wall = registry.walls.get(entity_other);
-				if (registry.playerBullets.get(entity).bulletBounce > 0) {
+				if (bullet.bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
 					vec2 a = motion.position - wall.startPosition;
 					vec2 b = wall.endPosition - wall.startPosition;
@@ -493,7 +494,8 @@ void WorldSystem::handleCollisions() {
 					// Assumes bullet flies towards facing direction
 					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
-					registry.playerBullets.get(entity).bulletBounce -= 1;
+					bullet.bulletBounce -= 1;
+					bullet.bulletRange = getModifiedValue(BulletRange, PlayerBullet().bulletRange); //refresh range
 					registry.ignores.get(entity).clear();
 				}
 				else {

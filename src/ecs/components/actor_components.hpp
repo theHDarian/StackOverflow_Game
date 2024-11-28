@@ -255,7 +255,7 @@ struct PlayerBullet {
     float damage = 10;
     float bulletSpeed = 400;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange = 10000;
+    float bulletRange = 6000;
     // Player bullet only scale in all directions?
     float bulletSize = 20;
     int bulletPierce = 0;
