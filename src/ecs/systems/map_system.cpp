@@ -345,7 +345,7 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,false);
+        map.currRoom.preset = getRoomPreset(RoomType::BossRoom,false);
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
         map.currRoom.type = RoomType::RestRoom;
@@ -355,7 +355,7 @@ void MapSystem::newMap()
         // createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
-        createWishGranter(renderer, vec2(500,500));
+        //createWishGranter(renderer, vec2(500,500));
     }
 }
 

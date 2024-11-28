@@ -112,4 +112,6 @@ struct UIRequest {
 
 struct Button {
 	float padding = 15.f;
+	vec2 buttonSize = vec2(0);
+	vec2 position = vec2(0);
 };

@@ -880,6 +880,15 @@ void RenderSystem::drawGameUI() {
 	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
+	for (Entity& entity : registry.bosses.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
+			drawHPbar(entity, projection, view);
+		}
+	}
+
 	for (Entity& entity : registry.gameUIs.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
@@ -1617,6 +1626,9 @@ void RenderSystem::drawHPbar(Entity& entity, const mat4& projection, const mat4&
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 
 	mat4 transform = createFollowCameraModel(HPBarMotion, vec2(0));
+	if (registry.bosses.has(entity)) {
+		transform = createNormalModel(HPBarMotion, vec2(0));
+	}
 
 	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
 	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
