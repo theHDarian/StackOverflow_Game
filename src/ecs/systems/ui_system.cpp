@@ -55,7 +55,10 @@ void UISystem::step(float elapsed_ms) {
 		registry.renderRequests.get(stackAddBubble).show = false;
 		registry.renderRequests.get(stackAddTail).show = false;	
 		registry.renderRequests.get(controlsGuide).show = false;
+
+		// feels like should be unnecessary, but because of early reset below, must do this
 		gameState.gamePaused = false;
+		gameState.gameOver = false;
 	}
 
 	// check: should menu be opened?
@@ -64,7 +67,7 @@ void UISystem::step(float elapsed_ms) {
 		registry.activeMenus.emplace(registry.menus.entities[MenuType::TitleMenu]);
 		ioState.activeMenu++;
 	}
-	if (gameState.gamePaused && !registry.activeMenus.has(registry.menus.entities[MenuType::PauseMenu])) {
+	if (gameState.gamePaused && !gameState.gameOver && !registry.activeMenus.has(registry.menus.entities[MenuType::PauseMenu])) {
 		registry.activeMenus.emplace(registry.menus.entities[MenuType::PauseMenu]);
 		ioState.activeMenu++;
 		//std::cout << "pause meny!" << std::endl;
@@ -150,8 +153,6 @@ void UISystem::step(float elapsed_ms) {
 					else {
 						ioState.shouldEnd = true;
 					}
-					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
-					ioState.activeMenu--;
 				}
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu)
 				{
@@ -174,6 +175,9 @@ void UISystem::step(float elapsed_ms) {
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::ControlsMenu) {
 					// only one choice
 					registry.renderRequests.get(controlsGuide).show = false;
+				}
+
+				if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type != MenuType::PauseMenu || clickedButtonIndex != 0) {
 					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
 					ioState.activeMenu--;
 				}
