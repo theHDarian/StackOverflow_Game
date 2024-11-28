@@ -73,6 +73,18 @@ void UISystem::step(float elapsed_ms) {
 		//std::cout << "pause meny!" << std::endl;
 	}
 
+	// need to make sure when unpauses, all current menus closed
+	if (!gameState.gamePaused && ioState.activeMenu > -1 && registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu) {
+		registry.activeMenus.clear();
+		ioState.activeMenu = -1;
+
+		// clear current menu choices
+		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+			Entity e = registry.menuChoices.entities[i];
+			registry.deleteEntityAndRelatedEntities(e);
+		}
+	}
+
 	if (ioState.activeMenu > -1) {
 		if (registry.menuChoices.components.size() == 0) {
 			Menu& menu = registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]);
