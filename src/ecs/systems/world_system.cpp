@@ -435,6 +435,7 @@ void WorldSystem::handleCollisions() {
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 					vec2 n = glm::normalize(a - c);
 
+					motion.position -= normalize(motion.velocity) * max(motion.scale.x,motion.scale.y)/2.f;
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
 					motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 
@@ -489,6 +490,7 @@ void WorldSystem::handleCollisions() {
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 					vec2 n = glm::normalize(a - c);
 
+					motion.position -= normalize(motion.velocity) * max(motion.scale.x,motion.scale.y)/2.f;
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
 					motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 					// Assumes bullet flies towards facing direction
