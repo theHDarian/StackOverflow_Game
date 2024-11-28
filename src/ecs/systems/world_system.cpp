@@ -136,7 +136,6 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	fprintf(stderr, "Loaded music\n");
 	this->soundPlayer = soundPlayer_arg;
 
-
 	// Set all states to default
 	GameState& gameState = registry.gameStates.components[0];
 	gameState.gameOver = false;
@@ -163,16 +162,12 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 	createRoomBounds(renderer, roomCenter, currRoom.preset.roomSize);
 
-	//Entity title = createSkipDialogue();
-	//registry.dialogueRequests.emplace(title);
-
 	// mock interactable call instead of proper ui for now
 	skipDialogue = createSkipDialogue();
-	//registry.dialogueRequests.emplace(skipDialogue);
 
-	//Entity skipDialogue2 = createSkipDialogue();
-	//registry.dialogueRequests.emplace(skipDialogue2);
 	registry.cameras.emplace(player);
+
+	registry.gameReports.emplace(player);
 }
 #pragma endregion
 
@@ -362,6 +357,12 @@ void WorldSystem::restartGame() {
 	Entity player = resetPlayer();
 	StackUI& stackUI = registry.stackUI.components[0];
 	stackUI.updateStackUISize(registry.stackCompile.get(player).baseStackSize);
+
+	// reset report
+	GameReport& report = registry.gameReports.get(player);
+	report.gameStartTime = Clock::now();
+	report.roomsCleared = 0;
+	report.name = std::to_string(Random::Int(1024));
 }
 
 // Compute collisions between entities

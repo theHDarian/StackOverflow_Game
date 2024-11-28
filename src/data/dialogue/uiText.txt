@@ -5,13 +5,13 @@
 UI ControlsGuide
 Controls:\n
 [WASD] to move
-[SPACE]/[RMB] to dash
+[SPACE/RMB] to dash
 [LMB] to shoot
 [E] to progress dialogue
 [ESC] to pause
 [R] to return to title
 [L] to leave game
-[=/-] to increase/decrease volume
+[=/-] to increase & decrease volume
 [C] to toggle collider visuals
 [F] to toggle FPS counter
 

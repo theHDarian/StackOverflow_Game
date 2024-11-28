@@ -174,6 +174,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     if (map.currRoom.type != RoomType::TutorialRoom1) {
         map.roomsTraversed++;
+        registry.gameReports.components[0].roomsCleared++;
     }
 
     //update Map Region

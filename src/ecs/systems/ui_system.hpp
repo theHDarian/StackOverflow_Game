@@ -97,5 +97,7 @@ private:
     Entity createRoomCounter();
     Entity createButton(std::string label, vec2 position, vec2 scale);
 
+    std::string reportStats();
+
     SoundSystem* soundSystem;
 };

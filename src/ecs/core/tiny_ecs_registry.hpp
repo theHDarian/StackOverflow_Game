@@ -101,6 +101,7 @@ public:
 	ComponentContainer<UIButton> buttons;
 	ComponentContainer<Menu> menus;
 	ComponentContainer<ActiveMenu> activeMenus;
+	ComponentContainer<GameReport> gameReports;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -193,6 +194,7 @@ public:
 		registry_list.push_back(&buttons);
 		registry_list.push_back(&menus);
 		registry_list.push_back(&activeMenus);
+		registry_list.push_back(&gameReports);
 	}
 
 	void clear_all_components() {

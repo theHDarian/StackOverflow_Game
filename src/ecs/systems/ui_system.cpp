@@ -61,6 +61,17 @@ void UISystem::step(float elapsed_ms) {
 		gameState.gameOver = false;
 	}
 
+	if (gameState.gameOver) {
+		std::string report = "\n\n" + reportStats();
+		std::vector<std::string> reportTokenized = getTokenizedText(report);
+
+		if (uiTexts.count(registry.gameReports.components[0].name) == 0) {
+			uiTexts.insert({ registry.gameReports.components[0].name, reportTokenized });
+			TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
+			text.tokenizedText.insert(text.tokenizedText.end(), reportTokenized.begin(), reportTokenized.end());
+		}
+	}
+
 	// check: should game be paused right now?
 	// if already paused, then close latest menu
 	// if latest menu is the pause menu, then unpause
@@ -429,9 +440,6 @@ bool UISystem::init(GLFWwindow* window) {
 	loadText();
 	loadBulletEffects();
 	
-	
-	
-	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
@@ -443,6 +451,7 @@ bool UISystem::init(GLFWwindow* window) {
 	titleScreen = createTitleScreen();
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 200.f));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
+	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
@@ -1188,11 +1197,12 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	text.bottomLeftBound = { 0, 0 };
 
 	WindowState& windowState = registry.windowStates.components[0];
-	text.scale = 1.2;
-	text.x = windowState.width - scale.x + 25;
-	text.y = windowState.height - position.y + text.scale * DEFAULT_FONT_SIZE / 2.f;
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
-	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.scale = 0.7f;
+	text.x = position.x - scale.x / 2.f + 25;
+	text.y = position.y + scale.y / 2.f - 25.f - text.scale * DEFAULT_FONT_SIZE;
+	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
+	text.bottomLeftBound = { 0, 0 + 25 };
+
 	text.tokenizedText = uiTexts["GameOver"];
 
 	UIBorder& border = registry.uiBorders.emplace(entity);
@@ -1567,5 +1577,13 @@ void UISystem::loadBulletEffects() {
 			std::cout << tooltip << std::endl;
 		}
 	}
+}
+
+std::string UISystem::reportStats() {
+	GameReport& report = registry.gameReports.components[0];
+	std::stringstream reportString;
+	reportString << "Rooms Cleared: " << report.roomsCleared << "\nSystem Runtime: " << std::fixed << std::setprecision(2) 
+		<< (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - report.gameStartTime)).count() / 1000 / 1000.f << "s";
+	return reportString.str();
 }
 

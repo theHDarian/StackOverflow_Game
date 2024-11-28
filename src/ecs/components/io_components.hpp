@@ -58,3 +58,9 @@ struct GameState {
 struct Camera {
 	float zoom = 1.0f;
 };
+
+struct GameReport {
+	int roomsCleared = 0; // in case differ from map's, i.e. each region's counts resets
+	std::chrono::steady_clock::time_point gameStartTime; // different from window, used to calculate run time
+	std::string name;
+};
