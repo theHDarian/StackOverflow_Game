@@ -153,24 +153,24 @@ struct StackCompile {
     };
 
     bool add(BulletStackEffect effect) {
+    	if (effect.type == Lightning) {
+	    if (currStack.size() < 1) return true;
+	    if (effect.effectCalc == Additive) {
+		std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+	    }
+	    else {
+		std::random_device rd;
+		std::mt19937 g(rd());
+		std::shuffle(currStack.begin(), currStack.end(), g);
+	    }
+    	    return true;
+        }
         int maxStackSize = (baseStackSize + additives[PlayerStackSize]) * multiplicatives[PlayerStackSize];
         if (currStack.size() >= maxStackSize) {
             return false;
         }
         if (effect.type == Inert || effect.type == Key) {
             currStack.push_back(effect);
-            return true;
-        }
-        if (effect.type == Lightning) {
-            if (currStack.size() < 1) return true;
-            if (effect.effectCalc == Additive) {
-                std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
-            }
-            else {
-                std::random_device rd;
-                std::mt19937 g(rd());
-                std::shuffle(currStack.begin(), currStack.end(), g);
-            }
             return true;
         }
         if (effect.effectCalc == Additive) {

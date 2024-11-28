@@ -402,8 +402,8 @@ Entity createGardener(RenderSystem *renderer, vec2 pos)
 	o.baseOffset = 20;
 
 	Animation &a = registry.animations.emplace(gardener);
-	a.max_frames = 4;
-	a.animation_countdown_base = 300;
+	a.max_frames = 25;
+	a.animation_countdown_base = 50;
 
 	registry.renderRequests.insert(
 		gardener,
