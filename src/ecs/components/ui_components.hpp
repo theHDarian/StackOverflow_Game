@@ -118,7 +118,8 @@ struct Button {
 
 enum MenuType {
 	TitleMenu,
-	PauseMenu
+	PauseMenu,
+	ControlsMenu
 };
 
 struct Menu {

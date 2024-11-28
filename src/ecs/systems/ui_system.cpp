@@ -51,10 +51,11 @@ void UISystem::step(float elapsed_ms) {
 		}
 
 		registry.activeMenus.clear();
-
 		ioState.activeMenu = -1;
 		registry.renderRequests.get(stackAddBubble).show = false;
 		registry.renderRequests.get(stackAddTail).show = false;	
+		registry.renderRequests.get(controlsGuide).show = false;
+		gameState.gamePaused = false;
 	}
 
 	// check: should menu be opened?
@@ -149,11 +150,16 @@ void UISystem::step(float elapsed_ms) {
 					else {
 						ioState.shouldEnd = true;
 					}
+					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+					ioState.activeMenu--;
 				}
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu)
 				{
 					if (clickedButtonIndex == 0) {
-						std::cout << "show controls!" << std::endl;
+						//std::cout << "show controls!" << std::endl;
+						registry.activeMenus.emplace(registry.menus.entities[MenuType::ControlsMenu]);
+						ioState.activeMenu++;
+						registry.renderRequests.get(controlsGuide).show = true;
 					}
 					else if (clickedButtonIndex == 1) {
 						ioState.shouldRestart = true;
@@ -165,14 +171,18 @@ void UISystem::step(float elapsed_ms) {
 						//std::cout << "quit!" << std::endl;
 					}
 				}
+				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::ControlsMenu) {
+					// only one choice
+					registry.renderRequests.get(controlsGuide).show = false;
+					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+					ioState.activeMenu--;
+				}
 
 				// clear current menu choices
 				for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
 					Entity e = registry.menuChoices.entities[i];
 					registry.deleteEntityAndRelatedEntities(e);
 				}
-				registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
-				ioState.activeMenu--;
 			}
 		}
 	}
@@ -315,8 +325,8 @@ void UISystem::step(float elapsed_ms) {
 
 	if (!gameState.gameOver) {
 		// toggling basic menu uis on/off
-		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused;
-		registry.renderRequests.get(controlsGuide).show = gameState.gamePaused;
+		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused && !registry.renderRequests.get(controlsGuide).show;
+		registry.renderRequests.get(controlsGuide).show = registry.renderRequests.get(controlsGuide).show && gameState.gamePaused;
 		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
 		registry.renderRequests.get(dialogueReminder).show = gameState.dialogueScene;
 
@@ -383,7 +393,7 @@ bool UISystem::init(GLFWwindow* window) {
 	loadBulletEffects();
 	
 	
-	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2 + wS.height / 8), vec2(wS.width, wS.height / 4));
+	
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
@@ -395,6 +405,7 @@ bool UISystem::init(GLFWwindow* window) {
 	roomCounter = createRoomCounter();
 	titleScreen = createTitleScreen();
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 200.f));
+	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
@@ -1027,10 +1038,10 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.color = vec3(1, 1, 1);
 
 	WindowState& windowState = registry.windowStates.components[0];
-	text.x = windowState.width - scale.x + 25;
-	text.y = windowState.height - position.y + scale.y / 4;
 	text.scale = 0.5;
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
+	text.x = position.x - scale.x/2.f + 25;
+	text.y = position.y + scale.y / 2.f - 25.f - text.scale * DEFAULT_FONT_SIZE;
+	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
 	text.tokenizedText = uiTexts["ControlsGuide"];
 
@@ -1038,6 +1049,12 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	border.borderColour = vec3(1.f);
 	border.border = UIBorderType::Outlined;
 	border.borderThickness = 10.f;
+
+	Menu& menu = registry.menus.emplace(entity);
+	menu.options = { "Back" };
+	menu.startPos = { position.x, position.y + scale.y / 2.f - 50 };
+	menu.offset = { 0, 50 + 30 };
+	menu.type = MenuType::ControlsMenu;
 
 	return entity;
 }
@@ -1092,7 +1109,7 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 
 	Menu& menu = registry.menus.emplace(entity);
 	menu.options = { "Controls", "Title", "Quit"};
-	menu.startPos = { text.x, text.y - 50 };
+	menu.startPos = { text.x,  windowState.height - text.y + 100};
 	menu.offset = { 0, 50 + 30 };
 	menu.type = MenuType::PauseMenu;
 
