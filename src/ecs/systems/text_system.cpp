@@ -37,7 +37,7 @@ int TextSystem::initFreetypeLib() {
     }
 
     // find path to font
-    std::string font_name = font_path("ByteBounce.ttf").c_str();
+    std::string font_name = font_path(FONT_FILE).c_str();
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
@@ -161,6 +161,22 @@ int TextSystem::initFreetypeLib() {
     return 1;
 }
 
+// for a single line?
+float TextSystem::getTextLength(std::string text, float scale) {
+    //std::string::const_iterator c;
+    //float length = 0;
+    //for (c = text.begin(); c != text.end(); c++)
+    //{
+    //    Character ch = Characters[*c];
+    //    length += (ch.Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
+    //}
+    //Character lastChar = Characters[text.at(text.length() - 1)];
+    //return length - (lastChar.Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR + (lastChar.Size.x) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
+
+    // if just monospaced font, then no need to go through every letter
+    return (text.length() - 1) * (Characters[65].Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR + Characters[65].Size.x * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
+}
+
 /*
 ref: https://learnopengl.com/In-Practice/Text-Rendering
 optimizations made based on: https://www.youtube.com/watch?v=S0PyZKX4lyI
@@ -179,7 +195,7 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
     vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment, bool isUI) {
     // temp put here to readjust sizes btween diff fonts
     scale *= FONT_ADJUST_FACTOR;
-    scale *= 48.0f / 256.0f; // so letters still look as same as before after changing texture sizes
+    scale *=DEFAULT_FONT_SIZE / 256.0f; // so letters still look as same as before after changing texture sizes
 
     float copyX = x;
 
@@ -192,12 +208,13 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
+
     Motion motion = Motion(); // placeholder for text motion info
 
     for (std::string text : tokenizedText) {
 
         // approximate next word length and compare with text box size
-        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x + 0.5f) * text.length() * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
+        if ((x + (Characters[65].Size.x + Characters[65].Bearing.x) * text.length() * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
             y -= ((Characters[65].Size.y)) * 2.0 * scale;
             x = copyX;
         }
@@ -216,6 +233,7 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
             else {
                 float xpos = x + ch.Bearing.x * scale;
                 float ypos = y - (256 - ch.Bearing.y) * scale;
+                
 
                 if (*c == ' ') { // skip "blank space characters" by not actually drawing them
                     x += (ch.Advance >> 6) * scale;
@@ -233,7 +251,6 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
                     transforms[currentIndex] = createNormalModel(motion, vec2(0));
                 }
                 else {
-                    // need to do more stuff to make position work, unfortunately...
                     WindowState& windowState = registry.windowStates.components[0];
                     transforms[currentIndex] = createFollowCameraModelText(motion, vec2(0));
                 }
@@ -289,7 +306,7 @@ std::vector<std::string> getTokenizedText(std::string text) {
     std::string str = "";
     for (char c : text) {
         if (c == ' ' && str.length() > 0) {
-            tokenizedText.push_back(str + space); // for some reason, need to add 2 spaces
+            tokenizedText.push_back(str + space);
             str = "";
         }
         else if (c == '\n') {
@@ -310,8 +327,19 @@ void TextSystem::renderText(std::string text, float x, float y, float scale, glm
 {
     // consider saving this in the future w/ a dirty bit if it gets expensive
     // or consider a universal string to tokenized string map w/ hash, but would hashing that also get expensive?
+
+    float textLength = 0;
+
+    // Currently alignment only works for a single line of text, not tokenized
+    if (alignment == TextAlignment::CenteredAlign) {
+        textLength = getTextLength(text, scale);
+    }
+    else if (alignment == TextAlignment::RightAlign) {
+        textLength = getTextLength(text, scale) * 2.f;
+    }
+
     std::vector<std::string> tokenizedText = getTokenizedText(text);
-    renderText(tokenizedText, x, y, scale, color, topRightBound, bottomLeftBound, alignment, isUI);
+    renderText(tokenizedText, x - textLength / 2.f, y, scale, color, topRightBound, bottomLeftBound, alignment, isUI);
 }
 
 void TextSystem::renderMenuUIText() {

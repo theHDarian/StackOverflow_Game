@@ -111,5 +111,23 @@ struct UIRequest {
 };
 
 struct Button {
-	float padding = 30.f;
+	float padding = 15.f;
+	vec2 buttonSize = vec2(0);
+	vec2 position = vec2(0);
+};
+
+enum MenuType {
+	TitleMenu,
+	PauseMenu
+};
+
+struct Menu {
+	std::vector<std::string> options;
+	vec2 startPos;
+	vec2 offset;
+	MenuType type;
+};
+
+struct ActiveMenu {
+
 };

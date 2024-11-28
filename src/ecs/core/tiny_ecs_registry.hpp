@@ -99,6 +99,8 @@ public:
 	ComponentContainer<RoomSizeScaled> roomSizeScaleds;
 	ComponentContainer<UIRequest> uiRequests;
 	ComponentContainer<Button> buttons;
+	ComponentContainer<Menu> menus;
+	ComponentContainer<ActiveMenu> activeMenus;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -189,6 +191,8 @@ public:
 		registry_list.push_back(&roomSizeScaleds);
 		registry_list.push_back(&uiRequests);
 		registry_list.push_back(&buttons);
+		registry_list.push_back(&menus);
+		registry_list.push_back(&activeMenus);
 	}
 
 	void clear_all_components() {
