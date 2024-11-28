@@ -794,13 +794,18 @@ void RenderSystem::drawGameElements()
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
 			drawHPbar(entity, projection, view);
 			BossEnemy& boss = registry.bosses.get(entity);
-			TextRenderRequest& textRequest = registry.textRenderRequests.get(entity);
-			textRequest.text = boss.name;
-			textRequest.x = windowState.width / 2,
-			textRequest.y = windowState.height * 0.94f;
-			textRequest.alignment = TextAlignment::CenteredAlign;
-			textRequest.scale = 1;
-			textRequest.color = vec3(1, 1, 1);
+			if (!registry.textRenderRequests.has (entity)) {
+				GameUIText& text = registry.gameUITexts.emplace(entity);
+				TextRenderRequest& textRequest = registry.textRenderRequests.emplace(entity);
+				textRequest.text = boss.name;
+				textRequest.x = windowState.width / 2,
+				textRequest.y = windowState.height * 0.04f;
+				textRequest.alignment = TextAlignment::CenteredAlign;
+				textRequest.scale = 0.4f;
+				textRequest.color = vec3(1, 1, 1);
+				textRequest.bottomLeftBound = vec2(0);
+				textRequest.topRightBound = vec2(windowState.width, windowState.height);
+			}
 
 		}
 
