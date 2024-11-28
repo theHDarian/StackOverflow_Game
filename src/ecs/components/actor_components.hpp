@@ -299,6 +299,9 @@ enum EnemyType {
     HifiEnemyTrail,
     HifiEnemyCannon,
     HifiEnemyChargerHard,
+    HifiEnemySniperHard,
+    HifiEnemyTrailHard,
+    HifiEnemyCannonHard,
 };
 
 enum class EnemyAttackPattern {

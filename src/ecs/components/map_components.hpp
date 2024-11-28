@@ -33,7 +33,6 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
 {
     const int bossRoomNum = 12;
     if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
-        //Make every 5 rooms the boss room
         return BossRoom;
     }
     if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled

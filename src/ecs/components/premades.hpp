@@ -1884,6 +1884,64 @@ struct EnemyHifiSniper : Enemy
 	};
 };
 
+struct EnemyHifiSniperHard : Enemy
+{
+	/**
+	 * Lighter Variant of Sniper - more shots, less bullets, more speed
+	 */
+	const AttackData sniperShot{
+		EnemyAttackPattern::BURST,
+		TRIANGLE,
+		{APRounds, dmgUpM, bulletRangeUpM},
+		blunt,
+		3,
+		0,
+		{30, 20},
+		600,
+		10000,
+		{100, 0},
+		0,
+		2,
+		0};
+	const AttackData spray{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{numBulletsUpA,spreadUpA},
+		blunt,
+		3,
+		M_PI/12,
+		{30, 20},
+		200,
+		2000,
+		{400, -M_PI/2},
+		0,
+		0,
+		0};
+
+	EnemyPattern random = {"STATIONARY", EnemyBehavior::RANDOM, {}, 0, 1500.f, 1500.f, {{ReactionType::PLAYER_CLOSE,1},{ReactionType::DURATION,0}}, 0, true, 0, 3000.f, sniperShot};
+	EnemyPattern random2 = {"STATIONARY", EnemyBehavior::CHARGING, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,2}}, 2, true, 0, 0.f, NoAttack};
+	EnemyPattern random3 = {"STATIONARY", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,3}}, 3, true, 0, 0.f, NoAttack};
+	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0, 1000.f, spray};
+	
+
+	EnemyHifiSniperHard()
+	{
+		maxHealth = 60;
+		currHealth = maxHealth;
+		enemyPatterns = {random,random2, random3,random4};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_000_hard.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({160.f / 2.f, 160.f / 2.f});
+		rotatePower = 90.f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 1.5;
+	};
+};
+
 
 struct EnemyHifiCharger : Enemy
 {
@@ -2043,6 +2101,91 @@ struct EnemyHifiTrail : Enemy
 	};
 };
 
+struct EnemyHifiTrailHard : Enemy
+{
+	/**
+	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
+	 */
+	const AttackData snailTrail{
+	EnemyAttackPattern::TRAIL,
+	CIRCLE,
+	{ },
+	buzz,
+	1,
+	0,
+	{20, 20},
+	0,
+	8000,
+	{0, 0},
+	0,
+	0,
+	0,
+	EnemyBulletDeath::CLUSTER
+	};
+
+	const AttackData spiral{
+	EnemyAttackPattern::RADIAL,
+	TRIANGLE,
+	{numBulletsUpA, dmgDownM},
+	blunt,
+	12,
+	0.0,
+	{20, 20},
+	400,
+	2000,
+	{400, -2 * M_PI / 3.0},
+	0,
+	0,
+	0};
+
+	EnemyPattern rotateState = { 
+		"Follow Player", 
+		EnemyBehavior::RANDOM, 
+		{}, 
+		0, 
+		4000.f, 
+		4000.f, 
+		{{ReactionType::PLAYER_CLOSE,1},}, 
+		0, 
+		true, 
+		0.f, 500.f, snailTrail };
+
+	EnemyPattern chargingState = {
+		"CHARGE", 
+		EnemyBehavior::CHARGING, 
+		{}, 0, 500.f, 500.f, {{ReactionType::DURATION,2}}, 2, true, 0.f, 0.f, snailTrail};
+
+
+	EnemyPattern chargingState2 = {
+		"CHARGE", 
+		EnemyBehavior::CHARGING, 
+		{}, 0, 1000.f, 1000.f, {{ReactionType::PLAYER_CLOSE,3},{ReactionType::DURATION,0}}, 0, true, 0.f, 0.f, snailTrail};
+
+	EnemyPattern shootingState = {
+		"ROTATE", 
+		EnemyBehavior::ROTATE_IN_PLACE, 
+		{}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 250.f, 250.f, spiral};
+
+	EnemyHifiTrailHard()
+	{
+		maxHealth = 170;
+		currHealth = maxHealth;
+
+		enemyPatterns = { rotateState,chargingState,chargingState2, shootingState };
+		rotationBehaviour = EnemyRotationBehavior::SPIN;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_010_hard.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 4.0;
+		rotatePower = 0.5;
+	};
+};
+
 struct EnemyHifiCannon : Enemy
 {
 	const AttackData cannonShot{
@@ -2096,6 +2239,70 @@ struct EnemyHifiCannon : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({240.f / 2.f, 240.f / 2.f});
+		rotatePower = 0.5f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 0.3;
+	};
+};
+
+struct EnemyHifiCannonHard : Enemy
+{
+	/**
+	 * More glass cannon, destructive variant that fills up the player stack on hit, spawning minions when player gets close
+	 */
+	const AttackData cannonShot{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{SniperPower,SniperSpeed,SniperPower,sizeUpM, sizeUpM,playerSpeedDownM, playerSpeedDownM},
+		{blunt},
+		2,
+		M_PI/2,
+		{120, 120},
+		60,
+		10000,
+		{400, -M_PI/4},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER};
+	const AttackData spawning{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		4,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::HardEnemyBoid
+		};
+
+
+	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,1},{ReactionType::PLAYER_CLOSE,4}}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,2}}, 2, false, 0.f, 0.f, NoAttack};
+	EnemyPattern backUp = {"RECOIL", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,3}}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, cannonShot};
+	EnemyPattern spawn = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,5}}, 5, true, 0.f, 200.f, spawning};
+	EnemyPattern rest = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION,0}}, 0, false, 0.f, 2000.f, NoAttack};
+
+	EnemyHifiCannonHard()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {random1,chargingState, backUp,shootCannon,spawn,rest};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_003_hard.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({300.f / 2.f, 300.f / 2.f});
 		rotatePower = 0.5f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 0.3;
