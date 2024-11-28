@@ -181,6 +181,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         map.currRegion = Biology; //Go to bio region at end of tutorial
     } else if (map.currRoom.type == BossRoom && map.currRegion == Biology) {
         map.currRegion = Physics;
+        map.roomsTraversed = 1; //reset rooms traversed to reset difficulty for region
     }
 
     SoundType old_s = roomTypeToMusic.at(map.currRoom.type);

@@ -139,6 +139,77 @@ void PhysicsSystem::step(float elapsed_ms)
 			motion.position = closestIntersection + bounceBack;
 		}
 	}
+	//player bullet vs wall check
+	for(uint i = 0; i< registry.playerBullets.size(); i++)
+	{
+		Entity entity = registry.playerBullets.entities[i];
+		Motion& motion = motion_registry.get(entity);
+		// check if dashing entity will intersect a wall
+		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
+		vec2 endPosition = motion.position;
+		bool hasCollided = false;
+		vec2 closestIntersection;
+		for (uint j = 0; j < walls.components.size(); j++) {
+			WallCollider& wall = walls.components[j];
+			vec2 intersectionPoint;
+			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
+				//get intersection point of the closest wall
+				if (!hasCollided || glm::distance(intersectionPoint,startPosition) < glm::distance(closestIntersection,startPosition)) {
+					closestIntersection = intersectionPoint;
+					hasCollided = true;
+				}
+			}
+		}
+
+		if (hasCollided) { //stop at closest wall
+			float radius = 5.f;
+			if (registry.circleColliders.has(entity)) {
+				radius = registry.circleColliders.get(entity).radius;
+			}
+			vec2 bounceBack = vec2(0);
+			if ((motion.velocity - motion.veer * step_seconds) != vec2(0)) {
+				bounceBack = glm::normalize(-(motion.velocity - motion.veer * step_seconds)) * radius/2.f;
+			}
+			motion.position = closestIntersection + bounceBack;
+		}
+	}
+
+	//enemy bullet vs wall check
+	for(uint i = 0; i< registry.enemyBullets.size(); i++)
+	{
+		Entity entity = registry.enemyBullets.entities[i];
+		Motion& motion = motion_registry.get(entity);
+		if (registry.lasers.has(entity)) continue;
+		// check if dashing entity will intersect a wall
+		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
+		vec2 endPosition = motion.position;
+		bool hasCollided = false;
+		vec2 closestIntersection;
+		for (uint j = 0; j < walls.components.size(); j++) {
+			WallCollider& wall = walls.components[j];
+			vec2 intersectionPoint;
+			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
+				//get intersection point of the closest wall
+				if (!hasCollided || glm::distance(intersectionPoint,startPosition) < glm::distance(closestIntersection,startPosition)) {
+					closestIntersection = intersectionPoint;
+				}
+				hasCollided = true;
+			}
+		}
+
+		if (hasCollided) { //stop at closest wall
+			float radius = 5.f;
+			if (registry.circleColliders.has(entity)) {
+				radius = registry.circleColliders.get(entity).radius;
+			}
+			vec2 bounceBack = vec2(0);
+			if ((motion.velocity - motion.veer * step_seconds) != vec2(0)) {
+				bounceBack = glm::normalize(-(motion.velocity - motion.veer * step_seconds)) * radius/2.f;
+			}
+			 
+			motion.position = closestIntersection + bounceBack;
+		}
+	}
 
 
 	// Collision tests:

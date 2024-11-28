@@ -377,8 +377,8 @@ void ParticleSystem::render() {
 
     Frame& frame = registry.frames.components[0];
     if (frame.prevFrameBuffer != 0 ) {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, frame.prevFrameBuffer);
 
         if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE 
         && glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
