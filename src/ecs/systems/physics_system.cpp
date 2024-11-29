@@ -326,15 +326,15 @@ bool PhysicsSystem::AABBToCircle(Entity aabb, Entity circle) {
 	AABBCollider& ab = registry.aabbs.get(aabb);
 	CircleCollider& c = registry.circleColliders.get(circle);
 
-	vec2 topLeft = mA.position + ab.topLeft;
-	vec2 topRight = mA.position + ab.topLeft * vec2(-1, 1);
-	vec2 bottomLeft = mA.position + ab.bottomRight * vec2(-1, 1);
-	vec2 bottomRight = mA.position + ab.bottomRight;
+	vec2 topLeft = mB.position - mA.position + ab.topLeft;
+	vec2 topRight = mB.position - mA.position + ab.topLeft * vec2(-1, 1);
+	vec2 bottomLeft = mB.position - mA.position + ab.bottomRight * vec2(-1, 1);
+	vec2 bottomRight = mB.position - mA.position + ab.bottomRight;
 
-	if (glm::dot(mB.position - topLeft, mB.position - topLeft) < c.radius * c.radius) return true;
-	if (glm::dot(mB.position - topRight, mB.position - topRight) < c.radius * c.radius) return true;
-	if (glm::dot(mB.position - bottomLeft, mB.position - bottomLeft) < c.radius * c.radius) return true;
-	if (glm::dot(mB.position - bottomRight, mB.position - bottomRight) < c.radius * c.radius) return true;
+	if (glm::dot(topLeft, topLeft) < c.radius * c.radius) return true;
+	if (glm::dot(topRight, topRight) < c.radius * c.radius) return true;
+	if (glm::dot(bottomLeft, bottomLeft) < c.radius * c.radius) return true;
+	if (glm::dot(bottomRight, bottomRight) < c.radius * c.radius) return true;
 
 	if (!PointInAABB(mB.position, bottomRight + vec2(0, c.radius), topLeft + vec2(0, -c.radius))) return true;
 	if (!PointInAABB(mB.position, bottomRight + vec2(c.radius, 0), topLeft + vec2(-c.radius, 0))) return true;
@@ -479,9 +479,15 @@ bool PhysicsSystem::AABBToPoly(Entity aabb, Entity poly) {
 
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
-	if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[0], mB.angle), rotate(s.offsetVertices[s.offsetVertices.size() - 1], mB.angle))) return true;
-	for (uint i = 1; i < s.offsetVertices.size(); i++) {
-		if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[i], mB.angle), rotate(s.offsetVertices[i-1], mB.angle))) return true;
+	//if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[0], mB.angle), rotate(s.offsetVertices[s.offsetVertices.size() - 1], mB.angle))) return true;
+	//for (uint i = 1; i < s.offsetVertices.size(); i++) {
+	//	if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[i], mB.angle), rotate(s.offsetVertices[i-1], mB.angle))) return true;
+	//}
+
+	// Cheap hacky alternative, just check if a poly vertex is in AABB OR center is in AABB
+	if (!PointInAABB(vec2(0), offset + ab.bottomRight, offset + ab.topLeft)) return true;
+	for (uint i = 0; i < s.offsetVertices.size(); i++) {
+		if (!PointInAABB(rotate(s.offsetVertices[i], mB.angle), offset + ab.bottomRight, offset + ab.topLeft)) return true;
 	}
 	return false;
 }

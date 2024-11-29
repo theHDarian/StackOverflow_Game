@@ -882,7 +882,7 @@ void WorldSystem::enemyBulletDeath(Entity e) {
 		createEnemyBulletDeath(renderer, ebm.position, vec2( 1,-1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1, 1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1,-1), EnemyBulletDeath::CLUSTER);
-		soundPlayer->playExplosionSound(0);
+		//soundPlayer->playExplosionSound(0);
 		return;
 	}
 }
