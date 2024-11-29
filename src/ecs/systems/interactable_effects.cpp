@@ -25,11 +25,12 @@ void resetStack(Entity player, RenderSystem* renderer) {
         int i = 0;
         for (BulletStackEffect b : reg.currStack) {
             AttackData atkData = AttackData();
+			atkData.shape = EnemyBulletShape::RECTANGLE;
             atkData.defaultEffect = b;
             atkData.rareBulletEffects = {b};
-            atkData.speed = 300;
-            atkData.size *= 2;
-            atkData.bulletRange = 7500;
+            atkData.speed = 200;
+            atkData.size = vec2(60,30);
+            atkData.bulletRange = 9000;
             atkData.bulletBounce = 3;
             float angle = (2 * M_PI / size) * i;
             createEnemyBullet( renderer, registry.motions.get(player).position + 150.f * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
