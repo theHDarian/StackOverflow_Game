@@ -10,6 +10,27 @@
 #include "world_init.hpp"
 #include "premades.hpp"
 
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresets =
+	{
+		{
+			{EnemyType::HifiEnemySniper, {0.6f,0.5f}},
+			   {EnemyType::HifiEnemySniper, {0.4f,0.5f}},
+			   {EnemyType::HifiEnemySniper, {0.5f,0.5f}},
+			   {EnemyType::HifiEnemySniper, {0.5f,0.6f}},
+			   {EnemyType::HifiEnemySniper, {0.5f,0.4f}},
+		},
+	{
+			{EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
+			{EnemyType::HifiEnemyCannon, {0.9f,0.5f}},
+			{EnemyType::HifiEnemyCannon, {0.9f,0.8f}},
+			{EnemyType::HifiEnemyCannon, {0.1f,0.2f}},
+			{EnemyType::HifiEnemyCannon, {0.1f,0.5f}},
+			{EnemyType::HifiEnemyCannon, {0.1f,0.8f}},
+
+	},
+
+
+	};
 
 void resetStack(Entity player, RenderSystem* renderer) {
 
@@ -25,11 +46,12 @@ void resetStack(Entity player, RenderSystem* renderer) {
         int i = 0;
         for (BulletStackEffect b : reg.currStack) {
             AttackData atkData = AttackData();
+			atkData.shape = EnemyBulletShape::RECTANGLE;
             atkData.defaultEffect = b;
             atkData.rareBulletEffects = {b};
-            atkData.speed = 300;
-            atkData.size *= 2;
-            atkData.bulletRange = 7500;
+            atkData.speed = 200;
+            atkData.size = vec2(60,30);
+            atkData.bulletRange = 9000;
             atkData.bulletBounce = 3;
             float angle = (2 * M_PI / size) * i;
             createEnemyBullet( renderer, registry.motions.get(player).position + 150.f * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
@@ -89,6 +111,8 @@ void closeDoors (SoundSystem* soundPlayer) {
 			registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
 		}
 	}
+	map.currRoom.type = RoomType::EnemyRoom;
+	soundPlayer->playNextMusic();
 }
 
 void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
@@ -106,21 +130,27 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
     }
 }
 
+void spawnEnemies (SoundSystem* soundPlayer, std::vector<std::tuple<EnemyType,vec2>> enemies) {
+	Map& map = registry.maps.components[0];
+	closeDoors( soundPlayer);
+	map.currRoom.preset.enemies = enemies;
+}
+
 void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* soundPlayer) {
 	switch (choice) {
 		case 0: {
-			addEffect(player, {fireRateUpA, dmgUpM});
-			closeDoors( soundPlayer);
+			addEffect(player, {fireRateUpA, dmgUpM, numBulletsUpA });
 			Map& map = registry.maps.components[0];
 			map.currRoom.preset.enemies ={{EnemyType::EasyEnemySkull, {0.2f, 0.8f}},
 	 {EnemyType::EasyEnemySkull, {0.8f, 0.8f}},
 	 {EnemyType::EasyEnemySkull, {0.8f, 0.2f}},
 	 {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
-{EnemyType::TestRevampedEnemy, {0.3, 0.2}},
-{EnemyType::TestRevampedEnemy, {0.3, 0.4}},
-	 {EnemyType::EvilSnail, {0.5f, 0.5f}}
+{EnemyType::HifiEnemyCharger, {0.25f,0.5f}},
+{EnemyType::HifiEnemyCharger, {0.75f,0.5f}},
+
 			};
 			registry.invincibles.emplace(player);
+			closeDoors( soundPlayer);
 			break;
 		}
 		case 1: {
@@ -142,6 +172,7 @@ void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* 
 	}
 
 }
+
 
 void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
     // interactible object management placed here and hard coded for now
@@ -226,6 +257,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
 				addEffect(player, stack.stack);
 				object.dialogueCount++;
+				RenderRequest& req = registry.renderRequests.get(reaction.object);
+				req.texture_name = "push_console_pushed.png";
+				req.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			}
 		}
 
@@ -240,7 +274,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				req.texture_name = "HoneyCanisterEmpty.png";
 
 				Map& map = registry.maps.components[0];
-				map.currRoom.cleared = false;
+				closeDoors(soundPlayer);
 				map.currRoom.preset.enemies = {{EnemyType::TwoBee, {0.2f, 0.8f}},
 				{EnemyType::ThreeBee, {0.8f, 0.8f}},
 					{EnemyType::TwoBee, {0.8f, 0.2f}},
@@ -251,6 +285,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 		if (object.item == WishGranter) {
 			grantWish( player, renderer, reaction.choice, soundPlayer);
 			object.dialogueCount++;
+			RenderRequest& req = registry.renderRequests.get(reaction.object);
+			req.texture_name = "wishGranter_granted.png";
+			req.used_effect = EFFECT_ASSET_ID::TEXTURED;
 		}
 		if (object.item == Baru) {
 			int currentDialogue = object.dialogueCount;
@@ -280,6 +317,21 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					}
 					break;
 				}
+			}
+		}
+		if (object.item == OracleCrab) {
+			if (reaction.choice == 0) {
+				// DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+				// req.choice = 1;
+				object.dialogueCount = Random::Int(5) + 1;
+			}
+		}
+		if (object.item == InteractableItem::FightConsole) {
+			if (reaction.choice == 0) {
+				EffectStack& stack = registry.effectStacks.get(reaction.object);
+				addEffect(player, stack.stack);
+				object.dialogueCount++;
+				spawnEnemies( soundPlayer, fightConsolePresets[Random::Int(fightConsolePresets.size())]);
 			}
 		}
 	}

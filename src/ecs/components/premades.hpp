@@ -211,7 +211,7 @@ const BulletStackEffect dashCDRUpM = {
 const BulletStackEffect dashCDRDownA = {
 	PlayerDashCDR,
 	Additive,
-	-750,
+	-150,
 	"Dash Cooldown Down (A)",
 	""};
 
@@ -1606,7 +1606,7 @@ struct EnemyMediumBoar : Enemy
 
 	EnemyMediumBoar()
 	{
-		maxHealth = 250;
+		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleState, randomPosNoCharge};
 		sprite = {
@@ -2253,8 +2253,8 @@ struct EnemyHifiCannonHard : Enemy
 	const AttackData cannonShot{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{SniperPower,SniperSpeed,SniperPower,sizeUpM, sizeUpM,playerSpeedDownM, playerSpeedDownM},
-		{blunt},
+		{SniperPower,SniperSpeed},
+		{playerSpeedDownM},
 		2,
 		M_PI/2,
 		{120, 120},

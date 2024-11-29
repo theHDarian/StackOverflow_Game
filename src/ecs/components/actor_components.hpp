@@ -496,6 +496,7 @@ struct EnemyMovement {
 };
 
 struct BossEnemy {
+    std::string name;
 };
 
 struct BossParts {

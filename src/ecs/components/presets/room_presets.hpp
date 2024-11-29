@@ -496,7 +496,7 @@ const RoomPreset TreasureRoom2{
 const RoomPreset TreasureRoom3{
     {},
     {},
-    {{{PushConsole,{dmgUpM}}, {0.5f, 0.5f}}},
+    {{{FightConsole,{dmgUpM}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
@@ -838,17 +838,17 @@ const RoomPreset HifiRoomCannonBoids{
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
-        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomEmpty,RestRoomBibleTree, RestRoomEmpty},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestRoomEmpty,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestRoomEmpty,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
@@ -857,17 +857,17 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDire
     {DifficultyRegion::Intro,{
         // {RoomType::EnemyRoom, {{HifiRoomTwinLaserShurikens,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
         {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{}}},
-        {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty,RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener,RestRoomBibleTree,},{RestingRoomPop}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty, RestRoomBibleTree,},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
