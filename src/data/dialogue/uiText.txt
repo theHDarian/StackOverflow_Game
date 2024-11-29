@@ -16,7 +16,7 @@ Controls:\n
 [F] to toggle FPS counter
 
 UI GameOver
-Game Over \npress R to restart
+ERROR: StackOverflow \nPress R to reboot
 
 
 

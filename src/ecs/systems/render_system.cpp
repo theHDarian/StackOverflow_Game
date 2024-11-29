@@ -791,9 +791,6 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
-			drawHPbar(entity, projection, view);
-		}
 
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
@@ -804,9 +801,6 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
 			continue;
 		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
-			drawHPbar(entity, projection, view);
-		}
 
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
@@ -880,6 +874,15 @@ void RenderSystem::drawGameUI() {
 	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
+	for (Entity& entity : registry.enemies.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
+			drawHPbar(entity, projection, view);
+		}
+	}
+	
 	for (Entity& entity : registry.bosses.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -1400,7 +1403,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4& pr
 }
 
 void RenderSystem::drawDashes(const mat4& projection, const mat4& view) {
-	vec2 pos = { 75,210 };
+	vec2 pos = { 77,220 };
 	vec2 scale = { 50, 50 };
 	float offset = 10;
 
@@ -1544,7 +1547,7 @@ void RenderSystem::drawHPbar(Entity& entity, const mat4& projection, const mat4&
 		HPBarMotion.scale = { 100, 10 };
 	}
 
-	if (registry.damageds.has(entity)) {
+	if (registry.damageds.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver) {
 		HPBarMotion.position.x += (rand() % 10) - 5;
 		HPBarMotion.position.y += (rand() % 10) - 5;
 	}
