@@ -435,6 +435,7 @@ void WorldSystem::handleCollisions() {
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 					vec2 n = glm::normalize(a - c);
 
+					motion.position -= normalize(motion.velocity) * max(motion.scale.x,motion.scale.y)/2.f;
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
 					motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 
@@ -478,22 +479,25 @@ void WorldSystem::handleCollisions() {
 
 		// Player bullet centric handling
 		if (registry.playerBullets.has(entity)) {
+			PlayerBullet &bullet = registry.playerBullets.get(entity);
 			if (registry.walls.has(entity_other)) {
 				Motion& motion = registry.motions.get(entity);
 				WallCollider& wall = registry.walls.get(entity_other);
-				if (registry.playerBullets.get(entity).bulletBounce > 0) {
+				if (bullet.bulletBounce > 0) {
 					// Bounce / reflect the enemy bullet against the wall
 					vec2 a = motion.position - wall.startPosition;
 					vec2 b = wall.endPosition - wall.startPosition;
 					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 					vec2 n = glm::normalize(a - c);
 
+					motion.position -= normalize(motion.velocity) * max(motion.scale.x,motion.scale.y)/2.f;
 					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
 					motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 					// Assumes bullet flies towards facing direction
 					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
-					registry.playerBullets.get(entity).bulletBounce -= 1;
+					bullet.bulletBounce -= 1;
+					bullet.bulletRange = getModifiedValue(BulletRange, PlayerBullet().bulletRange); //refresh range
 					registry.ignores.get(entity).clear();
 				}
 				else {

@@ -98,7 +98,7 @@ public:
 	ComponentContainer<StackAddNotif> stackAddNotifs;
 	ComponentContainer<RoomSizeScaled> roomSizeScaleds;
 	ComponentContainer<UIRequest> uiRequests;
-	ComponentContainer<Button> buttons;
+	ComponentContainer<UIButton> buttons;
 	ComponentContainer<Menu> menus;
 	ComponentContainer<ActiveMenu> activeMenus;
 

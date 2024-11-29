@@ -536,6 +536,8 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
 
 void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, AttackData atkData)
 {
+    if (registry.enemies.components.size() > MAX_ENEMY_SPAWN) return;
+    
     if (registry.animations.has(entity))
         registry.animations.get(entity).frame = 1;
     for (uint i = 0; i < atkData.numBullets; i++)
