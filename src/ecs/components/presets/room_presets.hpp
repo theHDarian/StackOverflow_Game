@@ -496,7 +496,7 @@ const RoomPreset TreasureRoom2{
 const RoomPreset TreasureRoom3{
     {},
     {},
-    {{{PushConsole,{dmgUpM}}, {0.5f, 0.5f}}},
+    {{{FightConsole,{dmgUpM}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,

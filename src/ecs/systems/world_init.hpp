@@ -27,7 +27,7 @@ Entity createBibleTree(RenderSystem* renderer, vec2 pos);
 
 Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink = vec2(1.f));
 
-Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset);
+Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect = EFFECT_ASSET_ID::TEXTURED);
 
 Entity createRamStick(RenderSystem* renderer, vec2 pos);
 
@@ -42,6 +42,8 @@ Entity createHoneyCanister(RenderSystem *renderer, vec2 pos);
 Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);
 
 Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects);
+
+Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects);
 
 Entity createFloorDeco(RenderSystem* renderer, vec2 pos, std::string filename);
 
