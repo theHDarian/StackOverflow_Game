@@ -122,8 +122,10 @@ void UISystem::step(float elapsed_ms) {
 					UIButton& buttonComponent = registry.buttons.get(button);
 					if (ioState.mousePosition.x > (buttonComponent.position.x - buttonComponent.buttonSize.x / 2) && ioState.mousePosition.x < (buttonComponent.position.x + buttonComponent.buttonSize.x / 2)
 						&& ioState.mousePosition.y >(buttonComponent.position.y - buttonComponent.buttonSize.y / 2) && ioState.mousePosition.y < (buttonComponent.position.y + buttonComponent.buttonSize.y / 2)) {
-						clickedButtonIndex = count;
-						break;
+						if (count == hoveringChoice) { 
+							clickedButtonIndex = count;
+							break;
+						}
 					}
 					count++;
 				}
@@ -143,7 +145,7 @@ void UISystem::step(float elapsed_ms) {
 					if (clickedButtonIndex == 0) {
 						gameState.titleScreen = false;
 						gameState.loading = true;
-						ioState.shouldRestart = true; // is setting it again ok?
+						ioState.shouldRestart = true;
 						soundSystem->playSpecialMusic(0);
 					}
 					else {
@@ -952,23 +954,19 @@ Entity UISystem::createMenuChoice(std::string choice, vec2 position) {
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
 	motion.scale = { 40, 40 };
-	motion.position = vec2(position.x - text.text.length() * text.scale * 48 / 2 - motion.scale.x, position.y);
+	motion.position = vec2(position.x - text.text.length() * text.scale * DEFAULT_FONT_SIZE / 2 - motion.scale.x, position.y);
 
 	text.x = position.x;
-	text.y = windowState.height - position.y - motion.scale.y / 2;
+	text.y = windowState.height - position.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
 
 	// also make it a button
 	UIButton& button = registry.buttons.emplace(entity);
 	button.padding = 15.f;
-	button.buttonSize = vec2(text.text.length() * text.scale * 48, motion.scale.y);
+	button.buttonSize = vec2(text.text.length() * text.scale * DEFAULT_FONT_SIZE, text.scale * DEFAULT_FONT_SIZE);
 	button.position = vec2(text.x, position.y);
 
 	vec3& color = registry.colors.emplace(entity);
 	color = COLOR_RED;
-
-	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
-
-
 
 	registry.menuChoices.emplace(entity);
 
