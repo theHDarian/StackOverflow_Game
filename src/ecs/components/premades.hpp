@@ -2253,8 +2253,8 @@ struct EnemyHifiCannonHard : Enemy
 	const AttackData cannonShot{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{SniperPower,SniperSpeed,SniperPower,sizeUpM, sizeUpM,playerSpeedDownM, playerSpeedDownM},
-		{blunt},
+		{SniperPower,SniperSpeed},
+		{playerSpeedDownM},
 		2,
 		M_PI/2,
 		{120, 120},
