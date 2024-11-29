@@ -32,46 +32,6 @@ void UISystem::step(float elapsed_ms) {
 	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
 	registry.renderRequests.get(fpsCounter).show = ioState.showFPS;
 
-	if (ioState.shouldRestart) {
-		//std::cout << "yep restart ui" << std::endl;
-
-		// clear UI stuff here for now
-		// resetting dialogue related stuff
-		DialogueLines& lines = registry.dialogueLines.components[0];
-		lines = DialogueLines();
-
-		// clear choices here for now
-		for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.dialogueChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
-		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.menuChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
-
-		registry.activeMenus.clear();
-		ioState.activeMenu = -1;
-		registry.renderRequests.get(stackAddBubble).show = false;
-		registry.renderRequests.get(stackAddTail).show = false;	
-		registry.renderRequests.get(controlsGuide).show = false;
-
-		// feels like should be unnecessary, but because of early reset below, must do this
-		gameState.gamePaused = false;
-		gameState.gameOver = false;
-	}
-
-	if (gameState.gameOver) {
-		std::string report = "\n\n" + reportStats();
-		std::vector<std::string> reportTokenized = getTokenizedText(report);
-
-		if (uiTexts.count(registry.gameReports.components[0].name) == 0) {
-			uiTexts.insert({ registry.gameReports.components[0].name, reportTokenized });
-			TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
-			text.tokenizedText.insert(text.tokenizedText.end(), reportTokenized.begin(), reportTokenized.end());
-		}
-	}
-
 	// check: should game be paused right now?
 	// if already paused, then close latest menu
 	// if latest menu is the pause menu, then unpause
@@ -99,7 +59,7 @@ void UISystem::step(float elapsed_ms) {
 
 	// check: should menu be opened?
 	if (gameState.titleScreen && !registry.activeMenus.has(registry.menus.entities[MenuType::TitleMenu])) {
-		ioState.shouldRestart = false; // not sure if this should be here, but prevents continuous resets (weird)
+		//ioState.shouldRestart = false; // not sure if this should be here, but prevents continuous resets (weird)
 		registry.activeMenus.emplace(registry.menus.entities[MenuType::TitleMenu]);
 		ioState.activeMenu++;
 	}
@@ -287,7 +247,7 @@ void UISystem::step(float elapsed_ms) {
 
 	// handle ui requests
 	for (UIRequest& uiRequest : registry.uiRequests.components) {
-		if (uiRequest.type == UIRequestType::StackNotifReqShift || UIRequestType::StackNotifReqShuffle) {
+		if (uiRequest.type == UIRequestType::StackNotifReqShift || uiRequest.type == UIRequestType::StackNotifReqShuffle) {
 			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
 			registry.renderRequests.get(stackAddBubble).show = true;
 			registry.renderRequests.get(stackAddTail).show = true;
@@ -312,6 +272,34 @@ void UISystem::step(float elapsed_ms) {
 			}
 
 			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), bullet);
+		}
+
+		if (uiRequest.type == UIRequestType::ResetUI) {
+			DialogueLines& lines = registry.dialogueLines.components[0];
+			lines = DialogueLines();
+
+			// clear choices here for now
+			for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+				Entity e = registry.dialogueChoices.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+			for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+				Entity e = registry.menuChoices.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+
+			registry.activeMenus.clear();
+			ioState.activeMenu = -1;
+			registry.renderRequests.get(stackAddBubble).show = false;
+			registry.renderRequests.get(stackAddTail).show = false;
+			registry.renderRequests.get(controlsGuide).show = false;
+		}
+		if (uiRequest.type == UIRequestType::GameOverReport) {
+			std::string report = "\n\n" + reportStats();
+			std::vector<std::string> reportTokenized = getTokenizedText(report);
+			TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
+			text.tokenizedText = uiTexts["GameOver"];
+			text.tokenizedText.insert(text.tokenizedText.end(), reportTokenized.begin(), reportTokenized.end());
 		}
 	}
 

@@ -11,7 +11,7 @@ Controls:\n
 [ESC] to pause
 [R] to return to title
 [L] to leave game
-[=/-] to increase & decrease volume
+[=/-] to increase and decrease volume
 [C] to toggle collider visuals
 [F] to toggle FPS counter
 

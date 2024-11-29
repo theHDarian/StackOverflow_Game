@@ -15,7 +15,7 @@ vec4 getRoomBounds(Entity entity) {
 	vec2 roomStartPos = map.currRoom.roomStart;
 	vec2 roomEndPos = map.currRoom.roomEnd;
 
-	vec2 scale = registry.motions.get(entity).scale;
+	vec2 scale = abs(registry.motions.get(entity).scale);
 	vec2 min = roomStartPos + scale / 2.f;
 	vec2 max = roomEndPos - scale / 2.f;
 

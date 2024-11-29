@@ -13,8 +13,8 @@
 
 void resetStack(Entity player, RenderSystem* renderer) {
 
-    Invincible& inv =registry.invincibles.emplace(player);
-    inv.countdown = 1000.0f;
+    //Invincible& inv =registry.invincibles.emplace(player);
+    //inv.countdown = 1000.0f;
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);

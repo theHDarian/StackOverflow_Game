@@ -362,8 +362,9 @@ void WorldSystem::restartGame() {
 	GameReport& report = registry.gameReports.get(player);
 	report.gameStartTime = Clock::now();
 	report.roomsCleared = 0;
-	report.name = std::to_string(Random::Int(1024));
 
+	UIRequest& uireq = registry.uiRequests.emplace(player);
+	uireq.type = UIRequestType::ResetUI;
 }
 
 // Compute collisions between entities
@@ -819,6 +820,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
 			if (!success) {
 				registry.gameStates.components[0].gameOver = true;
+				registry.uiRequests.insert(player, {UIRequestType::GameOverReport});
 			} else if (eBullet.isSpecial) {
 				registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 			}
@@ -831,6 +833,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		bool success = registry.stackCompile.get(player).add(e.collisionBullet);
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
+			registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
 		}
 	}
 }

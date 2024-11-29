@@ -162,6 +162,8 @@ void clearRoomActors()
 
 void MapSystem::changeRoom(RoomType type, int doorIndex)
 {
+    registry.gameStates.components[0].resetRoom = true;
+    
     std::vector<Door> &doors = registry.doors.components;
     Map &map = registry.maps.components[0];
     Door &door = doors[doorIndex];
