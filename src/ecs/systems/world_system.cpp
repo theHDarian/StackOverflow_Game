@@ -342,6 +342,9 @@ void WorldSystem::restartGame() {
 	gameState.seenLockedDoor = false; 
 	gameState.loading = false;
 	gameState.dialogueChoice = -1;
+	gameState.resetRoom = true;
+
+	registry.ioStates.components[0].shouldRestart = false;
 
 	// Reset the game speed
 	currentSpeed = 1.f;
@@ -350,9 +353,6 @@ void WorldSystem::restartGame() {
 
 	// mock interactable call instead of proper ui for now
 	registry.dialogueRequests.emplace(skipDialogue);
-
-	if (!registry.mapRequests.has(player))
-		registry.mapRequests.emplace(player,MapRequestType::RestartGame);
 
 	Entity player = resetPlayer();
 	StackUI& stackUI = registry.stackUI.components[0];
@@ -363,6 +363,7 @@ void WorldSystem::restartGame() {
 	report.gameStartTime = Clock::now();
 	report.roomsCleared = 0;
 	report.name = std::to_string(Random::Int(1024));
+
 }
 
 // Compute collisions between entities
@@ -840,15 +841,22 @@ void WorldSystem::clearDeleteQueue() {
 		// right now, all our entities that fade will also emit particles (enemies)
 		// but should be generalized for more things in the future
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
-			if (registry.enemyBullets.has(e) && !registry.ioStates.components[0].shouldRestart) {
+			if (registry.enemyBullets.has(e) && !registry.gameStates.components[0].resetRoom) {
 				enemyBulletDeath(e);
 			}
 			registry.deleteEntityAndRelatedEntities(e);
 		}
 	}
 
-	if (registry.ioStates.components[0].shouldRestart && registry.enemyBullets.entities.size() == 0) {
-		registry.ioStates.components[0].shouldRestart = false;
+	if (registry.gameStates.components[0].resetRoom) {
+		if (registry.enemyBullets.entities.size() == 0) {
+			registry.gameStates.components[0].resetRoom = false;
+		}
+		else {
+			if (!registry.mapRequests.has(player))
+				registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+		}
+		
 	}
 }
 

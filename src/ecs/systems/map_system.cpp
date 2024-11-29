@@ -349,13 +349,13 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::BossRoom,false);
+        map.currRoom.preset = getRoomPreset(RoomType::RestRoom,false);
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
         map.currRoom.type = RoomType::RestRoom;
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
-        // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
+         createEnemy(renderer, vec2(500, 500), EnemyType::EvilSnail);
         // createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});

@@ -51,8 +51,9 @@ struct GameState {
 	float currentVolume = 0.5f;
 	bool seenLockedDoor = false;
 	bool titleScreen = false;
+	bool resetRoom = false;
 	bool loading = true; // this is ONLY here to prevent awkward half second of non-black screen on game start
-	// when fix ui later properly can remove
+						// when fix ui later properly can remove
 };
 
 struct Camera {
