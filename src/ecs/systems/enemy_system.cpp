@@ -209,6 +209,9 @@ void EnemySystem::step(float elapsed_ms)
     // HANDLING DAMGE FROM COLLISION
     for (auto &entity : registry.collisions.entities)
     {
+        if (registry.invisibleEnemy.has(entity)) {
+            continue;
+        }
         const Collision &collision = registry.collisions.get(entity);
         Entity other_entity = collision.other;
         if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity) && !registry.deleteds.has(other_entity))
@@ -536,13 +539,27 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
 
 void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, AttackData atkData)
 {
-    if (registry.enemies.components.size() > MAX_ENEMY_SPAWN) return;
-    
     if (registry.animations.has(entity))
         registry.animations.get(entity).frame = 1;
+    Map& map = registry.maps.components[0];
+	// vec2 roomStartPos = map.currRoom.roomStart;
+	// vec2 roomEndPos = map.currRoom.roomEnd;
+
+
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        createEnemy(render, pos, atkData.spawn);
+        std::cout << "SHIELD SIZE" << registry.shield.entities.size() << std::endl;
+        if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity) && registry.shield.entities.size() < 1) {
+            
+            Entity shield = createEnemy(render, pos, atkData.spawn);
+            Scientist& scientist = registry.scientist.get(entity);
+            scientist.shield = shield;
+        }
+        if (atkData.spawnPosition.size() == atkData.numBullets) {
+            map.currRoom.preset.enemies.push_back({atkData.spawn, atkData.spawnPosition[i]});
+        } else {
+            createEnemy(render, pos, atkData.spawn);
+        }
     }
 
     currPattern.currAtkCD = currPattern.maxAtkCD;
