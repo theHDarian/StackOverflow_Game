@@ -121,10 +121,10 @@ void PhysicsSystem::step(float elapsed_ms)
 			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
 				//get intersection point of the closest wall
 				if (registry.circleColliders.has(entity)) {
-					if (!hasCollided || glm::distance(intersectionPoint,motion.position) < glm::distance(closestIntersection,motion.position)) {
+					if (!hasCollided || distanceSquared(intersectionPoint,motion.position) < distanceSquared(closestIntersection,motion.position)) {
 						closestIntersection = intersectionPoint;
+						hasCollided = true;
 					}
-					hasCollided = true;
 				} else {
 					//std::cout << "Unhandled Dash Component Collision!!" << std::endl;
 				}
@@ -139,11 +139,16 @@ void PhysicsSystem::step(float elapsed_ms)
 			motion.position = closestIntersection + bounceBack;
 		}
 	}
+
 	//player bullet vs wall check
 	for(uint i = 0; i< registry.playerBullets.size(); i++)
 	{
 		Entity entity = registry.playerBullets.entities[i];
+		PlayerBullet& pBullet = registry.playerBullets.components[i];
 		Motion& motion = motion_registry.get(entity);
+
+		if (pBullet.bulletSpeed <= 300) continue;
+
 		// check if dashing entity will intersect a wall
 		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
 		vec2 endPosition = motion.position;
@@ -154,9 +159,10 @@ void PhysicsSystem::step(float elapsed_ms)
 			vec2 intersectionPoint;
 			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
 				//get intersection point of the closest wall
-				if (!hasCollided || glm::distance(intersectionPoint,startPosition) < glm::distance(closestIntersection,startPosition)) {
+				if (!hasCollided || distanceSquared(intersectionPoint,startPosition) < distanceSquared(closestIntersection,startPosition)) {
 					closestIntersection = intersectionPoint;
 					hasCollided = true;
+					break;
 				}
 			}
 		}
@@ -178,8 +184,12 @@ void PhysicsSystem::step(float elapsed_ms)
 	for(uint i = 0; i< registry.enemyBullets.size(); i++)
 	{
 		Entity entity = registry.enemyBullets.entities[i];
+		EnemyBullet& eBullet = registry.enemyBullets.components[i];
 		Motion& motion = motion_registry.get(entity);
+
 		if (registry.lasers.has(entity)) continue;
+		if (eBullet.bulletSpeed <= 300) continue;
+
 		// check if dashing entity will intersect a wall
 		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
 		vec2 endPosition = motion.position;
@@ -190,10 +200,11 @@ void PhysicsSystem::step(float elapsed_ms)
 			vec2 intersectionPoint;
 			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
 				//get intersection point of the closest wall
-				if (!hasCollided || glm::distance(intersectionPoint,startPosition) < glm::distance(closestIntersection,startPosition)) {
+				if (!hasCollided || distanceSquared(intersectionPoint,startPosition) < distanceSquared(closestIntersection,startPosition)) {
 					closestIntersection = intersectionPoint;
+					hasCollided = true;
+					break;
 				}
-				hasCollided = true;
 			}
 		}
 
@@ -662,6 +673,11 @@ bool PhysicsSystem::CheapCircleToTriangle(vec2 p, float r, vec2 a, vec2 b, vec2 
 
 vec2 PhysicsSystem::rotate(vec2 v, float angle) {
 	return { v.x * cos(angle) - v.y * sin(angle), v.x * sin(angle) + v.y * cos(angle) };
+}
+
+float PhysicsSystem::distanceSquared(vec2 v1, vec2 v2) {
+	vec2 diff = v1 - v2;
+	return glm::dot(diff, diff);
 }
 
 bool PhysicsSystem::LineToLine(vec2 line1Start,vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint) {
