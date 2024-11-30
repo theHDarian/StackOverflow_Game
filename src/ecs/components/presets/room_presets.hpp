@@ -11,14 +11,13 @@
 const RoomPreset TutorialRoom1Preset{
     {},
     {},
-    {},
-    100000.0f,
+    {{{WhiteBoard,{}}, {0.2f, 0.2f}}},
+    0,
     0,
     0,
     "TutorialRoom1",
     false,
-    {1280,720}
-
+    {800,1200}
 };
 
 const RoomPreset TutorialRoom2Preset{

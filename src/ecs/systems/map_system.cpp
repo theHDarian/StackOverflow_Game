@@ -53,7 +53,7 @@ void MapSystem::step(float elapsed_ms)
         }
         map.currRoom.preset.enemies = {};
 
-        if (map.currRoom.cleared) {
+        if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {
             for (auto &e : map.currRoom.preset.interactables)
             {
                 vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
@@ -327,6 +327,9 @@ void MapSystem::newMap()
         updateBgPositions();
         map.currRoom.type = TutorialRoom1;
         map.directory = getDirectory(map.currRegion);
+
+        registry.motions.get(registry.players.entities[0]).position =
+            glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, vec2(0.5, 0.2));
     }
     else {
         Map& map = registry.maps.components[0];

@@ -180,9 +180,43 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createOracleCrab(renderer, pos);
 	case InteractableItem::FightConsole:
 		return createFightConsole(renderer, pos, effects);
+	case InteractableItem::WhiteBoard:
+		return createWhiteBoard(renderer, pos);
 	default:
 		return Entity();
 	}
+}
+
+Entity createWhiteBoard(RenderSystem* renderer, vec2 pos) {
+	Entity entity = Entity();
+
+	Motion& m = registry.motions.emplace(entity);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = {576/2.f, 300/2.f};
+
+	auto& o = registry.objects.emplace(entity);
+	o.baseOffset = m.scale.y/2.f;
+
+	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 2.f), 
+		vec2(pos.x + m.scale.x / 2.f, pos.y - m.scale.y / 2.f));
+
+	registry.backgrounds.emplace(entity);
+
+	registry.renderRequests.insert(
+		entity,
+		{ "controls.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	InteractableObject& object = registry.interactables.emplace(entity);
+	object.name = "WhiteBoard";
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = 200.f;
+
+	return entity;
 }
 
 Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects)
