@@ -527,17 +527,6 @@ void WorldSystem::handleCollisions() {
 	registry.collisions.clear();
 }
 
-void WorldSystem::playCutscene() {
-	// idea: wait until all animation sequences are done
-	if (registry.animationSequences.components.size() == 0) {
-		GameState& gameState = registry.gameStates.components[0];
-		gameState.cutScene = false;
-		Map& map = registry.maps.components[0];
-		map.currRoom.cutsceneCount++;
-		map.currRoom.cutSceneDone = true;
-	}
-}
-
 void WorldSystem::handleInput() {
 	assert(registry.ioStates.components.size() <= 1);
     IOState &input = registry.ioStates.components[0];

@@ -876,8 +876,8 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	text.color = vec3(1, 1, 1);
 	text.text = "E";
 	text.scale = 0.40;
-	text.topRightBound = { room.preset.roomSize.x * 1.5,  room.preset.roomSize.y * 1.5 };
-	text.bottomLeftBound = { -room.preset.roomSize.x * 1.5, -room.preset.roomSize.y * 1.5 };
+	text.topRightBound = { room.preset.roomSize.x * 10,  room.preset.roomSize.y * 10 };
+	text.bottomLeftBound = { -room.preset.roomSize.x * 10, -room.preset.roomSize.y * 10 };
 	text.y = windowState.height - motion.position.y - 15;
 	text.x = motion.position.x - 10;
 

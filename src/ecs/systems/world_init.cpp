@@ -196,11 +196,11 @@ Entity createWhiteBoard(RenderSystem* renderer, vec2 pos) {
 	m.scale = {576/2.f, 300/2.f};
 
 	auto& o = registry.objects.emplace(entity);
-	o.baseOffset = m.scale.y/2.f;
+	o.baseOffset = m.scale.y/3.f;
 
 	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
-	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 2.f), 
-		vec2(pos.x + m.scale.x / 2.f, pos.y - m.scale.y / 2.f));
+	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 2.f - o.baseOffset), 
+		vec2(pos.x + m.scale.x / 2.f, pos.y + m.scale.y / 2.f - o.baseOffset));
 
 	registry.backgrounds.emplace(entity);
 
@@ -214,7 +214,7 @@ Entity createWhiteBoard(RenderSystem* renderer, vec2 pos) {
 	object.name = "WhiteBoard";
 
 	CircleCollider& cc = registry.circleColliders.emplace(entity);
-	cc.radius = 200.f;
+	cc.radius = 100.f;
 
 	return entity;
 }

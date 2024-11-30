@@ -19,6 +19,7 @@ public:
 
     //bool init(); // load all dialogue
     void step(float elapsed_ms);
+    void playCutscene();
 
     std::unordered_map<std::string, SoundType> soundEffectNames = {
         {"normalBGM", SoundType::normalBGM},
