@@ -860,7 +860,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDire
     {DifficultyRegion::Intro,{
         // {RoomType::EnemyRoom, {{HifiRoomTwinLaserShurikens,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
         {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{}}},
-        {RoomType::RestRoom, {{RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{},{RestingRoomPop}}},
             {RoomType::EventRoom, {{TreasureRoomHoney}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
@@ -922,6 +922,42 @@ inline bool hasUnlocked(RoomType type, int roomsTraversed) {
     } else {
         return !map.directory.at(Medium).at(type).unlocked.empty();
     }
+}
+
+inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
+{
+    const int bossRoomNum = 12;
+    if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
+        return BossRoom;
+    }
+
+    if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
+        return RoomType::EnemyRoom;
+    }
+
+
+    std::vector<RoomType> possibleRooms;
+    if (!excludeNone) {
+        possibleRooms.push_back(RoomType::None);
+    }
+    if (hasLocked(RoomType::EventRoom, roomsTraversed) || hasUnlocked(RoomType::EventRoom, roomsTraversed)) {
+        possibleRooms.push_back(RoomType::EventRoom);
+    }
+    if (hasLocked(RoomType::TreasureRoom, roomsTraversed) || hasUnlocked(RoomType::TreasureRoom, roomsTraversed)) {
+        possibleRooms.push_back(RoomType::TreasureRoom);
+    }
+    if (hasLocked(RoomType::RestRoom, roomsTraversed) || hasUnlocked(RoomType::RestRoom, roomsTraversed) && Random::Float() < 0.25f) {
+        possibleRooms.push_back(RoomType::RestRoom);
+    }
+    return Random::ListItem(possibleRooms);
+
+    // else if (Random::Float() >  0.5f && Random::Float() < 0.7f) {
+    //     return RoomType::TreasureRoom;
+    // }  else if (Random::Float() > 0.7f && Random::Float() < 0.80f) {
+    //     return RoomType::EventRoom;
+    // }
+    //
+    // return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 
 inline RoomPreset getRoomPreset(RoomType type, bool locked) {

@@ -250,11 +250,12 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.reset();
 
         d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
-        if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1)) { //check if next room has locked
+        if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
+            //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
+            d.isLocked = true;
+        } else if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1)) { //check if next room has locked
             //have a chance of spawning locked rooms
             d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
-        } else if (!hasUnlocked(d.room,map.roomsTraversed + 1) && !hasLocked(d.room,map.roomsTraversed + 1)) {
-            d.room = RoomType::None;
         }
         if (d.room == RoomType::None) {
             excludeNone = true;
