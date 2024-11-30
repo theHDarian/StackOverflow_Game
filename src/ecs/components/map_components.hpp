@@ -21,6 +21,7 @@ enum RoomType : int {
     EnemyRoom,
     TreasureRoom,
     RestRoom,
+    EventRoom,
     None, //Keep None at the end of the list to be compatible with existing get random function
 
     //Special rooms that are not spawned via getRandomRoomType function
@@ -29,18 +30,6 @@ enum RoomType : int {
     BossRoom,
 };
 
-inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
-{
-    const int bossRoomNum = 12;
-    if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
-        return BossRoom;
-    }
-    if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
-        return RoomType::EnemyRoom;
-    }
-    
-    return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
-}
 
 enum RoomProp { Plant1 };
 enum BossType { BigCBoss };

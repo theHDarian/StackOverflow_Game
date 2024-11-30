@@ -838,17 +838,20 @@ const RoomPreset HifiRoomCannonBoids{
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
-        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomBibleTree, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop},}},
+        {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab, RestRoomEmpty}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab, RestRoomEmpty}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
@@ -857,17 +860,20 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDire
     {DifficultyRegion::Intro,{
         // {RoomType::EnemyRoom, {{HifiRoomTwinLaserShurikens,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
         {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{}}},
-        {RoomType::RestRoom, {{RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{},{RestingRoomPop}}},
+            {RoomType::EventRoom, {{TreasureRoomHoney}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
         {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener,RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{TreasureRoomHoney}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
         {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
+            {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
@@ -899,6 +905,59 @@ inline bool hasLocked(RoomType type, int roomsTraversed) {
     } else {
         return !map.directory.at(Medium).at(type).locked.empty();
     }
+}
+
+inline bool hasUnlocked(RoomType type, int roomsTraversed) {
+    Map& map = registry.maps.components[0];
+
+    if (type >= RoomType::None) {
+        return false;
+    }
+    if (roomsTraversed < DifficultyRegion::Intro) {
+        return !map.directory.at(Intro).at(type).unlocked.empty();
+    } else if (roomsTraversed < DifficultyRegion::Easy) {
+        return !map.directory.at(Easy).at(type).unlocked.empty();
+    } else if (roomsTraversed < DifficultyRegion::Medium) {
+        return !map.directory.at(Medium).at(type).unlocked.empty();
+    } else {
+        return !map.directory.at(Medium).at(type).unlocked.empty();
+    }
+}
+
+inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
+{
+    const int bossRoomNum = 12;
+    if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
+        return BossRoom;
+    }
+
+    if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
+        return RoomType::EnemyRoom;
+    }
+
+
+    std::vector<RoomType> possibleRooms;
+    if (!excludeNone) {
+        possibleRooms.push_back(RoomType::None);
+    }
+    if (hasLocked(RoomType::EventRoom, roomsTraversed) || hasUnlocked(RoomType::EventRoom, roomsTraversed)) {
+        possibleRooms.push_back(RoomType::EventRoom);
+    }
+    if (hasLocked(RoomType::TreasureRoom, roomsTraversed) || hasUnlocked(RoomType::TreasureRoom, roomsTraversed)) {
+        possibleRooms.push_back(RoomType::TreasureRoom);
+    }
+    if (hasLocked(RoomType::RestRoom, roomsTraversed) || hasUnlocked(RoomType::RestRoom, roomsTraversed) && Random::Float() < 0.25f) {
+        possibleRooms.push_back(RoomType::RestRoom);
+    }
+    return Random::ListItem(possibleRooms);
+
+    // else if (Random::Float() >  0.5f && Random::Float() < 0.7f) {
+    //     return RoomType::TreasureRoom;
+    // }  else if (Random::Float() > 0.7f && Random::Float() < 0.80f) {
+    //     return RoomType::EventRoom;
+    // }
+    //
+    // return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 
 inline RoomPreset getRoomPreset(RoomType type, bool locked) {
@@ -965,6 +1024,7 @@ const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::RestRoom,1},
     {RoomType::BossRoom,2},
     {RoomType::TreasureRoom,0},
+{ RoomType::EventRoom, 4 },
     {RoomType::None,4},
     {RoomType::TutorialRoom1,5},
     {RoomType::TutorialRoom2,5}
@@ -977,5 +1037,6 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
     {RoomType::TreasureRoom, SoundType::specialBGM},
     {RoomType::None, normalBGM},
     {RoomType::TutorialRoom1, SoundType::specialBGM},
-    {RoomType::TutorialRoom2, SoundType::normalBGM}
+    {RoomType::TutorialRoom2, SoundType::normalBGM},
+        { RoomType::EventRoom, SoundType::specialBGM }
 };
