@@ -140,6 +140,17 @@ void SceneSystem::step(float elapsed_ms) {
 
 }
 
+void SceneSystem::playCutscene() {
+	// idea: wait until all animation sequences are done
+	if (registry.animationSequences.components.size() == 0) {
+		GameState& gameState = registry.gameStates.components[0];
+		gameState.cutScene = false;
+		Map& map = registry.maps.components[0];
+		map.currRoom.cutsceneCount++;
+		map.currRoom.cutSceneDone = true;
+	}
+}
+
 // ref: A0 template
 void SceneSystem::loadDialogue(std::string dialogueType) {
 	std::string filename = dialogue_path(dialogueType + ".txt").c_str();

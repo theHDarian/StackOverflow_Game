@@ -382,7 +382,10 @@ enum InteractableItem {
 	Baru,
 	OracleCrab,
 	WishGranter,
-	NA,
+	WhiteBoard,
+	Desk,
+	Phone,
+	NA
 };
 
 struct InteractableObject {
