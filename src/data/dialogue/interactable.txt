@@ -31,11 +31,10 @@ CHOICES Yes\No
 CUT blackscreen.png
 
 ITEM ClosedTutorialDoor -1 0
-The door seems to be locked. Maybe the scientist could lend a hand?
-[Step away from the door and call the scientist by pressing [E] when you're done looking around the room.]
+The door seems to be locked. Maybe there's something in this room that could help...
 
 ITEM EmptyDoor -1 0
-This doesn't seem to lead to anywhere.
+This door doesn't seem to lead to anywhere.
 
 # ITEM OpenDoor -1 0
 # Enter door?
@@ -387,3 +386,29 @@ You've already used this! You wonder if the data you got was worth the fight.
 ITEM WhiteBoard -1 0
 A board with a blue print tacked onto it. These symbols look like they could come in handy.
 CUT controls.png
+
+ITEM Desk -1 0
+A desk cluttered with paper. Upon closer inspection, there's also purple notebook on it.
+Read the notebook?
+CHOICES Yes\Maybe no
+
+ITEM Desk 0 0
+Upon opening the notebook, you realize that all the pages had been torn out save for one.
+The page reads: "It was a fine day in Septemeber, at the cusp of summer giving way to fall, when we had first stepped foot into this..."
+The frivolous handwriting makes it especially hard to pick out the symbols. You don't really feel like reading the rest. 
+
+ITEM Desk 1 0
+It's best not to touch other people's belongings. Surely, the person signed "C." on the cover would agree with you.
+
+ITEM Phone -1 0
+A chip module. It seems to be related to communication. Install it?
+CHOICES Yes\No
+
+ITEM Phone 0 0
+You install the chip.
+It looks like this commincations module comes pre-installed with a contact. If you just...
+
+ITEM Phone 1 0
+You decide not to. Installing random things you find on the floor could be dangerous after all!
+# does this set precedence for a bad install
+# missed oppurtunity, player has to isntall

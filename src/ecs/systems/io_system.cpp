@@ -101,10 +101,12 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 			}
 		}
 		else if (!gameState.dialogueScene && registry.maps.components[0].currRoom.dialogueDone) {
-			if (!registry.dialogueRequests.has(registry.players.entities[0])) {
-				DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
-				req.type = DialogueRequestType::StoryDialogue;
-			}
+			// remove for now
+
+			//if (!registry.dialogueRequests.has(registry.players.entities[0])) {
+			//	DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+			//	req.type = DialogueRequestType::StoryDialogue;
+			//}
 		}
 	}
 	

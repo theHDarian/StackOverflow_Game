@@ -334,6 +334,15 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				spawnEnemies( soundPlayer, fightConsolePresets[Random::Int(fightConsolePresets.size())]);
 			}
 		}
+
+		if (object.item == InteractableItem::Phone) {
+			if (reaction.choice == 0) {
+				registry.renderRequests.get(reaction.object).show = false;
+				registry.deleteds.emplace(reaction.object);
+				DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+				req.type = DialogueRequestType::StoryDialogue;
+			}
+		}
 	}
 
 	registry.interactableReactions.clear();

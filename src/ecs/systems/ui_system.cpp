@@ -246,7 +246,10 @@ void UISystem::step(float elapsed_ms) {
 			// can notify player when stack has changed here
 			// NOTE: does not work for lightning bullets. Lightning bullets detected in handle player collision 
 			// this spawn position is also v incorrect, corrected later in usual update
-			createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y), stack.currStack[index]);
+			createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y), 
+				registry.stackUI.components[0].bulletSize* STACK_NOTIF_SCALE,
+				bulletEffectShapes.at(stack.currStack[index].type),
+				bulletEffectColors.at(stack.currStack[index].type));
 		}
 	}
 
@@ -259,7 +262,9 @@ void UISystem::step(float elapsed_ms) {
 
 	// handle ui requests
 	for (UIRequest& uiRequest : registry.uiRequests.components) {
-		if (uiRequest.type == UIRequestType::StackNotifReqShift || uiRequest.type == UIRequestType::StackNotifReqShuffle) {
+		if (uiRequest.type == UIRequestType::StackNotifReqShift 
+			|| uiRequest.type == UIRequestType::StackNotifReqShuffle 
+			|| uiRequest.type == UIRequestType::CallNotif) {
 			// clean up stack add notifs
 			for (int i = registry.stackAddNotifs.size() - 1; i >= 0; i--) {
 				Entity e = registry.stackAddNotifs.entities[i];
@@ -284,12 +289,15 @@ void UISystem::step(float elapsed_ms) {
 				registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
 			}
 			vec2 bulletStartPos = playerPos;
-			BulletStackEffect bullet = lightning1;
+			std::string sprite = "stackNotifShift.png";
 			if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
-				bullet = lightning2;
+				sprite = "stackNotifShuffle.png";
+			}
+			else if (uiRequest.type == UIRequestType::CallNotif) {
+				sprite = "callNotif.png";
 			}
 
-			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), bullet);
+			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, sprite, vec3(1));
 		}
 
 		if (uiRequest.type == UIRequestType::ResetUI) {
@@ -681,33 +689,19 @@ Entity UISystem::createStackAddBubble() {
 	return entity;
 }
 
-Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
+Entity UISystem::createStackAddNotif(vec2 position, vec2 scale, std::string sprite, vec3 c) {
 	Entity entity = Entity();
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0;
 	motion.velocity = { 0, 0 };
 	motion.position = position;
-	motion.scale = registry.stackUI.components[0].bulletSize * STACK_NOTIF_SCALE; // make same as UI for now
+	motion.scale = scale;
 	// but honestly this should be constant, not a field tied to stack ui??
-
-	std::string shape = "";
-	if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Multiplicative) {
-		shape = "stackNotifShuffle.png";
-		motion.scale = vec2(192) / 2.5f;
-	}
-	else if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Additive){
-		shape = "stackNotifShift.png";
-		motion.scale = vec2(192) / 2.5f;
-	}
-	else{
-		assert(bulletEffectShapes.count(bullet.type) > 0);
-		shape = bulletEffectShapes.at(bullet.type);
-	}
 
 	auto& rr = registry.renderRequests.insert(
 		entity,
-		{ shape,
+		{ sprite,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
@@ -715,7 +709,7 @@ Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
 	registry.gameUIs.emplace(entity);
 
 	vec3& color = registry.colors.emplace(entity);
-	color = bulletEffectColors.at(bullet.type);
+	color = c;
 	
 	registry.showTimers.emplace(entity);
 	registry.stackAddNotifs.emplace(entity);

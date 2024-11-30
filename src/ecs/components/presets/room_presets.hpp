@@ -11,7 +11,11 @@
 const RoomPreset TutorialRoom1Preset{
     {},
     {},
-    {{{WhiteBoard,{}}, {0.3f, 0.1f}}},
+    {
+        {{WhiteBoard,{}}, {0.25f, 0.1f}},
+        {{Desk,{}}, {0.85f, 0.07f}},
+        {{Phone,{}}, {0.5f, 0.8f}},
+    },
     0,
     0,
     0,

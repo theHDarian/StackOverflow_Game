@@ -182,9 +182,99 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createFightConsole(renderer, pos, effects);
 	case InteractableItem::WhiteBoard:
 		return createWhiteBoard(renderer, pos);
+	case InteractableItem::Desk:
+		return createDesk(renderer, pos);
+	case InteractableItem::Phone:
+		return createPhone(renderer, pos);
 	default:
 		return Entity();
 	}
+}
+
+Entity createPhone(RenderSystem* renderer, vec2 pos) {
+	Entity entity = Entity();
+
+	Motion& m = registry.motions.emplace(entity);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = { 384 / 4.f, 384 / 4.f };
+
+	registry.backgrounds.emplace(entity);
+
+	registry.renderRequests.insert(
+		entity,
+		{ "callchip.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	InteractableObject& object = registry.interactables.emplace(entity);
+	object.name = "Phone";
+	object.item = InteractableItem::Phone;
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = 50.f;
+
+	return entity;
+}
+
+Entity createDesk(RenderSystem* renderer, vec2 pos) {
+	Entity entity = Entity();
+
+	Motion& m = registry.motions.emplace(entity);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = { 378 / 1.5f, 291 / 1.5f };
+
+	auto& o = registry.objects.emplace(entity);
+	o.baseOffset = m.scale.y / 3.f;
+
+	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f),
+		vec2(pos.x + m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f));
+
+	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 4.f),
+		vec2(pos.x - m.scale.x / 2.f, pos.y - m.scale.y / 2.f));
+
+	//registry.backgrounds.emplace(entity);
+
+	registry.renderRequests.insert(
+		entity,
+		{ "desk.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	InteractableObject& object = registry.interactables.emplace(entity);
+	object.name = "Desk";
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = 150.f;
+
+	createProp(renderer, pos + vec2(0, o.baseOffset * 1.2), "chair.png", vec2(189 / 2.5f, 295 / 2.5f), vec2(1));
+	createJournal(renderer, pos + vec2(m.scale.x / 4, 0));
+
+	return entity;
+}
+
+// if make this a prop, would disappear because too tiny and is object.
+// consider changing type
+Entity createJournal(RenderSystem* renderer, vec2 pos) {
+	Entity entity = Entity();
+
+	Motion& m = registry.motions.emplace(entity);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = vec2(47 / 1.2f, 48 / 1.2f);
+
+	auto& o = registry.objects.emplace(entity);
+	o.baseOffset = 1000;
+
+	registry.renderRequests.insert(
+		entity,
+		{ "journal.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+
+	return entity;
 }
 
 Entity createWhiteBoard(RenderSystem* renderer, vec2 pos) {
@@ -198,7 +288,6 @@ Entity createWhiteBoard(RenderSystem* renderer, vec2 pos) {
 	auto& o = registry.objects.emplace(entity);
 	o.baseOffset = m.scale.y/3.f;
 
-	CircleCollider& c = registry.circleColliders.get(registry.players.entities[0]);
 	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f),
 		vec2(pos.x + m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f));
 
