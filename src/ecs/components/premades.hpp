@@ -1887,6 +1887,42 @@ struct TwinLaserEnemyHorizontal2 : TwinLaserEnemyHorizontal1 {
 	}
 };
 
+struct EnemyHifiLaserSniper : Enemy {
+	const AttackData FastLaser{
+		EnemyAttackPattern::LASER
+		,CIRCLE
+		,{dashUpA, dashCDRUpA}
+		,dashCDRDownM
+		,1
+		,0
+		,{20, 20}
+		,0
+		, 1025
+		,{5000, 0}
+		,0
+		,0
+		,0
+		,EnemyBulletDeath::NONE
+		};
+		EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, FastLaser };
+		EnemyPattern charging = { "Charge", EnemyBehavior::CHARGING, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, NoAttack };
+
+	EnemyHifiLaserSniper() {
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = { randomState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_007.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 160.0f / 2, 160.f / 2 });
+		rotatePower = 90.0f;
+		speedMultiplier = 1.3;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+	};
+};
+
 
 struct EnemyHifiSniper : Enemy
 {
