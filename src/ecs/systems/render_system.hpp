@@ -112,6 +112,7 @@ private:
 	void drawAllColliders(Entity entity, const mat4& projection, const mat4& view);
 	void drawCollider(Entity entity, std::string shape, const mat4& projection, const mat4& view);
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat4& projection, const mat4& view);
+	void drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view);
 	void drawBulletStack(const mat4& projection, const mat4& view);
 
 	// Window handle

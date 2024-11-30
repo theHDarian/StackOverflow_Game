@@ -532,6 +532,7 @@ struct HomingBullet {
 struct Laser {
     Entity start;
     float length;
+    float maxLength;
     float growth;
     float rotation;
 };

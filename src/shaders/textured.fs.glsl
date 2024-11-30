@@ -5,7 +5,7 @@ in vec2 texcoord;
 
 // Application data
 uniform sampler2D sampler0;
-uniform vec3 fcolor;
+uniform vec3 fcolor = vec3(1.0);
 uniform int changeColor = 0;
 uniform float alpha = 1.0;
 uniform float effectAlpha = 1.0;

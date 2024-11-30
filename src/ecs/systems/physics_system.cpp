@@ -65,6 +65,7 @@ void PhysicsSystem::step(float elapsed_ms)
 
 		if (registry.lasers.has(entity)) {
 			Laser& laser = registry.lasers.get(entity);
+			EnemyBullet& eBullet = registry.enemyBullets.get(entity);
 			if (registry.enemies.has(laser.start)) {
 				Enemy& enemy = registry.enemies.get(laser.start);
 				Motion& start = registry.motions.get(laser.start);
@@ -74,8 +75,7 @@ void PhysicsSystem::step(float elapsed_ms)
 				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER || enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
 					motion.angle = start.angle;
 				}
-				vec2 goal = start.position + vec2(cos(motion.angle), sin(motion.angle)) * (laser.length + laser.growth);
-				laser.length += laser.growth;
+				if (eBullet.initialRange - eBullet.bulletRange > 80) laser.length += laser.growth;
 				if (registry.enemyGroups.has(laser.start)) {
 					EnemyGroup& group = registry.enemyGroups.get(laser.start);
 					if (group.others.size() == 1) {
@@ -87,15 +87,20 @@ void PhysicsSystem::step(float elapsed_ms)
 						laser.rotation = atan2(diff.y,diff.x);
 					}
 				}
+				vec2 goal = start.position + vec2(cos(motion.angle), sin(motion.angle)) * (10000.f);
 				float currLength = laser.length;
+				float maxFind = 9999999.f;
 				for (uint i = 0; i < walls.components.size(); i++) {
 					WallCollider& wall = walls.components[i];
 					vec2 intersectionPoint;
 					if (LineToLine(start.position, goal, wall.startPosition, wall.endPosition, intersectionPoint)) {
-						currLength = min(currLength, glm::distance(intersectionPoint, start.position));
+						float dist = glm::distance(intersectionPoint, start.position);
+						maxFind = min(maxFind, dist);
+						currLength = min(currLength, dist);
 						registry.collisions.emplace_with_duplicates(entity,walls.entities[i]);
 					}
 				}
+				laser.maxLength = maxFind;
 				motion.position = start.position + vec2(cos(motion.angle), sin(motion.angle)) * min(laser.length, currLength) * 0.5f;
 				motion.scale.x = min(laser.length, currLength);
 			} else {
