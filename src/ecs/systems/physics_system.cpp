@@ -121,10 +121,10 @@ void PhysicsSystem::step(float elapsed_ms)
 			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
 				//get intersection point of the closest wall
 				if (registry.circleColliders.has(entity)) {
-					if (!hasCollided || glm::distance(intersectionPoint,motion.position) < glm::distance(closestIntersection,motion.position)) {
+					if (!hasCollided || distanceSquared(intersectionPoint,motion.position) < distanceSquared(closestIntersection,motion.position)) {
 						closestIntersection = intersectionPoint;
+						hasCollided = true;
 					}
-					hasCollided = true;
 				} else {
 					//std::cout << "Unhandled Dash Component Collision!!" << std::endl;
 				}
@@ -139,11 +139,16 @@ void PhysicsSystem::step(float elapsed_ms)
 			motion.position = closestIntersection + bounceBack;
 		}
 	}
+
 	//player bullet vs wall check
 	for(uint i = 0; i< registry.playerBullets.size(); i++)
 	{
 		Entity entity = registry.playerBullets.entities[i];
+		PlayerBullet& pBullet = registry.playerBullets.components[i];
 		Motion& motion = motion_registry.get(entity);
+
+		if (pBullet.bulletSpeed <= 300) continue;
+
 		// check if dashing entity will intersect a wall
 		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
 		vec2 endPosition = motion.position;
@@ -154,9 +159,10 @@ void PhysicsSystem::step(float elapsed_ms)
 			vec2 intersectionPoint;
 			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
 				//get intersection point of the closest wall
-				if (!hasCollided || glm::distance(intersectionPoint,startPosition) < glm::distance(closestIntersection,startPosition)) {
+				if (!hasCollided || distanceSquared(intersectionPoint,startPosition) < distanceSquared(closestIntersection,startPosition)) {
 					closestIntersection = intersectionPoint;
 					hasCollided = true;
+					break;
 				}
 			}
 		}
@@ -178,8 +184,12 @@ void PhysicsSystem::step(float elapsed_ms)
 	for(uint i = 0; i< registry.enemyBullets.size(); i++)
 	{
 		Entity entity = registry.enemyBullets.entities[i];
+		EnemyBullet& eBullet = registry.enemyBullets.components[i];
 		Motion& motion = motion_registry.get(entity);
+
 		if (registry.lasers.has(entity)) continue;
+		if (eBullet.bulletSpeed <= 300) continue;
+
 		// check if dashing entity will intersect a wall
 		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
 		vec2 endPosition = motion.position;
@@ -190,10 +200,11 @@ void PhysicsSystem::step(float elapsed_ms)
 			vec2 intersectionPoint;
 			if (LineToLine(startPosition,endPosition, wall.startPosition,wall.endPosition,intersectionPoint)) {
 				//get intersection point of the closest wall
-				if (!hasCollided || glm::distance(intersectionPoint,startPosition) < glm::distance(closestIntersection,startPosition)) {
+				if (!hasCollided || distanceSquared(intersectionPoint,startPosition) < distanceSquared(closestIntersection,startPosition)) {
 					closestIntersection = intersectionPoint;
+					hasCollided = true;
+					break;
 				}
-				hasCollided = true;
 			}
 		}
 
@@ -326,15 +337,15 @@ bool PhysicsSystem::AABBToCircle(Entity aabb, Entity circle) {
 	AABBCollider& ab = registry.aabbs.get(aabb);
 	CircleCollider& c = registry.circleColliders.get(circle);
 
-	vec2 topLeft = mA.position + ab.topLeft;
-	vec2 topRight = mA.position + ab.topLeft * vec2(-1, 1);
-	vec2 bottomLeft = mA.position + ab.bottomRight * vec2(-1, 1);
-	vec2 bottomRight = mA.position + ab.bottomRight;
+	vec2 topLeft = mB.position - mA.position + ab.topLeft;
+	vec2 topRight = mB.position - mA.position + ab.topLeft * vec2(-1, 1);
+	vec2 bottomLeft = mB.position - mA.position + ab.bottomRight * vec2(-1, 1);
+	vec2 bottomRight = mB.position - mA.position + ab.bottomRight;
 
-	if (glm::dot(mB.position - topLeft, mB.position - topLeft) < c.radius * c.radius) return true;
-	if (glm::dot(mB.position - topRight, mB.position - topRight) < c.radius * c.radius) return true;
-	if (glm::dot(mB.position - bottomLeft, mB.position - bottomLeft) < c.radius * c.radius) return true;
-	if (glm::dot(mB.position - bottomRight, mB.position - bottomRight) < c.radius * c.radius) return true;
+	if (glm::dot(topLeft, topLeft) < c.radius * c.radius) return true;
+	if (glm::dot(topRight, topRight) < c.radius * c.radius) return true;
+	if (glm::dot(bottomLeft, bottomLeft) < c.radius * c.radius) return true;
+	if (glm::dot(bottomRight, bottomRight) < c.radius * c.radius) return true;
 
 	if (!PointInAABB(mB.position, bottomRight + vec2(0, c.radius), topLeft + vec2(0, -c.radius))) return true;
 	if (!PointInAABB(mB.position, bottomRight + vec2(c.radius, 0), topLeft + vec2(-c.radius, 0))) return true;
@@ -479,9 +490,15 @@ bool PhysicsSystem::AABBToPoly(Entity aabb, Entity poly) {
 
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
-	if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[0], mB.angle), rotate(s.offsetVertices[s.offsetVertices.size() - 1], mB.angle))) return true;
-	for (uint i = 1; i < s.offsetVertices.size(); i++) {
-		if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[i], mB.angle), rotate(s.offsetVertices[i-1], mB.angle))) return true;
+	//if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[0], mB.angle), rotate(s.offsetVertices[s.offsetVertices.size() - 1], mB.angle))) return true;
+	//for (uint i = 1; i < s.offsetVertices.size(); i++) {
+	//	if (AABBToLine(offset + ab.bottomRight, offset + ab.topLeft, rotate(s.offsetVertices[i], mB.angle), rotate(s.offsetVertices[i-1], mB.angle))) return true;
+	//}
+
+	// Cheap hacky alternative, just check if a poly vertex is in AABB OR center is in AABB
+	if (!PointInAABB(vec2(0), offset + ab.bottomRight, offset + ab.topLeft)) return true;
+	for (uint i = 0; i < s.offsetVertices.size(); i++) {
+		if (!PointInAABB(rotate(s.offsetVertices[i], mB.angle), offset + ab.bottomRight, offset + ab.topLeft)) return true;
 	}
 	return false;
 }
@@ -656,6 +673,11 @@ bool PhysicsSystem::CheapCircleToTriangle(vec2 p, float r, vec2 a, vec2 b, vec2 
 
 vec2 PhysicsSystem::rotate(vec2 v, float angle) {
 	return { v.x * cos(angle) - v.y * sin(angle), v.x * sin(angle) + v.y * cos(angle) };
+}
+
+float PhysicsSystem::distanceSquared(vec2 v1, vec2 v2) {
+	vec2 diff = v1 - v2;
+	return glm::dot(diff, diff);
 }
 
 bool PhysicsSystem::LineToLine(vec2 line1Start,vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint) {
