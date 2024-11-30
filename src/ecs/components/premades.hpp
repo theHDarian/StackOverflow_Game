@@ -1532,7 +1532,66 @@ struct EnemyEasySkull : Enemy
 			500
 			};
 		patternIndex = 0;
-		scale = vec2({230.0f / 2, 240.f / 2});
+		scale = vec2(168.0f, 216.f) / 1.5f;
+		rotatePower = 0.f;
+	};
+};
+
+struct EnemyHardSkull : Enemy
+{
+	const AttackData laser2{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{dashUpA},
+	dashCDRDownA,
+	8,
+	0,
+	{20, 20},
+	0,
+	1500,
+	{500, 0},
+	0,
+	0,
+	0 };
+
+	const AttackData laser1{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{dashUpA},
+	dashCDRDownA,
+	8,
+	M_PI/8.f,
+	{20, 20},
+	0,
+	1500,
+	{500, 0},
+	0,
+	0,
+	0 };
+
+	Reaction AttackLaser{
+		ReactionType::DURATION,
+		0 };
+
+	EnemyPattern laserState1 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 1, true, 0.f, 2000.f, laser1 };
+	EnemyPattern laserState2 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 2, true, 0.f, 2000.f, laser2 };
+	EnemyPattern idleState   =  { "Idle", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 0, false, 0.f, 10000.f, laserRotate };
+	EnemyHardSkull()
+	{
+		maxHealth = 150;
+		currHealth = maxHealth;
+		enemyPatterns = { laserState1, laserState2, idleState };
+		sprite = {
+			"skull_evil",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			4,
+			500
+		};
+		patternIndex = 0;
+		scale = vec2(168.0f , 216.f) / 1.5f;
 		rotatePower = 0.f;
 	};
 };

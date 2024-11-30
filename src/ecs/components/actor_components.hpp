@@ -284,6 +284,7 @@ enum EnemyType {
     BeeHive,
     HardEnemyAngel,
     EasyEnemySkull,
+    HardEnemySkull,
     HardEnemyBoid,
     MediumEnemyBoar,
     MediumEnemyHealer,

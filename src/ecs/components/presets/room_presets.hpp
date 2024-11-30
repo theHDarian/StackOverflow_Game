@@ -22,7 +22,7 @@ const RoomPreset TutorialRoom1Preset{
 };
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EasyEnemySkull, {0.5, 0.5}}},
+    {{EnemyType::HardEnemySkull, {0.5, 0.5}}},
     {},
     {},
     0.0f,
