@@ -772,7 +772,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (registry.lasers.has(entity)) drawLaserIndicator(entity, projection, view);
+		if (registry.lasers.has(entity) && registry.enemies.has(registry.lasers.get(entity).start)) drawLaserIndicator(entity, projection, view);
 		drawTexturedMesh(entity, projection, view);
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);

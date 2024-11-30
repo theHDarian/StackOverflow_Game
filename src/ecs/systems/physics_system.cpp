@@ -75,7 +75,7 @@ void PhysicsSystem::step(float elapsed_ms)
 				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER || enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
 					motion.angle = start.angle;
 				}
-				if (eBullet.initialRange - eBullet.bulletRange > 80) laser.length += laser.growth;
+				if (laser.growth < 100.f || (eBullet.initialRange - eBullet.bulletRange > 1000)) laser.length += laser.growth;
 				if (registry.enemyGroups.has(laser.start)) {
 					EnemyGroup& group = registry.enemyGroups.get(laser.start);
 					if (group.others.size() == 1) {
