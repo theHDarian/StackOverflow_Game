@@ -1422,6 +1422,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	EnemyBullet &bullet = registry.enemyBullets.emplace(entity);
 	bullet.bulletSpeed = 0;
 	bullet.bulletRange = atkData.bulletRange;
+	bullet.initialRange = atkData.bulletRange;
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
 	bullet.bulletEffects = getBulletEffects(atkData,bullet.isSpecial);
