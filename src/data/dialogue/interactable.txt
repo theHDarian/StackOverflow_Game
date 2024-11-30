@@ -386,3 +386,4 @@ You've already used this! You wonder if the data you got was worth the fight.
 
 ITEM WhiteBoard -1 0
 A board with a blue print tacked onto it. These symbols look like they could come in handy.
+CUT controls.png

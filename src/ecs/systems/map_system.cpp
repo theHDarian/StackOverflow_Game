@@ -396,18 +396,18 @@ void MapSystem::updateBgPositions() {
         vec2(floorPosition.x, floorPosition.y + floorScale.y),
         vec2(floorScale.x * 1.1, wallThickness)},
         {// right
-        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
-        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 * min(floorScale.x/1920.f, 1.f) - 20, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 * min(floorScale.x / 1920.f, 1.f) - 20, floorPosition.y + floorScale.y * 2 / 2.f),
         vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
         vec2(floorScale.y * 2, wallThickness)},
             {// bottom
-        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f * min(floorScale.y / 1080.f, 1.f) + 10),
+        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f * min(floorScale.y / 1080.f, 1.f) + 10),
         vec2(floorPosition.x, floorPosition.y - floorScale.y),
         vec2(floorScale.x * 1.1, wallThickness)},
         {// left
-        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
-        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 * min(floorScale.x / 1920.f, 1.f) + 20, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 * min(floorScale.x / 1920.f, 1.f) + 20, floorPosition.y + floorScale.y * 2 / 2.f),
         vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y),
         vec2(floorScale.y * 2, wallThickness)},
     };
