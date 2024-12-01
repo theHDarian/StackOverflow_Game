@@ -2411,7 +2411,7 @@ struct ScientistBossEnemy : Enemy
 		7};
 
 	Reaction secondPhase{
-		ReactionType::SEVENTYFIVE_HEALTH,
+		ReactionType::FIFTY_HEALTH,
 		9};
 
 	Reaction secondPhasePlayerClose{
