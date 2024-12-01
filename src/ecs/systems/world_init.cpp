@@ -1193,6 +1193,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		registry.shield.emplace(entity);
 		break;
 	}
+	case EnemyType::ScientistHand:
+	{
+		enemy = ScientistHandEnemy();
+		registry.hand.emplace(entity);
+		break;
+	}
 		case EnemyType::HifiEnemyLaserSniper: enemy = EnemyHifiLaserSniper();break;
 	};
 

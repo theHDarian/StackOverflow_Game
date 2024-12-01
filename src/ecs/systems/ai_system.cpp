@@ -68,12 +68,31 @@ void AISystem::step(float elapsed_ms)
 		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
 			// std::cout << currPattern.name << "after update" << std::endl;
+			// if (registry.hand.has(entity) && currPattern.type == EnemyBehavior::IDLE) {
+			// 	continue;
+			// }
 			movement.posA = motion.position;
 			// ACTING
 			// std::cout << currPattern.name << "before getmove" << std::endl;
 			movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
+
+			if (registry.scientist.has(entity)) {
+				Scientist& scien = registry.scientist.get(entity);
+				Entity entityHand = scien.hand;
+				if (entityHand && registry.enemies.has(entityHand)) {
+					Enemy& hand = registry.enemies.get(scien.hand);
+					EnemyPattern& handPattern = hand.currEnemyPattern();
+					if (hand.currHealth > 0 && handPattern.type == EnemyBehavior::IDLE) {
+						EnemyMovement& handMovement = registry.enemyMovement.get(entityHand);
+						Motion& handMotion = registry.motions.get(entityHand);
+						handMovement.posA = handMotion.position;
+						handMovement.posB = movement.posB + vec2(100.f, 0.f);
+						handMovement.distanceTraveled = 0.f;
+					}
+				}
+			}
 		}
 	}
 }
@@ -212,7 +231,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			reaction_found = true;
 		}
 	}
-	else if (distance < closeDistance)
+	if (distance < closeDistance && reaction_found == false)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
 		if (reaction)

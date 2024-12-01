@@ -237,6 +237,14 @@ void EnemySystem::step(float elapsed_ms)
             enemyStat.currHealth -= bulletStat.damage;
             if (enemyStat.currHealth <= 0)
             {
+                if (registry.scientist.has(entity))
+                {
+                    Scientist &scien = registry.scientist.get(entity);
+                    if (!registry.deleteds.has(scien.hand))
+                    {
+                        registry.deleteds.emplace(scien.hand);
+                    }
+                }
                 if (!registry.deleteds.has(entity))
                 {
                     Fade &f = registry.fades.emplace(entity);
@@ -568,10 +576,16 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
     {
         if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity) && registry.shield.entities.size() < 1)
         {
-            std::cout << "created shield" << std::endl;
             Entity shield = createEnemy(render, pos, atkData.spawn);
             Scientist &scientist = registry.scientist.get(entity);
             scientist.shield = shield;
+            continue;
+        }
+        else if (atkData.spawn == EnemyType::ScientistHand && registry.scientist.has(entity))
+        {
+            Entity hand = createEnemy(render, pos, atkData.spawn);
+            Scientist &scientist = registry.scientist.get(entity);
+            scientist.hand = hand;
             continue;
         }
         if (atkData.spawnPosition.size() == atkData.numBullets)

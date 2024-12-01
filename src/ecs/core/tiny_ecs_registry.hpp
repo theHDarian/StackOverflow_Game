@@ -103,6 +103,7 @@ public:
 	ComponentContainer<ActiveMenu> activeMenus;
 	ComponentContainer<Scientist> scientist;
 	ComponentContainer<Shield> shield;
+	ComponentContainer<Hand> hand;
 	ComponentContainer<GameReport> gameReports;
 
 	// constructor that adds all containers for looping over them
@@ -199,6 +200,7 @@ public:
 		registry_list.push_back(&gameReports);
 		registry_list.push_back(&scientist);
 		registry_list.push_back(&shield);
+		registry_list.push_back(&hand);
 	}
 
 	void clear_all_components() {

@@ -297,6 +297,7 @@ enum EnemyType {
     ScientistLaserGridVerticalAttack,
     ScientistShield,
     ScientistBoss,
+    ScientistHand,
     HardEnemyBoidFish,
     HifiEnemyTwinLaserVertical1,
     HifiEnemyTwinLaserVertical2,
@@ -429,6 +430,11 @@ struct Shield {
 
 struct Scientist {
     Entity shield;
+    Entity hand;
+};
+
+struct Hand {
+
 };
 
 // act like a state that can move depending on enemies reactions
