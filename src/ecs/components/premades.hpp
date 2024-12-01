@@ -2709,7 +2709,7 @@ struct ScientistSheildEnemy : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		patternIndex = 0;
-		scale = vec2(250, 250);
+		scale = vec2(300, 300);
 		rotatePower = 0.f;
 	}
 };

@@ -7,7 +7,7 @@
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
 
-#define MAX_ENEMY_SPAWN 350
+#define MAX_ENEMY_SPAWN 300
 
 class SoundSystem;
 class EnemySystem

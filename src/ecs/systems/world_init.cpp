@@ -1258,9 +1258,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 
 	if (type == EnemyType::ScientistBoss) {
 		auto& animate = registry.animations.emplace(entity);
-		animate.max_frames = 30; 
-		animate.animation_countdown = 18;
-		animate.animation_countdown_base = 18;
+		animate.max_frames = 24; 
+		animate.animation_countdown = 36;
+		animate.animation_countdown_base = 36;
 	}
 
 	if (type == EnemyType::BossBeehiveMain)
