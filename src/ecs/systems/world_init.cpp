@@ -1251,9 +1251,16 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		auto &animate = registry.animations.emplace(entity);
 		animate.animate = enemy.sprite.animationType;
-		animate.max_frames = enemy.sprite.max_Frames; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
+		animate.max_frames = enemy.sprite.max_Frames;
 		animate.animation_countdown = enemy.sprite.countdown;
 		animate.animation_countdown_base = animate.animation_countdown;
+	}
+
+	if (type == EnemyType::ScientistBoss) {
+		auto& animate = registry.animations.emplace(entity);
+		animate.max_frames = 30; 
+		animate.animation_countdown = 18;
+		animate.animation_countdown_base = 18;
 	}
 
 	if (type == EnemyType::BossBeehiveMain)

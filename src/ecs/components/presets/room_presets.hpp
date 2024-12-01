@@ -33,6 +33,18 @@ const RoomPreset TutorialRoom2Preset{
     {1600,1000}
 };
 
+const RoomPreset ScientistRoom{
+    {{EnemyType::ScientistBoss, {0.5, 0.05}}},
+    {},
+    {},
+    0.0f,
+    0 ,
+    0,
+    "ScientistRoom",
+    false,
+    {1920,1080}
+};
+
 const RoomPreset EnemyRoomSwarm{
     {{EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},

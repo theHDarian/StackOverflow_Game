@@ -94,6 +94,19 @@ void AISystem::step(float elapsed_ms)
 				}
 			}
 		}
+
+		if (registry.scientist.has(entity)) {
+			EnemyPattern& pattern = enemy.currEnemyPattern();
+			RenderRequest& rr = registry.renderRequests.get(entity);
+			if (pattern.type != EnemyBehavior::IDLE && pattern.type != EnemyBehavior::TELEPORT) {
+				rr.texture_name = "scientist_walk";
+				rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
+			}
+			else {
+				rr.texture_name = "scientist.png";
+				rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+			}
+		}
 	}
 }
 

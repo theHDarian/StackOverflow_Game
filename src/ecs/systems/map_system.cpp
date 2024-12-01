@@ -354,7 +354,7 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::TreasureRoom,false);
+        map.currRoom.preset = ScientistRoom;
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
         map.currRoom.type = RoomType::RestRoom;
@@ -365,7 +365,7 @@ void MapSystem::newMap()
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
         //createWishGranter(renderer, vec2(500,500));
-        createEnemy(renderer, vec2(500, 500), ScientistBoss);
+        //createEnemy(renderer, vec2(500, 500), ScientistBoss);
     }
     decorateFloor();
 }
