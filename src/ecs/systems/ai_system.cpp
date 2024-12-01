@@ -51,7 +51,6 @@ void AISystem::step(float elapsed_ms)
 		updateState(enemy, movement, entity);
 		// std::cout << enemy.newPattern << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
-		// std::cout << currPattern.name << "after update" << std::endl;
 		if (registry.boids.has(entity))
 		{
 			Boid &boid = registry.boids.get(entity);
@@ -392,6 +391,14 @@ vec2 AISystem::getTeleportPos(Entity entity)
 	EnemyPattern &pattern = enemy.currEnemyPattern();
 	if (pattern.type == EnemyBehavior::TELEPORT)
 	{
+		std::cout << "tele" << pattern.name  << std::endl;
+		if (registry.hand.has(entity) && pattern.name == "T") {
+			std::cout << "should tele to scientist" << std::endl;
+			Entity scien = registry.scientist.entities[0];
+			Motion& scienMotion = registry.motions.get(scien);
+
+			return scienMotion.position - vec2(100.f, 0);
+		}
 
 		if (pattern.path.size() > 0)
 		{

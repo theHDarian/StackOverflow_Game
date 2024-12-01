@@ -574,8 +574,13 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
 
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity) && registry.shield.entities.size() < 1)
+        std::cout << registry.shield.entities.size() << "shield num" << std::endl;
+        if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity))
         {
+            if (registry.shield.entities.size() > 0) {
+                break;
+            }
+            std::cout << " created shield " << std::endl;
             Entity shield = createEnemy(render, pos, atkData.spawn);
             Scientist &scientist = registry.scientist.get(entity);
             scientist.shield = shield;
@@ -587,7 +592,8 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
             Scientist &scientist = registry.scientist.get(entity);
             scientist.hand = hand;
             continue;
-        }
+        } 
+
         if (atkData.spawnPosition.size() == atkData.numBullets)
         {
             map.currRoom.preset.enemies.push_back({atkData.spawn, atkData.spawnPosition[i]});

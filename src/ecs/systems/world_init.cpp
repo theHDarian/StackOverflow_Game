@@ -1094,7 +1094,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		float randomX = getRandomFloat(-35.f, 35.f);
 		float randomY = getRandomFloat(-35.f, 35.f);
 		boid.velocity = vec2(randomX, randomY);
-		boid.maxSpeed = 200.f;
+		boid.maxSpeed = 400.f;
 		break;
 	}
 	case EnemyType::HifiEnemyTwinLaserVertical1:
