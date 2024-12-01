@@ -55,22 +55,26 @@ void EnemySystem::step(float elapsed_ms)
         float angle = motion.angle;
 
         // Lightning bullet creation
-        if (((float)enemy.currHealth / (float)enemy.maxHealth < 0.3) && (rand() % 1000 > 990)) {
+        if (((float)enemy.currHealth / (float)enemy.maxHealth < 0.3) && (rand() % 1000 > 990))
+        {
             createLightningBullet(render, motion.position);
         }
 
         // Key bullet creation
-        if (((float)enemy.currHealth / (float)enemy.maxHealth > 0.7) && (rand() % 1000 < 1)) {
+        if (((float)enemy.currHealth / (float)enemy.maxHealth > 0.7) && (rand() % 1000 < 1))
+        {
             bool shouldKey = (registry.enemyBullets.components.size() > 0);
-            for (EnemyBullet& eb : registry.enemyBullets.components) {
-                if (eb.bulletEffects[0].type == Key) {
+            for (EnemyBullet &eb : registry.enemyBullets.components)
+            {
+                if (eb.bulletEffects[0].type == Key)
+                {
                     shouldKey = false;
                     break;
                 }
             }
-            if (shouldKey) createKeyBullet(render, motion.position);
+            if (shouldKey)
+                createKeyBullet(render, motion.position);
         }
-
 
         // merge bee logic
         EnemyPattern &pattern = enemy.currEnemyPattern();
@@ -151,7 +155,8 @@ void EnemySystem::step(float elapsed_ms)
                         motion.scale = (motion.scale.y < 0) ? motion.scale * vec2(1, -1) : motion.scale;
                     }
                 }
-                else if (enemy.rotationBehaviour == EnemyRotationBehavior::SPIN) {
+                else if (enemy.rotationBehaviour == EnemyRotationBehavior::SPIN)
+                {
                     float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
                     float rotationChange = angularSpeed * elapsed_ms / 1000.f;
                     motion.angle += rotationChange;
@@ -175,11 +180,19 @@ void EnemySystem::step(float elapsed_ms)
                     vec2 mid = twinMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
-
-                float totalDistance = glm::distance(movement.posA, movement.posB);
-                movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
-                motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
-            } else {
+                if (pattern.type == EnemyBehavior::TELEPORT)
+                {
+                    motion.position = movement.posB;
+                }
+                else
+                {
+                    float totalDistance = glm::distance(movement.posA, movement.posB);
+                    movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
+                    motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
+                }
+            }
+            else
+            {
                 if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
                     Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
@@ -209,7 +222,8 @@ void EnemySystem::step(float elapsed_ms)
     // HANDLING DAMGE FROM COLLISION
     for (auto &entity : registry.collisions.entities)
     {
-        if (registry.invisibleEnemy.has(entity)) {
+        if (registry.invisibleEnemy.has(entity))
+        {
             continue;
         }
         const Collision &collision = registry.collisions.get(entity);
@@ -228,12 +242,13 @@ void EnemySystem::step(float elapsed_ms)
                     Fade &f = registry.fades.emplace(entity);
                     registry.deleteds.emplace(entity);
 
-
                     ParticleProps props = enemyDeath;
-                    registry.emitParticles.replace(entity,PExplode, props,f.max, Random::Int(20) + 20);
-                    if (registry.enemyGroups.has(entity)) {
-                        for (Entity other : registry.enemyGroups.get(entity).others) {
-                            registry.emitParticles.replace(other,PExplode, props,f.max, Random::Int(20) + 20);
+                    registry.emitParticles.replace(entity, PExplode, props, f.max, Random::Int(20) + 20);
+                    if (registry.enemyGroups.has(entity))
+                    {
+                        for (Entity other : registry.enemyGroups.get(entity).others)
+                        {
+                            registry.emitParticles.replace(other, PExplode, props, f.max, Random::Int(20) + 20);
                         }
                     }
                 }
@@ -262,7 +277,7 @@ void EnemySystem::step(float elapsed_ms)
         EnemyPattern &pattern = enemyStat.currEnemyPattern();
         if (pattern.type == EnemyBehavior::DEATHSTATE)
         {
-            //std::cout << "got here" << std::endl;
+            // std::cout << "got here" << std::endl;
             if (!registry.deleteds.has(entity))
             {
                 Fade &f = registry.fades.emplace(entity);
@@ -288,12 +303,14 @@ void EnemySystem::step(float elapsed_ms)
 
     // Clear straggler boids
     // 0 < #boids <= 5, #non-boid == 0
-    if (registry.boids.components.size() > 0 && registry.boids.components.size() <= 5 && registry.enemies.components.size() - registry.boids.components.size() == 0) {
-        for (auto& boid : registry.boids.entities) {
-            if (!registry.deleteds.has(boid)) registry.deleteds.emplace(boid);
+    if (registry.boids.components.size() > 0 && registry.boids.components.size() <= 5 && registry.enemies.components.size() - registry.boids.components.size() == 0)
+    {
+        for (auto &boid : registry.boids.entities)
+        {
+            if (!registry.deleteds.has(boid))
+                registry.deleteds.emplace(boid);
         }
     }
-
 }
 
 void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData)
@@ -440,13 +457,13 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
 }
 void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
 {
-        //shoot towards the twin
-        Entity other = registry.enemyGroups.get(enemy).others[0];
-        Motion& otherMotion = registry.motions.get(other);
-        Motion& motion = registry.motions.get(enemy);
-        vec2 diff = otherMotion.position - motion.position;
-        float angle = atan2(diff.y, diff.x);
-        Entity e = createEnemyLaser(render, pos, angle, enemy, atkData);
+    // shoot towards the twin
+    Entity other = registry.enemyGroups.get(enemy).others[0];
+    Motion &otherMotion = registry.motions.get(other);
+    Motion &motion = registry.motions.get(enemy);
+    vec2 diff = otherMotion.position - motion.position;
+    float angle = atan2(diff.y, diff.x);
+    Entity e = createEnemyLaser(render, pos, angle, enemy, atkData);
 }
 
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
@@ -543,23 +560,26 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
     
     if (registry.animations.has(entity))
         registry.animations.get(entity).frame = 1;
-    Map& map = registry.maps.components[0];
-	// vec2 roomStartPos = map.currRoom.roomStart;
-	// vec2 roomEndPos = map.currRoom.roomEnd;
-
+    Map &map = registry.maps.components[0];
+    // vec2 roomStartPos = map.currRoom.roomStart;
+    // vec2 roomEndPos = map.currRoom.roomEnd;
 
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        std::cout << "SHIELD SIZE" << registry.shield.entities.size() << std::endl;
-        if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity) && registry.shield.entities.size() < 1) {
-            
+        if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity) && registry.shield.entities.size() < 1)
+        {
+            std::cout << "created shield" << std::endl;
             Entity shield = createEnemy(render, pos, atkData.spawn);
-            Scientist& scientist = registry.scientist.get(entity);
+            Scientist &scientist = registry.scientist.get(entity);
             scientist.shield = shield;
+            continue;
         }
-        if (atkData.spawnPosition.size() == atkData.numBullets) {
+        if (atkData.spawnPosition.size() == atkData.numBullets)
+        {
             map.currRoom.preset.enemies.push_back({atkData.spawn, atkData.spawnPosition[i]});
-        } else {
+        }
+        else
+        {
             createEnemy(render, pos, atkData.spawn);
         }
     }
