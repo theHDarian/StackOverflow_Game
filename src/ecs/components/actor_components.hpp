@@ -289,6 +289,13 @@ enum EnemyType {
     MediumEnemyHealer,
     HardEnemyBoidBio,
     ScientistlaserAttack,
+    ScientistradialAttack,
+    ScientistexplosiveAttack,
+    ScientistHomingAttack,
+    ScientistLaserGridAttack,
+    ScientistLaserGridVerticalAttack,
+    ScientistShield,
+    ScientistBoss,
     HardEnemyBoidFish,
     HifiEnemyTwinLaserVertical1,
     HifiEnemyTwinLaserVertical2,
@@ -350,6 +357,7 @@ struct AttackData {
     float homing = 0;
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
     EnemyType spawn;
+    std::vector<vec2> spawnPosition = {};
 };
 
 enum class EnemyBehavior {
@@ -400,7 +408,8 @@ enum class ReactionType {
     TWENTYFIVE_HEALTH,
     BEE_CLOSE,
     TEAM_HURT,
-    NO_BEES
+    NO_BEES,
+    SHIELDBREAK,
 };
 
 struct Reaction {
@@ -410,6 +419,14 @@ struct Reaction {
 
 struct InvisibleEnemy {
 
+};
+
+struct Shield {
+
+};
+
+struct Scientist {
+    Entity shield;
 };
 
 // act like a state that can move depending on enemies reactions

@@ -22,7 +22,7 @@ const RoomPreset TutorialRoom1Preset{
 };
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EasyEnemySkull, {0.5, 0.5}}},
+    {{EnemyType::ScientistBoss, {1, 0.5}}},
     {},
     {},
     0.0f,
@@ -199,7 +199,7 @@ const RoomPreset EnemyRoomSwarm{
 0,
 "EnemyRoomSwarm",
     false,
-    {3000, 3000}
+    {1600, 1000}
 };
 
 const RoomPreset EnemyRoomDashIntro1{
