@@ -365,6 +365,7 @@ void MapSystem::newMap()
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
         //createWishGranter(renderer, vec2(500,500));
+        createEnemy(renderer, vec2(500, 500), ScientistBoss);
     }
     decorateFloor();
 }

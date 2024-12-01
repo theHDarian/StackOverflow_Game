@@ -77,7 +77,7 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize = 16;
+    int baseStackSize = 160;
     std::vector<BulletStackEffect> currStack;
 
     std::map<BulletEffectType, float> additives = {
