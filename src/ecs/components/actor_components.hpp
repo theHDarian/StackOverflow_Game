@@ -284,6 +284,7 @@ enum EnemyType {
     BeeHive,
     HardEnemyAngel,
     EasyEnemySkull,
+    HardEnemySkull,
     HardEnemyBoid,
     MediumEnemyBoar,
     MediumEnemyHealer,
@@ -309,6 +310,7 @@ enum EnemyType {
     HifiEnemySniperHard,
     HifiEnemyTrailHard,
     HifiEnemyCannonHard,
+    HifiEnemyLaserSniper,
 };
 
 enum class EnemyAttackPattern {

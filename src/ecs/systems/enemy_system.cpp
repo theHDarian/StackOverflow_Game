@@ -244,7 +244,7 @@ void EnemySystem::step(float elapsed_ms)
             bulletStat.bulletPierce -= 1;
             registry.ignores.get(other_entity).ignores.push_back(entity);
 
-            if (!registry.deleteds.has(other_entity) && bulletStat.bulletPierce < 0 && !registry.boids.has(entity))
+            if (!registry.deleteds.has(other_entity) && bulletStat.bulletPierce < 0 && (!registry.boids.has(entity) || (registry.boids.has(entity) && registry.enemies.components.size() > registry.boids.components.size())))
                 registry.deleteds.emplace(other_entity);
             if (!registry.damageds.has(entity) && enemyStat.currHealth > 0)
             {

@@ -14,10 +14,10 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresets =
 	{
 		{
 			{EnemyType::HifiEnemySniper, {0.6f,0.5f}},
-			   {EnemyType::HifiEnemySniper, {0.4f,0.5f}},
-			   {EnemyType::HifiEnemySniper, {0.5f,0.5f}},
-			   {EnemyType::HifiEnemySniper, {0.5f,0.6f}},
-			   {EnemyType::HifiEnemySniper, {0.5f,0.4f}},
+			   {EnemyType::HifiEnemySniper, {0.2f,0.5f}},
+			   {EnemyType::HifiEnemySniper, {0.8f,0.5f}},
+			   {EnemyType::HifiEnemySniper, {0.8f,0.6f}},
+			   {EnemyType::HifiEnemySniper, {0.2f,0.4f}},
 		},
 	{
 			{EnemyType::HifiEnemyCannon, {0.9f,0.2f}},

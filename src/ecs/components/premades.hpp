@@ -1539,7 +1539,66 @@ struct EnemyEasySkull : Enemy
 			4,
 			500};
 		patternIndex = 0;
-		scale = vec2({230.0f / 2, 240.f / 2});
+		scale = vec2(168.0f, 216.f) / 1.5f;
+		rotatePower = 0.f;
+	};
+};
+
+struct EnemyHardSkull : Enemy
+{
+	const AttackData laser2{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{dashUpA},
+	dashCDRDownA,
+	8,
+	0,
+	{20, 20},
+	0,
+	1500,
+	{500, 0},
+	0,
+	0,
+	0 };
+
+	const AttackData laser1{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{dashUpA},
+	dashCDRDownA,
+	8,
+	M_PI/8.f,
+	{20, 20},
+	0,
+	1500,
+	{500, 0},
+	0,
+	0,
+	0 };
+
+	Reaction AttackLaser{
+		ReactionType::DURATION,
+		0 };
+
+	EnemyPattern laserState1 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 1, true, 0.f, 2000.f, laser1 };
+	EnemyPattern laserState2 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 2, true, 0.f, 2000.f, laser2 };
+	EnemyPattern idleState   =  { "Idle", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 0, false, 0.f, 10000.f, laserRotate };
+	EnemyHardSkull()
+	{
+		maxHealth = 150;
+		currHealth = maxHealth;
+		enemyPatterns = { laserState1, laserState2, idleState };
+		sprite = {
+			"skull_evil",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			4,
+			500
+		};
+		patternIndex = 0;
+		scale = vec2(168.0f , 216.f) / 1.5f;
 		rotatePower = 0.f;
 	};
 };
@@ -1781,6 +1840,43 @@ struct TwinLaserEnemyHorizontal2 : TwinLaserEnemyHorizontal1
 		enemyPatterns = {randomState};
 	}
 };
+
+struct EnemyHifiLaserSniper : Enemy {
+	const AttackData FastLaser{
+		EnemyAttackPattern::LASER
+		,CIRCLE
+		,{dashUpA, dashCDRUpA}
+		,dashCDRDownM
+		,1
+		,0
+		,{20, 20}
+		,0
+		, 1025
+		,{5000, 0}
+		,0
+		,0
+		,0
+		,EnemyBulletDeath::NONE
+		};
+		EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, FastLaser };
+		EnemyPattern charging = { "Charge", EnemyBehavior::CHARGING, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, NoAttack };
+
+	EnemyHifiLaserSniper() {
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = { randomState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_007.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 160.0f / 2, 160.f / 2 });
+		rotatePower = 90.0f;
+		speedMultiplier = 1.3;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+	};
+};
+
 
 struct EnemyHifiSniper : Enemy
 {
