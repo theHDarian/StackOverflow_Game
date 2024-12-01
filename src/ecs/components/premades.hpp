@@ -2714,12 +2714,12 @@ struct ScientistBossEnemy : Enemy
 						patrollingState1, patrollingState2,patrollingState3, patrollingState4, 
 						followState, closePlayerState};
 		sprite = {
-			"enemy_Angel.png",
+			"scientist.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		patternIndex = 8;
-		scale = vec2(100, 100);
+		scale = vec2(250, 250);
 		rotatePower = 0.f;
 	}
 };
@@ -2734,7 +2734,7 @@ struct ScientistSheildEnemy : Enemy
 	ScientistSheildEnemy()
 	{
 		maxHealth = 600;
-		currHealth = 600;
+		currHealth = 20;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_Pufferfish.png",
