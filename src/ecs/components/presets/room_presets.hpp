@@ -30,7 +30,7 @@ const RoomPreset TutorialRoom2Preset{
     0,
     "TutorialRoom2",
     false,
-    {1920,1080}
+    {1600,1000}
 };
 
 const RoomPreset EnemyRoomSwarm{
