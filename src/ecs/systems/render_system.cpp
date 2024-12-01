@@ -379,7 +379,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	float alpha = 1;
 
-
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
 	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
@@ -398,6 +397,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	}
 	else if (registry.interactIndicators.has(entity)) { // hard code here for now
 		alpha = 0.7;
+	}
+	else if (registry.shield.has(entity)) {
+		alpha = 0.3;
 	}
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
@@ -879,7 +881,7 @@ void RenderSystem::drawGameUI() {
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity)) {
 			drawHPbar(entity, projection, view);
 		}
 	}

@@ -161,10 +161,10 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		{
 
 			Enemy &shield = registry.enemies.get(scien.shield);
-			std::cout << shield.currHealth << "shield health" << std::endl;
+			//std::cout << shield.currHealth << "shield health" << std::endl;
 			if (shield.currHealth <= 0)
 			{
-				std::cout << "got here" << std::endl;
+				//std::cout << "got here" << std::endl;
 				auto reaction = getReactions(currPattern.reactions, ReactionType::SHIELDBREAK);
 				if (reaction)
 				{

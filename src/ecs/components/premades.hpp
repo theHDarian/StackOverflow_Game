@@ -2734,7 +2734,7 @@ struct ScientistSheildEnemy : Enemy
 	ScientistSheildEnemy()
 	{
 		maxHealth = 600;
-		currHealth = 20;
+		currHealth = 600;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_Pufferfish.png",

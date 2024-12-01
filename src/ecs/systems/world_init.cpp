@@ -1182,7 +1182,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::ScientistBoss:
 	{
 		enemy = ScientistBossEnemy();
-		registry.bosses.emplace(entity);
+		registry.bosses.insert(entity, {"The Purple Cyborg"});
 		Scientist& scien = registry.scientist.emplace(entity);
 		
 		break;
