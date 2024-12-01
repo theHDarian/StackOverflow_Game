@@ -162,6 +162,8 @@ void clearRoomActors()
 
 void MapSystem::changeRoom(RoomType type, int doorIndex)
 {
+    registry.gameStates.components[0].resetRoom = true;
+    
     std::vector<Door> &doors = registry.doors.components;
     Map &map = registry.maps.components[0];
     Door &door = doors[doorIndex];
@@ -174,6 +176,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     if (map.currRoom.type != RoomType::TutorialRoom1) {
         map.roomsTraversed++;
+        registry.gameReports.components[0].roomsCleared++;
     }
 
     //update Map Region
@@ -247,7 +250,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.reset();
 
         d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
-        if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1)) { //check if next room has locked
+        if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
+            //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
+            d.isLocked = true;
+        } else if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1)) { //check if next room has locked
             //have a chance of spawning locked rooms
             d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
         }
@@ -272,7 +278,7 @@ void MapSystem::decorateFloor() {
     Map& map = registry.maps.components[0];
     WindowState& ws = registry.windowStates.components[0];
     std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : (map.currRegion == Physics) ? "hifi_floor_addons" : "bio_floor_addons";
-    vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor( 0.8 * map.currRoom.preset.roomSize.x / 192.f));
+    vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor( 0.8 * map.currRoom.preset.roomSize.y / 192.f));
     vec2 dividers = vec2(0.9090 * map.currRoom.preset.roomSize.x / placements.x, 0.9090 * map.currRoom.preset.roomSize.y / placements.y);
     vec2 roomOffset = vec2(-map.currRoom.preset.roomSize.x / 2.2f, -map.currRoom.preset.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
     vec2 wiggle = (dividers - vec2(192)) / 2.f;
@@ -295,7 +301,6 @@ void MapSystem::decorateFloor() {
 void MapSystem::resetMap() {
     registry.maps.components[0].currRoom = Room();
     clearRoomActors();
-    soundPlayer->playSpecialMusic(0);
 }
 
 void MapSystem::newMap()
@@ -331,6 +336,7 @@ void MapSystem::newMap()
         map.currRegion = MapRegion::Physics;
         map.roomsTraversed = 0;
         map.directory = getDirectory(map.currRegion);
+        clearRoomActors();
 
         bool excludeNone = false;
         for (int i = 0; i < 4; i++)
@@ -359,6 +365,7 @@ void MapSystem::newMap()
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
         //createWishGranter(renderer, vec2(500,500));
+        createEnemy(renderer, vec2(500, 500), ScientistBoss);
     }
     decorateFloor();
 }

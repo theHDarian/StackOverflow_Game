@@ -11,7 +11,7 @@
 #include <sstream>
 
 class SoundSystem;
-const float STACK_NOTIF_SCALE = 0.90f;
+const float STACK_NOTIF_SCALE = 1.0f;
 
 // System responsible for handling user input
 class UISystem {
@@ -96,6 +96,8 @@ private:
     Entity createFpsCounter();
     Entity createRoomCounter();
     Entity createButton(std::string label, vec2 position, vec2 scale);
+
+    std::string reportStats();
 
     SoundSystem* soundSystem;
 };

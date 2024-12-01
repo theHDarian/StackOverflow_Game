@@ -178,6 +178,8 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createWishGranter(renderer, pos);
 	case InteractableItem::OracleCrab:
 		return createOracleCrab(renderer, pos);
+	case InteractableItem::FightConsole:
+		return createFightConsole(renderer, pos, effects);
 	default:
 		return Entity();
 	}
@@ -222,7 +224,7 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 	return console;
 }
 
-Entity createPopConsole(RenderSystem *renderer, vec2 pos)
+Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects)
 {
 	const Entity console = Entity();
 
@@ -243,8 +245,52 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 	aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
 	aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
 
-	// CircleCollider &cc = registry.circleColliders.emplace(console);
-	// cc.radius = m.scale.y / 4;
+	//CircleCollider &cc = registry.circleColliders.emplace(console);
+	//cc.radius = m.scale.y / 4;
+
+	InteractableObject &object = registry.interactables.emplace(console);
+	object.name = "FightConsole";
+	object.item = InteractableItem::FightConsole;
+
+	Animation &a = registry.animations.emplace(console);
+	a.max_frames = 1;
+	a.animation_countdown_base = 100;
+
+	EffectStack &stack = registry.effectStacks.emplace(console);
+	stack.stack = std::move(effects);
+
+	registry.renderRequests.insert(
+		console,
+		{"fight_console",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	return console;
+}
+
+Entity createPopConsole(RenderSystem *renderer, vec2 pos)
+{
+	const Entity console = Entity();
+
+	Motion &m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 200.f * vec2(1, 1.4166666);
+
+	auto &o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	CircleCollider &c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	registry.backgrounds.emplace(console);
+
+	// can use aabb as near player range for now for pseudo-offsetting
+	 AABBCollider& aabb = registry.aabbs.emplace(console);
+	 aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	 aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
+
+	//CircleCollider &cc = registry.circleColliders.emplace(console);
+	//cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PopStack";
@@ -265,7 +311,7 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 
 Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D(renderer, pos, "HoneyCanisterFull.png", vec2(200, 300), vec2(0, 100), 50);
+	auto entity = createProp3D( renderer, pos, "HoneyCanisterFull.png", vec2(200, 300), vec2(0, 100), 50);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "HoneyCanister";
 	object.item = InteractableItem::HoneyCanister;
@@ -279,21 +325,21 @@ Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 
 Entity createBaru(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D(renderer, pos, "Brau1589.png", vec2(1500, 750), vec2(0, 50), 50);
+	auto entity = createProp3D( renderer, pos, "Brau1589.png", vec2(1380, 960), vec2(1380, 960), 50);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "Baru";
 	object.item = InteractableItem::Baru;
-	registry.circleColliders.emplace(entity).radius = 100;
-	AABBCollider &aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-750, -375);
-	aabb.bottomRight = vec2(750, 375);
+	registry.circleColliders.emplace(entity).radius = 200;
+	// AABBCollider &aabb = registry.aabbs.emplace(entity);
+	// aabb.topLeft = vec2(-750, -375);
+	// aabb.bottomRight = vec2(750, 375);
 
 	return entity;
 }
 
 Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D(renderer, pos, "WishGranter.png", vec2(200, 200), vec2(0, 0), 0);
+	auto entity = createProp3D( renderer, pos, "wishGranter", vec2(132, 200), vec2(0, 0), 0, ANIMATE);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "WishGranter";
 	object.item = InteractableItem::WishGranter;
@@ -301,6 +347,9 @@ Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 	AABBCollider &aabb = registry.aabbs.emplace(entity);
 	aabb.topLeft = vec2(-100, -150);
 	aabb.bottomRight = vec2(100, 150);
+	Animation &a = registry.animations.emplace(entity);
+	a.max_frames = 4;
+	a.animation_countdown_base = 200;
 
 	return entity;
 }
@@ -453,8 +502,7 @@ Entity createProp(RenderSystem *renderer, vec2 pos, std::string filename, vec2 s
 }
 
 // For creating side-on props with a wall (like pop console or tree)
-Entity createProp3D(RenderSystem *renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset)
-{
+Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect) {
 	Entity e = Entity();
 
 	Motion &m = registry.motions.emplace(e);
@@ -471,9 +519,9 @@ Entity createProp3D(RenderSystem *renderer, vec2 pos, std::string filename, vec2
 
 	registry.renderRequests.insert(
 		e,
-		{filename,
-		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE});
+		{ filename,
+		 effect,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 	return e;
 }
 
@@ -919,7 +967,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBigC:
 	{
 		enemy = EnemyBigC();
-		registry.bosses.emplace(entity);
+		auto& boss = registry.bosses.emplace(entity);
+		boss.name = "BigC";
 		movement.angularSpeed = 20;
 		break;
 	}
@@ -979,12 +1028,18 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBeehiveMain:
 	{
 		enemy = BossBeeHive();
-		registry.bosses.emplace(entity);
+		auto& boss = registry.bosses.emplace(entity);
+		boss.name = "Grand Hive, the Queen's Throne";
 		break;
 	}
 	case EnemyType::EasyEnemySkull:
 	{
 		enemy = EnemyEasySkull();
+		break;
+	}
+	case EnemyType::HardEnemySkull:
+	{
+		enemy = EnemyHardSkull();
 		break;
 	}
 	case EnemyType::Snail:
@@ -1127,7 +1182,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::ScientistBoss:
 	{
 		enemy = ScientistBossEnemy();
-		registry.bosses.emplace(entity);
+		registry.bosses.insert(entity, {"The Purple Cyborg"});
 		Scientist& scien = registry.scientist.emplace(entity);
 		
 		break;
@@ -1144,6 +1199,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		registry.hand.emplace(entity);
 		break;
 	}
+		case EnemyType::HifiEnemyLaserSniper: enemy = EnemyHifiLaserSniper();break;
 	};
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1464,6 +1520,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	EnemyBullet &bullet = registry.enemyBullets.emplace(entity);
 	bullet.bulletSpeed = 0;
 	bullet.bulletRange = atkData.bulletRange;
+	bullet.initialRange = atkData.bulletRange;
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
 	bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
@@ -1568,25 +1625,25 @@ Entity createKeyBullet(RenderSystem *renderer, vec2 pos)
 	motion.scale = 20.f * vec2(2.8, 1); // Ensure scale is initialized
 	motion.veer = {0, 0};
 
-	PolyCollider &pc = registry.polyColliders.emplace(entity);
+	PolyCollider& pc = registry.polyColliders.emplace(entity);
 	pc.offsetVertices = {
 		{motion.scale.x / 2, motion.scale.y / 2},
 		{motion.scale.x / 2, -motion.scale.y / 2},
 		{-motion.scale.x / 2, -motion.scale.y / 2},
-		{-motion.scale.x / 2, motion.scale.y / 2}};
+		{-motion.scale.x / 2, motion.scale.y / 2} };
 	pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 
 	registry.renderRequests.insert(
 		entity,
-		{"enemy_bullet_key.png",
+		{ "enemy_bullet_key.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE});
+		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	ParticleProps props = enemyBullet;
 	props.colors.push_back(enemyBulletParticleColors.at(Key));
 	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-	EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
+	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
 	return entity;
 }
@@ -1680,11 +1737,12 @@ float getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity &player = registry.players.entities[0];
 	return min(
-		registry.stackCompile.get(player).maximums[bf],
-		max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]));
+			registry.stackCompile.get(player).maximums[bf],
+			max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf])
+		);
 }
 
-std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpecial)
+std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial)
 {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
 	float prob = (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies

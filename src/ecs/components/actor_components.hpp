@@ -77,7 +77,7 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize = 16;
+    int baseStackSize = 160;
     std::vector<BulletStackEffect> currStack;
 
     std::map<BulletEffectType, float> additives = {
@@ -128,7 +128,7 @@ struct StackCompile {
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
-        {PlayerSpeed,       1},
+        {PlayerSpeed,       50},
         {PlayerNumDash,     0},
         {PlayerStackSize,   1},
         {PlayerDashCDR,     1}
@@ -284,6 +284,7 @@ enum EnemyType {
     BeeHive,
     HardEnemyAngel,
     EasyEnemySkull,
+    HardEnemySkull,
     HardEnemyBoid,
     MediumEnemyBoar,
     MediumEnemyHealer,
@@ -310,6 +311,7 @@ enum EnemyType {
     HifiEnemySniperHard,
     HifiEnemyTrailHard,
     HifiEnemyCannonHard,
+    HifiEnemyLaserSniper,
 };
 
 enum class EnemyAttackPattern {
@@ -519,6 +521,7 @@ struct EnemyMovement {
 };
 
 struct BossEnemy {
+    std::string name;
 };
 
 struct BossParts {
@@ -554,6 +557,7 @@ struct HomingBullet {
 struct Laser {
     Entity start;
     float length;
+    float maxLength;
     float growth;
     float rotation;
 };

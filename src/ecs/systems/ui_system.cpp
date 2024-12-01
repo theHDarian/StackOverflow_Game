@@ -32,35 +32,6 @@ void UISystem::step(float elapsed_ms) {
 	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
 	registry.renderRequests.get(fpsCounter).show = ioState.showFPS;
 
-	if (ioState.shouldRestart) {
-		//std::cout << "yep restart ui" << std::endl;
-
-		// clear UI stuff here for now
-		// resetting dialogue related stuff
-		DialogueLines& lines = registry.dialogueLines.components[0];
-		lines = DialogueLines();
-
-		// clear choices here for now
-		for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.dialogueChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
-		for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
-			Entity e = registry.menuChoices.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
-
-		registry.activeMenus.clear();
-		ioState.activeMenu = -1;
-		registry.renderRequests.get(stackAddBubble).show = false;
-		registry.renderRequests.get(stackAddTail).show = false;	
-		registry.renderRequests.get(controlsGuide).show = false;
-
-		// feels like should be unnecessary, but because of early reset below, must do this
-		gameState.gamePaused = false;
-		gameState.gameOver = false;
-	}
-
 	// check: should game be paused right now?
 	// if already paused, then close latest menu
 	// if latest menu is the pause menu, then unpause
@@ -88,14 +59,13 @@ void UISystem::step(float elapsed_ms) {
 
 	// check: should menu be opened?
 	if (gameState.titleScreen && !registry.activeMenus.has(registry.menus.entities[MenuType::TitleMenu])) {
-		ioState.shouldRestart = false; // not sure if this should be here, but prevents continuous resets (weird)
 		registry.activeMenus.emplace(registry.menus.entities[MenuType::TitleMenu]);
+		soundSystem->playTitleMusic();
 		ioState.activeMenu++;
 	}
 	if (gameState.gamePaused && !gameState.gameOver && !registry.activeMenus.has(registry.menus.entities[MenuType::PauseMenu])) {
 		registry.activeMenus.emplace(registry.menus.entities[MenuType::PauseMenu]);
 		ioState.activeMenu++;
-		//std::cout << "pause meny!" << std::endl;
 	}
 
 	if (ioState.activeMenu > -1) {
@@ -152,8 +122,10 @@ void UISystem::step(float elapsed_ms) {
 					UIButton& buttonComponent = registry.buttons.get(button);
 					if (ioState.mousePosition.x > (buttonComponent.position.x - buttonComponent.buttonSize.x / 2) && ioState.mousePosition.x < (buttonComponent.position.x + buttonComponent.buttonSize.x / 2)
 						&& ioState.mousePosition.y >(buttonComponent.position.y - buttonComponent.buttonSize.y / 2) && ioState.mousePosition.y < (buttonComponent.position.y + buttonComponent.buttonSize.y / 2)) {
-						clickedButtonIndex = count;
-						break;
+						if (count == hoveringChoice) { 
+							clickedButtonIndex = count;
+							break;
+						}
 					}
 					count++;
 				}
@@ -173,7 +145,8 @@ void UISystem::step(float elapsed_ms) {
 					if (clickedButtonIndex == 0) {
 						gameState.titleScreen = false;
 						gameState.loading = true;
-						ioState.shouldRestart = true; // is setting it again ok?
+						ioState.shouldRestart = true;
+						soundSystem->playSpecialMusic(0);
 					}
 					else {
 						ioState.shouldEnd = true;
@@ -209,8 +182,18 @@ void UISystem::step(float elapsed_ms) {
 					}
 				}
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::ControlsMenu) {
-					// only one choice
 					registry.renderRequests.get(controlsGuide).show = false;
+					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
+					ioState.activeMenu--;
+				}
+				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::GameOverMenu) {
+					if (clickedButtonIndex == 0) {
+						ioState.shouldRestart = true;
+						gameState.titleScreen = true;
+					}
+					else if (clickedButtonIndex == 1) {
+						ioState.shouldEnd = true;
+					}
 					registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
 					ioState.activeMenu--;
 				}
@@ -276,11 +259,17 @@ void UISystem::step(float elapsed_ms) {
 
 	// handle ui requests
 	for (UIRequest& uiRequest : registry.uiRequests.components) {
-		if (uiRequest.type == UIRequestType::StackNotifReqShift || UIRequestType::StackNotifReqShuffle) {
+		if (uiRequest.type == UIRequestType::StackNotifReqShift || uiRequest.type == UIRequestType::StackNotifReqShuffle) {
+			// clean up stack add notifs
+			for (int i = registry.stackAddNotifs.size() - 1; i >= 0; i--) {
+				Entity e = registry.stackAddNotifs.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+			
 			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
 			registry.renderRequests.get(stackAddBubble).show = true;
 			registry.renderRequests.get(stackAddTail).show = true;
-			updateStackAddBubble(playerPos, 1);
+			updateStackAddBubble(playerPos,1);
 
 			if (!registry.showTimers.has(stackAddBubble)) {
 				if (registry.fades.has(stackAddBubble)) {
@@ -301,6 +290,37 @@ void UISystem::step(float elapsed_ms) {
 			}
 
 			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), bullet);
+		}
+
+		if (uiRequest.type == UIRequestType::ResetUI) {
+			DialogueLines& lines = registry.dialogueLines.components[0];
+			lines = DialogueLines();
+
+			// clear choices here for now
+			for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+				Entity e = registry.dialogueChoices.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+			for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+				Entity e = registry.menuChoices.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+
+			registry.activeMenus.clear();
+			ioState.activeMenu = -1;
+			registry.renderRequests.get(stackAddBubble).show = false;
+			registry.renderRequests.get(stackAddTail).show = false;
+			registry.renderRequests.get(controlsGuide).show = false;
+		}
+
+		if (uiRequest.type == UIRequestType::GameOverReport) {
+			std::string report = "\n" + reportStats();
+			std::vector<std::string> reportTokenized = getTokenizedText(report);
+			TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
+			text.tokenizedText = uiTexts["GameOver"];
+			text.tokenizedText.insert(text.tokenizedText.end(), reportTokenized.begin(), reportTokenized.end());
+			registry.activeMenus.emplace(registry.menus.entities[MenuType::GameOverMenu]);
+			ioState.activeMenu++;
 		}
 	}
 
@@ -429,9 +449,6 @@ bool UISystem::init(GLFWwindow* window) {
 	loadText();
 	loadBulletEffects();
 	
-	
-	
-	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width, wS.height / 4));
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
@@ -443,6 +460,7 @@ bool UISystem::init(GLFWwindow* window) {
 	titleScreen = createTitleScreen();
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 200.f));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
+	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 2.5, wS.height - 200.f));
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
@@ -676,11 +694,11 @@ Entity UISystem::createStackAddNotif(vec2 position, BulletStackEffect bullet) {
 	std::string shape = "";
 	if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Multiplicative) {
 		shape = "stackNotifShuffle.png";
-		motion.scale = vec2(192) * (motion.scale.y / 192.f);
+		motion.scale = vec2(192) / 2.5f;
 	}
 	else if (bullet.type == BulletEffectType::Lightning && bullet.effectCalc == Additive){
 		shape = "stackNotifShift.png";
-		motion.scale = vec2(192) * (motion.scale.y / 192.f);
+		motion.scale = vec2(192) / 2.5f;
 	}
 	else{
 		assert(bulletEffectShapes.count(bullet.type) > 0);
@@ -710,8 +728,10 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 	vec2 bulletSize = registry.stackUI.components[0].bulletSize;
 	float bulletOffset = registry.stackUI.components[0].bulletOffset;
 	vec2 bulletStartPos = position;
-	motion.scale = vec2(bulletNum * bulletSize.x * STACK_NOTIF_SCALE + bulletNum * bulletOffset * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE, bulletSize.y * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE);
+	motion.scale = vec2(bulletNum * bulletSize.x * STACK_NOTIF_SCALE + bulletNum * bulletOffset * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE,
+		bulletSize.y * STACK_NOTIF_SCALE + 2 * bulletOffset * STACK_NOTIF_SCALE);
 	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x * STACK_NOTIF_SCALE - bulletOffset * STACK_NOTIF_SCALE / 2, bulletStartPos.y);
+	motion.scale += vec2(10.f, 0);
 
 	Motion& tailMotion = registry.motions.get(stackAddTail);
 	tailMotion.position = motion.position - motion.scale * vec2(0.5, -0.5) - tailMotion.scale / 2.f * vec2(0.5, -0.5);
@@ -934,23 +954,19 @@ Entity UISystem::createMenuChoice(std::string choice, vec2 position) {
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
 	motion.scale = { 40, 40 };
-	motion.position = vec2(position.x - text.text.length() * text.scale * 48 / 2 - motion.scale.x, position.y);
+	motion.position = vec2(position.x - text.text.length() * text.scale * DEFAULT_FONT_SIZE / 2 - motion.scale.x, position.y);
 
 	text.x = position.x;
-	text.y = windowState.height - position.y - motion.scale.y / 2;
+	text.y = windowState.height - position.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
 
 	// also make it a button
 	UIButton& button = registry.buttons.emplace(entity);
 	button.padding = 15.f;
-	button.buttonSize = vec2(text.text.length() * text.scale * 48, motion.scale.y);
+	button.buttonSize = vec2(text.text.length() * text.scale * DEFAULT_FONT_SIZE, text.scale * DEFAULT_FONT_SIZE);
 	button.position = vec2(text.x, position.y);
 
 	vec3& color = registry.colors.emplace(entity);
 	color = COLOR_RED;
-
-	//registry.dialogueUITexts.emplace(entity); // comment out for now to avoid rendering twice (especially drawn in text render)
-
-
 
 	registry.menuChoices.emplace(entity);
 
@@ -1188,17 +1204,24 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	text.bottomLeftBound = { 0, 0 };
 
 	WindowState& windowState = registry.windowStates.components[0];
-	text.scale = 1.2;
-	text.x = windowState.width - scale.x + 25;
-	text.y = windowState.height - position.y + text.scale * DEFAULT_FONT_SIZE / 2.f;
-	text.topRightBound = { scale.x - 25, scale.y - 25 };
-	text.bottomLeftBound = { text.x, 0 + 25 };
+	text.scale = 0.7f;
+	text.x = position.x - scale.x / 2.f + 25;
+	text.y = position.y + scale.y / 2.f - 25.f - text.scale * DEFAULT_FONT_SIZE;
+	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
+	text.bottomLeftBound = { 0, 0 + 25 };
+
 	text.tokenizedText = uiTexts["GameOver"];
 
 	UIBorder& border = registry.uiBorders.emplace(entity);
 	border.borderColour = vec3(1.f);
 	border.border = UIBorderType::Outlined;
 	border.borderThickness = 10.f;
+
+	Menu& menu = registry.menus.emplace(entity);
+	menu.options = { "Title", "Quit"};
+	menu.startPos = { position.x,  position.y + scale.y / 2.f - 200};
+	menu.offset = { 0, 50 + 30 };
+	menu.type = MenuType::GameOverMenu;
 
 	return entity;
 }
@@ -1567,5 +1590,13 @@ void UISystem::loadBulletEffects() {
 			std::cout << tooltip << std::endl;
 		}
 	}
+}
+
+std::string UISystem::reportStats() {
+	GameReport& report = registry.gameReports.components[0];
+	std::stringstream reportString;
+	reportString << "System Diagnostics Report\nRooms Cleared: " << report.roomsCleared << "\nSystem Runtime: " << std::fixed << std::setprecision(2) 
+		<< (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - report.gameStartTime)).count() / 1000 / 1000.f << "s";
+	return reportString.str();
 }
 

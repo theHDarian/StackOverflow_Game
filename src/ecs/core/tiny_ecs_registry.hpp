@@ -104,6 +104,7 @@ public:
 	ComponentContainer<Scientist> scientist;
 	ComponentContainer<Shield> shield;
 	ComponentContainer<Hand> hand;
+	ComponentContainer<GameReport> gameReports;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -196,6 +197,7 @@ public:
 		registry_list.push_back(&buttons);
 		registry_list.push_back(&menus);
 		registry_list.push_back(&activeMenus);
+		registry_list.push_back(&gameReports);
 		registry_list.push_back(&scientist);
 		registry_list.push_back(&shield);
 		registry_list.push_back(&hand);

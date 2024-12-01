@@ -51,10 +51,17 @@ struct GameState {
 	float currentVolume = 0.5f;
 	bool seenLockedDoor = false;
 	bool titleScreen = false;
+	bool resetRoom = false;
 	bool loading = true; // this is ONLY here to prevent awkward half second of non-black screen on game start
-	// when fix ui later properly can remove
+						// when fix ui later properly can remove
 };
 
 struct Camera {
 	float zoom = 1.0f;
+};
+
+struct GameReport {
+	int roomsCleared = 0; // in case differ from map's, i.e. each region's counts resets
+	std::chrono::steady_clock::time_point gameStartTime; // different from window, used to calculate run time
+	std::string name;
 };

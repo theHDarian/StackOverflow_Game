@@ -22,7 +22,7 @@ const RoomPreset TutorialRoom1Preset{
 };
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::ScientistBoss, {1, 0.5}}},
+    {{EnemyType::EasyEnemySkull, {1, 0.5}}},
     {},
     {},
     0.0f,
@@ -191,9 +191,98 @@ const RoomPreset EnemyRoomSwarm{
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
      {EnemyType::HardEnemyBoid, {0.5f, 0.5f}}},
+
     {},
-    {{{PushConsole,{bulletPierceUpA}}, {0.5f, 0.5f}}},
+    {{{PopConsole,{bulletPierceUpA, bulletPierceUpM}}, {0.5f, 0.5f}}, {{PushConsole,{ bulletPierceUpM}}, {0.25f, 0.5f}}, {{PushConsole,{bulletPierceUpA}}, {0.75f, 0.5f}}},
     0.0f,
     0,
 0,
@@ -496,25 +585,25 @@ const RoomPreset TreasureRoom2{
 const RoomPreset TreasureRoom3{
     {},
     {},
-    {{{PushConsole,{dmgUpM}}, {0.5f, 0.5f}}},
+    {{{FightConsole,{dmgUpM}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
     "TreasureRoom3",
     false,
-     {1300, 1300},
+     {2600, 2200},
 };
 
 const RoomPreset TreasureRoom4{
     {},
     {},
-    {{{PushConsole,{dashCDRDownA}}, {0.5f, 0.5f}}},
+    {{{FightConsole,{dashCDRDownA}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
     "TreasureRoom4",
     false,
-     {1300, 1300},
+     {2600, 2200},
 };
 
 const RoomPreset TreasureRoom5{
@@ -555,7 +644,7 @@ const RoomPreset TreasureRoomBlunt{
 const RoomPreset TreasureRoomRam{
     {},
     {},
-    {{{InteractableItem::PushConsole,{stackSizeUpA}}, {0.5f, 0.5f}}},
+    {{{InteractableItem::PushConsole,{}}, {0.5f, 0.5f}}},
     0.0f,
     0,
     0,
@@ -572,7 +661,7 @@ const RoomPreset TreasureRoomSniper{
     5,
     0,
     "TreasureRoomSniper",
-    false,
+    true,
      {1300, 1300},
 };
 
@@ -596,8 +685,8 @@ const RoomPreset TreasureRoomKeys{
     5,
     0,
     "TreasureRoomKeys",
-    false,
-     {1300, 1300},
+    true,
+     {1300, 1800},
 };
 
 
@@ -758,6 +847,187 @@ const RoomPreset HifiRoomBoidSnipers{
     "HifiBoidSnipers"
 };
 
+const RoomPreset HifiEnemyRoomSwarmLasers {
+    {{EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+     {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+{EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
+    {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.3f}},
+{EnemyType::HifiEnemyTwinLaserHorizontal1, {0.3f,0.1f}},
+{EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.7f}},
+{EnemyType::HifiEnemyTrailHard, {0.6f,0.6f}},
+{EnemyType::HifiEnemyTrailHard, {0.4f,0.4f}}
+
+
+    },
+
+    {},
+    {{{PopConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
+        {{PushConsole,{numBulletsUpA}}, {0.25f, 0.5f}},
+        {{PushConsole,{bulletBurstUpA}}, {0.75f, 0.5f}}},
+    0.0f,
+    0,
+0,
+"HifiEnemyRoomSwarmLasers",
+    false,
+    {2000, 2000}
+};
+
 const RoomPreset HifiRoomCannonLasers{
     {
         {EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
@@ -768,6 +1038,23 @@ const RoomPreset HifiRoomCannonLasers{
         {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.3f}},
         {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.3f,0.1f}},
         {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.7f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiBoidCannons"
+};
+
+const RoomPreset HifiRoomCannonSnipers{
+    {
+        {EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
+        {EnemyType::HifiEnemyCannon, {0.9f,0.8f}},
+        {EnemyType::HifiEnemyLaserSniper, {0.1f,0.2f}},
+        {EnemyType::HifiEnemyLaserSniper, {0.1f,0.8f}},
+        {EnemyType::HifiEnemySniper, {0.6f,0.6f}},
+        {EnemyType::HifiEnemySniper, {0.4f,0.4f}}
     },
     {},
     {},
@@ -838,17 +1125,20 @@ const RoomPreset HifiRoomCannonBoids{
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
-        {RoomType::RestRoom, {{RestingRoomGardener, RestRoomEmpty,RestRoomBibleTree, RestRoomEmpty},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop},}},
+        {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab, RestRoomEmpty}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestRoomEmpty,RestingRoomGardener, RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab, RestRoomEmpty}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestRoomEmpty,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
@@ -856,18 +1146,21 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
         // {RoomType::EnemyRoom, {{HifiRoomTwinLaserShurikens,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
-        {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{}}},
-        {RoomType::RestRoom, {{RestRoomEmpty, RestRoomBaru, RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens, HifiRoomCannonLasers},{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::RestRoom, {{},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{TreasureRoomHoney}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty,RestRoomBibleTree,},{RestingRoomPop}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{TreasureRoomHoney}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomEmpty, RestRoomBibleTree,},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
@@ -899,6 +1192,59 @@ inline bool hasLocked(RoomType type, int roomsTraversed) {
     } else {
         return !map.directory.at(Medium).at(type).locked.empty();
     }
+}
+
+inline bool hasUnlocked(RoomType type, int roomsTraversed) {
+    Map& map = registry.maps.components[0];
+
+    if (type >= RoomType::None) {
+        return false;
+    }
+    if (roomsTraversed < DifficultyRegion::Intro) {
+        return !map.directory.at(Intro).at(type).unlocked.empty();
+    } else if (roomsTraversed < DifficultyRegion::Easy) {
+        return !map.directory.at(Easy).at(type).unlocked.empty();
+    } else if (roomsTraversed < DifficultyRegion::Medium) {
+        return !map.directory.at(Medium).at(type).unlocked.empty();
+    } else {
+        return !map.directory.at(Medium).at(type).unlocked.empty();
+    }
+}
+
+inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
+{
+    const int bossRoomNum = 12;
+    if (roomsTraversed % bossRoomNum == bossRoomNum-1) {
+        return BossRoom;
+    }
+
+    if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
+        return RoomType::EnemyRoom;
+    }
+
+
+    std::vector<RoomType> possibleRooms;
+    if (!excludeNone) {
+        possibleRooms.push_back(RoomType::None);
+    }
+    if (hasLocked(RoomType::EventRoom, roomsTraversed) || hasUnlocked(RoomType::EventRoom, roomsTraversed)) {
+        possibleRooms.push_back(RoomType::EventRoom);
+    }
+    if (hasLocked(RoomType::TreasureRoom, roomsTraversed) || hasUnlocked(RoomType::TreasureRoom, roomsTraversed)) {
+        possibleRooms.push_back(RoomType::TreasureRoom);
+    }
+    if (hasLocked(RoomType::RestRoom, roomsTraversed) || hasUnlocked(RoomType::RestRoom, roomsTraversed) && Random::Float() < 0.25f) {
+        possibleRooms.push_back(RoomType::RestRoom);
+    }
+    return Random::ListItem(possibleRooms);
+
+    // else if (Random::Float() >  0.5f && Random::Float() < 0.7f) {
+    //     return RoomType::TreasureRoom;
+    // }  else if (Random::Float() > 0.7f && Random::Float() < 0.80f) {
+    //     return RoomType::EventRoom;
+    // }
+    //
+    // return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
 }
 
 inline RoomPreset getRoomPreset(RoomType type, bool locked) {
@@ -965,6 +1311,7 @@ const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::RestRoom,1},
     {RoomType::BossRoom,2},
     {RoomType::TreasureRoom,0},
+{ RoomType::EventRoom, 4 },
     {RoomType::None,4},
     {RoomType::TutorialRoom1,5},
     {RoomType::TutorialRoom2,5}
@@ -977,5 +1324,6 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
     {RoomType::TreasureRoom, SoundType::specialBGM},
     {RoomType::None, normalBGM},
     {RoomType::TutorialRoom1, SoundType::specialBGM},
-    {RoomType::TutorialRoom2, SoundType::normalBGM}
+    {RoomType::TutorialRoom2, SoundType::normalBGM},
+        { RoomType::EventRoom, SoundType::specialBGM }
 };

@@ -18,13 +18,12 @@ struct StackUI {
 };
 
 enum UIBorderType {
-	NoBorder,
 	Outlined,
-	Fancy
+	Fancy // does not currently exist
 };
 
 struct UIBorder {
-	UIBorderType border = NoBorder;
+	UIBorderType border = UIBorderType::Outlined;
 	vec3 borderColour = vec3(1.f);
 	float borderThickness = 0;
 };
@@ -103,7 +102,9 @@ struct StackAddNotif {
 
 enum UIRequestType {
 	StackNotifReqShift,
-	StackNotifReqShuffle
+	StackNotifReqShuffle,
+	ResetUI,
+	GameOverReport
 };
 
 struct UIRequest {
@@ -119,7 +120,8 @@ struct UIButton {
 enum MenuType {
 	TitleMenu,
 	PauseMenu,
-	ControlsMenu
+	ControlsMenu,
+	GameOverMenu
 };
 
 struct Menu {

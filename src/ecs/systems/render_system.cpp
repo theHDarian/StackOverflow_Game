@@ -379,7 +379,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	float alpha = 1;
 
-
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
 	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
@@ -398,6 +397,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	}
 	else if (registry.interactIndicators.has(entity)) { // hard code here for now
 		alpha = 0.7;
+	}
+	else if (registry.shield.has(entity)) {
+		alpha = 0.3;
 	}
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
@@ -772,6 +774,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
+		if (registry.lasers.has(entity) && registry.enemies.has(registry.lasers.get(entity).start)) drawLaserIndicator(entity, projection, view);
 		drawTexturedMesh(entity, projection, view);
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
@@ -791,9 +794,6 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
-			drawHPbar(entity, projection, view);
-		}
 
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
@@ -804,9 +804,6 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
 			continue;
 		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
-			drawHPbar(entity, projection, view);
-		}
 
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
@@ -880,12 +877,34 @@ void RenderSystem::drawGameUI() {
 	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
+	for (Entity& entity : registry.enemies.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity)) {
+			drawHPbar(entity, projection, view);
+		}
+	}
+	
 	for (Entity& entity : registry.bosses.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
 			drawHPbar(entity, projection, view);
+			BossEnemy& boss = registry.bosses.get(entity);
+			if (!registry.textRenderRequests.has(entity)) {
+				GameUIText& text = registry.gameUITexts.emplace(entity);
+				TextRenderRequest& textRequest = registry.textRenderRequests.emplace(entity);
+				textRequest.text = boss.name;
+				textRequest.x = windowState.width / 2,
+					textRequest.y = windowState.height * 0.04f;
+				textRequest.alignment = TextAlignment::CenteredAlign;
+				textRequest.scale = 0.4f;
+				textRequest.color = vec3(1, 1, 1);
+				textRequest.bottomLeftBound = vec2(0);
+				textRequest.topRightBound = vec2(windowState.width, windowState.height);
+			}
 		}
 	}
 
@@ -1308,6 +1327,94 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	gl_has_errors();
 }
 
+void RenderSystem::drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view) {
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	Motion& motion1 = registry.motions.get(entity);
+	Laser& laser = registry.lasers.get(entity);
+	Motion motion = Motion();
+	motion.angle = motion1.angle;
+	motion.position = registry.motions.get(registry.lasers.get(entity).start).position + vec2(cos(motion.angle), sin(motion.angle)) * (laser.maxLength / 2.0f);
+	motion.scale = vec2(laser.maxLength, motion.scale.y * 2.f);
+	vec2 offset = render_request.offset;
+
+	const GLuint program = (GLuint)effects[EFFECT_ASSET_ID::TEXTURED];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+	gl_has_errors();
+
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, true);
+	gl_has_errors();
+
+	vec2 tiling = vec2(laser.maxLength / 48.f, 1);
+	GLint tiling_uloc = glGetUniformLocation(program, "tiling");
+	glUniform2fv(tiling_uloc, 1, (float*)&tiling);
+
+	// Enable and bind the texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture["LaserIndicator.png"]];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+
+	// Setting uniform values to the currently bound program
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	float wallThickness = 100 + 50;
+	float zoom = 1;
+	// note: perspective seems to make no difference?
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = glm::mat4(1.0);
+	transform = createFollowCameraModel(motion, offset);
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+
+	gl_has_errors();
+
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
+	gl_has_errors();
+}
+
 // draw collider shape based on shape texture passed
 // only draws circles and boxes for now
 // (more work required to include polygons)
@@ -1400,7 +1507,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4& pr
 }
 
 void RenderSystem::drawDashes(const mat4& projection, const mat4& view) {
-	vec2 pos = { 75,210 };
+	vec2 pos = { 77,220 };
 	vec2 scale = { 50, 50 };
 	float offset = 10;
 
@@ -1544,7 +1651,7 @@ void RenderSystem::drawHPbar(Entity& entity, const mat4& projection, const mat4&
 		HPBarMotion.scale = { 100, 10 };
 	}
 
-	if (registry.damageds.has(entity)) {
+	if (registry.damageds.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver) {
 		HPBarMotion.position.x += (rand() % 10) - 5;
 		HPBarMotion.position.y += (rand() % 10) - 5;
 	}

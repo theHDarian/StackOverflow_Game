@@ -35,4 +35,5 @@ private:
 	bool CheapCircleToCircle(vec2 p1, float r1, vec2 p2, float r2);
 	bool CheapCircleToTriangle(vec2 p, float r, vec2 a, vec2 b, vec2 c);
 	vec2 rotate(vec2 v, float angle);
+	float distanceSquared(vec2 v1, vec2 v2);
 };

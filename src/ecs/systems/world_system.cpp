@@ -99,7 +99,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -136,7 +136,6 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	fprintf(stderr, "Loaded music\n");
 	this->soundPlayer = soundPlayer_arg;
 
-
 	// Set all states to default
 	GameState& gameState = registry.gameStates.components[0];
 	gameState.gameOver = false;
@@ -163,16 +162,12 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 
 	createRoomBounds(renderer, roomCenter, currRoom.preset.roomSize);
 
-	//Entity title = createSkipDialogue();
-	//registry.dialogueRequests.emplace(title);
-
 	// mock interactable call instead of proper ui for now
 	skipDialogue = createSkipDialogue();
-	//registry.dialogueRequests.emplace(skipDialogue);
 
-	//Entity skipDialogue2 = createSkipDialogue();
-	//registry.dialogueRequests.emplace(skipDialogue2);
 	registry.cameras.emplace(player);
+
+	registry.gameReports.emplace(player);
 }
 #pragma endregion
 
@@ -347,6 +342,9 @@ void WorldSystem::restartGame() {
 	gameState.seenLockedDoor = false; 
 	gameState.loading = false;
 	gameState.dialogueChoice = -1;
+	gameState.resetRoom = true;
+
+	registry.ioStates.components[0].shouldRestart = false;
 
 	// Reset the game speed
 	currentSpeed = 1.f;
@@ -356,12 +354,17 @@ void WorldSystem::restartGame() {
 	// mock interactable call instead of proper ui for now
 	registry.dialogueRequests.emplace(skipDialogue);
 
-	if (!registry.mapRequests.has(player))
-		registry.mapRequests.emplace(player,MapRequestType::RestartGame);
-
 	Entity player = resetPlayer();
 	StackUI& stackUI = registry.stackUI.components[0];
 	stackUI.updateStackUISize(registry.stackCompile.get(player).baseStackSize);
+
+	// reset report
+	GameReport& report = registry.gameReports.get(player);
+	report.gameStartTime = Clock::now();
+	report.roomsCleared = 0;
+
+	UIRequest& uireq = registry.uiRequests.emplace(player);
+	uireq.type = UIRequestType::ResetUI;
 }
 
 // Compute collisions between entities
@@ -817,6 +820,9 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
 			if (!success) {
 				registry.gameStates.components[0].gameOver = true;
+				if (!registry.uiRequests.has(player)) {
+					registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
+				}
 			} else if (eBullet.isSpecial) {
 				registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 			}
@@ -829,6 +835,9 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		bool success = registry.stackCompile.get(player).add(e.collisionBullet);
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
+			if (!registry.uiRequests.has(player)) {
+				registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
+			}
 		}
 	}
 }
@@ -839,15 +848,22 @@ void WorldSystem::clearDeleteQueue() {
 		// right now, all our entities that fade will also emit particles (enemies)
 		// but should be generalized for more things in the future
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
-			if (registry.enemyBullets.has(e) && !registry.ioStates.components[0].shouldRestart) {
+			if (registry.enemyBullets.has(e) && !registry.gameStates.components[0].resetRoom) {
 				enemyBulletDeath(e);
 			}
 			registry.deleteEntityAndRelatedEntities(e);
 		}
 	}
 
-	if (registry.ioStates.components[0].shouldRestart && registry.enemyBullets.entities.size() == 0) {
-		registry.ioStates.components[0].shouldRestart = false;
+	if (registry.gameStates.components[0].resetRoom) {
+		if (registry.enemyBullets.entities.size() == 0) {
+			registry.gameStates.components[0].resetRoom = false;
+		}
+		else {
+			if (!registry.mapRequests.has(player))
+				registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+		}
+		
 	}
 }
 
@@ -870,7 +886,7 @@ void WorldSystem::enemyBulletDeath(Entity e) {
 		createEnemyBulletDeath(renderer, ebm.position, vec2( 1,-1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1, 1), EnemyBulletDeath::CLUSTER);
 		createEnemyBulletDeath(renderer, ebm.position, vec2(-1,-1), EnemyBulletDeath::CLUSTER);
-		soundPlayer->playExplosionSound(0);
+		//soundPlayer->playExplosionSound(0);
 		return;
 	}
 }

@@ -16,7 +16,7 @@ vec4 getRoomBounds(Entity entity)
 	vec2 roomStartPos = map.currRoom.roomStart;
 	vec2 roomEndPos = map.currRoom.roomEnd;
 
-	vec2 scale = registry.motions.get(entity).scale;
+	vec2 scale = abs(registry.motions.get(entity).scale);
 	vec2 min = roomStartPos + scale / 2.f;
 	vec2 max = roomEndPos - scale / 2.f;
 
@@ -180,10 +180,10 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		{
 
 			Enemy &shield = registry.enemies.get(scien.shield);
-			std::cout << shield.currHealth << "shield health" << std::endl;
+			//std::cout << shield.currHealth << "shield health" << std::endl;
 			if (shield.currHealth <= 0)
 			{
-				std::cout << "got here" << std::endl;
+				//std::cout << "got here" << std::endl;
 				auto reaction = getReactions(currPattern.reactions, ReactionType::SHIELDBREAK);
 				if (reaction)
 				{
