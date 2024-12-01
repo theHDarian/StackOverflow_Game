@@ -1198,7 +1198,6 @@ struct Bee3 : Enemy
 		0,
 		0};
 
-
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {reactionFollow}, 1, true, 0, 600.f, beeSpray};
 	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {reactionFollow}, 0, false, 0, 1000.f, none};
 	Bee3()
@@ -2332,11 +2331,10 @@ struct ScientistBossEnemy : Enemy
 	Reaction secondPhase{
 		ReactionType::FIFTY_HEALTH,
 		9};
-	
-	Reaction secondPhasePlayerClose {
+
+	Reaction secondPhasePlayerClose{
 		ReactionType::PLAYER_CLOSE,
-		18
-	};
+		13};
 
 	const AttackData spawnLaserRotating{
 		EnemyAttackPattern::SPAWNING,
@@ -2356,30 +2354,12 @@ struct ScientistBossEnemy : Enemy
 		EnemyType::ScientistlaserAttack,
 		{{0.5, 0.5}}};
 
-	const AttackData spawnHomingAtk{
-		EnemyAttackPattern::SPAWNING,
-		TRIANGLE,
-		{},
-		blunt,
-		1,
-		0,
-		{20, 20},
-		100,
-		3000,
-		{0, 0.5},
-		0,
-		0,
-		0,
-		EnemyBulletDeath::NONE,
-		EnemyType::ScientistHomingAttack,
-		{}};
-
 	const AttackData spawnBoids{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
 		{},
 		blunt,
-		20,
+		10,
 		0,
 		{20, 20},
 		100,
@@ -2467,7 +2447,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnExplosive{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{dashCDRUpA},
+		{sizeUpA},
 		blunt,
 		2,
 		0,
@@ -2480,7 +2460,7 @@ struct ScientistBossEnemy : Enemy
 		0,
 		EnemyBulletDeath::NONE,
 		EnemyType::ScientistexplosiveAttack,
-		{{0.5, 0.1}, {0.5, 0.9}}};
+		{{0.5, 0.3}, {0.5, 0.7}}};
 
 	const AttackData spawnShield{
 		EnemyAttackPattern::SPAWNING,
@@ -2500,12 +2480,12 @@ struct ScientistBossEnemy : Enemy
 		EnemyType::ScientistShield,
 		{}};
 
-	const AttackData spawnFishBoid{
+	const AttackData spawnHand{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
 		{dashCDRUpA},
 		blunt,
-		100,
+		1,
 		0,
 		{20, 20},
 		100,
@@ -2515,25 +2495,7 @@ struct ScientistBossEnemy : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::HardEnemyBoidFish,
-		{}};
-
-	const AttackData spawnHealer{
-		EnemyAttackPattern::SPAWNING,
-		TRIANGLE,
-		{dashCDRUpA},
-		blunt,
-		2,
-		0,
-		{20, 20},
-		100,
-		3000,
-		{0.5, 0.5},
-		0,
-		0,
-		0,
-		EnemyBulletDeath::NONE,
-		EnemyType::MediumEnemyHealer,
+		EnemyType::ScientistHand,
 		{}};
 
 	const AttackData lethalShot{
@@ -2565,29 +2527,40 @@ struct ScientistBossEnemy : Enemy
 		0,
 		0,
 		0};
-	
-	const AttackData beeHiveSpawn {
-		EnemyAttackPattern::SPAWNING,
+
+	const AttackData ScientistHomingShot{
+		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{dashCDRUpA},
+		{},
 		blunt,
 		1,
-		0,
+		M_PI / 16,
 		{20, 20},
-		100,
-		3000,
-		{0.5, 0.5},
+		450,
+		10000,
+		{600, 0},
+		1,
 		0,
-		0,
-		0,
-		EnemyBulletDeath::NONE,
-		EnemyType::BeeHive,
-		{}
-	};
+		0.02};
 
-	EnemyPattern spawnLaserHorizontalState = {"SHOOT HORIZONTAL", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 1, true, 0.f, 2000.f, spawnLaserHorizontal};
-	EnemyPattern spawnLaserVerticalState = {"SHOOT VERTICAL", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 2, true, 0.f, 3000.f, spawnLaserVertical};
-	EnemyPattern spawnHomingState = {"SHOOT HOMING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 3, true, 0.f, 5000.f, spawnHomingAtk};
+	const AttackData spraying{
+		EnemyAttackPattern::SPRAY,
+		TRIANGLE,
+		{numBulletsUpA},
+		playerSpeedDownA,
+		20,
+		M_PI,
+		{20, 20},
+		600,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0};
+
+	EnemyPattern spawnLaserHorizontalState = {"SHOOT HORIZONTAL", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 1, true, 0.f, 1000.f, spawnLaserHorizontal};
+	EnemyPattern spawnLaserVerticalState = {"SHOOT VERTICAL", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 2, true, 0.f, 4000.f, spawnLaserVertical};
+	EnemyPattern spawnHomingState = {"SHOOT HOMING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 3, true, 0.f, 500.f, ScientistHomingShot};
 	EnemyPattern spawnBoidState = {"SHOOT BOID", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 4, true, 0.f, 2500.f, spawnBoids};
 	EnemyPattern spawnLaserRotateState = {"SHOOT LASER", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 5, true, 0.f, 7000.f, spawnLaserRotating};
 	EnemyPattern spawnRadialState = {"SHOOT RADIAL", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase}, 0, true, 0.f, 4000.f, spawnTurret};
@@ -2595,28 +2568,22 @@ struct ScientistBossEnemy : Enemy
 	EnemyPattern vunerableState = {"VURNERABLE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration, secondPhase}, 8, false, 0.f, 0.f, NoAttack};
 	EnemyPattern spawnShieldState = {"Shield", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, secondPhase}, 0, true, 0.f, 2000.f, spawnShield};
 	EnemyPattern secondPhaseState = {"SECOND PHASE", EnemyBehavior::TELEPORT, {{0.5f, 0.5f}}, 0, 2000.f, 2000.f, {duration}, 10, false, 0.f, 0.f, NoAttack};
-	EnemyPattern spawnHealerState = {"SUMMON HEALER", EnemyBehavior::IDLE, {}, 0, 500.f, 500.f, {duration}, 11, true, 0.f, 5000.f, spawnHealer};
-	EnemyPattern spawnFishBoidState = {"FISH BOID", EnemyBehavior::IDLE, {}, 0, 500.f, 500.f, {duration}, 12, true, 0.f, 5000.f, spawnFishBoid};
-	EnemyPattern shootLethalState = {"LETHAL SHOT", EnemyBehavior::IDLE, {}, 0, 500.f, 500.f, {duration}, 13, true, 0.f, 5000.f, lethalShot};
-	EnemyPattern patrollingState1 = {"PATROL 1", EnemyBehavior::PATROLLING, {{0.2, 0.8}}, 0, 7000.f, 7000.f, {duration}, 14, true, 0.f, 7000.f, laserBoss};
-	EnemyPattern patrollingState2 = {"PATROL 2", EnemyBehavior::PATROLLING, {{0.2, 0.2}}, 0, 7000.f, 7000.f, {duration}, 15, true, 0.f, 7000.f, beeHiveSpawn};
-	EnemyPattern patrollingState3 = {"PATROL 3", EnemyBehavior::PATROLLING, {{0.8, 0.2}}, 0, 7000.f, 7000.f, {duration}, 16, true, 0.f, 7000.f, NoAttack};
-	EnemyPattern patrollingState4 = {"PATROL 4", EnemyBehavior::PATROLLING, {{0.8, 0.8}}, 0, 7000.f, 7000.f, {duration}, 17, true, 0.f, 7000.f, NoAttack};
-	EnemyPattern followState = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 20000.f, 20000.f, {secondPhasePlayerClose}, 18, false, 0.f, 0.f, NoAttack};
-	EnemyPattern closePlayerState = {"FOLLOW", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration}, 11, false, 0.f, 1000.f, spawnBeeBoids};
-
+	EnemyPattern spawnHandState = {"SUMMON HAND", EnemyBehavior::IDLE, {}, 0, 500.f, 500.f, {duration}, 11, true, 0.f, 5000.f, spawnHand};
+	EnemyPattern patrollingState1 = {"PATROL 1", EnemyBehavior::PATROLLING, {{0.2, 0.8}, {0.2, 0.2}}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 2000.f, lethalShot};
+	EnemyPattern patrollingState2 = {"PATROL 2", EnemyBehavior::PATROLLING, {{0.5, 0.5}, {0.7, 0.7}}, 0, 5000.f, 5000.f, {duration}, 13, true, 0.f, 5000.f, spawnExplosive};
+	EnemyPattern teleportState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.1, 0.5}}, 0, 5000.f, 5000.f, {duration}, 11, true, 0.f, 2500.f, spraying};
 
 	ScientistBossEnemy()
 	{
-		maxHealth = 200;
-		currHealth = 200;
-		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState, 
-						spawnBoidState, spawnLaserRotateState, 
-						spawnRadialState, spawnBeeBoidState, 
-						vunerableState, spawnShieldState, secondPhaseState, 
-						spawnHealerState, spawnFishBoidState, shootLethalState,
-						patrollingState1, patrollingState2,patrollingState3, patrollingState4, 
-						followState, closePlayerState};
+		maxHealth = 1200;
+		currHealth = 1200;
+		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
+						 spawnBoidState, spawnLaserRotateState,
+						 spawnRadialState, spawnBeeBoidState,
+						 vunerableState, spawnShieldState, secondPhaseState,
+						 spawnHandState,
+						 patrollingState1,
+						 patrollingState2, teleportState};
 		sprite = {
 			"enemy_Angel.png",
 			EFFECT_ASSET_ID::TEXTURED,
@@ -2638,7 +2605,7 @@ struct ScientistSheildEnemy : Enemy
 	ScientistSheildEnemy()
 	{
 		maxHealth = 600;
-		currHealth = 20;
+		currHealth = 600;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_Pufferfish.png",
@@ -2743,7 +2710,7 @@ struct InvisibleLaserEnemy : Enemy
 		{20, 20},
 		0,
 		30000,
-		{6.5, 0},
+		{10, 0},
 		0,
 		0,
 		0};
@@ -2782,12 +2749,12 @@ struct InvisibleLaserEnemyVertical : Enemy
 		{20, 20},
 		0,
 		30000,
-		{6.5, 0},
+		{10, 0},
 		0,
 		0,
 		0};
 
-	EnemyPattern laserState = {"LASER", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {deathTransition}, 1, true, 0.f, 3000.f, laserGrid};
+	EnemyPattern laserState = {"LASER", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {deathTransition}, 1, true, 0.f, 4000.f, laserGrid};
 	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition}, 1, false, 0.f, 0.f, NoAttack};
 	InvisibleLaserEnemyVertical()
 	{
@@ -2809,25 +2776,25 @@ struct InvisibleExplosiveEnemy : Enemy
 {
 
 	const AttackData ScientistCannonShot{
-		EnemyAttackPattern::BURST,
+		EnemyAttackPattern::RADIAL_POLYGON,
 		CIRCLE,
-		{dmgUpM, bulletBounceUpM, sizeUpM},
-		{fireRateDownM},
-		3,
+		{bulletBounceUpM},
+		{fireRateUpA},
+		10,
 		M_PI / 16,
 		{70, 70},
 		60,
 		10000,
-		{600, 0},
+		{60, 0},
 		0,
 		0,
 		0,
-		EnemyBulletDeath::EXPLODE};
+		EnemyBulletDeath::CLUSTER};
 
 	Reaction deathTransition{
 		ReactionType::DURATION,
 		1};
-	EnemyPattern ShootState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 600.f, ScientistCannonShot};
+	EnemyPattern ShootState = {"LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {deathTransition}, 1, true, 0.f, 2500.f, ScientistCannonShot};
 	EnemyPattern DeathState = {"REMOVE ME", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {deathTransition}, 1, false, 0.f, 0.f, NoAttack};
 	InvisibleExplosiveEnemy()
 	{
@@ -2880,6 +2847,68 @@ struct InvisibleHomingEnemy : Enemy
 		};
 		patternIndex = 0;
 		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct ScientistHandEnemy : Enemy
+{
+
+	Reaction duration{
+		ReactionType::DURATION,
+		0};
+
+	const AttackData HandBomb{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{numBulletsUpA, dmgDownA},
+		blunt,
+		5,
+		-M_PI / 20,
+		{100, 100},
+		150,
+		9000,
+		{5, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE};
+
+	const AttackData laserOne{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{numBulletsUpA, dmgDownA},
+		blunt,
+		1,
+		M_PI,
+		{100, 100},
+		150,
+		9000,
+		{30, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE};
+	EnemyPattern idling = {"IDLE", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargePlayer = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 3000.f, 3000.f, {duration}, 2, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling2 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern BombingState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 4, true, 1000.f, 1000.f, HandBomb};
+	EnemyPattern idling3 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 5, false, 0.f, 0.f, NoAttack};
+	EnemyPattern laserAttackPrepareState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.9, 0.1}}, 0, 2000.f, 2000.f, {duration}, 6, true, 1000.f, 1000.f, NoAttack};
+	EnemyPattern patrolLaserState = {"PATROLLING", EnemyBehavior::PATROLLING, {{0.9, 0.1}, {0.9, 0.9}}, 0, 15000.f, 15000.f, {duration}, 0, true, 0.f, 15000.f, laserOne};
+
+	ScientistHandEnemy()
+	{
+		maxHealth = 2000;
+		currHealth = 2000;
+		enemyPatterns = {idling, chargePlayer, idling2, BombingState, idling3, laserAttackPrepareState, patrolLaserState};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(200, 200);
 		rotatePower = 0.f;
 	};
 };

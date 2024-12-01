@@ -103,6 +103,7 @@ public:
 	ComponentContainer<ActiveMenu> activeMenus;
 	ComponentContainer<Scientist> scientist;
 	ComponentContainer<Shield> shield;
+	ComponentContainer<Hand> hand;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -197,6 +198,7 @@ public:
 		registry_list.push_back(&activeMenus);
 		registry_list.push_back(&scientist);
 		registry_list.push_back(&shield);
+		registry_list.push_back(&hand);
 	}
 
 	void clear_all_components() {
