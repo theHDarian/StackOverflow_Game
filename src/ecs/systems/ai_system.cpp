@@ -159,9 +159,12 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		Scientist &scien = registry.scientist.get(entity);
 		if (scien.shield && registry.enemies.has(scien.shield))
 		{
+
 			Enemy &shield = registry.enemies.get(scien.shield);
-			if (shield.currHealth < 0)
+			std::cout << shield.currHealth << "shield health" << std::endl;
+			if (shield.currHealth <= 0)
 			{
+				std::cout << "got here" << std::endl;
 				auto reaction = getReactions(currPattern.reactions, ReactionType::SHIELDBREAK);
 				if (reaction)
 				{
@@ -336,6 +339,8 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getCharginPos(entity);
 	case EnemyBehavior::RECOIL:
 		return getRecoilPos(entity);
+	case EnemyBehavior::TELEPORT:
+		return getTeleportPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
@@ -347,6 +352,33 @@ vec2 AISystem::getCurrentPos(Entity entity)
 	Motion &motion = registry.motions.get(entity);
 	movement.speed = 100.f;
 	return motion.position;
+}
+
+vec2 AISystem::getTeleportPos(Entity entity)
+{
+	Enemy &enemy = registry.enemies.get(entity);
+	EnemyPattern &pattern = enemy.currEnemyPattern();
+	if (pattern.type == EnemyBehavior::TELEPORT)
+	{
+
+		if (pattern.path.size() > 0)
+		{
+			vec2 positionFactor = pattern.path[0];
+			vec4 roomBounds = getRoomBounds(entity);
+			vec2 min = {roomBounds.x, roomBounds.y};
+			vec2 max = {roomBounds.z, roomBounds.w};
+
+			return glm::lerp(min, max, positionFactor);
+		}
+		else
+		{
+			return generateRandomPos(entity);
+		}
+	}
+	else
+	{
+		return getCurrentPos(entity);
+	}
 }
 
 vec2 AISystem::getNextPatrolPos(Entity entity)
@@ -390,22 +422,15 @@ vec2 AISystem::getCharginPos(Entity entity)
 	vec2 playerPos = getPlayerPos();
 	Motion &motion = registry.motions.get(entity);
 	vec2 scale = motion.scale;
-	// Calculate the direction from the enemy to the player
 	vec2 direction = playerPos - motion.position;
 
-	// Normalize the direction
 	if (glm::length(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
+	float chargeDistance = 100.0f;
 
-	// Define a charge distance (how far beyond the player the enemy charges)
-	float chargeDistance = 100.0f; // Adjust this value as needed
-
-	// Calculate the goal position for charging past the player
 	vec2 goalPosition = playerPos + direction * chargeDistance;
-
-	// Increase the enemy's speed for the charge
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 500.0f;
 
@@ -423,22 +448,17 @@ vec2 AISystem::getRecoilPos(Entity entity)
 	vec2 playerPos = getPlayerPos();
 	Motion &motion = registry.motions.get(entity);
 	vec2 scale = motion.scale;
-	// Calculate the direction from the enemy to the player
 	vec2 direction = motion.position - playerPos;
 
-	// Normalize the direction
 	if (glm::length(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
 
-	// Define a charge distance (how far beyond the player the enemy charges)
-	float chargeDistance = 300.0f; // Adjust this value as needed
+	float chargeDistance = 300.0f;
 
-	// Calculate the goal position for charging past the player
 	vec2 goalPosition = motion.position + direction * chargeDistance;
 
-	// Increase the enemy's speed for the charge
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 300.0f;
 
@@ -609,10 +629,11 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSFISH)
 	{
-		boidCircleRoom(entity, boid, 0.1f, 0.05f);
-		boidComputeCoherence(entity, boid, 0.015f, 1000.f);
-		boidComputeSeperation(entity, boid, 0.5f);
-		boidComputeAlignment(entity, boid, 0.01f);
+		boidCircleRoom(entity, boid, 0.3f, 0.05f);
+		// boidComputeCoherence(entity, boid, 0.015f, 1000.f);
+		// boidComputeSeperation(entity, boid, 0.5f);
+		// boidComputeAlignment(entity, boid, 0.01f);
+		boidComputeAllFactor(entity, boid, 0.01f, 0.5f, 0.01f, 700.f);
 
 		if (glm::length(boid.velocity) > boid.maxSpeed)
 		{
@@ -624,9 +645,10 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	else
 	{
 		boidWander(entity, boid, 0.1f);
-		boidComputeCoherence(entity, boid, 0.02f, 700.f);
-		boidComputeSeperation(entity, boid, 0.05f);
-		boidComputeAlignment(entity, boid, 0.02f);
+		// boidComputeCoherence(entity, boid, 0.02f, 700.f);
+		// boidComputeSeperation(entity, boid, 0.05f);
+		// boidComputeAlignment(entity, boid, 0.02f);
+		boidComputeAllFactor(entity, boid, 0.02f, 0.05f, 0.02f, 700.f);
 		if (glm::length(boid.velocity) > boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
@@ -846,9 +868,9 @@ void AISystem::boidCircleRoom(Entity entity, Boid &boid, float multiplier, float
 
 	WindowState &windowState = registry.windowStates.components[0];
 	Room &room = registry.maps.components[0].currRoom;
-	vec2 roomCenter = vec2(windowState.width, windowState.height) / 2.f;
+	vec2 roomCenter = (room.roomStart + room.roomEnd) / 2.f;
 
-	float radius = glm::min(room.preset.roomSize.x, room.preset.roomSize.y) / 2.75f;
+	float radius = glm::min(room.preset.roomSize.x, room.preset.roomSize.y) / 3.5f;
 
 	vec2 position = boid.position;
 	vec2 directionToCenter = position - roomCenter;
@@ -860,4 +882,77 @@ void AISystem::boidCircleRoom(Entity entity, Boid &boid, float multiplier, float
 	vec2 targetPosition = roomCenter + vec2(cos(newAngle) * radius, sin(newAngle) * radius);
 	vec2 desiredVelocity = targetPosition - position;
 	boid.velocity += desiredVelocity * multiplier;
+}
+
+void AISystem::boidComputeAllFactor(Entity entity, Boid &boid, float multiplierCoherence, float multiplierSeperation, float multiplierAlignment, float range)
+{
+	float centeringFactor = multiplierCoherence;
+	vec2 center = vec2{0, 0};
+	int numNeighbors = 0;
+	// ------- SPERATION ----- //
+	float minDistance = 20.f;
+	float avoidFactor = multiplierSeperation;
+	vec2 move = vec2(0, 0);
+	vec2 position = boid.position;
+	//------ ALIGNMENT ---- //
+	vec2 avgVelocity = vec2(0, 0);
+	int numNeighborsAlignemnt = 0;
+	float matchingFactor = multiplierAlignment;
+	for (Entity other : registry.boids.entities)
+	{
+		if (other == entity)
+		{
+			continue;
+		};
+		// -------- COHERENCE ----------- //
+		Boid &otherBoid = registry.boids.get(other);
+		vec2 otherPos = otherBoid.position;
+		float neighborRnge = range;
+		float distance = glm::distance(position, otherPos);
+
+		if (distance < neighborRnge)
+		{
+			center += otherPos;
+			numNeighbors++;
+		}
+
+		// --------- SEPERATION --------- //
+
+		if (distance < minDistance)
+		{
+			move[0] += boid.position[0] - otherPos[0];
+			move[1] += boid.position[1] - otherPos[1];
+		};
+
+		// ---------- ALIGNMENT ----------- //
+		float neighborRngeAlignment = 200.f;
+
+		if (distance < neighborRngeAlignment)
+		{
+			avgVelocity[0] += otherBoid.velocity[0];
+			avgVelocity[1] += otherBoid.velocity[1];
+			numNeighborsAlignemnt += 1;
+		}
+	}
+	// -------------- COHERENCE ------------//
+	if (numNeighbors > 0)
+	{
+		center /= numNeighbors;
+		vec2 cohesionVelocity = (center - position) * centeringFactor;
+		boid.velocity += cohesionVelocity;
+	}
+	// ------------------ SEPERATION ------------------ //
+
+	boid.velocity[0] += move[0] * avoidFactor;
+	boid.velocity[1] += move[1] * avoidFactor;
+	// -------------    ALIGNMENT    ----------//
+
+	if (numNeighborsAlignemnt > 0)
+	{
+		avgVelocity[0] /= numNeighbors;
+		avgVelocity[1] /= numNeighbors;
+
+		boid.velocity[0] += (avgVelocity[0] - boid.velocity[0]) * matchingFactor;
+		boid.velocity[1] += (avgVelocity[1] - boid.velocity[1]) * matchingFactor;
+	}
 }

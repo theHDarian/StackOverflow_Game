@@ -1029,6 +1029,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EnemyMediumHeal();
 		Healer &healer = registry.healers.emplace(entity);
 		healer.coolDown = 0.f;
+		break;
 	}
 	case EnemyType::HardEnemyBoidFish:
 	{
@@ -1039,6 +1040,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		float randomY = getRandomFloat(-35.f, 35.f);
 		boid.velocity = vec2(randomX, randomY);
 		boid.maxSpeed = 200.f;
+		break;
 	}
 	case EnemyType::HifiEnemyTwinLaserVertical1:
 	{

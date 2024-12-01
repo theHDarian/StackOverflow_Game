@@ -348,7 +348,7 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::BossRoom,false);
+        map.currRoom.preset = getRoomPreset(RoomType::TreasureRoom,false);
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
         map.currRoom.type = RoomType::RestRoom;
