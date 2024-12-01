@@ -115,13 +115,24 @@ void closeDoors (SoundSystem* soundPlayer) {
 	soundPlayer->playNextMusic();
 }
 
-void addEffect(Entity player, std::vector<BulletStackEffect> effects) {
+void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSystem* soundPlayer) {
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
         for (BulletStackEffect b : effects) {
             printf("Adding: %s\n",b.name.c_str());
-            reg.add(b);
+            bool success = reg.add(b);
+        	if (!success) {
+        		std::cout << "Stack Overflowed!" << std::endl;
+        		GameState& gameState = registry.gameStates.components[0];
+        		gameState.gameOver = true;
+        		gameState.currentVolume *= 0.15f;
+        		soundPlayer->playGameOverSound();
+        		soundPlayer->setMusicVolume(gameState.currentVolume);
+        		if (!registry.uiRequests.has(player)) {
+        			registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
+        		}
+        	}
         	if (b.type == BulletEffectType::PlayerStackSize) {
 				StackUI& ui = registry.stackUI.components[0];
 				ui.updateStackUISize(getModifiedValue( PlayerStackSize, reg.baseStackSize));
@@ -139,7 +150,7 @@ void spawnEnemies (SoundSystem* soundPlayer, std::vector<std::tuple<EnemyType,ve
 void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* soundPlayer) {
 	switch (choice) {
 		case 0: {
-			addEffect(player, {fireRateUpA, dmgUpM, numBulletsUpA });
+			addEffect(player, {fireRateUpA, dmgUpM, numBulletsUpA }, soundPlayer);
 			Map& map = registry.maps.components[0];
 			map.currRoom.preset.enemies ={{EnemyType::EasyEnemySkull, {0.2f, 0.8f}},
 	 {EnemyType::EasyEnemySkull, {0.8f, 0.8f}},
@@ -159,7 +170,7 @@ void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* 
 		}
 		case 2: {
 			extendStack(player, 4);
-			addEffect(player, {playerSpeedDownA});
+			addEffect(player, {playerSpeedDownA}, soundPlayer);
 			break;
 		}
 		case 3: {
@@ -255,7 +266,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 		if (object.item == PushConsole) {
 			if (reaction.choice == 0) {
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
-				addEffect(player, stack.stack);
+				addEffect(player, stack.stack, soundPlayer);
 				object.dialogueCount++;
 				RenderRequest& req = registry.renderRequests.get(reaction.object);
 				req.texture_name = "push_console_pushed.png";
@@ -311,7 +322,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				case 2 : {
 					if (reaction.choice == 0) {
 						if (reaction.choice == 0) {
-							addEffect(player, {WarMachine});
+							addEffect(player, {WarMachine}, soundPlayer);
 						}
 						object.dialogueCount = 4;
 					}
@@ -345,7 +356,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						//if (!registry.invincibles.has(player)) {
 						//	registry.invincibles.emplace(player);
 						//}
-						addEffect( player, {lightning2});
+						addEffect( player, {lightning2}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
 						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
 						object.dialogueCount++;
@@ -357,7 +368,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						// auto atkdata = AttackData();
 						// atkdata.defaultEffect = lightning2;
 						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
-						addEffect( player, {lightning2});
+						addEffect( player, {lightning2}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
 						auto& spriteMap = registry.sprites.get(player).sprites;
 						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
@@ -373,7 +384,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						// auto atkdata = AttackData();
 						// atkdata.defaultEffect = lightning1;
 						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
-						addEffect( player, {lightning1});
+						addEffect( player, {lightning1}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
 						auto& spriteMap = registry.sprites.get(player).sprites;
 						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
@@ -394,7 +405,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 		if (object.item == InteractableItem::FightConsole) {
 			if (reaction.choice == 0) {
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
-				addEffect(player, stack.stack);
+				addEffect(player, stack.stack, soundPlayer);
 				object.dialogueCount++;
 				spawnEnemies( soundPlayer, fightConsolePresets[Random::Int(fightConsolePresets.size())]);
 			}

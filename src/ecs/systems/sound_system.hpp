@@ -15,7 +15,13 @@ public:
     SoundSystem();
     ~SoundSystem();
 
-    bool setVolume(float volume);
+    bool setMusicVolume(float volume);
+
+    bool setSFXVolume(float volume);
+
+    void playGameOverSound();
+
+    void stopGameOverSound();
 
     void playNextMusic();
 
@@ -57,7 +63,8 @@ public:
 
     void stopNextDialogueSound();
 
-    float volume = 0.5f; //note this is overridden by gamestate
+    float sfxVolume = 0.5f; //note this is overridden by gamestate
+    float musicVolume = 0.5f;
 
 private:
     int currMusicIndex;
@@ -76,6 +83,7 @@ private:
     Mix_Chunk* nextDialogueSound;
     Mix_Chunk* itemGetSound;
     Mix_Chunk* rareItemGetSound;
+    Mix_Chunk* gameOversound;
 
     // Mix_Chunk* playerDeathSound;
     // Mix_Chunk* enemyHurtSound;

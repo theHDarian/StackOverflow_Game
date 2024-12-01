@@ -134,7 +134,7 @@ int main() {
 		renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS1));
 		renderer.drawGameUI();
 		textSystem.renderGameUIText();
-		if (ioSystem.isPaused()) renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS3));
+		if (ioSystem.isPaused() || ioSystem.isGameOver()) renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS3));
 		renderer.drawDialogueUI();
 		textSystem.renderDialogueUIText();
 		renderer.drawMenuUI();

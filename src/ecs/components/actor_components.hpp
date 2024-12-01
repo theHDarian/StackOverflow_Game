@@ -120,7 +120,7 @@ struct StackCompile {
         {BulletDamage,      1},
         {ProjectileSpeed,   1},
         {ProjectileSize,    1},
-        {FireRate,          1},
+        {FireRate,          0.5},
         {BulletRange,       1},
         {BulletSpread,      1},
         {BulletNum,         1},

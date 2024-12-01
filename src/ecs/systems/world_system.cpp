@@ -325,6 +325,7 @@ void WorldSystem::restartGame() {
 	gameState.dialogueChoice = -1;
 	gameState.resetRoom = true;
 	gameState.currentVolume = gameState.previousVolume;
+	soundPlayer->stopGameOverSound();
 
 	registry.ioStates.components[0].shouldRestart = false;
 
@@ -536,9 +537,9 @@ void WorldSystem::handleInput() {
 	Motion& cursorMotion = registry.motions.get(cursor);
 	cursorMotion.position = input.mousePosition;
 
-	//change volume
+	//change musicVolume
 	GameState& gameState = registry.gameStates.components[0];
-	soundPlayer->setVolume(gameState.currentVolume);
+	soundPlayer->setMusicVolume(gameState.currentVolume);
 
 	registry.nearbyInteractables.clear();
 }
@@ -803,7 +804,11 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
 			if (!success) {
-				registry.gameStates.components[0].gameOver = true;
+				GameState& gameState = registry.gameStates.components[0];
+				gameState.gameOver = true;
+				gameState.currentVolume *= 0.15f;
+				soundPlayer->playGameOverSound();
+				soundPlayer->setMusicVolume(gameState.currentVolume);
 				if (!registry.uiRequests.has(player)) {
 					registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
 				}
@@ -819,6 +824,10 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		bool success = registry.stackCompile.get(player).add(e.collisionBullet);
 		if (!success) {
 			registry.gameStates.components[0].gameOver = true;
+			GameState& gameState = registry.gameStates.components[0];
+			gameState.currentVolume *= 0.15f;
+			soundPlayer->playGameOverSound();
+			soundPlayer->setMusicVolume(gameState.currentVolume);
 			if (!registry.uiRequests.has(player)) {
 				registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
 			}

@@ -89,6 +89,14 @@ SoundSystem::~SoundSystem()
         Mix_FreeChunk(playerShootSound);
     if (doorOpenSound != nullptr)
         Mix_FreeChunk(doorOpenSound);
+    if (doorCloseSound != nullptr)
+        Mix_FreeChunk(doorCloseSound);
+    if (incomingDialogueSound != nullptr)
+        Mix_FreeChunk(incomingDialogueSound);
+    if (nextDialogueSound != nullptr)
+        Mix_FreeChunk(nextDialogueSound);
+    if (itemGetSound != nullptr)
+        Mix_FreeChunk(itemGetSound);
 
     for (int i = 0; i < 4; i++)
     {
@@ -139,7 +147,7 @@ void SoundSystem::loadMusic()
     currentBGM = &roomMusic[0];
 
     backgroundMusic = Mix_LoadMUS(currentBGM->path.c_str());
-    Mix_VolumeMusic(volume * MIX_MAX_VOLUME * currentBGM->volume);
+    Mix_VolumeMusic(musicVolume * MIX_MAX_VOLUME * currentBGM->volume);
     if (!backgroundMusic)
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
@@ -235,6 +243,13 @@ void SoundSystem::loadSoundEffects() {
     }
     rareItemGetSound->volume = 0.6f * MIX_MAX_VOLUME;
 
+    gameOversound = Mix_LoadWAV(audio_path("sfx/game_over.wav").c_str());
+    if (!gameOversound) {
+        fprintf(stderr, "Failed to load game over sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load game over sound");
+    }
+    gameOversound->volume = 0.8f * MIX_MAX_VOLUME;
+
     for (int i = 0; i < 5; i++) {
         explosionSounds.push_back(Mix_LoadWAV(audio_path("sfx/Explosion_0" + std::to_string(i) + ".wav").c_str()));
         if (!explosionSounds[i]) {
@@ -270,7 +285,7 @@ void SoundSystem::playNextMusic(int songIndex)
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume * volume);
+    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
 }
 
 void SoundSystem::playTitleMusic()
@@ -284,7 +299,7 @@ void SoundSystem::playTitleMusic()
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic( MIX_MAX_VOLUME * 0.6f * volume);
+    Mix_VolumeMusic( MIX_MAX_VOLUME * 0.6f * musicVolume);
 }
 
 void SoundSystem::playBossMusic(int songIndex)
@@ -298,7 +313,7 @@ void SoundSystem::playBossMusic(int songIndex)
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume * volume);
+    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
 }
 
 void SoundSystem::playSpecialMusic()
@@ -317,29 +332,29 @@ void SoundSystem::playSpecialMusic(int songIndex)
     {
         fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic( MIX_MAX_VOLUME * 0.4f * volume);
+    Mix_VolumeMusic( MIX_MAX_VOLUME * 0.4f * musicVolume);
 }
 
 void SoundSystem::playPlayerHurtSound() {
     Mix_PlayChannel(3, playerHurtSound, 0);
-    Mix_Volume(3, playerHurtSound->volume * volume);
+    Mix_Volume(3, playerHurtSound->volume * sfxVolume);
 }
 
 void SoundSystem::playPlayerZappedSound() {
     Mix_PlayChannel(3, playerZappedSound, 0);
-    Mix_Volume(3, playerZappedSound->volume * volume);
+    Mix_Volume(3, playerZappedSound->volume * sfxVolume);
 }
 
 void SoundSystem::playPlayerDashSound() {
     Mix_PlayChannelTimed(2, playerDashSound, 0, 200);
-    Mix_Volume(2, playerDashSound->volume * volume);
+    Mix_Volume(2, playerDashSound->volume * sfxVolume);
 }
 void SoundSystem::playPlayerShootSound(float ticks) {
     // if (!Mix_Playing(1)) {
         // Check if the channel is not playing
         // Mix_PlayChannelTimed(1, playerShootSound, 0, ticks);  // Play sound on specified channel);
         Mix_PlayChannel(1, playerShootSound, 0);
-        Mix_Volume(1, playerShootSound->volume * volume);
+        Mix_Volume(1, playerShootSound->volume * sfxVolume);
     // }
 }
 void SoundSystem::playEnemyShootSound(int sfxNumber, int loops) {
@@ -347,28 +362,28 @@ void SoundSystem::playEnemyShootSound(int sfxNumber, int loops) {
         // Check if the channel is not playing
         int i = sfxNumber % 4;
         Mix_PlayChannel(4, enemyShootSounds[i], loops);
-        Mix_Volume(4, enemyShootSounds[i]->volume * volume);
+        Mix_Volume(4, enemyShootSounds[i]->volume * sfxVolume);
     }
 }
 
 void SoundSystem::playDoorOpenSound() {
     if (!Mix_Playing(5)) {
         Mix_PlayChannel(5, doorOpenSound, 0);
-        Mix_Volume(5, doorOpenSound->volume * volume);
+        Mix_Volume(5, doorOpenSound->volume * sfxVolume);
     }
 }
 
 void SoundSystem::playDoorCloseSound() {
     if (!Mix_Playing(5)) {
         Mix_PlayChannel(5, doorCloseSound, 0);
-        Mix_Volume(5, doorCloseSound->volume * volume);
+        Mix_Volume(5, doorCloseSound->volume * sfxVolume);
     }
 }
 
 void SoundSystem::playIncomingDialogueSound() {
     if (!Mix_Playing(6)) {
         Mix_PlayChannel(6, incomingDialogueSound, 0);
-        Mix_Volume(6, incomingDialogueSound->volume * volume);
+        Mix_Volume(6, incomingDialogueSound->volume * sfxVolume);
     }
 }
 
@@ -384,11 +399,11 @@ void SoundSystem::stopIncomingDialogueSound() {
 void SoundSystem::playNextDialogueSound() {
     if (!Mix_Playing(7)) {
         Mix_PlayChannel(7, nextDialogueSound, 0);
-        Mix_Volume(7, nextDialogueSound->volume * volume);
+        Mix_Volume(7, nextDialogueSound->volume * sfxVolume);
     } else {
         Mix_HaltChannel(7);
         Mix_PlayChannel(7, nextDialogueSound, 0);
-        Mix_Volume(7, nextDialogueSound->volume * volume);
+        Mix_Volume(7, nextDialogueSound->volume * sfxVolume);
     }
 }
 
@@ -400,14 +415,14 @@ void SoundSystem::stopNextDialogueSound() {
 void SoundSystem::playItemPickupSound() {
     if (!Mix_Playing(8)) {
         Mix_PlayChannel(8, itemGetSound, 0);
-        Mix_Volume(8, itemGetSound->volume * volume);
+        Mix_Volume(8, itemGetSound->volume * sfxVolume);
     }
 }
 
 void SoundSystem::playRareItemPickupSound() {
     if (!Mix_Playing(8)) {
         Mix_PlayChannel(8, rareItemGetSound, 0);
-        Mix_Volume(8, rareItemGetSound->volume * volume);
+        Mix_Volume(8, rareItemGetSound->volume * sfxVolume);
     }
 }
 
@@ -415,15 +430,26 @@ void SoundSystem::playExplosionSound(int sfxNumber) {
     int i = sfxNumber % 5;
     if (!Mix_Playing(9)) {
         Mix_PlayChannel(9, explosionSounds[i], 0);
-        Mix_Volume(9, explosionSounds[i]->volume * volume);
+        Mix_Volume(9, explosionSounds[i]->volume * sfxVolume);
     }
 }
 
-bool SoundSystem::setVolume(float volume) {
-    if (volume >= 0.0f && volume <= 1.0f && this->volume != volume) {
-        std::cout << "old Volume: " << volume << std::endl;
-        this->volume = volume;
-        std::cout << "Volume: " << volume << std::endl;
+void SoundSystem::playGameOverSound() {
+    if (!Mix_Playing(10)) {
+        Mix_PlayChannel(10, gameOversound, -1);
+        Mix_Volume(10, gameOversound->volume * sfxVolume);
+    }
+}
+
+void SoundSystem::stopGameOverSound() {
+    if (Mix_Playing(10))
+        Mix_HaltChannel(10);
+}
+
+bool SoundSystem::setMusicVolume(float volume) {
+    if (volume >= 0.0f && volume <= 1.0f && this->musicVolume != volume) {
+        this->musicVolume = volume;
+        std::cout << "Music Volume: " << volume << std::endl;
         if (currentBGM != nullptr) {
             Mix_VolumeMusic(volume * MIX_MAX_VOLUME * currentBGM->volume);
         } else {
@@ -432,6 +458,25 @@ bool SoundSystem::setVolume(float volume) {
         Mix_Volume(1, playerShootSound->volume * volume);
         Mix_Volume(2, playerDashSound->volume * volume);
         Mix_Volume(3, playerHurtSound->volume * volume);
+        return true;
+    }
+    return false;
+}
+
+bool SoundSystem::setSFXVolume(float volume) {
+    if (volume >= 0.0f && volume <= 1.0f && this->sfxVolume != volume) {
+        this->sfxVolume = volume;
+        std::cout << "SFX Volume: " << volume << std::endl;
+        // Mix_Volume(1, playerShootSound->volume * volume);
+        // Mix_Volume(2, playerDashSound->volume * volume);
+        // Mix_Volume(3, playerHurtSound->volume * volume);
+        // Mix_Volume(4, enemyShootSounds[0]->volume * volume);
+        // Mix_Volume(5, doorOpenSound->volume * volume);
+        // Mix_Volume(6, incomingDialogueSound->volume * volume);
+        // Mix_Volume(7, nextDialogueSound->volume * volume);
+        // Mix_Volume(8, itemGetSound->volume * volume);
+        // Mix_Volume(9, explosionSounds[0]->volume * volume);
+        // Mix_Volume(10, gameOversound->volume * volume);
         return true;
     }
     return false;
