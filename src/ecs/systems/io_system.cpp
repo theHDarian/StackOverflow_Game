@@ -47,11 +47,13 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if (key == GLFW_KEY_L && action == GLFW_PRESS) {
 		ioState.shouldEnd = true;
 	}
-	if  (key == GLFW_KEY_MINUS && action != GLFW_RELEASE) {
+	if  (key == GLFW_KEY_MINUS && action != GLFW_RELEASE && !gameState.gamePaused) {
 		gameState.currentVolume = std::max(0.0f, gameState.currentVolume - 0.0125f);
+		gameState.previousVolume = gameState.currentVolume;
 	}
-	if  (key == GLFW_KEY_EQUAL && action != GLFW_RELEASE) {
+	if  (key == GLFW_KEY_EQUAL && action != GLFW_RELEASE && !gameState.gamePaused) {
 		gameState.currentVolume = std::min(1.0f, gameState.currentVolume + 0.0125f);
+		gameState.previousVolume = gameState.currentVolume;
 	}
 
 	// Resetting game

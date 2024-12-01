@@ -324,6 +324,7 @@ void WorldSystem::restartGame() {
 	gameState.loading = false;
 	gameState.dialogueChoice = -1;
 	gameState.resetRoom = true;
+	gameState.currentVolume = gameState.previousVolume;
 
 	registry.ioStates.components[0].shouldRestart = false;
 
