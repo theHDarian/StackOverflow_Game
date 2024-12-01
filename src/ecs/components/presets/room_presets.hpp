@@ -454,6 +454,21 @@ const RoomPreset EnemyRoomBees2{
     "EnemyRoomBees2",
     };
 
+const RoomPreset EnemyRoomBees3{
+    {{EnemyType::TwoBee, {0.2f, 0.8f}},
+     {EnemyType::OneBee, {0.8f, 0.8f}},
+     {EnemyType::TwoBee, {0.8f, 0.2f}},
+     {EnemyType::OneBee, {0.2f, 0.2f}},
+     {EnemyType::HardEnemySkull, {0.5f, 0.5f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "EnemyRoomBees1",
+};
+
 const RoomPreset EnemyRoomAngelTank{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
      {EnemyType::MediumEnemyCharge, {0.8f, 0.2f}},
@@ -1130,13 +1145,13 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
+        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab, RestRoomEmpty}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard,  EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
+        {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},

@@ -311,7 +311,7 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 
 Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "HoneyCanisterFull.png", vec2(200, 300), vec2(0, 100), 50);
+	auto entity = createProp3D( renderer, pos, "HoneyCanisterFull.png", vec2(200, 300), vec2(40, 80), 110);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "HoneyCanister";
 	object.item = InteractableItem::HoneyCanister;
