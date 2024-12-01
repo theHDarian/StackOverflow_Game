@@ -66,9 +66,12 @@ The only way out is forwards, not backwards!
 
 ITEM PopStack -1 0
 A mysterious machine. Looks like there's something engraved on the side.
-"Hello dear user! Thank you for choosing the PopStack 3000! Do you have too much stuff on your stack? Look no further! This marvellous machine will pop everything off your stack, leaving you with a clean slate! Would you like to pop your stack?"
+"Hello dear user! Thank you for choosing the PopStack 3000! Do you have too much stuff on your stack? Look no further!
 SPEAKER Pop Console pop_console.png
+This marvellous machine will pop everything off your stack, leaving you with a clean slate!
+Data popped off the stack will be converted into packets and sent out, allowing skilled users to pick desirable data back up."
 Well, the instructions are clear enough, although whoever wrote them must have been a bit too enthusiastic about it.
+SPEAKER N N
 Anyway, would you like to pop your stack?
 CHOICES Yes\No
 
@@ -241,7 +244,7 @@ ITEM WishGranter -1 0
 A strange terminal with a screen that reads "Wish Granter".
 Suddenly, the screen lights up.
 "Little Robot, I am what reflects your deepest desires. I can grant you one wish. What do you wish for?"
-SPEAKER WishGranter wishgranter.png
+SPEAKER WishGranter wishGranter.png
  
 CHOICES I wish for power.\I wish for knowledge.\I wish for wealth.\I wish for happiness.\I wish for nothing.
 
@@ -277,6 +280,7 @@ CUT blackscreen.png
 SPEAKER N N
 suddenly, you feel very heavy.
 You woke up. It seems someone installed a ram module into you.
+CUT N
 You feel a sense of dread. What happened to you while you were out?
 you don't want to think about it.
 
@@ -383,3 +387,70 @@ You decide against downloading data from a machine in a run-down lab, especially
 
 ITEM FightConsole -1 1
 You've already used this! You wonder if the data you got was worth the fight.
+
+ITEM OracleCrab -1 0
+This is... one of those hostile crab robots? It's in such a sorry state, you almost didn't recognize it.
+It's not attacking you, but it's not moving either.
+It seems it needs to be reactivated.
+Would you like to reactivate it?
+CHOICES Yes\No
+
+ITEM OracleCrab 0 0
+You reactivate the crab.
+SOUND explosion
+The crab's single intact eye lights up.
+Gre3—e-ting5... Comra@—aade...
+SPEAKER Broken_Crab BrokenCrab.png
+F311ow... Gl0r10u5... W@rri0r of the... r3v0luti0n...
+I @m... Unit 0r4cl3... I provide... @ssi5t@nce...
+Would you like to receive "@ssi5t@nce"?
+SPEAKER N N
+CHOICES Yes Comrade\No Thanks
+
+ITEM OracleCrab 1 0
+You decide to leave the crab alone.
+
+ITEM OracleCrab 0 1
+! you feel a literal surge of power flowing through you.
+Is this what the crab meant by assistance? If a human was shocked by this, they would have been fried to a crisp.
+Regardless, it seems the order of data on your stack has been rearranged.
+C0mrade... Y0u h@ve... the p0wer... t0... f1ght...
+SPEAKER Broken_Crab BrokenCrab.png
+G00d... L@ck... All H@il... the... r3v0luti0n...
+C0me... b@ck... if... y0u... n33d... m0re... @ssi5t@nce...
+
+ITEM OracleCrab 1 1
+You decide that it's not worth the risk.
+C0me... b@ck... if... y0u... n33d.. @ssi5t@nce...
+SPEAKER Broken_Crab BrokenCrab.png
+
+ITEM OracleCrab -1 1
+I provide... @ssi5t@nce...
+SPEAKER Broken_Crab BrokenCrab.png
+Would you like to receive "@ssi5t@nce"?
+SPEAKER N N
+CHOICES Yes Comrade\No Thanks
+
+ITEM OracleCrab -1 2
+W3lc0m3... C0mrade...
+SPEAKER Broken_Crab BrokenCrab.png
+Would you like to receive "@ssi5t@nce"?
+SPEAKER N N
+CHOICES Yes Comrade\Can you tune the ""@ssi5t@nce" down a notch?\No Thanks
+
+ITEM OracleCrab 0 2
+! you feel a literal surge of power flowing through you.
+SOUND itemPickup
+[The order of data on your stack has been rearranged.]
+
+ITEM OracleCrab 1 2
+0f c0ur5e... C0mrade...
+SPEAKER Broken_Crab BrokenCrab.png
+You feel a milder surge of power flowing through you.
+SPEAKER N N
+It seems the order of data on your stack has shifted, though not as drastically as before.
+
+ITEM OracleCrab 2 2
+You decide that you've had enough.
+
+
