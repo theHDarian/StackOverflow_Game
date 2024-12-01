@@ -301,6 +301,13 @@ void SceneSystem::summonDialogue() {
 	gameState.dialogueScene = true;
 	map.currRoom.dialogueDone = false;
 	map.currRoom.dialogueCount++;
+
+	// make player stop moving during dialogue
+	if (gameState.dialogueScene) {
+		RenderRequest& rr = registry.renderRequests.get(registry.players.entities[0]);
+		rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+		rr.texture_name = registry.sprites.get(registry.players.entities[0]).sprites[SPRITE_STATE::BASE];
+	}
 }
 
 // shows dialogue for interactible objects immediately
@@ -311,6 +318,13 @@ void SceneSystem::summonInteractibleDialogue(Entity object) {
 	iostate.nextDialogue = true;
 	gameState.dialogueScene = true;
 	map.currRoom.dialogueDone = false;
+
+	// make player stop moving during dialogue
+	if (gameState.dialogueScene) {
+		RenderRequest& rr = registry.renderRequests.get(registry.players.entities[0]);
+		rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+		rr.texture_name = registry.sprites.get(registry.players.entities[0]).sprites[SPRITE_STATE::BASE];
+	}
 }
 
 void SceneSystem::handleStoryChoices() {

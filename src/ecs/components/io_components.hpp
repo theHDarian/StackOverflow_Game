@@ -49,6 +49,7 @@ struct GameState {
 	bool cutScene = false;
 	int dialogueChoice = -1;
 	float currentVolume = 0.5f;
+	float previousVolume = 0.5f;
 	bool seenLockedDoor = false;
 	bool titleScreen = false;
 	bool resetRoom = false;

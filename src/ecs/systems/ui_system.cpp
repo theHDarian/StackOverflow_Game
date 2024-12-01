@@ -38,6 +38,8 @@ void UISystem::step(float elapsed_ms) {
 	if (ioState.pressedEsc) {
 		if (!gameState.gamePaused) {
 			gameState.gamePaused = true;
+			gameState.previousVolume = gameState.currentVolume;
+			gameState.currentVolume *= 0.125f;
 		}
 		else {
 			Entity currMenu = registry.activeMenus.entities[registry.activeMenus.entities.size() - 1];
@@ -52,6 +54,7 @@ void UISystem::step(float elapsed_ms) {
 
 			if (ioState.activeMenu < 0) {
 				gameState.gamePaused = false;
+				gameState.currentVolume = gameState.previousVolume;
 			}
 		}
 		ioState.pressedEsc = false;

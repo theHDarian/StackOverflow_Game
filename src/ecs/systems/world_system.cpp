@@ -307,25 +307,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	interact(elapsed_ms_since_last_update, player, renderer, soundPlayer);
 
-	// place sprite timer progression here for now
-	for (auto& entity : registry.spriteTimers.entities) {
-		auto& spriteTimer = registry.spriteTimers.get(entity);
-		spriteTimer.count_ms -= elapsed_ms_since_last_update;
-		if (spriteTimer.count_ms <= 0) {
-			//std::cout << " got hit, switch back to normal " << std::endl;
-			registry.renderRequests.get(entity).texture_name = spriteTimer.nextSprite;
-			registry.renderRequests.get(entity).used_effect = spriteTimer.nextEffect;
-			registry.spriteTimers.remove(entity);
-		}
-	}
-
-	// make player stop moving during dialogue
-	if (gameState.dialogueScene) {
-		RenderRequest& rr = registry.renderRequests.get(player);
-		rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
-		rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::BASE];
-	}
-
 	return true;
 }
 
@@ -343,6 +324,7 @@ void WorldSystem::restartGame() {
 	gameState.loading = false;
 	gameState.dialogueChoice = -1;
 	gameState.resetRoom = true;
+	gameState.currentVolume = gameState.previousVolume;
 
 	registry.ioStates.components[0].shouldRestart = false;
 
@@ -802,10 +784,12 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			if (registry.enemyBullets.get(other).bulletEffects[0].effectCalc == Multiplicative) {
 				//yellow is multiplicative
 				props = playerZappedYellow;
-				registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
+				if (!registry.uiRequests.has(player))
+					registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
 			} else {
 				props = playerZappedBlue;
-				registry.uiRequests.insert(player, { UIRequestType::StackNotifReqShift });
+				if (!registry.uiRequests.has(player))
+					registry.uiRequests.insert(player, { UIRequestType::StackNotifReqShift });
 			}
 		} else {
 			props = playerDamaged;

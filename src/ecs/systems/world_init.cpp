@@ -356,7 +356,7 @@ Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 
 Entity createOracleCrab(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "OracleCrab.png", vec2(200, 200), vec2(0, 0), 0);
+	auto entity = createProp3D( renderer, pos, "BrokenCrab.png", vec2(200, 200), vec2(0, 0), 0);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "OracleCrab";
 	object.item = InteractableItem::OracleCrab;

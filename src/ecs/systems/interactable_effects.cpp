@@ -320,10 +320,75 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			}
 		}
 		if (object.item == OracleCrab) {
-			if (reaction.choice == 0) {
-				// DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
-				// req.choice = 1;
-				object.dialogueCount = Random::Int(5) + 1;
+			switch (object.dialogueCount) {
+				case 0 : {
+					if (reaction.choice == 0) {
+						object.dialogueCount++;
+					}
+					break;
+				}
+				case 1 : {
+					if (reaction.choice == 0) {
+						// auto atkdata = AttackData();
+						// atkdata.defaultEffect = lightning2;
+						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
+						auto& spriteMap = registry.sprites.get(player).sprites;
+						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
+						registry.renderRequests.get(player).used_effect = EFFECT_ASSET_ID::TEXTURED;
+						if (!registry.spriteTimers.has(player)) {
+							auto& spriteTimer = registry.spriteTimers.emplace(player);
+							spriteTimer.count_ms = 250;
+							spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+							spriteTimer.nextEffect = EFFECT_ASSET_ID::TEXTURED;
+						}
+						// can consider putting this, but doesn't tick down in dialogue so looks a bit goofy (?)
+						//if (!registry.invincibles.has(player)) {
+						//	registry.invincibles.emplace(player);
+						//}
+						addEffect( player, {lightning2});
+						soundPlayer->playPlayerZappedSound();
+						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
+						object.dialogueCount++;
+					}
+					break;
+				}
+				case 2 : {
+					if (reaction.choice == 0) {
+						// auto atkdata = AttackData();
+						// atkdata.defaultEffect = lightning2;
+						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
+						addEffect( player, {lightning2});
+						soundPlayer->playPlayerZappedSound();
+						auto& spriteMap = registry.sprites.get(player).sprites;
+						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
+						registry.renderRequests.get(player).used_effect = EFFECT_ASSET_ID::TEXTURED;
+						if (!registry.spriteTimers.has(player)) {
+							auto& spriteTimer = registry.spriteTimers.emplace(player);
+							spriteTimer.count_ms = 250;
+							spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+							spriteTimer.nextEffect = EFFECT_ASSET_ID::TEXTURED;
+						}
+						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
+					} else if (reaction.choice == 1) {
+						// auto atkdata = AttackData();
+						// atkdata.defaultEffect = lightning1;
+						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
+						addEffect( player, {lightning1});
+						soundPlayer->playPlayerZappedSound();
+						auto& spriteMap = registry.sprites.get(player).sprites;
+						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
+						registry.renderRequests.get(player).used_effect = EFFECT_ASSET_ID::TEXTURED;
+						if (!registry.spriteTimers.has(player)) {
+							auto& spriteTimer = registry.spriteTimers.emplace(player);
+							spriteTimer.count_ms = 250;
+							spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
+							spriteTimer.nextEffect = EFFECT_ASSET_ID::TEXTURED;
+						}
+						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShift});
+					}
+					break;
+				}
+
 			}
 		}
 		if (object.item == InteractableItem::FightConsole) {
