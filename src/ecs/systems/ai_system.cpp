@@ -10,8 +10,9 @@
 #include <glm/gtx/compatibility.hpp>
 
 // returns a vec4(min position, max position)
-vec4 getRoomBounds(Entity entity) {
-	Map& map = registry.maps.components[0];
+vec4 getRoomBounds(Entity entity)
+{
+	Map &map = registry.maps.components[0];
 	vec2 roomStartPos = map.currRoom.roomStart;
 	vec2 roomEndPos = map.currRoom.roomEnd;
 
@@ -25,8 +26,8 @@ vec4 getRoomBounds(Entity entity) {
 vec2 boundPosition(vec2 position, Entity entity)
 {
 	vec4 roomBounds = getRoomBounds(entity);
-	vec2 min = { roomBounds.x, roomBounds.y };
-	vec2 max = { roomBounds.z, roomBounds.w };
+	vec2 min = {roomBounds.x, roomBounds.y};
+	vec2 max = {roomBounds.z, roomBounds.w};
 	return glm::clamp(position, min, max);
 }
 
@@ -50,7 +51,6 @@ void AISystem::step(float elapsed_ms)
 		updateState(enemy, movement, entity);
 		// std::cout << enemy.newPattern << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
-		// std::cout << currPattern.name << "after update" << std::endl;
 		if (registry.boids.has(entity))
 		{
 			Boid &boid = registry.boids.get(entity);
@@ -64,16 +64,49 @@ void AISystem::step(float elapsed_ms)
 		// 	movement.posA = motion.position;
 		// 	movement.distanceTraveled = 0.0f;
 		// }
-		if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
+		if (currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
 			// std::cout << currPattern.name << "after update" << std::endl;
+			// if (registry.hand.has(entity) && currPattern.type == EnemyBehavior::IDLE) {
+			// 	continue;
+			// }
 			movement.posA = motion.position;
 			// ACTING
 			// std::cout << currPattern.name << "before getmove" << std::endl;
 			movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
+
+			if (registry.scientist.has(entity)) {
+				Scientist& scien = registry.scientist.get(entity);
+				Entity entityHand = scien.hand;
+				if (entityHand && registry.enemies.has(entityHand)) {
+					Enemy& hand = registry.enemies.get(scien.hand);
+					EnemyPattern& handPattern = hand.currEnemyPattern();
+					if (hand.currHealth > 0 && handPattern.type == EnemyBehavior::IDLE) {
+						EnemyMovement& handMovement = registry.enemyMovement.get(entityHand);
+						Motion& handMotion = registry.motions.get(entityHand);
+						handMovement.posA = handMotion.position;
+						handMovement.posB = movement.posB + vec2(100.f, 0.f);
+						handMovement.distanceTraveled = 0.f;
+					}
+				}
+			}
 		}
+
+		if (registry.scientist.has(entity)) {
+			EnemyPattern& pattern = enemy.currEnemyPattern();
+			RenderRequest& rr = registry.renderRequests.get(entity);
+			if (pattern.type != EnemyBehavior::IDLE && pattern.type != EnemyBehavior::TELEPORT) {
+				rr.texture_name = "scientist_walk";
+				rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
+			}
+			else {
+				rr.texture_name = "scientist.png";
+				rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+			}
+		}
+
 	}
 }
 
@@ -153,6 +186,54 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			}
 		}
 	}
+	if (registry.scientist.has(entity))
+	{
+		Scientist &scien = registry.scientist.get(entity);
+		if (scien.shield && registry.enemies.has(scien.shield))
+		{
+
+			Enemy &shield = registry.enemies.get(scien.shield);
+			//std::cout << shield.currHealth << "shield health" << std::endl;
+			if (shield.currHealth <= 0)
+			{
+				//std::cout << "got here" << std::endl;
+				auto reaction = getReactions(currPattern.reactions, ReactionType::SHIELDBREAK);
+				if (reaction)
+				{
+					enemy.patternIndex = reaction->index;
+					enemy.newPattern = true;
+					reaction_found = true;
+				}
+			}
+		}
+	}
+
+	if (registry.hand.has(entity)) {
+		EnemyPattern& pattern = enemy.currEnemyPattern();
+		RenderRequest& rr = registry.renderRequests.get(entity);
+		if (pattern.type == EnemyBehavior::CHARGING) {
+			rr.texture_name = "hand_idletocharge";
+			rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
+			if (registry.animations.get(entity).frame == -1 && !registry.animationSequences.has(entity)) {
+				//registry.animations.get(entity).frame == 1;
+				AnimationSequence& as = registry.animationSequences.emplace(entity);
+				as.nextEffect = EFFECT_ASSET_ID::TEXTURED;
+				as.nextSprite = "hand_charging.png";
+				//std::cout << registry.animations.get(entity).frame << std::endl;
+			}
+		}
+		else if (pattern.type == EnemyBehavior::PATROLLING) {
+			rr.texture_name = "hand_shooting_laser.png";
+			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+			registry.animations.get(entity).frame = -1;
+		}
+		else {
+			rr.texture_name = "hand_idle.png";
+			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+			registry.animations.get(entity).frame = -1;
+		}
+	}
+
 	if (registry.healers.has(entity))
 	{
 		reaction_found = updateHealerState(enemy, entity);
@@ -190,7 +271,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			reaction_found = true;
 		}
 	}
-	else if (distance < closeDistance)
+	if (distance < closeDistance && reaction_found == false)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
 		if (reaction)
@@ -317,6 +398,8 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getCharginPos(entity);
 	case EnemyBehavior::RECOIL:
 		return getRecoilPos(entity);
+	case EnemyBehavior::TELEPORT:
+		return getTeleportPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
@@ -328,6 +411,41 @@ vec2 AISystem::getCurrentPos(Entity entity)
 	Motion &motion = registry.motions.get(entity);
 	movement.speed = 100.f;
 	return motion.position;
+}
+
+vec2 AISystem::getTeleportPos(Entity entity)
+{
+	Enemy &enemy = registry.enemies.get(entity);
+	EnemyPattern &pattern = enemy.currEnemyPattern();
+	if (pattern.type == EnemyBehavior::TELEPORT)
+	{
+		std::cout << "tele" << pattern.name  << std::endl;
+		if (registry.hand.has(entity) && pattern.name == "T") {
+			std::cout << "should tele to scientist" << std::endl;
+			Entity scien = registry.scientist.entities[0];
+			Motion& scienMotion = registry.motions.get(scien);
+
+			return scienMotion.position - vec2(100.f, 0);
+		}
+
+		if (pattern.path.size() > 0)
+		{
+			vec2 positionFactor = pattern.path[0];
+			vec4 roomBounds = getRoomBounds(entity);
+			vec2 min = {roomBounds.x, roomBounds.y};
+			vec2 max = {roomBounds.z, roomBounds.w};
+
+			return glm::lerp(min, max, positionFactor);
+		}
+		else
+		{
+			return generateRandomPos(entity);
+		}
+	}
+	else
+	{
+		return getCurrentPos(entity);
+	}
 }
 
 vec2 AISystem::getNextPatrolPos(Entity entity)
@@ -351,19 +469,19 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 	// printf("%.1f %.1f\n", patrolFactor.x,patrolFactor.y);
 
 	vec4 roomBounds = getRoomBounds(entity);
-	vec2 min = { roomBounds.x, roomBounds.y };
-	vec2 max = { roomBounds.z, roomBounds.w };
+	vec2 min = {roomBounds.x, roomBounds.y};
+	vec2 max = {roomBounds.z, roomBounds.w};
 
-	return glm::lerp(min,max,patrolFactor);
+	return glm::lerp(min, max, patrolFactor);
 }
 
 vec2 AISystem::generateRandomPos(Entity entity)
 {
 	vec4 roomBounds = getRoomBounds(entity);
-	vec2 min = { roomBounds.x, roomBounds.y };
-	vec2 max = { roomBounds.z, roomBounds.w };
+	vec2 min = {roomBounds.x, roomBounds.y};
+	vec2 max = {roomBounds.z, roomBounds.w};
 
-	return glm::lerp(min,max,Random::Vec2(vec2(1)));
+	return glm::lerp(min, max, Random::Vec2(vec2(1)));
 }
 
 vec2 AISystem::getCharginPos(Entity entity)
@@ -371,30 +489,23 @@ vec2 AISystem::getCharginPos(Entity entity)
 	vec2 playerPos = getPlayerPos();
 	Motion &motion = registry.motions.get(entity);
 	vec2 scale = motion.scale;
-	// Calculate the direction from the enemy to the player
 	vec2 direction = playerPos - motion.position;
 
-	// Normalize the direction
 	if (glm::length(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
+	float chargeDistance = 100.0f;
 
-	// Define a charge distance (how far beyond the player the enemy charges)
-	float chargeDistance = 100.0f; // Adjust this value as needed
-
-	// Calculate the goal position for charging past the player
 	vec2 goalPosition = playerPos + direction * chargeDistance;
-
-	// Increase the enemy's speed for the charge
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 500.0f;
 
 	vec4 roomBounds = getRoomBounds(entity);
-	vec2 min = { roomBounds.x, roomBounds.y };
-	vec2 max = { roomBounds.z, roomBounds.w };
+	vec2 min = {roomBounds.x, roomBounds.y};
+	vec2 max = {roomBounds.z, roomBounds.w};
 
-	goalPosition = glm::clamp(goalPosition, min,max);
+	goalPosition = glm::clamp(goalPosition, min, max);
 
 	return goalPosition;
 }
@@ -404,30 +515,25 @@ vec2 AISystem::getRecoilPos(Entity entity)
 	vec2 playerPos = getPlayerPos();
 	Motion &motion = registry.motions.get(entity);
 	vec2 scale = motion.scale;
-	// Calculate the direction from the enemy to the player
 	vec2 direction = motion.position - playerPos;
 
-	// Normalize the direction
 	if (glm::length(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
 
-	// Define a charge distance (how far beyond the player the enemy charges)
-	float chargeDistance = 300.0f; // Adjust this value as needed
+	float chargeDistance = 300.0f;
 
-	// Calculate the goal position for charging past the player
 	vec2 goalPosition = motion.position + direction * chargeDistance;
 
-	// Increase the enemy's speed for the charge
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	movement.speed = 300.0f;
 
 	vec4 roomBounds = getRoomBounds(entity);
-	vec2 min = { roomBounds.x, roomBounds.y };
-	vec2 max = { roomBounds.z, roomBounds.w };
+	vec2 min = {roomBounds.x, roomBounds.y};
+	vec2 max = {roomBounds.z, roomBounds.w};
 
-	goalPosition = glm::clamp(goalPosition, min,max);
+	goalPosition = glm::clamp(goalPosition, min, max);
 
 	return goalPosition;
 }
@@ -440,10 +546,10 @@ vec2 AISystem::generateRandomPosInRadius(Entity entity, int radiusNear, int radi
 	float pos_y = sin(angle) * (radiusNear + rand() % (radiusFar - radiusNear)) + start.y;
 
 	vec4 roomBounds = getRoomBounds(entity);
-	vec2 min = { roomBounds.x, roomBounds.y };
-	vec2 max = { roomBounds.z, roomBounds.w };
+	vec2 min = {roomBounds.x, roomBounds.y};
+	vec2 max = {roomBounds.z, roomBounds.w};
 
-	return glm::clamp(vec2(pos_x, pos_y),min,max);
+	return glm::clamp(vec2(pos_x, pos_y), min, max);
 }
 
 vec2 AISystem::getTeamPos(Entity entity)
@@ -469,8 +575,8 @@ vec2 AISystem::getTeamPos(Entity entity)
 			vec2 goalPosition = teammateMotion.position - direction * backDistance;
 
 			vec4 roomBounds = getRoomBounds(entity);
-			vec2 min = { roomBounds.x, roomBounds.y };
-			vec2 max = { roomBounds.z, roomBounds.w };
+			vec2 min = {roomBounds.x, roomBounds.y};
+			vec2 max = {roomBounds.z, roomBounds.w};
 
 			goalPosition = glm::clamp(goalPosition, min, max);
 
@@ -538,8 +644,8 @@ vec2 AISystem::evadeBullet(Entity entity)
 	}
 
 	vec4 roomBounds = getRoomBounds(entity);
-	vec2 min = { roomBounds.x, roomBounds.y };
-	vec2 max = { roomBounds.z, roomBounds.w };
+	vec2 min = {roomBounds.x, roomBounds.y};
+	vec2 max = {roomBounds.z, roomBounds.w};
 	bestEscapePos = glm::clamp(bestEscapePos, min, max);
 	return bestEscapePos;
 }
@@ -590,24 +696,26 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	}
 	else if (currentPattern.type == EnemyBehavior::BOIDSFISH)
 	{
-		boidCircleRoom(entity, boid, 0.1f, 0.05f);
-		boidComputeCoherence(entity, boid, 0.015f, 1000.f);
-		boidComputeSeperation(entity, boid, 0.5f);
-		boidComputeAlignment(entity, boid, 0.01f);
-		
+		boidCircleRoom(entity, boid, 0.3f, 0.05f);
+		// boidComputeCoherence(entity, boid, 0.015f, 1000.f);
+		// boidComputeSeperation(entity, boid, 0.5f);
+		// boidComputeAlignment(entity, boid, 0.01f);
+		boidComputeAllFactor(entity, boid, 0.01f, 0.5f, 0.01f, 700.f);
+
 		if (glm::length(boid.velocity) > boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
-		boidEvadePlayer(entity,boid, 100.0f);
+		boidEvadePlayer(entity, boid, 100.0f);
 		boidKeepBound(entity, boid, 0, 0, 0, 0);
 	}
 	else
 	{
 		boidWander(entity, boid, 0.1f);
-		boidComputeCoherence(entity, boid, 0.02f, 700.f);
-		boidComputeSeperation(entity, boid, 0.05f);
-		boidComputeAlignment(entity, boid, 0.02f);
+		// boidComputeCoherence(entity, boid, 0.02f, 700.f);
+		// boidComputeSeperation(entity, boid, 0.05f);
+		// boidComputeAlignment(entity, boid, 0.02f);
+		boidComputeAllFactor(entity, boid, 0.02f, 0.05f, 0.02f, 700.f);
 		if (glm::length(boid.velocity) > boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
@@ -619,10 +727,10 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 void AISystem::boidKeepBound(Entity entity, Boid &boid, float minx, float miny, float maxx, float maxy)
 {
 	WindowState &windowState = registry.windowStates.components[0];
-	Map& map = registry.maps.components[0];
-	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+	Map &map = registry.maps.components[0];
+	vec2 roomCenter = vec2(windowState.width, windowState.height) / 2.f;
 	vec2 roomStartPos = map.currRoom.roomStart;
-    vec2 roomEndPos = map.currRoom.roomEnd;
+	vec2 roomEndPos = map.currRoom.roomEnd;
 
 	vec2 scale = registry.motions.get(entity).scale;
 
@@ -813,7 +921,7 @@ void AISystem::boidEvadePlayer(Entity entity, Boid &boid, float multiplier)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * panicBoost * multiplier;
 		}
-		
+
 		float maxSpeed = 400.f;
 		if (glm::length(boid.velocity) > maxSpeed)
 		{
@@ -826,10 +934,10 @@ void AISystem::boidCircleRoom(Entity entity, Boid &boid, float multiplier, float
 {
 
 	WindowState &windowState = registry.windowStates.components[0];
-	Room& room = registry.maps.components[0].currRoom;
-	vec2 roomCenter = vec2(windowState.width,windowState.height)/2.f;
+	Room &room = registry.maps.components[0].currRoom;
+	vec2 roomCenter = (room.roomStart + room.roomEnd) / 2.f;
 
-	float radius = glm::min(room.preset.roomSize.x, room.preset.roomSize.y) / 2.75f;
+	float radius = glm::min(room.preset.roomSize.x, room.preset.roomSize.y) / 3.5f;
 
 	vec2 position = boid.position;
 	vec2 directionToCenter = position - roomCenter;
@@ -841,4 +949,77 @@ void AISystem::boidCircleRoom(Entity entity, Boid &boid, float multiplier, float
 	vec2 targetPosition = roomCenter + vec2(cos(newAngle) * radius, sin(newAngle) * radius);
 	vec2 desiredVelocity = targetPosition - position;
 	boid.velocity += desiredVelocity * multiplier;
+}
+
+void AISystem::boidComputeAllFactor(Entity entity, Boid &boid, float multiplierCoherence, float multiplierSeperation, float multiplierAlignment, float range)
+{
+	float centeringFactor = multiplierCoherence;
+	vec2 center = vec2{0, 0};
+	int numNeighbors = 0;
+	// ------- SPERATION ----- //
+	float minDistance = 20.f;
+	float avoidFactor = multiplierSeperation;
+	vec2 move = vec2(0, 0);
+	vec2 position = boid.position;
+	//------ ALIGNMENT ---- //
+	vec2 avgVelocity = vec2(0, 0);
+	int numNeighborsAlignemnt = 0;
+	float matchingFactor = multiplierAlignment;
+	for (Entity other : registry.boids.entities)
+	{
+		if (other == entity)
+		{
+			continue;
+		};
+		// -------- COHERENCE ----------- //
+		Boid &otherBoid = registry.boids.get(other);
+		vec2 otherPos = otherBoid.position;
+		float neighborRnge = range;
+		float distance = glm::distance(position, otherPos);
+
+		if (distance < neighborRnge)
+		{
+			center += otherPos;
+			numNeighbors++;
+		}
+
+		// --------- SEPERATION --------- //
+
+		if (distance < minDistance)
+		{
+			move[0] += boid.position[0] - otherPos[0];
+			move[1] += boid.position[1] - otherPos[1];
+		};
+
+		// ---------- ALIGNMENT ----------- //
+		float neighborRngeAlignment = 200.f;
+
+		if (distance < neighborRngeAlignment)
+		{
+			avgVelocity[0] += otherBoid.velocity[0];
+			avgVelocity[1] += otherBoid.velocity[1];
+			numNeighborsAlignemnt += 1;
+		}
+	}
+	// -------------- COHERENCE ------------//
+	if (numNeighbors > 0)
+	{
+		center /= numNeighbors;
+		vec2 cohesionVelocity = (center - position) * centeringFactor;
+		boid.velocity += cohesionVelocity;
+	}
+	// ------------------ SEPERATION ------------------ //
+
+	boid.velocity[0] += move[0] * avoidFactor;
+	boid.velocity[1] += move[1] * avoidFactor;
+	// -------------    ALIGNMENT    ----------//
+
+	if (numNeighborsAlignemnt > 0)
+	{
+		avgVelocity[0] /= numNeighbors;
+		avgVelocity[1] /= numNeighbors;
+
+		boid.velocity[0] += (avgVelocity[0] - boid.velocity[0]) * matchingFactor;
+		boid.velocity[1] += (avgVelocity[1] - boid.velocity[1]) * matchingFactor;
+	}
 }

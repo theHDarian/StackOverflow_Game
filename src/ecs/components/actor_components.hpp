@@ -304,7 +304,29 @@ enum EnemyType {
     EnemyHifiTrailHard,
     EnemyHifiCannonHard,
     EnemyLaserSniper,
-    EnemyHifiTemporaryBoid
+    EnemyHifiTemporaryBoid,
+    ScientistradialAttack,
+    ScientistexplosiveAttack,
+    ScientistHomingAttack,
+    ScientistLaserGridAttack,
+    ScientistLaserGridVerticalAttack,
+    ScientistShield,
+    ScientistBoss,
+    ScientistHand,
+    EnemyHifiBoidFish,
+    HifiEnemyTwinLaserVertical1,
+    HifiEnemyTwinLaserVertical2,
+    HifiEnemyTwinLaserHorizontal1,
+    HifiEnemyTwinLaserHorizontal2,
+    HifiEnemySniper,
+    HifiEnemyCharger,
+    HifiEnemyTrail,
+    HifiEnemyCannon,
+    HifiEnemyChargerHard,
+    HifiEnemySniperHard,
+    HifiEnemyTrailHard,
+    HifiEnemyCannonHard,
+    HifiEnemyLaserSniper,
 };
 
 enum class EnemyAttackPattern {
@@ -353,6 +375,7 @@ struct AttackData {
     float homing = 0;
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
     EnemyType spawn;
+    std::vector<vec2> spawnPosition = {};
 };
 
 enum class EnemyBehavior {
@@ -403,7 +426,8 @@ enum class ReactionType {
     TWENTYFIVE_HEALTH,
     BEE_CLOSE,
     TEAM_HURT,
-    NO_BEES
+    NO_BEES,
+    SHIELDBREAK,
 };
 
 struct Reaction {
@@ -412,6 +436,19 @@ struct Reaction {
 };
 
 struct InvisibleEnemy {
+
+};
+
+struct Shield {
+
+};
+
+struct Scientist {
+    Entity shield;
+    Entity hand;
+};
+
+struct Hand {
 
 };
 

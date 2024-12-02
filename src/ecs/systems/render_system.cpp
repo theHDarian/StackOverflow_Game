@@ -61,7 +61,7 @@ void RenderSystem::step(float elapsed_ms) {
 	for (Entity entity : registry.animations.entities) {
 		Animation& anim = registry.animations.get(entity);
 		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate != AnimationTypes::NONE) {
-			if (anim.animate != AnimationTypes::ONCE || anim.frame != 0) anim.animation_countdown -= elapsed_ms;
+			if (anim.animate != AnimationTypes::ONCE || anim.frame != 0 && anim.frame > -1) anim.animation_countdown -= elapsed_ms;
 			if (anim.animation_countdown <= 0) {
 				anim.animation_countdown = anim.animation_countdown_base;
 				if (anim.animate == AnimationTypes::ONCE) {
@@ -78,6 +78,9 @@ void RenderSystem::step(float elapsed_ms) {
 			rr.texture_name = as.nextSprite;
 			rr.used_effect = as.nextEffect;
 			registry.animationSequences.remove(entity);
+			anim.frame = 0;
+			//std::cout << "done" << std::endl;
+			//std::cout << anim.frame << std::endl;
 		}
 	}
 }
@@ -393,7 +396,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	float alpha = 1;
 
-
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
 	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
@@ -412,6 +414,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	}
 	else if (registry.interactIndicators.has(entity)) { // hard code here for now
 		alpha = 0.7;
+	}
+	else if (registry.shield.has(entity)) {
+		alpha = 0.3;
 	}
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
@@ -893,7 +898,7 @@ void RenderSystem::drawGameUI() {
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity)) {
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity)) {
 			drawHPbar(entity, projection, view);
 		}
 	}

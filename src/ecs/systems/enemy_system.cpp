@@ -180,10 +180,16 @@ void EnemySystem::step(float elapsed_ms)
                     vec2 mid = twinMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
-
-                float totalDistance = glm::distance(movement.posA, movement.posB);
-                movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
-                motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
+                if (pattern.type == EnemyBehavior::TELEPORT)
+                {
+                    motion.position = movement.posB;
+                }
+                else
+                {
+                    float totalDistance = glm::distance(movement.posA, movement.posB);
+                    movement.distanceTraveled = glm::min(movement.distanceTraveled + movement.speed * elapsed_ms / 1000.f, glm::distance(movement.posA, movement.posB));
+                    motion.position = glm::lerp(movement.posA, movement.posB, movement.distanceTraveled / totalDistance);
+                }
             }
             else
             {
@@ -216,6 +222,10 @@ void EnemySystem::step(float elapsed_ms)
     // HANDLING DAMGE FROM COLLISION
     for (auto &entity : registry.collisions.entities)
     {
+        if (registry.invisibleEnemy.has(entity))
+        {
+            continue;
+        }
         const Collision &collision = registry.collisions.get(entity);
         Entity other_entity = collision.other;
         if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity) && !registry.deleteds.has(other_entity))
@@ -227,6 +237,14 @@ void EnemySystem::step(float elapsed_ms)
             enemyStat.currHealth -= bulletStat.damage;
             if (enemyStat.currHealth <= 0)
             {
+                if (registry.scientist.has(entity))
+                {
+                    Scientist &scien = registry.scientist.get(entity);
+                    if (!registry.deleteds.has(scien.hand))
+                    {
+                        registry.deleteds.emplace(scien.hand);
+                    }
+                }
                 if (!registry.deleteds.has(entity))
                 {
                     Fade &f = registry.fades.emplace(entity);
@@ -553,9 +571,40 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
 
     if (registry.animations.has(entity))
         registry.animations.get(entity).frame = 1;
+    Map &map = registry.maps.components[0];
+    // vec2 roomStartPos = map.currRoom.roomStart;
+    // vec2 roomEndPos = map.currRoom.roomEnd;
+
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        createEnemy(render, pos, atkData.spawn);
+        std::cout << registry.shield.entities.size() << "shield num" << std::endl;
+        if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity))
+        {
+            if (registry.shield.entities.size() > 0) {
+                break;
+            }
+            std::cout << " created shield " << std::endl;
+            Entity shield = createEnemy(render, pos, atkData.spawn);
+            Scientist &scientist = registry.scientist.get(entity);
+            scientist.shield = shield;
+            continue;
+        }
+        else if (atkData.spawn == EnemyType::ScientistHand && registry.scientist.has(entity))
+        {
+            Entity hand = createEnemy(render, pos, atkData.spawn);
+            Scientist &scientist = registry.scientist.get(entity);
+            scientist.hand = hand;
+            continue;
+        } 
+
+        if (atkData.spawnPosition.size() == atkData.numBullets)
+        {
+            map.currRoom.preset.enemies.push_back({atkData.spawn, atkData.spawnPosition[i]});
+        }
+        else
+        {
+            createEnemy(render, pos, atkData.spawn);
+        }
     }
 
     currPattern.currAtkCD = currPattern.maxAtkCD;

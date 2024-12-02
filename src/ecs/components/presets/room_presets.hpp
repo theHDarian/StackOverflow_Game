@@ -306,7 +306,7 @@ const RoomPreset EnemyRoomSwarm{
 0,
 "EnemyRoomSwarm",
     false,
-    {3000, 3000}
+    {1600, 1000}
 };
 
 const RoomPreset EnemyRoomDashIntro1{

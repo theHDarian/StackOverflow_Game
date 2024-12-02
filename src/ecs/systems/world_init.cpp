@@ -342,7 +342,7 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 
 	registry.renderRequests.insert(
 		console,
-		{ "push_console",
+		{"push_console",
 		 EFFECT_ASSET_ID::ANIMATE,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
@@ -560,7 +560,6 @@ Entity createOracleCrab(RenderSystem *renderer, vec2 pos)
 	return entity;
 }
 
-
 Entity createRamStick(RenderSystem *renderer, vec2 pos)
 {
 	auto entity = Entity();
@@ -578,7 +577,7 @@ Entity createRamStick(RenderSystem *renderer, vec2 pos)
 	interact.name = "Ram";
 	interact.item = InteractableItem::Ram;
 	registry.circleColliders.emplace(entity).radius = motion.scale.x / 2;
-	auto& effect = registry.emitParticles.emplace(entity, PBulletTrail, playerBulletTrail, 999999, 1);
+	auto &effect = registry.emitParticles.emplace(entity, PBulletTrail, playerBulletTrail, 999999, 1);
 	// effect.props.colors = {{0.f, 1.f, 0.f,1.f},{0.f, 1.f, 0.f,1.f}}},
 
 	return entity;
@@ -613,8 +612,8 @@ Entity createGardener(RenderSystem *renderer, vec2 pos)
 	CircleCollider &cc = registry.circleColliders.emplace(gardener);
 	cc.radius = m.scale.y / 4;
 
-	createProp(renderer, pos + vec2(-400, 0), "lily_planter.png", vec2(264,480), vec2(0.8,0.9));
-	createProp(renderer, pos + vec2(+400, 0), "carrot_planter.png", vec2(264, 480), vec2(0.8,0.9));
+	createProp(renderer, pos + vec2(-400, 0), "lily_planter.png", vec2(264, 480), vec2(0.8, 0.9));
+	createProp(renderer, pos + vec2(+400, 0), "carrot_planter.png", vec2(264, 480), vec2(0.8, 0.9));
 
 	return gardener;
 }
@@ -667,10 +666,11 @@ Entity createBibleTree(RenderSystem *renderer, vec2 pos)
 }
 
 // For creating top-down props with four walls (like planters)
-Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink) {
+Entity createProp(RenderSystem *renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink)
+{
 	Entity e = Entity();
 
-	Motion& m = registry.motions.emplace(e);
+	Motion &m = registry.motions.emplace(e);
 	m.position = pos;
 	m.velocity = vec2(0);
 	m.scale = scale;
@@ -681,35 +681,34 @@ Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 s
 	createWall(renderer, pos + vec2(+scale.x / 2.f, +scale.y / 2.f), pos + vec2(-scale.x / 2.f, +scale.y / 2.f));
 	createWall(renderer, pos + vec2(+scale.x / 2.f, -scale.y / 2.f), pos + vec2(-scale.x / 2.f, -scale.y / 2.f));
 
-	Parent& p = registry.parents.emplace(ew);
+	Parent &p = registry.parents.emplace(ew);
 	p.children.push_back(e);
 
-	auto& object = registry.objects.emplace(e);
+	auto &object = registry.objects.emplace(e);
 	object.baseOffset;
 
 	registry.renderRequests.insert(
 		e,
-		{ filename,
+		{filename,
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 	return e;
 }
-
 
 // For creating side-on props with a wall (like pop console or tree)
 Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect) {
 	Entity e = Entity();
 
-	Motion& m = registry.motions.emplace(e);
+	Motion &m = registry.motions.emplace(e);
 	m.position = pos;
 	m.velocity = vec2(0);
 	m.scale = scale;
 
-	Entity ew = createWall(renderer, pos + wallOffset * vec2(-1,1), pos + wallOffset);
-	Parent& p = registry.parents.emplace(ew);
+	Entity ew = createWall(renderer, pos + wallOffset * vec2(-1, 1), pos + wallOffset);
+	Parent &p = registry.parents.emplace(ew);
 	p.children.push_back(e);
 
-	auto& object = registry.objects.emplace(e);
+	auto &object = registry.objects.emplace(e);
 	object.baseOffset = baseOffset;
 
 	registry.renderRequests.insert(
@@ -721,30 +720,31 @@ Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2
 }
 
 // For creating side-on props with a wall (like pop console or tree)
-Entity createFloorDeco(RenderSystem* renderer, vec2 pos, std::string filename) {
+Entity createFloorDeco(RenderSystem *renderer, vec2 pos, std::string filename)
+{
 	Entity e = Entity();
 
-	Motion& m = registry.motions.emplace(e);
+	Motion &m = registry.motions.emplace(e);
 	m.position = pos;
 	m.velocity = vec2(0);
 	m.scale = vec2(192 * ((rand() % 2 == 1) ? -1 : 1), 192);
 
 	Entity ew = createWall(renderer, vec2(-1000000), vec2(-100000));
-	Parent& p = registry.parents.emplace(ew);
+	Parent &p = registry.parents.emplace(ew);
 	p.children.push_back(e);
 
 	registry.backgrounds.emplace(e);
 
-	auto& anim = registry.animations.emplace(e);
+	auto &anim = registry.animations.emplace(e);
 	anim.animate = false;
 	anim.max_frames = 16;
 	anim.frame = rand() % 16;
 
 	registry.renderRequests.insert(
 		e,
-		{ filename,
+		{filename,
 		 EFFECT_ASSET_ID::ANIMATE,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 	return e;
 }
 
@@ -785,7 +785,7 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'B' : 'T' : (door.startPos.x < ws.width / 2.f) ? 'L'
 																																		  : 'R';
 
-	registry.roomSizeScaleds.emplace(entity,"Door");
+	registry.roomSizeScaleds.emplace(entity, "Door");
 	std::cout << glm::to_string(startPos) << ", " << glm::to_string(endPos) << ", " << door.side << std::endl;
 
 	InteractableObject &object = registry.interactables.emplace(entity);
@@ -803,21 +803,22 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	return entity;
 }
 
-Entity createWallThickness(vec2 pos, vec2 scale) {
+Entity createWallThickness(vec2 pos, vec2 scale)
+{
 	auto entity = Entity();
 
-	Motion& motion = registry.motions.emplace(entity);
+	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = scale + vec2(200, 200/1.33);
+	motion.scale = scale + vec2(200, 200 / 1.33);
 
 	registry.backgrounds.emplace(entity);
-	registry.roomSizeScaleds.emplace(entity,"WallThickness");
+	registry.roomSizeScaleds.emplace(entity, "WallThickness");
 
 	registry.renderRequests.insert(
 		entity,
-		{ "wall_border.png",
+		{"wall_border.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	return entity;
 }
@@ -826,18 +827,22 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 {
 	auto entity = Entity();
 	Motion &motion = registry.motions.emplace(entity);
-	Map& map = registry.maps.components[0];
-	WindowState& ws = registry.windowStates.components[0];
-	vec2 position = vec2(ws.width,ws.height)/2.f;
+	Map &map = registry.maps.components[0];
+	WindowState &ws = registry.windowStates.components[0];
+	vec2 position = vec2(ws.width, ws.height) / 2.f;
 	float of = 200.f;
-	if(side == 'T') position += vec2(0,map.currRoom.preset.roomSize.y/2+of);
-	if (side == 'R') position += vec2(map.currRoom.preset.roomSize.x/2+of,0);
-	if (side == 'B') position += vec2(0,-map.currRoom.preset.roomSize.y/2-of);
-	if (side == 'L') position += vec2(-map.currRoom.preset.roomSize.x/2-of,0);
+	if (side == 'T')
+		position += vec2(0, map.currRoom.preset.roomSize.y / 2 + of);
+	if (side == 'R')
+		position += vec2(map.currRoom.preset.roomSize.x / 2 + of, 0);
+	if (side == 'B')
+		position += vec2(0, -map.currRoom.preset.roomSize.y / 2 - of);
+	if (side == 'L')
+		position += vec2(-map.currRoom.preset.roomSize.x / 2 - of, 0);
 	motion.position = position;
 	motion.angle = 0;
 	motion.scale = vec2(120.f, 120);
-	registry.roomSizeScaleds.emplace(entity,"DoorSymbol");
+	registry.roomSizeScaleds.emplace(entity, "DoorSymbol");
 
 	DoorSymbol &symbol = registry.doorSymbols.emplace(entity);
 	symbol.angle = 0;
@@ -851,58 +856,64 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 														EFFECT_ASSET_ID::ANIMATE,
 														GEOMETRY_BUFFER_ID::SPRITE});
 
-	Animation& anim = registry.animations.emplace(entity);
+	Animation &anim = registry.animations.emplace(entity);
 	anim.max_frames = 100;
 	anim.animate = false;
 	anim.animation_countdown = 1000;
 	anim.animation_countdown_base = 1000;
 	return entity;
 }
-Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side)
+Entity createDoors(RenderSystem *renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side)
 {
 	auto entity = Entity();
-	Motion& motion = registry.motions.emplace(entity);
+	Motion &motion = registry.motions.emplace(entity);
 	float offsetAmount = -40.f;
 	vec2 offsetPos = vec2(0);
 	vec2 scaleOffset;
-	if(side == 'T') offsetPos.y = -offsetAmount;
-	if (side == 'R') offsetPos.x = offsetAmount;
-	if (side == 'B') offsetPos.y = offsetAmount;
-	if (side == 'L') offsetPos.x = -offsetAmount;
+	if (side == 'T')
+		offsetPos.y = -offsetAmount;
+	if (side == 'R')
+		offsetPos.x = offsetAmount;
+	if (side == 'B')
+		offsetPos.y = offsetAmount;
+	if (side == 'L')
+		offsetPos.x = -offsetAmount;
 	motion.position = position + offsetPos;
 	motion.angle = angle;
 	float angleOffset = 0.66;
 	if (angle == (M_PI / 2) || angle == (M_PI / 2 + M_PI))
 		angleOffset = 1.0f;
-	//this is a factor of the wall's scaling, the wall's dimensions are 120x66 so if we want the door to be 4 tiles long it should be
-	// motion.scale = vec2(336,400.f) * vec2(1,tan(radians(125.f)/2))* normalize(vec2(2 * scale.x / 120.f, 2 * scale.y / 66.f));
-	// if (side == 'R' || side == 'L') motion.scale.x *= 6.5f/3.8f;
-	if (side == 'L' || side == 'R') {
-        motion.scale = vec2(336, 264) * normalize(vec2(3,0.5555)) * 1.07f;
-    }
-    else {
-        motion.scale = vec2(336, 264) * normalize(vec2(1920, 1080)) * 0.7f;
-    }
+	// this is a factor of the wall's scaling, the wall's dimensions are 120x66 so if we want the door to be 4 tiles long it should be
+	//  motion.scale = vec2(336,400.f) * vec2(1,tan(radians(125.f)/2))* normalize(vec2(2 * scale.x / 120.f, 2 * scale.y / 66.f));
+	//  if (side == 'R' || side == 'L') motion.scale.x *= 6.5f/3.8f;
+	if (side == 'L' || side == 'R')
+	{
+		motion.scale = vec2(336, 264) * normalize(vec2(3, 0.5555)) * 1.07f;
+	}
+	else
+	{
+		motion.scale = vec2(336, 264) * normalize(vec2(1920, 1080)) * 0.7f;
+	}
 	// motion.scale = vec2(336,264) * vec2(1,0.1);
 
-	DoorSymbol& symbol = registry.doorSymbols.emplace(entity);
+	DoorSymbol &symbol = registry.doorSymbols.emplace(entity);
 	symbol.angle = doorAngle;
 	symbol.axis = axis;
 	symbol.offset = offset;
 	symbol.door = true;
 	symbol.side = side;
-	registry.roomSizeScaleds.emplace(entity,"DoorSprite");
+	registry.roomSizeScaleds.emplace(entity, "DoorSprite");
 
 	registry.backgrounds.emplace(entity);
 
-	auto& anim = registry.animations.emplace(entity);
+	auto &anim = registry.animations.emplace(entity);
 	anim.animate = false;
 	anim.max_frames = 3;
 
-	RenderRequest& rr = registry.renderRequests.insert(entity,
-		{ "doors",
-		 EFFECT_ASSET_ID::ROOM_BOUND,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+	RenderRequest &rr = registry.renderRequests.insert(entity,
+													   {"doors",
+														EFFECT_ASSET_ID::ROOM_BOUND,
+														GEOMETRY_BUFFER_ID::SPRITE});
 	return entity;
 }
 
@@ -929,59 +940,58 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 	float doorwidth = 100.f;
 
 	std::vector<WallPos> wallPositions = {
-		{
-			// top
-			vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
-			vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
-			vec2(floorPosition.x, floorPosition.y + floorScale.y),
-			vec2(floorScale.x * 1.1, wallThickness),
-			glm::radians(180.f),
-			vec3(0, 0, 50),
-			vec2(0, spriteOffset)},
-			 {// right
-	  vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
-	  vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
-	  vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
-	  vec2(floorScale.y * 2, wallThickness),
-	  glm::radians(90.f),
-	  vec3(0, 0, 50),
-	  vec2(spriteOffset, 0)},
+		{// top
+		 vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+		 vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y - floorScale.y / 2.f),
+		 vec2(floorPosition.x, floorPosition.y + floorScale.y),
+		 vec2(floorScale.x * 1.1, wallThickness),
+		 glm::radians(180.f),
+		 vec3(0, 0, 50),
+		 vec2(0, spriteOffset)},
+		{// right
+		 vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
+		 vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
+		 vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
+		 vec2(floorScale.y * 2, wallThickness),
+		 glm::radians(90.f),
+		 vec3(0, 0, 50),
+		 vec2(spriteOffset, 0)},
 		{// bottom
-	 vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-	 vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-	 vec2(floorPosition.x, floorPosition.y - floorScale.y), 
-	 vec2(floorScale.x * 1.1, wallThickness),
-	 0,
-	 vec3(0, 0, 50),
-	 vec2(0, -spriteOffset)},
-	{// left
-     vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
-	 vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
-	 vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y), 
-	 vec2(floorScale.y * 2, wallThickness),
-	 glm::radians(270.f),
-	 vec3(0, 0, 50),
-	 vec2(-spriteOffset, 0)},
+		 vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+		 vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+		 vec2(floorPosition.x, floorPosition.y - floorScale.y),
+		 vec2(floorScale.x * 1.1, wallThickness),
+		 0,
+		 vec3(0, 0, 50),
+		 vec2(0, -spriteOffset)},
+		{// left
+		 vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
+		 vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
+		 vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y),
+		 vec2(floorScale.y * 2, wallThickness),
+		 glm::radians(270.f),
+		 vec3(0, 0, 50),
+		 vec2(-spriteOffset, 0)},
 
- };
+	};
 	for (auto &p : wallPositions)
 	{
 		auto entity = Entity();
 
-		registry.roomSizeScaleds.emplace(entity,"Bound");
+		registry.roomSizeScaleds.emplace(entity, "Bound");
 
 		auto &motion = registry.motions.emplace(entity);
 		motion.position = p.spritePosition;
 		motion.scale = p.spriteScale;
 
-		//std::cout << "Position: " << p.spritePosition.x << ", " << p.spritePosition.y << std::endl;
-		//std::cout << "Scale: " << p.spriteScale.x << ", " << p.spriteScale.y << std::endl;
+		// std::cout << "Position: " << p.spritePosition.x << ", " << p.spritePosition.y << std::endl;
+		// std::cout << "Scale: " << p.spriteScale.x << ", " << p.spriteScale.y << std::endl;
 
-		//std::cout << "Start: " << p.colliderStart.x << ", " << p.colliderStart.y << std::endl;
-		//std::cout << "End: " << p.colliderEnd.x << ", " << p.colliderEnd.y << std::endl;
-		
+		// std::cout << "Start: " << p.colliderStart.x << ", " << p.colliderStart.y << std::endl;
+		// std::cout << "End: " << p.colliderEnd.x << ", " << p.colliderEnd.y << std::endl;
+
 		motion.angle = p.spriteAngle;
-		//std::cout << motion.angle << std::endl;
+		// std::cout << motion.angle << std::endl;
 
 		auto &wall = registry.walls.emplace(entity);
 		wall.startPosition = p.colliderStart;
@@ -991,38 +1001,40 @@ void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)
 		b.angle = glm::radians(-90.f);
 		b.axis = vec3(1, 0, 0);
 		b.offset = p.offset;
-		b.side = (p.colliderStart.y == p.colliderEnd.y) ? ((p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T') : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+		b.side = (p.colliderStart.y == p.colliderEnd.y) ? ((p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T') : (p.colliderStart.x < ws.width / 2.f) ? 'L'
+																																					 : 'R';
 
 		RenderRequest &rr = registry.renderRequests.insert(
 			entity,
 			{"walls",
 			 EFFECT_ASSET_ID::ROOM_BOUND,
 			 GEOMETRY_BUFFER_ID::SPRITE,
-			true,
-			vec2(0),
-			vec2(168,384)});
+			 true,
+			 vec2(0),
+			 vec2(168, 384)});
 		registry.backgrounds.emplace(entity);
 
 		// add door symbol for each wall
 		createDoorSymbol(renderer, b.side, motion.angle, motion.scale, b.angle, b.axis, b.offset, p.symbolOffset);
 	}
-	for (auto& p : wallPositions)
+	for (auto &p : wallPositions)
 	{
-		float angle = -M_PI/2.f;
+		float angle = -M_PI / 2.f;
 		vec3 axis = vec3(1, 0, 0);
 		vec3 offset = p.offset;
-		char side = (p.colliderStart.y == p.colliderEnd.y) ? ((p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T') : (p.colliderStart.x < ws.width / 2.f) ? 'L' : 'R';
+		char side = (p.colliderStart.y == p.colliderEnd.y) ? ((p.colliderStart.y < ws.height / 2.f) ? 'B' : 'T') : (p.colliderStart.x < ws.width / 2.f) ? 'L'
+																																						: 'R';
 
 		createDoors(renderer, p.spritePosition, p.spriteAngle, p.spriteScale, angle, axis, offset, side);
 	}
 
-	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y + 45 }, { ws.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y + 45 });
-	createDoor(renderer, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[1].colliderStart.x - 30,  ws.height / 2 + doorwidth / 2 });
-	createDoor(renderer, { ws.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y - 30 }, { ws.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y - 30 });
-	createDoor(renderer, { wallPositions[3].colliderStart.x + 30,  ws.height / 2 - doorwidth / 2 }, { wallPositions[3].colliderStart.x + 30,  ws.height / 2 + doorwidth / 2 });
+	createDoor(renderer, {ws.width / 2 - doorwidth / 2, wallPositions[0].colliderStart.y + 45}, {ws.width / 2 + doorwidth / 2, wallPositions[0].colliderStart.y + 45});
+	createDoor(renderer, {wallPositions[1].colliderStart.x - 30, ws.height / 2 - doorwidth / 2}, {wallPositions[1].colliderStart.x - 30, ws.height / 2 + doorwidth / 2});
+	createDoor(renderer, {ws.width / 2 - doorwidth / 2, wallPositions[2].colliderStart.y - 30}, {ws.width / 2 + doorwidth / 2, wallPositions[2].colliderStart.y - 30});
+	createDoor(renderer, {wallPositions[3].colliderStart.x + 30, ws.height / 2 - doorwidth / 2}, {wallPositions[3].colliderStart.x + 30, ws.height / 2 + doorwidth / 2});
 
 	// update room start/end pos based on colliders
-	Room& room = registry.maps.components[0].currRoom;
+	Room &room = registry.maps.components[0].currRoom;
 	room.roomStart = vec2(wallPositions[3].colliderStart.x, wallPositions[0].colliderStart.y);
 	room.roomEnd = vec2(wallPositions[1].colliderStart.x, wallPositions[2].colliderStart.y);
 }
@@ -1106,16 +1118,16 @@ Entity createFloor(RenderSystem *renderer, vec2 pos, vec2 scale)
 	motion.scale = scale;
 
 	registry.backgrounds.emplace(entity);
-	registry.roomSizeScaleds.emplace(entity,"Floor");
+	registry.roomSizeScaleds.emplace(entity, "Floor");
 
 	registry.renderRequests.insert(
 		entity,
 		{"Floor.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE,
-		true,
-		vec2(0),
-		vec2(1440.f/1.5f)});
+		 true,
+		 vec2(0),
+		 vec2(1440.f / 1.5f)});
 
 	return entity;
 };
@@ -1266,11 +1278,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = HealerAngel();
 		Healer& healer = registry.healers.emplace(entity);
 		healer.coolDown = 0.f;
-	}
-	case EnemyType::ScientistlaserAttack:
-	{
-		enemy = InvisibleRotateLaserEnemy();
-		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	}
 	case EnemyType::EnemyFishBoid:
@@ -1281,7 +1288,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		float randomX = getRandomFloat(-35.f, 35.f);
 		float randomY = getRandomFloat(-35.f, 35.f);
 		boid.velocity = vec2(randomX, randomY);
-		boid.maxSpeed = 200.f;
+		boid.maxSpeed = 400.f;
+		break;
 	}
 	case EnemyType::EnemyTwinLaserVertical1:
 	{
@@ -1317,6 +1325,65 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::EnemyHifiTrailHard: enemy = HifiTrailHard();break;
 	case EnemyType::EnemyHifiCannonHard: enemy = HifiCannonHard();break;
 	case EnemyType::EnemyHifiTemporaryBoid: enemy = HifiTemporaryBoid(); break;
+	case EnemyType::HifiEnemyCharger:
+		break;
+	case EnemyType::ScientistlaserAttack:
+	{
+		enemy = InvisibleRotateLaserEnemy();
+		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistradialAttack:
+	{
+		enemy = InvisibleTurretEnemy();
+		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistexplosiveAttack:
+	{
+		enemy = InvisibleExplosiveEnemy();
+		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistLaserGridAttack:
+	{
+		enemy = InvisibleLaserEnemy();
+		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistLaserGridVerticalAttack:
+	{
+		enemy = InvisibleLaserEnemyVertical();
+		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistHomingAttack:
+	{
+		enemy = InvisibleHomingEnemy();
+		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	};
+	case EnemyType::ScientistBoss:
+	{
+		enemy = ScientistBossEnemy();
+		registry.bosses.insert(entity, {"The Purple Cyborg"});
+		Scientist& scien = registry.scientist.emplace(entity);
+		
+		break;
+	}
+	case EnemyType::ScientistShield:
+	{
+		enemy = ScientistSheildEnemy();
+		registry.shield.emplace(entity);
+		break;
+	}
+	case EnemyType::ScientistHand:
+	{
+		enemy = ScientistHandEnemy();
+		registry.hand.emplace(entity);
+		break;
+	}
+		case EnemyType::HifiEnemyLaserSniper: enemy = HifiLaserSniper();break;
 	};
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1368,9 +1435,16 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		auto &animate = registry.animations.emplace(entity);
 		animate.animate = enemy.sprite.animationType;
-		animate.max_frames = enemy.sprite.max_Frames; // this works only for bee for now, but texture arrays also seem to auto-mod, may not be needed?
+		animate.max_frames = enemy.sprite.max_Frames;
 		animate.animation_countdown = enemy.sprite.countdown;
 		animate.animation_countdown_base = animate.animation_countdown;
+	}
+
+	if (type == EnemyType::ScientistBoss) {
+		auto& animate = registry.animations.emplace(entity);
+		animate.max_frames = 24; 
+		animate.animation_countdown = 36;
+		animate.animation_countdown_base = 36;
 	}
 
 	if (type == EnemyType::BossBeehiveMain)
@@ -1382,7 +1456,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	return entity;
 };
 
-void createEnemyGroup(RenderSystem * renderer, vec2 pos, EnemyType type) {
+void createEnemyGroup(RenderSystem *renderer, vec2 pos, EnemyType type)
+{
 	std::vector<Entity> groupMembers;
 	Map& map = registry.maps.components[0];
 	WindowState& ws =  registry.windowStates.components[0];
@@ -1399,10 +1474,13 @@ void createEnemyGroup(RenderSystem * renderer, vec2 pos, EnemyType type) {
 		groupMembers.push_back(createEnemy(renderer,pos,type));
 		groupMembers.push_back(createEnemy(renderer,twinPos,EnemyHifiTwinLaserHorizontal2));
 	}
-	for (Entity gm : groupMembers) {
-		EnemyGroup& eg = registry.enemyGroups.emplace(gm);
-		for (Entity other : groupMembers) {
-			if (other == gm) continue;
+	for (Entity gm : groupMembers)
+	{
+		EnemyGroup &eg = registry.enemyGroups.emplace(gm);
+		for (Entity other : groupMembers)
+		{
+			if (other == gm)
+				continue;
 			eg.others.push_back(other);
 		}
 	}
@@ -1420,7 +1498,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
 	bullet.bulletPierce = atkData.bulletPierce;
-	bullet.bulletEffects = getBulletEffects(atkData,bullet.isSpecial);
+	bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
 	bullet.shape = atkData.shape;
 	if (atkData.onDeath != EnemyBulletDeath::NONE)
 		bullet.onDeath = atkData.onDeath;
@@ -1433,7 +1511,8 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	motion.veer = veer;
 
 	// Make special bullets easier to hit
-	if (bullet.isSpecial) {
+	if (bullet.isSpecial)
+	{
 		bullet.bulletSpeed *= 0.8;
 		bullet.bulletRange *= 1.5;
 		motion.scale *= 1.2f;
@@ -1532,9 +1611,12 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		if(enemyBulletParticleColors.count(type) > 0) {
+		if (enemyBulletParticleColors.count(type) > 0)
+		{
 			props.colors.push_back(enemyBulletParticleColors.at(type));
-		} else {
+		}
+		else
+		{
 			printf("Warning: enemy bullet color not defined\n");
 		}
 	}
@@ -1587,9 +1669,9 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 	registry.renderRequests.insert(
 		entity,
 		{// spriteComponent.sprites[SPRITE_STATE::BASE],
-		(onDeath != EnemyBulletDeath::EXPLODE) ? "enemy_bullet_circle.png" : "none.png",
-		EFFECT_ASSET_ID::BULLET,
-		GEOMETRY_BUFFER_ID::SPRITE});
+		 (onDeath != EnemyBulletDeath::EXPLODE) ? "enemy_bullet_circle.png" : "none.png",
+		 EFFECT_ASSET_ID::BULLET,
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	// bullet trail (if we decide to add effects in the future)
 	ParticleProps props = enemyBullet;
@@ -1598,9 +1680,12 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		BulletEffectType type = effect.type;
 		if (type == BulletEffectType::Inert)
 			continue;
-		if(enemyBulletParticleColors.count(type) > 0) {
+		if (enemyBulletParticleColors.count(type) > 0)
+		{
 			props.colors.push_back(enemyBulletParticleColors.at(type));
-		} else {
+		}
+		else
+		{
 			printf("Warning: enemy bullet color not defined\n");
 		}
 	}
@@ -1626,7 +1711,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	bullet.initialRange = atkData.bulletRange;
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
-	bullet.bulletEffects = getBulletEffects(atkData,bullet.isSpecial);
+	bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1644,9 +1729,9 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 
 	ParticleProps props = enemyBulletDeathParticle;
 	props.lifetime = 200.f;
-	props.velocity.variation = {200,200};
-	props.colors.push_back({{1,1,1,1},{1,1,1,1}});
-	registry.emitParticles.emplace(entity,PLaser,props,100000,1);
+	props.velocity.variation = {200, 200};
+	props.colors.push_back({{1, 1, 1, 1}, {1, 1, 1, 1}});
+	registry.emitParticles.emplace(entity, PLaser, props, 100000, 1);
 
 	registry.renderRequests.insert(
 		entity,
@@ -1698,35 +1783,35 @@ Entity createLightningBullet(RenderSystem *renderer, vec2 pos)
 
 	registry.renderRequests.insert(
 		entity,
-		{ (type) ? "lightning_bullet_1" : "lightning_bullet_2",
+		{(type) ? "lightning_bullet_1" : "lightning_bullet_2",
 		 EFFECT_ASSET_ID::ANIMATE,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	return entity;
 }
 
-Entity createKeyBullet(RenderSystem* renderer, vec2 pos)
+Entity createKeyBullet(RenderSystem *renderer, vec2 pos)
 {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	EnemyBullet &bullet = registry.enemyBullets.emplace(entity);
 	bullet.bulletSpeed = 450;
 	bullet.bulletRange = 5000;
 	bullet.bulletBounce = 10;
 	bullet.bulletPierce = 0;
-	bullet.bulletEffects = { key };
+	bullet.bulletEffects = {key};
 	bullet.shape = RECTANGLE;
 
-	Motion& motion = registry.motions.emplace(entity);
+	Motion &motion = registry.motions.emplace(entity);
 	float angle = (rand() % 100 / 100.f) * 2 * M_PI;
 	motion.angle = angle;
 	motion.position = pos;
 	motion.velocity = 450.f * vec2(cos(angle), sin(angle));
 	motion.scale = 20.f * vec2(2.8, 1); // Ensure scale is initialized
-	motion.veer = { 0, 0 };
+	motion.veer = {0, 0};
 
 	PolyCollider& pc = registry.polyColliders.emplace(entity);
 	pc.offsetVertices = {
