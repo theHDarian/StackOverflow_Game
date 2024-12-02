@@ -104,7 +104,7 @@ void SceneSystem::step(float elapsed_ms) {
 		}
 		if (map.currRoom.type == RoomType::TutorialRoom2 && map.currRoom.dialogueCount == 1 && !map.currRoom.cleared) {
 			input.lockControls = true;
-			input.lastInputAxis = vec2(0);
+			//input.lastInputAxis = vec2(0);
 			input.inputAxis = vec2(0);
 			map.currRoom.dialogueCount++;
 		}
