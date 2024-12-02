@@ -776,7 +776,7 @@ const AttackData FastLaser{
 // };
 /////////////////////////////////
 
-struct TestEnemy : Enemy
+struct Pufferfish : Enemy
 {
 	Reaction reactionPatrol = {
 		ReactionType::DURATION,
@@ -791,7 +791,7 @@ struct TestEnemy : Enemy
 	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol}, 1, false, 0, 0, NoAttack};
 	EnemyPattern patrolState = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionPlayerClose, reactionIdle}, 0, true, 0, 2000.f, twelveSpiralShot};
 	EnemyPattern followState = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 0.f, 0.f, {reactionPlayerClose, reactionIdle}, 0, true, 0.f, 5000.f, SniperShot};
-	TestEnemy()
+	Pufferfish()
 	{
 		maxHealth = 50;
 		currHealth = maxHealth;
@@ -810,12 +810,12 @@ struct TestEnemy : Enemy
 	};
 };
 
-struct EnemyEasySentry : Enemy
+struct Quadshooter : Enemy
 {
 
 	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, quadShot};
 
-	EnemyEasySentry()
+	Quadshooter()
 	{
 		maxHealth = 100;
 		currHealth = maxHealth;
@@ -833,7 +833,7 @@ struct EnemyEasySentry : Enemy
 	};
 };
 
-struct EnemyEasyTrail : Enemy
+struct Snail : Enemy
 {
 	const AttackData snailTrail{
 	EnemyAttackPattern::TRAIL,
@@ -852,7 +852,7 @@ struct EnemyEasyTrail : Enemy
 
 	EnemyPattern rotateState = { "Follow Player", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, snailTrail };
 
-	EnemyEasyTrail()
+	Snail()
 	{
 		maxHealth = 150;
 		currHealth = maxHealth;
@@ -871,7 +871,7 @@ struct EnemyEasyTrail : Enemy
 	};
 };
 
-struct EnemyHardTrail : Enemy
+struct EvilSnail : Enemy
 {
 	const AttackData snailTrail{
 	EnemyAttackPattern::TRAIL,
@@ -892,7 +892,7 @@ struct EnemyHardTrail : Enemy
 
 	EnemyPattern rotateState = { "Follow Player", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 5000.f, snailTrail };
 
-	EnemyHardTrail()
+	EvilSnail()
 	{
 		maxHealth = 200;
 		currHealth = maxHealth;
@@ -912,7 +912,7 @@ struct EnemyHardTrail : Enemy
 	};
 };
 
-struct EnemyMediumTank : Enemy
+struct Crab : Enemy
 {
 
 	const AttackData twoPincerShot{
@@ -938,7 +938,7 @@ struct EnemyMediumTank : Enemy
 	EnemyPattern idleState =   {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 2, true, 0.f, 1000.f, twoPincerShot};
 	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 500.f, missile};
-	EnemyMediumTank()
+	Crab()
 	{
 		maxHealth = 150;
 		currHealth = maxHealth;
@@ -954,7 +954,7 @@ struct EnemyMediumTank : Enemy
 	};
 };
 
-struct EnemyLaserTank : Enemy
+struct LaserCrab : Enemy
 {
 
 	const AttackData crabLaser{
@@ -977,7 +977,7 @@ struct EnemyLaserTank : Enemy
 		1 };
 
 	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	EnemyLaserTank()
+	LaserCrab()
 	{
 		maxHealth = 150;
 		currHealth = maxHealth;
@@ -995,7 +995,7 @@ struct EnemyLaserTank : Enemy
 	};
 };
 
-struct EnemyHardTank : Enemy
+struct EvilCrab : Enemy
 {
 
 	const AttackData radialSquare{
@@ -1021,7 +1021,7 @@ struct EnemyHardTank : Enemy
 	EnemyPattern idleState = { "IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 1000.f, radialSquare };
 	EnemyPattern walkingRage = { "WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration}, 3, false, 0.f, 0.f, NoAttack };
 	EnemyPattern shootMisile = { "MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 300.f, missile };
-	EnemyHardTank()
+	EvilCrab()
 	{
 		maxHealth = 200;
 		currHealth = maxHealth;
@@ -1038,10 +1038,10 @@ struct EnemyHardTank : Enemy
 	};
 };
 
-struct EnemyBigC : Enemy
+struct BigC : Enemy
 {
 
-	EnemyBigC()
+	BigC()
 	{
 		maxHealth = 1000;
 
@@ -1059,7 +1059,7 @@ struct EnemyBigC : Enemy
 	};
 };
 
-struct EnemyMediumCharge : Enemy
+struct Magnet : Enemy
 {
 	Reaction lowHealth = {
 		ReactionType::FIFTY_HEALTH,
@@ -1074,7 +1074,7 @@ struct EnemyMediumCharge : Enemy
 		0};
 	EnemyPattern idleState = {"IDLE ATTACKING", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {durationIdle}, 0, true, 0.f, 2000.f, missile};
 	EnemyPattern followState = {"FOLLOW ENEMY", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {lowHealth, durationFollow}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyMediumCharge()
+	Magnet()
 	{
 		maxHealth = 50;
 		currHealth = maxHealth;
@@ -1091,7 +1091,7 @@ struct EnemyMediumCharge : Enemy
 	};
 };
 
-struct Bee1 : Enemy
+struct OneBee : Enemy
 {
 	Reaction reactionPatrol = {
 		ReactionType::DURATION,
@@ -1110,7 +1110,7 @@ struct Bee1 : Enemy
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {reactionPatrol, reactionBeeClose}, 1, false, 0, 0, NoAttack};
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM_NEAR, {}, 0, 1000.f, 1000.f, {reactionBeeClose, reactionIdle}, 0, false, 0, 2000.f, NoAttack};
 	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, false, 0.f, 5000.f, NoAttack};
-	Bee1()
+	OneBee()
 	{
 		maxHealth = 20;
 		currHealth = maxHealth;
@@ -1131,7 +1131,7 @@ struct Bee1 : Enemy
 	};
 };
 
-struct Bee2 : Enemy
+struct TwoBee : Enemy
 {
 	Reaction reactionPatrol = {
 		ReactionType::DURATION,
@@ -1152,7 +1152,7 @@ struct Bee2 : Enemy
 	EnemyPattern randomBee = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f, {reactionBeeClose, reactionIdle}, 0, true, 0, 2000.f, SniperShot};
 	EnemyPattern mergeBee = {"MERGE BEE", EnemyBehavior::MERGE_BEE, {}, 0, 0.f, 0.f, {reactionBeeClose, reactionNoBees}, 0, false, 0.f, 5000.f, NoAttack};
 
-	Bee2()
+	TwoBee()
 	{
 		maxHealth = 60;
 		currHealth = maxHealth;
@@ -1171,7 +1171,7 @@ struct Bee2 : Enemy
 	};
 };
 
-struct Bee3 : Enemy
+struct ThreeBee : Enemy
 {
 	Reaction reactionFollow = {
 		ReactionType::DURATION,
@@ -1203,7 +1203,7 @@ struct Bee3 : Enemy
 
 	EnemyPattern idleBee = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {reactionFollow}, 1, true, 0, 600.f, beeSpray};
 	EnemyPattern randomBee = {"FOLLOW", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 2000.f, 2000.f, {reactionFollow}, 0, false, 0, 1000.f, none};
-	Bee3()
+	ThreeBee()
 	{
 		maxHealth = 100;
 		currHealth = maxHealth;
@@ -1223,7 +1223,7 @@ struct Bee3 : Enemy
 };
 
 
-struct EnemyMediumBeeHive : Enemy {
+struct BeeHive : Enemy {
 
 	const AttackData OneBee{
 		EnemyAttackPattern::SPAWNING,
@@ -1240,7 +1240,7 @@ struct EnemyMediumBeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::OneBee
+		EnemyType::EnemyOneBee
 	};
 
 	const AttackData ManyBoidBees{
@@ -1258,7 +1258,7 @@ struct EnemyMediumBeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::HardEnemyBoidBio
+		EnemyType::EnemyBioBoid
 	};
 
 	Reaction Spawning{
@@ -1281,7 +1281,7 @@ struct EnemyMediumBeeHive : Enemy {
 	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::IDLE, {}, 0, 3000.f , 3000.f, {idling, halfHP}, 0, true, 0.f, 3000.f, OneBee};
 	EnemyPattern halfHPState = {"SPAWN LOT BEES", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {finalIdle}, 3, true, 0.f, 3000.f, ManyBoidBees};
 	EnemyPattern deadHiveState = {"DEAD HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {finalIdle}, 3, false, 0.f, 0.f, NoAttack};
-	EnemyMediumBeeHive()
+	BeeHive()
 	{
 		maxHealth = 200;
 		currHealth = maxHealth;
@@ -1318,7 +1318,7 @@ struct BossBeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::OneBee
+		EnemyType::EnemyOneBee
 	};
 
 	const AttackData twoBee{
@@ -1336,7 +1336,7 @@ struct BossBeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::OneBee
+		EnemyType::EnemyOneBee
 	};
 
 	const AttackData threeBoidBees{
@@ -1354,7 +1354,7 @@ struct BossBeeHive : Enemy {
 	0,
 	0,
 	EnemyBulletDeath::NONE,
-	EnemyType::HardEnemyBoidBio
+	EnemyType::EnemyBioBoid
 	};
 
 	const AttackData sixBoidBees{
@@ -1372,7 +1372,7 @@ struct BossBeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::HardEnemyBoidBio
+		EnemyType::EnemyBioBoid
 	};
 
 	const AttackData twelveBoidBees{
@@ -1390,7 +1390,7 @@ struct BossBeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::HardEnemyBoidBio
+		EnemyType::EnemyBioBoid
 	};
 
 	const AttackData radialHexagon{
@@ -1502,7 +1502,7 @@ struct BossBeeHive : Enemy {
 	};
 };
 
-struct BossBeehiveSentry : Enemy
+struct BeehiveGun : Enemy
 {
 
 	const AttackData beehivesentry{
@@ -1524,7 +1524,7 @@ struct BossBeehiveSentry : Enemy
 	// TODO Vincent add code to make rotate to face player, but not move
 	EnemyPattern rotateState = { "FACE PLAYER", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {}, 0, true, 0.f, 2000.f, beehivesentry };
 
-	BossBeehiveSentry()
+	BeehiveGun()
 	{
 		maxHealth = 300;
 		currHealth = maxHealth;
@@ -1543,13 +1543,13 @@ struct BossBeehiveSentry : Enemy
 	};
 };
 
-struct EnemyEasySkull : Enemy
+struct Skull : Enemy
 {
 	Reaction AttackLaser{
 		ReactionType::DURATION,
 		0};
 	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, true, 0.f, 10000.f, laserRotate};
-	EnemyEasySkull()
+	Skull()
 	{
 		maxHealth = 100;
 		currHealth = maxHealth;
@@ -1569,7 +1569,7 @@ struct EnemyEasySkull : Enemy
 	};
 };
 
-struct EnemyHardSkull : Enemy
+struct EvilSkull : Enemy
 {
 	const AttackData laser2{
 	EnemyAttackPattern::LASER,
@@ -1608,7 +1608,7 @@ struct EnemyHardSkull : Enemy
 	EnemyPattern laserState1 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 1, true, 0.f, 2000.f, laser1 };
 	EnemyPattern laserState2 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 2, true, 0.f, 2000.f, laser2 };
 	EnemyPattern idleState   =  { "Idle", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 0, false, 0.f, 10000.f, laserRotate };
-	EnemyHardSkull()
+	EvilSkull()
 	{
 		maxHealth = 150;
 		currHealth = maxHealth;
@@ -1628,7 +1628,7 @@ struct EnemyHardSkull : Enemy
 	};
 };
 
-struct EnemyHardBoid : Enemy
+struct HifiBoid : Enemy
 {
 	Reaction normalboid{
 		ReactionType::DURATION,
@@ -1657,7 +1657,7 @@ struct EnemyHardBoid : Enemy
 	EnemyPattern supernovaState1 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 3000.f, 3000.f, {singularityTransition2}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyPattern singularityState2 = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 1000.f, 1000.f, {supernovaTransition2}, 4, false, 0.f, 0.f, NoAttack};
 	EnemyPattern supernovaState2 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyHardBoid()
+	HifiBoid()
 	{
 		maxHealth = 1;
 		currHealth = maxHealth;
@@ -1673,7 +1673,31 @@ struct EnemyHardBoid : Enemy
 	}
 };
 
-struct EnemyMediumBoar : Enemy
+struct HifiTemporaryBoid : Enemy
+{
+	Reaction singularityTransition1{
+		ReactionType::DURATION,
+		1
+	};
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 10000.f, 10000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
+	EnemyPattern die = { "DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {}, 1, false, 0.f, 0.f, NoAttack };;
+	HifiTemporaryBoid()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = { boidState , die};
+		sprite = {
+			"hifi_boid.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({ 20.f, 20.f });
+		patternIndex = 0;
+		rotatePower = 1.f;
+	}
+};
+
+struct Sword : Enemy
 {
 	Reaction noticePlayer{
 		ReactionType::PLAYER_CLOSE,
@@ -1695,7 +1719,7 @@ struct EnemyMediumBoar : Enemy
 	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {reactionToRandom}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {reactionToRandom2}, 0, true, 0.f, 1000.f, NoAttack};
 
-	EnemyMediumBoar()
+	Sword()
 	{
 		maxHealth = 200;
 		currHealth = maxHealth;
@@ -1712,7 +1736,7 @@ struct EnemyMediumBoar : Enemy
 	}
 };
 
-struct EnemyMediumHeal : Enemy
+struct HealerAngel : Enemy
 {
 
 	Reaction teamHurt{
@@ -1723,7 +1747,7 @@ struct EnemyMediumHeal : Enemy
 		0};
 	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {teamHurt}, 0, false, 0.f, 0.f, NoAttack};
 	EnemyPattern healState = {"HEAL", EnemyBehavior::HEALING, {}, 0, 10000.f, 10000.f, {reactionToIdle, teamHurt}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyMediumHeal()
+	HealerAngel()
 	{
 		maxHealth = 200;
 		currHealth = maxHealth;
@@ -1739,14 +1763,14 @@ struct EnemyMediumHeal : Enemy
 	}
 };
 
-struct EnemyHardBoidBio : Enemy {
+struct BioBoid : Enemy {
 
 	Reaction boid{
 		ReactionType::DURATION,
 		0
 	};
 	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
-	EnemyHardBoidBio() {
+	BioBoid() {
 		maxHealth = 1;
 		currHealth = maxHealth;
 		enemyPatterns = { boidState };
@@ -1761,14 +1785,14 @@ struct EnemyHardBoidBio : Enemy {
 	}
 };
 
-struct EnemyHardBoidFish : Enemy {
+struct FishBoid : Enemy {
 
 	Reaction boid{
 		ReactionType::DURATION,
 		0
 	};
 	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
-	EnemyHardBoidFish() {
+	FishBoid() {
 		maxHealth = 1;
 		currHealth = maxHealth;
 		enemyPatterns = { boidState };
@@ -1861,7 +1885,7 @@ struct InvisibleLaserEnemy : Enemy {
 };
 
 //----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------
-struct TwinLaserEnemyVertical1 : Enemy {
+struct TwinLaserVertical1 : Enemy {
 	const AttackData crabLaser{
 	EnemyAttackPattern::TWIN_LASER,
 	CIRCLE,
@@ -1882,9 +1906,9 @@ struct TwinLaserEnemyVertical1 : Enemy {
 		1 };
 
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.01,0.01},{0.01,0.99},{0.01,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserEnemyVertical1()
+	TwinLaserVertical1()
 	{
-		maxHealth = 500;
+		maxHealth = 300;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
@@ -1899,31 +1923,31 @@ struct TwinLaserEnemyVertical1 : Enemy {
 		rotationBehaviour = EnemyRotationBehavior::FACE_TWIN;
 	};
 };
-struct TwinLaserEnemyVertical2 : TwinLaserEnemyVertical1 {
+struct TwinLaserVertical2 : TwinLaserVertical1 {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserEnemyVertical2() : TwinLaserEnemyVertical1() {
+	TwinLaserVertical2() : TwinLaserVertical1() {
 		enemyPatterns = { randomState};
 	}
 };
 
-struct TwinLaserEnemyHorizontal1 : TwinLaserEnemyVertical1 {
+struct TwinLaserHorizontal1 : TwinLaserVertical1 {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserEnemyHorizontal1() : TwinLaserEnemyVertical1() {
+	TwinLaserHorizontal1() : TwinLaserVertical1() {
 		enemyPatterns = { randomState};
 	}
 };
-struct TwinLaserEnemyHorizontal2 : TwinLaserEnemyHorizontal1 {
+struct TwinLaserHorizontal2 : TwinLaserHorizontal1 {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.99},{0.01,0.99},{0.99,0.99}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserEnemyHorizontal2() : TwinLaserEnemyHorizontal1() {
+	TwinLaserHorizontal2() : TwinLaserHorizontal1() {
 		enemyPatterns = { randomState};
 	}
 };
 
-struct EnemyHifiLaserSniper : Enemy {
+struct HifiLaserSniper : Enemy {
 		EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, FastLaser };
 		EnemyPattern charging = { "Charge", EnemyBehavior::CHARGING, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, NoAttack };
 
-	EnemyHifiLaserSniper() {
+	HifiLaserSniper() {
 		maxHealth = 100;
 		currHealth = maxHealth;
 		enemyPatterns = { randomState};
@@ -1940,7 +1964,7 @@ struct EnemyHifiLaserSniper : Enemy {
 };
 
 
-struct EnemyHifiSniper : Enemy
+struct HifiSniper : Enemy
 {
 	const AttackData HifiSniperShot{
 		EnemyAttackPattern::BURST,
@@ -1977,7 +2001,7 @@ struct EnemyHifiSniper : Enemy
 	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,0}}, 0, true, 0, 3000.f, spray};
 	
 
-	EnemyHifiSniper()
+	HifiSniper()
 	{
 		maxHealth = 90;
 		currHealth = maxHealth;
@@ -1995,7 +2019,7 @@ struct EnemyHifiSniper : Enemy
 	};
 };
 
-struct EnemyHifiSniperHard : Enemy
+struct HifiSniperHard : Enemy
 {
 	/**
 	 * Lighter Variant of Sniper - more shots, less bullets, more speed
@@ -2035,7 +2059,7 @@ struct EnemyHifiSniperHard : Enemy
 	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0, 1000.f, spray};
 	
 
-	EnemyHifiSniperHard()
+	HifiSniperHard()
 	{
 		maxHealth = 60;
 		currHealth = maxHealth;
@@ -2054,7 +2078,7 @@ struct EnemyHifiSniperHard : Enemy
 };
 
 
-struct EnemyHifiCharger : Enemy
+struct HifiCharger : Enemy
 {
 	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::PLAYER_CLOSE,1}}, 0, true, 0.f, 1000.f, NoAttack};
 	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 0.f, 0.f, {{ReactionType::DURATION,2}}, 2, true, 0.f, 0.f, NoAttack};
@@ -2065,7 +2089,7 @@ struct EnemyHifiCharger : Enemy
 	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,7}}, 7, false, 0.f, 0.f, NoAttack};
 	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 1000.f, NoAttack};
 
-	EnemyHifiCharger()
+	HifiCharger()
 	{
 		maxHealth = 120;
 		currHealth = maxHealth;
@@ -2083,7 +2107,7 @@ struct EnemyHifiCharger : Enemy
 	}
 };
 
-struct EnemyHifiChargerHard : Enemy
+struct HifiChargerHard : Enemy
 {
 	const AttackData explode{
 		EnemyAttackPattern::TRAIL,
@@ -2112,7 +2136,7 @@ struct EnemyHifiChargerHard : Enemy
 	EnemyPattern idleState3 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,9}}, 9, false, 0.f, 0.f, NoAttack};
 	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 1000.f, NoAttack};
 
-	EnemyHifiChargerHard()
+	HifiChargerHard()
 	{
 		maxHealth = 120;
 		currHealth = maxHealth;
@@ -2130,7 +2154,7 @@ struct EnemyHifiChargerHard : Enemy
 	}
 };
 
-struct EnemyHifiTrail : Enemy
+struct HifiTrail : Enemy
 {
 	const AttackData snailTrail{
 	EnemyAttackPattern::TRAIL,
@@ -2192,9 +2216,9 @@ struct EnemyHifiTrail : Enemy
 		EnemyBehavior::ROTATE_IN_PLACE, 
 		{}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 250.f, 250.f, spiral};
 
-	EnemyHifiTrail()
+	HifiTrail()
 	{
-		maxHealth = 350;
+		maxHealth = 250;
 		currHealth = maxHealth;
 
 		enemyPatterns = { rotateState,chargingState,chargingState2, shootingState };
@@ -2212,7 +2236,7 @@ struct EnemyHifiTrail : Enemy
 	};
 };
 
-struct EnemyHifiTrailHard : Enemy
+struct HifiTrailHard : Enemy
 {
 	/**
 	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
@@ -2277,7 +2301,7 @@ struct EnemyHifiTrailHard : Enemy
 		EnemyBehavior::ROTATE_IN_PLACE, 
 		{}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 250.f, 250.f, spiral};
 
-	EnemyHifiTrailHard()
+	HifiTrailHard()
 	{
 		maxHealth = 170;
 		currHealth = maxHealth;
@@ -2297,7 +2321,7 @@ struct EnemyHifiTrailHard : Enemy
 	};
 };
 
-struct EnemyHifiCannon : Enemy
+struct HifiCannon : Enemy
 {
 	const AttackData cannonShot{
 		EnemyAttackPattern::SHOTGUN,
@@ -2329,7 +2353,7 @@ struct EnemyHifiCannon : Enemy
 		0,
 		0,
 		EnemyBulletDeath::CLUSTER,
-		HifiEnemyCharger};
+		EnemyHifiCharger};
 
 
 	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,1},{ReactionType::PLAYER_CLOSE,4}}, 1, false, 0.f, 0.f, NoAttack};
@@ -2338,9 +2362,9 @@ struct EnemyHifiCannon : Enemy
 	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, cannonShot};
 	EnemyPattern shootCluster = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, cluster};
 
-	EnemyHifiCannon()
+	HifiCannon()
 	{
-		maxHealth = 350;
+		maxHealth = 250;
 		currHealth = maxHealth;
 		enemyPatterns = {random1,chargingState, backUp,shootCannon,shootCluster};
 		patternIndex = 0;
@@ -2356,7 +2380,7 @@ struct EnemyHifiCannon : Enemy
 	};
 };
 
-struct EnemyHifiCannonHard : Enemy
+struct HifiCannonHard : Enemy
 {
 	/**
 	 * More glass cannon, destructive variant that fills up the player stack on hit, spawning minions when player gets close
@@ -2381,7 +2405,7 @@ struct EnemyHifiCannonHard : Enemy
 		CIRCLE,
 		{},
 		blunt,
-		4,
+		2,
 		0,
 		{60, 60},
 		600,
@@ -2391,7 +2415,7 @@ struct EnemyHifiCannonHard : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::HardEnemyBoid
+		EnemyType::EnemyHifiTemporaryBoid
 		};
 
 
@@ -2403,9 +2427,9 @@ struct EnemyHifiCannonHard : Enemy
 	EnemyPattern rest = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION,0}}, 0, false, 0.f, 2000.f, NoAttack};
 	EnemyPattern laser = {"LASER", EnemyBehavior::IDLE, {}, 0, 0.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, FastLaser};
 
-	EnemyHifiCannonHard()
+	HifiCannonHard()
 	{
-		maxHealth = 500;
+		maxHealth = 400;
 		currHealth = maxHealth;
 		enemyPatterns = {random1,chargingState, backUp,shootCannon,spawn,rest,laser};
 		patternIndex = 0;
@@ -2504,9 +2528,9 @@ struct HifiBossEnemy : Enemy {
 };
 
 
-// struct EnemyHardSkull : {
+// struct EvilSkull : {
 
-// 	EnemyHardSkull() {
+// 	EvilSkull() {
 
 // 	};
 // };

@@ -45,7 +45,7 @@ void MapSystem::step(float elapsed_ms)
         for (auto &e : map.currRoom.preset.enemies)
         {
             vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
-            if (std::get<EnemyType>(e) == EnemyType::HifiEnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::HifiEnemyTwinLaserHorizontal1) {
+            if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
                 createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
             } else {
                 createEnemy(renderer, pos, std::get<EnemyType>(e));
@@ -276,10 +276,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }
 
-    decorateFloor();
+    decorateRoom();
 }
 
-void MapSystem::decorateFloor() {
+void MapSystem::decorateRoom() {
     // Create floor decorations
     Map& map = registry.maps.components[0];
     WindowState& ws = registry.windowStates.components[0];
@@ -302,6 +302,7 @@ void MapSystem::decorateFloor() {
 
         }
     }
+
 }
  
 void MapSystem::resetMap() {
@@ -390,13 +391,13 @@ void MapSystem::newMap()
         createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
-        // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
-        // createEnemy(renderer, vec2(1000, 300), EnemyType::TestRevampedEnemy);
+        // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
+        // createEnemy(renderer, vec2(1000, 300), EnemyType::EnemyPufferfish);
         // createRamStick(renderer, vec2(500, 500));
         // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
         //createWishGranter(renderer, vec2(500,500));
     }
-    decorateFloor();
+    decorateRoom();
 }
 
 void MapSystem::updateBgPositions() {

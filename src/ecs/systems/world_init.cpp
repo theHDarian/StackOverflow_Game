@@ -1013,19 +1013,19 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	Enemy &enemy = registry.enemies.emplace(entity);
 	switch (type)
 	{
-	case EnemyType::TestRevampedEnemy:
+	case EnemyType::EnemyPufferfish:
 	{
-		enemy = TestEnemy();
+		enemy = Pufferfish();
 		break;
 	}
-	case EnemyType::EasyEnemySentry:
+	case EnemyType::EnemyQuadshooter:
 	{
-		enemy = EnemyEasySentry();
+		enemy = Quadshooter();
 		break;
 	}
 	case EnemyType::BossBigC:
 	{
-		enemy = EnemyBigC();
+		enemy = BigC();
 		auto& boss = registry.bosses.emplace(entity);
 		boss.name = "BigC";
 		movement.angularSpeed = 20;
@@ -1033,55 +1033,55 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	case EnemyType::BossBeehiveGun:
 	{
-		enemy = BossBeehiveSentry();
+		enemy = BeehiveGun();
 		registry.bossParts.emplace(entity);
 		break;
 	}
-	case EnemyType::MediumEnemyCharge:
+	case EnemyType::EnemyMagnet:
 	{
-		enemy = EnemyMediumCharge();
+		enemy = Magnet();
 		break;
 	}
-	case EnemyType::OneBee:
+	case EnemyType::EnemyOneBee:
 	{
 
-		enemy = Bee1();
+		enemy = OneBee();
 		registry.bees.emplace(entity);
 		break;
 	}
-	case EnemyType::TwoBee:
+	case EnemyType::EnemyTwoBee:
 	{
-		enemy = Bee2();
+		enemy = TwoBee();
 		BeeEnemy &bee = registry.bees.emplace(entity);
 		bee.mergeCount = 2;
 
 		break;
 	}
-	case EnemyType::ThreeBee:
+	case EnemyType::EnemyThreeBee:
 	{
-		enemy = Bee3();
+		enemy = ThreeBee();
 		BeeEnemy &bee = registry.bees.emplace(entity);
 		bee.mergeCount = 3;
 		break;
 	}
-	case EnemyType::MediumEnemyTank:
+	case EnemyType::EnemyCrab:
 	{
-		enemy = EnemyMediumTank();
+		enemy = Crab();
 		break;
 	}
-	case EnemyType::LaserEnemyTank:
+	case EnemyType::EnemyLaserCrab:
 	{
-		enemy = EnemyLaserTank();
+		enemy = LaserCrab();
 		break;
 	}
-	case EnemyType::HardEnemyTank:
+	case EnemyType::EnemyEvilCrab:
 	{
-		enemy = EnemyHardTank();
+		enemy = EvilCrab();
 		break;
 	}
-	case EnemyType::BeeHive:
+	case EnemyType::EnemyBeeHive:
 	{
-		enemy = EnemyMediumBeeHive();
+		enemy = BeeHive();
 		break;
 	}
 	case EnemyType::BossBeehiveMain:
@@ -1091,29 +1091,29 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boss.name = "Grand Hive, the Queen's Throne";
 		break;
 	}
-	case EnemyType::EasyEnemySkull:
+	case EnemyType::EnemySkull:
 	{
-		enemy = EnemyEasySkull();
+		enemy = Skull();
 		break;
 	}
-	case EnemyType::HardEnemySkull:
+	case EnemyType::EnemyEvilSkull:
 	{
-		enemy = EnemyHardSkull();
+		enemy = EvilSkull();
 		break;
 	}
-	case EnemyType::Snail:
+	case EnemyType::EnemySnail:
 	{
-		enemy = EnemyEasyTrail();
+		enemy = Snail();
 		break;
 	}
-	case EnemyType::EvilSnail:
+	case EnemyType::EnemyEvilSnail:
 	{
-		enemy = EnemyHardTrail();
+		enemy = EvilSnail();
 		break;
 	}
-	case EnemyType::HardEnemyBoid:
+	case EnemyType::EnemyHifiBoid:
 	{
-		enemy = EnemyHardBoid();
+		enemy = HifiBoid();
 		Boid &boid = registry.boids.emplace(entity);
 		boid.position = pos;
 		float randomX = getRandomFloat(-150.f, 150.f);
@@ -1122,9 +1122,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boid.maxSpeed = 500.f;
 		break;
 	}
-	case EnemyType::HardEnemyBoidBio:
+	case EnemyType::EnemyBioBoid:
 	{
-		enemy = EnemyHardBoidBio();
+		enemy = BioBoid();
 		Boid &boid = registry.boids.emplace(entity);
 		boid.position = pos;
 		float randomX = getRandomFloat(-150.f, 150.f);
@@ -1133,15 +1133,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boid.maxSpeed = 500.f;
 		break;
 	}
-	case EnemyType::MediumEnemyBoar:
+	case EnemyType::EnemySword:
 	{
-		enemy = EnemyMediumBoar();
+		enemy = Sword();
 		break;
 	}
-	case EnemyType::MediumEnemyHealer:
+	case EnemyType::EnemyHealer:
 	{
-		enemy = EnemyMediumHeal();
-		Healer &healer = registry.healers.emplace(entity);
+		enemy = HealerAngel();
+		Healer& healer = registry.healers.emplace(entity);
 		healer.coolDown = 0.f;
 	}
 	case EnemyType::ScientistlaserAttack:
@@ -1150,9 +1150,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	}
-	case EnemyType::HardEnemyBoidFish:
+	case EnemyType::EnemyFishBoid:
 	{
-		enemy = EnemyHardBoidFish();
+		enemy = FishBoid();
 		Boid &boid = registry.boids.emplace(entity);
 		boid.position = pos;
 		float randomX = getRandomFloat(-35.f, 35.f);
@@ -1160,39 +1160,40 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boid.velocity = vec2(randomX, randomY);
 		boid.maxSpeed = 200.f;
 	}
-	case EnemyType::HifiEnemyTwinLaserVertical1:
+	case EnemyType::EnemyTwinLaserVertical1:
 	{
-		enemy = TwinLaserEnemyVertical1();
+		enemy = TwinLaserVertical1();
 		break;
 	}
-	case EnemyType::HifiEnemyTwinLaserVertical2:
+	case EnemyType::EnemyTwinLaserVertical2:
 	{
-		enemy = TwinLaserEnemyVertical2();
+		enemy = TwinLaserVertical2();
 		break;
 	}
-	case EnemyType::HifiEnemyTwinLaserHorizontal1:
+	case EnemyType::EnemyHifiTwinLaserHorizontal1:
 	{
-		enemy = TwinLaserEnemyHorizontal1();
+		enemy = TwinLaserHorizontal1();
 		break;
 	}
-	case EnemyType::HifiEnemyTwinLaserHorizontal2:
+	case EnemyType::EnemyHifiTwinLaserHorizontal2:
 	{
-		enemy = TwinLaserEnemyHorizontal2();
+		enemy = TwinLaserHorizontal2();
 		break;
 	}
-	case EnemyType::HifiEnemySniper:
+	case EnemyType::EnemySniper:
 	{
-		enemy = EnemyHifiSniper();
+		enemy = HifiSniper();
 		break;
 	}
-		case EnemyType::HifiEnemyLaserSniper: enemy = EnemyHifiLaserSniper();break;
-	case EnemyType::HifiEnemyCharger: enemy = EnemyHifiCharger();break;
-	case EnemyType::HifiEnemyTrail: enemy = EnemyHifiTrail();break;
-	case EnemyType::HifiEnemyCannon: enemy = EnemyHifiCannon();break;
-	case EnemyType::HifiEnemyChargerHard: enemy = EnemyHifiChargerHard();break;
-	case EnemyType::HifiEnemySniperHard: enemy = EnemyHifiSniperHard();break;
-	case EnemyType::HifiEnemyTrailHard: enemy = EnemyHifiTrailHard();break;
-	case EnemyType::HifiEnemyCannonHard: enemy = EnemyHifiCannonHard();break;
+	case EnemyType::EnemyLaserSniper: enemy = HifiLaserSniper();break;
+	case EnemyType::EnemyHifiCharger: enemy = HifiCharger();break;
+	case EnemyType::EnemyHifiTrail: enemy = HifiTrail();break;
+	case EnemyType::EnemyHifiCannon: enemy = HifiCannon();break;
+	case EnemyType::EnemyHifiChargerHard: enemy = HifiChargerHard();break;
+	case EnemyType::EnemyHifiSniperHard: enemy = HifiSniperHard();break;
+	case EnemyType::EnemyHifiTrailHard: enemy = HifiTrailHard();break;
+	case EnemyType::EnemyHifiCannonHard: enemy = HifiCannonHard();break;
+	case EnemyType::EnemyHifiTemporaryBoid: enemy = HifiTemporaryBoid(); break;
 	};
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -1262,18 +1263,18 @@ void createEnemyGroup(RenderSystem * renderer, vec2 pos, EnemyType type) {
 	std::vector<Entity> groupMembers;
 	Map& map = registry.maps.components[0];
 	WindowState& ws =  registry.windowStates.components[0];
-	if (type == EnemyType::HifiEnemyTwinLaserVertical1) {
+	if (type == EnemyType::EnemyTwinLaserVertical1) {
 		//should spawn twin on the side perpendicular to patrol direction
 		vec2 twinPos = pos; //normalized position
 		twinPos.x = ws.width - pos.x;
 		groupMembers.push_back(createEnemy(renderer,pos,type));
-		groupMembers.push_back(createEnemy(renderer,twinPos,HifiEnemyTwinLaserVertical2));
-	} else if (type == EnemyType::HifiEnemyTwinLaserHorizontal1) {
+		groupMembers.push_back(createEnemy(renderer,twinPos,EnemyTwinLaserVertical2));
+	} else if (type == EnemyType::EnemyHifiTwinLaserHorizontal1) {
 		//should spawn twin on the side perpendicular to patrol direction
 		vec2 twinPos = pos; //normalized position
 		twinPos.y = ws.height - twinPos.y;
 		groupMembers.push_back(createEnemy(renderer,pos,type));
-		groupMembers.push_back(createEnemy(renderer,twinPos,HifiEnemyTwinLaserHorizontal2));
+		groupMembers.push_back(createEnemy(renderer,twinPos,EnemyHifiTwinLaserHorizontal2));
 	}
 	for (Entity gm : groupMembers) {
 		EnemyGroup& eg = registry.enemyGroups.emplace(gm);

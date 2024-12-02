@@ -111,10 +111,10 @@ struct MapRequest {
 };
 
 enum MapRegion {
-    Tutorial,
-    Biology,
-    Physics,
-    Final
+    Tutorial = 0,
+    Biology = 1,
+    Physics = 2,
+    Final = 3
 };
 
 struct Map {

@@ -230,7 +230,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 bool AISystem::updateHealerState(Enemy &enemy, Entity entity)
 {
 	EnemyPattern &currPattern = enemy.currEnemyPattern();
-	Healer &healer = registry.healers.get(entity);
+	Healer& healer = registry.healers.get(entity);
 	bool reaction_found = false;
 	if (healer.targetEntity)
 	{
@@ -452,7 +452,7 @@ vec2 AISystem::getTeamPos(Entity entity)
 	vec2 scale = motion.scale;
 	if (registry.healers.has(entity))
 	{
-		Healer &healComponent = registry.healers.get(entity);
+		Healer& healComponent = registry.healers.get(entity);
 		Entity teammates = healComponent.targetEntity;
 		if (teammates && registry.motions.has(teammates))
 		{

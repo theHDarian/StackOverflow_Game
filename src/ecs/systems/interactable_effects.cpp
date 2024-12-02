@@ -13,43 +13,43 @@
 std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsPhysics =
 	{
 		{
-			{EnemyType::HifiEnemySniper, {0.6f,0.5f}},
-			   {EnemyType::HifiEnemySniper, {0.2f,0.5f}},
-			   {EnemyType::HifiEnemySniper, {0.8f,0.5f}},
-			   {EnemyType::HifiEnemySniper, {0.8f,0.6f}},
-			   {EnemyType::HifiEnemySniper, {0.2f,0.4f}},
+			{EnemyType::EnemySniper, {0.6f,0.5f}},
+			   {EnemyType::EnemySniper, {0.2f,0.5f}},
+			   {EnemyType::EnemySniper, {0.8f,0.5f}},
+			   {EnemyType::EnemySniper, {0.8f,0.6f}},
+			   {EnemyType::EnemySniper, {0.2f,0.4f}},
 		},
 	{
-			{EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
-			{EnemyType::MediumEnemyHealer, {0.9f,0.5f}},
-			{EnemyType::HifiEnemyCannonHard, {0.1f,0.5f}},
-			{EnemyType::MediumEnemyHealer, {0.1f,0.8f}},
+			{EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
+			{EnemyType::EnemyHealer, {0.9f,0.5f}},
+			{EnemyType::EnemyHifiCannonHard, {0.1f,0.5f}},
+			{EnemyType::EnemyHealer, {0.1f,0.8f}},
 	},
 	{
-		{HifiEnemyChargerHard, {0.8f,0.2f}},
-		{HifiEnemyChargerHard, {0.8f,0.8f}},
-		{HifiEnemyChargerHard, {0.2f,0.2f}},
-		{HifiEnemyChargerHard, {0.2f,0.8f}},
-			{EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
+		{EnemyHifiChargerHard, {0.8f,0.2f}},
+		{EnemyHifiChargerHard, {0.8f,0.8f}},
+		{EnemyHifiChargerHard, {0.2f,0.2f}},
+		{EnemyHifiChargerHard, {0.2f,0.8f}},
+			{EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
 
 	},
 	{
-		{ EnemyType::HifiEnemyLaserSniper, {0.7f,0.3f}},
-		{ EnemyType::HifiEnemyTrail, {0.7f,0.7f}},
-		{ EnemyType::HifiEnemyLaserSniper, {0.3f,0.3f}},
-		{ EnemyType::HifiEnemyTrail, {0.3f,0.7f}},
+		{ EnemyType::EnemyLaserSniper, {0.7f,0.3f}},
+		{ EnemyType::EnemyHifiTrail, {0.7f,0.7f}},
+		{ EnemyType::EnemyLaserSniper, {0.3f,0.3f}},
+		{ EnemyType::EnemyHifiTrail, {0.3f,0.7f}},
 
 	},
 
 		{
-			{ EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
-			{ EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.7f}},
-			{ EnemyType::HifiEnemyCannon, {0.6f,0.6f}},
-			{ EnemyType::HifiEnemyCannon, {0.4f,0.4f}}
+			{ EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+			{ EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
+			{ EnemyType::EnemyHifiCannon, {0.6f,0.6f}},
+			{ EnemyType::EnemyHifiCannon, {0.4f,0.4f}}
 		},
 	{
-			{ EnemyType::HifiEnemyCannonHard, {0.6f,0.6f}},
-				{ EnemyType::HifiEnemyCannonHard, {0.4f,0.4f}}
+			{ EnemyType::EnemyHifiCannonHard, {0.6f,0.6f}},
+				{ EnemyType::EnemyHifiCannonHard, {0.4f,0.4f}}
 	},
 
 
@@ -58,28 +58,28 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsPhysics 
 std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
 	{
 		{
-			{EnemyType::EvilSnail, {0.5f, 0.5f}},
-		{Snail, {0.2f, 0.8f}},
-		{EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
-		{MediumEnemyCharge, {0.2f, 0.4f}},
+			{EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
+		{EnemySnail, {0.2f, 0.8f}},
+		{EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
+		{EnemyMagnet, {0.2f, 0.4f}},
 		},
 	{
-	{EnemyType::MediumEnemyTank, {0.8f, 0.8f}},
-		 {EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
-		 {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
-		 {EnemyType::HardEnemyTank, {0.5f, 0.5f}},
+	{EnemyType::EnemyCrab, {0.8f, 0.8f}},
+		 {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
+		 {EnemyType::EnemyCrab, {0.2f, 0.2f}},
+		 {EnemyType::EnemyEvilCrab, {0.5f, 0.5f}},
 	},
 {
-	{EnemyType::TwoBee, {0.8f, 0.2f}},
- {EnemyType::TwoBee, {0.2f, 0.2f}},
- {EnemyType::BeeHive, {0.2f, 0.4f}},
- {EnemyType::BeeHive, {0.8f, 0.4f}}
+	{EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
+ {EnemyType::EnemyTwoBee, {0.2f, 0.2f}},
+ {EnemyType::EnemyBeeHive, {0.2f, 0.4f}},
+ {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}
 },
 
-{{EnemyType::TwoBee, {0.2f, 0.8f}},
- {EnemyType::ThreeBee, {0.8f, 0.8f}},
- {EnemyType::TwoBee, {0.8f, 0.2f}},
- {EnemyType::OneBee, {0.2f, 0.2f}},
+{{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
+ {EnemyType::EnemyThreeBee, {0.8f, 0.8f}},
+ {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
+ {EnemyType::EnemyOneBee, {0.2f, 0.2f}},
 
 },
 
@@ -205,12 +205,12 @@ void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* 
 		case 0: {
 			addEffect(player, {fireRateUpA, dmgUpM, numBulletsUpA }, soundPlayer);
 			Map& map = registry.maps.components[0];
-			map.currRoom.preset.enemies ={{EnemyType::EasyEnemySkull, {0.2f, 0.8f}},
-	 {EnemyType::EasyEnemySkull, {0.8f, 0.8f}},
-	 {EnemyType::EasyEnemySkull, {0.8f, 0.2f}},
-	 {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
-{EnemyType::HifiEnemyCharger, {0.25f,0.5f}},
-{EnemyType::HifiEnemyCharger, {0.75f,0.5f}},
+			map.currRoom.preset.enemies ={{EnemyType::EnemySkull, {0.2f, 0.8f}},
+	 {EnemyType::EnemySkull, {0.8f, 0.8f}},
+	 {EnemyType::EnemySkull, {0.8f, 0.2f}},
+	 {EnemyType::EnemySkull, {0.2f, 0.2f}},
+{EnemyType::EnemyHifiCharger, {0.25f,0.5f}},
+{EnemyType::EnemyHifiCharger, {0.75f,0.5f}},
 
 			};
 			registry.invincibles.emplace(player);
@@ -340,10 +340,10 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 
 				Map& map = registry.maps.components[0];
 				closeDoors(soundPlayer);
-				map.currRoom.preset.enemies = {{EnemyType::TwoBee, {0.2f, 0.8f}},
-				{EnemyType::ThreeBee, {0.8f, 0.8f}},
-					{EnemyType::TwoBee, {0.8f, 0.2f}},
-				{EnemyType::ThreeBee, {0.2f, 0.2f}},
+				map.currRoom.preset.enemies = {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
+				{EnemyType::EnemyThreeBee, {0.8f, 0.8f}},
+					{EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
+				{EnemyType::EnemyThreeBee, {0.2f, 0.2f}},
 			};
 			}
 		}

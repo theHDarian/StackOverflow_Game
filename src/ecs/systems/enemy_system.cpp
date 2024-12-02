@@ -82,7 +82,7 @@ void EnemySystem::step(float elapsed_ms)
 
         if (registry.healers.has(entity) && pattern.type == EnemyBehavior::HEALING)
         {
-            Healer &healer = registry.healers.get(entity);
+            Healer& healer = registry.healers.get(entity);
             healer.coolDown -= elapsed_ms;
             heal(entity, pattern);
         }
@@ -554,14 +554,14 @@ void EnemySystem::creatingMergeBee(int count, vec2 pos)
     {
     case 2:
         // std::cout << "CREATING" << std::endl;
-        createEnemy(render, pos, EnemyType::TwoBee);
+        createEnemy(render, pos, EnemyType::EnemyTwoBee);
         break;
     case 3:
-        createEnemy(render, pos, EnemyType::ThreeBee);
+        createEnemy(render, pos, EnemyType::EnemyThreeBee);
         break;
     default:
         // std::cout << "CREATING 1" << std::endl;
-        createEnemy(render, pos, EnemyType::OneBee);
+        createEnemy(render, pos, EnemyType::EnemyOneBee);
     }
 }
 
@@ -609,7 +609,7 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
 
 void EnemySystem::heal(Entity entity, EnemyPattern &currPattern)
 {
-    Healer &healer = registry.healers.get(entity);
+    Healer& healer = registry.healers.get(entity);
     if (healer.targetEntity && currPattern.type == EnemyBehavior::HEALING)
     {
         Entity otherEntity = healer.targetEntity;

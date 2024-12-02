@@ -273,7 +273,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			axis = b.axis;
 			offset = b.offset;
 			tiling = vec2(registry.maps.components[0].currRoom.preset.roomSize.x / render_request.idealScale.x, 1);
-			//tiling = vec2(5, 1);
+
+			// For changing wall textures per region
+			Map& map = registry.maps.components[0];
+			frame = (map.currRegion <= MapRegion::Biology) ? 0 : 1;
 
 		} else if (registry.doorSymbols.has(entity)) {
 			DoorSymbol& d = registry.doorSymbols.get(entity);
