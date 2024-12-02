@@ -10,7 +10,7 @@
 #include "world_init.hpp"
 #include "premades.hpp"
 
-std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresets =
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsPhysics =
 	{
 		{
 			{EnemyType::HifiEnemySniper, {0.6f,0.5f}},
@@ -21,14 +21,67 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresets =
 		},
 	{
 			{EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
-			{EnemyType::HifiEnemyCannon, {0.9f,0.5f}},
-			{EnemyType::HifiEnemyCannon, {0.9f,0.8f}},
-			{EnemyType::HifiEnemyCannon, {0.1f,0.2f}},
-			{EnemyType::HifiEnemyCannon, {0.1f,0.5f}},
-			{EnemyType::HifiEnemyCannon, {0.1f,0.8f}},
+			{EnemyType::MediumEnemyHealer, {0.9f,0.5f}},
+			{EnemyType::HifiEnemyCannonHard, {0.1f,0.5f}},
+			{EnemyType::MediumEnemyHealer, {0.1f,0.8f}},
+	},
+	{
+		{HifiEnemyChargerHard, {0.8f,0.2f}},
+		{HifiEnemyChargerHard, {0.8f,0.8f}},
+		{HifiEnemyChargerHard, {0.2f,0.2f}},
+		{HifiEnemyChargerHard, {0.2f,0.8f}},
+			{EnemyType::HifiEnemyCannon, {0.9f,0.2f}},
+
+	},
+	{
+		{ EnemyType::HifiEnemyLaserSniper, {0.7f,0.3f}},
+		{ EnemyType::HifiEnemyTrail, {0.7f,0.7f}},
+		{ EnemyType::HifiEnemyLaserSniper, {0.3f,0.3f}},
+		{ EnemyType::HifiEnemyTrail, {0.3f,0.7f}},
 
 	},
 
+		{
+			{ EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
+			{ EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.7f}},
+			{ EnemyType::HifiEnemyCannon, {0.6f,0.6f}},
+			{ EnemyType::HifiEnemyCannon, {0.4f,0.4f}}
+		},
+	{
+			{ EnemyType::HifiEnemyCannonHard, {0.6f,0.6f}},
+				{ EnemyType::HifiEnemyCannonHard, {0.4f,0.4f}}
+	},
+
+
+	};
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
+	{
+		{
+			{EnemyType::EvilSnail, {0.5f, 0.5f}},
+		{Snail, {0.2f, 0.8f}},
+		{EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
+		{MediumEnemyCharge, {0.2f, 0.4f}},
+		},
+	{
+	{EnemyType::MediumEnemyTank, {0.8f, 0.8f}},
+		 {EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
+		 {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
+		 {EnemyType::HardEnemyTank, {0.5f, 0.5f}},
+	},
+{
+	{EnemyType::TwoBee, {0.8f, 0.2f}},
+ {EnemyType::TwoBee, {0.2f, 0.2f}},
+ {EnemyType::BeeHive, {0.2f, 0.4f}},
+ {EnemyType::BeeHive, {0.8f, 0.4f}}
+},
+
+{{EnemyType::TwoBee, {0.2f, 0.8f}},
+ {EnemyType::ThreeBee, {0.8f, 0.8f}},
+ {EnemyType::TwoBee, {0.8f, 0.2f}},
+ {EnemyType::OneBee, {0.2f, 0.2f}},
+
+},
 
 	};
 
@@ -408,7 +461,18 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
 				addEffect(player, stack.stack, soundPlayer);
 				object.dialogueCount++;
-				spawnEnemies( soundPlayer, fightConsolePresets[Random::Int(fightConsolePresets.size())]);
+				Map &map = registry.maps.components[0];
+				switch (map.currRegion) {
+					case Physics: {
+						spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsPhysics));
+						break;
+					}
+					case Biology: {
+						spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsBio));
+						break;
+					}
+				}
+				registry.deleteds.emplace(reaction.object);
 			}
 		}
 		if (object.item == InteractableItem::Swarm) {
