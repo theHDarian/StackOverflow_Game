@@ -134,14 +134,17 @@ void SoundSystem::loadMusic()
 
     for (SoundRequest &track : roomMusic)
     {
+        track.music = Mix_LoadMUS(track.path.c_str());
         normalRoomMusic.push_back(track);
         std::cout << "Loaded background music " << track.path << std::endl;
     }
 
     SoundRequest boss = {SoundType::bossBGM, audio_path("boss/boss-music.wav"), 0.25f, -1};
+    boss.music = Mix_LoadMUS(boss.path.c_str());
     bossRoomMusic.push_back(boss);
 
     SoundRequest special = {SoundType::specialBGM, audio_path("special/special-room.wav"), 0.25f, -1};
+    special.music = Mix_LoadMUS(special.path.c_str());
     specialRoomMusic.push_back(special);
 
     currentBGM = &roomMusic[0];
@@ -268,25 +271,28 @@ void SoundSystem::playNextMusic() {
     playNextMusic(nextMusicIndex);
 }
 
-void SoundSystem::playNextMusic(int songIndex)
-{
-    int nextMusicIndex = songIndex;
-    if (nextMusicIndex == currMusicIndex)
-    {
+void SoundSystem::playNextMusic(int songIndex) {
+    if (songIndex == currMusicIndex) {
         return;
     }
-    currMusicIndex = nextMusicIndex;
-    currentBGM = &normalRoomMusic[currMusicIndex];
+
+    // Free old music
     Mix_FreeMusic(backgroundMusic);
-    Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM->path.c_str());
-    Mix_FadeInMusic(newbackgroundMusic, currentBGM->loops, 3000);
-    backgroundMusic = newbackgroundMusic;
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+
+    // Update current music index and pointers
+    currMusicIndex = songIndex;
+    currentBGM = &normalRoomMusic[currMusicIndex];
+    backgroundMusic = currentBGM->music;
+
+    // Play new music
+    if (backgroundMusic) {
+        Mix_FadeInMusic(backgroundMusic, currentBGM->loops, 3000);
+        Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
+    } else {
+        fprintf(stderr, "Failed to play background music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic( MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
 }
+
 
 void SoundSystem::playTitleMusic()
 {

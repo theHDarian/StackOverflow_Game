@@ -191,29 +191,6 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 	GameState& gameState = registry.gameStates.components[0];
 	for (InteractableReaction& reaction : registry.interactableReactions.components) {
 		InteractableObject& object = registry.interactables.get(reaction.object);
-		if (object.name.compare("PopStack") == 0) { // the choices are known implicitly by person who wrote object script for now
-			if (reaction.choice == 0) { // yes
-				object.dialogueCount++;
-				resetStack(player, renderer);
-			}
-			else if (reaction.choice == 1) { // no
-				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
-			}
-		}
-
-		if (object.name.compare("BibleTree") == 0) {
-			if (reaction.choice == 0) { // yes
-				object.dialogueCount++;
-				if (!registry.keyItems.has(player)) {
-					registry.keyItems.emplace(player);
-				}
-				KeyItems& keyItems = registry.keyItems.get(player);
-				keyItems.fruits++;
-			}
-			else if (reaction.choice == 1) { // no
-				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
-			}
-		}
 
 		if (object.name.compare("SkipTutorial") == 0) {
 			IOState& iostate = registry.ioStates.components[0];
@@ -252,6 +229,30 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 
 			if (reaction.choice == 0) {
 				registry.mapRequests.emplace(reaction.object, MapRequestType::ChangeRoom, registry.doors.get(reaction.object).room, registry.doors.get(reaction.object).doorIndex);
+			}
+		}
+
+		if (object.item == PopConsole) { // the choices are known implicitly by person who wrote object script for now
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+				resetStack(player, renderer);
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
+			}
+		}
+
+		if (object.item == BibleTree) {
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+				if (!registry.keyItems.has(player)) {
+					registry.keyItems.emplace(player);
+				}
+				KeyItems& keyItems = registry.keyItems.get(player);
+				keyItems.fruits++;
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
 			}
 		}
 
@@ -322,7 +323,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				case 2 : {
 					if (reaction.choice == 0) {
 						if (reaction.choice == 0) {
-							addEffect(player, {WarMachine}, soundPlayer);
+							addEffect(player, {WeaponOfWar}, soundPlayer);
 						}
 						object.dialogueCount = 4;
 					}
@@ -408,6 +409,46 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				addEffect(player, stack.stack, soundPlayer);
 				object.dialogueCount++;
 				spawnEnemies( soundPlayer, fightConsolePresets[Random::Int(fightConsolePresets.size())]);
+			}
+		}
+		if (object.item == InteractableItem::Swarm) {
+			switch (object.dialogueCount) {
+				case 0 : {
+					object.dialogueCount = 1;
+					break;
+				}
+				case 1 : {
+					if (reaction.choice == 0) {
+						addEffect(player, {theCurse, Freedom}, soundPlayer);
+						object.dialogueCount++;
+					}
+					break;
+				}
+
+			}
+		}
+		if (object.item == InteractableItem::Gardener) {
+			switch (object.dialogueCount) {
+				case 0 : {
+					object.dialogueCount++;
+					break;
+				}
+				case 1 : {
+					object.dialogueCount++;
+					break;
+				}
+				case 2 : {
+					if (reaction.choice == 0) {
+						if (!registry.keyItems.has(player)) {
+							registry.keyItems.emplace(player);
+						}
+						KeyItems& keyItems = registry.keyItems.get(player);
+						keyItems.hasSeenPieRecipe = true;
+						object.dialogueCount++;
+					}
+					break;
+				}
+
 			}
 		}
 	}

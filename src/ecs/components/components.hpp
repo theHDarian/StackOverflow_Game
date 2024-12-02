@@ -128,6 +128,7 @@ struct SoundRequest {
 	int loops;
 	float ticks;
 	int songIndex;
+	Mix_Music* music;
 };
 
 
@@ -382,6 +383,7 @@ enum InteractableItem {
 	Baru,
 	OracleCrab,
 	WishGranter,
+	Swarm,
 	NA,
 };
 

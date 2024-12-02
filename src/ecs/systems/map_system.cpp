@@ -252,10 +252,16 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
         if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
             //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
+            std:: cout << "Spawning locked room" << std::endl;
             d.isLocked = true;
-        } else if (lockedRooms + excludeNone < 2 && hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1)) { //check if next room has locked
+        }
+        else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
             //have a chance of spawning locked rooms
             d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
+        } else {
+            if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
+                d.room = RoomType::EnemyRoom;
+            }
         }
         if (d.room == RoomType::None) {
             excludeNone = true;
@@ -338,17 +344,37 @@ void MapSystem::newMap()
         map.directory = getDirectory(map.currRegion);
         clearRoomActors();
 
+        int lockedRooms = 0;
         bool excludeNone = false;
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
             d.reset();
             d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
-            if (d.room == RoomType::None)
-                excludeNone = true;
 
+            if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
+                //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
+                std:: cout << "Spawning locked room" << std::endl;
+                d.isLocked = true;
+            }
+            else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
+                //have a chance of spawning locked rooms
+                d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
+            } else {
+                if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
+                    d.room = RoomType::EnemyRoom;
+                }
+            }
             registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
+            if (d.room == RoomType::None) {
+                excludeNone = true;
+                registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
+            }
+            if (d.isLocked) {
+                registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+                lockedRooms++;
+            }
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
 

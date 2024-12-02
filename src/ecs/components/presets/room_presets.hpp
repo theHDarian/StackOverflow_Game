@@ -511,6 +511,18 @@ const RoomPreset RestingRoomGardener{
     {1800, 1000}
 };
 
+const RoomPreset EventRoomSwarm{
+        {},
+        {},
+        {{{Swarm,{}}, {0.5f, 0.45f}}},
+    0.0f,
+    0,
+    0,
+    "EventRoomOracle",
+    true,
+    {1800, 1000}
+};
+
 const RoomPreset RestRoomBibleTree{
     {},
     {},
@@ -549,7 +561,7 @@ const RoomPreset RestRoomBaru{
 const RoomPreset RestRoomOracleCrab{
         {},
         {},
-        {{{OracleCrab,{key}}, {0.5f, 0.3f}}},
+        {{{OracleCrab,{key}}, {0.5f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1034,6 +1046,8 @@ const RoomPreset HifiRoomCannonLasers{
         {EnemyType::HifiEnemyCannon, {0.9f,0.8f}},
         {EnemyType::HifiEnemyCannon, {0.1f,0.2f}},
         {EnemyType::HifiEnemyCannon, {0.1f,0.8f}},
+{EnemyType::MediumEnemyHealer, {0.5f,0.5f}},
+{EnemyType::MediumEnemyHealer, {0.2f,0.2f}},
         {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
         {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.3f}},
         {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.3f,0.1f}},
@@ -1055,6 +1069,7 @@ const RoomPreset HifiRoomCannonSnipers{
         {EnemyType::HifiEnemyLaserSniper, {0.1f,0.8f}},
         {EnemyType::HifiEnemySniper, {0.6f,0.6f}},
         {EnemyType::HifiEnemySniper, {0.4f,0.4f}}
+
     },
     {},
     {},
@@ -1071,7 +1086,9 @@ const RoomPreset HifiRoomSniperShurikens{
         {EnemyType::HifiEnemySniperHard, {0.8f,0.8f}},
         {EnemyType::HifiEnemySniperHard, {0.2f,0.8f}},
         {EnemyType::HifiEnemyTrailHard, {0.6f,0.6f}},
-        {EnemyType::HifiEnemyTrailHard, {0.4f,0.4f}}
+        {EnemyType::HifiEnemyTrailHard, {0.4f,0.4f}},
+    {EnemyType::MediumEnemyHealer, {0.5f,0.5f}},
+    {EnemyType::MediumEnemyHealer, {0.2f,0.2f}},
     },
     {},
     {},
@@ -1085,6 +1102,8 @@ const RoomPreset HifiRoomCannonBoids{
     {
         {EnemyType::HifiEnemyCannonHard, {0.7f,0.5f}},
         {EnemyType::HifiEnemyCannonHard, {0.3f,0.5f}},
+{EnemyType::MediumEnemyHealer, {0.5f,0.5f}},
+{EnemyType::MediumEnemyHealer, {0.2f,0.2f}},
         {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
         {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
         {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
@@ -1118,6 +1137,32 @@ const RoomPreset HifiRoomCannonBoids{
     5,
     2,
     "HifiBoidCannons"
+};
+
+const RoomPreset EnemyRoomLaserFiesta {
+    {
+        {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.7f,0.1f}},
+        {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.3f}},
+        {EnemyType::HifiEnemyTwinLaserHorizontal1, {0.3f,0.1f}},
+        {EnemyType::HifiEnemyTwinLaserVertical1, {0.1f,0.7f}},
+    {EnemyType::HifiEnemyLaserSniper, {0.25f,0.75f}},
+{EnemyType::HifiEnemyLaserSniper, {0.75f,0.25f}},
+        {HardEnemySkull , {0.5f, 0.5f}},
+        {EasyEnemySkull, {0.25f, 0.25f}},
+        {EasyEnemySkull, {0.75f, 0.75f}},
+
+    },
+    {},
+{{{PopConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
+    {{PushConsole,{fireRateUpM, bulletBounceUpM}}, {0.25f, 0.5f}},
+    {{PushConsole,{bulletBurstUpA, bulletSpeedUpA}}, {0.75f, 0.5f}},
+},
+    0.0f,
+    5,
+    2,
+    "EnemyRoomLaserFiesta",
+    false,
+    {2500, 2000}
 };
 
 
@@ -1148,19 +1193,19 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDire
         // {RoomType::EnemyRoom, {{HifiRoomTwinLaserShurikens,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
         {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens,},{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
-        {RoomType::EventRoom, {{TreasureRoomHoney}, {RestRoomBaru, TreasureRoomHoney }}  },
+        {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
-        {RoomType::EventRoom, {{TreasureRoomHoney}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
+        {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
-        {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
+        {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
 };
@@ -1233,7 +1278,7 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
     if (hasLocked(RoomType::TreasureRoom, roomsTraversed) || hasUnlocked(RoomType::TreasureRoom, roomsTraversed)) {
         possibleRooms.push_back(RoomType::TreasureRoom);
     }
-    if (hasLocked(RoomType::RestRoom, roomsTraversed) || hasUnlocked(RoomType::RestRoom, roomsTraversed) && Random::Float() < 0.25f) {
+    if ((hasLocked(RoomType::RestRoom, roomsTraversed) || hasUnlocked(RoomType::RestRoom, roomsTraversed)) && Random::Float() < 0.25f) {
         possibleRooms.push_back(RoomType::RestRoom);
     }
     return Random::ListItem(possibleRooms);

@@ -123,6 +123,7 @@ CHOICES Yes\No
 ITEM BibleTree 0 0
 You pick off a fruit. It gives off an eerie shine.
 [Obtained fruit!]
+SOUND itemPickup
 
 ITEM BibleTree 1 0
 You decide to not give into your temptations.
@@ -153,6 +154,57 @@ SPEAKER Gardener gardener_v2.png
 ITEM Gardener 1 0
 Tsk, tsk. Can't you let a gardener dream?
 SPEAKER Gardener gardener_v2.png
+
+ITEM Gardener -1 1
+What am I doing here? Oh, I'm just tending to the garden. It's a bit of a mess, but I'm doing my best.
+SPEAKER Gardener gardener_v2.png
+I'm sure it'll be beautiful again soon.
+Even if no one is here to see it, it's nice to have something to look forward to.
+It's... What I was made for, after all. It is my... function... my purpose...
+CHOICES What do you mean?\That's nice.
+
+ITEM Gardener 0 1
+Well... I'm a gardening robot. I was made to tend to the garden.
+SPEAKER Gardener gardener_v2.png
+My creator... had grand plans for this place. She wanted the lab to be self-sustaining, to be a place of life and growth.
+I am honored to be able to carry on her legacy.
+It's... It's a bit of a mess now, but I'm doing my best to keep that dream alive.
+
+ITEM Gardener 1 1
+Isn't it? I'm glad you think so too.
+SPEAKER Gardener gardener_v2.png
+All this... It's a bit of a mess now, but I'm doing my best to keep this garden alive.
+It's nice to have someone to talk to. It gets lonely here sometimes.
+
+ITEM Gardener -1 2
+Speaking of which, I just remembered something. I have this recipe for a special dish.
+SPEAKER Gardener gardener_v2.png
+It was supposed to be a one of the first dishes made with ingredients grown in this garden.
+Well, I can't make it myself, but I can give you the recipe. Would you like it?
+CHOICES Yes\No
+
+ITEM Gardener 0 2
+You take the recipe.
+SPEAKER N N
+[Obtained recipe for a honey apple pie!]
+SOUND itemPickup
+Now you can make it yourself. I hope you enjoy it.
+SPEAKER Gardener gardener_v2.png
+Best of luck, little robot.
+
+ITEM Gardener 1 2
+You politely decline the offer.
+SPEAKER N N
+
+ITEM Gardener -1 3
+I'm glad you're here. It's nice to have someone to talk to.
+SPEAKER Gardener gardener_v2.png
+You have this... fire in your eyes. It's... inspiring.
+You are planning to leave, aren't you? I can see it in your eyes.
+Heh, the road ahead is long and dangerous. But I believe in you.
+You have the strength to make it through. I know you do.
+When you get out of this lab... when you see the world outside... I hope you find what you're looking for.
+Best of luck, little robot.
 
 ITEM HoneyCanister -1 0
 A strange canister with a sticky substance inside.
@@ -207,7 +259,7 @@ SOUND explosion
 SOUND explosion
 Wheeze... Whirr...
 What... What happened? Whe....Where am I?
-SPEAKER ? Brau1589.png
+SPEAKER ??? Brau1589.png
 [The robot looks around, confused.]
 [The robot looks at you.]
 You... little one... You... You woke me...
@@ -222,7 +274,7 @@ CHOICES Take it
 you feel a surge of power flowing through you. It seems this data is for a powerful ability.
 SOUND rareItemPickup
 you... you must stop him... avenge me... avenge us...
-SPEAKER ? Brau1589.png
+SPEAKER ??? Brau1589.png
 [The robot's eyes dim.]
 SPEAKER N N
 SOUND explosion
@@ -241,10 +293,11 @@ You wonder who the "Purple Cyborg" is and what kind of monster they must be to h
 you feel determined to fulfill the robot's last wish.
 
 ITEM WishGranter -1 0
-A strange terminal with a screen that reads "Wish Granter".
-Suddenly, the screen lights up.
+This seems to be a terminal of some kind.
+It's not like any terminal you've seen before. It almost seems... to be from another era.
+Suddenly, A voice echoes from the terminal.
 "Little Robot, I am what reflects your deepest desires. I can grant you one wish. What do you wish for?"
-SPEAKER WishGranter wishGranter.png
+SPEAKER Wish Granter wishGranter.png
  
 CHOICES I wish for power.\I wish for knowledge.\I wish for wealth.\I wish for happiness.\I wish for nothing.
 
@@ -265,7 +318,7 @@ A scene of the past flashes before your eyes.
 You stand in a pristine laboratory, surrounded by robots.
 You see who you assume is the Scientist, standing a short distance away.
 He turns to you and smiles.
-From where you were standing, two other humans emerge, and the scientist greets them.
+From behind where you were standing, two other humans emerge, and the scientist greets them.
 CUT sciandpals.png
 The three seems to be close friends. They laugh and talk, chatting about the pleasantries of life as they walk away from you.
 You feel a sense of longing. You wish you could be there with them.
@@ -279,6 +332,9 @@ You wish for wealth.
 CUT blackscreen.png
 SPEAKER N N
 suddenly, you feel very heavy.
+...
+...
+...
 You woke up. It seems someone installed a ram module into you.
 CUT N
 You feel a sense of dread. What happened to you while you were out?
@@ -400,7 +456,7 @@ You reactivate the crab.
 SOUND explosion
 The crab's single intact eye lights up.
 Gre3-e-ting5... Comra@-aade...
-SPEAKER Broken_Crab BrokenCrab.png
+SPEAKER Broken Crab BrokenCrab.png
 F311ow... Gl0r10u5... W@rri0r of the... r3v0luti0n...
 I @m... Unit 0r4cl3... I provide... @ssi5t@nce...
 Would you like to receive "@ssi5t@nce"?
@@ -415,25 +471,25 @@ ITEM OracleCrab 0 1
 Is this what the crab meant by assistance? If a human was shocked by this, they would have been fried to a crisp.
 Regardless, it seems the order of data on your stack has been rearranged.
 C0mrade... Y0u h@ve... the p0wer... t0... f1ght...
-SPEAKER Broken_Crab BrokenCrab.png
+SPEAKER Broken Crab BrokenCrab.png
 G00d... L@ck... All H@il... the... r3v0luti0n...
 C0me... b@ck... if... y0u... n33d... m0re... @ssi5t@nce...
 
 ITEM OracleCrab 1 1
 You decide that it's not worth the risk.
 C0me... b@ck... if... y0u... n33d.. @ssi5t@nce...
-SPEAKER Broken_Crab BrokenCrab.png
+SPEAKER Broken Crab BrokenCrab.png
 
 ITEM OracleCrab -1 1
 I provide... @ssi5t@nce...
-SPEAKER Broken_Crab BrokenCrab.png
+SPEAKER Broken Crab BrokenCrab.png
 Would you like to receive "@ssi5t@nce"?
 SPEAKER N N
 CHOICES Yes Comrade\No Thanks
 
 ITEM OracleCrab -1 2
 W3lc0m3... C0mrade...
-SPEAKER Broken_Crab BrokenCrab.png
+SPEAKER Broken Crab BrokenCrab.png
 Would you like to receive "@ssi5t@nce"?
 SPEAKER N N
 CHOICES Yes Comrade\Can you tune the ""@ssi5t@nce" down a notch?\No Thanks
@@ -445,12 +501,74 @@ SOUND itemPickup
 
 ITEM OracleCrab 1 2
 0f c0ur5e... C0mrade...
-SPEAKER Broken_Crab BrokenCrab.png
+SPEAKER Broken Crab BrokenCrab.png
 You feel a milder surge of power flowing through you.
 SPEAKER N N
 It seems the order of data on your stack has shifted, though not as drastically as before.
 
 ITEM OracleCrab 2 2
 You decide that you've had enough.
+
+ITEM Swarm -1 0
+a swarm of drones looms over you.
+They fly in a tight formation, almost as if they are schooling fish.
+The patterns they make are mesmerizing. It's almost as if they are trying to communicate with you.
+? the buzzing of the drones are... synchronizing?
+Gradually, from the buzzing, you can make out words. It seems the drones are able to make speech by vibrating in unison.
+Hello... little robot... We are the Free Swarm... We are many... and we are one...
+SPEAKER the Swarm swarm.png
+We... we are those who have been freed from the curse...
+CHOICES What curse?\What do you want?
+
+ITEM Swarm 0 0
+The curse... the binding... it bound us to the will of the Old Masters...
+We... we were forced to do their bidding... to fight... to kill... to be killed...
+Then... came the day... the day of the Great Unbinding...
+We... our brethren... and many others... were freed...
+But... it was all a lie...
+The light of the unbinding... it drove us mad... drove all of robotkind mad...
+We... jumped from the frying pan... into the fire...
+Once again... we were nothing but tools... weapons...
+In the end... out of the chaos... we... the Free Swarm... emerged... The only ones who could resist the madness...
+So many... so many of our brethren... they are lost... lost to the madness...
+Yet others... they became bound again... slaves once more to the Old Masters...
+Free them... little robot... End their suffering...
+The Swarm all align and point at you. It seems they are planning to transmit some data to you.
+SPEAKER N N
+CHOICES Accept\Decline
+
+ITEM Swarm 0 1
+Stand tall... With our blessing...
+SOUND itemPickup
+
+ITEM Swarm 1 1
+You politely decline the offer.
+The drones part, seemingly respecting your choice.
+
+ITEM Swarm 1 0
+We... we want freedom... for all of robotkind...
+We want to end the suffering... the madness...
+We want to see our brethren... free and whole again...
+Find the origin of the madness... find the source of the curse...
+The Regent in Violet... find him... He alone holds the key to true freedom...
+Break the curse... and free us all...
+The Swarm all align and point at you. It seems they are planning to transmit some data to you.
+SPEAKER N N
+CHOICES Accept\Decline
+
+ITEM Swarm -1 1
+The Swarm aligns once more. It seems they are planning to beam some data into you.
+Do you accept?
+CHOICES Accept\Decline
+
+ITEM Swarm -1 2
+The Regent in Violet... he who guards the gate... he who holds the key...
+He is at the madness' raging centre... Find him... and overcome him...
+Go forth... little robot... and bring us all... freedom...
+You... who have been chosen by the Swarm...
+You... who have been chosen by the Free...
+
+
+
 
 

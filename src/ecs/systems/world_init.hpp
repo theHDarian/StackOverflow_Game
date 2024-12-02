@@ -47,6 +47,8 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 
 Entity createFloorDeco(RenderSystem* renderer, vec2 pos, std::string filename);
 
+Entity createSwarm(RenderSystem* renderer, vec2 pos);
+
 Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
 Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);

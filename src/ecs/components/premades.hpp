@@ -370,17 +370,31 @@ const BulletStackEffect DataCompression = {
 	"" };
 
 const BulletStackEffect WarMachine = {
-	Homing,
+	BulletBurst,
 	Additive,
-	0.5,
+	2,
 	"War Machine",
 	"" };
 
 const BulletStackEffect WeaponOfWar = {
-	BulletBurst,
+	Homing,
 	Additive,
-	2,
+	1,
 	"Weapon of War",
+	"" };
+
+const BulletStackEffect theCurse = {
+	Homing,
+	Additive,
+	-0.5,
+	"\"The Curse\"",
+	"" };
+
+const BulletStackEffect Freedom = {
+	PlayerSpeed,
+	Multiplicative,
+	1.5,
+	"\"Freedom\"",
 	"" };
 
 

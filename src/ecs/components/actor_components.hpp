@@ -121,7 +121,7 @@ struct StackCompile {
         {ProjectileSpeed,   1},
         {ProjectileSize,    1},
         {FireRate,          0.5},
-        {BulletRange,       1},
+        {BulletRange,       10},
         {BulletSpread,      1},
         {BulletNum,         1},
         {BulletBurst,       1},
@@ -576,5 +576,5 @@ struct Critter {
 struct KeyItems {
     int fruits = 0;
     int honey = 0;
-
+    bool hasSeenPieRecipe = false;
 };

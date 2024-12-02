@@ -180,6 +180,8 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createOracleCrab(renderer, pos);
 	case InteractableItem::FightConsole:
 		return createFightConsole(renderer, pos, effects);
+		case InteractableItem::Swarm:
+			return createSwarm(renderer, pos);
 	default:
 		return Entity();
 	}
@@ -323,6 +325,73 @@ Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 	return entity;
 }
 
+Entity createUnInterableSwarm(RenderSystem *renderer, vec2 pos)
+{
+	auto entity = Entity();
+	Motion &motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.velocity = vec2(0);
+	motion.scale = vec2(244, 240);
+	motion.angle = 0;
+
+	auto &object = registry.objects.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{"hivemind_boids",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+	Animation &a = registry.animations.emplace(entity);
+	a.max_frames = 50;
+	a.animation_countdown_base = 100;
+	auto &interact = registry.interactables.emplace(entity);
+	return entity;
+}
+
+Entity createSwarm( RenderSystem *renderer, vec2 pos)
+{
+	auto entity = Entity();
+	Motion &motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.velocity = vec2(0);
+	motion.scale = vec2(244, 240);
+	motion.angle = 0;
+
+	auto &object = registry.objects.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{"hivemind_boids",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	for (int i = 0; i < 2; i++)
+	{
+		vec2 newPos = pos;
+		if (i == 0)
+		{
+			newPos.x += 80;
+			newPos.y += 120;
+		}
+		else
+		{
+			newPos.x -= 80;
+			newPos.y += 120;
+		}
+		auto e = createUnInterableSwarm(renderer, newPos);
+	}
+
+	Animation &a = registry.animations.emplace(entity);
+	a.max_frames = 50;
+	a.animation_countdown_base = 100;
+	auto &interact = registry.interactables.emplace(entity);
+	interact.name = "Swarm";
+	interact.item = InteractableItem::Swarm;
+	registry.circleColliders.emplace(entity).radius = motion.scale.x;
+	// auto& effect = registry.emitParticles.emplace(entity, PBulletTrail, playerBulletTrail, 999999, 1);
+	// effect.props.colors = {{0.f, 1.f, 0.f,1.f},{0.f, 1.f, 0.f,1.f}}},
+
+	return entity;
+}
+
 Entity createBaru(RenderSystem *renderer, vec2 pos)
 {
 	auto entity = createProp3D( renderer, pos, "Brau1589.png", vec2(1380, 960), vec2(1380, 960), 50);
@@ -416,6 +485,7 @@ Entity createGardener(RenderSystem *renderer, vec2 pos)
 
 	InteractableObject &object = registry.interactables.emplace(gardener);
 	object.name = "Gardener";
+	object.item = InteractableItem::Gardener;
 
 	CircleCollider &cc = registry.circleColliders.emplace(gardener);
 	cc.radius = m.scale.y / 4;
@@ -465,6 +535,7 @@ Entity createBibleTree(RenderSystem *renderer, vec2 pos)
 
 	InteractableObject &object = registry.interactables.emplace(tree);
 	object.name = "BibleTree";
+	object.item = InteractableItem::BibleTree;
 
 	CircleCollider &cc = registry.circleColliders.emplace(tree);
 	cc.radius = 200; // hard code for now, can't seem to see if use scale??
