@@ -375,7 +375,6 @@ const RoomPreset EnemyRoomDashHard{
      {EnemyType::EasyEnemySkull, {0.8f, 0.2f}},
      {EnemyType::EasyEnemySkull, {0.2f, 0.2f}},
 {EnemyType::TestRevampedEnemy, {0.3, 0.2}},
-{EnemyType::TestRevampedEnemy, {0.3, 0.4}},
      {EnemyType::EvilSnail, {0.5f, 0.5f}}
      },
     {},
@@ -421,6 +420,42 @@ const RoomPreset EnemyRoomSnailsHard {
         {1000, 750}
 
     };
+
+const RoomPreset EnemyRoomCrabs{
+    {{EnemyType::MediumEnemyTank, {0.8f, 0.8f}},
+     {EnemyType::LaserEnemyTank, {0.8f, 0.2f}},
+     {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
+     {EnemyType::HardEnemyTank, {0.5f, 0.5f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "EnemyRoomCrabs",
+};
+
+const RoomPreset EnemyRoomSmall{
+    {{EnemyType::EasyEnemySkull, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    {EnemyType::HardEnemyBoid, {0.5f, 0.5f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "EnemyRoomSmall",
+    false,
+    {800,800}
+};
 
 const RoomPreset EnemyRoomBees1{
     {{EnemyType::OneBee, {0.2f, 0.8f}},
@@ -487,9 +522,9 @@ const RoomPreset EnemyRoomAngelTank{
 const RoomPreset EnemyRoomTripleBuffEX{
     {{EnemyType::MediumEnemyCharge, {0.2f, 0.8f}},
         {EnemyType::MediumEnemyTank, {0.2f, 0.2f}},
-    {EnemyType::MediumEnemyTank, {0.6f, 0.2f}},
+    {EnemyType::HardEnemyTank, {0.6f, 0.2f}},
     {EnemyType::MediumEnemyTank, {0.2f, 0.6f}},
-        {EvilSnail, {0.7f, 0.7f}},
+        {Snail, {0.7f, 0.7f}},
         {EvilSnail, {0.7f, 0.3f}},
     },
     {},
@@ -1139,19 +1174,19 @@ const RoomPreset HifiRoomCannonBoids{
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3 },{}}},
+        {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3,EnemyRoomSmall },{}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop},}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab, RestRoomEmpty}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
+        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1,EnemyRoomCrabs,EnemyRoomSmall, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab, RestRoomEmpty}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{EnemyRoomAngelTank, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
+        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {}}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
