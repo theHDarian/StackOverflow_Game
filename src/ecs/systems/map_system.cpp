@@ -336,9 +336,12 @@ void MapSystem::newMap()
         updateBgPositions();
         map.currRoom.type = TutorialRoom1;
         map.directory = getDirectory(map.currRegion);
+        createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
     }
     else {
         Map& map = registry.maps.components[0];
+
+        // CHANGE THIS FOR M4:
         map.currRegion = MapRegion::Physics;
         map.roomsTraversed = 0;
         map.directory = getDirectory(map.currRegion);
@@ -380,10 +383,11 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = getRoomPreset(RoomType::TreasureRoom,false);
+        map.currRoom.preset = TutorialRoom1Preset;
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
         map.currRoom.type = RoomType::RestRoom;
+        createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EasyEnemySkull);
