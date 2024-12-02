@@ -47,7 +47,9 @@ private:
     std::unordered_map<InteractibleDialogue, std::vector<Dialogue>> interactibleDialogue;
     Entity currentObject;
     bool isStoryDialogue;
+    Entity callObject;
 
+    Entity createCallObject();
     void summonDialogue();
     void summonInteractibleDialogue(Entity object);
     void loadDialogue(std::string dialogueType);

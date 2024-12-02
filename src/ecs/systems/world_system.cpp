@@ -344,6 +344,9 @@ void WorldSystem::restartGame() {
 	gameState.dialogueChoice = -1;
 	gameState.resetRoom = true;
 
+	if (!registry.mapRequests.has(player))
+		registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+
 	registry.ioStates.components[0].shouldRestart = false;
 
 	// Reset the game speed
@@ -777,6 +780,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		}
 	}
 
+
 	//play hit sound
 	if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
 		soundPlayer->playPlayerZappedSound();
@@ -804,6 +808,14 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 
 	//add to stack for enemy bullets
 	if (registry.enemyBullets.has(other)) {
+		// check tutorial condition here for now
+		if (registry.ioStates.components[0].lockControls) {
+			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+			req.type = DialogueRequestType::StoryDialogue;
+			registry.ioStates.components[0].lockControls = false;
+			std::cout << registry.maps.components[0].currRoom.dialogueCount << std::endl;
+		}
+
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
 		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);

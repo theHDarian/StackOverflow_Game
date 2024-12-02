@@ -11,12 +11,22 @@ SceneSystem::SceneSystem( SoundSystem* soundSystem) {
 	storyDialogue = std::unordered_map<Scene, std::vector<Dialogue>>();
 	interactibleDialogue = std::unordered_map<InteractibleDialogue, std::vector<Dialogue>>();
 	currentObject = Entity();
+	callObject = createCallObject();
 	loadDialogue("story");
 	loadDialogue("interactable");
 }
 
 SceneSystem::~SceneSystem() {
 
+}
+
+Entity SceneSystem::createCallObject() {
+	Entity entity = Entity();
+	
+	//InteractableObject& object = registry.interactables.emplace(entity);
+	//object.name = "CallScientist";
+
+	return entity;
 }
 
 void SceneSystem::step(float elapsed_ms) {
@@ -92,6 +102,12 @@ void SceneSystem::step(float elapsed_ms) {
 		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 2 && !map.currRoom.cleared) {
 			map.currRoom.cleared = true;
 		}
+		if (map.currRoom.type == RoomType::TutorialRoom2 && map.currRoom.dialogueCount == 1 && !map.currRoom.cleared) {
+			input.lockControls = true;
+			input.lastInputAxis = vec2(0);
+			input.inputAxis = vec2(0);
+			map.currRoom.dialogueCount++;
+		}
 
 		if (storyDialogue.count(scene) > 0) {
 			DialogueLines& lines = registry.dialogueLines.components[0];
@@ -138,6 +154,16 @@ void SceneSystem::step(float elapsed_ms) {
 					summonDialogue();
 					isStoryDialogue = true;
 				}
+			}
+			// mock in this way for now, may regret later
+			else if (req.type == DialogueRequestType::CallDialogue && map.currRoom.type != RoomType::TutorialRoom1 
+				&& (map.currRoom.type != RoomType::TutorialRoom2 || map.currRoom.cleared) && map.currRoom.type != RoomType::BossRoom) {
+				InteractibleDialogue dialogueObject = { "CallScientist", gameState.dialogueChoice, 0 };
+				DialogueLines& lines = registry.dialogueLines.components[0];
+				lines = DialogueLines();
+				lines.lines = interactibleDialogue[dialogueObject];
+				summonDialogue(); 
+				isStoryDialogue = true;
 			}
 		}
 		

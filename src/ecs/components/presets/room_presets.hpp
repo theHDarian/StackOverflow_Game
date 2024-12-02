@@ -25,7 +25,7 @@ const RoomPreset TutorialRoom1Preset{
 };
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::HardEnemySkull, {0.5, 0.5}}},
+    {{EnemyType::EasyEnemySentry, {0.5, 0.4}}},
     {},
     {},
     0.0f,
@@ -33,7 +33,7 @@ const RoomPreset TutorialRoom2Preset{
     0,
     "TutorialRoom2",
     false,
-    {1920,1080}
+    {1000,800}
 };
 
 const RoomPreset EnemyRoomSwarm{

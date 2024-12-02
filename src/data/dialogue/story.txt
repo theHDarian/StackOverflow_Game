@@ -31,13 +31,13 @@ SCENE TutorialRoom1 1 1 0 -1
 SPEAKER N N
 SOUND IncomingDialogue
 Uh, hello? This is C--
-SPEAKER Caller ID: C. scientist_avatar.png
+SPEAKER Scientist scientist_avatar.png
 Hold on, I haven't had anyone call me in ages! How did you get my number?!
 Actually, never mind that. I'm just glad someone finally called! It's been rather lonely, locked up in this lab full of rampaging rogue robots.
-Ah, you do know about those rogue robots, right? Word of advice: stay as far away as possible. There's just nothing we can do against them.
+Ah, you do know about those rogue robots, right? Word of advice: stay as far away as possible.
 Better yet, leave the lab entirely. 
-.. Is what I would love to do, but there just seems to be no way out of this darn lab.
-Oh, I know! Why don't we team up? Surely, we can make it out together!
+... Is what I would love to do, and yet I never managed to find a way out.
+That doesn't mean I can't do my best to help get you out though.
 Let me just cross-reference your call coordinates with the map... 
 Oh, wait, looks like all the doors are locked for you. Don't worry though, I got this.
 There, the door on the bottom should be unlocked now.
@@ -46,29 +46,34 @@ Let me know once you're on the other side!
 
 SCENE TutorialRoom2 0 0 0 -1
 So, did it work?
-SPEAKER Caller ID: C. scientist_avatar.png
-Nice! See, I may not be much use against those robots, but I do know a thing or two about how this place works.
-I used to work here before it all went down, after all.
-Ah, speaking of those robots--I think I see one up ahead!
-SPEAKER Caller ID: C. scientist_avatar.png
-Darn, this is bad, let me try to find some other way out for you, I'll be right back!
-[Call ending...]
-SPEAKER N N
-As helpful as your callee has been, you know there's one thing he's wrong about: you do have something against these robots!
-
-SCENE TutorialRoom2 1 0 1 -1
-Whew, I was a bit worried there, but you did it!
 SPEAKER Scientist scientist_avatar.png
-Now that no one's guarding the door anymore, you should be able to walk through it.
-Well, since you handled all that just fine, looks like you don't need to much of my help after all.
-Ah, before I go though, there's one last thing I should tell you.
-You seem to have a special stack container that can encode and store anything you come in contact with into units of pure data.
-But it's a stack after all, so I'm sure it'll overflow if you have too many--and that can't be a good thing.
-I sure wonder how you'll make use of this stack... Perhaps you'll use it to modify your abilities?
-Anyway, to get to the lab exit, I suggest you make your way to the Biology Wing. There should be less rogue robot activity there.
-Also, keep in mind of the symbols on top of the doors. They'll give you a rough idea of the encounters beyond.
-I'll contact you again when you get there. I wish you luck, little robot.
-[Press [ESC] to pause and hover over your stack to take a closer look at it!]
+Nice! See, I may not be much use against those robots, but I do know a thing or two about how this place works.
+Ah, speaking of those robots--I think I see one up ahead! 
+Watch out!
+
+SCENE TutorialRoom2 3 0 0 -1
+Oh!? It seems you're alright after all?
+SPEAKER Scientist scientist_avatar.png
+For a bullet to have disappeared immediately on contact... It must be the work of the S.T.A.C.K.!
+This "stack" has the special ability to encode anything you come across into pure data.
+And what kind of data exactly? Whether it ends up "good" or "bad", you'd only really know when you take a closer look at it.
+So long as you make sure your S.T.A.C.K. doesn't overflow, I'm sure you can fend off this robot just fine then!
+[Mouse over the bullet stacks in your stack to take a closer look, and shoot to fight off enemies!]
+SPEAKER N N
+
+SCENE TutorialRoom2 4 0 1 -1
+Whew, nicely done! 
+SPEAKER Scientist scientist_avatar.png
+Now that no one's guarding the doors anymore, you should be able to walk through them just fine.
+As for which door, that choice is up to you. Maybe you'll choose to encounter more robots for more bullets, or maybe find a place to recharge, or even do some investigating...
+All that matters is that you go forwards, because the only way out is forwards after all!
+That being said, I do recommend you take the route through the Biology wing. There's a lot less rogue robot activity there.
+Well then, I'll be busy from now on as I try to plot out a more detailed exit route for you. 
+In the meantime, feel free to dial my number for any questions. I'll be leaving my assistant at the phone.
+I wish you luck, little robot.
+[Press [C] to call the scientist for any questions.]
+SPEAKER N N
+
 SPEAKER N N
 # REMOVE LATER
 # notice how this line is too long so it overlaps with the choices
