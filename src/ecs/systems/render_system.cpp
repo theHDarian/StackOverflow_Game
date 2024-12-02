@@ -50,7 +50,7 @@ void RenderSystem::step(float elapsed_ms) {
 	for (Entity entity : registry.animations.entities) {
 		Animation& anim = registry.animations.get(entity);
 		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ANIMATE && anim.animate != AnimationTypes::NONE) {
-			if (anim.animate != AnimationTypes::ONCE || anim.frame != 0) anim.animation_countdown -= elapsed_ms;
+			if (anim.animate != AnimationTypes::ONCE || anim.frame != 0 && anim.frame > -1) anim.animation_countdown -= elapsed_ms;
 			if (anim.animation_countdown <= 0) {
 				anim.animation_countdown = anim.animation_countdown_base;
 				if (anim.animate == AnimationTypes::ONCE) {
@@ -67,6 +67,9 @@ void RenderSystem::step(float elapsed_ms) {
 			rr.texture_name = as.nextSprite;
 			rr.used_effect = as.nextEffect;
 			registry.animationSequences.remove(entity);
+			anim.frame = 0;
+			//std::cout << "done" << std::endl;
+			//std::cout << anim.frame << std::endl;
 		}
 	}
 }

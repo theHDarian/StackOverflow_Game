@@ -2661,7 +2661,7 @@ struct ScientistBossEnemy : Enemy
 	ScientistBossEnemy()
 	{
 		maxHealth = 3000;
-		currHealth = 3000;
+		currHealth = 1510;
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
 						 spawnRadialState, spawnBeeBoidState,
@@ -2690,10 +2690,10 @@ struct ScientistSheildEnemy : Enemy
 	ScientistSheildEnemy()
 	{
 		maxHealth = 600;
-		currHealth = 600;
+		currHealth = 1;
 		enemyPatterns = {IdleState};
 		sprite = {
-			"enemy_Pufferfish.png",
+			"enemy_bullet_square.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
@@ -3022,14 +3022,17 @@ struct ScientistHandEnemy : Enemy
 	{
 		maxHealth = 1200;
 		currHealth = 1200;
-		enemyPatterns = {idling, chargePlayer, idling2, 
-						BombingState,teleportToScientist2, idling3, 
-						laserAttackPrepareState, patrolLaserState, teleportToScientist3, 
-						idling4, SprayingState, teleportToScientist4};
+		enemyPatterns = { idling, chargePlayer, idling2,
+						BombingState,teleportToScientist2, idling3,
+						laserAttackPrepareState, patrolLaserState, teleportToScientist3,
+						idling4, SprayingState, teleportToScientist4 };
 		sprite = {
-			"enemy_Angel.png",
-			EFFECT_ASSET_ID::TEXTURED,
+			"hand_idletocharge",
+			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			9
 		};
 		patternIndex = 0;
 		scale = vec2(200, 200);

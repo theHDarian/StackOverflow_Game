@@ -106,6 +106,7 @@ void AISystem::step(float elapsed_ms)
 				rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			}
 		}
+
 	}
 }
 
@@ -206,6 +207,33 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			}
 		}
 	}
+
+	if (registry.hand.has(entity)) {
+		EnemyPattern& pattern = enemy.currEnemyPattern();
+		RenderRequest& rr = registry.renderRequests.get(entity);
+		if (pattern.type == EnemyBehavior::CHARGING) {
+			rr.texture_name = "hand_idletocharge";
+			rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
+			if (registry.animations.get(entity).frame == -1 && !registry.animationSequences.has(entity)) {
+				//registry.animations.get(entity).frame == 1;
+				AnimationSequence& as = registry.animationSequences.emplace(entity);
+				as.nextEffect = EFFECT_ASSET_ID::TEXTURED;
+				as.nextSprite = "hand_charging.png";
+				//std::cout << registry.animations.get(entity).frame << std::endl;
+			}
+		}
+		else if (pattern.type == EnemyBehavior::PATROLLING) {
+			rr.texture_name = "hand_shooting_laser.png";
+			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+			registry.animations.get(entity).frame = -1;
+		}
+		else {
+			rr.texture_name = "hand_idle.png";
+			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
+			registry.animations.get(entity).frame = -1;
+		}
+	}
+
 	if (registry.healers.has(entity))
 	{
 		reaction_found = updateHealerState(enemy, entity);
