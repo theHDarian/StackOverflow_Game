@@ -3020,8 +3020,8 @@ struct ScientistHandEnemy : Enemy
 
 	ScientistHandEnemy()
 	{
-		maxHealth = 2000;
-		currHealth = 2000;
+		maxHealth = 1200;
+		currHealth = 1200;
 		enemyPatterns = {idling, chargePlayer, idling2, 
 						BombingState,teleportToScientist2, idling3, 
 						laserAttackPrepareState, patrolLaserState, teleportToScientist3, 
