@@ -64,7 +64,7 @@ void AISystem::step(float elapsed_ms)
 		// 	movement.posA = motion.position;
 		// 	movement.distanceTraveled = 0.0f;
 		// }
-		if (currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
+		if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
 			// std::cout << currPattern.name << "after update" << std::endl;
 			// if (registry.hand.has(entity) && currPattern.type == EnemyBehavior::IDLE) {
@@ -76,37 +76,23 @@ void AISystem::step(float elapsed_ms)
 			movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
-
-			if (registry.scientist.has(entity)) {
-				Scientist& scien = registry.scientist.get(entity);
-				Entity entityHand = scien.hand;
-				if (entityHand && registry.enemies.has(entityHand)) {
-					Enemy& hand = registry.enemies.get(scien.hand);
-					EnemyPattern& handPattern = hand.currEnemyPattern();
-					if (hand.currHealth > 0 && handPattern.type == EnemyBehavior::IDLE) {
-						EnemyMovement& handMovement = registry.enemyMovement.get(entityHand);
-						Motion& handMotion = registry.motions.get(entityHand);
-						handMovement.posA = handMotion.position;
-						handMovement.posB = movement.posB + vec2(100.f, 0.f);
-						handMovement.distanceTraveled = 0.f;
-					}
-				}
-			}
 		}
 
-		if (registry.scientist.has(entity)) {
-			EnemyPattern& pattern = enemy.currEnemyPattern();
-			RenderRequest& rr = registry.renderRequests.get(entity);
-			if (pattern.type != EnemyBehavior::IDLE && pattern.type != EnemyBehavior::TELEPORT) {
+		if (registry.scientist.has(entity))
+		{
+			EnemyPattern &pattern = enemy.currEnemyPattern();
+			RenderRequest &rr = registry.renderRequests.get(entity);
+			if (pattern.type != EnemyBehavior::IDLE && pattern.type != EnemyBehavior::TELEPORT)
+			{
 				rr.texture_name = "scientist_walk";
 				rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
 			}
-			else {
+			else
+			{
 				rr.texture_name = "scientist.png";
 				rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			}
 		}
-
 	}
 }
 
@@ -193,10 +179,10 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		{
 
 			Enemy &shield = registry.enemies.get(scien.shield);
-			//std::cout << shield.currHealth << "shield health" << std::endl;
+			// std::cout << shield.currHealth << "shield health" << std::endl;
 			if (shield.currHealth <= 0)
 			{
-				//std::cout << "got here" << std::endl;
+				// std::cout << "got here" << std::endl;
 				auto reaction = getReactions(currPattern.reactions, ReactionType::SHIELDBREAK);
 				if (reaction)
 				{
@@ -208,26 +194,31 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		}
 	}
 
-	if (registry.hand.has(entity)) {
-		EnemyPattern& pattern = enemy.currEnemyPattern();
-		RenderRequest& rr = registry.renderRequests.get(entity);
-		if (pattern.type == EnemyBehavior::CHARGING) {
+	if (registry.hand.has(entity))
+	{
+		EnemyPattern &pattern = enemy.currEnemyPattern();
+		RenderRequest &rr = registry.renderRequests.get(entity);
+		if (pattern.type == EnemyBehavior::CHARGING)
+		{
 			rr.texture_name = "hand_idletocharge";
 			rr.used_effect = EFFECT_ASSET_ID::ANIMATE;
-			if (registry.animations.get(entity).frame == -1 && !registry.animationSequences.has(entity)) {
-				//registry.animations.get(entity).frame == 1;
-				AnimationSequence& as = registry.animationSequences.emplace(entity);
+			if (registry.animations.get(entity).frame == -1 && !registry.animationSequences.has(entity))
+			{
+				// registry.animations.get(entity).frame == 1;
+				AnimationSequence &as = registry.animationSequences.emplace(entity);
 				as.nextEffect = EFFECT_ASSET_ID::TEXTURED;
 				as.nextSprite = "hand_charging.png";
-				//std::cout << registry.animations.get(entity).frame << std::endl;
+				// std::cout << registry.animations.get(entity).frame << std::endl;
 			}
 		}
-		else if (pattern.type == EnemyBehavior::PATROLLING) {
+		else if (pattern.type == EnemyBehavior::PATROLLING)
+		{
 			rr.texture_name = "hand_shooting_laser.png";
 			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			registry.animations.get(entity).frame = -1;
 		}
-		else {
+		else
+		{
 			rr.texture_name = "hand_idle.png";
 			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			registry.animations.get(entity).frame = -1;
@@ -400,10 +391,22 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getRecoilPos(entity);
 	case EnemyBehavior::TELEPORT:
 		return getTeleportPos(entity);
+	case EnemyBehavior::FOLLOWSCIENTIST:
+		return getScientistPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
 };
+
+vec2 AISystem::getScientistPos(Entity entity)
+{
+
+	Entity scienEntity = registry.scientist.entities[0];
+	Scientist &scien = registry.scientist.components[0];
+	Motion &motionScientist = registry.motions.get(scienEntity);
+
+	return motionScientist.position + vec2(100.f, 0);
+}
 
 vec2 AISystem::getCurrentPos(Entity entity)
 {
@@ -419,11 +422,12 @@ vec2 AISystem::getTeleportPos(Entity entity)
 	EnemyPattern &pattern = enemy.currEnemyPattern();
 	if (pattern.type == EnemyBehavior::TELEPORT)
 	{
-		std::cout << "tele" << pattern.name  << std::endl;
-		if (registry.hand.has(entity) && pattern.name == "T") {
+		std::cout << "tele" << pattern.name << std::endl;
+		if (registry.hand.has(entity) && pattern.name == "T")
+		{
 			std::cout << "should tele to scientist" << std::endl;
 			Entity scien = registry.scientist.entities[0];
-			Motion& scienMotion = registry.motions.get(scien);
+			Motion &scienMotion = registry.motions.get(scien);
 
 			return scienMotion.position - vec2(100.f, 0);
 		}

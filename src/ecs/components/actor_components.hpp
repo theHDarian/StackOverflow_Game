@@ -387,7 +387,8 @@ enum class EnemyBehavior {
     HEALING,
     DEATHSTATE,
     BOIDSWARMPLAYER,
-    BOIDSFISH
+    BOIDSFISH,
+    FOLLOWSCIENTIST
 };
 
 enum class EnemyRotationBehavior {

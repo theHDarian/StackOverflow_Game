@@ -2630,7 +2630,7 @@ struct ScientistBossEnemy : Enemy
 		TRIANGLE,
 		{numBulletsUpA},
 		playerSpeedDownA,
-		50,
+		30,
 		M_PI,
 		{20, 20},
 		600,
@@ -2864,10 +2864,10 @@ struct InvisibleExplosiveEnemy : Enemy
 		EnemyAttackPattern::RADIAL_POLYGON,
 		CIRCLE,
 		{bulletBounceUpM},
-		{fireRateUpA},
-		10,
+		{bulletPierceUpA},
+		5,
 		M_PI / 16,
-		{70, 70},
+		{50, 50},
 		60,
 		10000,
 		{60, 0},
@@ -2968,7 +2968,7 @@ struct ScientistHandEnemy : Enemy
 		M_PI,
 		{100, 100},
 		150,
-		20000,
+		15000,
 		{99, 0},
 		0,
 		0,
@@ -3005,16 +3005,16 @@ struct ScientistHandEnemy : Enemy
 		0,
 		0};
 
-	EnemyPattern idling = {"IDLE", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern chargePlayer = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 3000.f, 3000.f, {duration}, 2, false, 0.f, 0.f, NoAttack};
-	EnemyPattern idling2 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling2 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 10000.f, 10000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyPattern BombingState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 4, true, 1000.f, 1000.f, HandBomb};
 	EnemyPattern teleportToScientist2 = {"T", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 1000.f, 1000.f, {duration}, 5, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling3 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 6, false, 0.f, 0.f, NoAttack};
-	EnemyPattern laserAttackPrepareState = {"TELEPORT", EnemyBehavior::TELEPORT, {{1, 0.05}}, 0, 2000.f, 2000.f, {duration}, 7, true, 1000.f, 1000.f, NoAttack};
-	EnemyPattern patrolLaserState = {"PATROLLING", EnemyBehavior::PATROLLING, {{1, 0.05}, {1, 0.95}}, 0, 15000.f, 15000.f, {duration}, 8, true, 0.f, 15000.f, laserOne};
+	EnemyPattern idling3 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 10000.f, 10000.f, {duration}, 6, false, 0.f, 0.f, NoAttack};
+	EnemyPattern laserAttackPrepareState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.95, 0.09}}, 0, 2000.f, 2000.f, {duration}, 7, true, 1000.f, 1000.f, NoAttack};
+	EnemyPattern patrolLaserState = {"PATROLLING", EnemyBehavior::PATROLLING, {{0.95, 0.09}, {0.95, 0.95}}, 0, 15000.f, 15000.f, {duration}, 8, true, 0.f, 15000.f, laserOne};
 	EnemyPattern teleportToScientist3 = {"T", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 1000.f, 1000.f, {duration}, 9, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling4 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 10, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling4 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 10000.f, 10000.f, {duration}, 10, false, 0.f, 0.f, NoAttack};
 	EnemyPattern SprayingState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 11, true, 1000.f, 1000.f, sprayingShot};
 	EnemyPattern teleportToScientist4 = {"T", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 1000.f, 1000.f, {duration}, 0, true, 500.f, 1000.f, quakeShot};
 
