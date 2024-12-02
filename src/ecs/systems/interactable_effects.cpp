@@ -460,6 +460,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			if (reaction.choice == 0) {
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
 				addEffect(player, stack.stack, soundPlayer);
+				registry.invincibles.emplace(player);
 				object.dialogueCount++;
 				Map &map = registry.maps.components[0];
 				switch (map.currRegion) {
