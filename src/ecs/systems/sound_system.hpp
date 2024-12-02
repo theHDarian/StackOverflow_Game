@@ -6,9 +6,10 @@
 #define SOUND_SYSTEM_H
 #include "SDL_mixer.h"
 #include "components.hpp"
-#endif //SOUND_SYSTEM_H
+#endif // SOUND_SYSTEM_H
 
-class SoundSystem {
+class SoundSystem
+{
 public:
     void step(float elapsed_ms);
 
@@ -63,39 +64,38 @@ public:
 
     void stopNextDialogueSound();
 
-    float sfxVolume = 0.5f; //note this is overridden by gamestate
+    float sfxVolume = 0.5f; // note this is overridden by gamestate
     float musicVolume = 0.5f;
 
 private:
     int currMusicIndex;
-    SoundRequest* currentBGM;
-    Mix_Music* backgroundMusic;
+    SoundRequest *currentBGM;
+    Mix_Music *backgroundMusic;
     std::vector<SoundRequest> normalRoomMusic;
     std::vector<SoundRequest> bossRoomMusic;
     std::vector<SoundRequest> specialRoomMusic;
     SoundRequest titleScreenMusic;
-    Mix_Chunk* playerHurtSound;
-    Mix_Chunk* playerShootSound;
-    Mix_Chunk* playerDashSound;
-    Mix_Chunk* playerZappedSound; //hit by lightning bullet
+    Mix_Chunk *playerHurtSound;
+    Mix_Chunk *playerShootSound;
+    Mix_Chunk *playerDashSound;
+    Mix_Chunk *playerZappedSound; // hit by lightning bullet
 
-    Mix_Chunk* incomingDialogueSound;
-    Mix_Chunk* nextDialogueSound;
-    Mix_Chunk* itemGetSound;
-    Mix_Chunk* rareItemGetSound;
-    Mix_Chunk* gameOversound;
+    Mix_Chunk *incomingDialogueSound;
+    Mix_Chunk *nextDialogueSound;
+    Mix_Chunk *itemGetSound;
+    Mix_Chunk *rareItemGetSound;
+    Mix_Chunk *gameOversound;
 
     // Mix_Chunk* playerDeathSound;
     // Mix_Chunk* enemyHurtSound;
     // Mix_Chunk* enemyDeathSound;
-    std::vector<Mix_Chunk*> enemyShootSounds;
-    std::vector<Mix_Chunk*> explosionSounds;
+    std::vector<Mix_Chunk *> enemyShootSounds;
+    std::vector<Mix_Chunk *> explosionSounds;
 
-    Mix_Chunk* doorOpenSound;
-    Mix_Chunk* doorCloseSound;
+    Mix_Chunk *doorOpenSound;
+    Mix_Chunk *doorCloseSound;
+    SoundRequest roomMusic[4];
 
     void loadMusic();
     void loadSoundEffects();
-
-
 };

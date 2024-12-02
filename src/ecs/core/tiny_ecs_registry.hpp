@@ -10,14 +10,14 @@
 class ECSRegistry
 {
 	// Callbacks to remove a particular or all entities in the system
-	std::vector<ContainerInterface*> registry_list;
+	std::vector<ContainerInterface *> registry_list;
 
 public:
 	// Manually created list of all components this game has
 	ComponentContainer<Motion> motions;
 	ComponentContainer<Collision> collisions;
 	ComponentContainer<Player> players;
-	ComponentContainer<Mesh*> meshPtrs;
+	ComponentContainer<Mesh *> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<IOState> ioStates;
 	ComponentContainer<GameState> gameStates;
@@ -42,9 +42,9 @@ public:
 	ComponentContainer<AABBCollider> aabbs;
 	ComponentContainer<MeshCollider> meshColliders;
 	ComponentContainer<PlayerAttackData> shoots;
-    ComponentContainer<Invisible> invisibles;
+	ComponentContainer<Invisible> invisibles;
 	ComponentContainer<Dash> dashes;
-	ComponentContainer <Frame> frames;
+	ComponentContainer<Frame> frames;
 	ComponentContainer<EmitParticle> emitParticles;
 	ComponentContainer<Burst> bursts;
 	ComponentContainer<HomingBullet> homes;
@@ -62,7 +62,7 @@ public:
 	ComponentContainer<Damaged> damageds;
 	ComponentContainer<Door> doors;
 	ComponentContainer<DoorSymbol> doorSymbols;
-	ComponentContainer<Bound> bounds; //room boundaries
+	ComponentContainer<Bound> bounds; // room boundaries
 	ComponentContainer<MapRequest> mapRequests;
 	ComponentContainer<BossEnemy> bosses;
 	ComponentContainer<BossParts> bossParts;
@@ -135,7 +135,7 @@ public:
 		registry_list.push_back(&meshColliders);
 		registry_list.push_back(&collisionShapes);
 		registry_list.push_back(&shoots);
-        registry_list.push_back(&invisibles);
+		registry_list.push_back(&invisibles);
 		registry_list.push_back(&dashes);
 		registry_list.push_back(&homes);
 		registry_list.push_back(&lasers);
@@ -197,47 +197,52 @@ public:
 		registry_list.push_back(&gameReports);
 	}
 
-	void clear_all_components() {
-		for (ContainerInterface* reg : registry_list)
+	void clear_all_components()
+	{
+		for (ContainerInterface *reg : registry_list)
 			reg->clear();
 	}
 
-	void list_all_components() {
+	void list_all_components()
+	{
 		printf("Debug info on all registry entries:\n");
-		for (ContainerInterface* reg : registry_list)
+		for (ContainerInterface *reg : registry_list)
 			if (reg->size() > 0)
 				printf("%4d components of type %s\n", (int)reg->size(), typeid(*reg).name());
 	}
 
-	void list_all_components_of(Entity e) {
+	void list_all_components_of(Entity e)
+	{
 		printf("Debug info on components of entity %u:\n", (unsigned int)e);
-		for (ContainerInterface* reg : registry_list)
+		for (ContainerInterface *reg : registry_list)
 			if (reg->has(e))
 				printf("type %s\n", typeid(*reg).name());
 	}
 
-	void remove_all_components_of(Entity e) {
-		for (ContainerInterface* reg : registry_list)
+	void remove_all_components_of(Entity e)
+	{
+		for (ContainerInterface *reg : registry_list)
 			reg->remove(e);
 	}
 
 	// deletes all entities associated with entities
-	void deleteEntityAndRelatedEntities(Entity& entity) {
+	void deleteEntityAndRelatedEntities(Entity &entity)
+	{
 		// remove all other entities associated with this entity
 		// notably, check collision outlines
-		if (collisionShapes.has(entity)) {
-			for (Entity shape : collisionShapes.get(entity).shapes) {
+		if (collisionShapes.has(entity))
+		{
+			for (Entity shape : collisionShapes.get(entity).shapes)
+			{
 				remove_all_components_of(shape);
 			}
 		}
-		if (parents.has(entity)) {
-			for (Entity child : parents.get(entity).children) {
-				if (!deleteds.has(child)) remove_all_components_of(child);
-			}
-		}
-		if (enemyGroups.has(entity)) {
-			for (Entity other : enemyGroups.get(entity).others) {
-				if (!deleteds.has(other)) remove_all_components_of(other);
+		if (parents.has(entity))
+		{
+			for (Entity child : parents.get(entity).children)
+			{
+				if (!deleteds.has(child))
+					remove_all_components_of(child);
 			}
 		}
 		remove_all_components_of(entity);
