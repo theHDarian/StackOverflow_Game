@@ -66,7 +66,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	}
 
 	// Debug toggle for colliders
-	if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
+	if (key == GLFW_KEY_V && action == GLFW_RELEASE) {
 		ioState.debugMode = !ioState.debugMode;
 	}
 
@@ -86,6 +86,14 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		ioState.confirmedOption = true;
 	}
 
+	// call the scientist
+	if (action == GLFW_RELEASE && key == GLFW_KEY_C && !gameState.gamePaused && !gameState.cutScene && !gameState.gameOver && !gameState.dialogueScene && !gameState.titleScreen) {
+		if (!registry.dialogueRequests.has(registry.players.entities[0])) {
+			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+			req.type = DialogueRequestType::CallDialogue;
+		}
+	}
+
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
 		ioState.nextDialogue = true;
@@ -103,10 +111,12 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 			}
 		}
 		else if (!gameState.dialogueScene && registry.maps.components[0].currRoom.dialogueDone) {
-			if (!registry.dialogueRequests.has(registry.players.entities[0])) {
-				DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
-				req.type = DialogueRequestType::StoryDialogue;
-			}
+			// remove for now
+
+			//if (!registry.dialogueRequests.has(registry.players.entities[0])) {
+			//	DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+			//	req.type = DialogueRequestType::StoryDialogue;
+			//}
 		}
 	}
 	
@@ -118,8 +128,8 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	else if (gameState.dialogueScene && !gameState.gamePaused) {
 		handleDialogueChoice(key, action, ioState, gameState);
 	}
-
-	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
+	if (!ioState.lockControls)
+		handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
 }
 
@@ -158,7 +168,7 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 
 	IOState& state = registry.ioStates.components[0];
 	GameState& gameState = registry.gameStates.components[0];
-	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
+	if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS && !state.lockControls) {
 		state.shouldDash = true;
 	}
 
@@ -167,7 +177,7 @@ void IOSystem::mouseClick(int button, int action, int mods) {
 		if (state.activeMenu > -1 && action == GLFW_PRESS) {
 			state.clickedButton = true;
 		}
-		else { // click buttons
+		else if (!state.lockControls) {
 			state.shouldShoot = (action == GLFW_PRESS || action == GLFW_REPEAT);
 		}
 	}

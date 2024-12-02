@@ -384,7 +384,10 @@ enum InteractableItem {
 	OracleCrab,
 	WishGranter,
 	Swarm,
-	NA,
+	WhiteBoard,
+	Desk,
+	Phone,
+	NA
 };
 
 struct InteractableObject {
@@ -396,7 +399,8 @@ struct InteractableObject {
 
 enum DialogueRequestType {
 	StoryDialogue,
-	InteractableDialogue
+	InteractableDialogue,
+	CallDialogue
 };
 
 struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)

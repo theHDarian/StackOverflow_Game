@@ -8,11 +8,12 @@ Controls:\n
 [SPACE/RMB] to dash
 [LMB] to shoot
 [E] to progress dialogue
+[C] to call the scientist for help
 [ESC] to pause
 [R] to return to title
 [L] to leave game
 [=/-] to increase and decrease volume
-[C] to toggle collider visuals
+[V] to toggle collider visuals
 [F] to toggle FPS counter
 
 UI GameOver

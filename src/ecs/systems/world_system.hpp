@@ -41,7 +41,6 @@ public:
 
 	void closeGame();
 	void handleInput();
-	void playCutscene();
 
 	void clearDeleteQueue();
 

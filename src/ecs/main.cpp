@@ -98,7 +98,8 @@ int main() {
 		}
 		else if (ioSystem.isCutscene()) { // should be in separate system, but lazy
 			renderer.step(elapsed_ms);
-			world.playCutscene();
+			mapSystem.step(elapsed_ms);
+			sceneSystem.playCutscene();
 			world.step(elapsed_ms);
 		}
 		else if (ioSystem.isDialogue()) {

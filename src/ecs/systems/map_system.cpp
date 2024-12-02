@@ -53,7 +53,7 @@ void MapSystem::step(float elapsed_ms)
         }
         map.currRoom.preset.enemies = {};
 
-        if (map.currRoom.cleared) {
+        if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {
             for (auto &e : map.currRoom.preset.interactables)
             {
                 vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
@@ -149,6 +149,11 @@ void clearRoomActors()
             registry.deleteds.emplace(ent);
     }
     for (Entity ent : registry.stackAddNotifs.entities)
+    {
+        if (!registry.deleteds.has(ent))
+            registry.deleteds.emplace(ent);
+    }
+    for (Entity ent : registry.objects.entities)
     {
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
@@ -283,7 +288,7 @@ void MapSystem::decorateRoom() {
     // Create floor decorations
     Map& map = registry.maps.components[0];
     WindowState& ws = registry.windowStates.components[0];
-    std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : (map.currRegion == Physics) ? "hifi_floor_addons" : "bio_floor_addons";
+    std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : (map.currRegion == Physics) ? "hifi_floor_addons" : "tutorial_floor_addons";
     vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor( 0.8 * map.currRoom.preset.roomSize.y / 192.f));
     vec2 dividers = vec2(0.9090 * map.currRoom.preset.roomSize.x / placements.x, 0.9090 * map.currRoom.preset.roomSize.y / placements.y);
     vec2 roomOffset = vec2(-map.currRoom.preset.roomSize.x / 2.2f, -map.currRoom.preset.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
@@ -337,7 +342,9 @@ void MapSystem::newMap()
         updateBgPositions();
         map.currRoom.type = TutorialRoom1;
         map.directory = getDirectory(map.currRegion);
-        createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
+
+        registry.motions.get(registry.players.entities[0]).position =
+            glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, vec2(0.25, 0.2));
     }
     else {
         Map& map = registry.maps.components[0];
@@ -384,11 +391,11 @@ void MapSystem::newMap()
 
         // temporarily set start room to empty, create pop console
         map.currRoom = Room();
-        map.currRoom.preset = TutorialRoom1Preset;
+        map.currRoom.preset = StartingRoom;
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
         map.currRoom.type = RoomType::RestRoom;
-        createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
+        //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
@@ -425,18 +432,18 @@ void MapSystem::updateBgPositions() {
         vec2(floorPosition.x, floorPosition.y + floorScale.y),
         vec2(floorScale.x * 1.1, wallThickness)},
         {// right
-        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y - floorScale.y * 2 / 2.f),
-        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 - 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 * min(floorScale.x/1920.f, 1.f) - 20, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x + floorScale.x / 2.f - wallThickness * 1.1 / 2 * min(floorScale.x / 1920.f, 1.f) - 20, floorPosition.y + floorScale.y * 2 / 2.f),
         vec2(floorPosition.x + floorScale.x / 2 * 1.1, floorPosition.y), // not sure why 1.1, is magic number rn
         vec2(floorScale.y * 2, wallThickness)},
             {// bottom
-        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
-        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f),
+        vec2(floorPosition.x - floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f * min(floorScale.y / 1080.f, 1.f) + 10),
+        vec2(floorPosition.x + floorScale.x * 1.1 / 2.f, floorPosition.y + floorScale.y / 2.f - wallThickness / 2.f * min(floorScale.y / 1080.f, 1.f) + 10),
         vec2(floorPosition.x, floorPosition.y - floorScale.y),
         vec2(floorScale.x * 1.1, wallThickness)},
         {// left
-        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y - floorScale.y * 2 / 2.f),
-        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 + 25, floorPosition.y + floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 * min(floorScale.x / 1920.f, 1.f) + 20, floorPosition.y - floorScale.y * 2 / 2.f),
+        vec2(floorPosition.x - floorScale.x / 2.f + wallThickness * 1.1 / 2 * min(floorScale.x / 1920.f, 1.f) + 20, floorPosition.y + floorScale.y * 2 / 2.f),
         vec2(floorPosition.x - floorScale.x / 2 * 1.1, floorPosition.y),
         vec2(floorScale.y * 2, wallThickness)},
     };

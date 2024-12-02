@@ -327,6 +327,9 @@ void WorldSystem::restartGame() {
 	gameState.currentVolume = gameState.previousVolume;
 	soundPlayer->stopGameOverSound();
 
+	if (!registry.mapRequests.has(player))
+		registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+
 	registry.ioStates.components[0].shouldRestart = false;
 
 	// Reset the game speed
@@ -508,17 +511,6 @@ void WorldSystem::handleCollisions() {
 
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
-}
-
-void WorldSystem::playCutscene() {
-	// idea: wait until all animation sequences are done
-	if (registry.animationSequences.components.size() == 0) {
-		GameState& gameState = registry.gameStates.components[0];
-		gameState.cutScene = false;
-		Map& map = registry.maps.components[0];
-		map.currRoom.cutsceneCount++;
-		map.currRoom.cutSceneDone = true;
-	}
 }
 
 void WorldSystem::handleInput() {
@@ -771,6 +763,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		}
 	}
 
+
 	//play hit sound
 	if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
 		soundPlayer->playPlayerZappedSound();
@@ -800,6 +793,14 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 
 	//add to stack for enemy bullets
 	if (registry.enemyBullets.has(other)) {
+		// check tutorial condition here for now
+		if (registry.ioStates.components[0].lockControls) {
+			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+			req.type = DialogueRequestType::StoryDialogue;
+			registry.ioStates.components[0].lockControls = false;
+			std::cout << registry.maps.components[0].currRoom.dialogueCount << std::endl;
+		}
+
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
 		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
 			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);

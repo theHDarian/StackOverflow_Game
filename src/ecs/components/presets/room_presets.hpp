@@ -11,18 +11,36 @@
 const RoomPreset TutorialRoom1Preset{
     {},
     {},
-    {},
-    100000.0f,
+    {
+        {{WhiteBoard,{}}, {0.25f, 0.1f}},
+        {{Desk,{}}, {0.85f, 0.07f}},
+        {{Phone,{}}, {0.5f, 0.8f}},
+    },
+    0,
     0,
     0,
     "TutorialRoom1",
     false,
-    {1280,720}
+    {1000,1200}
+};
 
+const RoomPreset StartingRoom{
+    {},
+    {},
+    {
+        {{WhiteBoard,{}}, {0.25f, 0.1f}},
+        {{Desk,{}}, {0.85f, 0.07f}}
+    },
+    0,
+    0,
+    0,
+    "StartingRoom",
+    false,
+    {1000,1200}
 };
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EnemyEvilSkull, {0.5, 0.5}}},
+    {{EnemyType::EnemyQuadshooter, {0.5, 0.4}}},
     {},
     {},
     0.0f,
@@ -30,7 +48,7 @@ const RoomPreset TutorialRoom2Preset{
     0,
     "TutorialRoom2",
     false,
-    {1920,1080}
+    {1000,800}
 };
 
 const RoomPreset EnemyRoomSwarm{

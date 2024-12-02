@@ -11,12 +11,22 @@ SceneSystem::SceneSystem( SoundSystem* soundSystem) {
 	storyDialogue = std::unordered_map<Scene, std::vector<Dialogue>>();
 	interactibleDialogue = std::unordered_map<InteractibleDialogue, std::vector<Dialogue>>();
 	currentObject = Entity();
+	callObject = createCallObject();
 	loadDialogue("story");
 	loadDialogue("interactable");
 }
 
 SceneSystem::~SceneSystem() {
 
+}
+
+Entity SceneSystem::createCallObject() {
+	Entity entity = Entity();
+	
+	//InteractableObject& object = registry.interactables.emplace(entity);
+	//object.name = "CallScientist";
+
+	return entity;
 }
 
 void SceneSystem::step(float elapsed_ms) {
@@ -89,8 +99,14 @@ void SceneSystem::step(float elapsed_ms) {
 		Scene scene = { map.currRoom.type, map.currRoom.dialogueCount, map.currRoom.cutsceneCount, map.currRoom.cleared, gameState.dialogueChoice };
 
 		// just check for that 1 tutorial room for now
-		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 3 && !map.currRoom.cleared) {
+		if (map.currRoom.type == RoomType::TutorialRoom1 && map.currRoom.dialogueCount == 2 && !map.currRoom.cleared) {
 			map.currRoom.cleared = true;
+		}
+		if (map.currRoom.type == RoomType::TutorialRoom2 && map.currRoom.dialogueCount == 1 && !map.currRoom.cleared) {
+			input.lockControls = true;
+			//input.lastInputAxis = vec2(0);
+			input.inputAxis = vec2(0);
+			map.currRoom.dialogueCount++;
 		}
 
 		if (storyDialogue.count(scene) > 0) {
@@ -126,6 +142,12 @@ void SceneSystem::step(float elapsed_ms) {
 				if (storyDialogue.count(scene) > 0) {
 					// if so, make sure to add + 1 to current room too
 					map.currRoom.dialogueCount++;
+
+					// hard code notifs for now
+					if (map.currRoom.dialogueCount == 1 && map.currRoom.type == TutorialRoom1) {
+						registry.uiRequests.insert(registry.players.entities[0], { UIRequestType::CallNotif });
+					}
+
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
 					lines.lines = storyDialogue[scene];
@@ -133,11 +155,32 @@ void SceneSystem::step(float elapsed_ms) {
 					isStoryDialogue = true;
 				}
 			}
+			// mock in this way for now, may regret later
+			else if (req.type == DialogueRequestType::CallDialogue && map.currRoom.type != RoomType::TutorialRoom1 
+				&& (map.currRoom.type != RoomType::TutorialRoom2 || map.currRoom.cleared) && map.currRoom.type != RoomType::BossRoom) {
+				InteractibleDialogue dialogueObject = { "CallScientist", gameState.dialogueChoice, 0 };
+				DialogueLines& lines = registry.dialogueLines.components[0];
+				lines = DialogueLines();
+				lines.lines = interactibleDialogue[dialogueObject];
+				summonDialogue(); 
+				isStoryDialogue = true;
+			}
 		}
 		
 		registry.dialogueRequests.clear();
 	}
 
+}
+
+void SceneSystem::playCutscene() {
+	// idea: wait until all animation sequences are done
+	if (registry.animationSequences.components.size() == 0) {
+		GameState& gameState = registry.gameStates.components[0];
+		gameState.cutScene = false;
+		Map& map = registry.maps.components[0];
+		map.currRoom.cutsceneCount++;
+		map.currRoom.cutSceneDone = true;
+	}
 }
 
 // ref: A0 template

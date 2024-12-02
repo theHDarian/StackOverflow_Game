@@ -19,6 +19,7 @@ public:
 
     //bool init(); // load all dialogue
     void step(float elapsed_ms);
+    void playCutscene();
 
     std::unordered_map<std::string, SoundType> soundEffectNames = {
         {"normalBGM", SoundType::normalBGM},
@@ -46,7 +47,9 @@ private:
     std::unordered_map<InteractibleDialogue, std::vector<Dialogue>> interactibleDialogue;
     Entity currentObject;
     bool isStoryDialogue;
+    Entity callObject;
 
+    Entity createCallObject();
     void summonDialogue();
     void summonInteractibleDialogue(Entity object);
     void loadDialogue(std::string dialogueType);

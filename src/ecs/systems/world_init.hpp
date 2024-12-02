@@ -19,6 +19,14 @@ Entity createCursor();
 
 Entity createCritter(RenderSystem* renderer, vec2 pos);
 
+Entity createPhone(RenderSystem* renderer, vec2 pos);
+
+Entity createJournal(RenderSystem* renderer, vec2 pos);
+
+Entity createDesk(RenderSystem* renderer, vec2 pos);
+
+Entity createWhiteBoard(RenderSystem* renderer, vec2 pos);
+
 Entity createPopConsole(RenderSystem* renderer, vec2 pos);
 
 Entity createGardener(RenderSystem* renderer, vec2 pos);
