@@ -105,7 +105,8 @@ enum UIRequestType {
 	StackNotifReqShuffle,
 	ResetUI,
 	GameOverReport,
-	CallNotif
+	CallNotif,
+	RoomClear
 };
 
 struct UIRequest {

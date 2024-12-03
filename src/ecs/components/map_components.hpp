@@ -84,7 +84,7 @@ struct DoorSymbol {
 
 struct Room {
     RoomPreset preset;
-    RoomType type;
+    RoomType type = RoomType::TutorialRoom;
     bool cleared = false;
     float timeElapsed = 0; //time passed since enter room in seconds
     int dialogueCount = 0; // place here for now

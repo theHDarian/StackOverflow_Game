@@ -66,12 +66,15 @@ void MapSystem::step(float elapsed_ms)
     
 
     // set room to cleared if all enemies are defeated
-    if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
+    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
     {
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
             soundPlayer->playNextMusic();
         }
+        registry.gameReports.components[0].roomsCleared++;
+        if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
+            registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
     }
 
     if (map.currRoom.cleared) {
@@ -181,7 +184,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     if (map.currRoom.type != RoomType::TutorialRoom1) {
         map.roomsTraversed++;
-        registry.gameReports.components[0].roomsCleared++;
     }
 
     //update Map Region
@@ -399,7 +401,7 @@ void MapSystem::newMap()
         // temporarily set start room to empty, create pop console
         // soundPlayer->playTitleMusic();
         map.currRoom = Room();
-        map.currRoom.preset = RestingRoomPop;
+        map.currRoom.preset = StartingRoom;
         //map.currRoom.preset = ScientistBossRoom;
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);

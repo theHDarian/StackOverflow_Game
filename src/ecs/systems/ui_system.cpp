@@ -333,6 +333,11 @@ void UISystem::step(float elapsed_ms) {
 			registry.activeMenus.emplace(registry.menus.entities[MenuType::GameOverMenu]);
 			ioState.activeMenu++;
 		}
+
+		if (uiRequest.type == UIRequestType::RoomClear) {
+			registry.renderRequests.get(roomClearMessage).show = true;
+			registry.showTimers.emplace(roomClearMessage);
+		}
 	}
 
 	registry.uiRequests.clear();
@@ -481,6 +486,7 @@ bool UISystem::init(GLFWwindow* window) {
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
+	roomClearMessage = createRoomClearMessage();
 
 	return true;
 }
@@ -522,11 +528,11 @@ void UISystem::playDialogue() {
 			}
 
 			// change speaker avatar and name to current
-			if (nextLine.speakerName.length() > 0 && nextLine.speakerName.compare(currSpeakerName) != 0) {
+			if (nextLine.speakerName.length() > 0 && nextLine.speakerName.compare(currSpeakerName) != 0 && nextLine.speakerName.compare("N") != 0) {
 				registry.textRenderRequests.get(dialogueAvatar).text = nextLine.speakerName;
 			}
 			if (nextLine.speakerAvatar.length() > 0 && nextLine.speakerAvatar.compare(currSpeakerAvatar) != 0) {
-				if (nextLine.speakerName.compare("N") != 0) { // N is narrator for now
+				if (nextLine.speakerAvatar.compare("N") != 0) { // N is narrator for now
 					registry.renderRequests.get(dialogueAvatar).show = true;
 					registry.renderRequests.get(dialogueAvatar).texture_name = nextLine.speakerAvatar;
 				}
@@ -1290,6 +1296,44 @@ Entity UISystem::createScreenCutIn() {
 	return entity;
 }
 
+Entity UISystem::createRoomClearMessage() {
+	WindowState& windowState = registry.windowStates.components[0];
+	auto entity = Entity();
+
+	registry.dialogueUIs.emplace(entity);
+	registry.dialogueUITexts.emplace(entity);
+
+	auto& rr = registry.renderRequests.insert(
+		entity, { "enemy_bullet_square.png",
+				 EFFECT_ASSET_ID::TEXTURED,
+				 GEOMETRY_BUFFER_ID::SPRITE,
+				false});
+
+	registry.colors.insert(entity, { 0,0,0 });
+	
+	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
+	float padding = 35.f;
+	trr.text = "Room Cleared";
+	trr.color = vec3(1.0f);
+	trr.scale = 0.7f;
+	trr.x = windowState.width/2.f;
+	trr.y = windowState.height/2.f + windowState.height / 4.f - DEFAULT_FONT_SIZE * trr.scale / 2.f;
+	trr.topRightBound = { windowState.width,windowState.height };
+	trr.bottomLeftBound = { 0,0 };
+	trr.alignment = TextAlignment::CenteredAlign;
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = vec2(windowState.width / 2, windowState.height / 2 - windowState.height / 4);
+	motion.scale = vec2(trr.text.length() * DEFAULT_FONT_SIZE * trr.scale + padding * 2, 100);
+
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderColour = COLOR_WHITE;
+	border.borderThickness = 10.f;
+	border.border = UIBorderType::Outlined;
+
+	return entity;
+}
+
 Entity UISystem::createFpsCounter() {
 	WindowState& windowState = registry.windowStates.components[0];
 	auto entity = Entity();
@@ -1590,7 +1634,7 @@ void UISystem::loadBulletEffects() {
 		if (tooltip.length() > 0) {
 			tokenizedTooltip = getTokenizedText(tooltip);
 			uiTexts.insert({ "HoverBullet_" + bullet.name, tokenizedTooltip});
-			std::cout << tooltip << std::endl;
+			//std::cout << tooltip << std::endl;
 		}
 	}
 }

@@ -41,12 +41,15 @@ private:
     Entity stackAddBubble; // seems like bad practice; what's the best way for multi-part ui?
     Entity stackAddTail;
     Entity dialogueReminder;
+    Entity roomClearMessage;
 
     int lastHoveredBullet = -1;
 
     std::unordered_map<std::string, std::vector<std::string>> uiTexts;
     Entity fpsCounter;
     Entity roomCounter;
+
+    Entity createRoomClearMessage();
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
