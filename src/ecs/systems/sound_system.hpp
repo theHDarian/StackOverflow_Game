@@ -7,6 +7,14 @@
 #include "SDL_mixer.h"
 #include "components.hpp"
 #endif // SOUND_SYSTEM_H
+const int CROSSFADE_DURATION = 3000; // Duration of the crossfade in milliseconds
+enum class MusicState {
+    Stopped,
+    FadingOut,
+    FadingIn,
+    Playing,
+    Crossfading,
+};
 
 class SoundSystem
 {
@@ -69,8 +77,8 @@ public:
 
 private:
     int currMusicIndex;
-    SoundRequest *currentBGM;
-    Mix_Music *backgroundMusic;
+    SoundRequest *currentBGM = nullptr;
+    Mix_Music* currentPlayingMusic = nullptr;
     std::vector<SoundRequest> normalRoomMusic;
     std::vector<SoundRequest> bossRoomMusic;
     std::vector<SoundRequest> specialRoomMusic;

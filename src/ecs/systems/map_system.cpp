@@ -390,13 +390,13 @@ void MapSystem::newMap()
         }
 
         // temporarily set start room to empty, create pop console
-        soundPlayer->playSpecialMusic();
+        // soundPlayer->playTitleMusic();
         map.currRoom = Room();
         map.currRoom.preset = StartingRoom;
         //map.currRoom.preset = ScientistBossRoom;
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
-        map.currRoom.type = RoomType::RestRoom;
+        map.currRoom.type = RoomType::TutorialRoom;
         //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));

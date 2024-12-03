@@ -80,8 +80,6 @@ SoundSystem::SoundSystem()
 
 SoundSystem::~SoundSystem()
 {
-    if (backgroundMusic != nullptr)
-        Mix_FreeMusic(backgroundMusic);
     if (playerHurtSound != nullptr)
         Mix_FreeChunk(playerHurtSound);
     if (playerDashSound != nullptr)
@@ -312,7 +310,10 @@ void SoundSystem::playNextMusic(int songIndex) {
     currMusicIndex = songIndex;
     currentBGM = &normalRoomMusic[currMusicIndex];
     if (currentBGM && currentBGM->music) {
-        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
+        if (Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000) == -1) {
+    fprintf(stderr, "Error fading in music: %s\n", Mix_GetError());
+}
+
         Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
     } else {
         fprintf(stderr, "Failed to play background music: %s\n", Mix_GetError());
@@ -325,7 +326,10 @@ void SoundSystem::playTitleMusic()
     Mix_HaltMusic();
     currentBGM = &titleScreenMusic;
     if (currentBGM && currentBGM->music) {
-        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
+        if (Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000) == -1) {
+    fprintf(stderr, "Error fading in music: %s\n", Mix_GetError());
+    }
+
         Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
     } else {
         fprintf(stderr, "Failed to play title music: %s\n", Mix_GetError());
@@ -340,7 +344,10 @@ void SoundSystem::playBossMusic(int songIndex) {
     currMusicIndex = songIndex;
     currentBGM = &bossRoomMusic[currMusicIndex];
     if (currentBGM && currentBGM->music) {
-        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
+        if (Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000) == -1) {
+    fprintf(stderr, "Error fading in music: %s\n", Mix_GetError());
+}
+
         Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
     } else {
         fprintf(stderr, "Failed to play boss music: %s\n", Mix_GetError());
@@ -361,7 +368,10 @@ void SoundSystem::playSpecialMusic(int songIndex) {
     currMusicIndex = songIndex;
     currentBGM = &specialRoomMusic[currMusicIndex];
     if (currentBGM && currentBGM->music) {
-        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
+        if (Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000) == -1) {
+    fprintf(stderr, "Error fading in music: %s\n", Mix_GetError());
+}
+
         Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
     } else {
         fprintf(stderr, "Failed to play special music: %s\n", Mix_GetError());

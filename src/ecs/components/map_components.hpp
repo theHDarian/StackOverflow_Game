@@ -25,6 +25,7 @@ enum RoomType : int {
     None, //Keep None at the end of the list to be compatible with existing get random function
 
     //Special rooms that are not spawned via getRandomRoomType function
+    TutorialRoom,
     TutorialRoom1,
     TutorialRoom2,
     BossRoom,

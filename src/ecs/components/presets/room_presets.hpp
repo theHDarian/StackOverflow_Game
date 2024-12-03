@@ -1448,7 +1448,9 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
     {RoomType::BossRoom, SoundType::bossBGM},
     {RoomType::TreasureRoom, SoundType::specialBGM},
     {RoomType::None, normalBGM},
-    {RoomType::TutorialRoom1, SoundType::specialBGM},
+    {RoomType::TutorialRoom, SoundType::titleBGM},
+    {RoomType::TutorialRoom1, SoundType::titleBGM},
     {RoomType::TutorialRoom2, SoundType::normalBGM},
-        { RoomType::EventRoom, SoundType::specialBGM }
+{ RoomType::EventRoom, SoundType::specialBGM }
+
 };

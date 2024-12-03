@@ -149,7 +149,6 @@ void UISystem::step(float elapsed_ms) {
 						gameState.titleScreen = false;
 						gameState.loading = true;
 						ioState.shouldRestart = true;
-						soundSystem->playSpecialMusic(0);
 					}
 					else {
 						ioState.shouldEnd = true;

@@ -128,7 +128,7 @@ struct SoundRequest {
 	int loops;
 	float ticks;
 	int songIndex;
-	Mix_Music* music;
+	Mix_Music* music= nullptr;
 };
 
 
