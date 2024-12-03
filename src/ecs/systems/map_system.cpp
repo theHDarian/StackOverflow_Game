@@ -212,6 +212,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
     playerMotion.position = spawnPosition;
+    playerMotion.velocity = vec2(0);
 
     // clear enemies and obstacles
     clearRoomActors();
@@ -398,7 +399,7 @@ void MapSystem::newMap()
         // temporarily set start room to empty, create pop console
         // soundPlayer->playTitleMusic();
         map.currRoom = Room();
-        map.currRoom.preset = StartingRoom;
+        map.currRoom.preset = RestingRoomPop;
         //map.currRoom.preset = ScientistBossRoom;
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);

@@ -1525,14 +1525,19 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	if (shape == "circle.png")
 	{
 		auto &circle = registry.circleColliders.get(entity);
-		colliderMotion.scale = {circle.radius * 2, circle.radius * 2};
+		colliderMotion.scale = { circle.radius * 2, circle.radius * 2};
+		//std::cout << "pos: " << colliderMotion.position.x << ", " << colliderMotion.position.y << std::endl;
+		//std::cout << colliderMotion.scale.x << ", " << colliderMotion.scale.y << std::endl;
 	}
+	// note: this isn't working for offset aabbs
 	else if (shape == "rectangle.png")
 	{
 		auto &aabb = registry.aabbs.get(entity);
-		colliderMotion.position = vec2(motion.position.x + (abs(aabb.bottomRight.x) - abs(aabb.topLeft.x)) / 2, motion.position.y + (abs(aabb.bottomRight.y) - abs(aabb.topLeft.y)) / 2);
-		colliderMotion.angle = motion.angle;
+		colliderMotion.position = vec2(motion.position.x + (abs(aabb.bottomRight.x) - abs(aabb.topLeft.x)) / 2.f, motion.position.y + (abs(aabb.bottomRight.y) - abs(aabb.topLeft.y)) / 2.f);
 		colliderMotion.scale = {aabb.bottomRight.x - aabb.topLeft.x, aabb.bottomRight.y - aabb.topLeft.y};
+	}
+	else {
+		assert(false);
 	}
 
 	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
@@ -1555,6 +1560,10 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
 	gl_has_errors();
 	assert(in_texcoord_loc >= 0);
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, 0);
+	gl_has_errors();
 
 	glEnableVertexAttribArray(in_position_loc);
 	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
@@ -1825,6 +1834,10 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, 1);
+	gl_has_errors();
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, 0);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
