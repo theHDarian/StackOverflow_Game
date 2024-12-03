@@ -1245,8 +1245,9 @@ const RoomPreset EnemyRoomLaserFiesta {
     {2500, 2000}
 };
 
-const RoomPreset HifiRoomJellyFish {
+const RoomPreset HifiRoomJellyFish { //Test room for new enemies
     {
+        {EnemyHifiWhip, {0.5f, 0.5f}},
         {EnemyHifiJellyFish, {0.5f, 0.5f}},
         {EnemyHifiTackShooter, {0.8,0.2}},
         {EnemyHifiTackShooter, {0.8,0.8}},
@@ -1307,14 +1308,14 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        // {RoomType::EnemyRoom, {{HifiRoomTwinLaserShurikens,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomCannons},{}}},
-        {RoomType::EnemyRoom, {{HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens,},{HifiEnemyRoomSwarmLasers}}},
+        // {RoomType::EnemyRoom, {{HifiRoomJellyFish},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomJellyFish,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomRam, TreasureRoomSniper, TreasureRoom5}}},
