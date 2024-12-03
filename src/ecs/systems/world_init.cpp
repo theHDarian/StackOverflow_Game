@@ -186,68 +186,70 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createDesk(renderer, pos);
 	case InteractableItem::Phone:
 		return createPhone(renderer, pos);
-		case InteractableItem::Swarm:
-			return createSwarm(renderer, pos);
+	case InteractableItem::Swarm:
+		return createSwarm(renderer, pos);
 	default:
 		return Entity();
 	}
 }
 
-Entity createPhone(RenderSystem* renderer, vec2 pos) {
+Entity createPhone(RenderSystem *renderer, vec2 pos)
+{
 	Entity entity = Entity();
 
-	Motion& m = registry.motions.emplace(entity);
+	Motion &m = registry.motions.emplace(entity);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = { 384 / 4.f, 384 / 4.f };
+	m.scale = {384 / 4.f, 384 / 4.f};
 
 	registry.backgrounds.emplace(entity);
 
 	registry.renderRequests.insert(
 		entity,
-		{ "callchip.png",
+		{"callchip.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
-	InteractableObject& object = registry.interactables.emplace(entity);
+	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "Phone";
 	object.item = InteractableItem::Phone;
 
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = 50.f;
 
 	return entity;
 }
 
-Entity createDesk(RenderSystem* renderer, vec2 pos) {
+Entity createDesk(RenderSystem *renderer, vec2 pos)
+{
 	Entity entity = Entity();
 
-	Motion& m = registry.motions.emplace(entity);
+	Motion &m = registry.motions.emplace(entity);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = { 378 / 1.5f, 291 / 1.5f };
+	m.scale = {378 / 1.5f, 291 / 1.5f};
 
-	auto& o = registry.objects.emplace(entity);
+	auto &o = registry.objects.emplace(entity);
 	o.baseOffset = m.scale.y / 3.f;
 
 	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f),
-		vec2(pos.x + m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f));
+			   vec2(pos.x + m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f));
 
 	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 4.f),
-		vec2(pos.x - m.scale.x / 2.f, pos.y - m.scale.y / 2.f));
+			   vec2(pos.x - m.scale.x / 2.f, pos.y - m.scale.y / 2.f));
 
-	//registry.backgrounds.emplace(entity);
+	// registry.backgrounds.emplace(entity);
 
 	registry.renderRequests.insert(
 		entity,
-		{ "desk.png",
+		{"desk.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
-	InteractableObject& object = registry.interactables.emplace(entity);
+	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "Desk";
 
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = 150.f;
 
 	createProp(renderer, pos + vec2(0, o.baseOffset * 1.2), "chair.png", vec2(189 / 2.5f, 295 / 2.5f), vec2(1));
@@ -258,53 +260,54 @@ Entity createDesk(RenderSystem* renderer, vec2 pos) {
 
 // if make this a prop, would disappear because too tiny and is object.
 // consider changing type
-Entity createJournal(RenderSystem* renderer, vec2 pos) {
+Entity createJournal(RenderSystem *renderer, vec2 pos)
+{
 	Entity entity = Entity();
 
-	Motion& m = registry.motions.emplace(entity);
+	Motion &m = registry.motions.emplace(entity);
 	m.position = pos;
 	m.velocity = vec2(0);
 	m.scale = vec2(47 / 1.2f, 48 / 1.2f);
 
-	auto& o = registry.objects.emplace(entity);
+	auto &o = registry.objects.emplace(entity);
 	o.baseOffset = 1000;
 
 	registry.renderRequests.insert(
 		entity,
-		{ "journal.png",
+		{"journal.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
-
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	return entity;
 }
 
-Entity createWhiteBoard(RenderSystem* renderer, vec2 pos) {
+Entity createWhiteBoard(RenderSystem *renderer, vec2 pos)
+{
 	Entity entity = Entity();
 
-	Motion& m = registry.motions.emplace(entity);
+	Motion &m = registry.motions.emplace(entity);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = {576/1.5f, 300/1.5f};
+	m.scale = {576 / 1.5f, 300 / 1.5f};
 
-	auto& o = registry.objects.emplace(entity);
-	o.baseOffset = m.scale.y/3.f;
+	auto &o = registry.objects.emplace(entity);
+	o.baseOffset = m.scale.y / 3.f;
 
 	createWall(renderer, vec2(pos.x - m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f),
-		vec2(pos.x + m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f));
+			   vec2(pos.x + m.scale.x / 2.f, pos.y + m.scale.y / 2.f - m.scale.y / 4.f));
 
 	registry.backgrounds.emplace(entity);
 
 	registry.renderRequests.insert(
 		entity,
-		{ "controls.png",
+		{"controls.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
-	InteractableObject& object = registry.interactables.emplace(entity);
+	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "WhiteBoard";
 
-	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	CircleCollider &cc = registry.circleColliders.emplace(entity);
 	cc.radius = 150.f;
 
 	return entity;
@@ -370,8 +373,8 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
 	aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
 
-	//CircleCollider &cc = registry.circleColliders.emplace(console);
-	//cc.radius = m.scale.y / 4;
+	// CircleCollider &cc = registry.circleColliders.emplace(console);
+	// cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "FightConsole";
@@ -410,12 +413,12 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 	registry.backgrounds.emplace(console);
 
 	// can use aabb as near player range for now for pseudo-offsetting
-	 AABBCollider& aabb = registry.aabbs.emplace(console);
-	 aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
-	 aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
+	AABBCollider &aabb = registry.aabbs.emplace(console);
+	aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
 
-	//CircleCollider &cc = registry.circleColliders.emplace(console);
-	//cc.radius = m.scale.y / 4;
+	// CircleCollider &cc = registry.circleColliders.emplace(console);
+	// cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PopStack";
@@ -436,7 +439,7 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 
 Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "HoneyCanisterFull.png", vec2(200, 300), vec2(40, 80), 110);
+	auto entity = createProp3D(renderer, pos, "HoneyCanisterFull.png", vec2(200, 300), vec2(40, 80), 110);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "HoneyCanister";
 	object.item = InteractableItem::HoneyCanister;
@@ -470,7 +473,7 @@ Entity createUnInterableSwarm(RenderSystem *renderer, vec2 pos)
 	return entity;
 }
 
-Entity createSwarm( RenderSystem *renderer, vec2 pos)
+Entity createSwarm(RenderSystem *renderer, vec2 pos)
 {
 	auto entity = Entity();
 	Motion &motion = registry.motions.emplace(entity);
@@ -517,7 +520,7 @@ Entity createSwarm( RenderSystem *renderer, vec2 pos)
 
 Entity createBaru(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "Brau1589.png", vec2(1380, 960), vec2(1380, 960), 50);
+	auto entity = createProp3D(renderer, pos, "Brau1589.png", vec2(1380, 960), vec2(1380, 960), 50);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "Baru";
 	object.item = InteractableItem::Baru;
@@ -531,7 +534,7 @@ Entity createBaru(RenderSystem *renderer, vec2 pos)
 
 Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "wishGranter", vec2(132, 200), vec2(0, 0), 0, ANIMATE);
+	auto entity = createProp3D(renderer, pos, "wishGranter", vec2(132, 200), vec2(0, 0), 0, ANIMATE);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "WishGranter";
 	object.item = InteractableItem::WishGranter;
@@ -548,7 +551,7 @@ Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 
 Entity createOracleCrab(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D( renderer, pos, "BrokenCrab.png", vec2(200, 200), vec2(0, 0), 0);
+	auto entity = createProp3D(renderer, pos, "BrokenCrab.png", vec2(200, 200), vec2(0, 0), 0);
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "OracleCrab";
 	object.item = InteractableItem::OracleCrab;
@@ -696,7 +699,8 @@ Entity createProp(RenderSystem *renderer, vec2 pos, std::string filename, vec2 s
 }
 
 // For creating side-on props with a wall (like pop console or tree)
-Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect) {
+Entity createProp3D(RenderSystem *renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect)
+{
 	Entity e = Entity();
 
 	Motion &m = registry.motions.emplace(e);
@@ -713,9 +717,9 @@ Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2
 
 	registry.renderRequests.insert(
 		e,
-		{ filename,
+		{filename,
 		 effect,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 	return e;
 }
 
@@ -1161,7 +1165,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBigC:
 	{
 		enemy = BigC();
-		auto& boss = registry.bosses.emplace(entity);
+		auto &boss = registry.bosses.emplace(entity);
 		boss.name = "BigC";
 		movement.angularSpeed = 20;
 		break;
@@ -1222,7 +1226,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBeehiveMain:
 	{
 		enemy = BossBeeHive();
-		auto& boss = registry.bosses.emplace(entity);
+		auto &boss = registry.bosses.emplace(entity);
 		boss.name = "Grand Hive, the Queen's Throne";
 		break;
 	}
@@ -1276,8 +1280,13 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::EnemyHealer:
 	{
 		enemy = HealerAngel();
-		Healer& healer = registry.healers.emplace(entity);
+		Healer &healer = registry.healers.emplace(entity);
 		healer.coolDown = 0.f;
+	}
+	case EnemyType::ScientistlaserAttack:
+	{
+		enemy = InvisibleRotateLaserEnemy();
+		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	}
 	case EnemyType::EnemyFishBoid:
@@ -1316,23 +1325,35 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = HifiSniper();
 		break;
 	}
-	case EnemyType::EnemyLaserSniper: enemy = HifiLaserSniper();break;
-	case EnemyType::EnemyHifiCharger: enemy = HifiCharger();break;
-	case EnemyType::EnemyHifiTrail: enemy = HifiTrail();break;
-	case EnemyType::EnemyHifiCannon: enemy = HifiCannon();break;
-	case EnemyType::EnemyHifiChargerHard: enemy = HifiChargerHard();break;
-	case EnemyType::EnemyHifiSniperHard: enemy = HifiSniperHard();break;
-	case EnemyType::EnemyHifiTrailHard: enemy = HifiTrailHard();break;
-	case EnemyType::EnemyHifiCannonHard: enemy = HifiCannonHard();break;
-	case EnemyType::EnemyHifiTemporaryBoid: enemy = HifiTemporaryBoid(); break;
+	case EnemyType::EnemyLaserSniper:
+		enemy = HifiLaserSniper();
+		break;
+	case EnemyType::EnemyHifiCharger:
+		enemy = HifiCharger();
+		break;
+	case EnemyType::EnemyHifiTrail:
+		enemy = HifiTrail();
+		break;
+	case EnemyType::EnemyHifiCannon:
+		enemy = HifiCannon();
+		break;
+	case EnemyType::EnemyHifiChargerHard:
+		enemy = HifiChargerHard();
+		break;
+	case EnemyType::EnemyHifiSniperHard:
+		enemy = HifiSniperHard();
+		break;
+	case EnemyType::EnemyHifiTrailHard:
+		enemy = HifiTrailHard();
+		break;
+	case EnemyType::EnemyHifiCannonHard:
+		enemy = HifiCannonHard();
+		break;
+	case EnemyType::EnemyHifiTemporaryBoid:
+		enemy = HifiTemporaryBoid();
+		break;
 	case EnemyType::HifiEnemyCharger:
 		break;
-	case EnemyType::ScientistlaserAttack:
-	{
-		enemy = InvisibleRotateLaserEnemy();
-		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
-		break;
-	}
 	case EnemyType::ScientistradialAttack:
 	{
 		enemy = InvisibleTurretEnemy();
@@ -1459,20 +1480,23 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 void createEnemyGroup(RenderSystem *renderer, vec2 pos, EnemyType type)
 {
 	std::vector<Entity> groupMembers;
-	Map& map = registry.maps.components[0];
-	WindowState& ws =  registry.windowStates.components[0];
-	if (type == EnemyType::EnemyTwinLaserVertical1) {
-		//should spawn twin on the side perpendicular to patrol direction
-		vec2 twinPos = pos; //normalized position
+	Map &map = registry.maps.components[0];
+	WindowState &ws = registry.windowStates.components[0];
+	if (type == EnemyType::EnemyTwinLaserVertical1)
+	{
+		// should spawn twin on the side perpendicular to patrol direction
+		vec2 twinPos = pos; // normalized position
 		twinPos.x = ws.width - pos.x;
-		groupMembers.push_back(createEnemy(renderer,pos,type));
-		groupMembers.push_back(createEnemy(renderer,twinPos,EnemyTwinLaserVertical2));
-	} else if (type == EnemyType::EnemyHifiTwinLaserHorizontal1) {
-		//should spawn twin on the side perpendicular to patrol direction
-		vec2 twinPos = pos; //normalized position
+		groupMembers.push_back(createEnemy(renderer, pos, type));
+		groupMembers.push_back(createEnemy(renderer, twinPos, EnemyTwinLaserVertical2));
+	}
+	else if (type == EnemyType::EnemyHifiTwinLaserHorizontal1)
+	{
+		// should spawn twin on the side perpendicular to patrol direction
+		vec2 twinPos = pos; // normalized position
 		twinPos.y = ws.height - twinPos.y;
-		groupMembers.push_back(createEnemy(renderer,pos,type));
-		groupMembers.push_back(createEnemy(renderer,twinPos,EnemyHifiTwinLaserHorizontal2));
+		groupMembers.push_back(createEnemy(renderer, pos, type));
+		groupMembers.push_back(createEnemy(renderer, twinPos, EnemyHifiTwinLaserHorizontal2));
 	}
 	for (Entity gm : groupMembers)
 	{
@@ -1813,25 +1837,25 @@ Entity createKeyBullet(RenderSystem *renderer, vec2 pos)
 	motion.scale = 20.f * vec2(2.8, 1); // Ensure scale is initialized
 	motion.veer = {0, 0};
 
-	PolyCollider& pc = registry.polyColliders.emplace(entity);
+	PolyCollider &pc = registry.polyColliders.emplace(entity);
 	pc.offsetVertices = {
 		{motion.scale.x / 2, motion.scale.y / 2},
 		{motion.scale.x / 2, -motion.scale.y / 2},
 		{-motion.scale.x / 2, -motion.scale.y / 2},
-		{-motion.scale.x / 2, motion.scale.y / 2} };
+		{-motion.scale.x / 2, motion.scale.y / 2}};
 	pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
 	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
 
 	registry.renderRequests.insert(
 		entity,
-		{ "enemy_bullet_key.png",
+		{"enemy_bullet_key.png",
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	ParticleProps props = enemyBullet;
 	props.colors.push_back(enemyBulletParticleColors.at(Key));
 	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
+	EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
 	return entity;
 }
@@ -1925,12 +1949,11 @@ float getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity &player = registry.players.entities[0];
 	return min(
-			registry.stackCompile.get(player).maximums[bf],
-			max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf])
-		);
+		registry.stackCompile.get(player).maximums[bf],
+		max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]));
 }
 
-std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial)
+std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpecial)
 {
 	// TODO add logic from room data about whether a bullet should be default effect or special effects
 	float prob = (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
