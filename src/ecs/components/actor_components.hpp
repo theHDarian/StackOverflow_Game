@@ -308,6 +308,7 @@ enum EnemyType {
     EnemyHifiJellyFish,
     EnemyHifiTackShooter,
     EnemyHifiBallLauncher,
+    EnemyHifiWhip,
     ScientistradialAttack,
     ScientistexplosiveAttack,
     ScientistHomingAttack,

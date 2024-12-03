@@ -2339,7 +2339,7 @@ struct HifiTrailHard : Enemy
 struct HifiJellyFish : Enemy
 {
 	/**
-	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
+	 * Jellyfish pattern attacks
 	 */
 	const BulletStackEffect playerSpeedDownASmall = {
 		PlayerSpeed,
@@ -2485,7 +2485,7 @@ struct HifiJellyFish : Enemy
 struct HifiTackShooter : Enemy
 {
 	/**
-	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
+	 * Stationary turret that attacks within a range around it 
 	 */
 	const BulletStackEffect playerSpeedDownASmall = {
 		PlayerSpeed,
@@ -2578,7 +2578,7 @@ struct HifiTackShooter : Enemy
 struct HifiBallLauncher : Enemy
 {
 	/**
-	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
+	 * 
 	 */
 	const BulletStackEffect playerSpeedDownASmall = {
 		PlayerSpeed,
@@ -2643,6 +2643,76 @@ struct HifiBallLauncher : Enemy
 		patternIndex = 0;
 		sprite = {
 			"enemy_hifi_009.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 0;
+		rotatePower = 2;
+	};
+};
+
+struct HifiWhip: Enemy
+{
+	/**
+	 * Expanding whip
+	 */
+	const AttackData whip{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{dmgUpA},
+		blunt,
+		2,
+		-M_PI/4.f,
+		{15, 15},
+		400,
+		2000,
+		{200, M_PI/1.5},
+		0,
+		2,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		500.f,
+		500.f,
+		{
+			{ReactionType::DURATION,1},
+		},
+		1,
+		true,
+		0.f,
+		0.f,
+		whip};
+
+	EnemyPattern restState = {
+		"ROTATE",
+		EnemyBehavior::IDLE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		0.f,
+		500.f,
+		NoAttack};
+
+	HifiWhip()
+	{
+		maxHealth = 250;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, restState};
+		rotationBehaviour = EnemyRotationBehavior::REGULAR;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_006.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0, 0)};
