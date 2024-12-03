@@ -161,6 +161,7 @@ void closeDoors (SoundSystem* soundPlayer) {
 				soundPlayer->playDoorCloseSound();
 			}
 			registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
+			registry.interactables.get(registry.doors.entities[i]).item = ClosedDoor;
 			registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
 		}
 	}

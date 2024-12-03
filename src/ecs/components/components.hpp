@@ -378,6 +378,7 @@ enum InteractableItem {
 	FightConsole,
 	OpenDoor,
 	LockedDoor,
+	ClosedDoor,
 	BibleTree,
 	Gardener,
 	HoneyCanister,
