@@ -8,7 +8,7 @@
 //used by roomsTraversed to determine type of enemy to spawn, some enemies only spawn in certain difficulty regions
 enum DifficultyRegion {
     Intro = 3,
-    Easy = 10,
+    Easy = 8,
     Medium = 20,
     // Hard,
 };

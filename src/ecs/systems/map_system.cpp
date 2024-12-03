@@ -109,7 +109,7 @@ void MapSystem::handleMapRequests()
     }
 }
 
-void clearRoomActors()
+void MapSystem::clearRoomActors()
 {
     for (Entity ent : registry.enemies.entities)
     {
