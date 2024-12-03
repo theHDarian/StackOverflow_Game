@@ -4,6 +4,7 @@
 
 #include "interactable_effects.h"
 
+#include "map_system.hpp"
 #include "sound_system.hpp"
 #include "tiny_ecs.hpp"
 #include "tiny_ecs_registry.hpp"
@@ -49,7 +50,9 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsPhysics 
 		},
 	{
 			{ EnemyType::EnemyHifiCannonHard, {0.6f,0.6f}},
-				{ EnemyType::EnemyHifiCannonHard, {0.4f,0.4f}}
+				{ EnemyType::EnemyHifiCannonHard, {0.4f,0.4f}},
+		{EnemyType::EnemyHealer, {0.9f,0.5f}},
+		{EnemyType::EnemyHifiTrail, {0.1f,0.5f}},
 	},
 
 
@@ -205,17 +208,16 @@ void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* 
 	switch (choice) {
 		case 0: {
 			addEffect(player, {fireRateUpA, dmgUpM, numBulletsUpA }, soundPlayer);
-			Map& map = registry.maps.components[0];
-			map.currRoom.preset.enemies ={{EnemyType::EnemySkull, {0.2f, 0.8f}},
-	 {EnemyType::EnemySkull, {0.8f, 0.8f}},
-	 {EnemyType::EnemySkull, {0.8f, 0.2f}},
-	 {EnemyType::EnemySkull, {0.2f, 0.2f}},
-{EnemyType::EnemyHifiCharger, {0.25f,0.5f}},
-{EnemyType::EnemyHifiCharger, {0.75f,0.5f}},
-
-			};
+			spawnEnemies( soundPlayer, {
+			{EnemyType::EnemyHifiCharger, {0.25f,0.5f}},
+			{EnemyType::EnemyHifiCharger, {0.75f,0.5f}},
+			{EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
+			{EnemyType::EnemyHealer, {0.9f,0.5f}},
+				{EnemyLaserSniper, {0.7f,0.3f}},
+				{EnemyHifiTrail, {0.7f,0.7f}},
+				{EnemyLaserSniper, {0.3f,0.3f}},
+			});
 			registry.invincibles.emplace(player);
-			closeDoors( soundPlayer);
 			break;
 		}
 		case 1: {
@@ -465,6 +467,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				addEffect(player, stack.stack, soundPlayer);
 				registry.invincibles.emplace(player);
 				object.dialogueCount++;
+				MapSystem::clearRoomActors();
 				Map &map = registry.maps.components[0];
 				switch (map.currRegion) {
 					case Physics: {
@@ -476,7 +479,6 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						break;
 					}
 				}
-				registry.deleteds.emplace(reaction.object);
 			}
 		}
 		if (object.item == InteractableItem::Swarm) {

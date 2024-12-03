@@ -683,7 +683,7 @@ const RoomPreset TreasureRoom3{
     0,
     "TreasureRoom3",
     false,
-     {2600, 2200},
+     {2000, 1500},
 };
 
 const RoomPreset TreasureRoom4{
@@ -695,7 +695,7 @@ const RoomPreset TreasureRoom4{
     0,
     "TreasureRoom4",
     false,
-     {2600, 2200},
+     {2000, 1500},
 };
 
 const RoomPreset TreasureRoom5{
@@ -791,7 +791,7 @@ const RoomPreset TreasureRoomWish{
     0,
     "TreasureRoomWish",
     true,
-     {1300, 1300},
+     {1800, 2000},
 };
 
 

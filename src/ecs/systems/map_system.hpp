@@ -10,6 +10,7 @@ class MapSystem {
     public:
         MapSystem();
         ~MapSystem();
+        static void clearRoomActors();
         void init(RenderSystem *renderer, SoundSystem *soundPlayer_arg);
         void step(float elapsed_ms);
     private:
@@ -17,6 +18,7 @@ class MapSystem {
         void resetMap();
         void changeRoom(RoomType type,int doorIndex);
         void handleMapRequests();
+
         void newMap();
         void updateBgPositions();
         void decorateRoom();

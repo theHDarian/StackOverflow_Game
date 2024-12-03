@@ -369,12 +369,12 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	registry.backgrounds.emplace(console);
 
 	// can use aabb as near player range for now for pseudo-offsetting
-	AABBCollider &aabb = registry.aabbs.emplace(console);
-	aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
-	aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
+	//AABBCollider &aabb = registry.aabbs.emplace(console);
+	//aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	//aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
 
-	// CircleCollider &cc = registry.circleColliders.emplace(console);
-	// cc.radius = m.scale.y / 4;
+	 CircleCollider &cc = registry.circleColliders.emplace(console);
+	 cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "FightConsole";
@@ -413,12 +413,12 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 	registry.backgrounds.emplace(console);
 
 	// can use aabb as near player range for now for pseudo-offsetting
-	AABBCollider &aabb = registry.aabbs.emplace(console);
-	aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
-	aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
+	//AABBCollider &aabb = registry.aabbs.emplace(console);
+	//aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	//aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
 
-	// CircleCollider &cc = registry.circleColliders.emplace(console);
-	// cc.radius = m.scale.y / 4;
+	 CircleCollider &cc = registry.circleColliders.emplace(console);
+	 cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PopStack";
@@ -444,9 +444,9 @@ Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 	object.name = "HoneyCanister";
 	object.item = InteractableItem::HoneyCanister;
 	registry.circleColliders.emplace(entity).radius = 100;
-	AABBCollider &aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-100, -150);
-	aabb.bottomRight = vec2(100, 150);
+	//AABBCollider &aabb = registry.aabbs.emplace(entity);
+	//aabb.topLeft = vec2(-100, -150);
+	//aabb.bottomRight = vec2(100, 150);
 
 	return entity;
 }
@@ -539,9 +539,9 @@ Entity createWishGranter(RenderSystem *renderer, vec2 pos)
 	object.name = "WishGranter";
 	object.item = InteractableItem::WishGranter;
 	registry.circleColliders.emplace(entity).radius = 100;
-	AABBCollider &aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-100, -150);
-	aabb.bottomRight = vec2(100, 150);
+	//AABBCollider &aabb = registry.aabbs.emplace(entity);
+	//aabb.topLeft = vec2(-100, -150);
+	//aabb.bottomRight = vec2(100, 150);
 	Animation &a = registry.animations.emplace(entity);
 	a.max_frames = 4;
 	a.animation_countdown_base = 200;
@@ -556,9 +556,9 @@ Entity createOracleCrab(RenderSystem *renderer, vec2 pos)
 	object.name = "OracleCrab";
 	object.item = InteractableItem::OracleCrab;
 	registry.circleColliders.emplace(entity).radius = 100;
-	AABBCollider &aabb = registry.aabbs.emplace(entity);
-	aabb.topLeft = vec2(-100, -150);
-	aabb.bottomRight = vec2(100, 150);
+	//AABBCollider &aabb = registry.aabbs.emplace(entity);
+	//aabb.topLeft = vec2(-100, -150);
+	//aabb.bottomRight = vec2(100, 150);
 
 	return entity;
 }
