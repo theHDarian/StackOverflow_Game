@@ -143,6 +143,12 @@ const BulletStackEffect bulletPierceUpA = {
 	1,
 	"Pierce Up (A)",
 	""};
+const BulletStackEffect bulletPierceUpAII = {
+	Pierce,
+	Additive,
+	2,
+	"Pierce Up II (A)",
+	""};
 
 const BulletStackEffect bulletPierceUpM = {
 	Pierce,
@@ -161,7 +167,7 @@ const BulletStackEffect bulletBounceUpA = {
 const BulletStackEffect bulletBounceUpM = {
 	Bounce,
 	Multiplicative,
-	.5,
+	1,
 	"Bounce Up (M)",
 	""};
 
@@ -777,8 +783,8 @@ const AttackData FastLaser{
 	,0
 	,{20, 20}
 	,0
-	, 1025
-	,{5000, 0}
+	, 2000
+	,{5000, 0.95}
 	,0
 	,0
 	,0
@@ -862,7 +868,7 @@ struct Quadshooter : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0, 0)};
 		scale = vec2({240.0f / 2, 240.f / 2});
-		rotatePower = 0.f;
+		rotatePower = 1.f;
 	};
 };
 
@@ -1688,7 +1694,7 @@ struct HifiTemporaryBoid : Enemy
 		ReactionType::DURATION,
 		1
 	};
-	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 1000.f, 1000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 9000.f, 9000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
 	EnemyPattern die = { "DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,1}}, 1, false, 0.f, 0.f, NoAttack };;
 	HifiTemporaryBoid()
 	{
@@ -1859,7 +1865,7 @@ struct TwinLaserVertical1 : Enemy {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.01,0.01},{0.01,0.99},{0.01,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
 	TwinLaserVertical1()
 	{
-		maxHealth = 300;
+		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
@@ -1874,6 +1880,7 @@ struct TwinLaserVertical1 : Enemy {
 		rotationBehaviour = EnemyRotationBehavior::FACE_TWIN;
 	};
 };
+
 struct TwinLaserVertical2 : TwinLaserVertical1 {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
 	TwinLaserVertical2() : TwinLaserVertical1() {
@@ -1920,7 +1927,7 @@ struct HifiSniper : Enemy
 	const AttackData HifiSniperShot{
 		EnemyAttackPattern::BURST,
 		TRIANGLE,
-		{APRounds, dmgUpM, bulletRangeUpM},
+		{bulletPierceUpAII, bulletSpeedUpM},
 		blunt,
 		4,
 		0,
@@ -2042,7 +2049,7 @@ struct HifiCharger : Enemy
 
 	HifiCharger()
 	{
-		maxHealth = 120;
+		maxHealth = 70;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, randomPosNoCharge};
 		sprite = {
@@ -2089,7 +2096,7 @@ struct HifiChargerHard : Enemy
 
 	HifiChargerHard()
 	{
-		maxHealth = 120;
+		maxHealth = 90;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3, randomPosNoCharge};
 		sprite = {
@@ -2330,6 +2337,392 @@ struct HifiTrailHard : Enemy
 	};
 };
 
+struct HifiJellyFish : Enemy
+{
+	/**
+	 * Jellyfish pattern attacks
+	 */
+	const BulletStackEffect playerSpeedDownASmall = {
+		PlayerSpeed,
+		Additive,
+		-30,
+		"Movement Speed Down Small (A)",
+		""};
+
+	const AttackData spiral{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{numBulletsUpA, playerSpeedDownASmall},
+		blunt,
+		10,
+		0.0,
+		{20, 20},
+		400,
+		5000,
+		{200, -2 * M_PI / 2.0},
+		0,
+		0,
+		0};
+	const AttackData spiky{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{numBulletsUpA, dashCDRDownA},
+		blunt,
+		6,
+		0.0,
+		{20, 20},
+		300,
+		2000,
+		{200, 0},
+		0,
+		0,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::RANDOM,
+		{},
+		0,
+		4000.f,
+		4000.f,
+		{
+			{ReactionType::DURATION,1},
+		},
+		1,
+		true,
+		0.f,
+		500.f,
+		NoAttack};
+
+	EnemyPattern chargingState = {
+		"CHARGE",
+		EnemyBehavior::RANDOM,
+		{},
+		0,
+		500.f,
+		500.f,
+		{{ReactionType::DURATION, 2}},
+		2,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern chargingState2 = {
+		"CHARGE",
+		EnemyBehavior::CHARGING,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 3}},
+		3,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 4}},
+		4,
+		true,
+		250.f,
+		250.f,
+		spiral};
+	
+	EnemyPattern chargingState3 = {
+		"CHARGE",
+		EnemyBehavior::RECOIL,
+		{},
+		0,
+		500.f,
+		500.f,
+		{{ReactionType::DURATION, 5}},
+		5,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+	EnemyPattern shootingState2 = {
+		"ROTATE",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		250.f,
+		250.f,
+		spiky};
+
+	HifiJellyFish()
+	{
+		maxHealth = 150;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState, chargingState3, shootingState2};
+		rotationBehaviour = EnemyRotationBehavior::SPIN;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_008.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 2.0;
+		rotatePower = 2;
+	};
+};
+
+struct HifiTackShooter : Enemy
+{
+	/**
+	 * Stationary turret that attacks within a range around it 
+	 */
+	const BulletStackEffect playerSpeedDownASmall = {
+		PlayerSpeed,
+		Additive,
+		-30,
+		"Movement Speed Down Small (A)",
+		""};
+
+	const AttackData spiral{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{key},
+		sluggish,
+		10,
+		0.0,
+		{20, 20},
+		400,
+		2000,
+		{200, -2 * M_PI / 2.0},
+		0,
+		0,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::IDLE,
+		{},
+		0,
+		2000.f,
+		2000.f,
+		{
+			{ReactionType::DURATION,0},
+			{ReactionType::PLAYER_CLOSE,1}
+		},
+		0,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 2}},
+		2,
+		true,
+		500.f,
+		500.f,
+		spiral};
+	EnemyPattern rotateState2 = {
+		"Follow Player",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		2000.f,
+		2000.f,
+		{
+			{ReactionType::DURATION,0},
+		},
+		0,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	HifiTackShooter()
+	{
+		maxHealth = 250;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, shootingState,rotateState2};
+		rotationBehaviour = EnemyRotationBehavior::SPIN;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_009.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 0;
+		rotatePower = 3;
+	};
+};
+
+struct HifiBallLauncher : Enemy
+{
+	/**
+	 * 
+	 */
+	const BulletStackEffect playerSpeedDownASmall = {
+		PlayerSpeed,
+		Additive,
+		-30,
+		"Movement Speed Down Small (A)",
+		""};
+
+	const AttackData launch{
+		EnemyAttackPattern::RADIAL,
+		CIRCLE,
+		{bulletBounceUpM,bulletBounceUpA},
+		blunt,
+		4,
+		M_PI/4.f,
+		{30, 30},
+		600,
+		10000,
+		{0, 0},
+		0,
+		2,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		500.f,
+		500.f,
+		{
+			{ReactionType::DURATION,1},
+		},
+		1,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::IDLE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		0.f,
+		500.f,
+		launch};
+
+	HifiBallLauncher()
+	{
+		maxHealth = 90;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, shootingState};
+		rotationBehaviour = EnemyRotationBehavior::REGULAR;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_009.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 0;
+		rotatePower = 2;
+	};
+};
+
+struct HifiWhip: Enemy
+{
+	/**
+	 * Expanding whip
+	 */
+	const AttackData whip{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{dmgUpA},
+		blunt,
+		2,
+		-M_PI/4.f,
+		{15, 15},
+		400,
+		2000,
+		{200, M_PI/1.5},
+		0,
+		2,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		500.f,
+		500.f,
+		{
+			{ReactionType::DURATION,1},
+		},
+		1,
+		true,
+		0.f,
+		0.f,
+		whip};
+
+	EnemyPattern restState = {
+		"ROTATE",
+		EnemyBehavior::IDLE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		0.f,
+		500.f,
+		NoAttack};
+
+	HifiWhip()
+	{
+		maxHealth = 150;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, restState};
+		rotationBehaviour = EnemyRotationBehavior::REGULAR;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_006.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 0;
+		rotatePower = 2;
+	};
+};
+
 struct HifiCannon : Enemy
 {
 	const AttackData cannonShot{
@@ -2372,7 +2765,7 @@ struct HifiCannon : Enemy
 
 	HifiCannon()
 	{
-		maxHealth = 250;
+		maxHealth = 150;
 		currHealth = maxHealth;
 		enemyPatterns = {random1, chargingState, backUp, shootCannon, shootCluster};
 		patternIndex = 0;

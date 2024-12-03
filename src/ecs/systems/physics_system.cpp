@@ -84,9 +84,12 @@ void PhysicsSystem::step(float elapsed_ms)
 				{
 					motion.angle += laser.rotation;
 				}
-				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER || enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
+				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER)
 				{
 					motion.angle = start.angle;
+				}
+				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
+					motion.angle = laser.rotation * motion.angle + (1.f - laser.rotation) * start.angle;
 				}
 				if (laser.growth < 100.f || (eBullet.initialRange - eBullet.bulletRange > 1000))
 					laser.length += laser.growth;

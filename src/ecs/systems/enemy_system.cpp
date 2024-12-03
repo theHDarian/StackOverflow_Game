@@ -133,6 +133,8 @@ void EnemySystem::step(float elapsed_ms)
             {
                 float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
                 float rotationChange = angularSpeed * elapsed_ms / 1000.f;
+                if (enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
+                    rotationChange *= enemy.rotatePower;
                 motion.angle += rotationChange;
             }
             else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
@@ -458,6 +460,9 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
     for (uint i = 0; i < atkData.numBullets; i++)
     {
         float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
+        if (registry.enemies.get(enemy).rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
+            a = registry.motions.get(enemy).angle + i * (2 * M_PI / atkData.numBullets);
+        }
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
 }
