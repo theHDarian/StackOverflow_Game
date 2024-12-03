@@ -783,8 +783,8 @@ const AttackData FastLaser{
 	,0
 	,{20, 20}
 	,0
-	, 1025
-	,{5000, 0}
+	, 2000
+	,{5000, 0.95}
 	,0
 	,0
 	,0
@@ -1694,7 +1694,7 @@ struct HifiTemporaryBoid : Enemy
 		ReactionType::DURATION,
 		1
 	};
-	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 1000.f, 1000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 9000.f, 9000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
 	EnemyPattern die = { "DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,1}}, 1, false, 0.f, 0.f, NoAttack };;
 	HifiTemporaryBoid()
 	{
@@ -1865,7 +1865,7 @@ struct TwinLaserVertical1 : Enemy {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.01,0.01},{0.01,0.99},{0.01,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
 	TwinLaserVertical1()
 	{
-		maxHealth = 300;
+		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
@@ -1880,6 +1880,7 @@ struct TwinLaserVertical1 : Enemy {
 		rotationBehaviour = EnemyRotationBehavior::FACE_TWIN;
 	};
 };
+
 struct TwinLaserVertical2 : TwinLaserVertical1 {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
 	TwinLaserVertical2() : TwinLaserVertical1() {
@@ -2048,7 +2049,7 @@ struct HifiCharger : Enemy
 
 	HifiCharger()
 	{
-		maxHealth = 120;
+		maxHealth = 70;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, randomPosNoCharge};
 		sprite = {
@@ -2095,7 +2096,7 @@ struct HifiChargerHard : Enemy
 
 	HifiChargerHard()
 	{
-		maxHealth = 120;
+		maxHealth = 90;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3, randomPosNoCharge};
 		sprite = {
@@ -2464,7 +2465,7 @@ struct HifiJellyFish : Enemy
 
 	HifiJellyFish()
 	{
-		maxHealth = 200;
+		maxHealth = 150;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState, chargingState3, shootingState2};
@@ -2536,8 +2537,8 @@ struct HifiTackShooter : Enemy
 		{{ReactionType::DURATION, 2}},
 		2,
 		true,
-		250.f,
-		250.f,
+		500.f,
+		500.f,
 		spiral};
 	EnemyPattern rotateState2 = {
 		"Follow Player",
@@ -2634,7 +2635,7 @@ struct HifiBallLauncher : Enemy
 
 	HifiBallLauncher()
 	{
-		maxHealth = 250;
+		maxHealth = 90;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, shootingState};
@@ -2704,7 +2705,7 @@ struct HifiWhip: Enemy
 
 	HifiWhip()
 	{
-		maxHealth = 250;
+		maxHealth = 150;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, restState};
@@ -2764,7 +2765,7 @@ struct HifiCannon : Enemy
 
 	HifiCannon()
 	{
-		maxHealth = 250;
+		maxHealth = 150;
 		currHealth = maxHealth;
 		enemyPatterns = {random1, chargingState, backUp, shootCannon, shootCluster};
 		patternIndex = 0;

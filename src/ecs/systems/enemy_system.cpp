@@ -460,6 +460,9 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
     for (uint i = 0; i < atkData.numBullets; i++)
     {
         float a = atkData.angleOffset + i * (2 * M_PI / atkData.numBullets);
+        if (registry.enemies.get(enemy).rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
+            a = registry.motions.get(enemy).angle + i * (2 * M_PI / atkData.numBullets);
+        }
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
 }
