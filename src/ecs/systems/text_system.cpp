@@ -216,8 +216,10 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
 
         // approximate next word length and compare with text box size
         if ((x + text.length() * (Characters[65].Advance >> 6) * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
-            y -= ((Characters[65].Size.y)) * 2.0 * scale;
-            x = copyX;
+            if (text.compare("\n") != 0) {
+                y -= ((Characters[65].Size.y)) * 2.0 * scale;
+                x = copyX;
+            }
         }
         if (y > topRightBound.y || y < bottomLeftBound.y) {
             // do nothing for now, unless want to write text that goes up and down

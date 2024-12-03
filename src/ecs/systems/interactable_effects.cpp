@@ -337,6 +337,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				keyItems.honey++;
 				RenderRequest& req = registry.renderRequests.get(reaction.object);
 				req.texture_name = "HoneyCanisterEmpty.png";
+				object.dialogueCount++;
 
 				Map& map = registry.maps.components[0];
 				closeDoors(soundPlayer);
