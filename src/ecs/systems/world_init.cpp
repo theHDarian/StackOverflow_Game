@@ -1351,6 +1351,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		break;
 	case EnemyType::EnemyHifiTemporaryBoid:
 		enemy = HifiTemporaryBoid();
+		Boid &boid = registry.boids.emplace(entity);
+		boid.position = pos;
+		float randomX = getRandomFloat(-150.f, 150.f);
+		float randomY = getRandomFloat(-150.f, 150.f);
+		boid.velocity = vec2(randomX, randomY);
+		boid.maxSpeed = 500.f;
 		break;
 	case EnemyType::HifiEnemyCharger:
 		break;

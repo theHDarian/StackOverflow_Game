@@ -1688,8 +1688,8 @@ struct HifiTemporaryBoid : Enemy
 		ReactionType::DURATION,
 		1
 	};
-	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 10000.f, 10000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
-	EnemyPattern die = { "DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {}, 1, false, 0.f, 0.f, NoAttack };;
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 1000.f, 1000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
+	EnemyPattern die = { "DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,1}}, 1, false, 0.f, 0.f, NoAttack };;
 	HifiTemporaryBoid()
 	{
 		maxHealth = 1;

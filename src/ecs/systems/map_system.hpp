@@ -23,11 +23,5 @@ class MapSystem {
 
     void loadMusic();
 
-    Mix_Music* backgroundMusic;
-    std::vector<SoundRequest> normalRoomMusic;
-    std::vector<SoundRequest> bossRoomMusic;
-    std::vector<SoundRequest> specialRoomMusic;
-    int currMusicIndex;
-
     SoundSystem* soundPlayer;
 };
