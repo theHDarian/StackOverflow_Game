@@ -91,6 +91,16 @@ void EnemySystem::step(float elapsed_ms)
             heal(entity, pattern);
         }
 
+        if (pattern.type == EnemyBehavior::DEATHSTATE)
+        {
+            // std::cout << "got here" << std::endl;
+            if (!registry.deleteds.has(entity))
+            {
+                Fade &f = registry.fades.emplace(entity);
+                registry.deleteds.emplace(entity);
+            }
+        }
+
         // for (Entity deletedBee : pendingDeletion)
         //{
         //     //std::cout << pendingDeletion.size() << "to be delted" << std::endl;
@@ -278,20 +288,6 @@ void EnemySystem::step(float elapsed_ms)
             else if (registry.damageds.has(entity))
             {
                 registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
-            }
-        }
-    }
-    for (auto &entity : registry.invisibleEnemy.entities)
-    {
-        Enemy &enemyStat = registry.enemies.get(entity);
-        EnemyPattern &pattern = enemyStat.currEnemyPattern();
-        if (pattern.type == EnemyBehavior::DEATHSTATE)
-        {
-            // std::cout << "got here" << std::endl;
-            if (!registry.deleteds.has(entity))
-            {
-                Fade &f = registry.fades.emplace(entity);
-                registry.deleteds.emplace(entity);
             }
         }
     }
