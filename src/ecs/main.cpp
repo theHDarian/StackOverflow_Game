@@ -91,6 +91,7 @@ int main() {
 		t = now;
 		uiSystem.step(elapsed_ms);
 		sceneSystem.step(elapsed_ms); // not sure if this should always be here
+		soundSystem.step(elapsed_ms);
 		world.handleInput(); // to allow for pausing while cutscene is happening, can be taken out later
 
 		if (ioSystem.isPaused() || ioSystem.isGameOver() || ioSystem.isTitle()) {
@@ -115,7 +116,6 @@ int main() {
 			aiSystem.step(elapsed_ms);
 			enemySystem.step(elapsed_ms);
 			particleSystem.step(elapsed_ms);
-			soundSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
 		}
