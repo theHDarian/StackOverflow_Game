@@ -181,6 +181,7 @@ void UISystem::step(float elapsed_ms) {
 					if (clickedButtonIndex != 0) {
 						registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
 						ioState.activeMenu--;
+						gameState.currentVolume = gameState.previousVolume;
 					}
 				}
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::ControlsMenu) {

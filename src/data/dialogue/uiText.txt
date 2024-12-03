@@ -3,7 +3,7 @@
 # followed by a body of text
 
 UI ControlsGuide
-Controls:\n
+Controls:
 [WASD] to move
 [SPACE/RMB] to dash
 [LMB] to shoot
