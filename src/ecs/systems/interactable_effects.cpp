@@ -162,7 +162,7 @@ void closeDoors (SoundSystem* soundPlayer) {
 			}
 			registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
 			registry.interactables.get(registry.doors.entities[i]).item = ClosedDoor;
-			registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
+			registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
 		}
 	}
 	map.currRoom.type = RoomType::EnemyRoom;
