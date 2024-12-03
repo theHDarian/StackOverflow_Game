@@ -279,10 +279,11 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 
 		if (object.name.compare("OpenDoor") == 0) {
 			assert(registry.doors.has(reaction.object));
+			// doesn't actually do anything, but leave here for now
 
-			if (reaction.choice == 0) {
-				registry.mapRequests.emplace(reaction.object, MapRequestType::ChangeRoom, registry.doors.get(reaction.object).room, registry.doors.get(reaction.object).doorIndex);
-			}
+			//if (reaction.choice == 0) {
+			//	registry.mapRequests.emplace(reaction.object, MapRequestType::ChangeRoom, registry.doors.get(reaction.object).room, registry.doors.get(reaction.object).doorIndex);
+			//}
 		}
 
 		if (object.item == PopConsole) { // the choices are known implicitly by person who wrote object script for now

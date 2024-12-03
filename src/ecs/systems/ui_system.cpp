@@ -355,36 +355,42 @@ void UISystem::step(float elapsed_ms) {
 		stackui.bulletPositions.resize(stack.currStack.size());
 	}
 
-	// is the player hovering over a stack ui bullet right now?
-	// bad: copies code from render system; consider making each bullet an entity
-	// may optimize using some other method like colour picking/just limiting search size
-	// in the future (since search space is pretty deterministic)
-	int bulletHoveredIndex = -1;
-	int count = -1;
-	vec2 bulletSize = stackui.bulletSize;
-	// should check first: is it in stack ui at all?
-	// this is point in aabb detection
-	if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
-		&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
-		for (vec2 bulletPos : stackui.bulletPositions) {
-			count++;
-			if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
-				&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
-				bulletHoveredIndex = count;
-				break;
+	if (gameState.gamePaused || gameState.dialogueScene || registry.maps.components[0].currRoom.cleared) {
+		// is the player hovering over a stack ui bullet right now?
+		// bad: copies code from render system; consider making each bullet an entity
+		// may optimize using some other method like colour picking/just limiting search size
+		// in the future (since search space is pretty deterministic)
+		int bulletHoveredIndex = -1;
+		int count = -1;
+		vec2 bulletSize = stackui.bulletSize;
+		// should check first: is it in stack ui at all?
+		// this is point in aabb detection
+		if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+			&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+			for (vec2 bulletPos : stackui.bulletPositions) {
+				count++;
+				if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+					&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+					bulletHoveredIndex = count;
+					break;
+				}
 			}
+			if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
+				updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset,
+					stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+			}
+			else if (bulletHoveredIndex == -1) {
+				registry.renderRequests.get(bulletUI).show = false;
+				registry.renderRequests.get(bulletUIArrow).show = false;
+			}
+			else {
+			}
+			lastHoveredBullet = bulletHoveredIndex;
 		}
-		if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
-			updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset, 
-				stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
-		}
-		else if (bulletHoveredIndex == -1){
+		else {
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
 		}
-		else {
-		}
-		lastHoveredBullet = bulletHoveredIndex;
 	}
 	else {
 		registry.renderRequests.get(bulletUI).show = false;
