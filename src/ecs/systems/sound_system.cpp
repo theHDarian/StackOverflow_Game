@@ -321,9 +321,6 @@ void SoundSystem::playNextMusic()
 }
 
 void SoundSystem::playNextMusic(int songIndex) {
-    if (songIndex == currMusicIndex) {
-        return;
-    }
 
     Mix_HaltMusic();
     currMusicIndex = songIndex;
@@ -357,9 +354,6 @@ void SoundSystem::playTitleMusic()
 }
 
 void SoundSystem::playBossMusic(int songIndex) {
-    if (songIndex == currMusicIndex) {
-        return;
-    }
     Mix_HaltMusic();
     currMusicIndex = songIndex;
     currentBGM = &bossRoomMusic[currMusicIndex];
@@ -382,9 +376,6 @@ void SoundSystem::playSpecialMusic()
 }
 
 void SoundSystem::playSpecialMusic(int songIndex) {
-    if (songIndex == currMusicIndex) {
-        return;
-    }
     Mix_HaltMusic();
     currMusicIndex = songIndex;
     currentBGM = &specialRoomMusic[currMusicIndex];
