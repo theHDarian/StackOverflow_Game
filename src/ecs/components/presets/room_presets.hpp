@@ -1183,14 +1183,19 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
         return BossRoom;
     }
 
-    if (Random::Float() < 0.5f) { //enemy room has higher chance of being rolled
+    float r = Random::Float();
+
+    if (r < 0.65f) { //enemy room has higher chance of being rolled
         return RoomType::EnemyRoom;
+    }
+    if (r < 0.75f) { //enemy room has higher chance of being rolled
+        return RoomType::RestRoom;
     }
 
 
     std::vector<RoomType> possibleRooms;
     if (!excludeNone) {
-        possibleRooms.push_back(RoomType::None);
+        possibleRooms.push_back(RoomType::EnemyRoom);
     }
     if (hasLocked(RoomType::EventRoom, roomsTraversed) || hasUnlocked(RoomType::EventRoom, roomsTraversed)) {
         possibleRooms.push_back(RoomType::EventRoom);
@@ -1198,18 +1203,40 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
     if (hasLocked(RoomType::TreasureRoom, roomsTraversed) || hasUnlocked(RoomType::TreasureRoom, roomsTraversed)) {
         possibleRooms.push_back(RoomType::TreasureRoom);
     }
-    if ((hasLocked(RoomType::RestRoom, roomsTraversed) || hasUnlocked(RoomType::RestRoom, roomsTraversed)) && Random::Float() < 0.25f) {
-        possibleRooms.push_back(RoomType::RestRoom);
-    }
     return Random::ListItem(possibleRooms);
+}
 
-    // else if (Random::Float() >  0.5f && Random::Float() < 0.7f) {
-    //     return RoomType::TreasureRoom;
-    // }  else if (Random::Float() > 0.7f && Random::Float() < 0.80f) {
-    //     return RoomType::EventRoom;
-    // }
-    //
-    // return static_cast<RoomType>(Random::Int(excludeNone ? RoomType::None - 1 : RoomType::None));
+inline std::vector<RoomType> getRandomRoomTypes(bool excludeNone, int roomsTraversed)
+{
+    const int bossRoomNum = 12;
+    if (roomsTraversed % bossRoomNum == bossRoomNum - 1) {
+        return { RoomType::BossRoom,RoomType::BossRoom ,RoomType::BossRoom ,RoomType::BossRoom };
+    }
+
+    std::vector<RoomType> out = { RoomType::EnemyRoom, RoomType::EnemyRoom, RoomType::EnemyRoom, RoomType::EnemyRoom};
+    bool treasure = false;
+    bool rest = false;
+    bool event = false;
+    for (int i = 0; i < 4; i++) {
+        float r = Random::Float();
+        if (r < 0.600f) continue;
+        if (r < 0.700f && !rest && !(treasure && event)) {
+            out[i] = RoomType::RestRoom;
+            rest = true;
+        }
+        else if (r < 0.850f && !treasure && !(rest && event)) {
+            out[i] = RoomType::TreasureRoom;
+            treasure = true;
+        } 
+        else if (r < 1.000f && !event && !(treasure && rest)) {
+            out[i] = RoomType::EventRoom; 
+            event = true;
+        }
+    }
+
+    if (!treasure && !rest && !event && Random::Float() < 0.3) out[rand() % 4] = RoomType::RestRoom;
+
+    return out;
 }
 
 inline RoomPreset getRoomPreset(RoomType type, bool locked) {

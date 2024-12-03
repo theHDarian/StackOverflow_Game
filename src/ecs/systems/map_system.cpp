@@ -249,6 +249,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     int lockedRooms = 0;
     bool excludeNone = false;
+    std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
     for (int i = 0; i < doors.size(); i++)
     {
         // reset previous room type
@@ -260,7 +261,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         DoorSymbol &ds = registry.doorSymbols.components[i];
         d.reset();
 
-        d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
+        d.room = newRooms[i];
         if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
             //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
             std:: cout << "Spawning locked room" << std::endl;
@@ -271,7 +272,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
         } else {
             if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
-                d.room = RoomType::EnemyRoom;
+                //d.room = RoomType::EnemyRoom;
             }
         }
         if (d.room == RoomType::None) {
@@ -363,11 +364,12 @@ void MapSystem::newMap()
 
         int lockedRooms = 0;
         bool excludeNone = false;
+        std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
             d.reset();
-            d.room = getRandomRoomType(excludeNone, map.roomsTraversed);
+            d.room = newRooms[i];
 
             if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
                 //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
@@ -379,7 +381,7 @@ void MapSystem::newMap()
                 d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
             } else {
                 if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
-                    d.room = RoomType::EnemyRoom;
+                    //d.room = RoomType::EnemyRoom;
                 }
             }
             registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
