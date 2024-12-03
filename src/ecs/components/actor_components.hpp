@@ -306,6 +306,7 @@ enum EnemyType {
     EnemyLaserSniper,
     EnemyHifiTemporaryBoid,
     EnemyHifiJellyFish,
+    EnemyHifiTackShooter,
     ScientistradialAttack,
     ScientistexplosiveAttack,
     ScientistHomingAttack,

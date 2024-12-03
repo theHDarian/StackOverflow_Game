@@ -133,6 +133,8 @@ void EnemySystem::step(float elapsed_ms)
             {
                 float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
                 float rotationChange = angularSpeed * elapsed_ms / 1000.f;
+                if (enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
+                    rotationChange *= enemy.rotatePower;
                 motion.angle += rotationChange;
             }
             else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)

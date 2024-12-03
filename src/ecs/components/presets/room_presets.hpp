@@ -1248,6 +1248,10 @@ const RoomPreset EnemyRoomLaserFiesta {
 const RoomPreset HifiRoomJellyFish {
     {
         {EnemyHifiJellyFish, {0.5f, 0.5f}},
+        {EnemyHifiTackShooter, {0.8,0.2}},
+        {EnemyHifiTackShooter, {0.8,0.8}},
+        {EnemyHifiTackShooter, {0.2,0.2}},
+        {EnemyHifiTackShooter, {0.2,0.8}},
     },
     {},
     {},

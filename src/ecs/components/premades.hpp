@@ -862,7 +862,7 @@ struct Quadshooter : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0, 0)};
 		scale = vec2({240.0f / 2, 240.f / 2});
-		rotatePower = 0.f;
+		rotatePower = 1.f;
 	};
 };
 
@@ -2473,6 +2473,99 @@ struct HifiJellyFish : Enemy
 		scale = vec2(240, 240) * 0.5f;
 		speedMultiplier = 2.0;
 		rotatePower = 2;
+	};
+};
+
+struct HifiTackShooter : Enemy
+{
+	/**
+	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
+	 */
+	const BulletStackEffect playerSpeedDownASmall = {
+		PlayerSpeed,
+		Additive,
+		-30,
+		"Movement Speed Down Small (A)",
+		""};
+
+	const AttackData spiral{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{key},
+		sluggish,
+		10,
+		0.0,
+		{20, 20},
+		400,
+		2000,
+		{200, -2 * M_PI / 2.0},
+		0,
+		0,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::IDLE,
+		{},
+		0,
+		2000.f,
+		2000.f,
+		{
+			{ReactionType::DURATION,0},
+			{ReactionType::PLAYER_CLOSE,1}
+		},
+		0,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 2}},
+		2,
+		true,
+		250.f,
+		250.f,
+		spiral};
+	EnemyPattern rotateState2 = {
+		"Follow Player",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		2000.f,
+		2000.f,
+		{
+			{ReactionType::DURATION,0},
+		},
+		0,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	HifiTackShooter()
+	{
+		maxHealth = 250;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, shootingState,rotateState2};
+		rotationBehaviour = EnemyRotationBehavior::SPIN;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_009.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 0;
+		rotatePower = 3;
 	};
 };
 
