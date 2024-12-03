@@ -1356,6 +1356,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	case EnemyType::EnemyHifiJellyFish: enemy = HifiJellyFish(); break;
 	case EnemyType::EnemyHifiTackShooter: enemy = HifiTackShooter(); break;
+	case EnemyType::EnemyHifiBallLauncher: enemy = HifiBallLauncher(); break;
 	case EnemyType::ScientistlaserAttack:
 	{
 		enemy = InvisibleRotateLaserEnemy();

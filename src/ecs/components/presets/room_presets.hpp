@@ -1252,6 +1252,25 @@ const RoomPreset HifiRoomJellyFish {
         {EnemyHifiTackShooter, {0.8,0.8}},
         {EnemyHifiTackShooter, {0.2,0.2}},
         {EnemyHifiTackShooter, {0.2,0.8}},
+        {EnemyHifiBallLauncher,{0.4,0.6}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiRoomJellyFish",
+    false,
+    {2500, 2000}
+};
+
+const RoomPreset HifiRoomSniperBallLauncher {
+    {
+        {EnemyHifiBallLauncher,{0.5,0.5}},
+        {EnemySniper,{0.7,0.5}},
+        {EnemySniper,{0.3,0.5}},
+        {EnemySniper,{0.5,0.3}},
+        {EnemySniper,{0.5,0.7}},
     },
     {},
     {},

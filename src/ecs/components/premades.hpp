@@ -143,6 +143,12 @@ const BulletStackEffect bulletPierceUpA = {
 	1,
 	"Pierce Up (A)",
 	""};
+const BulletStackEffect bulletPierceUpAII = {
+	Pierce,
+	Additive,
+	2,
+	"Pierce Up II (A)",
+	""};
 
 const BulletStackEffect bulletPierceUpM = {
 	Pierce,
@@ -161,7 +167,7 @@ const BulletStackEffect bulletBounceUpA = {
 const BulletStackEffect bulletBounceUpM = {
 	Bounce,
 	Multiplicative,
-	.5,
+	1,
 	"Bounce Up (M)",
 	""};
 
@@ -1920,7 +1926,7 @@ struct HifiSniper : Enemy
 	const AttackData HifiSniperShot{
 		EnemyAttackPattern::BURST,
 		TRIANGLE,
-		{APRounds, dmgUpM, bulletRangeUpM},
+		{bulletPierceUpAII, bulletSpeedUpM},
 		blunt,
 		4,
 		0,
@@ -2566,6 +2572,83 @@ struct HifiTackShooter : Enemy
 		scale = vec2(240, 240) * 0.5f;
 		speedMultiplier = 0;
 		rotatePower = 3;
+	};
+};
+
+struct HifiBallLauncher : Enemy
+{
+	/**
+	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
+	 */
+	const BulletStackEffect playerSpeedDownASmall = {
+		PlayerSpeed,
+		Additive,
+		-30,
+		"Movement Speed Down Small (A)",
+		""};
+
+	const AttackData launch{
+		EnemyAttackPattern::RADIAL,
+		CIRCLE,
+		{bulletBounceUpM,bulletBounceUpA},
+		blunt,
+		4,
+		M_PI/4.f,
+		{30, 30},
+		600,
+		10000,
+		{0, 0},
+		0,
+		2,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		500.f,
+		500.f,
+		{
+			{ReactionType::DURATION,1},
+		},
+		1,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::IDLE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		0.f,
+		500.f,
+		launch};
+
+	HifiBallLauncher()
+	{
+		maxHealth = 250;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, shootingState};
+		rotationBehaviour = EnemyRotationBehavior::REGULAR;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_009.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 0;
+		rotatePower = 2;
 	};
 };
 
