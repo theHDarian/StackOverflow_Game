@@ -1696,7 +1696,7 @@ struct HifiTemporaryBoid : Enemy
 		currHealth = maxHealth;
 		enemyPatterns = { boidState , die};
 		sprite = {
-			"hifi_boid.png",
+			"enemy_tempBoid.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
