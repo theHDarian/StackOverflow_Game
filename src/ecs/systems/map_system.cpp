@@ -220,13 +220,19 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     if (s != old_s) {
         if (s == SoundType::normalBGM) {
             std::cout << "Playing normal music" << std::endl;
-            soundPlayer->playNextMusic();
+            // soundPlayer->playNextMusic();
+            auto& req = registry.soundRequests.emplace(Entity());
+            req.type = SoundType::normalBGM;
         } else if (s == SoundType::bossBGM) {
             std::cout << "Playing boss music" << std::endl;
-            soundPlayer->playBossMusic(0);
+            // soundPlayer->playBossMusic(0);
+            auto& req = registry.soundRequests.emplace(Entity());
+            req.type = SoundType::bossBGM;
         } else if (s == SoundType::specialBGM) {
             std::cout << "Playing special music" << std::endl;
-            soundPlayer->playSpecialMusic(0);
+            // soundPlayer->playSpecialMusic(0);
+            auto& req = registry.soundRequests.emplace(Entity());
+            req.type = SoundType::specialBGM;
         }
     } else {
         std::cout << "Not changing music" << std::endl;

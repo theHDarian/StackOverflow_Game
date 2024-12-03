@@ -11,62 +11,81 @@
 
 void SoundSystem::step(float elapsed_ms)
 {
-    for (int i = (int)registry.soundRequests.components.size() - 1; i >= 0; --i)
+    for (SoundRequest &soundRequest : registry.soundRequests.components)
     {
-        SoundRequest &soundRequest = registry.soundRequests.components[i];
 
-        if (soundRequest.type == SoundType::normalBGM)
-        {
-            playNextMusic();
+        switch (soundRequest.type) {
+            case SoundType::normalBGM:
+                playNextMusic();
+            break;
+
+            case SoundType::bossBGM:
+                if (soundRequest.songIndex == -1)
+                    playBossMusic(Random::Int(bossRoomMusic.size()));
+                else
+                    playBossMusic(soundRequest.songIndex);
+            break;
+
+            case SoundType::specialBGM:
+                if (soundRequest.songIndex == -1)
+                    playSpecialMusic();
+                else
+                    playSpecialMusic(soundRequest.songIndex);
+            break;
+
+            case SoundType::PlayerHurt:
+                playPlayerHurtSound();
+            break;
+
+            case SoundType::DashSound:
+                playPlayerDashSound();
+            break;
+
+            case SoundType::PlayerShoot:
+                playPlayerShootSound(soundRequest.ticks);
+            break;
+
+            case SoundType::EnemyShoot:
+                playEnemyShootSound(soundRequest.songIndex, soundRequest.loops);
+            break;
+
+            case SoundType::IncomingDialogue:
+                playIncomingDialogueSound();
+            break;
+
+            case SoundType::NormalDialogue:
+                playNextDialogueSound();
+            break;
+
+            case SoundType::DoorOpen:
+                playDoorOpenSound();
+            break;
+
+            case SoundType::itemPickup:
+                playItemPickupSound();
+            break;
+
+            case SoundType::rareItemPickup:
+                playRareItemPickupSound();
+            break;
+
+            case SoundType::explosion:
+                playExplosionSound(soundRequest.songIndex);
+
+            case SoundType::DoorClose:
+                playDoorCloseSound();
+
+            case SoundType::titleBGM:
+                playTitleMusic();
+
+            case SoundType::PlayerZapped:
+                playPlayerZappedSound();
+
+            default:
+                std::cerr << "Unknown sound type: " << soundRequest.type << std::endl;
+            break;
         }
-        else if (soundRequest.type == SoundType::bossBGM)
-        {
-            if (soundRequest.songIndex == -1)
-                playBossMusic(Random::Int(bossRoomMusic.size()));
-            playBossMusic(soundRequest.songIndex);
-        }
-        else if (soundRequest.type == SoundType::specialBGM)
-        {
-            if (soundRequest.songIndex == -1)
-                playSpecialMusic();
-            playSpecialMusic(soundRequest.songIndex);
-        }
-        else if (soundRequest.type == SoundType::PlayerHurt)
-        {
-            playPlayerHurtSound();
-        }
-        else if (soundRequest.type == SoundType::DashSound)
-        {
-            playPlayerDashSound();
-        }
-        else if (soundRequest.type == SoundType::PlayerShoot)
-        {
-            playPlayerShootSound(soundRequest.ticks);
-        }
-        else if (soundRequest.type == SoundType::EnemyShoot)
-        {
-            playEnemyShootSound(soundRequest.songIndex, soundRequest.loops);
-        }
-        else if (soundRequest.type == SoundType::IncomingDialogue)
-        {
-            playIncomingDialogueSound();
-        }
-        else if (soundRequest.type == SoundType::NormalDialogue)
-        {
-            playNextDialogueSound();
-        }
-        else if (soundRequest.type == SoundType::DoorOpen)
-        {
-            playDoorOpenSound();
-        }
-        else if (soundRequest.type == SoundType::itemPickup)
-        {
-            playItemPickupSound();
-        }
-        else if (soundRequest.type == SoundType::rareItemPickup)
-        {
-            playRareItemPickupSound();
-        }
+
     }
     registry.soundRequests.clear();
 }
@@ -302,14 +321,12 @@ void SoundSystem::playNextMusic()
 }
 
 void SoundSystem::playNextMusic(int songIndex) {
-    if (songIndex == currMusicIndex) {
-        return;
-    }
 
     Mix_HaltMusic();
     currMusicIndex = songIndex;
     currentBGM = &normalRoomMusic[currMusicIndex];
     if (currentBGM && currentBGM->music) {
+        std::cout << "normal music" << std::endl;
         if (Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000) == -1) {
     fprintf(stderr, "Error fading in music: %s\n", Mix_GetError());
 }
@@ -337,13 +354,11 @@ void SoundSystem::playTitleMusic()
 }
 
 void SoundSystem::playBossMusic(int songIndex) {
-    if (songIndex == currMusicIndex) {
-        return;
-    }
     Mix_HaltMusic();
     currMusicIndex = songIndex;
     currentBGM = &bossRoomMusic[currMusicIndex];
     if (currentBGM && currentBGM->music) {
+        std::cout << "boss music" << std::endl;
         if (Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000) == -1) {
     fprintf(stderr, "Error fading in music: %s\n", Mix_GetError());
 }
@@ -361,13 +376,11 @@ void SoundSystem::playSpecialMusic()
 }
 
 void SoundSystem::playSpecialMusic(int songIndex) {
-    if (songIndex == currMusicIndex) {
-        return;
-    }
     Mix_HaltMusic();
     currMusicIndex = songIndex;
     currentBGM = &specialRoomMusic[currMusicIndex];
     if (currentBGM && currentBGM->music) {
+        std::cout << "special music" << std::endl;
         if (Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000) == -1) {
     fprintf(stderr, "Error fading in music: %s\n", Mix_GetError());
 }

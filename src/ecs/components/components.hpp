@@ -110,6 +110,7 @@ enum SoundType {
 	specialBGM,
 	titleBGM,
 	PlayerHurt,
+	PlayerZapped,
 	DashSound,
 	PlayerShoot,
 	EnemyShoot,
