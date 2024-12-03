@@ -107,58 +107,75 @@ SoundSystem::~SoundSystem()
 
     if (Mix_PlayingMusic())
         Mix_HaltMusic();
+    for (auto& track : normalRoomMusic)
+    {
+        if (track.music != nullptr)
+            Mix_FreeMusic(track.music);
+    }
+    for (auto& track : bossRoomMusic)
+    {
+        if (track.music != nullptr)
+            Mix_FreeMusic(track.music);
+    }
+    for (auto& track : specialRoomMusic)
+    {
+        if (track.music != nullptr)
+            Mix_FreeMusic(track.music);
+    }
+
     Mix_CloseAudio();
 }
 
-void SoundSystem::loadMusic()
-{
-    roomMusic[0] = {SoundType::normalBGM, audio_path("room/game-music-loop-1.wav"), 0.25f, -1};
-    roomMusic[1] = {SoundType::normalBGM, audio_path("room/game-music-loop-2.wav"), 0.25f, -1};
-    roomMusic[2] = {SoundType::normalBGM, audio_path("room/game-music-loop-3.wav"), 0.25f, -1};
-    roomMusic[3] = {SoundType::normalBGM, audio_path("room/game-music-loop-4.wav"), 0.3f, -1};
-
-    // Ensure SDL audio system is initialized only once
-    if (!SDL_WasInit(SDL_INIT_AUDIO))
-    {
-        if (SDL_Init(SDL_INIT_AUDIO) < 0)
-        {
-            fprintf(stderr, "Failed to initialize SDL Audio: %s\n", SDL_GetError());
-            throw std::runtime_error("Failed to initialize SDL Audio");
-        }
-        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
-        {
-            fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
-            throw std::runtime_error("Failed to open audio device");
-        }
+void SoundSystem::loadMusic() {
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        fprintf(stderr, "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
     }
 
-    for (SoundRequest &track : roomMusic)
-    {
+    // Preload normal room music
+    normalRoomMusic = {
+                {SoundType::normalBGM, audio_path("room/game-music-loop-1.wav"), 0.25f, -1},
+        {SoundType::normalBGM, audio_path("room/game-music-loop-2.wav"), 0.25f, -1},
+        {SoundType::normalBGM, audio_path("room/game-music-loop-3.wav"), 0.25f, -1},
+        {SoundType::normalBGM, audio_path("room/game-music-loop-4.wav"), 0.3f, -1},
+    };
+
+    for (auto& track : normalRoomMusic) {
         track.music = Mix_LoadMUS(track.path.c_str());
-        normalRoomMusic.push_back(track);
-        std::cout << "Loaded background music " << track.path << std::endl;
+        if (!track.music) {
+            fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+        }
     }
 
-    SoundRequest boss = {SoundType::bossBGM, audio_path("boss/boss-music.wav"), 0.25f, -1};
-    boss.music = Mix_LoadMUS(boss.path.c_str());
-    bossRoomMusic.push_back(boss);
+    // Preload boss room music
+    bossRoomMusic = {
+        {SoundType::bossBGM, audio_path("boss/boss-music-1.wav"), 0.5f, -1},
+        // {SoundType::bossBGM, audio_path("boss/boss-music-2.wav"), 0.5f, -1},
+    };
 
-    SoundRequest special = {SoundType::specialBGM, audio_path("special/special-room.wav"), 0.25f, -1};
-    special.music = Mix_LoadMUS(special.path.c_str());
-    specialRoomMusic.push_back(special);
-
-    currentBGM = &roomMusic[0];
-
-    backgroundMusic = Mix_LoadMUS(currentBGM->path.c_str());
-    Mix_VolumeMusic(musicVolume * MIX_MAX_VOLUME * currentBGM->volume);
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
-        throw std::runtime_error("Failed to load background music");
+    for (auto& track : bossRoomMusic) {
+        track.music = Mix_LoadMUS(track.path.c_str());
+        if (!track.music) {
+            fprintf(stderr, "Failed to load boss music: %s\n", Mix_GetError());
+        }
     }
 
-    SoundRequest title = {SoundType::titleBGM, audio_path("title/title.wav"), 0.4f, -1};
+    // Preload special room music
+    specialRoomMusic = {
+        {SoundType::specialBGM, audio_path("event/event-room-1.wav"), 0.4f, -1},
+        // {SoundType::specialBGM, audio_path("event/event-room-2.wav"), 0.4f, -1},
+    };
+
+    for (auto& track : specialRoomMusic) {
+        track.music = Mix_LoadMUS(track.path.c_str());
+        if (!track.music) {
+            fprintf(stderr, "Failed to load special music: %s\n", Mix_GetError());
+        }
+    }
+
+    this->titleScreenMusic = {SoundType::titleBGM, audio_path("title/title.wav"), 0.4f, -1};
+    this->titleScreenMusic.music = Mix_LoadMUS(titleScreenMusic.path.c_str());
 }
+
 
 void SoundSystem::loadSoundEffects()
 {
@@ -286,79 +303,71 @@ void SoundSystem::playNextMusic()
     playNextMusic(nextMusicIndex);
 }
 
-void SoundSystem::playNextMusic(int songIndex)
-{
-    if (songIndex == currMusicIndex)
-    {
+void SoundSystem::playNextMusic(int songIndex) {
+    if (songIndex == currMusicIndex) {
         return;
     }
 
-    // Free old music
-    Mix_FreeMusic(backgroundMusic);
-
-    // Update current music index and pointers
+    Mix_HaltMusic();
     currMusicIndex = songIndex;
     currentBGM = &normalRoomMusic[currMusicIndex];
-    backgroundMusic = currentBGM->music;
-
-    // Play new music
-    if (backgroundMusic)
-    {
-        Mix_FadeInMusic(backgroundMusic, currentBGM->loops, 3000);
+    if (currentBGM && currentBGM->music) {
+        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
         Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
-    }
-    else
-    {
+    } else {
         fprintf(stderr, "Failed to play background music: %s\n", Mix_GetError());
     }
 }
 
+
 void SoundSystem::playTitleMusic()
 {
+    Mix_HaltMusic();
     currentBGM = &titleScreenMusic;
-    Mix_FreeMusic(backgroundMusic);
-    Mix_Music *newbackgroundMusic = Mix_LoadMUS(audio_path("title/title.wav").c_str());
-    Mix_FadeInMusic(newbackgroundMusic, -1, 3000);
-    backgroundMusic = newbackgroundMusic;
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+    if (currentBGM && currentBGM->music) {
+        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
+        Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
+    } else {
+        fprintf(stderr, "Failed to play title music: %s\n", Mix_GetError());
     }
-    Mix_VolumeMusic(MIX_MAX_VOLUME * 0.6f * musicVolume);
 }
 
-void SoundSystem::playBossMusic(int songIndex)
-{
-    currentBGM = &bossRoomMusic[songIndex];
-    Mix_FreeMusic(backgroundMusic);
-    Mix_Music *newbackgroundMusic = Mix_LoadMUS(currentBGM->path.c_str());
-    Mix_FadeInMusic(newbackgroundMusic, currentBGM->loops, 3000);
-    backgroundMusic = newbackgroundMusic;
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+void SoundSystem::playBossMusic(int songIndex) {
+    if (songIndex == currMusicIndex) {
+        return;
     }
-    Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
+    Mix_HaltMusic();
+    currMusicIndex = songIndex;
+    currentBGM = &bossRoomMusic[currMusicIndex];
+    if (currentBGM && currentBGM->music) {
+        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
+        Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
+    } else {
+        fprintf(stderr, "Failed to play boss music: %s\n", Mix_GetError());
+    }
 }
+
 
 void SoundSystem::playSpecialMusic()
 {
     playSpecialMusic(0);
 }
 
-void SoundSystem::playSpecialMusic(int songIndex)
-{
-    currentBGM = &specialRoomMusic[songIndex];
-    Mix_Music *newbackgroundMusic = Mix_LoadMUS(audio_path("event/event-room.wav").c_str());
-    Mix_FreeMusic(backgroundMusic);
-    Mix_FadeInMusic(newbackgroundMusic, -1, 3000);
-    backgroundMusic = newbackgroundMusic;
-    if (!backgroundMusic)
-    {
-        fprintf(stderr, "Failed to load background music: %s\n", Mix_GetError());
+void SoundSystem::playSpecialMusic(int songIndex) {
+    if (songIndex == currMusicIndex) {
+        return;
     }
-    Mix_VolumeMusic(MIX_MAX_VOLUME * 0.4f * musicVolume);
+    Mix_HaltMusic();
+    currMusicIndex = songIndex;
+    currentBGM = &specialRoomMusic[currMusicIndex];
+    if (currentBGM && currentBGM->music) {
+        Mix_FadeInMusic(currentBGM->music, currentBGM->loops, 3000);
+        Mix_VolumeMusic(MIX_MAX_VOLUME * currentBGM->volume * musicVolume);
+    } else {
+        fprintf(stderr, "Failed to play special music: %s\n", Mix_GetError());
+    }
 }
+
 
 void SoundSystem::playPlayerHurtSound()
 {

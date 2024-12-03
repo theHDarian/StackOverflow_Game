@@ -57,7 +57,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	}
 
 	// Resetting game
-	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_R && !gameState.titleScreen) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
 

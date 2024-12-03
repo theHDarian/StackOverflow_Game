@@ -390,6 +390,7 @@ void MapSystem::newMap()
         }
 
         // temporarily set start room to empty, create pop console
+        soundPlayer->playSpecialMusic();
         map.currRoom = Room();
         map.currRoom.preset = StartingRoom;
         //map.currRoom.preset = ScientistBossRoom;
