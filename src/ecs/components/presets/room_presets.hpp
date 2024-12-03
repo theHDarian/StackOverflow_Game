@@ -1085,6 +1085,20 @@ const RoomPreset HifiRoomSniperBallLauncher {
     {2500, 2000}
 };
 
+const RoomPreset allConsoles {
+    {},
+    {},
+    {{{PushConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
+    {{PopConsole,{fireRateUpM, bulletBounceUpM}}, {0.25f, 0.5f}},
+    {{WishGranter,{bulletBurstUpA, bulletSpeedUpA}}, {0.75f, 0.5f}},
+},
+    0.0f,
+    5,
+    2,
+    "AllConsoles",
+    false,
+    {2500, 2000}
+};
 
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
