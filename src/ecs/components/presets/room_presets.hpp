@@ -39,6 +39,18 @@ const RoomPreset StartingRoom{
     {1000,1200}
 };
 
+const RoomPreset ScientistBossRoom{
+    {{EnemyType::ScientistBoss, {0.5, 0.1}}},
+    {},
+    {},
+    0.0f,
+    0 ,
+    0,
+    "ScientistRoom",
+    false,
+    {1000,1000}
+};
+
 const RoomPreset TutorialRoom2Preset{
     {{EnemyType::EnemyQuadshooter, {0.5, 0.4}}},
     {},

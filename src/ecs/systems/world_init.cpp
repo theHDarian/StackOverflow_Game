@@ -1283,12 +1283,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		Healer &healer = registry.healers.emplace(entity);
 		healer.coolDown = 0.f;
 	}
-	case EnemyType::ScientistlaserAttack:
-	{
-		enemy = InvisibleRotateLaserEnemy();
-		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
-		break;
-	}
 	case EnemyType::EnemyFishBoid:
 	{
 		enemy = FishBoid();
@@ -1354,42 +1348,48 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		break;
 	case EnemyType::HifiEnemyCharger:
 		break;
+	case EnemyType::ScientistlaserAttack:
+	{
+		enemy = InvisibleRotateLaserEnemy();
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
+		break;
+	}
 	case EnemyType::ScientistradialAttack:
 	{
 		enemy = InvisibleTurretEnemy();
-		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	}
 	case EnemyType::ScientistexplosiveAttack:
 	{
 		enemy = InvisibleExplosiveEnemy();
-		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	}
 	case EnemyType::ScientistLaserGridAttack:
 	{
 		enemy = InvisibleLaserEnemy();
-		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	}
 	case EnemyType::ScientistLaserGridVerticalAttack:
 	{
 		enemy = InvisibleLaserEnemyVertical();
-		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	}
 	case EnemyType::ScientistHomingAttack:
 	{
 		enemy = InvisibleHomingEnemy();
-		InvisibleEnemy &inv = registry.invisibleEnemy.emplace(entity);
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
 		break;
 	};
 	case EnemyType::ScientistBoss:
 	{
 		enemy = ScientistBossEnemy();
-		registry.bosses.insert(entity, {"The Purple Cyborg"});
+		registry.bosses.insert(entity, { "The Purple Cyborg" });
 		Scientist& scien = registry.scientist.emplace(entity);
-		
+
 		break;
 	}
 	case EnemyType::ScientistShield:
@@ -1405,7 +1405,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		break;
 	}
 		case EnemyType::HifiEnemyLaserSniper: enemy = HifiLaserSniper();break;
+		default:
+			assert(false);
 	};
+
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
