@@ -1354,8 +1354,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		boid.maxSpeed = 500.f;
 		break;
 	}
-	case EnemyType::HifiEnemyCharger:
-		break;
+	case EnemyType::EnemyHifiJellyFish: enemy = HifiJellyFish(); break;
 	case EnemyType::ScientistlaserAttack:
 	{
 		enemy = InvisibleRotateLaserEnemy();
@@ -1412,7 +1411,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		registry.hand.emplace(entity);
 		break;
 	}
-		case EnemyType::HifiEnemyLaserSniper: enemy = HifiLaserSniper();break;
 		default:
 			assert(false);
 	};

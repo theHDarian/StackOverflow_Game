@@ -2330,6 +2330,152 @@ struct HifiTrailHard : Enemy
 	};
 };
 
+struct HifiJellyFish : Enemy
+{
+	/**
+	 * Lower health variant focused on spreading traps on the ground with its high speed and longer bullet range, dodging attacks
+	 */
+	const BulletStackEffect playerSpeedDownASmall = {
+		PlayerSpeed,
+		Additive,
+		-30,
+		"Movement Speed Down Small (A)",
+		""};
+
+	const AttackData spiral{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{numBulletsUpA, playerSpeedDownASmall},
+		blunt,
+		10,
+		0.0,
+		{20, 20},
+		400,
+		5000,
+		{200, -2 * M_PI / 2.0},
+		0,
+		0,
+		0};
+	const AttackData spiky{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{numBulletsUpA, dashCDRDownA},
+		blunt,
+		6,
+		0.0,
+		{20, 20},
+		300,
+		2000,
+		{200, 0},
+		0,
+		0,
+		0};
+
+	EnemyPattern rotateState = {
+		"Follow Player",
+		EnemyBehavior::RANDOM,
+		{},
+		0,
+		4000.f,
+		4000.f,
+		{
+			{ReactionType::DURATION,1},
+		},
+		1,
+		true,
+		0.f,
+		500.f,
+		NoAttack};
+
+	EnemyPattern chargingState = {
+		"CHARGE",
+		EnemyBehavior::RANDOM,
+		{},
+		0,
+		500.f,
+		500.f,
+		{{ReactionType::DURATION, 2}},
+		2,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern chargingState2 = {
+		"CHARGE",
+		EnemyBehavior::CHARGING,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 3}},
+		3,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 4}},
+		4,
+		true,
+		250.f,
+		250.f,
+		spiral};
+	
+	EnemyPattern chargingState3 = {
+		"CHARGE",
+		EnemyBehavior::RECOIL,
+		{},
+		0,
+		500.f,
+		500.f,
+		{{ReactionType::DURATION, 5}},
+		5,
+		true,
+		0.f,
+		0.f,
+		NoAttack};
+	EnemyPattern shootingState2 = {
+		"ROTATE",
+		EnemyBehavior::ROTATE_IN_PLACE,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		250.f,
+		250.f,
+		spiky};
+
+	HifiJellyFish()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState, chargingState3, shootingState2};
+		rotationBehaviour = EnemyRotationBehavior::SPIN;
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_008.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.5f;
+		speedMultiplier = 2.0;
+		rotatePower = 2;
+	};
+};
+
 struct HifiCannon : Enemy
 {
 	const AttackData cannonShot{

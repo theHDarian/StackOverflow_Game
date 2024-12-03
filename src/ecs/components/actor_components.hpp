@@ -305,6 +305,7 @@ enum EnemyType {
     EnemyHifiCannonHard,
     EnemyLaserSniper,
     EnemyHifiTemporaryBoid,
+    EnemyHifiJellyFish,
     ScientistradialAttack,
     ScientistexplosiveAttack,
     ScientistHomingAttack,
@@ -314,19 +315,6 @@ enum EnemyType {
     ScientistBoss,
     ScientistHand,
     EnemyHifiBoidFish,
-    HifiEnemyTwinLaserVertical1,
-    HifiEnemyTwinLaserVertical2,
-    HifiEnemyTwinLaserHorizontal1,
-    HifiEnemyTwinLaserHorizontal2,
-    HifiEnemySniper,
-    HifiEnemyCharger,
-    HifiEnemyTrail,
-    HifiEnemyCannon,
-    HifiEnemyChargerHard,
-    HifiEnemySniperHard,
-    HifiEnemyTrailHard,
-    HifiEnemyCannonHard,
-    HifiEnemyLaserSniper,
 };
 
 enum class EnemyAttackPattern {

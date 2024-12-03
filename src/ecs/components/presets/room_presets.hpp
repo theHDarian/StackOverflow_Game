@@ -1245,6 +1245,20 @@ const RoomPreset EnemyRoomLaserFiesta {
     {2500, 2000}
 };
 
+const RoomPreset HifiRoomJellyFish {
+    {
+        {EnemyHifiJellyFish, {0.5f, 0.5f}},
+    },
+    {},
+    {},
+    0.0f,
+    5,
+    2,
+    "HifiRoomJellyFish",
+    false,
+    {2500, 2000}
+};
+
 
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
