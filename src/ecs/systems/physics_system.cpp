@@ -355,18 +355,25 @@ void PhysicsSystem::step(float elapsed_ms)
 		if (/*!doors.components[i].isPrev &&*/ CircleToLine(m.position, c.radius, doors.components[i].startPos, doors.components[i].endPos))
 		{
 			// spawn on side opposite to the door
-			if (registry.mapRequests.components.size() <= 0 && !registry.nearbyInteractables.has(registry.doors.entities[i])) {
+			Room& room = registry.maps.components[0].currRoom;
+			if (registry.mapRequests.components.size() <= 0 && !registry.nearbyInteractables.has(registry.doors.entities[i]) && (room.cleared || room.type == RoomType::TutorialRoom1)) {
 				if (registry.interactables.has(registry.doors.entities[i]) 
 					&& registry.interactables.get(registry.doors.entities[i]).interactType == InteractableType::DialogueInteractable) {
 					registry.nearbyInteractables.emplace(registry.doors.entities[i]);
 				}
 				else {
-					registry.mapRequests.emplace(doors.entities[i], MapRequestType::ChangeRoom, doors.components[i].room, i);
+					registry.interactables.get(registry.doors.entities[i]).timer -= elapsed_ms;
+					if (registry.interactables.get(registry.doors.entities[i]).timer <= 0) {
+						MapRequest& mapReq = registry.mapRequests.emplace(doors.entities[i], MapRequestType::ChangeRoom, doors.components[i].room, i);
+					}
 				}
 			}
 				 // user has to press e to move doors
 																				  // registry.dialogueRequests.emplace(registry.doors.entities[i]); // prompt user if want to change door
 			// registry.mapRequests.emplace(doors.entities[i],MapRequestType::ChangeRoom,doors.components[i].room,i);
+		}
+		else {
+			registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
 		}
 	}
 

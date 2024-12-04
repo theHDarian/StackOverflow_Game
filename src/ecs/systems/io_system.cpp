@@ -128,7 +128,8 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	else if (gameState.dialogueScene && !gameState.gamePaused) {
 		handleDialogueChoice(key, action, ioState, gameState);
 	}
-	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
+	if (!ioState.lockControls && !gameState.dialogueScene)
+		handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
 }
 
@@ -194,7 +195,7 @@ void IOSystem::onMouseMove(vec2 mousePosition) {
 }
 
 void IOSystem::handleMovementInput(int key, int action, IOState& state, GameState& gameState) {
-	if (action == GLFW_PRESS && !state.lockControls && !gameState.dialogueScene) {
+	if (action == GLFW_PRESS) {
 		if (key == GLFW_KEY_A) {
 			state.pressedHorizontal.push(-1.0f);
 		} else if (key == GLFW_KEY_D) {
@@ -204,8 +205,10 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state, GameStat
 		} else if (key == GLFW_KEY_S) {
 			state.pressedVertical.push(1.0f);
 		}
-        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused && !gameState.dialogueScene && !gameState.cutScene) {
-
+        if ((key == GLFW_KEY_SPACE || key == GLFW_MOUSE_BUTTON_1) && !gameState.gamePaused && !gameState.cutScene) {
+			if (state.pressedHorizontal.empty() && state.pressedVertical.empty()) {
+				state.lastInputAxis = { 1, 1 };
+			}
             state.shouldDash = true;
         }
 	} else if (action == GLFW_RELEASE) {
@@ -224,7 +227,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state, GameStat
 	float verticalAxis = state.pressedVertical.empty() ? 0.0f : state.pressedVertical.top();
 	// std::cout << horizontalAxis << " " << verticalAxis << std::endl;
     state.inputAxis = {horizontalAxis,verticalAxis};
-	if (state.inputAxis != vec2(0.0f) && !state.lockControls) {
+	if (state.inputAxis != vec2(0.0f)) {
 		state.lastInputAxis = state.inputAxis;
 	}
 

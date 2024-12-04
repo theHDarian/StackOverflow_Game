@@ -19,7 +19,7 @@ class MapSystem {
         void changeRoom(RoomType type,int doorIndex);
         void handleMapRequests();
 
-        void newMap();
+        void newMap(MapRegion region, RoomType roomType);
         void updateBgPositions();
         void decorateRoom();
 

@@ -1546,7 +1546,7 @@ struct BossBeeHive : Enemy
 	EnemyPattern endingState = {"25% HP HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {}, 8, true, 0.f, 5000.f, twelveBoidBees};
 	BossBeeHive()
 	{
-		maxHealth = 1000;
+		maxHealth = 800;
 		currHealth = maxHealth;
 		enemyPatterns = {startingState1, startingState2, halfHpState1, halfHpState2, halfHpState3, quarterHpState1, quarterHpState2, quarterHpState3, endingState};
 		sprite = {
@@ -3260,8 +3260,8 @@ struct ScientistBossEnemy : Enemy
 
 	ScientistBossEnemy()
 	{
-		maxHealth = 3000;
-		currHealth = 1510;
+		maxHealth = 1500;
+		currHealth = 1500;
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
 						 spawnRadialState, spawnBeeBoidState,
@@ -3289,8 +3289,8 @@ struct ScientistSheildEnemy : Enemy
 	EnemyPattern IdleState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {IdleTransition}, 0, false, 0.f, 600.f, NoAttack};
 	ScientistSheildEnemy()
 	{
-		maxHealth = 600;
-		currHealth = 1;
+		maxHealth = 150;
+		currHealth = 150;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_bullet_square.png",
@@ -3657,8 +3657,8 @@ struct ScientistHandEnemy : Enemy
 
 	ScientistHandEnemy()
 	{
-		maxHealth = 1200;
-		currHealth = 1200;
+		maxHealth = 1000;
+		currHealth = 1000;
 		enemyPatterns = {idling, chargePlayer, idling2,
 						 BombingState, idling3,teleportToScientist2,
 						 laserAttackPrepareState, patrolLaserState, teleportToScientist3,

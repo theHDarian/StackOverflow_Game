@@ -31,6 +31,14 @@ void UISystem::step(float elapsed_ms) {
 	WindowState& ws = registry.windowStates.components[0];
 	float elapsed = (float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - ws.currUnixTime)).count() / 1000;
 	registry.renderRequests.get(fpsCounter).show = ioState.showFPS;
+	ws.numFramesThisSecond++;
+	if (elapsed > 1000.0f) {
+		ws.fps = ws.numFramesThisSecond;
+		ws.numFramesThisSecond = 0;
+		ws.currUnixTime = Clock::now();
+		TextRenderRequest& fpsText = registry.textRenderRequests.get(fpsCounter);
+		fpsText.text = "FPS: " + std::to_string(ws.fps);
+	}
 
 	// check: should game be paused right now?
 	// if already paused, then close latest menu
@@ -236,10 +244,6 @@ void UISystem::step(float elapsed_ms) {
 			registry.showTimers.emplace(stackAddBubble);
 			registry.showTimers.emplace(stackAddTail);
 		}
-		else {
-			registry.showTimers.get(stackAddBubble).timer += registry.showTimers.get(stackAddBubble).base;
-			registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
-		}
 		
 		vec2 bulletStartPos = playerPos;
 		for (int i = 0; i < diff; i++) {
@@ -287,10 +291,6 @@ void UISystem::step(float elapsed_ms) {
 				registry.showTimers.emplace(stackAddBubble);
 				registry.showTimers.emplace(stackAddTail);
 			}
-			else {
-				registry.showTimers.get(stackAddBubble).timer += registry.showTimers.get(stackAddBubble).base;
-				registry.showTimers.get(stackAddTail).timer += registry.showTimers.get(stackAddBubble).base;
-			}
 			vec2 bulletStartPos = playerPos;
 			std::string sprite = "stackNotifShift.png";
 			if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
@@ -322,6 +322,7 @@ void UISystem::step(float elapsed_ms) {
 			registry.renderRequests.get(stackAddBubble).show = false;
 			registry.renderRequests.get(stackAddTail).show = false;
 			registry.renderRequests.get(controlsGuide).show = false;
+			registry.renderRequests.get(roomClearMessage).show = false;
 		}
 
 		if (uiRequest.type == UIRequestType::GameOverReport) {
@@ -352,6 +353,10 @@ void UISystem::step(float elapsed_ms) {
 		for (Entity entity : registry.stackAddNotifs.entities) {
 			registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * STACK_NOTIF_SCALE + index * stackui.bulletOffset * STACK_NOTIF_SCALE, bulletStartPos.y);
 			index++;
+		}
+		if (registry.showTimers.has(registry.stackAddNotifs.entities[0])) {
+			registry.showTimers.get(stackAddBubble).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
+			registry.showTimers.get(stackAddTail).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
 		}
 	}
 
@@ -415,15 +420,6 @@ void UISystem::step(float elapsed_ms) {
 
 		// update stack ui
 		registry.textRenderRequests.get(stackUI).text = "STACK: " + std::to_string(stack.currStack.size()) + " / " + std::to_string((int)getModifiedValue(PlayerStackSize, stack.baseStackSize));
-
-		ws.numFramesThisSecond++;
-		if (elapsed > 1000.0f) {
-			ws.fps = ws.numFramesThisSecond;
-			ws.numFramesThisSecond = 0;
-			ws.currUnixTime = Clock::now();
-			TextRenderRequest& fpsText = registry.textRenderRequests.get(fpsCounter);
-			fpsText.text = "FPS: " + std::to_string(ws.fps);
-		}
 		
 		Map& map = registry.maps.components[0];
 		TextRenderRequest& roomCounterText = registry.textRenderRequests.get(roomCounter);
@@ -585,6 +581,11 @@ void UISystem::playDialogue() {
 			map.currRoom.dialogueDone = true;
 			gameState.dialogueScene = false;
 			soundSystem->stopNextDialogueSound();
+			input.pressedHorizontal = ExtendedStack<int>();
+			input.pressedVertical = ExtendedStack<int>();
+			input.lastInputAxis = vec2(0);
+			input.inputAxis = vec2(0);
+			registry.motions.get(registry.players.entities[0]).velocity = vec2(0);
 		}
 	}
 }
@@ -972,7 +973,7 @@ Entity UISystem::createMenuChoice(std::string choice, vec2 position) {
 	// also make it a button
 	UIButton& button = registry.buttons.emplace(entity);
 	button.padding = 15.f;
-	button.buttonSize = vec2(text.text.length() * text.scale * DEFAULT_FONT_SIZE, text.scale * DEFAULT_FONT_SIZE);
+	button.buttonSize = vec2(text.text.length() * text.scale * DEFAULT_FONT_SIZE, text.scale * DEFAULT_FONT_SIZE + button.padding * 2.f);
 	button.position = vec2(text.x, position.y);
 
 	vec3& color = registry.colors.emplace(entity);

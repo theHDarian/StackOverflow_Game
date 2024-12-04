@@ -114,11 +114,6 @@ void SceneSystem::step(float elapsed_ms) {
 		}
 		if (map.currRoom.type == RoomType::TutorialRoom2 && map.currRoom.dialogueCount == 1 && !map.currRoom.cleared) {
 			input.lockControls = true;
-			input.lastInputAxis = vec2(0);
-			input.inputAxis = vec2(0);
-			input.pressedHorizontal = ExtendedStack<int>();
-			input.pressedVertical = ExtendedStack<int>();
-			registry.motions.get(registry.players.entities[0]).velocity = vec2(0);
 			map.currRoom.dialogueCount++;
 		}
 
@@ -177,6 +172,7 @@ void SceneSystem::step(float elapsed_ms) {
 				lines.lines = interactibleDialogue[dialogueObject];
 				summonDialogue(); 
 				callScientist = true;
+				registry.uiRequests.insert(registry.players.entities[0], { UIRequestType::CallNotif });
 			}
 		}
 		

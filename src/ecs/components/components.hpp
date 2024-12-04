@@ -397,6 +397,8 @@ struct InteractableObject {
 	int dialogueCount = 0;
 	InteractableType interactType = DialogueInteractable;
 	InteractableItem item = InteractableItem::NA;
+	float timer = 1000;
+	float base = timer;
 };
 
 enum DialogueRequestType {

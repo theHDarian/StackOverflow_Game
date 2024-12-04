@@ -100,16 +100,6 @@ enum MapRequestType {
     ChangeRoom = 'C',
     NewGame = 'N'
 };
-struct MapRequest {
-    MapRequestType requestType;
-    RoomType type;
-    int doorIndex;
-    MapRequest(MapRequestType requestType, RoomType type = RoomType::None, int doorIndex = 0) { 
-        this->requestType = requestType;
-        this->type = type; 
-        this->doorIndex = doorIndex;
-    }
-};
 
 enum MapRegion {
     Tutorial = 0,
@@ -117,6 +107,21 @@ enum MapRegion {
     Physics = 2,
     Final = 3
 };
+
+struct MapRequest {
+    MapRequestType requestType;
+    RoomType type;
+    int doorIndex;
+    MapRegion region;
+    MapRequest(MapRequestType requestType, RoomType type = RoomType::None, int doorIndex = 0, MapRegion region = MapRegion::Tutorial) {
+        this->requestType = requestType;
+        this->type = type; 
+        this->region = region;
+        this->doorIndex = doorIndex;
+    }
+};
+
+
 
 struct Map {
     Room currRoom;
