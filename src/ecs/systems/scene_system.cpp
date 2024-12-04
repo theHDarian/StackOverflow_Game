@@ -39,16 +39,25 @@ void SceneSystem::step(float elapsed_ms) {
 		if (registry.dialogueChoices.entities.size() > 0) {
 			gameState.dialogueChoice = registry.dialogueChoices.components.size() - 1 - input.hoveringDialogueChoice; // commit player choice
 			if (!isStoryDialogue) {
-				assert(registry.interactables.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
-
-				Entity objectEntity = currentObject;
-				registry.interactableReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice); // emplace with dupes for now, in case some other system needs this
-				InteractableObject& object = registry.interactables.get(objectEntity);
-				InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
-				if (interactibleDialogue.count(dialogueObject) > 0) { // if there's more lines of dialogue to be played after choice
-					DialogueLines& lines = registry.dialogueLines.components[0];
-					lines = DialogueLines();
-					lines.lines = interactibleDialogue[dialogueObject];
+				if (callScientist) {
+					InteractibleDialogue dialogueObject = { "CallScientist", gameState.dialogueChoice, 0 };
+					if (interactibleDialogue.count(dialogueObject) > 0) { // if there's more lines of dialogue to be played after choice
+						DialogueLines& lines = registry.dialogueLines.components[0];
+						lines = DialogueLines();
+						lines.lines = interactibleDialogue[dialogueObject];
+					}
+				}
+				else {
+					assert(registry.interactables.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
+					Entity objectEntity = currentObject;
+					registry.interactableReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice); // emplace with dupes for now, in case some other system needs this
+					InteractableObject& object = registry.interactables.get(objectEntity);
+					InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+					if (interactibleDialogue.count(dialogueObject) > 0) { // if there's more lines of dialogue to be played after choice
+						DialogueLines& lines = registry.dialogueLines.components[0];
+						lines = DialogueLines();
+						lines.lines = interactibleDialogue[dialogueObject];
+					}
 				}
 			}
 			else {
@@ -166,7 +175,7 @@ void SceneSystem::step(float elapsed_ms) {
 				lines = DialogueLines();
 				lines.lines = interactibleDialogue[dialogueObject];
 				summonDialogue(); 
-				isStoryDialogue = true;
+				callScientist = true;
 			}
 		}
 		

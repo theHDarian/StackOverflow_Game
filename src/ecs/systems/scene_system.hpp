@@ -48,6 +48,7 @@ private:
     Entity currentObject;
     bool isStoryDialogue;
     Entity callObject;
+    bool callScientist = false;
 
     Entity createCallObject();
     void summonDialogue();
