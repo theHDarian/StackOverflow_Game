@@ -1259,7 +1259,7 @@ inline RoomPreset getRoomPreset(RoomType type, bool locked) {
     if (type == RoomType::BossRoom && map.currRegion == MapRegion::Biology) {
         return BossRoomBee;
     } else if (type == RoomType::BossRoom && map.currRegion == MapRegion::Physics) {
-        return BossRoomBee; //TODO change to physics boss
+        return ScientistBossRoom; //TODO change to physics boss
     }
 
     // Tutorial rooms

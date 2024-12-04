@@ -764,7 +764,7 @@ const AttackData NoAttack{
 const AttackData quadShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{dashUpA},
+	{},
 	blunt,
 	4,
 	0.0,
