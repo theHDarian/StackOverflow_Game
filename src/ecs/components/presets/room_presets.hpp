@@ -48,7 +48,7 @@ const RoomPreset ScientistBossRoom{
     0,
     "ScientistRoom",
     false,
-    {1000,1000}
+    {1600,1300}
 };
 
 const RoomPreset TutorialRoom2Preset{
