@@ -1273,10 +1273,25 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 	// want to overwrite the colour with given; could also use a separate shader program
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 1);
+	float alpha = 1;
+	float effect_alpha = 1;
+
+	GameState& gameState = registry.gameStates.components[0];
+	if (registry.invincibles.has(registry.players.entities[0]) && !registry.dashes.has(registry.players.entities[0])
+		&& !gameState.gameOver && !gameState.gamePaused && !gameState.dialogueScene)
+	{
+		Invincible& invincible = registry.invincibles.get(registry.players.entities[0]);
+		//float effect_alpha = abs(sin(invincible.countdown / invincible.max * 10) * 0.3);
+		//glUniform1f(effect_alpha_uloc, effect_alpha);
+		//color = COLOR_TEAL_MED;
+		alpha = 1 - abs(sin(invincible.countdown / invincible.max * 10) * 0.5);
+	}
+
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, 1);
+	glUniform1f(alpha_uloc, alpha);
 	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
-	glUniform1f(effect_alpha_uloc, 1);
+	glUniform1f(effect_alpha_uloc, effect_alpha);
+
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t

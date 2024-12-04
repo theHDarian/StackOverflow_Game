@@ -66,12 +66,15 @@ void MapSystem::step(float elapsed_ms)
     
 
     // set room to cleared if all enemies are defeated
-    if (registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
+    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
     {
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
             soundPlayer->playNextMusic();
         }
+        registry.gameReports.components[0].roomsCleared++;
+        if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
+            registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
     }
 
     if (map.currRoom.cleared) {
@@ -181,7 +184,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     if (map.currRoom.type != RoomType::TutorialRoom1) {
         map.roomsTraversed++;
-        registry.gameReports.components[0].roomsCleared++;
     }
 
     //update Map Region
@@ -245,7 +247,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     doors[spawnIndex].isPrev = true;
     doors[spawnIndex].isLocked = false;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
-    registry.animations.get(registry.doorSymbols.entities[spawnIndex]).frame = 4;
+    registry.animations.get(registry.doorSymbols.entities[spawnIndex]).frame = 5;
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
     int lockedRooms = 0;
@@ -401,11 +403,11 @@ void MapSystem::newMap()
         // temporarily set start room to empty, create pop console
         // soundPlayer->playTitleMusic();
         map.currRoom = Room();
-        map.currRoom.preset = ScientistBossRoom;
+        map.currRoom.preset = StartingRoom;
         //map.currRoom.preset = ScientistBossRoom;
         updateBgPositions();
         map.directory = getDirectory(map.currRegion);
-        map.currRoom.type = RoomType::BossRoom;
+        map.currRoom.type = RoomType::TutorialRoom;
         //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));

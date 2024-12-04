@@ -798,7 +798,10 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
 			req.type = DialogueRequestType::StoryDialogue;
 			registry.ioStates.components[0].lockControls = false;
-			std::cout << registry.maps.components[0].currRoom.dialogueCount << std::endl;
+			registry.ioStates.components[0].lastInputAxis = vec2(0);
+			registry.ioStates.components[0].inputAxis = vec2(0);
+			registry.motions.get(registry.players.entities[0]).velocity = vec2(0);
+			//std::cout << registry.maps.components[0].currRoom.dialogueCount << std::endl;
 		}
 
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
