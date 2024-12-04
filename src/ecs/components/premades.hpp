@@ -3260,8 +3260,8 @@ struct ScientistBossEnemy : Enemy
 
 	ScientistBossEnemy()
 	{
-		maxHealth = 1500;
-		currHealth = 1500;
+		maxHealth = 2000;
+		currHealth = 2000;
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
 						 spawnRadialState, spawnBeeBoidState,
@@ -3289,8 +3289,8 @@ struct ScientistSheildEnemy : Enemy
 	EnemyPattern IdleState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {IdleTransition}, 0, false, 0.f, 600.f, NoAttack};
 	ScientistSheildEnemy()
 	{
-		maxHealth = 150;
-		currHealth = 150;
+		maxHealth = 200;
+		currHealth = 200;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_bullet_square.png",
@@ -3657,8 +3657,8 @@ struct ScientistHandEnemy : Enemy
 
 	ScientistHandEnemy()
 	{
-		maxHealth = 1000;
-		currHealth = 1000;
+		maxHealth = 800;
+		currHealth = 800;
 		enemyPatterns = {idling, chargePlayer, idling2,
 						 BombingState, idling3,teleportToScientist2,
 						 laserAttackPrepareState, patrolLaserState, teleportToScientist3,
