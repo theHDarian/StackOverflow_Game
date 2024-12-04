@@ -19,4 +19,4 @@
 - Background Music: Title Screen: "Lines of Code" by Trevor Lentz (opengameart.org)
 - SFX: Enemy shooting sounds/itemgetsounds: Little Robot Sound Factory, www.littlerobotsoundfactory.com
 - SFX: Door opening sound: Space ship engine sounds by Tuomo Untinen
-- Font Used: https://www.1001fonts.com/bytebounce-font.html
+- Font Used: https://idreesinc.itch.io/monocraft
