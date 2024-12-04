@@ -777,7 +777,21 @@ const AttackData quadShot{
 	0};
 
 const AttackData FastLaser{
-	EnemyAttackPattern::LASER, CIRCLE, {dashUpA, dashCDRUpA}, dashCDRDownM, 1, 0, {20, 20}, 0, 2000, {5000, 0.95}, 0, 0, 0, EnemyBulletDeath::NONE};
+	EnemyAttackPattern::LASER
+	,CIRCLE
+	,{dashUpA, dashCDRUpA}
+	,dashCDRDownM
+	,1
+	,0
+	,{20, 20}
+	,0
+	, 2000
+	,{5000, 0.97}
+	,0
+	,0
+	,0
+	,EnemyBulletDeath::NONE
+	};
 
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
@@ -1673,10 +1687,10 @@ struct HifiTemporaryBoid : Enemy
 {
 	Reaction singularityTransition1{
 		ReactionType::DURATION,
-		1};
-	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 9000.f, 9000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyPattern die = {"DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 1}}, 1, false, 0.f, 0.f, NoAttack};
-	;
+		1
+	};
+	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 20000.f, 20000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
+	EnemyPattern die = { "DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,1}}, 1, false, 0.f, 0.f, NoAttack };;
 	HifiTemporaryBoid()
 	{
 		maxHealth = 1;
@@ -1849,7 +1863,7 @@ struct TwinLaserVertical1 : Enemy
 	EnemyPattern randomState = {"PatrolSide", EnemyBehavior::PATROLLING, {{0.01, 0.01}, {0.01, 0.99}, {0.01, 0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
 	TwinLaserVertical1()
 	{
-		maxHealth = 200;
+		maxHealth = 100;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
