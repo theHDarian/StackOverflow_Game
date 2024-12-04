@@ -1,10 +1,14 @@
 # Team19
+## M4 Creative Component
+- Basic Feature: camera that follows player
+- Basic Feature: game balance
+- Basic Feature: audio feedback. Sfx plays when the player performs certain actions/when enemies act. Also plays different bgm tracks based on the current room.
+
 ## M3 Creative Component
 - Advanced Feature: swarming behaviour in enemies using BOIDs.
 - Advanced Feature: a wide variety of visually coherent sprites. All visual assets (aside from the font) is made by us. 
 
 ## M2 Creative Component
-- Basic Feature: sound system. Sfx plays when the player dashes, shoots, traverses between rooms, when enemies shoot, and at certain times during dialogue. Also plays different bgm tracks based on the current room.
 - Advanced Feature: instanced particle system. Spawns particle when enemies die/player bullets hit the wall, and uses instanced rendering to do so.
 
 ## M1 Creative Components
