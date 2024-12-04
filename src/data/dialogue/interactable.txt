@@ -625,7 +625,8 @@ Enemy rooms are filled with various rogue robots.
 And finally, boss rooms have especially dangerous rogue robots. Unfortunately, once you've entered their domain, you've no choice but to fight them!
 
 ITEM CallScientist 2 0
-LIGHTNING bullets are special and don't add effects to your stack. Instead, they reorder the items in your stack.
+"LIGHTNING bullets" are packets of concentrated electricity that leak from severely damaged robots, and thus, do not add effects to your stack or take up stack space.
+However,if you make contact with these packets, your systems will experience a shock, causing the order of data on your stack will be rearranged.
 BLUE lightning shifts all your effects to the right by one, and YELLOW shuffles your stack.
 When rogue robots are nearing death, they tend to spit out more of these lightning bullets.
 The order of effects in your stack could be important when it comes to using keys, which will remove all effects following the key once you use them!
