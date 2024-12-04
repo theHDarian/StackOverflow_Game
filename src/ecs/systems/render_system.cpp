@@ -1280,11 +1280,13 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 	if (registry.invincibles.has(registry.players.entities[0]) && !registry.dashes.has(registry.players.entities[0])
 		&& !gameState.gameOver && !gameState.gamePaused && !gameState.dialogueScene)
 	{
+
 		Invincible& invincible = registry.invincibles.get(registry.players.entities[0]);
 		//float effect_alpha = abs(sin(invincible.countdown / invincible.max * 10) * 0.3);
 		//glUniform1f(effect_alpha_uloc, effect_alpha);
-		//color = COLOR_TEAL_MED;
+		color = COLOR_RED;
 		alpha = 1 - abs(sin(invincible.countdown / invincible.max * 10) * 0.5);
+		// effect_alpha = lerp( 0.5f, 0.f, (invincible.max-invincible.countdown) / invincible.max);
 	}
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
