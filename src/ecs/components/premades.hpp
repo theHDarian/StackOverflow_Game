@@ -764,7 +764,7 @@ const AttackData NoAttack{
 const AttackData quadShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{},
+	{dashUpA},
 	blunt,
 	4,
 	0.0,
@@ -862,6 +862,49 @@ struct Quadshooter : Enemy
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState};
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2({240.0f / 2, 240.f / 2});
+		rotatePower = 1.f;
+	};
+};
+
+struct TutorialQuadshooter : Enemy
+{
+	const AttackData tutorialQuadShot{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		dashUpA,
+		4,
+		0.0,
+		{20, 20},
+		200,
+		3000,
+		{0.0, 0.0},
+		0,
+		0,
+		0};
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		1};
+
+	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 5000.f, 5000.f, {duration}, 1, true, 0.f, 5000.f, tutorialQuadShot};
+	EnemyPattern rotateStatenorm = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 0.f, 10000.f, {duration}, 1, true, 0.f, 5000.f, quadShot};
+
+
+	TutorialQuadshooter()
+	{
+		maxHealth = 50;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, rotateStatenorm};
 
 		patternIndex = 0;
 		sprite = {

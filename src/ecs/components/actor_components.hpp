@@ -263,6 +263,7 @@ struct PlayerBullet {
 };
 
 enum EnemyType {
+    TutorialEnemyQuadshooter,
     EnemyQuadshooter,
     // //MediumEnemyClusterShot,
     EnemyMagnet,

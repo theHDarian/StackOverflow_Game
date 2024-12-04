@@ -1172,6 +1172,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = Quadshooter();
 		break;
 	}
+		case EnemyType::TutorialEnemyQuadshooter:
+	{
+		enemy = TutorialQuadshooter();
+		break;
+	}
 	case EnemyType::BossBigC:
 	{
 		enemy = BigC();

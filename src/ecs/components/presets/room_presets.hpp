@@ -52,11 +52,11 @@ const RoomPreset ScientistBossRoom{
 };
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::EnemyQuadshooter, {0.5, 0.4}}},
+    {{EnemyType::TutorialEnemyQuadshooter, {0.5, 0.4}}},
     {},
     {},
     0.0f,
-    0 ,
+    3 ,
     0,
     "TutorialRoom2",
     false,
