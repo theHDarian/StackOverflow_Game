@@ -72,7 +72,6 @@ void MapSystem::step(float elapsed_ms)
         if (map.currRoom.type == BossRoom) {
             soundPlayer->playNextMusic();
         }
-        registry.gameReports.components[0].roomsCleared++;
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
             registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
     }
@@ -184,6 +183,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     if (map.currRoom.type != RoomType::TutorialRoom1) {
         map.roomsTraversed++;
+        registry.gameReports.components[0].roomsCleared++;
     }
 
     //update Map Region
