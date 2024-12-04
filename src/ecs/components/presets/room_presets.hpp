@@ -1318,9 +1318,9 @@ const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::BossRoom,2},
     {RoomType::TreasureRoom,0},
 { RoomType::EventRoom, 4 },
-    {RoomType::None,4},
-    {RoomType::TutorialRoom1,5},
-    {RoomType::TutorialRoom2,5}
+    {RoomType::None,5},
+    {RoomType::TutorialRoom1,6},
+    {RoomType::TutorialRoom2,6}
 };
 
 const std::map<RoomType, SoundType> roomTypeToMusic = {

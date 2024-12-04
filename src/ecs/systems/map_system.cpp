@@ -251,7 +251,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
     int lockedRooms = 0;
-    bool excludeNone = false;
+    bool excludeNone = true;
     std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
     for (int i = 0; i < doors.size(); i++)
     {

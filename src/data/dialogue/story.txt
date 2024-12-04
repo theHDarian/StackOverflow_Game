@@ -58,7 +58,7 @@ For a bullet to have disappeared immediately on contact... It must be the work o
 This "stack" has the special ability to encode anything you come across into pure data.
 And what kind of data exactly? Whether it ends up "good" or "bad", you'd only really know when you take a closer look at it.
 So long as you make sure your S.T.A.C.K. doesn't overflow, I'm sure you can fend off this robot just fine then!
-[Mouse over the bullet stacks in your stack to take a closer look, and shoot to fight off enemies!]
+[Mouse over the bullet stacks in your stack to take a closer look when you're not fighting, and shoot to fight off enemies!]
 SPEAKER N N
 
 SCENE TutorialRoom2 4 0 1 -1

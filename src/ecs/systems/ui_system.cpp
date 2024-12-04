@@ -414,7 +414,7 @@ void UISystem::step(float elapsed_ms) {
 		StackUI& stackui = registry.stackUI.get(stackUI);
 
 		// update stack ui
-		registry.textRenderRequests.get(stackUI).text = "Stack: " + std::to_string(stack.currStack.size()) + " / " + std::to_string((int)getModifiedValue(PlayerStackSize, stack.baseStackSize));
+		registry.textRenderRequests.get(stackUI).text = "STACK: " + std::to_string(stack.currStack.size()) + " / " + std::to_string((int)getModifiedValue(PlayerStackSize, stack.baseStackSize));
 
 		ws.numFramesThisSecond++;
 		if (elapsed > 1000.0f) {
