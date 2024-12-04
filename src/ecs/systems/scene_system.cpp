@@ -106,6 +106,8 @@ void SceneSystem::step(float elapsed_ms) {
 			input.lockControls = true;
 			input.lastInputAxis = vec2(0);
 			input.inputAxis = vec2(0);
+			input.pressedHorizontal = ExtendedStack<int>();
+			input.pressedVertical = ExtendedStack<int>();
 			registry.motions.get(registry.players.entities[0]).velocity = vec2(0);
 			map.currRoom.dialogueCount++;
 		}
