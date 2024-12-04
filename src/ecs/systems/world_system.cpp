@@ -181,6 +181,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
 
+	// very dumb camera zoom set for now
+	if (registry.maps.components[0].currRoom.type == RoomType::BossRoom && !registry.maps.components[0].currRoom.cleared) {
+		registry.cameras.components[0].zoom = 0.75f;
+	}
+	else {
+		registry.cameras.components[0].zoom = 1.f;
+	}
+
 	// Remove entities that leave the screen on the left side
 	// Iterate backwards to be able to remove without unterfering with the next object to visit
 	// (the containers exchange the last element with the current)
