@@ -331,6 +331,7 @@ void WorldSystem::restartGame() {
 		registry.mapRequests.emplace(player, MapRequestType::RestartGame);
 
 	registry.ioStates.components[0].shouldRestart = false;
+	registry.ioStates.components[0].lockControls = false;
 
 	// Reset the game speed
 	currentSpeed = 1.f;
