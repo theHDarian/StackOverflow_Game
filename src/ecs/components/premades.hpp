@@ -392,15 +392,14 @@ const BulletStackEffect theCurse = {
 	Additive,
 	-0.5,
 	"\"The Curse\"",
-	"" };
+	""};
 
 const BulletStackEffect Freedom = {
 	PlayerSpeed,
 	Multiplicative,
 	1.5,
 	"\"Freedom\"",
-	"" };
-
+	""};
 
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
@@ -469,6 +468,9 @@ struct AttackData {
 	int bulletPierce = 0;
 	int bulletBounce = 0;
 	float homing = 0;
+	EnemyBulletDeath 
+	EnemyType //for spawning
+	vector<vec2> spawnPosition; spawning position have to have the same length as number of spawning
 };
 */
 
@@ -775,21 +777,7 @@ const AttackData quadShot{
 	0};
 
 const AttackData FastLaser{
-	EnemyAttackPattern::LASER
-	,CIRCLE
-	,{dashUpA, dashCDRUpA}
-	,dashCDRDownM
-	,1
-	,0
-	,{20, 20}
-	,0
-	, 2000
-	,{5000, 0.95}
-	,0
-	,0
-	,0
-	,EnemyBulletDeath::NONE
-	};
+	EnemyAttackPattern::LASER, CIRCLE, {dashUpA, dashCDRUpA}, dashCDRDownM, 1, 0, {20, 20}, 0, 2000, {5000, 0.95}, 0, 0, 0, EnemyBulletDeath::NONE};
 
 ////////////////////////////////////
 //////////// ENEMY TYPE ////////////
@@ -1014,7 +1002,7 @@ struct LaserCrab : Enemy
 		ReactionType::FINISH_PATROL,
 		1};
 
-	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	EnemyPattern randomState = {"PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
 	LaserCrab()
 	{
 		maxHealth = 150;
@@ -1055,10 +1043,10 @@ struct EvilCrab : Enemy
 		ReactionType::DURATION,
 		1};
 
-	EnemyPattern randomState = { "RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration}, 1, false, 0.f, 0.f, NoAttack };
-	EnemyPattern idleState = { "IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 1000.f, radialSquare };
-	EnemyPattern walkingRage = { "WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration}, 3, false, 0.f, 0.f, NoAttack };
-	EnemyPattern shootMisile = { "MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 300.f, missile };
+	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idleState = {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 1000.f, radialSquare};
+	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 0, true, 0.f, 300.f, missile};
 	EvilCrab()
 	{
 		maxHealth = 200;
@@ -1256,7 +1244,8 @@ struct ThreeBee : Enemy
 	};
 };
 
-struct BeeHive : Enemy {
+struct BeeHive : Enemy
+{
 
 	const AttackData OneBee{
 		EnemyAttackPattern::SPAWNING,
@@ -1273,8 +1262,7 @@ struct BeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyOneBee
-	};
+		EnemyType::EnemyOneBee};
 
 	const AttackData ManyBoidBees{
 		EnemyAttackPattern::SPAWNING,
@@ -1291,8 +1279,7 @@ struct BeeHive : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyBioBoid
-	};
+		EnemyType::EnemyBioBoid};
 
 	Reaction Spawning{
 		ReactionType::DURATION,
@@ -1349,8 +1336,7 @@ struct BossBeeHive : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyOneBee
-	};
+		EnemyType::EnemyOneBee};
 
 	const AttackData twoBee{
 		EnemyAttackPattern::SPAWNING,
@@ -1367,26 +1353,24 @@ struct BossBeeHive : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyOneBee
-	};
+		EnemyType::EnemyOneBee};
 
 	const AttackData threeBoidBees{
-	EnemyAttackPattern::SPAWNING,
-	TRIANGLE,
-	{},
-	blunt,
-	3,
-	0,
-	{20, 20},
-	100,
-	3000,
-	{600, 0},
-	0,
-	0,
-	0,
-	EnemyBulletDeath::NONE,
-	EnemyType::EnemyBioBoid
-	};
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		3,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyBioBoid};
 
 	const AttackData sixBoidBees{
 		EnemyAttackPattern::SPAWNING,
@@ -1403,8 +1387,7 @@ struct BossBeeHive : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyBioBoid
-	};
+		EnemyType::EnemyBioBoid};
 
 	const AttackData twelveBoidBees{
 		EnemyAttackPattern::SPAWNING,
@@ -1421,8 +1404,7 @@ struct BossBeeHive : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyBioBoid
-	};
+		EnemyType::EnemyBioBoid};
 
 	const AttackData radialHexagon{
 		EnemyAttackPattern::RADIAL_POLYGON,
@@ -1468,7 +1450,6 @@ struct BossBeeHive : Enemy
 		0,
 		0,
 		0};
-
 
 	Reaction duration{
 		ReactionType::DURATION,
@@ -1625,9 +1606,9 @@ struct EvilSkull : Enemy
 		ReactionType::DURATION,
 		0};
 
-	EnemyPattern laserState1 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 1, true, 0.f, 2000.f, laser1 };
-	EnemyPattern laserState2 = { "ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 2, true, 0.f, 2000.f, laser2 };
-	EnemyPattern idleState   =  { "Idle", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 0, false, 0.f, 10000.f, laserRotate };
+	EnemyPattern laserState1 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 1, true, 0.f, 2000.f, laser1};
+	EnemyPattern laserState2 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 2, true, 0.f, 2000.f, laser2};
+	EnemyPattern idleState = {"Idle", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 0, false, 0.f, 10000.f, laserRotate};
 	EvilSkull()
 	{
 		maxHealth = 150;
@@ -1692,21 +1673,21 @@ struct HifiTemporaryBoid : Enemy
 {
 	Reaction singularityTransition1{
 		ReactionType::DURATION,
-		1
-	};
-	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDS, {}, 0, 9000.f, 9000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack };
-	EnemyPattern die = { "DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,1}}, 1, false, 0.f, 0.f, NoAttack };;
+		1};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDS, {}, 0, 9000.f, 9000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern die = {"DIE", EnemyBehavior::DEATHSTATE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 1}}, 1, false, 0.f, 0.f, NoAttack};
+	;
 	HifiTemporaryBoid()
 	{
 		maxHealth = 1;
 		currHealth = maxHealth;
-		enemyPatterns = { boidState , die};
+		enemyPatterns = {boidState, die};
 		sprite = {
 			"enemy_tempBoid.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
-		scale = vec2({ 20.f, 20.f });
+		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
 		rotatePower = 1.f;
 	}
@@ -1778,14 +1759,15 @@ struct HealerAngel : Enemy
 	}
 };
 
-struct BioBoid : Enemy {
+struct BioBoid : Enemy
+{
 
 	Reaction boid{
 		ReactionType::DURATION,
-		0
-	};
-	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
-	BioBoid() {
+		0};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+	BioBoid()
+	{
 		maxHealth = 1;
 		currHealth = maxHealth;
 		enemyPatterns = {boidState};
@@ -1800,14 +1782,15 @@ struct BioBoid : Enemy {
 	}
 };
 
-struct FishBoid : Enemy {
+struct FishBoid : Enemy
+{
 
 	Reaction boid{
 		ReactionType::DURATION,
-		0
-	};
-	EnemyPattern boidState = { "BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack };
-	FishBoid() {
+		0};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+	FishBoid()
+	{
 		maxHealth = 1;
 		currHealth = maxHealth;
 		enemyPatterns = {boidState};
@@ -1842,7 +1825,8 @@ struct EnemyTestPatrol : Enemy
 };
 
 //----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------
-struct TwinLaserVertical1 : Enemy {
+struct TwinLaserVertical1 : Enemy
+{
 	const AttackData crabLaser{
 		EnemyAttackPattern::TWIN_LASER,
 		CIRCLE,
@@ -1862,7 +1846,7 @@ struct TwinLaserVertical1 : Enemy {
 		ReactionType::FINISH_PATROL,
 		1};
 
-	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.01,0.01},{0.01,0.99},{0.01,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
+	EnemyPattern randomState = {"PatrolSide", EnemyBehavior::PATROLLING, {{0.01, 0.01}, {0.01, 0.99}, {0.01, 0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
 	TwinLaserVertical1()
 	{
 		maxHealth = 200;
@@ -1881,31 +1865,39 @@ struct TwinLaserVertical1 : Enemy {
 	};
 };
 
-struct TwinLaserVertical2 : TwinLaserVertical1 {
-	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserVertical2() : TwinLaserVertical1() {
-		enemyPatterns = { randomState};
+struct TwinLaserVertical2 : TwinLaserVertical1
+{
+	EnemyPattern randomState = {"PatrolSide", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.99, 0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
+	TwinLaserVertical2() : TwinLaserVertical1()
+	{
+		enemyPatterns = {randomState};
 	}
 };
 
-struct TwinLaserHorizontal1 : TwinLaserVertical1 {
-	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.01,0.01},{0.99,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserHorizontal1() : TwinLaserVertical1() {
-		enemyPatterns = { randomState};
+struct TwinLaserHorizontal1 : TwinLaserVertical1
+{
+	EnemyPattern randomState = {"PatrolSide", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.01, 0.01}, {0.99, 0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
+	TwinLaserHorizontal1() : TwinLaserVertical1()
+	{
+		enemyPatterns = {randomState};
 	}
 };
-struct TwinLaserHorizontal2 : TwinLaserHorizontal1 {
-	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.99,0.99},{0.01,0.99},{0.99,0.99}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
-	TwinLaserHorizontal2() : TwinLaserHorizontal1() {
-		enemyPatterns = { randomState};
+struct TwinLaserHorizontal2 : TwinLaserHorizontal1
+{
+	EnemyPattern randomState = {"PatrolSide", EnemyBehavior::PATROLLING, {{0.99, 0.99}, {0.01, 0.99}, {0.99, 0.99}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
+	TwinLaserHorizontal2() : TwinLaserHorizontal1()
+	{
+		enemyPatterns = {randomState};
 	}
 };
 
-struct HifiLaserSniper : Enemy {
-		EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99,0.01},{0.99,0.99},{0.01,0.99},{0.01,0.01},{0.99,0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, FastLaser };
-		EnemyPattern charging = { "Charge", EnemyBehavior::CHARGING, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 5000.f, NoAttack };
+struct HifiLaserSniper : Enemy
+{
+	EnemyPattern randomState = {"PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
+	EnemyPattern charging = {"Charge", EnemyBehavior::CHARGING, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
 
-	HifiLaserSniper() {
+	HifiLaserSniper()
+	{
 		maxHealth = 100;
 		currHealth = maxHealth;
 		enemyPatterns = {randomState};
@@ -1920,7 +1912,6 @@ struct HifiLaserSniper : Enemy {
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	};
 };
-
 
 struct HifiSniper : Enemy
 {
@@ -1953,11 +1944,10 @@ struct HifiSniper : Enemy
 		0,
 		0};
 
-	EnemyPattern random = {"STATIONARY", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {{ReactionType::PLAYER_CLOSE,1},{ReactionType::DURATION,0}}, 0, true, 0, 6000.f, HifiSniperShot};
-	EnemyPattern random2 = {"STATIONARY", EnemyBehavior::CHARGING, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,2}}, 2, true, 0, 0.f, NoAttack};
-	EnemyPattern random3 = {"STATIONARY", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,3}}, 3, true, 0, 0.f, NoAttack};
-	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,0}}, 0, true, 0, 3000.f, spray};
-	
+	EnemyPattern random = {"STATIONARY", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {{ReactionType::PLAYER_CLOSE, 1}, {ReactionType::DURATION, 0}}, 0, true, 0, 6000.f, HifiSniperShot};
+	EnemyPattern random2 = {"STATIONARY", EnemyBehavior::CHARGING, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 2}}, 2, true, 0, 0.f, NoAttack};
+	EnemyPattern random3 = {"STATIONARY", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 3, true, 0, 0.f, NoAttack};
+	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 0}}, 0, true, 0, 3000.f, spray};
 
 	HifiSniper()
 	{
@@ -2011,11 +2001,10 @@ struct HifiSniperHard : Enemy
 		0,
 		0};
 
-	EnemyPattern random = {"STATIONARY", EnemyBehavior::RANDOM, {}, 0, 1500.f, 1500.f, {{ReactionType::PLAYER_CLOSE,1},{ReactionType::DURATION,0}}, 0, true, 0, 3000.f, sniperShot};
-	EnemyPattern random2 = {"STATIONARY", EnemyBehavior::CHARGING, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,2}}, 2, true, 0, 0.f, NoAttack};
-	EnemyPattern random3 = {"STATIONARY", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,3}}, 3, true, 0, 0.f, NoAttack};
-	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0, 1000.f, spray};
-	
+	EnemyPattern random = {"STATIONARY", EnemyBehavior::RANDOM, {}, 0, 1500.f, 1500.f, {{ReactionType::PLAYER_CLOSE, 1}, {ReactionType::DURATION, 0}}, 0, true, 0, 3000.f, sniperShot};
+	EnemyPattern random2 = {"STATIONARY", EnemyBehavior::CHARGING, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 2}}, 2, true, 0, 0.f, NoAttack};
+	EnemyPattern random3 = {"STATIONARY", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 3, true, 0, 0.f, NoAttack};
+	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0, 1000.f, spray};
 
 	HifiSniperHard()
 	{
@@ -2034,7 +2023,6 @@ struct HifiSniperHard : Enemy
 		speedMultiplier = 1.5;
 	};
 };
-
 
 struct HifiCharger : Enemy
 {
@@ -2386,7 +2374,7 @@ struct HifiJellyFish : Enemy
 		4000.f,
 		4000.f,
 		{
-			{ReactionType::DURATION,1},
+			{ReactionType::DURATION, 1},
 		},
 		1,
 		true,
@@ -2435,7 +2423,7 @@ struct HifiJellyFish : Enemy
 		250.f,
 		250.f,
 		spiral};
-	
+
 	EnemyPattern chargingState3 = {
 		"CHARGE",
 		EnemyBehavior::RECOIL,
@@ -2486,7 +2474,7 @@ struct HifiJellyFish : Enemy
 struct HifiTackShooter : Enemy
 {
 	/**
-	 * Stationary turret that attacks within a range around it 
+	 * Stationary turret that attacks within a range around it
 	 */
 	const BulletStackEffect playerSpeedDownASmall = {
 		PlayerSpeed,
@@ -2517,10 +2505,8 @@ struct HifiTackShooter : Enemy
 		0,
 		2000.f,
 		2000.f,
-		{
-			{ReactionType::DURATION,0},
-			{ReactionType::PLAYER_CLOSE,1}
-		},
+		{{ReactionType::DURATION, 0},
+		 {ReactionType::PLAYER_CLOSE, 1}},
 		0,
 		true,
 		0.f,
@@ -2548,7 +2534,7 @@ struct HifiTackShooter : Enemy
 		2000.f,
 		2000.f,
 		{
-			{ReactionType::DURATION,0},
+			{ReactionType::DURATION, 0},
 		},
 		0,
 		true,
@@ -2561,7 +2547,7 @@ struct HifiTackShooter : Enemy
 		maxHealth = 250;
 		currHealth = maxHealth;
 
-		enemyPatterns = {rotateState, shootingState,rotateState2};
+		enemyPatterns = {rotateState, shootingState, rotateState2};
 		rotationBehaviour = EnemyRotationBehavior::SPIN;
 
 		patternIndex = 0;
@@ -2579,7 +2565,7 @@ struct HifiTackShooter : Enemy
 struct HifiBallLauncher : Enemy
 {
 	/**
-	 * 
+	 *
 	 */
 	const BulletStackEffect playerSpeedDownASmall = {
 		PlayerSpeed,
@@ -2591,10 +2577,10 @@ struct HifiBallLauncher : Enemy
 	const AttackData launch{
 		EnemyAttackPattern::RADIAL,
 		CIRCLE,
-		{bulletBounceUpM,bulletBounceUpA},
+		{bulletBounceUpM, bulletBounceUpA},
 		blunt,
 		4,
-		M_PI/4.f,
+		M_PI / 4.f,
 		{30, 30},
 		600,
 		10000,
@@ -2611,7 +2597,7 @@ struct HifiBallLauncher : Enemy
 		500.f,
 		500.f,
 		{
-			{ReactionType::DURATION,1},
+			{ReactionType::DURATION, 1},
 		},
 		1,
 		true,
@@ -2653,7 +2639,7 @@ struct HifiBallLauncher : Enemy
 	};
 };
 
-struct HifiWhip: Enemy
+struct HifiWhip : Enemy
 {
 	/**
 	 * Expanding whip
@@ -2664,11 +2650,11 @@ struct HifiWhip: Enemy
 		{dmgUpA},
 		blunt,
 		2,
-		-M_PI/4.f,
+		-M_PI / 4.f,
 		{15, 15},
 		400,
 		2000,
-		{200, M_PI/1.5},
+		{200, M_PI / 1.5},
 		0,
 		2,
 		0};
@@ -2681,7 +2667,7 @@ struct HifiWhip: Enemy
 		500.f,
 		500.f,
 		{
-			{ReactionType::DURATION,1},
+			{ReactionType::DURATION, 1},
 		},
 		1,
 		true,
@@ -2816,23 +2802,21 @@ struct HifiCannonHard : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyHifiTemporaryBoid
-		};
+		EnemyType::EnemyHifiTemporaryBoid};
 
-
-	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,1},{ReactionType::PLAYER_CLOSE,4}}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyPattern chargingState = {"CHARGING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,2}}, 2, false, 0.f, 0.f, NoAttack};
-	EnemyPattern backUp = {"RECOIL", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION,3}}, 3, false, 0.f, 0.f, NoAttack};
-	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, cannonShot};
-	EnemyPattern spawn = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION,5}}, 5, true, 0.f, 200.f, spawning};
-	EnemyPattern rest = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION,0}}, 0, false, 0.f, 2000.f, NoAttack};
-	EnemyPattern laser = {"LASER", EnemyBehavior::IDLE, {}, 0, 0.f, 2000.f, {{ReactionType::DURATION,0}}, 0, true, 0.f, 2000.f, FastLaser};
+	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, {ReactionType::PLAYER_CLOSE, 4}}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 2}}, 2, false, 0.f, 0.f, NoAttack};
+	EnemyPattern backUp = {"RECOIL", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, cannonShot};
+	EnemyPattern spawn = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 5}}, 5, true, 0.f, 200.f, spawning};
+	EnemyPattern rest = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 2000.f, NoAttack};
+	EnemyPattern laser = {"LASER", EnemyBehavior::IDLE, {}, 0, 0.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, FastLaser};
 
 	HifiCannonHard()
 	{
 		maxHealth = 400;
 		currHealth = maxHealth;
-		enemyPatterns = {random1,chargingState, backUp,shootCannon,spawn,rest,laser};
+		enemyPatterns = {random1, chargingState, backUp, shootCannon, spawn, rest, laser};
 		patternIndex = 0;
 		sprite = {
 			"enemy_hifi_003_hard.png",
@@ -2846,14 +2830,15 @@ struct HifiCannonHard : Enemy
 	};
 };
 
-struct HifiBossEnemy : Enemy {
+struct HifiBossEnemy : Enemy
+{
 	/**
 	 * Boss enemy that has a variety of attacks and patterns
 	 */
 	const AttackData snailTrail{
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
-		{ },
+		{},
 		buzz,
 		1,
 		0,
@@ -2864,8 +2849,7 @@ struct HifiBossEnemy : Enemy {
 		0,
 		0,
 		0,
-		EnemyBulletDeath::CLUSTER
-		};
+		EnemyBulletDeath::CLUSTER};
 
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
@@ -2889,26 +2873,56 @@ struct HifiBossEnemy : Enemy {
 		0,
 		4000.f,
 		4000.f,
-		{{ReactionType::PLAYER_CLOSE,1},},
+		{
+			{ReactionType::PLAYER_CLOSE, 1},
+		},
 		0,
 		true,
-		0.f, 5000.f, snailTrail };
+		0.f,
+		5000.f,
+		snailTrail};
 
 	EnemyPattern chargingState = {
 		"CHARGE",
 		EnemyBehavior::CHARGING,
-		{}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,2}}, 2, true, 0.f, 0.f, snailTrail};
-
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 2}},
+		2,
+		true,
+		0.f,
+		0.f,
+		snailTrail};
 
 	EnemyPattern chargingState2 = {
 		"CHARGE",
 		EnemyBehavior::CHARGING,
-		{}, 0, 2000.f, 2000.f, {{ReactionType::PLAYER_CLOSE,3},{ReactionType::DURATION,0}}, 0, true, 0.f, 0.f, snailTrail};
+		{},
+		0,
+		2000.f,
+		2000.f,
+		{{ReactionType::PLAYER_CLOSE, 3}, {ReactionType::DURATION, 0}},
+		0,
+		true,
+		0.f,
+		0.f,
+		snailTrail};
 
 	EnemyPattern shootingState = {
 		"ROTATE",
 		EnemyBehavior::ROTATE_IN_PLACE,
-		{}, 0, 1000.f, 1000.f, {{ReactionType::DURATION,0}}, 0, true, 250.f, 250.f, spiral};
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		250.f,
+		250.f,
+		spiral};
 
 	EnemyPattern fourWayLaser = {
 		"LASER",
@@ -2917,15 +2931,12 @@ struct HifiBossEnemy : Enemy {
 		0,
 		0.f,
 		2000.f,
-		{{ReactionType::DURATION,0}},
+		{{ReactionType::DURATION, 0}},
 		0,
 		true,
 		0.f,
 		2000.f,
-		FastLaser
-	};
-
-
+		FastLaser};
 };
 
 struct ScientistBossEnemy : Enemy
@@ -3186,8 +3197,8 @@ struct ScientistBossEnemy : Enemy
 	EnemyPattern spawnShieldState = {"Shield", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, shieldBreak, secondPhase}, 0, true, 0.f, 100.f, spawnShield};
 	EnemyPattern secondPhaseState = {"SECOND PHASE", EnemyBehavior::TELEPORT, {{0.5f, 0.5f}}, 0, 2000.f, 2000.f, {duration}, 10, false, 0.f, 0.f, NoAttack};
 	EnemyPattern spawnHandState = {"SUMMON HAND", EnemyBehavior::IDLE, {}, 0, 500.f, 500.f, {duration}, 11, true, 0.f, 5000.f, spawnHand};
-	EnemyPattern patrollingState1 = {"PATROL 1", EnemyBehavior::PATROLLING, {{0.2, 0.8}, {0.2, 0.2}}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 2000.f, lethalShot};
-	EnemyPattern patrollingState2 = {"PATROL 2", EnemyBehavior::PATROLLING, {{0.5, 0.5}, {0.7, 0.7}}, 0, 5000.f, 5000.f, {duration}, 13, true, 0.f, 5000.f, spawnExplosive};
+	EnemyPattern patrollingState1 = {"RANDOM", EnemyBehavior::RANDOM, {{0.2, 0.8}, {0.2, 0.2}}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 5000.f, lethalShot};
+	EnemyPattern patrollingState2 = {"RANDOM", EnemyBehavior::RANDOM, {{0.5, 0.5}, {0.7, 0.7}}, 0, 5000.f, 5000.f, {duration}, 13, true, 0.f, 5000.f, spawnExplosive};
 	EnemyPattern teleportState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 0, 3000.f, 3000.f, {duration}, 11, true, 0.f, 3000.f, boidFishSummon};
 
 	ScientistBossEnemy()
@@ -3473,29 +3484,29 @@ struct ScientistHandEnemy : Enemy
 
 	Reaction duration{
 		ReactionType::DURATION,
-		0 };
+		0};
 
 	const AttackData HandBomb{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
 		{numBulletsUpA, dmgDownA},
 		blunt,
-		5,
+		7,
 		-M_PI / 20,
-		{100, 100},
+		{50, 50},
 		150,
 		9000,
-		{5, 0},
+		{40, 0},
 		0,
 		0,
 		0,
-		EnemyBulletDeath::EXPLODE };
+		EnemyBulletDeath::EXPLODE};
 
 	const AttackData laserOne{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{numBulletsUpA, dmgDownA},
-		blunt,
+		dmgDownA,
 		1,
 		M_PI,
 		{100, 100},
@@ -3505,7 +3516,7 @@ struct ScientistHandEnemy : Enemy
 		0,
 		0,
 		0,
-		EnemyBulletDeath::EXPLODE };
+		EnemyBulletDeath::EXPLODE};
 
 	const AttackData quakeShot{
 		EnemyAttackPattern::RADIAL,
@@ -3520,13 +3531,13 @@ struct ScientistHandEnemy : Enemy
 		{20, 0},
 		0,
 		0,
-		0 };
+		0};
 
 	const AttackData sprayingShot{
 		EnemyAttackPattern::SPRAY,
 		CIRCLE,
 		{numBulletsUpA},
-		blunt,
+		playerSpeedDownA,
 		50,
 		-M_PI / 20,
 		{20, 20},
@@ -3535,44 +3546,80 @@ struct ScientistHandEnemy : Enemy
 		{90, 0},
 		0,
 		0,
-		0 };
+		0};
+
+	const AttackData sprayHoming{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{dmgDownM},
+		playerSpeedUpA,
+		20,
+		-M_PI / 20,
+		{20, 20},
+		400,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0.02};
+
+	const AttackData laserArea{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{numBulletsUpA},
+		dmgDownA,
+		1,
+		M_PI / 2,
+		{75, 75},
+		150,
+		2000,
+		{99, M_PI / 200},
+		0,
+		0,
+		0};
 
 	EnemyPattern idling = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern chargePlayer = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 3000.f, 3000.f, {duration}, 2, false, 0.f, 0.f, NoAttack};
-	EnemyPattern idling2 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 10000.f, 10000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
-	EnemyPattern BombingState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 4, true, 1000.f, 1000.f, HandBomb};
-	EnemyPattern teleportToScientist2 = {"T", EnemyBehavior::IDLE, {{0.5, 0.5}}, 4, 1000.f, 1000.f, {duration}, 5, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling3 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 10000.f, 10000.f, {duration}, 6, false, 0.f, 0.f, NoAttack};
-	EnemyPattern laserAttackPrepareState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.95, 0.09}}, 0, 2000.f, 2000.f, {duration}, 7, true, 1000.f, 1000.f, NoAttack};
-	EnemyPattern patrolLaserState = {"PATROLLING", EnemyBehavior::PATROLLING, {{0.95, 0.09}, {0.95, 0.95}}, 0, 15000.f, 15000.f, {duration}, 8, true, 0.f, 15000.f, laserOne};
-	EnemyPattern teleportToScientist3 = {"T", EnemyBehavior::IDLE, {{0.5, 0.5}}, 4, 1000.f, 1000.f, {duration}, 9, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling4 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 10000.f, 10000.f, {duration}, 10, false, 0.f, 0.f, NoAttack};
-	EnemyPattern SprayingState = {"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 11, true, 1000.f, 1000.f, sprayingShot};
-	EnemyPattern teleportToScientist4 = {"T", EnemyBehavior::IDLE, {{0.5, 0.5}}, 4, 1000.f, 1000.f, {duration}, 0, true, 500.f, 1000.f, quakeShot};
+	EnemyPattern idling2 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern BombingState = {"PATROL", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 6000.f, 6000.f, {duration}, 4, true, 1000.f, 1000.f, HandBomb};
+	EnemyPattern idling3 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 5, false, 0.f, 0.f, NoAttack};
+	EnemyPattern teleportToScientist2 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 6, true, 500.f, 1000.f, quakeShot};
+	EnemyPattern laserAttackPrepareState = {"PATROL", EnemyBehavior::TELEPORT, {{1, 0.1}}, 0, 2000.f, 2000.f, {duration}, 7, false, 1000.f, 1000.f, NoAttack};
+	EnemyPattern patrolLaserState = {"PATROLLING", EnemyBehavior::PATROLLING, {{1, 0.1}, {1, 0.95}}, 0, 15000.f, 15000.f, {duration}, 8, true, 0.f, 15000.f, laserOne};
+	EnemyPattern teleportToScientist3 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 9, true, 500.f, 1000.f, quakeShot};
+	EnemyPattern idling4 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 10, false, 0.f, 0.f, NoAttack};
+	EnemyPattern SprayingState = {"PATROL", EnemyBehavior::PATROLLING, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 11, true, 1000.f, 1000.f, sprayingShot};
+	EnemyPattern teleportToScientist4 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 12, true, 500.f, 1000.f, quakeShot};
+	EnemyPattern idling5 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 13, false, 0.f, 0.f, NoAttack};
+	EnemyPattern sprayHomingState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 6000.f, 6000.f, {duration}, 14, true, 0.f, 3000.f, sprayHoming};
+	EnemyPattern idling6 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 15, false, 0.f, 0.f, NoAttack};
+	EnemyPattern teleportToScientist5 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 16, true, 500.f, 1000.f, quakeShot};
+	EnemyPattern teleportToWall = {"TELEPORT", EnemyBehavior::TELEPORT, {{1, 0.5}}, 0, 2000.f, 2000.f, {duration}, 17, false, 1000.f, 1000.f, NoAttack};
+	EnemyPattern laserRotateState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 3000.f, laserArea};
+
 
 	ScientistHandEnemy()
 	{
 		maxHealth = 1200;
 		currHealth = 1200;
-		enemyPatterns = { idling, chargePlayer, idling2,
-						BombingState,teleportToScientist2, idling3,
-						laserAttackPrepareState, patrolLaserState, teleportToScientist3,
-						idling4, SprayingState, teleportToScientist4 };
+		enemyPatterns = {idling, chargePlayer, idling2,
+						 BombingState, idling3,teleportToScientist2,
+						 laserAttackPrepareState, patrolLaserState, teleportToScientist3,
+						 idling4, SprayingState, teleportToScientist4, idling5, sprayHomingState, idling6,teleportToScientist5, teleportToWall
+						 , laserRotateState};
 		sprite = {
 			"hand_idletocharge",
 			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0),
 			AnimationTypes::REGULAR,
-			9
-		};
+			9};
 		patternIndex = 0;
 		scale = vec2(200, 200);
 		rotatePower = 0.f;
-		speedMultiplier = 2.f;
+		speedMultiplier = 4.f;
 	};
 };
-
 
 // struct EvilSkull : {
 

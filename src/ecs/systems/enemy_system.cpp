@@ -194,6 +194,8 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 if (pattern.type == EnemyBehavior::TELEPORT)
                 {
+
+                    std::cout << "teleporting in" << movement.posB[0] << ": " << movement.posB[1] << std::endl;
                     motion.position = movement.posB;
                 }
                 else
@@ -578,13 +580,11 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
 
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        std::cout << registry.shield.entities.size() << "shield num" << std::endl;
         if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity))
         {
             if (registry.shield.entities.size() > 0) {
                 break;
             }
-            std::cout << " created shield " << std::endl;
             Entity shield = createEnemy(render, pos, atkData.spawn);
             Scientist &scientist = registry.scientist.get(entity);
             scientist.shield = shield;
