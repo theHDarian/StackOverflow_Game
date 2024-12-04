@@ -422,6 +422,7 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PopStack";
+	object.item = PopConsole;
 	// or maybe object type enum? This is not a unique id, just an object type identifier
 
 	Animation &a = registry.animations.emplace(console);
@@ -520,11 +521,20 @@ Entity createSwarm(RenderSystem *renderer, vec2 pos)
 
 Entity createBaru(RenderSystem *renderer, vec2 pos)
 {
-	auto entity = createProp3D(renderer, pos, "Brau1589.png", vec2(1380, 960), vec2(1380, 960), 50);
+	auto entity = createProp3D(renderer, pos, "Brau1589.png", vec2(1380, 960), vec2(0, 0), 300);
 	InteractableObject &object = registry.interactables.emplace(entity);
+	WallCollider& wall = registry.walls.emplace(Entity());
+	wall.startPosition = pos + vec2(-400, 300);
+	wall.endPosition = pos + vec2(500, 300);
+	WallCollider& wall2 = registry.walls.emplace(Entity());
+	wall2.startPosition = pos + vec2(-400, -300);
+	wall2.endPosition = pos + vec2(-400, 300);
+	WallCollider& wall3 = registry.walls.emplace(Entity());
+	wall3.startPosition = pos + vec2(500, 300);
+	wall3.endPosition = pos + vec2(-400, -300);
 	object.name = "Baru";
 	object.item = InteractableItem::Baru;
-	registry.circleColliders.emplace(entity).radius = 200;
+	registry.circleColliders.emplace(entity).radius = 450;
 	// AABBCollider &aabb = registry.aabbs.emplace(entity);
 	// aabb.topLeft = vec2(-750, -375);
 	// aabb.bottomRight = vec2(750, 375);
