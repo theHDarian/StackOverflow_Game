@@ -128,8 +128,7 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	else if (gameState.dialogueScene && !gameState.gamePaused) {
 		handleDialogueChoice(key, action, ioState, gameState);
 	}
-	if (!ioState.lockControls)
-		handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
+	handleMovementInput(key, action, ioState, gameState); // seems like always need to handle this, or else weird movement bugs
 
 }
 
@@ -195,7 +194,7 @@ void IOSystem::onMouseMove(vec2 mousePosition) {
 }
 
 void IOSystem::handleMovementInput(int key, int action, IOState& state, GameState& gameState) {
-	if (action == GLFW_PRESS) {
+	if (action == GLFW_PRESS && !state.lockControls && !gameState.dialogueScene) {
 		if (key == GLFW_KEY_A) {
 			state.pressedHorizontal.push(-1.0f);
 		} else if (key == GLFW_KEY_D) {
@@ -225,7 +224,7 @@ void IOSystem::handleMovementInput(int key, int action, IOState& state, GameStat
 	float verticalAxis = state.pressedVertical.empty() ? 0.0f : state.pressedVertical.top();
 	// std::cout << horizontalAxis << " " << verticalAxis << std::endl;
     state.inputAxis = {horizontalAxis,verticalAxis};
-	if (state.inputAxis != vec2(0.0f)) {
+	if (state.inputAxis != vec2(0.0f) && !state.lockControls) {
 		state.lastInputAxis = state.inputAxis;
 	}
 
