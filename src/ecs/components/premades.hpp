@@ -1865,7 +1865,7 @@ struct TwinLaserVertical1 : Enemy {
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::PATROLLING, {{0.01,0.01},{0.01,0.99},{0.01,0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser };
 	TwinLaserVertical1()
 	{
-		maxHealth = 200;
+		maxHealth = 100;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
