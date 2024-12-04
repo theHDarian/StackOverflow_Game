@@ -46,6 +46,7 @@ void SceneSystem::step(float elapsed_ms) {
 						lines = DialogueLines();
 						lines.lines = interactibleDialogue[dialogueObject];
 					}
+					callScientist = false;
 				}
 				else {
 					assert(registry.interactables.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
