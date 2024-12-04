@@ -361,7 +361,7 @@ void UISystem::step(float elapsed_ms) {
 		stackui.bulletPositions.resize(stack.currStack.size());
 	}
 
-	if (gameState.gamePaused || gameState.dialogueScene || registry.maps.components[0].currRoom.cleared) {
+	if (gameState.gamePaused || gameState.dialogueScene || registry.maps.components[0].currRoom.cleared || gameState.gameOver) {
 		// is the player hovering over a stack ui bullet right now?
 		// bad: copies code from render system; consider making each bullet an entity
 		// may optimize using some other method like colour picking/just limiting search size
