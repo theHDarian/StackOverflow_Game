@@ -25,6 +25,12 @@ Entity createJournal(RenderSystem* renderer, vec2 pos);
 
 Entity createDesk(RenderSystem* renderer, vec2 pos);
 
+Entity createDeskWithMouse(RenderSystem* renderer, vec2 pos);
+
+Entity createOracleTurret ( RenderSystem *renderer, vec2 pos );
+
+Entity CreateOven ( RenderSystem *renderer, vec2 pos );
+
 Entity createWhiteBoard(RenderSystem* renderer, vec2 pos);
 
 Entity createPopConsole(RenderSystem* renderer, vec2 pos);

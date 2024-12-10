@@ -607,5 +607,6 @@ struct Critter {
 struct KeyItems {
     int fruits = 0;
     int honey = 0;
+    int cheese = 0;
     bool hasSeenPieRecipe = false;
 };

@@ -242,7 +242,7 @@ void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* 
 
 
 void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
-    // interactible object management placed here and hard coded for now
+	// interactible object management placed here and hard coded for now
 	// can consider: each behaviour type is component, when choice X is selected then enact that behaviour
 	GameState& gameState = registry.gameStates.components[0];
 	for (InteractableReaction& reaction : registry.interactableReactions.components) {
@@ -526,13 +526,116 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			if (reaction.choice == 0) {
 				registry.renderRequests.get(reaction.object).show = false;
 				registry.deleteds.emplace(reaction.object);
-				DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
 				req.type = DialogueRequestType::StoryDialogue;
 			}
 		}
-	}
 
-	registry.interactableReactions.clear();
+		if ( object.item == InteractableItem::Mouse) {
+			switch (object.dialogueCount) {
+				case  0 : {
+					if (reaction.choice == 0) {
+
+						DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+						// registry.renderRequests.get(reaction.object).show = false;
+						// registry.deleteds.emplace(reaction.object);
+						StackCompile& stack = registry.stackCompile.get(player);
+						if (stack.useKey()) {
+							req.choice = 7;
+							object.dialogueCount = 1;
+							if (!registry.keyItems.has(player)) {
+								registry.keyItems.emplace(player);
+							}
+							KeyItems& keyItems = registry.keyItems.get(player);
+							keyItems.cheese++;
+						} else {
+							req.choice = 3;
+						}
+					}
+					break;
+				}
+				case 1 : {
+					if (reaction.choice == 0) {
+						if (!registry.keyItems.has(player)) {
+							registry.keyItems.emplace(player);
+						}
+						KeyItems& keyItems = registry.keyItems.get(player);
+						if (keyItems.cheese > 0) {
+							keyItems.cheese--;
+						}
+						object.dialogueCount = 2;
+					}
+					break;
+				}
+			}
+		}
+		if (object.item == InteractableItem::Oven) {
+			switch ( object.dialogueCount) {
+				case 0 : {
+					if (reaction.choice == 0) {
+						DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
+						if (!registry.keyItems.has(player)) {
+							registry.keyItems.emplace(player);
+						}
+						KeyItems& keyItems = registry.keyItems.get(player);
+						if (keyItems.hasSeenPieRecipe) {
+							if (reaction.choice == 0) {
+								if (keyItems.fruits > 0 && keyItems.honey > 0) {
+									req.choice = 6;
+								} else if (keyItems.fruits > 0) {
+									req.choice = 4;
+								} else if (keyItems.honey > 0) {
+									req.choice = 3;
+								} else {
+									req.choice = 5;
+								}
+								object.dialogueCount = 1;
+							}
+						} else {
+							req.choice = 2;
+						}
+
+					}
+					break;
+				}
+
+			}
+		}
+		if (object.item == InteractableItem::OracleTurret) {
+			switch ( object.dialogueCount) {
+				case 0 : {
+					if (reaction.choice == 0) {
+						object.dialogueCount = 1;
+					}
+					break;
+				}
+				case 1 : {
+					object.dialogueCount = 2;
+					break;
+				}
+				case 2 : {
+					object.dialogueCount = 3;
+					break;
+				}
+				case 3 : {
+					object.dialogueCount = 4;
+					break;
+				}
+				case 4 : {
+					object.dialogueCount = 5;
+					break;
+				}
+				case 5 : {
+					object.dialogueCount = 2;
+					break;
+				}
+
+
+			}
+		}
+
+		registry.interactableReactions.clear();
+	}
 }
 
 

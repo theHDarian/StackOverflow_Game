@@ -389,6 +389,9 @@ enum InteractableItem {
 	WhiteBoard,
 	Desk,
 	Phone,
+	Mouse,
+	OracleTurret,
+	Oven,
 	NA
 };
 

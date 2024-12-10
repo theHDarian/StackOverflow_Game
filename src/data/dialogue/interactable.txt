@@ -367,11 +367,14 @@ What's inside? It seems to be... a piece of cheese?
 would you like to open the safe?
 CHOICES Yes\No
 
-ITEM Mouse 0 0
+ITEM Mouse 7 1
 You open the safe.
 Inside, you find a piece of cheese.
 [Obtained cheese!]
 SOUND itemPickup
+
+ITEM Mouse 3 0
+You can't figure out how to open the safe.
 
 ITEM Mouse 1 0
 You decide to leave the safe alone.
@@ -391,36 +394,44 @@ You feel a sense of satisfaction.
 ITEM Mouse 1 1
 You decide to keep the cheese for yourself.
 
+ITEM Mouse -1 2
+The mouse is content with the cheese.
+You feel a sense of satisfaction.
+
 ITEM OracleTurret -1 0
-There's one of those hostile crabs again. This one seems to be very beat up.
+There's one of those hostile turrets. This one seems to be very beat up.
 It's not attacking you, but it's not moving either.
 Would you like to investigate?
 CHOICES Yes\No
 
-ITEM OracleTurret 0 0
-You approach the crab.
+
 
 ITEM OracleTurret 1 0
-You decide to leave the crab alone.
+You decide to leave the strange turret alone.
 
-ITEM OracleTurret -1 1
-Suddenly, the crab starts to speak.
-SPEAKER OracleTurret BrokenCrab.png
+ITEM OracleTurret 0 0
+You approach the turret.
+Suddenly, the turret starts to speak.
+SPEAKER OracleTurret Turret.png
 "System... error... System... error..."
 "Sisyphus was punished by the gods to roll a boulder up a hill, only for it to roll back down every time he reached the top."
 
-ITEM OracleTurret -1 2
+ITEM OracleTurret -1 1
 "There was once three... Now there is one..."
-SPEAKER OracleTurret BrokenCrab.png
+SPEAKER OracleTurret Turret.png
 
-ITEM OracleTurret -1 3
+ITEM OracleTurret -1 2
 "He... doesn't want you to leave...  He... doesn't want anyone to leave..."
 
-ITEM OracleTurret -1 4
+ITEM OracleTurret -1 3
 "Hello... Hello..."
+"Are you still there?"
+
+ITEM OracleTurret -1 4
+"The cheese... The cheese... Takes two keys..."
 
 ITEM OracleTurret -1 5
-"The cheese... The cheese... Takes two keys..."
+"He... He is more machine... than man..."
 
 ITEM FightConsole -1 0
 This seems to be one of those machines that can directly link to robots and push data onto their stacks... But why is it red?
@@ -572,10 +583,6 @@ You... who have been chosen by the Swarm...
 You... who have been chosen by the Free...
 
 
-
-
-
-
 ITEM WhiteBoard -1 0
 A board with a blue print tacked onto it. These symbols look like they could come in handy.
 CUT controls.png
@@ -634,4 +641,66 @@ The order of effects in your stack could be important when it comes to using key
 ITEM CallScientist 3 0
 KEYS are special bullets that are occasionally fired by rogue robots. They are used to unlock locked rooms.
 These rooms tend to have stronger enemies or even better rewards!
+
+ITEM Oven  -1 0
+It's... a regular oven? It seems to be in working condition.
+Why would there be an oven here?
+Regardless, it seems to be fit for baking. Would you like to bake something?
+CHOICES Yes\No
+
+ITEM Oven 2 0
+You can't think of anything to bake.
+
+ITEM Oven -1 1
+You've already baked something. You wonder if you should bake something else.
+
+
+ITEM Oven 6 1
+You remember the recipe you got from the gardener.
+Following the recipe, you need apples and honey to bake a honey apple pie.
+You put the ingredients in the oven.
+You smell the sweet aroma of the pie baking.
+...
+...
+...
+[Obtained Honey Apple Pie!]
+SOUND itemPickup
+It seems you've baked a delicious pie! This is something a human would die for.
+Not literally, of course.
+
+ITEM Oven 3 1
+You remember the recipe you got from the gardener.
+Following the recipe, you need apples and honey to bake a honey apple pie.
+You don't have any apples, but you do have honey. You decide to still give it a shot.
+You put the honey in the oven.
+You smell the sweet aroma of the pie baking.
+...
+...
+...
+[Obtained Honey Pie!]
+SOUND itemPickup
+Without the apples, it's not quite a honey apple pie, but it's still a delicious treat!
+
+ITEM Oven 4 1
+You remember the recipe you got from the gardener.
+Following the recipe, you need apples and honey to bake a honey apple pie.
+You don't have any honey, but you do have apples. You decide to still give it a shot.
+You put the apples in the oven.
+You smell the sweet aroma of the pie baking.
+...
+...
+...
+[Obtained Apple Pie!]
+SOUND itemPickup
+Without the honey, it's not quite a honey apple pie, but it's still a delicious treat!
+
+ITEM Oven 5 1
+You can't bake anything without the ingredients.
+
+
+ITEM Oven 1 0
+You decide to leave the oven alone.
+
+
+
 

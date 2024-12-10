@@ -188,6 +188,12 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createPhone(renderer, pos);
 	case InteractableItem::Swarm:
 		return createSwarm(renderer, pos);
+	case InteractableItem::Mouse:
+		return createDeskWithMouse(renderer, pos);
+		case InteractableItem::OracleTurret:
+			return  createOracleTurret(renderer, pos);
+		case InteractableItem::Oven:
+			return CreateOven(renderer, pos);
 	default:
 		return Entity();
 	}
@@ -257,6 +263,55 @@ Entity createDesk(RenderSystem *renderer, vec2 pos)
 
 	return entity;
 }
+
+Entity createDeskWithMouse ( RenderSystem *renderer, vec2 pos )
+{
+	Entity entity = createProp3D( renderer, pos, "Mouse1.png", vec2(240 / 1.5f, 192/ 1.5f), vec2(130 / 1.5f, 0), 0, EFFECT_ASSET_ID::TEXTURED );
+
+	// registry.backgrounds.emplace(entity);
+
+	InteractableObject &object = registry.interactables.emplace(entity);
+	object.name = "Mouse";
+	object.item = InteractableItem::Mouse;
+
+	CircleCollider &cc = registry.circleColliders.emplace(entity);
+	cc.radius = 150.f;
+
+	return entity;
+}
+
+Entity createOracleTurret ( RenderSystem *renderer, vec2 pos )
+{
+	Entity entity = createProp3D( renderer, pos, "Turret.png", vec2(192, 264), vec2(110, 35), 35, EFFECT_ASSET_ID::TEXTURED );
+
+	// registry.backgrounds.emplace(entity);
+
+	InteractableObject &object = registry.interactables.emplace(entity);
+	object.name = "OracleTurret";
+	object.item = InteractableItem::OracleTurret;
+
+	CircleCollider &cc = registry.circleColliders.emplace(entity);
+	cc.radius = 150.f;
+
+	return entity;
+}
+
+Entity CreateOven ( RenderSystem *renderer, vec2 pos )
+{
+	Entity entity = createProp3D( renderer, pos, "oven.png", vec2(200, 200), vec2(100, 60), 60, EFFECT_ASSET_ID::TEXTURED );
+
+	// registry.backgrounds.emplace(entity);
+
+	InteractableObject &object = registry.interactables.emplace(entity);
+	object.name = "Oven";
+	object.item = InteractableItem::Oven;
+
+	CircleCollider &cc = registry.circleColliders.emplace(entity);
+	cc.radius = 150.f;
+
+	return entity;
+}
+
 
 // if make this a prop, would disappear because too tiny and is object.
 // consider changing type
@@ -351,6 +406,8 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 
 	return console;
 }
+
+
 
 Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects)
 {
