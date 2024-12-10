@@ -176,6 +176,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		{
 			GLint frame_uloc = glGetUniformLocation(program, "frame");
 			glUniform1i(frame_uloc, registry.animations.get(entity).frame);
+			GLuint time_uloc = glGetUniformLocation(program, "time");
+			glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 			gl_has_errors();
 		}
 
@@ -230,7 +232,22 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
 		{
+			GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
 			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+			glUniform1i(texture_uloc, 0);
+			gl_has_errors();
+
+			GLuint glitch_mask_id = texture_gl_handles[(GLuint)name_to_texture["glitch_mask"]];
+			GLuint glitch_mask_uloc = glGetUniformLocation(program, "glitchMask");
+			glActiveTexture(GL_TEXTURE0 + 1);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_mask_id);
+			glUniform1i(glitch_mask_uloc, 1);
+
+			GLuint glitch_id = texture_gl_handles[(GLuint)name_to_texture["glitch"]];
+			GLuint glitch_uloc = glGetUniformLocation(program, "glitch");
+			glActiveTexture(GL_TEXTURE0 + 2);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_id);
+			glUniform1i(glitch_uloc, 2);
 			gl_has_errors();
 		}
 		else
