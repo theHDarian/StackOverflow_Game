@@ -434,7 +434,10 @@ void WorldSystem::handleCollisions() {
 
 					registry.enemyBullets.get(entity).bulletBounce -= 1;
 				}
-				else {
+				else if (registry.enemyBullets.get(entity).bulletBounce < -1) {
+					motion.velocity = vec2(0.f);
+					motion.veer = vec2(0.f);
+				} else {
 					if (!registry.deleteds.has(entity)) {
 						//emit wall collision particle
 						ParticleProps props = enemyBulletDeathParticle;

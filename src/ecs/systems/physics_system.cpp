@@ -35,7 +35,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		motion.velocity += motion.veer * step_seconds;
 
 		// slightly broken
-		if (!registry.lasers.has(entity) && (registry.enemyBullets.has(entity) || registry.playerBullets.has(entity)))
+		if (!registry.lasers.has(entity) && (motion.velocity != vec2(0.f)) && (registry.enemyBullets.has(entity) || registry.playerBullets.has(entity)))
 			motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 		if (registry.homes.has(entity))
@@ -308,7 +308,9 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 		for (uint j = 0; j < walls.components.size(); j++)
 		{
-			if ((registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
+			// Bullets that dont move don't collide with walls
+			if (motion_registry.components[i].velocity != vec2(0.f) &&
+				(registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
 				(registry.polyColliders.has(eBullets.entities[i]) && PolyToWall(eBullets.entities[i], walls.entities[j])))
 			{
 				registry.collisions.emplace_with_duplicates(eBullets.entities[i], walls.entities[j]);
@@ -449,10 +451,6 @@ bool PhysicsSystem::CircleToWall(Entity circle, Entity wall)
 	CircleCollider &c = registry.circleColliders.get(circle);
 
 	WallCollider &w = registry.walls.get(wall);
-
-	// Check to stop explosions from being deleted too soon
-	if (m.velocity == vec2(0))
-		return false;
 
 	return CircleToLine(m.position, c.radius, w.startPosition, w.endPosition);
 }

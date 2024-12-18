@@ -1713,25 +1713,27 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	// bullet trail
-	ParticleProps props = enemyBullet;
-	for (const BulletStackEffect &effect : bullet.bulletEffects)
-	{
-		BulletEffectType type = effect.type;
-		if (type == BulletEffectType::Inert)
-			continue;
-		if (enemyBulletParticleColors.count(type) > 0)
+	if (bullet.isSpecial) {
+		ParticleProps props = enemyBullet;
+		for (const BulletStackEffect& effect : bullet.bulletEffects)
 		{
-			props.colors.push_back(enemyBulletParticleColors.at(type));
+			BulletEffectType type = effect.type;
+			if (type == BulletEffectType::Inert)
+				continue;
+			if (enemyBulletParticleColors.count(type) > 0)
+			{
+				props.colors.push_back(enemyBulletParticleColors.at(type));
+			}
+			else
+			{
+				printf("Warning: enemy bullet color not defined\n");
+			}
 		}
-		else
+		if (!props.colors.empty())
 		{
-			printf("Warning: enemy bullet color not defined\n");
+			props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+			EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
 		}
-	}
-	if (!props.colors.empty())
-	{
-		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
 	}
 
 	return entity;

@@ -466,7 +466,7 @@ struct AttackData {
 	float bulletRange = 3000;
 	vec2 veer = { 0,0 }; // {magnitude, angle}, {growth, rotation} lasers, {#bullets per shot, burst CD} radial burst
 	int bulletPierce = 0;
-	int bulletBounce = 0;
+	int bulletBounce = 0; // Very low bounce implies piledriver (bullet sticks into the wall until duration)
 	float homing = 0;
 	EnemyBulletDeath 
 	EnemyType //for spawning
@@ -2543,7 +2543,7 @@ struct HifiTackShooter : Enemy
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
-		{key},
+		{APRounds},
 		sluggish,
 		10,
 		0.0,
