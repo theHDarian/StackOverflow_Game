@@ -21,10 +21,11 @@ uniform int letterMap[100];
 // much easier to have smaller arr for texture and a bigger one of ints
 // (indirect accessing)
 uniform vec3 textColor;
+uniform float alpha = 1.0;
 
 void main()
 {    
     // recall with texture arrays: 3rd = layer/index
     vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, vec3(fs_in.TexCoords.xy, letterMap[fs_in.index])).r);
-    color = vec4(textColor, 1.0) * sampled;
+    color = vec4(textColor, alpha) * sampled;
 }  

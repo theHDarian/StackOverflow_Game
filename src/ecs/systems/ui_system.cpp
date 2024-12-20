@@ -322,7 +322,7 @@ void UISystem::step(float elapsed_ms) {
 			registry.renderRequests.get(stackAddBubble).show = false;
 			registry.renderRequests.get(stackAddTail).show = false;
 			registry.renderRequests.get(controlsGuide).show = false;
-			registry.renderRequests.get(roomClearMessage).show = false;
+			registry.renderRequests.get(flashMessageDisplay).show = false;
 		}
 
 		if (uiRequest.type == UIRequestType::GameOverReport) {
@@ -335,10 +335,11 @@ void UISystem::step(float elapsed_ms) {
 			ioState.activeMenu++;
 		}
 
-		if (uiRequest.type == UIRequestType::RoomClear) {
-			registry.renderRequests.get(roomClearMessage).show = true;
-			registry.showTimers.emplace(roomClearMessage);
-			soundSystem->playRareItemPickupSound();
+		if (uiRequest.type == UIRequestType::DisplayFlashMessage) {
+			updateFlashMessageDisplay(uiRequest.text);
+			// lazy -- only play for room cleared. Should either use a separate req or at least a string constant
+			if (uiRequest.text.compare("Room Cleared") == 0)
+				soundSystem->playRareItemPickupSound();
 		}
 	}
 
@@ -428,6 +429,7 @@ void UISystem::step(float elapsed_ms) {
 		if (map.currRegion == Biology) region = "Biology";
 		if (map.currRegion == Physics) region = "Physics";
 		roomCounterText.text = region + " Room " + std::to_string(map.roomsTraversed);
+		registry.textRenderRequests.get(roomName).text = map.currRoom.preset.ID;
 		
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
@@ -476,6 +478,7 @@ bool UISystem::init(GLFWwindow* window) {
 	bulletUIArrow = createBulletUIArrow();
 	fpsCounter = createFpsCounter();
 	roomCounter = createRoomCounter();
+	roomName = createRoomName();
 	titleScreen = createTitleScreen();
 	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 200.f));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
@@ -483,7 +486,7 @@ bool UISystem::init(GLFWwindow* window) {
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
-	roomClearMessage = createRoomClearMessage();
+	flashMessageDisplay = createFlashMessageDisplay();
 
 	return true;
 }
@@ -1298,7 +1301,18 @@ Entity UISystem::createScreenCutIn() {
 	return entity;
 }
 
-Entity UISystem::createRoomClearMessage() {
+void UISystem::updateFlashMessageDisplay(std::string text) {
+	registry.renderRequests.get(flashMessageDisplay).show = true;
+	registry.showTimers.emplace(flashMessageDisplay);
+
+	TextRenderRequest& trr = registry.textRenderRequests.get(flashMessageDisplay);
+	trr.text = text;
+
+	Motion& motion = registry.motions.get(flashMessageDisplay);
+	motion.scale.x = text.length() * DEFAULT_FONT_SIZE * trr.scale + 35.f * 2;
+}
+
+Entity UISystem::createFlashMessageDisplay() {
 	WindowState& windowState = registry.windowStates.components[0];
 	auto entity = Entity();
 
@@ -1352,7 +1366,7 @@ Entity UISystem::createFpsCounter() {
 	trr.color = vec3(1.0f);
 	trr.scale = 0.35f;
 	trr.x = windowState.width - padding;
-	trr.y = windowState.height - (trr.scale * DEFAULT_FONT_SIZE + padding / 2) * 3.f; //appear below room count
+	trr.y = windowState.height - (trr.scale * DEFAULT_FONT_SIZE + padding / 2) * 3.0f - trr.scale * DEFAULT_FONT_SIZE / 2 - padding; //appear below room name
 	trr.topRightBound = { windowState.width + 1000,windowState.height };
 	trr.bottomLeftBound = { 0,0 };
 	trr.alignment = TextAlignment::RightAlign;
@@ -1378,6 +1392,31 @@ Entity UISystem::createRoomCounter() {
 	trr.scale = 0.35f;
 	trr.x = windowState.width - padding;
 	trr.y = windowState.height - (dimensions.y + padding);
+	trr.topRightBound = { windowState.width + 1000,windowState.height };
+	trr.bottomLeftBound = { 0,0 };
+	trr.alignment = TextAlignment::RightAlign;
+
+	return entity;
+}
+
+Entity UISystem::createRoomName() {
+	WindowState& windowState = registry.windowStates.components[0];
+	auto entity = Entity();
+
+	registry.gameUITexts.emplace(entity);
+	auto& rr = registry.renderRequests.insert(
+		entity, { "none",
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	TextRenderRequest& trr = registry.textRenderRequests.emplace(entity);
+	vec2 dimensions = { 240.f,25.f };
+	float padding = 50.f;
+	trr.text = "";
+	trr.color = vec3(1.0f);
+	trr.scale = 0.35f;
+	trr.x = windowState.width - padding;
+	trr.y = windowState.height - (trr.scale * DEFAULT_FONT_SIZE + padding / 2) * 3.f; // appear below room counter
 	trr.topRightBound = { windowState.width + 1000,windowState.height };
 	trr.bottomLeftBound = { 0,0 };
 	trr.alignment = TextAlignment::RightAlign;

@@ -41,15 +41,16 @@ private:
     Entity stackAddBubble; // seems like bad practice; what's the best way for multi-part ui?
     Entity stackAddTail;
     Entity dialogueReminder;
-    Entity roomClearMessage;
+    Entity flashMessageDisplay;
 
     int lastHoveredBullet = -1;
 
     std::unordered_map<std::string, std::vector<std::string>> uiTexts;
     Entity fpsCounter;
     Entity roomCounter;
+    Entity roomName;
 
-    Entity createRoomClearMessage();
+    Entity createFlashMessageDisplay();
 
     Entity createPauseMenu(vec2 position, vec2 scale);
 
@@ -96,8 +97,11 @@ private:
 
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
 
+    void updateFlashMessageDisplay(std::string text);
+
     Entity createFpsCounter();
     Entity createRoomCounter();
+    Entity createRoomName();
     Entity createButton(std::string label, vec2 position, vec2 scale);
 
     std::string reportStats();
