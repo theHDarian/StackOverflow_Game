@@ -44,235 +44,235 @@ const BulletStackEffect dmgDownA = {
 	BulletDamage,
 	Additive,
 	-2.0,
-	"Damage Down (A)",
+	"Damage Down (+)",
 	""};
 
 const BulletStackEffect dmgDownM = {
 	BulletDamage,
 	Multiplicative,
 	-0.3,
-	"Damage Down (M)",
+	"Damage Down (%)",
 	""};
 
 const BulletStackEffect dmgUpA = {
 	BulletDamage,
 	Additive,
 	5.0,
-	"Damage Up (A)",
+	"Damage Up (+)",
 	""};
 
 const BulletStackEffect dmgUpM = {
 	BulletDamage,
 	Multiplicative,
 	0.5,
-	"Damage Up (M)",
+	"Damage Up (%)",
 	""};
 
 const BulletStackEffect numBulletsUpA = {
 	BulletNum,
 	Additive,
 	1,
-	"Bullet Count Up (A)",
+	"Bullet Count Up (+)",
 	""};
 
 const BulletStackEffect sizeUpA = {
 	ProjectileSize,
 	Additive,
 	10,
-	"Bullet Size Up (A)",
+	"Bullet Size Up (+)",
 	""};
 const BulletStackEffect sizeUpM = {
 	ProjectileSize,
 	Multiplicative,
 	0.5,
-	"Bullet Size Up (A)",
+	"Bullet Size Up (+)",
 	""};
 
 const BulletStackEffect spreadUpA = {
 	BulletSpread,
 	Additive,
 	15,
-	"Bullet Spread Up (A)",
+	"Bullet Spread Up (+)",
 	""};
 
 const BulletStackEffect bulletSpeedUpA = {
 	ProjectileSpeed,
 	Additive,
 	50,
-	"Bullet Speed Up (A)",
+	"Bullet Speed Up (+)",
 	""};
 
 const BulletStackEffect bulletSpeedUpM = {
 	ProjectileSpeed,
 	Multiplicative,
 	0.5,
-	"Bullet Speed Up (M)",
+	"Bullet Speed Up (%)",
 	""};
 
 const BulletStackEffect bulletRangeUpA = {
 	BulletRange,
 	Additive,
 	500,
-	"Range Up (A)",
+	"Range Up (+)",
 	""};
 
 const BulletStackEffect bulletRangeUpM = {
 	BulletRange,
 	Multiplicative,
 	0.5,
-	"Range Up (M)",
+	"Range Up (%)",
 	""};
 
 const BulletStackEffect bulletBurstUpA = {
 	BulletBurst,
 	Additive,
 	1,
-	"Burst Up (A)",
+	"Burst Up (+)",
 	""};
 
 const BulletStackEffect bulletBurstUpM = {
 	BulletBurst,
 	Multiplicative,
 	.5,
-	"Burst Up (M)",
+	"Burst Up (%)",
 	""};
 
 const BulletStackEffect bulletPierceUpA = {
 	Pierce,
 	Additive,
 	1,
-	"Pierce Up (A)",
+	"Pierce Up (+)",
 	""};
 const BulletStackEffect bulletPierceUpAII = {
 	Pierce,
 	Additive,
 	2,
-	"Pierce Up II (A)",
+	"Pierce Up II (+)",
 	""};
 
 const BulletStackEffect bulletPierceUpM = {
 	Pierce,
 	Multiplicative,
 	0.5,
-	"Pierce Up (M)",
+	"Pierce Up (%)",
 	""};
 
 const BulletStackEffect bulletBounceUpA = {
 	Bounce,
 	Additive,
 	1,
-	"Bounce Up (A)",
+	"Bounce Up (+)",
 	""};
 
 const BulletStackEffect bulletBounceUpM = {
 	Bounce,
 	Multiplicative,
 	1,
-	"Bounce Up (M)",
+	"Bounce Up (%)",
 	""};
 
 const BulletStackEffect dashUpA = {
 	PlayerNumDash,
 	Additive,
 	1,
-	"Dash Count Up (A)",
+	"Dash Count Up (+)",
 	""};
 
 const BulletStackEffect dashUpM = {
 	PlayerNumDash,
 	Multiplicative,
 	1,
-	"Dash Count Up (M)",
+	"Dash Count Up (%)",
 	""};
 
 const BulletStackEffect stackSizeUpA = {
 	PlayerStackSize,
 	Additive,
 	4,
-	"Stack Size Up (A)",
+	"Stack Size Up (+)",
 	""};
 
 const BulletStackEffect stackSizeUpM = {
 	PlayerStackSize,
 	Multiplicative,
 	.5,
-	"Stack Size Up (M)",
+	"Stack Size Up (%)",
 	""};
 
 const BulletStackEffect dashCDRUpA = {
 	PlayerDashCDR,
 	Additive,
 	500,
-	"Dash Cooldown Up (A)",
+	"Dash Cooldown Up (+)",
 	""};
 
 const BulletStackEffect dashCDRUpM = {
 	PlayerDashCDR,
 	Multiplicative,
 	.25,
-	"Dash Cooldown Up (M)",
+	"Dash Cooldown Up (%)",
 	""};
 
 const BulletStackEffect dashCDRDownA = {
 	PlayerDashCDR,
 	Additive,
 	-150,
-	"Dash Cooldown Down (A)",
+	"Dash Cooldown Down (+)",
 	""};
 
 const BulletStackEffect dashCDRDownM = {
 	PlayerDashCDR,
 	Multiplicative,
 	-0.5,
-	"Dash Cooldown Down (M)",
+	"Dash Cooldown Down (%)",
 	""};
 
 const BulletStackEffect playerSpeedUpA = {
 	PlayerSpeed,
 	Additive,
 	100,
-	"Movement Speed Up (A)",
+	"Movement Speed Up (+)",
 	""};
 
 const BulletStackEffect playerSpeedUpM = {
 	PlayerSpeed,
 	Multiplicative,
 	.1,
-	"Movement Speed Up (M)",
+	"Movement Speed Up (%)",
 	""};
 
 const BulletStackEffect playerSpeedDownA = {
 	PlayerSpeed,
 	Additive,
 	-100,
-	"Movement Speed Down (A)",
+	"Movement Speed Down (+)",
 	""};
 
 const BulletStackEffect playerSpeedDownM = {
 	PlayerSpeed,
 	Multiplicative,
 	-0.2,
-	"Movement Speed Down (M)",
+	"Movement Speed Down (%)",
 	""};
 
 const BulletStackEffect fireRateUpA = {
 	FireRate,
 	Additive,
 	1.5,
-	"Fire Rate Up (A)",
+	"Fire Rate Up (+)",
 	""};
 
 const BulletStackEffect fireRateUpM = {
 	FireRate,
 	Multiplicative,
 	.2,
-	"Fire Rate Up (M)",
+	"Fire Rate Up (%)",
 	""};
 const BulletStackEffect fireRateDownM = {
 	FireRate,
 	Multiplicative,
 	-0.2,
-	"Fire Rate Down (M)",
+	"Fire Rate Down (%)",
 	""};
 
 const BulletStackEffect ostrichWarrior = {
@@ -300,7 +300,7 @@ const BulletStackEffect homingUpA = {
 	Homing,
 	Additive,
 	0.1,
-	"Homing Accuracy (A)",
+	"Homing Accuracy (+)",
 	""};
 
 const BulletStackEffect buzz = {
@@ -2391,7 +2391,7 @@ struct HifiJellyFish : Enemy
 		PlayerSpeed,
 		Additive,
 		-30,
-		"Movement Speed Down Small (A)",
+		"Movement Speed Down Small (+)",
 		""};
 
 	const AttackData spiral{
@@ -2537,7 +2537,7 @@ struct HifiTackShooter : Enemy
 		PlayerSpeed,
 		Additive,
 		-30,
-		"Movement Speed Down Small (A)",
+		"Movement Speed Down Small (+)",
 		""};
 
 	const AttackData spiral{
@@ -2628,7 +2628,7 @@ struct HifiBallLauncher : Enemy
 		PlayerSpeed,
 		Additive,
 		-30,
-		"Movement Speed Down Small (A)",
+		"Movement Speed Down Small (+)",
 		""};
 
 	const AttackData launch{
