@@ -119,6 +119,7 @@ void SceneSystem::step(float elapsed_ms) {
 			lines.lines = storyDialogue[scene];
 			summonDialogue();
 			isStoryDialogue = true;
+			callScientist = false;
 		}
 
 		for (Entity entity : registry.dialogueRequests.entities) { // IDEALLY should only be one at a time
