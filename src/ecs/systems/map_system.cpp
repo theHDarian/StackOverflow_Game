@@ -111,6 +111,26 @@ void MapSystem::handleMapRequests()
     }
 }
 
+void MapSystem::clearRoomInteractables() {
+    for (Entity ent : registry.interactables.entities)
+    {
+        if (!registry.deleteds.has(ent) && !registry.doors.has(ent) && !registry.menuUIs.has(ent))
+            registry.deleteds.emplace(ent);
+    }
+    for (Entity ent : registry.walls.entities)
+    {
+        if (!registry.deleteds.has(ent) && !registry.bounds.has(ent))
+        {
+            registry.deleteds.emplace(ent);
+        }
+    }
+    for (Entity ent : registry.critters.entities)
+    {
+        if (!registry.deleteds.has(ent))
+            registry.deleteds.emplace(ent);
+    }
+}
+
 void MapSystem::clearRoomActors()
 {
     for (Entity ent : registry.enemies.entities)
@@ -159,6 +179,13 @@ void MapSystem::clearRoomActors()
     {
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
+    }
+    for (Entity ent : registry.backgrounds.entities)
+    {
+        if (!registry.deleteds.has(ent) && !registry.roomSizeScaleds.has(ent) )
+        {
+            registry.deleteds.emplace(ent);
+        }
     }
     registry.invincibles.clear();
     registry.spriteTimers.clear();

@@ -484,7 +484,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				addEffect(player, stack.stack, soundPlayer);
 				registry.invincibles.emplace(player);
 				object.dialogueCount++;
-				MapSystem::clearRoomActors();
+				MapSystem::clearRoomInteractables();
 				Map &map = registry.maps.components[0];
 				switch (map.currRegion) {
 					case Physics: {

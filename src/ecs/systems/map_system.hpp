@@ -11,6 +11,7 @@ class MapSystem {
         MapSystem();
         ~MapSystem();
         static void clearRoomActors();
+        static void clearRoomInteractables();
         void init(RenderSystem *renderer, SoundSystem *soundPlayer_arg);
         void step(float elapsed_ms);
     private:
