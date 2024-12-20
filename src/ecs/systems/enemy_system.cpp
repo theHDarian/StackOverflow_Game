@@ -600,7 +600,8 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
 
         if (atkData.spawnPosition.size() == atkData.numBullets)
         {
-            map.currRoom.preset.enemies.push_back({atkData.spawn, atkData.spawnPosition[i]});
+            if (!map.currRoom.preset.enemies.empty())
+            map.currRoom.preset.enemies.front().emplace_back(atkData.spawn, atkData.spawnPosition[i]);
         }
         else
         {

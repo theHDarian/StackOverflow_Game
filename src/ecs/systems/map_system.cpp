@@ -41,8 +41,8 @@ void MapSystem::step(float elapsed_ms)
     //vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
     //vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
-    if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
-        for (auto &e : map.currRoom.preset.enemies)
+    if ((map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay || map.currRoom.currentWave == 0) && !map.currRoom.preset.enemies.empty()) {
+        for (auto &e : map.currRoom.preset.enemies.front())
         {
             vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
             if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
@@ -51,7 +51,9 @@ void MapSystem::step(float elapsed_ms)
                 createEnemy(renderer, pos, std::get<EnemyType>(e));
             }
         }
-        map.currRoom.preset.enemies = {};
+        map.currRoom.preset.enemies.pop_front();
+        map.currRoom.timeElapsed = 0;
+        map.currRoom.currentWave++;
 
         if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {
             for (auto &e : map.currRoom.preset.interactables)
@@ -74,6 +76,9 @@ void MapSystem::step(float elapsed_ms)
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
             registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
+    } else if (!map.currRoom.cleared && registry.enemies.entities.empty()) {
+        //spawn next wave by setting timeElapsed to spawnDelay
+        map.currRoom.timeElapsed += map.currRoom.preset.spawnDelay;
     }
 
     if (map.currRoom.cleared) {

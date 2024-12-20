@@ -40,7 +40,7 @@ struct RoomInteractable {
     std::vector<BulletStackEffect> pushConsoleEffects;
 };
 struct RoomPreset {
-    std::vector<std::tuple<EnemyType,vec2>> enemies;
+    std::list<std::vector<std::tuple<EnemyType,vec2>>>enemies;
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
     std::vector<std::tuple<RoomInteractable, vec2>> interactables; //for interactables
     float spawnDelay; //in seconds - for enemies and bosses
@@ -89,6 +89,7 @@ struct Room {
     float timeElapsed = 0; //time passed since enter room in seconds
     int dialogueCount = 0; // place here for now
     int cutsceneCount = 0;
+    int currentWave = 0;
     bool dialogueDone = true;
     bool cutSceneDone = true;
     float wallThickness = 100.f;

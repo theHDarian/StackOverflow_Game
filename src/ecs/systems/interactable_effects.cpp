@@ -197,11 +197,10 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
         }
     }
 }
-
 void spawnEnemies (SoundSystem* soundPlayer, std::vector<std::tuple<EnemyType,vec2>> enemies) {
 	Map& map = registry.maps.components[0];
 	closeDoors( soundPlayer);
-	map.currRoom.preset.enemies = enemies;
+	map.currRoom.preset.enemies.push_back( enemies);
 }
 
 void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* soundPlayer) {
@@ -362,11 +361,11 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 
 				Map& map = registry.maps.components[0];
 				closeDoors(soundPlayer);
-				map.currRoom.preset.enemies = {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
+				map.currRoom.preset.enemies.push_back( {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
 				{EnemyType::EnemyThreeBee, {0.8f, 0.8f}},
 					{EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
 				{EnemyType::EnemyThreeBee, {0.2f, 0.2f}},
-			};
+			});
 			}
 		}
 		if (object.item == WishGranter) {

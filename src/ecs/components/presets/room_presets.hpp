@@ -40,7 +40,7 @@ const RoomPreset StartingRoom{
 };
 
 const RoomPreset ScientistBossRoom{
-    {{EnemyType::ScientistBoss, {0.5, 0.1}}},
+    {{{EnemyType::ScientistBoss, {0.5, 0.1}}}},
     {},
     {},
     0.0f,
@@ -52,7 +52,7 @@ const RoomPreset ScientistBossRoom{
 };
 
 const RoomPreset TutorialRoom2Preset{
-    {{EnemyType::TutorialEnemyQuadshooter, {0.5, 0.4}}},
+    {{{EnemyType::TutorialEnemyQuadshooter, {0.5, 0.4}}}},
     {},
     {},
     0.0f,
@@ -64,7 +64,8 @@ const RoomPreset TutorialRoom2Preset{
 };
 
 const RoomPreset EnemyRoomSwarm{
-    {{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {
+        {{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
      {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
      {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
      {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
@@ -309,7 +310,8 @@ const RoomPreset EnemyRoomSwarm{
      {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
      {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
      {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}}},
+     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}}}
+    },
 
     {},
     {{{PopConsole,{bulletPierceUpA, bulletPierceUpM}}, {0.5f, 0.5f}}, {{PushConsole,{ bulletPierceUpM}}, {0.25f, 0.5f}}, {{PushConsole,{bulletPierceUpA}}, {0.75f, 0.5f}}},
@@ -322,10 +324,12 @@ const RoomPreset EnemyRoomSwarm{
 };
 
 const RoomPreset EnemyRoomDashIntro1{
-        {{EnemyType::EnemyQuadshooter, {0.8f, 0.2f}},
-         {EnemyType::EnemyQuadshooter, {0.2f, 0.8f}},
-         {EnemyType::EnemySkull, {0.5, 0.5}}
-        },
+            {
+                {{EnemyType::EnemyQuadshooter, {0.8f, 0.2f}},
+                {EnemyType::EnemyQuadshooter, {0.2f, 0.8f}},
+                {EnemyType::EnemySkull, {0.5, 0.5}}
+                }
+            },
        {},
        {},
        0.0f,
@@ -335,10 +339,12 @@ const RoomPreset EnemyRoomDashIntro1{
 };
 
 const RoomPreset EnemyRoomDashIntro2{
-        {{EnemyType::EnemySnail, {0.2f, 0.8f}},
-         {EnemyType::EnemySnail, {0.8f, 0.8f}},
-         {EnemyType::EnemyCrab, {0.5f, 0.5f}},
-        },
+            {
+                {{EnemyType::EnemySnail, {0.2f, 0.8f}},
+                {EnemyType::EnemySnail, {0.8f, 0.8f}},
+                {EnemyType::EnemyCrab, {0.5f, 0.5f}},
+               }
+            },
        {},
        {},
        0.0f,
@@ -348,14 +354,16 @@ const RoomPreset EnemyRoomDashIntro2{
 };
 
 const RoomPreset EnemyRoomDashIntro3{
-        {{EnemyType::EnemyBioBoid, {0.2f, 0.8f}},
-         {EnemyType::EnemyBioBoid, {0.2f, 0.8f}},
-         {EnemyType::EnemyBioBoid, {0.2f, 0.8f}},
-         {EnemyType::EnemyBioBoid, {0.8f, 0.2f}},
-         {EnemyType::EnemyBioBoid, {0.8f, 0.2f}},
-         {EnemyType::EnemyBioBoid, {0.8f, 0.2f}},
-         {EnemyType::EnemyThreeBee, {0.5f, 0.5f}},
-        },
+            {
+                {{EnemyType::EnemyBioBoid, {0.2f, 0.8f}},
+                {EnemyType::EnemyBioBoid, {0.2f, 0.8f}},
+                {EnemyType::EnemyBioBoid, {0.2f, 0.8f}},
+                {EnemyType::EnemyBioBoid, {0.8f, 0.2f}},
+                {EnemyType::EnemyBioBoid, {0.8f, 0.2f}},
+                {EnemyType::EnemyBioBoid, {0.8f, 0.2f}},
+                {EnemyType::EnemyThreeBee, {0.5f, 0.5f}},
+               }
+            },
        {},
        {},
        0.0f,
@@ -365,16 +373,18 @@ const RoomPreset EnemyRoomDashIntro3{
 };
 
 const RoomPreset EnemyRoomDash1{
-    {{EnemyType::EnemyQuadshooter, {0.2f, 0.8f}},
-     {EnemyType::EnemyQuadshooter, {0.8f, 0.8f}},
-     {EnemyType::EnemyQuadshooter, {0.8f, 0.2f}},
-     {EnemyType::EnemyQuadshooter, {0.2f, 0.2f}},
-     {EnemyType::EnemyPufferfish, {0.2, 0.4}},
-     {EnemyType::EnemyPufferfish, {0.8, 0.4}},
-     {EnemyType::EnemySkull, {0.5f, 0.5f}},
-     {EnemyType::EnemySword, {0.3f, 0.7f}},
-     {EnemyType::EnemySword, {0.3f, 0.7f}}
-     },
+        {
+            {{EnemyType::EnemyQuadshooter, {0.2f, 0.8f}},
+            {EnemyType::EnemyQuadshooter, {0.8f, 0.8f}},
+            {EnemyType::EnemyQuadshooter, {0.8f, 0.2f}},
+            {EnemyType::EnemyQuadshooter, {0.2f, 0.2f}},
+            {EnemyType::EnemyPufferfish, {0.2, 0.4}},
+            {EnemyType::EnemyPufferfish, {0.8, 0.4}},
+            {EnemyType::EnemySkull, {0.5f, 0.5f}},
+            {EnemyType::EnemySword, {0.3f, 0.7f}},
+            {EnemyType::EnemySword, {0.3f, 0.7f}}
+            }
+        },
     {},
     {},
     0.0f,
@@ -384,12 +394,14 @@ const RoomPreset EnemyRoomDash1{
 };
 
 const RoomPreset EnemyRoomDash2{
-    {{EnemyType::EnemyQuadshooter, {0.4f, 0.2f}},
-    {EnemyType::EnemyQuadshooter, {0.8f, 0.4f}},
-     {EnemyType::EnemyPufferfish, {0.7, 0.4}},
-        {EnemySnail, {0.5f, 0.7f}},
-     {EnemyType::EnemySkull, {0.5f, 0.5f}}
-     },
+        {
+            {{EnemyType::EnemyQuadshooter, {0.4f, 0.2f}},
+           {EnemyType::EnemyQuadshooter, {0.8f, 0.4f}},
+            {EnemyType::EnemyPufferfish, {0.7, 0.4}},
+               {EnemySnail, {0.5f, 0.7f}},
+            {EnemyType::EnemySkull, {0.5f, 0.5f}}
+            }
+        },
     {},
     {},
     0.0f,
@@ -400,13 +412,15 @@ const RoomPreset EnemyRoomDash2{
 
 
 const RoomPreset EnemyRoomDashHard{
-    {{EnemyType::EnemySkull, {0.2f, 0.8f}},
-     {EnemyType::EnemySkull, {0.8f, 0.8f}},
-     {EnemyType::EnemySkull, {0.8f, 0.2f}},
-     {EnemyType::EnemySkull, {0.2f, 0.2f}},
-{EnemyType::EnemyPufferfish, {0.3, 0.2}},
-     {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}}
-     },
+        {
+            {{EnemyType::EnemySkull, {0.2f, 0.8f}},
+            {EnemyType::EnemySkull, {0.8f, 0.8f}},
+            {EnemyType::EnemySkull, {0.8f, 0.2f}},
+            {EnemyType::EnemySkull, {0.2f, 0.2f}},
+       {EnemyType::EnemyPufferfish, {0.3, 0.2}},
+            {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}}
+            }
+        },
     {},
     {},
     0.0f,
@@ -416,13 +430,15 @@ const RoomPreset EnemyRoomDashHard{
 };
 
 const RoomPreset EnemyRoomSnails {
-    {
-        {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
-        {EnemySnail, {0.2f, 0.8f}},
-        {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
-        {EnemyMagnet, {0.2f, 0.4f}},
-        {EnemyMagnet, {0.8f, 0.4f}},
-},
+        {
+            {
+                {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
+                {EnemySnail, {0.2f, 0.8f}},
+                {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
+                {EnemyMagnet, {0.2f, 0.4f}},
+                {EnemyMagnet, {0.8f, 0.4f}},
+        }
+        },
 {},
 {},
 0.0f,
@@ -433,13 +449,15 @@ const RoomPreset EnemyRoomSnails {
 };
 
 const RoomPreset EnemyRoomSnailsHard {
-        {
-            {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
-            {EnemySnail, {0.3f, 0.7f}},
-            {EnemySnail, {0.4f, 0.6f}},
-            {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
-            {EnemyMagnet, {0.8f, 0.4f}},
-    },
+            {
+                {
+                    {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
+                    {EnemySnail, {0.3f, 0.7f}},
+                    {EnemySnail, {0.4f, 0.6f}},
+                    {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
+                    {EnemyMagnet, {0.8f, 0.4f}},
+            }
+            },
     {},
     {},
     0.0f,
@@ -452,11 +470,13 @@ const RoomPreset EnemyRoomSnailsHard {
     };
 
 const RoomPreset EnemyRoomCrabs{
-    {{EnemyType::EnemyCrab, {0.8f, 0.8f}},
-     {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
-     {EnemyType::EnemyCrab, {0.2f, 0.2f}},
-     {EnemyType::EnemyEvilCrab, {0.5f, 0.5f}},
-    },
+        {
+            {{EnemyType::EnemyCrab, {0.8f, 0.8f}},
+            {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
+            {EnemyType::EnemyCrab, {0.2f, 0.2f}},
+            {EnemyType::EnemyEvilCrab, {0.5f, 0.5f}},
+           }
+        },
     {},
     {},
     0.0f,
@@ -466,17 +486,19 @@ const RoomPreset EnemyRoomCrabs{
 };
 
 const RoomPreset EnemyRoomSmall{
-    {{EnemyType::EnemySkull, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    },
+        {
+            {{EnemyType::EnemySkull, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           }
+        },
     {},
     {},
     0.0f,
@@ -488,12 +510,14 @@ const RoomPreset EnemyRoomSmall{
 };
 
 const RoomPreset EnemyRoomBees1{
-    {{EnemyType::EnemyOneBee, {0.2f, 0.8f}},
-     {EnemyType::EnemyOneBee, {0.8f, 0.8f}},
-     {EnemyType::EnemyOneBee, {0.8f, 0.2f}},
-     {EnemyType::EnemyOneBee, {0.2f, 0.2f}},
-     {EnemyType::EnemyBeeHive, {0.2f, 0.4f}},
-     {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}},
+        {
+            {{EnemyType::EnemyOneBee, {0.2f, 0.8f}},
+            {EnemyType::EnemyOneBee, {0.8f, 0.8f}},
+            {EnemyType::EnemyOneBee, {0.8f, 0.2f}},
+            {EnemyType::EnemyOneBee, {0.2f, 0.2f}},
+            {EnemyType::EnemyBeeHive, {0.2f, 0.4f}},
+            {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}}
+        },
     {},
     {},
     0.0f,
@@ -503,13 +527,15 @@ const RoomPreset EnemyRoomBees1{
 };
 
 const RoomPreset EnemyRoomBees2{
-    {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
-     {EnemyType::EnemyTwoBee, {0.8f, 0.8f}},
-     {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
-     {EnemyType::EnemyTwoBee, {0.2f, 0.2f}},
-        {EnemyEvilSnail, {0.5f, 0.6f}},
-     {EnemyType::EnemyBeeHive, {0.2f, 0.4f}},
-     {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}},
+        {
+            {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
+            {EnemyType::EnemyTwoBee, {0.8f, 0.8f}},
+            {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
+            {EnemyType::EnemyTwoBee, {0.2f, 0.2f}},
+               {EnemyEvilSnail, {0.5f, 0.6f}},
+            {EnemyType::EnemyBeeHive, {0.2f, 0.4f}},
+            {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}}
+        },
 
     {},
     {},
@@ -520,12 +546,14 @@ const RoomPreset EnemyRoomBees2{
     };
 
 const RoomPreset EnemyRoomBees3{
-    {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
-     {EnemyType::EnemyOneBee, {0.8f, 0.8f}},
-     {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
-     {EnemyType::EnemyOneBee, {0.2f, 0.2f}},
-     {EnemyType::EnemyEvilSkull, {0.5f, 0.5f}},
-    },
+        {
+            {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
+            {EnemyType::EnemyOneBee, {0.8f, 0.8f}},
+            {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
+            {EnemyType::EnemyOneBee, {0.2f, 0.2f}},
+            {EnemyType::EnemyEvilSkull, {0.5f, 0.5f}},
+           }
+        },
     {},
     {},
     0.0f,
@@ -535,11 +563,13 @@ const RoomPreset EnemyRoomBees3{
 };
 
 const RoomPreset EnemyRoomAngelTank{
-    {{EnemyType::EnemyMagnet, {0.2f, 0.8f}},
-     {EnemyType::EnemyMagnet, {0.8f, 0.2f}},
-     {EnemyType::EnemyCrab, {0.5f, 0.5f}},
-     {EnemyType::EnemyHealer, {0.8, 0.8}},
-     {EnemyType::EnemyHealer, {0.2, 0.2}}},
+        {
+            {{EnemyType::EnemyMagnet, {0.2f, 0.8f}},
+            {EnemyType::EnemyMagnet, {0.8f, 0.2f}},
+            {EnemyType::EnemyCrab, {0.5f, 0.5f}},
+            {EnemyType::EnemyHealer, {0.8, 0.8}},
+            {EnemyType::EnemyHealer, {0.2, 0.2}}}
+        },
      
     {},
     {},
@@ -550,13 +580,15 @@ const RoomPreset EnemyRoomAngelTank{
 };
 
 const RoomPreset EnemyRoomTripleBuffEX{
-    {{EnemyType::EnemyMagnet, {0.2f, 0.8f}},
-        {EnemyType::EnemyCrab, {0.2f, 0.2f}},
-    {EnemyType::EnemyEvilCrab, {0.6f, 0.2f}},
-    {EnemyType::EnemyCrab, {0.2f, 0.6f}},
-        {EnemySnail, {0.7f, 0.7f}},
-        {EnemyEvilSnail, {0.7f, 0.3f}},
-    },
+        {
+            {{EnemyType::EnemyMagnet, {0.2f, 0.8f}},
+               {EnemyType::EnemyCrab, {0.2f, 0.2f}},
+           {EnemyType::EnemyEvilCrab, {0.6f, 0.2f}},
+           {EnemyType::EnemyCrab, {0.2f, 0.6f}},
+               {EnemySnail, {0.7f, 0.7f}},
+               {EnemyEvilSnail, {0.7f, 0.3f}},
+           }
+        },
     {},
     {{{PushConsole,{bulletBounceUpA, bulletPierceUpA}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
     },
@@ -836,7 +868,7 @@ const RoomPreset TreasureRoomWish{
 
 
 const RoomPreset BossRoomBee{
-    {{BossBeehiveMain, {0.5f, 0.5f}}, {EnemyThreeBee,{0.5f, 0.75f}}},
+    {{{BossBeehiveMain, {0.5f, 0.5f}}, {EnemyThreeBee,{0.5f, 0.75f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,
@@ -847,13 +879,15 @@ const RoomPreset BossRoomBee{
 };
 
 const RoomPreset HifiRoomTwinLaserShurikens {
-    {
-        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
-        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.99f,0.1f}},
-        {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
-        {EnemyType::EnemyHifiTrail, {0.6f,0.6f}},
-        {EnemyType::EnemyHifiTrail, {0.4f,0.4f}}
-    },
+        {
+            {
+                {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+                {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.99f,0.1f}},
+                {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
+                {EnemyType::EnemyHifiTrail, {0.6f,0.6f}},
+                {EnemyType::EnemyHifiTrail, {0.4f,0.4f}}
+            }
+        },
     {},
     {},
     0.0f,
@@ -862,16 +896,18 @@ const RoomPreset HifiRoomTwinLaserShurikens {
     "HifiLaserShurikens"
 };
 const RoomPreset HifiRoomTwinLaserChargers {
-    {
-        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
-        {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
-        {EnemyType::EnemyHifiChargerHard, {0.8f,0.2f}},
-        {EnemyType::EnemyHifiChargerHard, {0.8f,0.8f}},
-        {EnemyType::EnemyHifiChargerHard, {0.2f,0.2f}},
-        {EnemyType::EnemyHifiChargerHard, {0.2f,0.8f}},
-        {EnemyType::EnemyHifiChargerHard, {0.4f,0.6f}},
-        {EnemyType::EnemyHifiChargerHard, {0.6f,0.4f}},
-    },
+        {
+            {
+                {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+                {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
+                {EnemyType::EnemyHifiChargerHard, {0.8f,0.2f}},
+                {EnemyType::EnemyHifiChargerHard, {0.8f,0.8f}},
+                {EnemyType::EnemyHifiChargerHard, {0.2f,0.2f}},
+                {EnemyType::EnemyHifiChargerHard, {0.2f,0.8f}},
+                {EnemyType::EnemyHifiChargerHard, {0.4f,0.6f}},
+                {EnemyType::EnemyHifiChargerHard, {0.6f,0.4f}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -882,18 +918,20 @@ const RoomPreset HifiRoomTwinLaserChargers {
 
 
 const RoomPreset HifiRoomBasicEnemy {
-    {
-        {EnemyType::EnemyHifiCharger, {0.7f,0.3f}},
-        {EnemyType::EnemyHifiCharger, {0.7f,0.7f}},
-        {EnemyType::EnemyHifiCharger, {0.4f,0.5f}},
-        {EnemyType::EnemySniper, {0.5f,0.5f}},
-        {EnemyType::EnemySniper, {0.2f,0.2f}},
-        {EnemyType::EnemySniper, {0.8f,0.2f}},
-        {EnemyType::EnemySniper, {0.8f,0.8f}},
-        {EnemyType::EnemySniper, {0.2f,0.8f}},
-        {EnemyType::EnemyHealer, {0.5f,0.5f}},
-        {EnemyType::EnemyHealer, {0.2f,0.2f}},
-    },
+        {
+            {
+                {EnemyType::EnemyHifiCharger, {0.7f,0.3f}},
+                {EnemyType::EnemyHifiCharger, {0.7f,0.7f}},
+                {EnemyType::EnemyHifiCharger, {0.4f,0.5f}},
+                {EnemyType::EnemySniper, {0.5f,0.5f}},
+                {EnemyType::EnemySniper, {0.2f,0.2f}},
+                {EnemyType::EnemySniper, {0.8f,0.2f}},
+                {EnemyType::EnemySniper, {0.8f,0.8f}},
+                {EnemyType::EnemySniper, {0.2f,0.8f}},
+                {EnemyType::EnemyHealer, {0.5f,0.5f}},
+                {EnemyType::EnemyHealer, {0.2f,0.2f}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -901,31 +939,62 @@ const RoomPreset HifiRoomBasicEnemy {
     2,
     "HifiBasic"
 };
+
+const RoomPreset HifiRoomBasicWave {
+            {
+                {
+                    {EnemyType::EnemyHifiCharger, {0.7f,0.3f}},
+                    {EnemyType::EnemyHifiCharger, {0.7f,0.7f}},
+                    {EnemyType::EnemyHifiCharger, {0.4f,0.5f}},
+                },
+                {
+                        {EnemyType::EnemySniper, {0.5f,0.5f}},
+                        {EnemyType::EnemySniper, {0.2f,0.2f}},
+                        {EnemyType::EnemySniper, {0.8f,0.2f}},
+                        {EnemyType::EnemySniper, {0.8f,0.8f}},
+                        {EnemyType::EnemySniper, {0.2f,0.8f}},
+                },
+                {
+                            {EnemyType::EnemyHifiCharger, {0.4f,0.5f}},
+                        {EnemyType::EnemyHealer, {0.5f,0.5f}},
+                        {EnemyType::EnemyHealer, {0.2f,0.2f}},
+                }
+            },
+        {},
+        {},
+        20.0f,
+        5,
+        2,
+        "HifiWave"
+    };
+
 const RoomPreset HifiRoomBoidSnipers{
-    {
-        {EnemyType::EnemySniper, {0.6f,0.5f}},
-        {EnemyType::EnemySniper, {0.4f,0.5f}},
-        {EnemyType::EnemySniper, {0.5f,0.5f}},
-        {EnemyType::EnemySniper, {0.5f,0.6f}},
-        {EnemyType::EnemySniper, {0.5f,0.4f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    },
+        {
+            {
+                {EnemyType::EnemySniper, {0.6f,0.5f}},
+                {EnemyType::EnemySniper, {0.4f,0.5f}},
+                {EnemyType::EnemySniper, {0.5f,0.5f}},
+                {EnemyType::EnemySniper, {0.5f,0.6f}},
+                {EnemyType::EnemySniper, {0.5f,0.4f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -935,43 +1004,45 @@ const RoomPreset HifiRoomBoidSnipers{
 };
 
 const RoomPreset HifiEnemyRoomSwarmLasers {
-    {{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-     {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-{EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
-    {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
-{EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
-{EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
-{EnemyType::EnemyHifiTrailHard, {0.6f,0.6f}},
-{EnemyType::EnemyHifiTrailHard, {0.4f,0.4f}}
+        {
+            {{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+       {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+           {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
+       {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
+       {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
+       {EnemyType::EnemyHifiTrailHard, {0.6f,0.6f}},
+       {EnemyType::EnemyHifiTrailHard, {0.4f,0.4f}}
 
 
-    },
+            }
+        },
 
     {},
     {{{PopConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
@@ -986,18 +1057,20 @@ const RoomPreset HifiEnemyRoomSwarmLasers {
 };
 
 const RoomPreset HifiRoomCannonLasers{
-    {
-        {EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
-        {EnemyType::EnemyHifiCannon, {0.9f,0.8f}},
-        {EnemyType::EnemyHifiCannon, {0.1f,0.2f}},
-        {EnemyType::EnemyHifiCannon, {0.1f,0.8f}},
-{EnemyType::EnemyHealer, {0.5f,0.5f}},
-{EnemyType::EnemyHealer, {0.2f,0.2f}},
-        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
-        {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
-        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
-        {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
-    },
+        {
+            {
+                {EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
+                {EnemyType::EnemyHifiCannon, {0.9f,0.8f}},
+                {EnemyType::EnemyHifiCannon, {0.1f,0.2f}},
+                {EnemyType::EnemyHifiCannon, {0.1f,0.8f}},
+        {EnemyType::EnemyHealer, {0.5f,0.5f}},
+        {EnemyType::EnemyHealer, {0.2f,0.2f}},
+                {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+                {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
+                {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
+                {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -1007,15 +1080,17 @@ const RoomPreset HifiRoomCannonLasers{
 };
 
 const RoomPreset HifiRoomCannonSnipers{
-    {
-        {EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
-        {EnemyType::EnemyHifiCannon, {0.9f,0.8f}},
-        {EnemyType::EnemyLaserSniper, {0.1f,0.2f}},
-        {EnemyType::EnemyLaserSniper, {0.1f,0.8f}},
-        {EnemyType::EnemySniper, {0.6f,0.6f}},
-        {EnemyType::EnemySniper, {0.4f,0.4f}}
+        {
+            {
+                {EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
+                {EnemyType::EnemyHifiCannon, {0.9f,0.8f}},
+                {EnemyType::EnemyLaserSniper, {0.1f,0.2f}},
+                {EnemyType::EnemyLaserSniper, {0.1f,0.8f}},
+                {EnemyType::EnemySniper, {0.6f,0.6f}},
+                {EnemyType::EnemySniper, {0.4f,0.4f}}
 
-    },
+            }
+        },
     {},
     {},
     0.0f,
@@ -1025,16 +1100,18 @@ const RoomPreset HifiRoomCannonSnipers{
 };
 
 const RoomPreset HifiRoomSniperShurikens{
-    {
-        {EnemyType::EnemyHifiSniperHard, {0.8f,0.2f}},
-        {EnemyType::EnemyHifiSniperHard, {0.2f,0.2f}},
-        {EnemyType::EnemyHifiSniperHard, {0.8f,0.8f}},
-        {EnemyType::EnemyHifiSniperHard, {0.2f,0.8f}},
-        {EnemyType::EnemyHifiTrailHard, {0.6f,0.6f}},
-        {EnemyType::EnemyHifiTrailHard, {0.4f,0.4f}},
-    {EnemyType::EnemyHealer, {0.5f,0.5f}},
-    {EnemyType::EnemyHealer, {0.2f,0.2f}},
-    },
+        {
+            {
+                {EnemyType::EnemyHifiSniperHard, {0.8f,0.2f}},
+                {EnemyType::EnemyHifiSniperHard, {0.2f,0.2f}},
+                {EnemyType::EnemyHifiSniperHard, {0.8f,0.8f}},
+                {EnemyType::EnemyHifiSniperHard, {0.2f,0.8f}},
+                {EnemyType::EnemyHifiTrailHard, {0.6f,0.6f}},
+                {EnemyType::EnemyHifiTrailHard, {0.4f,0.4f}},
+            {EnemyType::EnemyHealer, {0.5f,0.5f}},
+            {EnemyType::EnemyHealer, {0.2f,0.2f}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -1044,12 +1121,14 @@ const RoomPreset HifiRoomSniperShurikens{
 };
 
 const RoomPreset HifiRoomCannonBoids{
-    {
-        {EnemyType::EnemyHifiCannonHard, {0.7f,0.5f}},
-        {EnemyType::EnemyHifiCannonHard, {0.3f,0.5f}},
-{EnemyType::EnemyHealer, {0.5f,0.5f}},
-{EnemyType::EnemyHealer, {0.2f,0.2f}},
-    },
+        {
+            {
+                {EnemyType::EnemyHifiCannonHard, {0.7f,0.5f}},
+                {EnemyType::EnemyHifiCannonHard, {0.3f,0.5f}},
+        {EnemyType::EnemyHealer, {0.5f,0.5f}},
+        {EnemyType::EnemyHealer, {0.2f,0.2f}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -1059,18 +1138,20 @@ const RoomPreset HifiRoomCannonBoids{
 };
 
 const RoomPreset EnemyRoomLaserFiesta {
-    {
-        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
-        {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
-        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
-        {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
-    {EnemyType::EnemyLaserSniper, {0.25f,0.75f}},
-{EnemyType::EnemyLaserSniper, {0.75f,0.25f}},
-        {EnemyEvilSkull , {0.5f, 0.5f}},
-        {EnemySkull, {0.25f, 0.25f}},
-        {EnemySkull, {0.75f, 0.75f}},
+        {
+            {
+                {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+                {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
+                {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
+                {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
+            {EnemyType::EnemyLaserSniper, {0.25f,0.75f}},
+        {EnemyType::EnemyLaserSniper, {0.75f,0.25f}},
+                {EnemyEvilSkull , {0.5f, 0.5f}},
+                {EnemySkull, {0.25f, 0.25f}},
+                {EnemySkull, {0.75f, 0.75f}},
 
-    },
+            }
+        },
     {},
 {{{PopConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
     {{PushConsole,{fireRateUpM, bulletBounceUpM}}, {0.25f, 0.5f}},
@@ -1085,15 +1166,17 @@ const RoomPreset EnemyRoomLaserFiesta {
 };
 
 const RoomPreset HifiRoomJellyFish { //Test room for new enemies
-    {
-        {EnemyHifiWhip, {0.5f, 0.5f}},
-        {EnemyHifiJellyFish, {0.5f, 0.5f}},
-        {EnemyHifiTackShooter, {0.8,0.2}},
-        {EnemyHifiTackShooter, {0.8,0.8}},
-        {EnemyHifiTackShooter, {0.2,0.2}},
-        {EnemyHifiTackShooter, {0.2,0.8}},
-        {EnemyHifiBallLauncher,{0.4,0.6}},
-    },
+        {
+            {
+                {EnemyHifiWhip, {0.5f, 0.5f}},
+                {EnemyHifiJellyFish, {0.5f, 0.5f}},
+                {EnemyHifiTackShooter, {0.8,0.2}},
+                {EnemyHifiTackShooter, {0.8,0.8}},
+                {EnemyHifiTackShooter, {0.2,0.2}},
+                {EnemyHifiTackShooter, {0.2,0.8}},
+                {EnemyHifiBallLauncher,{0.4,0.6}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -1105,13 +1188,15 @@ const RoomPreset HifiRoomJellyFish { //Test room for new enemies
 };
 
 const RoomPreset HifiRoomSniperBallLauncher {
-    {
-        {EnemyHifiBallLauncher,{0.5,0.5}},
-        {EnemySniper,{0.7,0.5}},
-        {EnemySniper,{0.3,0.5}},
-        {EnemySniper,{0.5,0.3}},
-        {EnemySniper,{0.5,0.7}},
-    },
+        {
+            {
+                {EnemyHifiBallLauncher,{0.5,0.5}},
+                {EnemySniper,{0.7,0.5}},
+                {EnemySniper,{0.3,0.5}},
+                {EnemySniper,{0.5,0.3}},
+                {EnemySniper,{0.5,0.7}},
+            }
+        },
     {},
     {},
     0.0f,
@@ -1161,8 +1246,8 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        // {RoomType::EnemyRoom, {{HifiRoomJellyFish},{}}},
-        {RoomType::EnemyRoom, {{HifiRoomJellyFish,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::EnemyRoom, {{HifiRoomBasicWave},{}}},
+        // {RoomType::EnemyRoom, {{HifiRoomJellyFish,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
