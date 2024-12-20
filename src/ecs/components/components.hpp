@@ -400,12 +400,15 @@ struct InteractableObject {
 	int dialogueCount = 0;
 	InteractableType interactType = DialogueInteractable;
 	InteractableItem item = InteractableItem::NA;
+	float timer = 1000;
+	float base = timer;
 };
 
 enum DialogueRequestType {
 	StoryDialogue,
 	InteractableDialogue,
-	CallDialogue
+	CallDialogue,
+	ResetDialogue
 };
 
 struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)

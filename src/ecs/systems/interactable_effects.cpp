@@ -70,7 +70,7 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
 	{EnemyType::EnemyCrab, {0.8f, 0.8f}},
 		 {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
 		 {EnemyType::EnemyCrab, {0.2f, 0.2f}},
-		 {EnemyType::EnemyEvilCrab, {0.5f, 0.5f}},
+		 {EnemyType::EnemyEvilCrab, {0.3f, 0.7f}},
 	},
 {
 	{EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
@@ -247,16 +247,33 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 	GameState& gameState = registry.gameStates.components[0];
 	for (InteractableReaction& reaction : registry.interactableReactions.components) {
 		InteractableObject& object = registry.interactables.get(reaction.object);
-
+		MapRegion region = Tutorial;
+		RoomType room = TutorialRoom;
 		if (object.name.compare("SkipTutorial") == 0) {
 			IOState& iostate = registry.ioStates.components[0];
-			if (reaction.choice == 0) { // yes
-				iostate.tutorialOn = false;
-			}
-			else if (reaction.choice == 1) { // no
+			if (reaction.choice == 0) { // do tutorial
 				iostate.tutorialOn = true;
 			}
-			registry.mapRequests.emplace(player, MapRequestType::NewGame);
+			else{
+				iostate.tutorialOn = false;
+				if (reaction.choice == 1) { // bio region
+					region = Biology;
+				}
+				else if (reaction.choice == 2) {
+					region = Physics;
+				}
+				else if (reaction.choice == 3) {
+					region = Biology;
+					room = BossRoom;
+				}
+				else if (reaction.choice == 4) {
+					region = Physics;
+					room = BossRoom;
+				}
+			}
+			MapRequest& req = registry.mapRequests.emplace(player, NewGame);
+			req.type = room;
+			req.region = region;
 		}
 
 		if (object.name.compare("LockedDoor") == 0) {

@@ -94,12 +94,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	// window_height_px = 720;
 	  window_width_px = 1920;
 	  window_height_px = 1080;
-	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor , nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -180,6 +180,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
+
+	// very dumb camera zoom set for now
+	if (registry.maps.components[0].currRoom.type == RoomType::BossRoom && !registry.maps.components[0].currRoom.cleared) {
+		registry.cameras.components[0].zoom = 0.75f;
+	}
+	else {
+		registry.cameras.components[0].zoom = 1.f;
+	}
 
 	// Remove entities that leave the screen on the left side
 	// Iterate backwards to be able to remove without unterfering with the next object to visit
@@ -327,8 +335,10 @@ void WorldSystem::restartGame() {
 	gameState.currentVolume = gameState.previousVolume;
 	soundPlayer->stopGameOverSound();
 
-	if (!registry.mapRequests.has(player))
-		registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+	if (!registry.mapRequests.has(player)) {
+		MapRequest& mapReq = registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+	}
+		
 
 	registry.ioStates.components[0].shouldRestart = false;
 	registry.ioStates.components[0].lockControls = false;
@@ -337,6 +347,9 @@ void WorldSystem::restartGame() {
 	currentSpeed = 1.f;
 
 	registry.maps.components[0].currRoom.dialogueDone = true;
+
+	//DialogueRequest& resetReq = registry.dialogueRequests.emplace(player);
+	//resetReq.type = DialogueRequestType::ResetDialogue;
 
 	// mock interactable call instead of proper ui for now
 	registry.dialogueRequests.emplace(skipDialogue);
@@ -404,7 +417,8 @@ void WorldSystem::handleCollisions() {
 
 			// check if player is within detection radius of interactible
 			// this is for when player is near and has to press E to interact
-			if (registry.interactables.has(entity_other)) {
+			Room& room = registry.maps.components[0].currRoom;
+			if (registry.interactables.has(entity_other) && (room.cleared || room.type == RoomType::TutorialRoom1)) {
 				// bad singleton implementation: only interested in one E so just io system can just grab most recent one
 				// consider grabbing nearest one instead
 				if (!registry.interactableReactions.has(entity_other))
@@ -802,9 +816,6 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
 			req.type = DialogueRequestType::StoryDialogue;
 			registry.ioStates.components[0].lockControls = false;
-			registry.ioStates.components[0].lastInputAxis = vec2(0);
-			registry.ioStates.components[0].inputAxis = vec2(0);
-			registry.motions.get(registry.players.entities[0]).velocity = vec2(0);
 			//std::cout << registry.maps.components[0].currRoom.dialogueCount << std::endl;
 		}
 
@@ -861,8 +872,9 @@ void WorldSystem::clearDeleteQueue() {
 			registry.gameStates.components[0].resetRoom = false;
 		}
 		else {
-			if (!registry.mapRequests.has(player))
-				registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+			if (!registry.mapRequests.has(player)) {
+				MapRequest& mapReq = registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+			}
 		}
 		
 	}

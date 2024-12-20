@@ -22,9 +22,6 @@ SceneSystem::~SceneSystem() {
 
 Entity SceneSystem::createCallObject() {
 	Entity entity = Entity();
-	
-	//InteractableObject& object = registry.interactables.emplace(entity);
-	//object.name = "CallScientist";
 
 	return entity;
 }
@@ -46,7 +43,6 @@ void SceneSystem::step(float elapsed_ms) {
 						lines = DialogueLines();
 						lines.lines = interactibleDialogue[dialogueObject];
 					}
-					callScientist = false;
 				}
 				else {
 					assert(registry.interactables.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
@@ -114,11 +110,6 @@ void SceneSystem::step(float elapsed_ms) {
 		}
 		if (map.currRoom.type == RoomType::TutorialRoom2 && map.currRoom.dialogueCount == 1 && !map.currRoom.cleared) {
 			input.lockControls = true;
-			input.lastInputAxis = vec2(0);
-			input.inputAxis = vec2(0);
-			input.pressedHorizontal = ExtendedStack<int>();
-			input.pressedVertical = ExtendedStack<int>();
-			registry.motions.get(registry.players.entities[0]).velocity = vec2(0);
 			map.currRoom.dialogueCount++;
 		}
 
@@ -145,6 +136,7 @@ void SceneSystem::step(float elapsed_ms) {
 					currentObject = entity; // need to keep track of current speaking object
 					summonInteractibleDialogue(entity);
 					isStoryDialogue = false;
+					callScientist = false;
 				}
 				else {
 					std::cout << "No dialogue found for item: " << object.name << std::endl;
@@ -166,6 +158,7 @@ void SceneSystem::step(float elapsed_ms) {
 					lines.lines = storyDialogue[scene];
 					summonDialogue();
 					isStoryDialogue = true;
+					callScientist = false;
 				}
 			}
 			// mock in this way for now, may regret later
@@ -177,6 +170,11 @@ void SceneSystem::step(float elapsed_ms) {
 				lines.lines = interactibleDialogue[dialogueObject];
 				summonDialogue(); 
 				callScientist = true;
+				isStoryDialogue = false;
+				registry.uiRequests.insert(registry.players.entities[0], { UIRequestType::CallNotif });
+			}
+			else if (req.type == DialogueRequestType::ResetDialogue) {
+				// actually not needed right now, but still leave here just incase
 			}
 		}
 		

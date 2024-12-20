@@ -26,9 +26,12 @@
 # note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
 
 ITEM SkipTutorial -1 0
-Would you like to skip the tutorial?
-CHOICES Yes\No
+#Would you like to skip the tutorial?
+#CHOICES Yes\No
+#Select where you would like to start in:
+ 
 CUT blackscreen.png
+CHOICES Start in Tutorial\Start in Biology Region\Start in Physics Region\Start in Biology Boss\Start in Physics Boss
 
 ITEM ClosedTutorialDoor -1 0
 The door seems to be locked. Maybe there's something in this room that could help...

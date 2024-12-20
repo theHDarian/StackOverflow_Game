@@ -106,7 +106,7 @@ void MapSystem::handleMapRequests()
         else if (r.requestType == MapRequestType::RestartGame)
             resetMap();
         else if (r.requestType == MapRequestType::NewGame)
-            newMap();
+            newMap(r.region, r.type);
         registry.mapRequests.clear();
     }
 }
@@ -256,6 +256,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
     for (int i = 0; i < doors.size(); i++)
     {
+        // reset counters
+        registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
+        
         // reset previous room type
         if (i == spawnIndex)
             continue;
@@ -326,9 +329,11 @@ void MapSystem::resetMap() {
     clearRoomActors();
 }
 
-void MapSystem::newMap()
+void MapSystem::newMap(MapRegion region, RoomType roomType)
 {
     IOState& iostate = registry.ioStates.components[0];
+    Map& map = registry.maps.components[0];
+    map.roomsTraversed = 0;
     if (iostate.tutorialOn) {
         // preset doors for first tutorial room
         for (int i = 0; i < 4; i++)
@@ -344,9 +349,7 @@ void MapSystem::newMap()
         registry.interactables.get(registry.doors.entities[2]).name = "ClosedTutorialDoor";
         registry.interactables.get(registry.doors.entities[2]).interactType = InteractableType::DialogueInteractable;
 
-        Map& map = registry.maps.components[0];
         map.currRegion = MapRegion::Tutorial;
-        map.roomsTraversed = 0;
 
         map.currRoom = Room();
         map.currRoom.preset = TutorialRoom1Preset;
@@ -358,16 +361,24 @@ void MapSystem::newMap()
             glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, vec2(0.25, 0.2));
     }
     else {
-        Map& map = registry.maps.components[0];
-
         // CHANGE THIS FOR M4:
-        map.currRegion = MapRegion::Physics;
-        map.roomsTraversed = 0;
-        map.directory = getDirectory(map.currRegion);
-        clearRoomActors();
-
         int lockedRooms = 0;
         bool excludeNone = false;
+        map.currRoom = Room();
+        map.currRegion = region;
+        map.currRoom.type = roomType;
+        if (roomType == RoomType::TutorialRoom) {
+            map.currRoom.preset = StartingRoom;
+        }
+        else {
+            if (map.currRegion == Biology) {
+                map.currRoom.preset = BossRoomBee;
+            }
+            else {
+                map.currRoom.preset = ScientistBossRoom;
+            }
+        }
+        map.directory = getDirectory(map.currRegion);
         std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
         for (int i = 0; i < 4; i++)
         {
@@ -401,14 +412,7 @@ void MapSystem::newMap()
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
 
-        // temporarily set start room to empty, create pop console
-        // soundPlayer->playTitleMusic();
-        map.currRoom = Room();
-        map.currRoom.preset = StartingRoom;
-        //map.currRoom.preset = ScientistBossRoom;
         updateBgPositions();
-        map.directory = getDirectory(map.currRegion);
-        map.currRoom.type = RoomType::TutorialRoom;
         //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));
