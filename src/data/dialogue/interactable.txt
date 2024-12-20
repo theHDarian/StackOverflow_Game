@@ -23,6 +23,10 @@
 # CUT cutsceneimage.png 
 # just an image for now
 
+# format for script variables (defined per object)
+# blah blah {0} -> index 0 of the object's scriptVars vector is "bob" -> blah blah bob
+# the number in the braces {X} means the string variable at index X
+
 # note: always add other stuff AFTER line of dialogue you want to have speaker/sound/choice for
 
 ITEM SkipTutorial -1 0
@@ -89,7 +93,8 @@ You've already used this! Thinking back, why does a run-down lab have a machine 
 
 ITEM PushStack -1 0
 This seems to be one of those machines that can directly link to robots and push data onto their stacks.
-Would you like to download data from this machine?
+This one in particular seems to have the following data: {0}
+Would you like to download {0} from this machine?
 CHOICES Yes\No
 
 ITEM PushStack 0 0
@@ -443,7 +448,8 @@ SPEAKER Fight Console fight_console.png
 "Prove you are worthy this data! Use it to fight for your life!"
 Well, it seems using this machine will grant you powerful data, but you will have to fight to keep it.
 SPEAKER N N
-Would you like to download data from this machine?
+This one in particular seems to have the following data: {0}
+Would you like to download {0} from this machine?
 CHOICES I've got this\On second thought...
 
 ITEM FightConsole 0 0

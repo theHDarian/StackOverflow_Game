@@ -96,6 +96,8 @@ private:
 
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
 
+    std::string bindScriptVariables(std::string text, std::vector<std::string>& variables);
+
     Entity createFpsCounter();
     Entity createRoomCounter();
     Entity createButton(std::string label, vec2 position, vec2 scale);

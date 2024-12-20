@@ -10,20 +10,12 @@ SceneSystem::SceneSystem( SoundSystem* soundSystem) {
 	this->soundSystem = soundSystem;
 	storyDialogue = std::unordered_map<Scene, std::vector<Dialogue>>();
 	interactibleDialogue = std::unordered_map<InteractibleDialogue, std::vector<Dialogue>>();
-	currentObject = Entity();
-	callObject = createCallObject();
 	loadDialogue("story");
 	loadDialogue("interactable");
 }
 
 SceneSystem::~SceneSystem() {
 
-}
-
-Entity SceneSystem::createCallObject() {
-	Entity entity = Entity();
-
-	return entity;
 }
 
 void SceneSystem::step(float elapsed_ms) {
@@ -45,8 +37,8 @@ void SceneSystem::step(float elapsed_ms) {
 					}
 				}
 				else {
-					assert(registry.interactables.has(currentObject)); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
-					Entity objectEntity = currentObject;
+					assert(registry.interactableInDialogue.components.size() > 0); // not ENTIRELY sure how long this is valid for, so assume it will always be for now
+					Entity objectEntity = registry.interactableInDialogue.entities[0];
 					registry.interactableReactions.emplace_with_duplicates(objectEntity, objectEntity, gameState.dialogueChoice); // emplace with dupes for now, in case some other system needs this
 					InteractableObject& object = registry.interactables.get(objectEntity);
 					InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
@@ -54,6 +46,9 @@ void SceneSystem::step(float elapsed_ms) {
 						DialogueLines& lines = registry.dialogueLines.components[0];
 						lines = DialogueLines();
 						lines.lines = interactibleDialogue[dialogueObject];
+					}
+					else {
+						registry.interactableInDialogue.clear();
 					}
 				}
 			}
@@ -134,7 +129,8 @@ void SceneSystem::step(float elapsed_ms) {
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
 					lines.lines = interactibleDialogue[dialogueObject];
-					currentObject = entity; // need to keep track of current speaking object
+					registry.interactableInDialogue.clear();
+					registry.interactableInDialogue.emplace(entity);
 					summonInteractibleDialogue(entity);
 					isStoryDialogue = false;
 					callScientist = false;

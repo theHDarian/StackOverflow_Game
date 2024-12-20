@@ -402,6 +402,7 @@ struct InteractableObject {
 	InteractableItem item = InteractableItem::NA;
 	float timer = 1000;
 	float base = timer;
+	std::vector<std::string> scriptVariables = std::vector<std::string>();
 };
 
 enum DialogueRequestType {
@@ -425,4 +426,8 @@ struct InteractableReaction {
 
 struct NearbyInteractables {
 	// placeholder component that has list of nearby interactibles the io system can respond to
+};
+
+struct InteractableInDialogue {
+	// container to store the current interactable active in dialogue
 };

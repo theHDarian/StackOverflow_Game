@@ -389,7 +389,15 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PushStack";
 	object.item = InteractableItem::PushConsole;
-	// or maybe object type enum? This is not a unique id, just an object type identifier
+	
+	// add names of effects
+	std::string effectsString = "";
+	for (int i = 0; i < effects.size() - 1; i++) {
+		effectsString += effects[i].name + ", ";
+	}
+	effectsString += effects[effects.size() - 1].name;
+
+	object.scriptVariables.push_back(effectsString);
 
 	Animation &a = registry.animations.emplace(console);
 	a.max_frames = 8;
@@ -436,6 +444,15 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "FightConsole";
 	object.item = InteractableItem::FightConsole;
+
+	// add names of effects
+	std::string effectsString = "";
+	for (int i = 0; i < effects.size() - 1; i++) {
+		effectsString += effects[i].name + ", ";
+	}
+	effectsString += effects[effects.size() - 1].name;
+
+	object.scriptVariables.push_back(effectsString);
 
 	Animation &a = registry.animations.emplace(console);
 	a.max_frames = 1;
