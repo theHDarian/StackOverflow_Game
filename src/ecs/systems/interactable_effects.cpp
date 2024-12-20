@@ -543,7 +543,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			if (reaction.choice == 0) {
 				registry.renderRequests.get(reaction.object).show = false;
 				registry.deleteds.emplace(reaction.object);
-				DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+				DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]); // note: MUST be player because chip gets deleted after being picked up
 				req.type = DialogueRequestType::StoryDialogue;
 			}
 		}
