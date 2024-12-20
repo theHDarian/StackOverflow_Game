@@ -60,6 +60,26 @@ struct GameState {
 
 struct Camera {
 	float zoom = 1.0f;
+	vec2 lookAtPos = vec2(0);
+	float startZoom = 1.0f;
+	vec2 startPos = vec2(0);
+	float elapsedTime = 0;
+	Entity target; // camera will follow target if no transitions ongoing, default is player
+};
+
+enum CameraRequestType {
+	ChangeZoom,
+	ChangeLookAt,
+	ChangeLookAtAndZoom,
+	ChangeTarget
+};
+
+struct CameraRequest {
+	CameraRequestType type;
+	float newZoom; // so can lerp from current zoom to new zoom
+	vec2 newLookAt; // look to a static position
+	float transitionTime = 1000; // how long camera transition should take
+	Entity newTarget; // new target camera should follow, must have a motion attached. Will also transition camera position over to target first.
 };
 
 struct GameReport {

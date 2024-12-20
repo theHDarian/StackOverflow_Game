@@ -387,8 +387,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glUniform2fv(tiling_uloc, 1, (float *)&tiling);
 		gl_has_errors();
 
-		Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
+		//Motion &targetMotion = registry.motions.get(registry.players.entities[0]);
 		Camera &camera = registry.cameras.components[0];
+		//Motion& targetMotion = registry.motions.get(camera.target);
 		Room &room = registry.maps.components[0].currRoom;
 
 		vec2 roomCenterOffset = vec2(0);
@@ -397,21 +398,21 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		if ((room.preset.roomSize.y / 2) < (ws.height / 2))
 			roomCenterOffset += -1.f * camera.zoom * vec2(0, (ws.height / 2 - room.preset.roomSize.y / 2) * 1.8f * (1 - ((room.preset.roomSize.y * 0.33f) / 2.f / (ws.height / 2))));
 
-		vec3 clampedTranslate = vec3(clamp(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f,
+		vec3 clampedTranslate = vec3(clamp(motion.position.x - camera.lookAtPos.x * 1.1f + ws.width * 0.1f / 2.f,
 										   motion.position.x - room.preset.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - room.wallThickness * 1.5f * 1.1f / 2 - 25,
 										   motion.position.x + room.preset.roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + room.wallThickness * 1.5f * 1.1f / 2 + 25),
-									 clamp(motion.position.y + playerMotion.position.y * 2.f - ws.height * 2.f / 2.f - ws.height / 2.f,
+									 clamp(motion.position.y + camera.lookAtPos.y * 2.f - ws.height * 2.f / 2.f - ws.height / 2.f,
 										   motion.position.y + ws.height / clampAmount / 2.f - room.preset.roomSize.y / clampAmount - room.wallThickness * 1.5f,
 										   motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + room.preset.roomSize.y + room.wallThickness * 1.5f),
 									 -room.wallThickness * 1.5f + 50);
-		vec3 unclampedTranslate = vec3(motion.position.x - playerMotion.position.x * 1.1f + ws.width * 0.1f / 2.f,
-									   motion.position.y + playerMotion.position.y * 2.f - ws.height * 2.f / 2.f - ws.height / 2.f,
+		vec3 unclampedTranslate = vec3(motion.position.x - camera.lookAtPos.x * 1.1f + ws.width * 0.1f / 2.f,
+									   motion.position.y + camera.lookAtPos.y * 2.f - ws.height * 2.f / 2.f - ws.height / 2.f,
 									   -room.wallThickness * 1.5f + 50);
 		mat4 model =
 			glm::translate(glm::mat4(1.0f), vec3(ws.width / 2, ws.height / 2, 0)) * glm::scale(glm::mat4(1.0f), vec3(camera.zoom, camera.zoom, 1.0f)) * glm::translate(glm::mat4(1.0f), clampedTranslate)
 			// minor offset to close "gap" btween floor & wall
 			* glm::rotate(glm::mat4(1.0f), motion.angle, vec3(0, 0, 1)) * glm::translate(glm::mat4(1.0f), vec3(0))
-			/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(playerMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
+			/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(targetMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
 			* glm::rotate(glm::mat4(1.0f), angle, axis) * glm::scale(glm::mat4(1.0f), vec3(motion.scale, 1.0f));
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float *)&model);
 
@@ -1920,15 +1921,14 @@ mat4 createNormalModel(Motion &motion, vec2 offset = vec2(0))
 mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 {
 	WindowState &windowState = registry.windowStates.components[0];
-	Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
 	Camera &camera = registry.cameras.components[0];
-
+	//Motion& targetMotion = registry.motions.get(camera.target);
 	mat4 transform = glm::mat4(1.0);
 	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
 	transform = glm::scale(transform, vec3(camera.zoom));
 	transform = glm::translate(transform,
-							   vec3(motion.position.x - playerMotion.position.x,
-									motion.position.y - playerMotion.position.y,
+							   vec3(motion.position.x - camera.lookAtPos.x,
+									motion.position.y - camera.lookAtPos.y,
 									0.0));
 	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
 	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
@@ -1940,15 +1940,15 @@ mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 mat4 createFollowCameraModelText(Motion &motion, vec2 offset)
 {
 	WindowState &windowState = registry.windowStates.components[0];
-	Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
 	Camera &camera = registry.cameras.components[0];
+	//Motion& targetMotion = registry.motions.get(camera.target);
 	Room &room = registry.maps.components[0].currRoom;
 	mat4 transform = glm::mat4(1.0);
 	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
 	transform = glm::scale(transform, vec3(camera.zoom));
 	transform = glm::translate(transform,
-							   vec3(motion.position.x - playerMotion.position.x,
-									motion.position.y - (windowState.height - playerMotion.position.y),
+							   vec3(motion.position.x - camera.lookAtPos.x,
+									motion.position.y - (windowState.height - camera.lookAtPos.y),
 									0.0));
 	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
 	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
