@@ -349,6 +349,8 @@ void WorldSystem::restartGame() {
 	registry.maps.components[0].currRoom.dialogueDone = true;
 
 	// mock interactable call instead of proper ui for now
+	DialogueRequest& resetReq = registry.dialogueRequests.emplace(player);
+	resetReq.type = DialogueRequestType::ResetDialogue;
 	registry.dialogueRequests.emplace(skipDialogue);
 
 	Entity player = resetPlayer();

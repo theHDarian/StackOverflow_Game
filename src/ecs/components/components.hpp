@@ -404,7 +404,8 @@ struct InteractableObject {
 enum DialogueRequestType {
 	StoryDialogue,
 	InteractableDialogue,
-	CallDialogue
+	CallDialogue,
+	ResetDialogue
 };
 
 struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
