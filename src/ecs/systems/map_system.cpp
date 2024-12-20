@@ -54,18 +54,17 @@ void MapSystem::step(float elapsed_ms)
         map.currRoom.preset.enemies.pop_front();
         map.currRoom.timeElapsed = 0;
         map.currRoom.currentWave++;
-
-        if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {
-            for (auto &e : map.currRoom.preset.interactables)
-            {
-                vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
-                createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
-            }
-            map.currRoom.preset.interactables = {};
-
-        }
     }
-    
+
+    if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {
+        for (auto &e : map.currRoom.preset.interactables)
+        {
+            vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
+            createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+        }
+        map.currRoom.preset.interactables = {};
+
+    }
 
     // set room to cleared if all enemies are defeated
     if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
@@ -76,7 +75,7 @@ void MapSystem::step(float elapsed_ms)
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
             registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
-    } else if (!map.currRoom.cleared && registry.enemies.entities.empty()) {
+    } else if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.type != TutorialRoom1) {
         //spawn next wave by setting timeElapsed to spawnDelay
         map.currRoom.timeElapsed += map.currRoom.preset.spawnDelay;
     }
