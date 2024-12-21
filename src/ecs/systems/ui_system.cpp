@@ -1321,7 +1321,12 @@ Entity UISystem::createScreenCutIn() {
 
 void UISystem::updateFlashMessageDisplay(std::string text) {
 	registry.renderRequests.get(flashMessageDisplay).show = true;
-	registry.showTimers.emplace(flashMessageDisplay);
+	if (registry.showTimers.has(flashMessageDisplay)) {
+		registry.showTimers.get(flashMessageDisplay).timer = registry.showTimers.get(flashMessageDisplay).base;
+	}
+	else {
+		registry.showTimers.emplace(flashMessageDisplay);
+	}
 
 	TextRenderRequest& trr = registry.textRenderRequests.get(flashMessageDisplay);
 	trr.text = text;

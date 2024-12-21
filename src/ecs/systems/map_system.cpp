@@ -95,8 +95,12 @@ void MapSystem::step(float elapsed_ms)
             cameraReq2.transitionTime = 500;
             cameraReq2.newZoom = 1.0f;
         }
-        if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
-            registry.uiRequests.insert(registry.maps.entities[0], { UIRequestType::DisplayFlashMessage, "Room Cleared" }); // probably don't need insert with dupes yet
+        if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2) {
+            UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            uiReq.type = UIRequestType::DisplayFlashMessage;
+            uiReq.text = "Room Cleared";
+        }
+            
     } else if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.type != TutorialRoom1) {
         //spawn next wave by setting timeElapsed to spawnDelay
         map.currRoom.timeElapsed += map.currRoom.preset.spawnDelay;
@@ -295,7 +299,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         std::cout << "Not changing music" << std::endl;
     }
 
-
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
@@ -305,8 +308,18 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     registry.interactables.get(registry.doors.entities[spawnIndex]).interactType = InteractableType::DialogueInteractable;
 
     int lockedRooms = 0;
-    bool excludeNone = true;
+    int noneRooms = 0;
+    bool excludeNone = false;
     std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
+
+    // first count the number of none rooms
+    for (int i = 0; i < doors.size(); i++)
+    {
+        if (newRooms[i] == RoomType::None) {
+            noneRooms++;
+        }
+    }
+
     for (int i = 0; i < doors.size(); i++)
     {
         // reset counters
@@ -322,21 +335,23 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.reset();
 
         d.room = newRooms[i];
-        if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
+
+        if ((lockedRooms + noneRooms < 2) && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
             //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
             std:: cout << "Spawning locked room" << std::endl;
             d.isLocked = true;
         }
-        else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
+        else if ((lockedRooms + noneRooms < 2) && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
             //have a chance of spawning locked rooms
             d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
         } else {
-            if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
-                //d.room = RoomType::EnemyRoom;
+            if (d.room != RoomType::None && d.room != RoomType::BossRoom) {
+                std::cout << "ran out of rooms for room type: " << d.room << std::endl;
+                d.room = RoomType::EnemyRoom;
             }
         }
+
         if (d.room == RoomType::None) {
-            excludeNone = true;
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
@@ -349,7 +364,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     }
 
     decorateRoom();
-    registry.uiRequests.insert(registry.maps.entities[0], { UIRequestType::DisplayFlashMessage, map.currRoom.preset.ID });
+    UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
+    uiReq.type = UIRequestType::DisplayFlashMessage;
+    uiReq.text = map.currRoom.preset.ID;
 }
 
 void MapSystem::decorateRoom() {
