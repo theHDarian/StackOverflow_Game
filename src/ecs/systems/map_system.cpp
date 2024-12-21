@@ -35,31 +35,48 @@ void MapSystem::step(float elapsed_ms)
 
     handleMapRequests();
 
-    // WindowState &wS = registry.windowStates.components[0];
     WindowState &wS = registry.windowStates.components[0];
     vec2 roomCenter = vec2(wS.width,wS.height)/2.f;
-    //vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
-    //vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
-
+    
     if ((map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay /*|| map.currRoom.currentWave == 0*/) && !map.currRoom.preset.enemies.empty()) {
+        Entity bossEnemy;
         for (auto &e : map.currRoom.preset.enemies.front())
         {
             vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
             if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
                 createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
             } else {
-                createEnemy(renderer, pos, std::get<EnemyType>(e));
+                Entity enemy = createEnemy(renderer, pos, std::get<EnemyType>(e));
+                if (registry.bosses.has(enemy)) {
+                    bossEnemy = enemy;
+                }
             }
         }
         map.currRoom.preset.enemies.pop_front();
         map.currRoom.timeElapsed = 0;
         map.currRoom.currentWave++;
+
+        // look at boss and zoom out when boss spawns
+        if (registry.motions.has(bossEnemy)) {
+            CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq2.type = CameraRequestType::ChangeTargetAndZoom;
+            cameraReq2.newTarget = bossEnemy;
+            cameraReq2.transitionTime = 500;
+            cameraReq2.newZoom = 0.75f;
+            CameraRequest& cameraReq3 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq3.type = CameraRequestType::HoldCamera;
+            cameraReq3.transitionTime = 1000;
+            CameraRequest& cameraReq4 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq4.type = CameraRequestType::ChangeTarget;
+            cameraReq4.newTarget = registry.players.entities[0];
+            cameraReq4.transitionTime = 500;
+        }
     }
 
     if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {
-        for (auto &e : map.currRoom.preset.interactables)
+        for (auto& e : map.currRoom.preset.interactables)
         {
-            vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
+            vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, std::get<vec2>(e));
             createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
         }
         map.currRoom.preset.interactables = {};
@@ -72,6 +89,11 @@ void MapSystem::step(float elapsed_ms)
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
             soundPlayer->playNextMusic();
+            CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq2.type = CameraRequestType::ChangeTargetAndZoom;
+            cameraReq2.newTarget = registry.players.entities[0];
+            cameraReq2.transitionTime = 500;
+            cameraReq2.newZoom = 1.0f;
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
             registry.uiRequests.insert(registry.maps.entities[0], { UIRequestType::DisplayFlashMessage, "Room Cleared" }); // probably don't need insert with dupes yet

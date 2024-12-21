@@ -94,12 +94,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	// window_height_px = 720;
 	  window_width_px = 1920;
 	  window_height_px = 1080;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -165,7 +165,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, SoundSystem* soundPlayer_arg)
 	// mock interactable call instead of proper ui for now
 	skipDialogue = createSkipDialogue();
 
-	registry.cameras.emplace(player);
+	Camera& camera = registry.cameras.emplace(player);
+	camera.target = player;
 
 	registry.gameReports.emplace(player);
 }
@@ -180,14 +181,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
-
-	// very dumb camera zoom set for now
-	if (registry.maps.components[0].currRoom.type == RoomType::BossRoom && !registry.maps.components[0].currRoom.cleared) {
-		registry.cameras.components[0].zoom = 0.75f;
-	}
-	else {
-		registry.cameras.components[0].zoom = 1.f;
-	}
 
 	// Remove entities that leave the screen on the left side
 	// Iterate backwards to be able to remove without unterfering with the next object to visit
@@ -338,7 +331,13 @@ void WorldSystem::restartGame() {
 	if (!registry.mapRequests.has(player)) {
 		MapRequest& mapReq = registry.mapRequests.emplace(player, MapRequestType::RestartGame);
 	}
-		
+	
+	registry.cameras.components[0].zoom = 1.0f;
+	registry.cameras.components[0].startZoom = 1.0f;
+	registry.cameras.components[0].startPos = vec2(0);
+	registry.cameras.components[0].elapsedTime = 0;
+	registry.cameras.components[0].target = player;
+	registry.cameraRequests.clear();
 
 	registry.ioStates.components[0].shouldRestart = false;
 	registry.ioStates.components[0].lockControls = false;

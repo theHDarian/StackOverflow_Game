@@ -19,6 +19,7 @@
 #include "ui_system.hpp"
 #include "scene_system.hpp"
 #include "sound_system.hpp"
+#include "camera_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -48,6 +49,7 @@ int main() {
     TextSystem textSystem;
 	UISystem uiSystem(&soundSystem);
 	SceneSystem sceneSystem(&soundSystem);
+	CameraSystem cameraSystem;
 
     // Initialize window
     GLFWwindow* window = world.createWindow();
@@ -102,12 +104,14 @@ int main() {
 			mapSystem.step(elapsed_ms);
 			sceneSystem.playCutscene();
 			world.step(elapsed_ms);
+			cameraSystem.step(elapsed_ms);
 		}
 		else if (ioSystem.isDialogue()) {
 			mapSystem.step(elapsed_ms); // just so the tutorial room can spawn an enemy right away
 			uiSystem.playDialogue();
 			world.step(elapsed_ms);
 			renderer.step(elapsed_ms); // not sure if this was needed?
+			cameraSystem.step(elapsed_ms);
 		}
 		else {
 			mapSystem.step(elapsed_ms);
@@ -118,6 +122,7 @@ int main() {
 			particleSystem.step(elapsed_ms);
 			renderer.step(elapsed_ms);
 			world.handleCollisions();
+			cameraSystem.step(elapsed_ms);
 		}
 		world.clearDeleteQueue();
 		// note: the more complex our drawing is, the more complex the order,
