@@ -74,7 +74,7 @@ void MapSystem::step(float elapsed_ms)
             soundPlayer->playNextMusic();
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
-            registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
+            registry.uiRequests.insert(registry.maps.entities[0], { UIRequestType::DisplayFlashMessage, "Room Cleared" }); // probably don't need insert with dupes yet
     } else if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.type != TutorialRoom1) {
         //spawn next wave by setting timeElapsed to spawnDelay
         map.currRoom.timeElapsed += map.currRoom.preset.spawnDelay;
@@ -327,6 +327,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     }
 
     decorateRoom();
+    registry.uiRequests.insert(registry.maps.entities[0], { UIRequestType::DisplayFlashMessage, map.currRoom.preset.ID });
 }
 
 void MapSystem::decorateRoom() {
