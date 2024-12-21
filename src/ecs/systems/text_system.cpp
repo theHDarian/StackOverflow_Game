@@ -2,7 +2,7 @@
 
 #include "text_system.hpp" 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/compatibility.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <fstream>
 #include <iostream>
@@ -192,19 +192,52 @@ additional things added:
 - adapted to consider text wrapping
 - tokenized text beforehand to help with text wrapping
 */
-void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, float y, float scale, glm::vec3 color, 
-    vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment, bool isUI) {
+void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI) {
+    float scale = request.scale;
+    float x = request.x;
+    float y = request.y;
+
+    float textLength = 0;
+
+    // Currently alignment only works for a single line of text, not tokenized
+    if (request.alignment == TextAlignment::CenteredAlign) {
+        textLength = getTextLength(request.text, scale);
+    }
+    else if (request.alignment == TextAlignment::RightAlign) {
+        textLength = getTextLength(request.text, scale) * 2.f;
+    }
+    x -= textLength / 2.f;
+
+    float copyX = x;
+
     // temp put here to readjust sizes btween diff fonts
     scale *= FONT_ADJUST_FACTOR;
     scale *=DEFAULT_FONT_SIZE / 256.0f; // so letters still look as same as before after changing texture sizes
 
-    float copyX = x;
+    // do NOT do for now, because if text changes but tokenized text didn't, it'd be outdated
+    //if (request.tokenizedText.size() == 0) {
+    //    request.tokenizedText = getTokenizedText(request.text);
+    //}
+
+    std::vector<std::string> tokenizedText = request.tokenizedText;
+    if (request.tokenizedText.size() == 0) {
+        tokenizedText = getTokenizedText(request.text);
+    }
 
     glUseProgram(program);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-    glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
+    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
+
+    float alpha = 1.0f;
+    if (registry.fades.has(entity))
+    {
+        Fade& fade = registry.fades.get(entity);
+        alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
+    }
+    GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+    glUniform1f(alpha_uloc, alpha);
 
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
@@ -215,13 +248,13 @@ void TextSystem::renderText(std::vector<std::string> tokenizedText, float x, flo
     for (std::string text : tokenizedText) {
 
         // approximate next word length and compare with text box size
-        if ((x + text.length() * (Characters[65].Advance >> 6) * scale) > topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
+        if ((x + text.length() * (Characters[65].Advance >> 6) * scale) > request.topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
             if (text.compare("\n") != 0) {
                 y -= ((Characters[65].Size.y)) * 2.0 * scale;
                 x = copyX;
             }
         }
-        if (y > topRightBound.y || y < bottomLeftBound.y) {
+        if (y > request.topRightBound.y || y < request.bottomLeftBound.y) {
             // do nothing for now, unless want to write text that goes up and down
         }
         
@@ -325,26 +358,6 @@ std::vector<std::string> getTokenizedText(std::string text) {
     return tokenizedText;
 }
 
-void TextSystem::renderText(std::string text, float x, float y, float scale, glm::vec3 color, 
-    vec2 topRightBound, vec2 bottomLeftBound, TextAlignment alignment, bool isUI)
-{
-    // consider saving this in the future w/ a dirty bit if it gets expensive
-    // or consider a universal string to tokenized string map w/ hash, but would hashing that also get expensive?
-
-    float textLength = 0;
-
-    // Currently alignment only works for a single line of text, not tokenized
-    if (alignment == TextAlignment::CenteredAlign) {
-        textLength = getTextLength(text, scale);
-    }
-    else if (alignment == TextAlignment::RightAlign) {
-        textLength = getTextLength(text, scale) * 2.f;
-    }
-
-    std::vector<std::string> tokenizedText = getTokenizedText(text);
-    renderText(tokenizedText, x - textLength / 2.f, y, scale, color, topRightBound, bottomLeftBound, alignment, isUI);
-}
-
 void TextSystem::renderMenuUIText() {
     // no longer need to turn these on again now that we render BEFORE post processing 
     // (which turns off blending)
@@ -358,23 +371,13 @@ void TextSystem::renderMenuUIText() {
         // for now, tie text visibility to entitie's render visibility
         // but assumption may not always hold
         if (registry.renderRequests.get(entity).show)
-            if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
-            else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
+            renderText(textReq, entity);
     }
 
     // workaround for now instead of having text have its own show
     for (Entity entity : registry.menuChoices.entities) {
         auto& textReq = registry.textRenderRequests.get(entity);
-        if (textReq.tokenizedText.size() > 0) {
-            renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-        }
-        else {
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-        }
+        renderText(textReq, entity);
     }
 
     glBindVertexArray(0);
@@ -388,12 +391,7 @@ void TextSystem::renderMenuOverlayUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show)
-            if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
-            else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
+            renderText(textReq, entity);
     }
 
     glBindVertexArray(0);
@@ -407,12 +405,7 @@ void TextSystem::renderGameUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show) {
-            if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment, false);
-            }
-            else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment, false);
-            }
+            renderText(textReq, entity, false);
         }
     }
 
@@ -420,12 +413,7 @@ void TextSystem::renderGameUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show) {
-            if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
-            else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
+            renderText(textReq, entity);
         }
     }
 
@@ -441,25 +429,14 @@ void TextSystem::renderDialogueUIText() {
     {
         auto& textReq = registry.textRenderRequests.get(entity);
         if (registry.renderRequests.get(entity).show) {
-            if (textReq.tokenizedText.size() > 0) {
-                renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
-            else {
-                renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-            }
+            renderText(textReq, entity);
         }
-            
     }
 
     // workaround for now instead of having text have its own show
     for (Entity entity : registry.dialogueChoices.entities) {
         auto& textReq = registry.textRenderRequests.get(entity);
-        if (textReq.tokenizedText.size() > 0) {
-            renderText(textReq.tokenizedText, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-        }
-        else {
-            renderText(textReq.text, textReq.x, textReq.y, textReq.scale, textReq.color, textReq.topRightBound, textReq.bottomLeftBound, textReq.alignment);
-        }
+        renderText(textReq, entity);
     }
 
     glBindVertexArray(0);

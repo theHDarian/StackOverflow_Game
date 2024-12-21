@@ -41,7 +41,7 @@ void MapSystem::step(float elapsed_ms)
     //vec2 roomStartPos = roomCenter-map.currRoom.preset.roomSize/2.f;
     //vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
-    if ((map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay || map.currRoom.currentWave == 0) && !map.currRoom.preset.enemies.empty()) {
+    if ((map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay /*|| map.currRoom.currentWave == 0*/) && !map.currRoom.preset.enemies.empty()) {
         for (auto &e : map.currRoom.preset.enemies.front())
         {
             vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
@@ -74,7 +74,7 @@ void MapSystem::step(float elapsed_ms)
             soundPlayer->playNextMusic();
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
-            registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
+            registry.uiRequests.insert(registry.maps.entities[0], { UIRequestType::DisplayFlashMessage, "Room Cleared" }); // probably don't need insert with dupes yet
     } else if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.type != TutorialRoom1) {
         //spawn next wave by setting timeElapsed to spawnDelay
         map.currRoom.timeElapsed += map.currRoom.preset.spawnDelay;
@@ -327,6 +327,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     }
 
     decorateRoom();
+    registry.uiRequests.insert(registry.maps.entities[0], { UIRequestType::DisplayFlashMessage, map.currRoom.preset.ID });
 }
 
 void MapSystem::decorateRoom() {
