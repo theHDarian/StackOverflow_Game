@@ -203,6 +203,12 @@ void spawnEnemies (SoundSystem* soundPlayer, std::vector<std::tuple<EnemyType,ve
 	map.currRoom.preset.enemies.push_back( enemies);
 }
 
+void spawnEnemies (SoundSystem* soundPlayer,std::vector<std::vector<std::tuple<EnemyType,vec2>>>enemies) {
+	Map& map = registry.maps.components[0];
+	closeDoors( soundPlayer);
+	map.currRoom.preset.enemies.insert(map.currRoom.preset.enemies.end(), enemies.begin(), enemies.end());
+}
+
 void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* soundPlayer) {
 	switch (choice) {
 		case 0: {
