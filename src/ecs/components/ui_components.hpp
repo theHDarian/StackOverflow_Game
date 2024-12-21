@@ -137,3 +137,9 @@ struct Menu {
 struct ActiveMenu {
 
 };
+
+struct GaugeVisual {
+	float chargeBoundary = 1.0;
+	vec4 unchargedColor = vec4(0.65, 0.65, 0.65, 1.0);
+	bool isVertical = false;
+};

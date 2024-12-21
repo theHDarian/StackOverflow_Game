@@ -146,7 +146,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::BULLET || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
+	if (render_request.used_effect == EFFECT_ASSET_ID::BULLET || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED 
+		|| render_request.used_effect == EFFECT_ASSET_ID::ANIMATE || render_request.used_effect == EFFECT_ASSET_ID::DASH)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
@@ -170,6 +171,19 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
 			GLint tiling_uloc = glGetUniformLocation(program, "tiling");
 			glUniform2fv(tiling_uloc, 1, (float *)&tiling);
+			gl_has_errors();
+		}
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::DASH) {
+			assert(registry.gaugeVisuals.has(entity));
+			GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+			GLint chargeBoundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+			glUniform1f(chargeBoundary_uloc, gauge.chargeBoundary);
+			GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
+			glUniform4fv(uncharged_uloc, 1, (float*)&gauge.unchargedColor);
+			GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
+			glUniform1i(chargeDir_uloc, gauge.isVertical ? 1 : 0);
+			gl_has_errors();
 		}
 
 		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
@@ -1731,8 +1745,6 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		vec3 color = COLOR_YELLOW;
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float *)&color);
-		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-		glUniform1i(change_color_uloc, 0);
 		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
@@ -1742,8 +1754,6 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		vec3 color = COLOR_YELLOW * vec3(0.2, 0.2, 0.2); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float *)&color);
-		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-		glUniform1i(change_color_uloc, 1);
 		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
@@ -1752,8 +1762,6 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		vec3 color = COLOR_YELLOW * vec3(0.60, 0.60, 0.60); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float *)&color);
-		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-		glUniform1i(change_color_uloc, 1);
 
 		float chargeBoundary = glm::lerp(0.f, 1.f, (max - cooldown) / max);
 
@@ -1763,6 +1771,11 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, 1);
+	vec4 unchargedColor = vec4(0.65, 0.65, 0.65, 1.0);
+	GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
+	glUniform4fv(uncharged_uloc, 1, (float*)&unchargedColor);
+	GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
+	glUniform1i(chargeDir_uloc, 1);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t

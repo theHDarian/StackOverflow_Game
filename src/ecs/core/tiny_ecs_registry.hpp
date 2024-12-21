@@ -107,6 +107,7 @@ public:
 	ComponentContainer<GameReport> gameReports;
 	ComponentContainer<CameraRequest> cameraRequests;
 	ComponentContainer<InteractableInDialogue> interactableInDialogue;
+	ComponentContainer<GaugeVisual> gaugeVisuals;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -205,6 +206,7 @@ public:
 		registry_list.push_back(&hand);
 		registry_list.push_back(&cameraRequests);
 		registry_list.push_back(&interactableInDialogue);
+		registry_list.push_back(&gaugeVisuals);
 	}
 
 	void clear_all_components()

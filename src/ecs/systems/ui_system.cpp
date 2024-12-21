@@ -3,6 +3,7 @@
 #include "sound_system.hpp"
 #include "text_system.hpp"
 #include "premades.hpp"
+#include <glm/gtx/compatibility.hpp>
 #include "utils/colours.hpp"
 #include <fstream>
 #include <iomanip>
@@ -402,6 +403,23 @@ void UISystem::step(float elapsed_ms) {
 		else {
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
+		}
+
+		for (Entity gaugeEntity : registry.gaugeVisuals.entities) {
+			if (!registry.deleteds.has(gaugeEntity)) {
+				registry.deleteds.emplace(gaugeEntity);
+			}
+		}
+
+		// update guages of all interactables whose timers have gone off
+		for (Entity interactEntity : registry.interactables.entities) {
+			InteractableObject& interactable = registry.interactables.get(interactEntity);
+			if (interactable.timer < interactable.base) {
+				// if don't already have gauge drawn, then make gauge ui
+				// else, just update timer
+				// dumb method: do like interact indicators, and just clear all prev frames
+				createInteractGauge(registry.motions.get(interactEntity).position, interactable.timer, interactable.base);
+			}
 		}
 	}
 	else {
@@ -914,6 +932,55 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	text.x = motion.position.x - 10;
 
 	registry.interactIndicators.emplace(entity);
+
+	return entity;
+}
+
+Entity UISystem::createInteractGauge(vec2 position, float timer, float baseTimer) {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::DASH,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	registry.gameUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = { 10, 50 };
+	motion.position = { position.x, position.y };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = COLOR_TEAL_LIGHT;
+
+	GaugeVisual& gauge = registry.gaugeVisuals.emplace(entity);
+	gauge.chargeBoundary = glm::lerp(0.f, 1.f, (baseTimer - timer) / baseTimer);
+	gauge.isVertical = true;
+	gauge.unchargedColor = vec4(0.65, 0.65, 0.65, 1.0);
+
+	// hard code these offsets to make the doors look nice
+	Room room = registry.maps.components[0].currRoom;
+	if (position.y <= registry.motions.get(registry.doors.entities[0]).position.y) { // bottom door
+		motion.position.y -= 50;
+		motion.scale = { 50, 10 };
+		gauge.isVertical = false;
+	}
+	else if (position.y >= registry.motions.get(registry.doors.entities[2]).position.y) { // top door
+		motion.position.y += 50;
+		motion.scale = { 50, 10 };
+		gauge.isVertical = false;
+	}
+
+	if (position.x <= registry.motions.get(registry.doors.entities[3]).position.x) { // left door
+		motion.position.x -= 50;
+	}
+	else if (position.x >= registry.motions.get(registry.doors.entities[1]).position.x) { // right door
+		motion.position.x += 50;
+	}
 
 	return entity;
 }
