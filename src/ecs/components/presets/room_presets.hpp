@@ -364,15 +364,22 @@ const RoomPreset EnemyRoomDash1{
             {EnemyType::EnemyQuadshooter, {0.8f, 0.2f}},
             {EnemyType::EnemyQuadshooter, {0.2f, 0.2f}},
             {EnemyType::EnemyPufferfish, {0.2, 0.4}},
-            {EnemyType::EnemyPufferfish, {0.8, 0.4}},
             {EnemyType::EnemySkull, {0.5f, 0.5f}},
-            {EnemyType::EnemySword, {0.3f, 0.7f}},
-            {EnemyType::EnemySword, {0.3f, 0.7f}}
-            }
+            },
+            {
+                {EnemyType::EnemySword, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemySword, {Random::Float(),Random::Float()}}
+            },
+            {
+                {EnemyType::EnemySword, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}},
+{EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}},
+{EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}}
+            },
         },
     {},
     {},
-    0.0f,
+    10.0f,
     5,
     2,
     "EnemyRoomDash1",
@@ -398,17 +405,25 @@ const RoomPreset EnemyRoomDash2{
 
 const RoomPreset EnemyRoomDashHard{
         {
-            {{EnemyType::EnemySkull, {0.2f, 0.8f}},
-            {EnemyType::EnemySkull, {0.8f, 0.8f}},
-            {EnemyType::EnemySkull, {0.8f, 0.2f}},
-            {EnemyType::EnemySkull, {0.2f, 0.2f}},
-       {EnemyType::EnemyPufferfish, {0.3, 0.2}},
-            {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}}
-            }
+            {
+                {EnemyType::EnemyEvilSkull, {0.5f, 0.5f}},
+                {EnemyType::EnemyPufferfish, {0.3, 0.2}},
+            },
+            {
+                    {EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyEvilSnail, {Random::Float(),Random::Float()}}
+            },
+            {
+                {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
+        {EnemyType::EnemySkull, {0.2f, 0.8f}},
+    {EnemyType::EnemySkull, {0.8f, 0.8f}},
+        {EnemyType::EnemySkull, {0.8f, 0.2f}},
+        {EnemyType::EnemySkull, {0.2f, 0.2f}},
+            },
         },
     {},
     {},
-    0.0f,
+    20.0f,
     5,
     2,
     "EnemyRoomDashHard",
@@ -779,7 +794,7 @@ const RoomPreset TreasureRoomBlunt{
 const RoomPreset TreasureRoomSniper{
     {},
     {},
-    {{{PushConsole,{SniperPower, SniperBurden, SniperSpeed, SniperLethargy}}, {0.5f, 0.5f}}},
+    {{{PushConsole,{SniperPower,  SniperSpeed, SniperLethargy}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
@@ -938,28 +953,41 @@ const RoomPreset HifiRoomBoidSnipers{
                 {EnemyType::EnemySniper, {0.5f,0.5f}},
                 {EnemyType::EnemySniper, {0.5f,0.6f}},
                 {EnemyType::EnemySniper, {0.5f,0.4f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-                {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            }
+            },
+{
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+
+            },
+    {
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+
+                },
+{
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+        {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+
+                },
         },
     {},
     {},
-    0.0f,
+    10.0f,
     5,
     2,
     "HifiBoidSnipers"
@@ -970,47 +998,51 @@ const RoomPreset HifiEnemyRoomSwarmLasers {
             {{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
             {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
             {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-            {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+
        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
            {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
        {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
        {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
-       {EnemyType::EnemyHifiTrailHard, {0.6f,0.6f}},
-       {EnemyType::EnemyHifiTrailHard, {0.4f,0.4f}}
 
+            },
+            {
+                       {EnemyType::EnemyHifiTrail, {0.6f,0.6f}},
+           {EnemyType::EnemyHifiTrail, {0.4f,0.4f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+            },
 
-            }
+        {{EnemyType::EnemyHifiTrailHard, {0.4f,0.6f}},
+{EnemyType::EnemyHifiTrailHard, {0.6f,0.4f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+                },
+
         },
 
     {},
     {{{PopConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
         {{PushConsole,{numBulletsUpA}}, {0.25f, 0.5f}},
         {{PushConsole,{bulletBurstUpA}}, {0.75f, 0.5f}}},
-    0.0f,
+    15.0f,
     0,
 0,
 "HifiEnemyRoomSwarmLasers",
@@ -1044,18 +1076,25 @@ const RoomPreset HifiRoomCannonLasers{
 const RoomPreset HifiRoomCannonSnipers{
         {
             {
-                {EnemyType::EnemyHifiCannon, {0.9f,0.2f}},
-                {EnemyType::EnemyHifiCannon, {0.9f,0.8f}},
                 {EnemyType::EnemyLaserSniper, {0.1f,0.2f}},
-                {EnemyType::EnemyLaserSniper, {0.1f,0.8f}},
                 {EnemyType::EnemySniper, {0.6f,0.6f}},
                 {EnemyType::EnemySniper, {0.4f,0.4f}}
 
-            }
+            },
+            {
+                    {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemySniper, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemySniper, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemySniper, {Random::Float(),Random::Float()}},
+            },
+            {
+                    {EnemyType::EnemyHifiCannon, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemyHifiCannon, {Random::Float(),Random::Float()}},
+            },
         },
     {},
     {},
-    0.0f,
+    12.0f,
     5,
     2,
     "HifiBoidCannons"
@@ -1065,18 +1104,24 @@ const RoomPreset HifiRoomSniperShurikens{
         {
             {
                 {EnemyType::EnemyHifiSniperHard, {0.8f,0.2f}},
-                {EnemyType::EnemyHifiSniperHard, {0.2f,0.2f}},
-                {EnemyType::EnemyHifiSniperHard, {0.8f,0.8f}},
-                {EnemyType::EnemyHifiSniperHard, {0.2f,0.8f}},
-                {EnemyType::EnemyHifiTrailHard, {0.6f,0.6f}},
                 {EnemyType::EnemyHifiTrailHard, {0.4f,0.4f}},
             {EnemyType::EnemyHealer, {0.5f,0.5f}},
             {EnemyType::EnemyHealer, {0.2f,0.2f}},
-            }
+            },
+            {
+                    {EnemyType::EnemyHifiTrailHard, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemyHifiTrailHard, {Random::Float(),Random::Float()}},
+            },
+            {
+                {EnemyType::EnemyHifiSniperHard, {0.8f,0.8f}},
+                    {EnemyType::EnemyHifiSniperHard, {0.2f,0.8f}},
+                {EnemyType::EnemyHealer, {0.5f,0.5f}},
+                {EnemyType::EnemyHealer, {0.2f,0.2f}},
+            },
         },
     {},
     {},
-    0.0f,
+    10.0f,
     5,
     2,
     "HifiBoidCannons"
@@ -1089,11 +1134,21 @@ const RoomPreset HifiRoomCannonBoids{
                 {EnemyType::EnemyHifiCannonHard, {0.3f,0.5f}},
         {EnemyType::EnemyHealer, {0.5f,0.5f}},
         {EnemyType::EnemyHealer, {0.2f,0.2f}},
-            }
+            },
+{{EnemyHifiTackShooter, {0.2,0.2}},
+        {EnemyHifiTackShooter, {0.2,0.8}},},
+            {
+                    {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
+            {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
+            {EnemyType::EnemyHifiCannonHard, {0.5f,0.5f}},
+            {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
+            },
+
         },
     {},
     {},
-    0.0f,
+    15.0f,
     5,
     2,
     "HifiBoidCannons"
@@ -1106,20 +1161,39 @@ const RoomPreset EnemyRoomLaserFiesta {
                 {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
                 {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
                 {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
-            {EnemyType::EnemyLaserSniper, {0.25f,0.75f}},
-        {EnemyType::EnemyLaserSniper, {0.75f,0.25f}},
-                {EnemyEvilSkull , {0.5f, 0.5f}},
+            },
+{{EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+
+        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+
+            },
+            {
+                    {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+
+                    {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+            },
+                {
+                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+
+                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                },
+{
+                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+
+                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                },
+            {
+            {EnemyEvilSkull , {0.5f, 0.5f}},
                 {EnemySkull, {0.25f, 0.25f}},
                 {EnemySkull, {0.75f, 0.75f}},
-
-            }
+                },
         },
     {},
 {{{PopConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
     {{PushConsole,{fireRateUpM, bulletBounceUpM}}, {0.25f, 0.5f}},
     {{PushConsole,{bulletBurstUpA, bulletSpeedUpA}}, {0.75f, 0.5f}},
 },
-    0.0f,
+    12.0f,
     5,
     2,
     "EnemyRoomLaserFiesta",
@@ -1133,11 +1207,13 @@ const RoomPreset HifiRoomJellyFish { //Test room for new enemies
                 {EnemyHifiWhip, {0.5f, 0.5f}},
                 {EnemyHifiJellyFish, {0.5f, 0.5f}},
                 {EnemyHifiTackShooter, {0.8,0.2}},
-                {EnemyHifiTackShooter, {0.8,0.8}},
-                {EnemyHifiTackShooter, {0.2,0.2}},
-                {EnemyHifiTackShooter, {0.2,0.8}},
-                {EnemyHifiBallLauncher,{0.4,0.6}},
-            }
+            },
+            {
+                    {EnemyHifiJellyFish, {0.5f, 0.5f}},
+                    {EnemyHifiTackShooter, {0.2,0.2}},
+                    {EnemyHifiTackShooter, {0.2,0.8}},
+                    {EnemyHifiBallLauncher,{0.4,0.6}},
+            },
         },
     {},
     {},
@@ -1208,21 +1284,21 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{HifiRoomBasicWave},{}}},
-        // {RoomType::EnemyRoom, {{HifiRoomJellyFish,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens},{HifiEnemyRoomSwarmLasers}}},
+        // {RoomType::EnemyRoom, {{EnemyRoomLaserFiesta},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens, HifiRoomBasicWave},{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomJellyFish, HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
-        {RoomType::RestRoom, {{RestingRoomPop,RestingRoomGardener, RestRoomBibleTree,},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomSniper, TreasureRoom5}}},
     }},
