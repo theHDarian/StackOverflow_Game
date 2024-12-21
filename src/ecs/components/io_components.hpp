@@ -71,14 +71,16 @@ enum CameraRequestType {
 	ChangeZoom,
 	ChangeLookAt,
 	ChangeLookAtAndZoom,
-	ChangeTarget
+	ChangeTarget,
+	HoldCamera, // keep camera frozen for X ms
+	ChangeTargetAndZoom
 };
 
 struct CameraRequest {
 	CameraRequestType type;
 	float newZoom; // so can lerp from current zoom to new zoom
 	vec2 newLookAt; // look to a static position
-	float transitionTime = 1000; // how long camera transition should take
+	float transitionTime = 1000; // how long camera transition should take, in ms
 	Entity newTarget; // new target camera should follow, must have a motion attached. Will also transition camera position over to target first.
 };
 

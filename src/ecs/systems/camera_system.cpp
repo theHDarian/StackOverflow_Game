@@ -27,16 +27,20 @@ void CameraSystem::step(float elapsed_ms) {
 	if (registry.cameraRequests.components.size() > 0) {
 		CameraRequest& currReq = registry.cameraRequests.components[0];
 		camera.elapsedTime += elapsed_ms;
-		if (currReq.type == CameraRequestType::ChangeTarget) {
+		if (currReq.type == CameraRequestType::ChangeTarget || currReq.type == CameraRequestType::ChangeTargetAndZoom) {
 			assert(registry.motions.has(currReq.newTarget));
 			camera.lookAtPos = glm::lerp(camera.startPos, registry.motions.get(currReq.newTarget).position, camera.elapsedTime / currReq.transitionTime);
 		}
 		
-		if (currReq.type == CameraRequestType::ChangeZoom || currReq.type == CameraRequestType::ChangeLookAtAndZoom) {
+		if (currReq.type == CameraRequestType::ChangeZoom || currReq.type == CameraRequestType::ChangeLookAtAndZoom || currReq.type == CameraRequestType::ChangeTargetAndZoom) {
 			camera.zoom = glm::lerp(camera.startZoom, currReq.newZoom, camera.elapsedTime / currReq.transitionTime);
 		}
 		if (currReq.type == CameraRequestType::ChangeLookAt || currReq.type == CameraRequestType::ChangeLookAtAndZoom) {
 			camera.lookAtPos = glm::lerp(camera.startPos, currReq.newLookAt, camera.elapsedTime / currReq.transitionTime);
+		}
+
+		if (currReq.type == CameraRequestType::HoldCamera) {
+			// do nothing
 		}
 		
 		if (camera.elapsedTime >= currReq.transitionTime) { // remove the first item

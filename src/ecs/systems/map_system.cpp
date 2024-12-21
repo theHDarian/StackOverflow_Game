@@ -42,14 +42,17 @@ void MapSystem::step(float elapsed_ms)
     //vec2 roomEndPos = roomCenter+map.currRoom.preset.roomSize/2.f;
 
     if (map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay) {
-        Entity lastEnemy;
+        Entity bossEnemy;
         for (auto &e : map.currRoom.preset.enemies)
         {
             vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
             if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
                 createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
             } else {
-                lastEnemy = createEnemy(renderer, pos, std::get<EnemyType>(e));
+                Entity enemy = createEnemy(renderer, pos, std::get<EnemyType>(e));
+                if (registry.bosses.has(enemy)) {
+                    bossEnemy = enemy;
+                }
             }
         }
         map.currRoom.preset.enemies = {};
@@ -64,19 +67,22 @@ void MapSystem::step(float elapsed_ms)
 
         }
 
-        // just a demo of how camera could be used -- this makes it switch targets to last enemy spawned
-        if (registry.motions.has(lastEnemy)) {
-            //CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
-            //cameraReq2.type = CameraRequestType::ChangeLookAt;
-            //cameraReq2.newLookAt = vec2(100);
-            //CameraRequest& cameraReq = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
-            //cameraReq.type = CameraRequestType::ChangeTarget;
-            //cameraReq.newTarget = lastEnemy;
-            //cameraReq.transitionTime = 1; // how long transition takes
+        // look at boss and zoom out when boss spawns
+        if (registry.motions.has(bossEnemy)) {
+            CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq2.type = CameraRequestType::ChangeTargetAndZoom;
+            cameraReq2.newTarget = bossEnemy;
+            cameraReq2.transitionTime = 500;
+            cameraReq2.newZoom = 0.75f;
+            CameraRequest& cameraReq3 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq3.type = CameraRequestType::HoldCamera;
+            cameraReq3.transitionTime = 1000;
+            CameraRequest& cameraReq4 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq4.type = CameraRequestType::ChangeTarget;
+            cameraReq4.newTarget = registry.players.entities[0];
+            cameraReq4.transitionTime = 500;
         }
-
     }
-    
 
     // set room to cleared if all enemies are defeated
     if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
@@ -84,9 +90,11 @@ void MapSystem::step(float elapsed_ms)
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
             soundPlayer->playNextMusic();
-            CameraRequest& cameraReq = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
-            cameraReq.type = CameraRequestType::ChangeZoom;
-            cameraReq.newZoom = 1.0f;
+            CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
+            cameraReq2.type = CameraRequestType::ChangeTargetAndZoom;
+            cameraReq2.newTarget = registry.players.entities[0];
+            cameraReq2.transitionTime = 500;
+            cameraReq2.newZoom = 1.0f;
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2)
             registry.uiRequests.insert(registry.maps.entities[0], {UIRequestType::RoomClear});
@@ -228,12 +236,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom.preset = getRoomPreset(door.room, door.isLocked);
     updateBgPositions();
     map.currRoom.type = door.room;
-
-    if (map.currRoom.type == RoomType::BossRoom) {
-        CameraRequest& cameraReq = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
-        cameraReq.type = CameraRequestType::ChangeZoom;
-        cameraReq.newZoom = 0.75f;
-    }
 
     vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
     playerMotion.position = spawnPosition;
@@ -398,11 +400,6 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else {
                 map.currRoom.preset = ScientistBossRoom;
-            }
-            if (map.currRoom.type = RoomType::BossRoom) {
-                CameraRequest& cameraReq = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
-                cameraReq.type = CameraRequestType::ChangeZoom;
-                cameraReq.newZoom = 0.75f;
             }
         }
         map.directory = getDirectory(map.currRegion);
