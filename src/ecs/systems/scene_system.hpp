@@ -45,12 +45,9 @@ private:
     // (unless it was just a happy accident)
     std::unordered_map<Scene, std::vector<Dialogue>> storyDialogue;
     std::unordered_map<InteractibleDialogue, std::vector<Dialogue>> interactibleDialogue;
-    Entity currentObject;
     bool isStoryDialogue;
-    Entity callObject;
     bool callScientist = false;
 
-    Entity createCallObject();
     void summonDialogue();
     void summonInteractibleDialogue(Entity object);
     void loadDialogue(std::string dialogueType);

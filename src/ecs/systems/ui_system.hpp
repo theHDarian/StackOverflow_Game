@@ -99,6 +99,8 @@ private:
 
     void updateFlashMessageDisplay(std::string text);
 
+    std::string bindScriptVariables(std::string text, std::vector<std::string>& variables);
+
     Entity createFpsCounter();
     Entity createRoomCounter();
     Entity createRoomName();

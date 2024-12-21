@@ -347,6 +347,8 @@ void WorldSystem::restartGame() {
 
 	registry.maps.components[0].currRoom.dialogueDone = true;
 
+	registry.interactableInDialogue.clear();
+
 	//DialogueRequest& resetReq = registry.dialogueRequests.emplace(player);
 	//resetReq.type = DialogueRequestType::ResetDialogue;
 

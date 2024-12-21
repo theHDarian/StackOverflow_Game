@@ -516,6 +516,15 @@ void UISystem::playDialogue() {
 		if (nextLine.text.compare("<end>") != 0) { // there is a next line
 			registry.renderRequests.get(dialogueBox).show = true;
 			registry.textRenderRequests.get(dialogueBox).tokenizedText = nextLine.tokenizedText;
+
+			// check if any script variables need to be bound
+			if (registry.interactableInDialogue.entities.size() > 0) {
+				InteractableObject& currItem = registry.interactables.get(registry.interactableInDialogue.entities[0]);
+				if (currItem.scriptVariables.size() > 0) {
+					std::string bindedDialogue = bindScriptVariables(nextLine.text, currItem.scriptVariables);
+					registry.textRenderRequests.get(dialogueBox).tokenizedText = getTokenizedText(bindedDialogue);
+				}
+			}
 			
 			// play a sound if there is one
 			if (nextLine.sfx == IncomingDialogue) {
@@ -1697,3 +1706,19 @@ std::string UISystem::reportStats() {
 	return reportString.str();
 }
 
+std::string UISystem::bindScriptVariables(std::string text, std::vector<std::string>& variables) {
+	// assumes script format: {x}, where x corresponds to the index of the variable
+	for (int i = 0; i < text.length(); i++) {
+		char c = text.at(i);
+		if (c == '{') {
+			// very basic format checking -- make sure there's a closing brace
+			assert(text.find_first_of('}', i) != -1);
+			int closingBraceIndex = text.find_first_of('}', i);
+			int varNum = std::stoi(text.substr(i + 1, closingBraceIndex)); // assume this will work for now
+			assert(varNum < variables.size());
+			text = text.substr(0, i) + variables[varNum] + text.substr(closingBraceIndex + 1);
+			i += variables[varNum].length();
+		}
+	}
+	return text;
+}

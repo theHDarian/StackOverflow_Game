@@ -402,6 +402,7 @@ struct InteractableObject {
 	InteractableItem item = InteractableItem::NA;
 	float timer = 1000;
 	float base = timer;
+	std::vector<std::string> scriptVariables = std::vector<std::string>();
 };
 
 enum DialogueRequestType {
@@ -435,5 +436,8 @@ enum InteractableRequestType {
 	AddEffect, // adds effect to stack
 	RemoveEffect, // removes effect from stack
 	SpawnEnemy, // spawns enemy based on region, or can pass in specific enemy
+};
 
+struct InteractableInDialogue {
+	// container to store the current interactable active in dialogue
 };
