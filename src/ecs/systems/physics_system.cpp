@@ -366,6 +366,7 @@ void PhysicsSystem::step(float elapsed_ms)
 					registry.interactables.get(registry.doors.entities[i]).timer -= elapsed_ms;
 					if (registry.interactables.get(registry.doors.entities[i]).timer <= 0) {
 						MapRequest& mapReq = registry.mapRequests.emplace(doors.entities[i], MapRequestType::ChangeRoom, doors.components[i].room, i);
+						registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
 					}
 				}
 			}

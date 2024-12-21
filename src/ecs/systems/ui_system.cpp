@@ -1392,6 +1392,8 @@ void UISystem::updateFlashMessageDisplay(std::string text) {
 		registry.showTimers.get(flashMessageDisplay).timer = registry.showTimers.get(flashMessageDisplay).base;
 	}
 	else {
+		if (registry.fades.has(flashMessageDisplay))
+			registry.fades.remove(flashMessageDisplay);
 		registry.showTimers.emplace(flashMessageDisplay);
 	}
 
