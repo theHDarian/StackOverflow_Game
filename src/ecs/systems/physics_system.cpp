@@ -35,7 +35,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		motion.velocity += motion.veer * step_seconds;
 
 		// slightly broken
-		if (!registry.lasers.has(entity) && (motion.velocity != vec2(0.f)) && (registry.enemyBullets.has(entity) || registry.playerBullets.has(entity)))
+		if (!registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1)|| registry.playerBullets.has(entity)))
 			motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 		if (registry.homes.has(entity))
@@ -308,9 +308,8 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 		for (uint j = 0; j < walls.components.size(); j++)
 		{
-			// Bullets that dont move don't collide with walls
-			if (motion_registry.components[i].velocity != vec2(0.f) &&
-				(registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
+			// Should check for collision for piledriver bullets too, because their speed gets set to 0 on collision
+			if ((registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
 				(registry.polyColliders.has(eBullets.entities[i]) && PolyToWall(eBullets.entities[i], walls.entities[j])))
 			{
 				registry.collisions.emplace_with_duplicates(eBullets.entities[i], walls.entities[j]);
