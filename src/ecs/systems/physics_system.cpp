@@ -417,37 +417,46 @@ bool PhysicsSystem::CircleToCircle(Entity circleA, Entity circleB)
 	return CheapCircleToCircle(motionA.position, cA.radius, motionB.position, cB.radius);
 }
 
-// Imagine drawing the circle at every corner of the AABB
-// And then creating 2 rectangles fill the space to make a rounded rectangle
-// Check that the center of the circle is within any of these 6 shapes
+// ref: https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-detection (mostly the explanation, not the code)
 bool PhysicsSystem::AABBToCircle(Entity aabb, Entity circle)
 {
-	Motion &mA = registry.motions.get(aabb);
-	Motion &mB = registry.motions.get(circle);
+	Motion& motion1 = registry.motions.get(aabb);
+	Motion& motion2 = registry.motions.get(circle);
+	AABBCollider& aabbBox = registry.aabbs.get(aabb);
 
-	AABBCollider &ab = registry.aabbs.get(aabb);
-	CircleCollider &c = registry.circleColliders.get(circle);
+	float dist = distance(motion1.position, motion2.position);
+	float angle = atan2(motion2.position.y - motion1.position.y, motion2.position.x - motion1.position.x);
+	float clamped_x = clamp(dist * cos(angle), aabbBox.topLeft.x, aabbBox.bottomRight.x);
+	float clamped_y = clamp(dist * sin(angle), aabbBox.topLeft.y, aabbBox.bottomRight.y);
+	vec2 closestToCircle = { clamped_x + motion1.position.x, clamped_y + motion1.position.y };
+	return distance(closestToCircle, motion2.position) <= registry.circleColliders.get(circle).radius;
 
-	vec2 topLeft = mB.position - mA.position + ab.topLeft;
-	vec2 topRight = mB.position - mA.position + ab.topLeft * vec2(-1, 1);
-	vec2 bottomLeft = mB.position - mA.position + ab.bottomRight * vec2(-1, 1);
-	vec2 bottomRight = mB.position - mA.position + ab.bottomRight;
+	//Motion& mA = registry.motions.get(aabb);
+	//Motion& mB = registry.motions.get(circle);
 
-	if (glm::dot(topLeft, topLeft) < c.radius * c.radius)
-		return true;
-	if (glm::dot(topRight, topRight) < c.radius * c.radius)
-		return true;
-	if (glm::dot(bottomLeft, bottomLeft) < c.radius * c.radius)
-		return true;
-	if (glm::dot(bottomRight, bottomRight) < c.radius * c.radius)
-		return true;
+	//AABBCollider& ab = registry.aabbs.get(aabb);
+	//CircleCollider& c = registry.circleColliders.get(circle);
 
-	if (!PointInAABB(mB.position, bottomRight + vec2(0, c.radius), topLeft + vec2(0, -c.radius)))
-		return true;
-	if (!PointInAABB(mB.position, bottomRight + vec2(c.radius, 0), topLeft + vec2(-c.radius, 0)))
-		return true;
+	//vec2 topLeft = mB.position - mA.position + ab.topLeft;
+	//vec2 topRight = mB.position - mA.position + ab.topLeft * vec2(-1, 1);
+	//vec2 bottomLeft = mB.position - mA.position + ab.bottomRight * vec2(-1, 1);
+	//vec2 bottomRight = mB.position - mA.position + ab.bottomRight;
 
-	return false;
+	//if (glm::dot(topLeft, topLeft) < c.radius * c.radius)
+	//	return true;
+	//if (glm::dot(topRight, topRight) < c.radius * c.radius)
+	//	return true;
+	//if (glm::dot(bottomLeft, bottomLeft) < c.radius * c.radius)
+	//	return true;
+	//if (glm::dot(bottomRight, bottomRight) < c.radius * c.radius)
+	//	return true;
+
+	//if (!PointInAABB(mB.position, bottomRight + vec2(0, c.radius), topLeft + vec2(0, -c.radius)))
+	//	return true;
+	//if (!PointInAABB(mB.position, bottomRight + vec2(c.radius, 0), topLeft + vec2(-c.radius, 0)))
+	//	return true;
+
+	//return false;
 }
 
 bool PhysicsSystem::CircleToWall(Entity circle, Entity wall)
