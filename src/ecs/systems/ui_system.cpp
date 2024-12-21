@@ -429,7 +429,16 @@ void UISystem::step(float elapsed_ms) {
 		if (map.currRegion == Biology) region = "Biology";
 		if (map.currRegion == Physics) region = "Physics";
 		roomCounterText.text = region + " Room " + std::to_string(map.roomsTraversed);
-		registry.textRenderRequests.get(roomName).text = map.currRoom.preset.ID;
+		auto& roomNameText = registry.textRenderRequests.get(roomName).text;
+		roomNameText = map.currRoom.preset.ID;
+		if (map.currRoom.type == EnemyRoom || map.currRoom.type == BossRoom) {
+			if (map.currRoom.cleared) {
+				roomNameText += ", Cleared";
+			}
+			else {
+				roomNameText += ", Wave " + std::to_string(map.currRoom.currentWave);
+			}
+		}
 		
 		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 			registry.renderRequests.get(dialogueAvatar).show = false;
