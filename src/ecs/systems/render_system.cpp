@@ -992,7 +992,13 @@ void RenderSystem::drawGameUI()
 			continue;
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity)) {
 			drawHPbar(entity, projection, view);
+			drawEnemyIndicator(entity, projection, view);
 		}
+	}
+
+	// draw an indicator for the first boid
+	if (registry.boids.entities.size() > 0) {
+		drawEnemyIndicator(registry.boids.entities[0], projection, view);
 	}
 
 	for (Entity &entity : registry.bosses.entities)
@@ -1240,6 +1246,104 @@ void RenderSystem::drawAllColliders(Entity entity, const mat4 &projection, const
 		drawCollider(entity, "circle.png", projection, view);
 	if (registry.aabbs.has(entity))
 		drawCollider(entity, "rectangle.png", projection, view);
+}
+
+void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, const mat4& view) {
+	// first get angle -> which is player pos - enemy pos
+	Motion& motion = registry.motions.get(enemy);
+	Camera& camera = registry.cameras.components[0]; // set as camera target instead of just player; may regret later
+	vec2 posDiff = motion.position - camera.lookAtPos;
+
+	WindowState& ws = registry.windowStates.components[0];
+
+	// calculate: should an enemy indicator be drawn? (i.e is the enemy off screen?)
+	// currently offset by enemy scale, but can consider other things like circle collider scale instead
+	if ((abs(posDiff.x) * camera.zoom) < (ws.width / 2.f + motion.scale.x / 2.f) && abs(posDiff.y) * (camera.zoom) < (ws.height / 2.f + motion.scale.y / 2.f)) {
+		return;
+	}
+
+	// currently draws in screen coordinates
+	Motion indicatorMotion = Motion();
+	indicatorMotion.scale = { 30, 30 };
+	indicatorMotion.position = glm::clamp(posDiff, -vec2(ws.width / 2.f, ws.height / 2.f) + indicatorMotion.scale,
+		vec2(ws.width / 2.f, ws.height / 2.f) - indicatorMotion.scale) + vec2(ws.width / 2.f, ws.height / 2.f);
+	indicatorMotion.angle = atan(posDiff.y, posDiff.x);
+
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
+	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, 0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)name_to_texture["enemy_indicator.png"]];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+
+	vec3 color = COLOR_RED;
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = createNormalModel(indicatorMotion, vec2(0));
+
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+	gl_has_errors();
+
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
 }
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI

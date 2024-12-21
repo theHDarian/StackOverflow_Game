@@ -482,7 +482,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
-
+        
         updateBgPositions();
         //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
