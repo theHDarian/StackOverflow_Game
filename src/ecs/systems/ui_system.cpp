@@ -672,8 +672,6 @@ Entity UISystem::createNotifMessage(std::string message) {
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
 
-	UIButton& button = registry.buttons.emplace(entity);
-
 	registry.dialogueUIs.emplace(entity);
 	registry.dialogueUITexts.emplace(entity);
 
