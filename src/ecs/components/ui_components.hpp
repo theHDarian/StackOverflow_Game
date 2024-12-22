@@ -143,3 +143,7 @@ struct GaugeVisual {
 	vec4 unchargedColor = vec4(0.65, 0.65, 0.65, 1.0);
 	bool isVertical = false;
 };
+
+struct NotifMessage {
+	// this is a notif message
+};

@@ -629,6 +629,46 @@ void UISystem::playDialogue() {
 	}
 }
 
+Entity UISystem::createNotifMessage(std::string message) {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	UIButton& button = registry.buttons.emplace(entity);
+
+	registry.dialogueUIs.emplace(entity);
+	registry.dialogueUITexts.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = {200, 100};
+
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.scale = 0.40;
+	text.text = message;
+	text.tokenizedText = getTokenizedText(message);
+	text.topRightBound = { windowState.width, windowState.height }; // need to update this
+	text.bottomLeftBound = { 0, 0 };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = vec3(0.f);
+
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderThickness = 5.f;
+	border.borderColour = COLOR_WHITE;
+	border.border = UIBorderType::Outlined;
+
+	return entity;
+}
+
 Entity UISystem::createButton(std::string label, vec2 position, vec2 scale) {
 	Entity entity = Entity();
 	WindowState& windowState = registry.windowStates.components[0];

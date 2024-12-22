@@ -108,6 +108,7 @@ public:
 	ComponentContainer<CameraRequest> cameraRequests;
 	ComponentContainer<InteractableInDialogue> interactableInDialogue;
 	ComponentContainer<GaugeVisual> gaugeVisuals;
+	ComponentContainer<NotifMessage> notifMessages;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -207,6 +208,7 @@ public:
 		registry_list.push_back(&cameraRequests);
 		registry_list.push_back(&interactableInDialogue);
 		registry_list.push_back(&gaugeVisuals);
+		registry_list.push_back(&notifMessages);
 	}
 
 	void clear_all_components()

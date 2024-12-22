@@ -76,6 +76,10 @@ private:
 
     Entity createMenuChoice(std::string choice, vec2 position);
 
+    Entity createNotifMessage(std::string message);
+
+    void updateNotifMessage(Entity entity);
+
     // assume will only ever have one
     Entity createBulletUI();
 
