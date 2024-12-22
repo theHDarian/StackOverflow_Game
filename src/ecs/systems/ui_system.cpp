@@ -258,6 +258,8 @@ void UISystem::step(float elapsed_ms) {
 				registry.stackUI.components[0].bulletSize* STACK_NOTIF_SCALE,
 				bulletEffectShapes.at(stack.currStack[index].type),
 				bulletEffectColors.at(stack.currStack[index].type));
+			std::string message = stack.currStack[index].name + " has been added onto the stack";
+			createNotifMessage(message);
 		}
 	}
 
@@ -294,14 +296,20 @@ void UISystem::step(float elapsed_ms) {
 			}
 			vec2 bulletStartPos = playerPos;
 			std::string sprite = "stackNotifShift.png";
+			std::string message = "Stack has been shifted by 1";
 			if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
 				sprite = "stackNotifShuffle.png";
+				message = "Stack has been shuffled";
 			}
 			else if (uiRequest.type == UIRequestType::CallNotif) {
 				sprite = "callNotif.png";
 			}
 
 			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, sprite, vec3(1));
+
+			if (uiRequest.type == UIRequestType::StackNotifReqShuffle ||
+				uiRequest.type == UIRequestType::StackNotifReqShift)
+				createNotifMessage(message);
 		}
 
 		if (uiRequest.type == UIRequestType::ResetUI) {
@@ -315,6 +323,10 @@ void UISystem::step(float elapsed_ms) {
 			}
 			for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
 				Entity e = registry.menuChoices.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+			for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+				Entity e = registry.notifMessages.entities[i];
 				registry.deleteEntityAndRelatedEntities(e);
 			}
 
@@ -359,6 +371,26 @@ void UISystem::step(float elapsed_ms) {
 		if (registry.showTimers.has(registry.stackAddNotifs.entities[0])) {
 			registry.showTimers.get(stackAddBubble).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
 			registry.showTimers.get(stackAddTail).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
+		}
+	}
+
+	// move positions of notif messages
+	if (registry.notifMessages.size() > 0) {
+		// clean up notifs that have faded out
+		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+			Entity e = registry.notifMessages.entities[i];
+			if (!registry.renderRequests.get(e).show)
+				registry.deleteEntityAndRelatedEntities(e);
+		}
+
+		vec2 startingPosition = vec2(50, ws.height - 35);
+		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+			Entity messageEntity = registry.notifMessages.entities[i];
+			TextRenderRequest& text = registry.textRenderRequests.get(messageEntity);
+			vec2 nextPosition = vec2(startingPosition.x, startingPosition.y 
+				- (registry.notifMessages.size() - 1 - i) * 50);
+			text.x = nextPosition.x;
+			text.y = ws.height - nextPosition.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
 		}
 	}
 
@@ -648,7 +680,8 @@ Entity UISystem::createNotifMessage(std::string message) {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-	motion.scale = {200, 100};
+	motion.scale = {0, 0};
+	motion.position = vec2(0);
 
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
@@ -657,6 +690,8 @@ Entity UISystem::createNotifMessage(std::string message) {
 	text.tokenizedText = getTokenizedText(message);
 	text.topRightBound = { windowState.width, windowState.height }; // need to update this
 	text.bottomLeftBound = { 0, 0 };
+	text.x = 50;
+	text.y = 50;
 
 	vec3& color = registry.colors.emplace(entity);
 	color = vec3(0.f);
@@ -665,6 +700,10 @@ Entity UISystem::createNotifMessage(std::string message) {
 	border.borderThickness = 5.f;
 	border.borderColour = COLOR_WHITE;
 	border.border = UIBorderType::Outlined;
+
+	registry.showTimers.emplace(entity);
+
+	registry.notifMessages.emplace(entity);
 
 	return entity;
 }
