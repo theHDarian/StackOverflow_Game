@@ -986,19 +986,22 @@ void RenderSystem::drawGameUI()
 	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
+	// draw an indicator for the first boid
+	//if (registry.boids.entities.size() > 0) {
+	for (Entity& entity : registry.boids.entities)
+	{
+		drawEnemyIndicator(entity, projection, view);
+	}
+
 	for (Entity &entity : registry.enemies.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity)) {
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
 			drawHPbar(entity, projection, view);
-			drawEnemyIndicator(entity, projection, view);
+			if(!registry.shield.has(entity))
+				drawEnemyIndicator(entity, projection, view);
 		}
-	}
-
-	// draw an indicator for the first boid
-	if (registry.boids.entities.size() > 0) {
-		drawEnemyIndicator(registry.boids.entities[0], projection, view);
 	}
 
 	for (Entity &entity : registry.bosses.entities)
@@ -1008,6 +1011,7 @@ void RenderSystem::drawGameUI()
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity))
 		{
 			drawHPbar(entity, projection, view);
+			drawEnemyIndicator(entity, projection, view);
 			BossEnemy &boss = registry.bosses.get(entity);
 			if (!registry.textRenderRequests.has(entity))
 			{
@@ -1249,7 +1253,6 @@ void RenderSystem::drawAllColliders(Entity entity, const mat4 &projection, const
 }
 
 void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, const mat4& view) {
-	// first get angle -> which is player pos - enemy pos
 	Motion& motion = registry.motions.get(enemy);
 	Camera& camera = registry.cameras.components[0]; // set as camera target instead of just player; may regret later
 	vec2 posDiff = motion.position - camera.lookAtPos;
@@ -1262,10 +1265,23 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 		return;
 	}
 
-	// currently draws in screen coordinates
+	std::string indicatorName = "enemy_indicator.png";
+	vec3 color = COLOR_RED;
+
+	// draw indicator in screen coordinates
 	Motion indicatorMotion = Motion();
 	indicatorMotion.scale = { 30, 30 };
-	indicatorMotion.position = glm::clamp(posDiff, -vec2(ws.width / 2.f, ws.height / 2.f) + indicatorMotion.scale,
+
+	if (registry.bosses.has(enemy)) {
+		indicatorMotion.scale = vec2(96.f, 48.f) * 30.f / 48.f * 1.25f;
+		indicatorName = "enemy_indicator_boss.png";
+	}
+	else if (registry.boids.has(enemy)) {
+		indicatorMotion.scale *= 0.7;
+		//color = COLOR_ORANGE;
+	}
+
+	indicatorMotion.position = glm::clamp(posDiff * camera.zoom, -vec2(ws.width / 2.f, ws.height / 2.f) + indicatorMotion.scale,
 		vec2(ws.width / 2.f, ws.height / 2.f) - indicatorMotion.scale) + vec2(ws.width / 2.f, ws.height / 2.f);
 	indicatorMotion.angle = atan(posDiff.y, posDiff.x);
 
@@ -1310,8 +1326,8 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 	gl_has_errors();
 
 	GLuint texture_id =
-		texture_gl_handles[(GLuint)name_to_texture["enemy_indicator.png"]];
-
+		texture_gl_handles[(GLuint)name_to_texture[indicatorName]];
+	
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	gl_has_errors();
 
@@ -1326,9 +1342,14 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 
-	vec3 color = COLOR_RED;
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color_uloc, 1, (float*)&color);
+
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
+
+	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
+	glUniform1f(effect_alpha_uloc, 0);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
