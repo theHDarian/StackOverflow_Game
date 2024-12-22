@@ -258,7 +258,7 @@ void UISystem::step(float elapsed_ms) {
 				registry.stackUI.components[0].bulletSize* STACK_NOTIF_SCALE,
 				bulletEffectShapes.at(stack.currStack[index].type),
 				bulletEffectColors.at(stack.currStack[index].type));
-			std::string message = stack.currStack[index].name + " has been added onto the stack";
+			std::string message = stack.currStack[index].name + " added onto the stack";
 			createNotifMessage(message);
 		}
 	}
@@ -383,7 +383,7 @@ void UISystem::step(float elapsed_ms) {
 				registry.deleteEntityAndRelatedEntities(e);
 		}
 
-		vec2 startingPosition = vec2(50, ws.height - 35);
+		vec2 startingPosition = vec2(50, ws.height - 50);
 		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
 			Entity messageEntity = registry.notifMessages.entities[i];
 			TextRenderRequest& text = registry.textRenderRequests.get(messageEntity);
