@@ -277,6 +277,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	//check spawn countdown
+	if (registry.spawnings.entities.size() > 0) {
+		for (int i = (int)registry.spawnings.components.size()-1; i>=0; --i) {
+			Spawning& entity = registry.spawnings.components[i];
+			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				registry.spawnings.remove(registry.spawnings.entities[i]);
+			}
+		}
+	}
+
 	// Critter management
 	if (registry.critters.entities.size() > 0) {
 		for (int i = (int)registry.critters.components.size() - 1; i >= 0; --i) {
@@ -381,7 +391,7 @@ void WorldSystem::handleCollisions() {
 		// Player centric collision handling
 		if (registry.players.has(entity)) {
 			// Checking Player - Deadly collisions
-			if (!registry.invincibles.has(entity)
+			if (!registry.invincibles.has(entity) && !registry.spawnings.has(entity_other)
 				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))) {
 				handlePlayerHit(entity_other);
 				if (registry.enemyBullets.has(entity_other) 

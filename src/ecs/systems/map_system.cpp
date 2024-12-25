@@ -41,6 +41,7 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             if (registry.bosses.has(enemy)) {
                 bossEnemy = enemy;
             }
+            registry.spawnings.emplace( enemy);
         }
     }
 }
