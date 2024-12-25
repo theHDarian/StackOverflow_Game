@@ -1311,7 +1311,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = BossBeeHive();
 		auto &boss = registry.bosses.emplace(entity);
-		boss.name = "Grand Hive, the Queen's Throne";
+		boss.name = "The Main Hive";
 		break;
 	}
 	case EnemyType::EnemySkull:

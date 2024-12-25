@@ -46,7 +46,7 @@ const RoomPreset ScientistBossRoom{
     0.0f,
     0 ,
     0,
-    "ScientistRoom",
+    "\"Gatekeeper\"",
     false,
     {1600,1300}
 };
@@ -303,7 +303,7 @@ const RoomPreset EnemyRoomSwarm{
     15.0f,
     0,
 0,
-"EnemyRoomSwarm",
+"Hallway full of Drones",
     false,
     {1600, 1000}
 };
@@ -444,7 +444,7 @@ const RoomPreset EnemyRoomSnails {
 0.0f,
     5,
     2,
-    "EnemyRoomSnails",
+    "Snail's Sector",
 
 };
 
@@ -456,14 +456,20 @@ const RoomPreset EnemyRoomSnailsHard {
                     {EnemySnail, {0.4f, 0.6f}},
                     {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
                     {EnemyMagnet, {0.8f, 0.4f}},
-            }
+            },
+                {
+                        {EnemyType::EnemyEvilSnail, {Random::Float(), Random::Float()}},
+{EnemySnail, {Random::Float(), Random::Float()}},
+                    {EnemySkull, {0.5f, 0.5f}},
+
+                }
             },
     {},
     {},
-    0.0f,
+    15.0f,
         5,
         2,
-        "EnemyRoomSnailsHard",
+        "Snail's Sanctuary",
         false,
         {1000, 750}
 
@@ -488,15 +494,15 @@ const RoomPreset EnemyRoomCrabs{
 const RoomPreset EnemyRoomSmall{
         {
             {{EnemyType::EnemySkull, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-           {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
+           {EnemyType::EnemyBioBoid, {0.5f, 0.5f}},
            }
         },
     {},
@@ -504,7 +510,7 @@ const RoomPreset EnemyRoomSmall{
     0.0f,
     5,
     2,
-    "EnemyRoomSmall",
+    "Closet Cleanout",
     false,
     {800,800}
 };
@@ -523,26 +529,30 @@ const RoomPreset EnemyRoomBees1{
     0.0f,
     5,
     2,
-    "EnemyRoomBees1",
+    "Bee Brigade",
 };
 
 const RoomPreset EnemyRoomBees2{
         {
             {{EnemyType::EnemyTwoBee, {0.2f, 0.8f}},
             {EnemyType::EnemyTwoBee, {0.8f, 0.8f}},
-            {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
-            {EnemyType::EnemyTwoBee, {0.2f, 0.2f}},
-               {EnemyEvilSnail, {0.5f, 0.6f}},
             {EnemyType::EnemyBeeHive, {0.2f, 0.4f}},
-            {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}}
+            {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}},
+            {
+                {EnemyType::EnemyTwoBee, {Random::Float(), Random::Float()}},
+                   {EnemyEvilSnail, {Random::Float(), Random::Float()}},
+                 {EnemyType::EnemyTwoBee, {Random::Float(), Random::Float()}},
+        {EnemyType::EnemyTwoBee, {Random::Float(), Random::Float()}},
+
+            },
         },
 
     {},
     {},
-    0.5f,
+    22.5f,
     7,
     2,
-    "EnemyRoomBees2",
+    "Bee Squadron",
     };
 
 const RoomPreset EnemyRoomBees3{
@@ -559,7 +569,7 @@ const RoomPreset EnemyRoomBees3{
     0.0f,
     5,
     2,
-    "EnemyRoomBees1",
+    "Bee Blitz",
 };
 
 const RoomPreset EnemyRoomAngelTank{
@@ -606,7 +616,7 @@ const RoomPreset RestingRoomPop{
     0.0f,
     0,
     0,
-    "RestingRoomPop",
+    "Resting Room",
     false,
     {1000,1000}
 };
@@ -618,7 +628,7 @@ const RoomPreset RestingRoomGardener{
     0.0f,
     0,
     0,
-    "RestingRoomGardener",
+    "Gardener's Abode",
     true,
     {1800, 1000}
 };
@@ -630,7 +640,7 @@ const RoomPreset EventRoomSwarm{
     0.0f,
     0,
     0,
-    "EventRoomSwarms",
+    "Swarms' Retreat",
     true,
     {1800, 1000}
 };
@@ -642,7 +652,7 @@ const RoomPreset EventRoomOven{
         0.0f,
         0,
         0,
-        "EventRoomOven",
+        "Oven Room",
         false,
         {1200, 1200}
 };
@@ -654,7 +664,7 @@ const RoomPreset EventRoomOracle{
         0.0f,
         0,
         0,
-        "EventRoomOracle",
+        "The Oracle",
         true,
         {1800, 1000}
 };
@@ -679,7 +689,7 @@ const RoomPreset RestRoomBibleTree{
     0.0f,
     0,
     0,
-    "RestRoomBibleTree",
+    "Tree of Knowledge",
     true,
     {2000,2000}
 };
@@ -691,7 +701,7 @@ const RoomPreset RestRoomBaru{
         0.0f,
         5,
         0,
-    "RestRoomBaru",
+    "Unknown Machine",
         true,
     {3000, 2000}
     };
@@ -703,7 +713,7 @@ const RoomPreset RestRoomOracleCrab{
         0.0f,
         5,
         0,
-    "RestRoomOracleCrab",
+    "Strange Crab",
         true
     };
 
@@ -851,7 +861,7 @@ const RoomPreset BossRoomBee{
     0.0f,
     20,
     5,
-    "BossRoomBee",
+    "\"Apiarist\"",
 
 };
 
