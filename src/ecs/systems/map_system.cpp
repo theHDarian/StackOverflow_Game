@@ -28,6 +28,30 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     soundPlayer->playNextMusic();
 }
 
+void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity& bossEnemy, RenderSystem *renderer)
+{
+    Map& map = registry.maps.components[0];
+    for (auto &e : enemies)
+    {
+        vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
+        if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
+            createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
+        } else {
+            Entity enemy = createEnemy(renderer, pos, std::get<EnemyType>(e));
+            if (registry.bosses.has(enemy)) {
+                bossEnemy = enemy;
+            }
+        }
+    }
+}
+
+void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, RenderSystem *renderer)
+{
+    Entity bossEnemy;
+    SpawnEnemiesInList( enemies, bossEnemy, renderer);
+}
+
+
 void MapSystem::step(float elapsed_ms)
 {
     Map &map = registry.maps.components[0];
@@ -40,18 +64,7 @@ void MapSystem::step(float elapsed_ms)
     
     if ((map.currRoom.timeElapsed > map.currRoom.preset.spawnDelay /*|| map.currRoom.currentWave == 0*/) && !map.currRoom.preset.enemies.empty()) {
         Entity bossEnemy;
-        for (auto &e : map.currRoom.preset.enemies.front())
-        {
-            vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
-            if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
-                createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
-            } else {
-                Entity enemy = createEnemy(renderer, pos, std::get<EnemyType>(e));
-                if (registry.bosses.has(enemy)) {
-                    bossEnemy = enemy;
-                }
-            }
-        }
+        SpawnEnemiesInList( map.currRoom.preset.enemies.front(), bossEnemy, renderer);
         map.currRoom.preset.enemies.pop_front();
         map.currRoom.timeElapsed = 0;
         map.currRoom.currentWave++;
@@ -71,6 +84,11 @@ void MapSystem::step(float elapsed_ms)
             cameraReq4.newTarget = registry.players.entities[0];
             cameraReq4.transitionTime = 500;
         }
+    }
+
+    if (!map.currRoom.enemiesToSpawn.empty()) {
+        SpawnEnemiesInList(map.currRoom.enemiesToSpawn, renderer);
+        map.currRoom.enemiesToSpawn.clear();
     }
 
     if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {

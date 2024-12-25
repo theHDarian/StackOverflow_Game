@@ -600,9 +600,8 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
 
         if (atkData.spawnPosition.size() == atkData.numBullets)
         {
-
-            map.currRoom.preset.enemies.push_back({});
-            map.currRoom.preset.enemies.back().push_back({atkData.spawn, atkData.spawnPosition[i]});
+            std::tuple<EnemyType, vec2> spawn = std::make_tuple(  atkData.spawn,atkData.spawnPosition[i]);
+            map.currRoom.enemiesToSpawn.push_back(spawn);
         }
         else
         {

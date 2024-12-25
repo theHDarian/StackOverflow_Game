@@ -1,4 +1,6 @@
 #pragma once
+#include <list>
+
 #include "common.hpp"
 #include "components/actor_components.hpp"
 
@@ -85,6 +87,7 @@ struct DoorSymbol {
 struct Room {
     RoomPreset preset;
     RoomType type = RoomType::TutorialRoom;
+    std::vector<std::tuple<EnemyType, vec2>> enemiesToSpawn = {};
     bool cleared = false;
     float timeElapsed = 0; //time passed since enter room in seconds
     int dialogueCount = 0; // place here for now
