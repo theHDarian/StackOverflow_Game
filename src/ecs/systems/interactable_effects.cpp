@@ -200,7 +200,7 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
 void spawnEnemies (SoundSystem* soundPlayer, std::vector<std::tuple<EnemyType,vec2>> enemies) {
 	Map& map = registry.maps.components[0];
 	closeDoors( soundPlayer);
-	map.currRoom.preset.enemies.push_back( enemies);
+	map.currRoom.enemiesToSpawn.insert(map.currRoom.enemiesToSpawn.end(), enemies.begin(), enemies.end());
 }
 
 void spawnEnemies (SoundSystem* soundPlayer,std::vector<std::vector<std::tuple<EnemyType,vec2>>>enemies) {
