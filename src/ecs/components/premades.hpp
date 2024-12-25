@@ -3675,6 +3675,13 @@ struct ScientistHandEnemy : Enemy
 		scale = vec2(200, 200);
 		rotatePower = 0.f;
 		speedMultiplier = 4.f;
+		collisionBullet = {
+			Pop,
+			Additive,
+			0,
+			"Pop the stack",
+			""
+		};
 	};
 };
 

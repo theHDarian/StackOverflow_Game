@@ -24,7 +24,8 @@ const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{PlayerDashCDR,     COLOR_BROWN},
 			{Inert,             COLOR_GREY_LIGHT},
 			{Lightning,			{1.f,1.f,1.f}},
-			{Key,				{1.0, 1.0, 1.0}}
+			{Key,				{1.0, 1.0, 1.0}},
+				{ Pop,				{1.0, 1.0, 1.0} }
 	};
 
 const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
@@ -44,7 +45,8 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
 			{PlayerStackSize,   "enemy_bullet_square.png"},
 			{PlayerDashCDR,     "enemy_bullet_square.png"},
 			{Inert,             "enemy_bullet_square.png"},
-			{Key,				"enemy_bullet_key (2).png"} 
+			{Key,				"enemy_bullet_key (2).png"},
+			{ Pop,				"enemy_bullet_square.png" }
 	};
 
 const std::map<BulletEffectType, Vec4StartEnd> enemyBulletParticleColors = {
@@ -66,4 +68,5 @@ const std::map<BulletEffectType, Vec4StartEnd> enemyBulletParticleColors = {
     {Inert,             {{0,0,0,0},{0,0,0,0}}},
 	{Lightning,			{{0,0,0,0},{0,0,0,0}}},
     {Key, 				{{ 255 / 255.0f, 215 / 255.0f, 0 / 255.0f, 1.0f },{ 250 / 255.0f, 250 / 255.0f, 210 / 255.0f, .9f }}},
+	{ Pop,				{{ 0, 0, 0, 0 },{ 0, 0, 0, 0 }}}
 };

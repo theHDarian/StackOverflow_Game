@@ -5,6 +5,7 @@
 #include <vector>
 #include <stack>
 #include <unordered_map>
+
 #include "../ext/stb_image/stb_image.h"
 
 #include "io_components.hpp"
@@ -428,15 +429,6 @@ struct NearbyInteractables {
 	// placeholder component that has list of nearby interactibles the io system can respond to
 };
 
-enum InteractableRequestType {
-	PopStack, // clears stack, spawns bullets with effects that were in stack
-	ClearStack, // clears stack without spawning anything
-	ExtendStack, // extends stack by n
-	GrantWish, // grants wish based on choice, 0 is first choice, 1 is second, etc
-	AddEffect, // adds effect to stack
-	RemoveEffect, // removes effect from stack
-	SpawnEnemy, // spawns enemy based on region, or can pass in specific enemy
-};
 
 struct InteractableInDialogue {
 	// container to store the current interactable active in dialogue

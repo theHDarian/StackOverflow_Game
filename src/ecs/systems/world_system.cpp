@@ -822,18 +822,23 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
 		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
-			bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
-			if (!success) {
-				GameState& gameState = registry.gameStates.components[0];
-				gameState.gameOver = true;
-				gameState.currentVolume *= 0.15f;
-				soundPlayer->playGameOverSound();
-				soundPlayer->setMusicVolume(gameState.currentVolume);
-				if (!registry.uiRequests.has(player)) {
-					registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
+			if (eBullet.bulletEffects[i].type == BulletEffectType::Pop) {
+				InteractableRequest& req = registry.interactableRequests.emplace(Entity());
+				req.type = InteractableRequestType::PopStack;
+			} else {
+				bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
+				if (!success) {
+					GameState& gameState = registry.gameStates.components[0];
+					gameState.gameOver = true;
+					gameState.currentVolume *= 0.15f;
+					soundPlayer->playGameOverSound();
+					soundPlayer->setMusicVolume(gameState.currentVolume);
+					if (!registry.uiRequests.has(player)) {
+						registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
+					}
+				} else if (eBullet.isSpecial) {
+					registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 				}
-			} else if (eBullet.isSpecial) {
-				registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
 			}
 		}
 	}
@@ -841,15 +846,20 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		// Boid touch enemy, it die
 		if (registry.boids.has(other) && !registry.deleteds.has(other)) registry.deleteds.emplace(other);
 		Enemy& e = registry.enemies.get(other);
-		bool success = registry.stackCompile.get(player).add(e.collisionBullet);
-		if (!success) {
-			registry.gameStates.components[0].gameOver = true;
-			GameState& gameState = registry.gameStates.components[0];
-			gameState.currentVolume *= 0.15f;
-			soundPlayer->playGameOverSound();
-			soundPlayer->setMusicVolume(gameState.currentVolume);
-			if (!registry.uiRequests.has(player)) {
-				registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
+		if (e.collisionBullet.type == BulletEffectType::Pop) {
+			InteractableRequest& req = registry.interactableRequests.emplace(Entity());
+			req.type = InteractableRequestType::PopStack;
+		} else {
+			bool success = registry.stackCompile.get(player).add(e.collisionBullet);
+			if (!success) {
+				registry.gameStates.components[0].gameOver = true;
+				GameState& gameState = registry.gameStates.components[0];
+				gameState.currentVolume *= 0.15f;
+				soundPlayer->playGameOverSound();
+				soundPlayer->setMusicVolume(gameState.currentVolume);
+				if (!registry.uiRequests.has(player)) {
+					registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
+				}
 			}
 		}
 	}

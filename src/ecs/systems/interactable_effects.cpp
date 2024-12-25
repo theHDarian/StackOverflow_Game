@@ -245,6 +245,46 @@ void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* 
 
 }
 
+void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
+	for (InteractableRequest& request : registry.interactableRequests.components) {
+		switch (request.type) {
+			case InteractableRequestType::PopStack:
+			resetStack(player, renderer);
+				break;
+			case InteractableRequestType::ClearStack:
+			clearStack(player);
+				break;
+			case InteractableRequestType::ExtendStack:
+			extendStack(player, request.choice);
+				break;
+			case InteractableRequestType::GrantWish:
+			grantWish(player, renderer, request.choice, soundPlayer);
+				break;
+			case InteractableRequestType::AddEffect:
+			addEffect(player, request.effects, soundPlayer);
+				break;
+			case InteractableRequestType::RemoveEffect:
+			// removeEffect(player, request.choice);
+				break;
+			case InteractableRequestType::SpawnEnemy:
+				if (request.enemies.empty()) {
+					auto region = registry.maps.components[0].currRegion;
+					switch ( region ) {
+						case MapRegion::Biology:
+							spawnEnemies(soundPlayer, fightConsolePresetsBio[request.choice > -1 ? request.choice : Random::Int(fightConsolePresetsBio.size())]);
+							break;
+						case MapRegion::Physics:
+							spawnEnemies(soundPlayer, fightConsolePresetsPhysics[request.choice > -1 ? request.choice : Random::Int(fightConsolePresetsPhysics.size())]);
+							break;
+					}
+				}  else
+					spawnEnemies(soundPlayer, request.enemies);
+				break;
+		}
+	}
+	registry.interactableRequests.clear();
+}
+
 
 void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
 	// interactible object management placed here and hard coded for now
@@ -658,6 +698,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 
 		registry.interactableReactions.clear();
 	}
+	handleRequests( elapsed_ms, player, renderer, soundPlayer);
 }
 
 

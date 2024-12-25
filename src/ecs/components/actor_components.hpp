@@ -27,7 +27,8 @@ enum BulletEffectType {
     PlayerDashCDR,
     Inert, // Bullet that does nothing but take up stack space
     Lightning,
-    Key
+    Key,
+    Pop, // Bullet that pops the stack, should only be a contact effect
 };
 
 enum EffectCalculation {
@@ -609,4 +610,21 @@ struct KeyItems {
     int honey = 0;
     int cheese = 0;
     bool hasSeenPieRecipe = false;
+};
+
+enum InteractableRequestType {
+    PopStack, // clears stack, spawns bullets with effects that were in stack
+    ClearStack, // clears stack without spawning anything
+    ExtendStack, // extends stack by n
+    GrantWish, // grants wish based on choice, 0 is first choice, 1 is second, etc
+    AddEffect, // adds effect to stack
+    RemoveEffect, // removes effect from stack
+    SpawnEnemy, // spawns enemy based on region, or can pass in specific enemy
+};
+
+struct InteractableRequest {
+    InteractableRequestType type;
+    int choice = -1;
+    std::vector<std::tuple<EnemyType,vec2>> enemies = {};
+    std::vector<BulletStackEffect> effects = {};
 };
