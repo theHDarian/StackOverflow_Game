@@ -285,7 +285,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // change current room in the map
     map.currRoom = Room();
     assert(door.room != RoomType::None);
-    map.currRoom.preset = getRoomPreset(door.room, door.isLocked);
+    map.currRoom.preset = door.preset;
     updateBgPositions();
     map.currRoom.type = door.room;
 
@@ -379,6 +379,13 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
             lockedRooms++;
         }
+
+        d.preset = getRoomPreset(d.room, d.isLocked);
+
+        if (registry.textRenderRequests.has(registry.doors.entities[i])) {
+            registry.textRenderRequests.remove(registry.doors.entities[i]);
+        }
+
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }
 
@@ -500,6 +507,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 lockedRooms++;
             }
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
+
+            d.preset = getRoomPreset(d.room, d.isLocked);
+
         }
 
         updateBgPositions();
