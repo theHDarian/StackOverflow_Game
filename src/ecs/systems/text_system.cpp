@@ -318,20 +318,6 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     gl_has_errors();
 }
 
-void TextSystem::renderText(TransientTextRenderRequest& request, Entity entity, bool isUI) {
-    TextRenderRequest textReq = TextRenderRequest();
-    textReq.text = request.text;
-    textReq.x = request.x;
-    textReq.y = request.y;
-    textReq.scale = request.scale;
-    textReq.color = request.color;
-    textReq.topRightBound = request.topRightBound;
-    textReq.bottomLeftBound = request.bottomLeftBound;
-    textReq.alignment = request.alignment;
-    textReq.tokenizedText = request.tokenizedText;
-    renderText( textReq, entity, isUI);
-}
-
 // length = how many rendering at once
 void TextSystem::drawInstancedText(int length) {
     if (length > 0) {
@@ -455,22 +441,4 @@ void TextSystem::renderDialogueUIText() {
 
     glBindVertexArray(0);
     gl_has_errors();
-}
-
-void TextSystem::renderTransientText() {
-    glBindVertexArray(VAO);
-
-    for (Entity entity : registry.transientTextRenderRequests.entities)
-    {
-        auto& textReq = registry.transientTextRenderRequests.get(entity);
-        if (registry.renderRequests.get(entity).show) {
-            renderText(textReq, entity, false);
-        }
-    }
-
-    registry.transientTextRenderRequests.clear();
-
-    glBindVertexArray(0);
-    gl_has_errors();
-
 }
