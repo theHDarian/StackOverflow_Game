@@ -70,9 +70,13 @@ private:
 
     Entity createInteractIndicator(vec2 position);
 
+    Entity createInteractGauge(vec2 position, float timer, float baseTimer);
+
     Entity createTitleScreen();
 
     Entity createMenuChoice(std::string choice, vec2 position);
+
+    Entity createNotifMessage(std::string message);
 
     // assume will only ever have one
     Entity createBulletUI();

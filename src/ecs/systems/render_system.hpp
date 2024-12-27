@@ -84,6 +84,7 @@ public:
 	// Draw all entities
 	void drawSetupFrame();
 	void drawGameElements();
+	void drawGameOverlayUI();
 	void drawGameUI();
 	void drawMenuUI();
 	void drawMenuOverlayUI();
@@ -106,6 +107,7 @@ private:
 	void drawMesh(Entity entity, const mat4& projection, const mat4& view);
 	void drawDashes(const mat4& projection, const mat4& view);
 	void drawHPbar(Entity& entity, const mat4& projection, const mat4& view);
+	void drawEnemyIndicator(Entity& enemy, const mat4& projection, const mat4& view);
 
 	//void drawDashCharges(GLuint &VAO, GLuint &VBO, GLuint &EBO);
 	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat4& projection, const mat4& view);

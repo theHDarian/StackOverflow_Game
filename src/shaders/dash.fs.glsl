@@ -6,23 +6,29 @@ in vec2 texcoord;
 // Application data
 uniform sampler2D sampler0;
 uniform vec3 fcolor;
-uniform int changeColor = 0;
 uniform float alpha = 1.0;
 uniform float chargeBoundary = 1.0;
+uniform vec4 unchargedColor;
+uniform int isVertical = 1;
 
 // Output color
-layout(location = 0) out  vec4 color;
+layout(location = 0) out vec4 color;
 
 void main()
 {
-	color = vec4(fcolor, texture(sampler0, texcoord).a);
-	// color = texture(sampler0, vec2(texcoord.x, texcoord.y));
+	color = vec4(fcolor, alpha) * vec4(texture(sampler0, texcoord));
 	// note: branches are expensive, consider using another shader instead?
-	if (texcoord.y < 1.0-chargeBoundary){
+	if (texcoord.y < 1.0-chargeBoundary && isVertical == 1){
 		color.r *= fcolor.r;
 		color.g *= fcolor.g;
 		color.b *= fcolor.b;
-		color *= vec4(0.65,0.65,0.65, 1.0);
+		color *= unchargedColor;
+	}
+	if (texcoord.x > chargeBoundary && isVertical == 0) {
+		color.r *= fcolor.r;
+		color.g *= fcolor.g;
+		color.b *= fcolor.b;
+		color *= unchargedColor;
 	}
 }
 

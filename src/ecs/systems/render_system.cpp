@@ -146,7 +146,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::BULLET || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
+	if (render_request.used_effect == EFFECT_ASSET_ID::BULLET || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED 
+		|| render_request.used_effect == EFFECT_ASSET_ID::ANIMATE || render_request.used_effect == EFFECT_ASSET_ID::DASH)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
@@ -170,6 +171,19 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
 			GLint tiling_uloc = glGetUniformLocation(program, "tiling");
 			glUniform2fv(tiling_uloc, 1, (float *)&tiling);
+			gl_has_errors();
+		}
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::DASH) {
+			assert(registry.gaugeVisuals.has(entity));
+			GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+			GLint chargeBoundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+			glUniform1f(chargeBoundary_uloc, gauge.chargeBoundary);
+			GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
+			glUniform4fv(uncharged_uloc, 1, (float*)&gauge.unchargedColor);
+			GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
+			glUniform1i(chargeDir_uloc, gauge.isVertical ? 1 : 0);
+			gl_has_errors();
 		}
 
 		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
@@ -1002,6 +1016,36 @@ void RenderSystem::drawGameElements()
 	gl_has_errors();
 }
 
+void RenderSystem::drawGameOverlayUI()
+{
+	drawSetupFrame();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+	mat3 projection_2D = createProjectionMatrix();
+
+	WindowState& windowState = registry.windowStates.components[0];
+	Camera& camera = registry.cameras.get(registry.players.entities[0]);
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// note: this camera doesn't really do anything rn
+	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
+
+	for (Entity entity : registry.gameOverlayUIs.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
+			continue;
+		drawTexturedMesh(entity, projection, view, false);
+	}
+
+	glBindVertexArray(0);
+	gl_has_errors();
+}
+
 void RenderSystem::drawGameUI()
 {
 	drawSetupFrame();
@@ -1023,12 +1067,21 @@ void RenderSystem::drawGameUI()
 	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
+	// draw an indicator for the first boid
+	//if (registry.boids.entities.size() > 0) {
+	for (Entity& entity : registry.boids.entities)
+	{
+		drawEnemyIndicator(entity, projection, view);
+	}
+
 	for (Entity &entity : registry.enemies.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity)) {
+		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
 			drawHPbar(entity, projection, view);
+			if(!registry.shield.has(entity))
+				drawEnemyIndicator(entity, projection, view);
 		}
 	}
 
@@ -1039,6 +1092,7 @@ void RenderSystem::drawGameUI()
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity))
 		{
 			drawHPbar(entity, projection, view);
+			drawEnemyIndicator(entity, projection, view);
 			BossEnemy &boss = registry.bosses.get(entity);
 			if (!registry.textRenderRequests.has(entity))
 			{
@@ -1277,6 +1331,121 @@ void RenderSystem::drawAllColliders(Entity entity, const mat4 &projection, const
 		drawCollider(entity, "circle.png", projection, view);
 	if (registry.aabbs.has(entity))
 		drawCollider(entity, "rectangle.png", projection, view);
+}
+
+void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, const mat4& view) {
+	Motion& motion = registry.motions.get(enemy);
+	Camera& camera = registry.cameras.components[0]; // set as camera target instead of just player; may regret later
+	vec2 posDiff = motion.position - camera.lookAtPos;
+
+	WindowState& ws = registry.windowStates.components[0];
+
+	// calculate: should an enemy indicator be drawn? (i.e is the enemy off screen?)
+	// currently offset by enemy scale, but can consider other things like circle collider scale instead
+	if ((abs(posDiff.x) * camera.zoom) < (ws.width / 2.f + motion.scale.x / 2.f) && abs(posDiff.y) * (camera.zoom) < (ws.height / 2.f + motion.scale.y / 2.f)) {
+		return;
+	}
+
+	std::string indicatorName = "enemy_indicator.png";
+	vec3 color = COLOR_RED;
+
+	// draw indicator in screen coordinates
+	Motion indicatorMotion = Motion();
+	indicatorMotion.scale = { 30, 30 };
+
+	if (registry.bosses.has(enemy)) {
+		indicatorMotion.scale = vec2(96.f, 48.f) * 30.f / 48.f * 1.25f;
+		indicatorName = "enemy_indicator_boss.png";
+	}
+	else if (registry.boids.has(enemy)) {
+		indicatorMotion.scale *= 0.7;
+		//color = COLOR_ORANGE;
+	}
+
+	indicatorMotion.position = glm::clamp(posDiff * camera.zoom, -vec2(ws.width / 2.f, ws.height / 2.f) + indicatorMotion.scale,
+		vec2(ws.width / 2.f, ws.height / 2.f) - indicatorMotion.scale) + vec2(ws.width / 2.f, ws.height / 2.f);
+	indicatorMotion.angle = atan(posDiff.y, posDiff.x);
+
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
+	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, 0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)name_to_texture[indicatorName]];
+	
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
+
+	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
+	glUniform1f(effect_alpha_uloc, 0);
+
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = createNormalModel(indicatorMotion, vec2(0));
+
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+	gl_has_errors();
+
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
 }
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI
@@ -1782,8 +1951,6 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		vec3 color = COLOR_YELLOW;
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float *)&color);
-		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-		glUniform1i(change_color_uloc, 0);
 		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
@@ -1793,8 +1960,6 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		vec3 color = COLOR_YELLOW * vec3(0.2, 0.2, 0.2); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float *)&color);
-		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-		glUniform1i(change_color_uloc, 1);
 		GLint charge_boundary_uloc = glGetUniformLocation(program, "chargeBoundary");
 		glUniform1f(charge_boundary_uloc, 1.0);
 	}
@@ -1803,8 +1968,6 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 		vec3 color = COLOR_YELLOW * vec3(0.60, 0.60, 0.60); // grey
 		GLint color_uloc = glGetUniformLocation(program, "fcolor");
 		glUniform3fv(color_uloc, 1, (float *)&color);
-		GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-		glUniform1i(change_color_uloc, 1);
 
 		float chargeBoundary = glm::lerp(0.f, 1.f, (max - cooldown) / max);
 
@@ -1814,6 +1977,11 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, 1);
+	vec4 unchargedColor = vec4(0.65, 0.65, 0.65, 1.0);
+	GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
+	glUniform4fv(uncharged_uloc, 1, (float*)&unchargedColor);
+	GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
+	glUniform1i(chargeDir_uloc, 1);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t

@@ -91,6 +91,7 @@ public:
 	ComponentContainer<Parent> parents;
 	ComponentContainer<Camera> cameras;
 	ComponentContainer<GameOverlayUIText> gameOverlayUITexts;
+	ComponentContainer<GameOverlayUI> gameOverlayUIs;
 	ComponentContainer<EnemyGroup> enemyGroups;
 	ComponentContainer<KeyItems> keyItems;
 	ComponentContainer<UIBorder> uiBorders;
@@ -109,6 +110,8 @@ public:
 	ComponentContainer<InteractableInDialogue> interactableInDialogue;
 	ComponentContainer<InteractableRequest> interactableRequests;
 	ComponentContainer<Spawning> spawnings;
+	ComponentContainer<GaugeVisual> gaugeVisuals;
+	ComponentContainer<NotifMessage> notifMessages;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -191,6 +194,7 @@ public:
 		registry_list.push_back(&parents);
 		registry_list.push_back(&cameras);
 		registry_list.push_back(&gameOverlayUITexts);
+		registry_list.push_back(&gameOverlayUIs);
 		registry_list.push_back(&enemyGroups);
 		registry_list.push_back(&keyItems);
 		registry_list.push_back(&uiBorders);
@@ -209,6 +213,8 @@ public:
 		registry_list.push_back(&interactableInDialogue);
 		registry_list.push_back(&interactableRequests);
 		registry_list.push_back(&spawnings);
+		registry_list.push_back(&gaugeVisuals);
+		registry_list.push_back(&notifMessages);
 	}
 
 	void clear_all_components()

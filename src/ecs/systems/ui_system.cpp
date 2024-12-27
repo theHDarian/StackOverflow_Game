@@ -3,6 +3,7 @@
 #include "sound_system.hpp"
 #include "text_system.hpp"
 #include "premades.hpp"
+#include <glm/gtx/compatibility.hpp>
 #include "utils/colours.hpp"
 #include <fstream>
 #include <iomanip>
@@ -257,6 +258,8 @@ void UISystem::step(float elapsed_ms) {
 				registry.stackUI.components[0].bulletSize* STACK_NOTIF_SCALE,
 				bulletEffectShapes.at(stack.currStack[index].type),
 				bulletEffectColors.at(stack.currStack[index].type));
+			std::string message = stack.currStack[index].name + " added onto the stack";
+			createNotifMessage(message);
 		}
 	}
 
@@ -293,14 +296,20 @@ void UISystem::step(float elapsed_ms) {
 			}
 			vec2 bulletStartPos = playerPos;
 			std::string sprite = "stackNotifShift.png";
+			std::string message = "Stack has been shifted by 1";
 			if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
 				sprite = "stackNotifShuffle.png";
+				message = "Stack has been shuffled";
 			}
 			else if (uiRequest.type == UIRequestType::CallNotif) {
 				sprite = "callNotif.png";
 			}
 
 			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, sprite, vec3(1));
+
+			if (uiRequest.type == UIRequestType::StackNotifReqShuffle ||
+				uiRequest.type == UIRequestType::StackNotifReqShift)
+				createNotifMessage(message);
 		}
 
 		if (uiRequest.type == UIRequestType::ResetUI) {
@@ -314,6 +323,10 @@ void UISystem::step(float elapsed_ms) {
 			}
 			for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
 				Entity e = registry.menuChoices.entities[i];
+				registry.deleteEntityAndRelatedEntities(e);
+			}
+			for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+				Entity e = registry.notifMessages.entities[i];
 				registry.deleteEntityAndRelatedEntities(e);
 			}
 
@@ -361,6 +374,26 @@ void UISystem::step(float elapsed_ms) {
 		}
 	}
 
+	// move positions of notif messages
+	if (registry.notifMessages.size() > 0) {
+		// clean up notifs that have faded out
+		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+			Entity e = registry.notifMessages.entities[i];
+			if (!registry.renderRequests.get(e).show)
+				registry.deleteEntityAndRelatedEntities(e);
+		}
+
+		vec2 startingPosition = vec2(50, ws.height - 50);
+		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+			Entity messageEntity = registry.notifMessages.entities[i];
+			TextRenderRequest& text = registry.textRenderRequests.get(messageEntity);
+			vec2 nextPosition = vec2(startingPosition.x, startingPosition.y 
+				- (registry.notifMessages.size() - 1 - i) * 50);
+			text.x = nextPosition.x;
+			text.y = ws.height - nextPosition.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
+		}
+	}
+
 	else if (stack.currStack.size() < stackui.bulletPositions.size()) {
 		// much harder to know what bullets got removed from stack though
 		// need to rely on interact system for that (seems to be the only way bullets are popped?)
@@ -402,6 +435,23 @@ void UISystem::step(float elapsed_ms) {
 		else {
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
+		}
+
+		for (Entity gaugeEntity : registry.gaugeVisuals.entities) {
+			if (!registry.deleteds.has(gaugeEntity)) {
+				registry.deleteds.emplace(gaugeEntity);
+			}
+		}
+
+		// update guages of all interactables whose timers have gone off
+		for (Entity interactEntity : registry.interactables.entities) {
+			InteractableObject& interactable = registry.interactables.get(interactEntity);
+			if (interactable.timer < interactable.base) {
+				// if don't already have gauge drawn, then make gauge ui
+				// else, just update timer
+				// dumb method: do like interact indicators, and just clear all prev frames
+				createInteractGauge(registry.motions.get(interactEntity).position, interactable.timer, interactable.base);
+			}
 		}
 	}
 	else {
@@ -609,6 +659,51 @@ void UISystem::playDialogue() {
 			registry.motions.get(registry.players.entities[0]).velocity = vec2(0);
 		}
 	}
+}
+
+Entity UISystem::createNotifMessage(std::string message) {
+	Entity entity = Entity();
+	WindowState& windowState = registry.windowStates.components[0];
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	registry.dialogueUIs.emplace(entity);
+	registry.dialogueUITexts.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = {0, 0};
+	motion.position = vec2(0);
+
+	auto& text = registry.textRenderRequests.emplace(entity);
+	text.color = vec3(1, 1, 1);
+	text.scale = 0.40;
+	text.text = message;
+	text.tokenizedText = getTokenizedText(message);
+	text.topRightBound = { windowState.width, windowState.height }; // need to update this
+	text.bottomLeftBound = { 0, 0 };
+	text.x = 50;
+	text.y = 50;
+
+	vec3& color = registry.colors.emplace(entity);
+	color = vec3(0.f);
+
+	UIBorder& border = registry.uiBorders.emplace(entity);
+	border.borderThickness = 5.f;
+	border.borderColour = COLOR_WHITE;
+	border.border = UIBorderType::Outlined;
+
+	registry.showTimers.emplace(entity);
+
+	registry.notifMessages.emplace(entity);
+
+	return entity;
 }
 
 Entity UISystem::createButton(std::string label, vec2 position, vec2 scale) {
@@ -876,7 +971,7 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
 
-	registry.gameUIs.emplace(entity);
+	registry.gameOverlayUIs.emplace(entity);
 
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -914,6 +1009,55 @@ Entity UISystem::createInteractIndicator(vec2 position) {
 	text.x = motion.position.x - 10;
 
 	registry.interactIndicators.emplace(entity);
+
+	return entity;
+}
+
+Entity UISystem::createInteractGauge(vec2 position, float timer, float baseTimer) {
+	Entity entity = Entity();
+
+	auto& rr = registry.renderRequests.insert(
+		entity,
+		{ "enemy_bullet_square.png", // temporary choice selection indicator
+		 EFFECT_ASSET_ID::DASH,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.show = true;
+
+	registry.gameUIs.emplace(entity);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.scale = { 10, 50 };
+	motion.position = { position.x, position.y };
+
+	vec3& color = registry.colors.emplace(entity);
+	color = COLOR_TEAL_LIGHT;
+
+	GaugeVisual& gauge = registry.gaugeVisuals.emplace(entity);
+	gauge.chargeBoundary = glm::lerp(0.f, 1.f, (baseTimer - timer) / baseTimer);
+	gauge.isVertical = true;
+	gauge.unchargedColor = vec4(0.65, 0.65, 0.65, 1.0);
+
+	// hard code these offsets to make the doors look nice
+	Room room = registry.maps.components[0].currRoom;
+	if (position.y <= registry.motions.get(registry.doors.entities[0]).position.y) { // bottom door
+		motion.position.y -= 50;
+		motion.scale = { 50, 10 };
+		gauge.isVertical = false;
+	}
+	else if (position.y >= registry.motions.get(registry.doors.entities[2]).position.y) { // top door
+		motion.position.y += 50;
+		motion.scale = { 50, 10 };
+		gauge.isVertical = false;
+	}
+
+	if (position.x <= registry.motions.get(registry.doors.entities[3]).position.x) { // left door
+		motion.position.x -= 50;
+	}
+	else if (position.x >= registry.motions.get(registry.doors.entities[1]).position.x) { // right door
+		motion.position.x += 50;
+	}
 
 	return entity;
 }
@@ -1325,6 +1469,8 @@ void UISystem::updateFlashMessageDisplay(std::string text) {
 		registry.showTimers.get(flashMessageDisplay).timer = registry.showTimers.get(flashMessageDisplay).base;
 	}
 	else {
+		if (registry.fades.has(flashMessageDisplay))
+			registry.fades.remove(flashMessageDisplay);
 		registry.showTimers.emplace(flashMessageDisplay);
 	}
 

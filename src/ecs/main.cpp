@@ -138,9 +138,10 @@ int main() {
 		particleSystem.render();
 		renderer.drawGameElements();
 		renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS1));
+		renderer.drawGameOverlayUI();
 		textSystem.renderGameOverlayUIText();
-		textSystem.renderGameUIText();
 		renderer.drawGameUI();
+		textSystem.renderGameUIText();
 		if (ioSystem.isPaused() || ioSystem.isGameOver()) renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS3));
 		renderer.drawDialogueUI();
 		textSystem.renderDialogueUIText();
