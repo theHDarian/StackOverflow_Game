@@ -41,7 +41,14 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             if (registry.bosses.has(enemy)) {
                 bossEnemy = enemy;
             }
-            registry.spawnings.emplace( enemy);
+            registry.spawnings.emplace(enemy);
+            // make it a gauge
+            if (registry.renderRequests.get(enemy).used_effect == EFFECT_ASSET_ID::TEXTURED) {
+                registry.renderRequests.get(enemy).used_effect = EFFECT_ASSET_ID::DASH;
+                GaugeVisual& gauge = registry.gaugeVisuals.emplace(enemy);
+                gauge.unchargedColor = vec4(1.0, 1.0, 1.0, 0.0);
+                gauge.isVertical = true;
+            }
         }
     }
 }

@@ -98,6 +98,14 @@ void RenderSystem::step(float elapsed_ms)
 			//std::cout << anim.frame << std::endl;
 		}
 	}
+
+	for (Entity entity : registry.gaugeVisuals.entities) {
+		GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+		if (registry.spawnings.has(entity)) {
+			Spawning& spawning = registry.spawnings.get(entity);
+			gauge.chargeBoundary = glm::lerp(0.0f, 1.f, (spawning.max - spawning.countdown) / spawning.max);
+		}
+	}
 }
 
 void RenderSystem::drawCursor()
@@ -578,51 +586,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	if (registry.spawnings.has(entity))
 	{
 		Spawning &spawning = registry.spawnings.get(entity);
-		//change color to grey
-		vec3 Color = COLOR_GREY_LIGHT;
+		//change color to blue
+		vec3 Color = vec3(1.0, 1.0, 2.0);
 		glUniform3fv(color_uloc, 1, (float *)&Color);
 		glUniform1i(change_color_uloc, 0);
-		alpha = glm::lerp(0.f, 2.f, (spawning.max - spawning.countdown) / spawning.max);
-		// GLuint effects_enum = static_cast<GLuint>(EFFECT_ASSET_ID::DASH);
-		// GLuint Program = (GLuint)effects[effects_enum];
-		// glUseProgram(Program);
-		// gl_has_errors();
-		// glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		// gl_has_errors();
-		// GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		// GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-		// gl_has_errors();
-		// assert(in_texcoord_loc >= 0);
-		//
-		// glEnableVertexAttribArray(in_position_loc);
-		// glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-		// 					  sizeof(TexturedVertex), (void *)0);
-		// gl_has_errors();
-		//
-		// glEnableVertexAttribArray(in_texcoord_loc);
-		// glVertexAttribPointer(
-		// 	in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		// 	(void *)sizeof(
-		// 		vec3)); // note the stride to skip the preceeding vertex position
-		//
-		// // Enabling and binding texture to slot 0
-		// glActiveTexture(GL_TEXTURE0);
-		// gl_has_errors();
-		//
-		// GLuint texture_id =
-		// 	texture_gl_handles[(GLuint)name_to_texture["chevron.png"]];
-		//
-		// glBindTexture(GL_TEXTURE_2D, texture_id);
-		// gl_has_errors();
-		// GLuint Change_color_uloc = glGetUniformLocation(Program, "changeColor");
-		// glUniform1i(Change_color_uloc, 1);
-		//
-		// GLint Color_uloc = glGetUniformLocation(Program, "fcolor");
-		// glUniform3fv(Color_uloc, 1, (float *)&Color);
-		// GLuint chargeBoundary_uloc = glGetUniformLocation(Program, "chargeBoundary");
-		// glUniform1f(chargeBoundary_uloc, glm::lerp(1.f, 0.f, (spawning.max - spawning.countdown) / spawning.max));
-
 	}
 	// GLsizei num_triangles = num_indices / 3;
 

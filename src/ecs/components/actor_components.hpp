@@ -435,7 +435,7 @@ struct InvisibleEnemy {
 
 struct Spawning {
     float max = 1000;
-    float countdown = 1000;
+    float countdown = max;
 };
 
 struct Shield {
