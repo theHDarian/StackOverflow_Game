@@ -372,6 +372,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		{
 			assert(false);
 		}
+
 		GLint frame_uloc = glGetUniformLocation(program, "frame");
 		glUniform1i(frame_uloc, frame);
 		gl_has_errors();

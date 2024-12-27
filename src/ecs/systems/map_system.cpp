@@ -285,38 +285,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // change current room in the map
     map.currRoom = Room();
     assert(door.room != RoomType::None);
-    map.currRoom.preset = getRoomPreset(door.room, door.isLocked);
-    updateBgPositions();
+    map.currRoom.preset = door.preset;
     map.currRoom.type = door.room;
-
-    vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
-    playerMotion.position = spawnPosition;
-    playerMotion.velocity = vec2(0);
-
-    // clear enemies and obstacles
-    clearRoomActors();
-
-    SoundType s = roomTypeToMusic.at(type);
-    if (s != old_s) {
-        if (s == SoundType::normalBGM) {
-            std::cout << "Playing normal music" << std::endl;
-            // soundPlayer->playNextMusic();
-            auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::normalBGM;
-        } else if (s == SoundType::bossBGM) {
-            std::cout << "Playing boss music" << std::endl;
-            // soundPlayer->playBossMusic(0);
-            auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::bossBGM;
-        } else if (s == SoundType::specialBGM) {
-            std::cout << "Playing special music" << std::endl;
-            // soundPlayer->playSpecialMusic(0);
-            auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::specialBGM;
-        }
-    } else {
-        std::cout << "Not changing music" << std::endl;
-    }
 
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
@@ -343,7 +313,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     {
         // reset counters
         registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
-        
+
         // reset previous room type
         if (i == spawnIndex)
             continue;
@@ -379,7 +349,41 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
             lockedRooms++;
         }
+
+        d.preset = getRoomPreset(d.room, d.isLocked);
+
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
+    }
+
+    updateBgPositions();
+
+    vec2 spawnPosition = (doors[spawnIndex].startPos + doors[spawnIndex].endPos) / 2.0f;
+    playerMotion.position = spawnPosition;
+    playerMotion.velocity = vec2(0);
+
+    // clear enemies and obstacles
+    clearRoomActors();
+
+    SoundType s = roomTypeToMusic.at(type);
+    if (s != old_s || (s == SoundType::normalBGM && Random::Float( ) < 0.35f)) {
+        if (s == SoundType::normalBGM) {
+            std::cout << "Playing normal music" << std::endl;
+            // soundPlayer->playNextMusic();
+            auto& req = registry.soundRequests.emplace(Entity());
+            req.type = SoundType::normalBGM;
+        } else if (s == SoundType::bossBGM) {
+            std::cout << "Playing boss music" << std::endl;
+            // soundPlayer->playBossMusic(0);
+            auto& req = registry.soundRequests.emplace(Entity());
+            req.type = SoundType::bossBGM;
+        } else if (s == SoundType::specialBGM) {
+            std::cout << "Playing special music" << std::endl;
+            // soundPlayer->playSpecialMusic(0);
+            auto& req = registry.soundRequests.emplace(Entity());
+            req.type = SoundType::specialBGM;
+        }
+    } else {
+        std::cout << "Not changing music" << std::endl;
     }
 
     decorateRoom();
@@ -500,6 +504,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 lockedRooms++;
             }
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
+
+            d.preset = getRoomPreset(d.room, d.isLocked);
+
         }
 
         updateBgPositions();
@@ -581,6 +588,90 @@ void MapSystem::updateBgPositions() {
             if (side == 'L') position += vec2(-map.currRoom.preset.roomSize.x/2-of,0);
             motion.position = position;
             symbolIndex++;
+            for (Entity &d1 : registry.doors.entities)
+            {
+                if (registry.doors.get(d1).side == side)
+                {
+                    Door &door = registry.doors.get(d1);
+                    WindowState &ws = registry.windowStates.components[0];
+                    if (!registry.textRenderRequests.has(d1))
+                    {
+                        if (door.preset.ID != "") {
+                            if (!registry.gameOverlayUITexts.has(d1))
+                            {
+                                GameOverlayUIText &text = registry.gameOverlayUITexts.emplace(d1);
+                            }
+                            TextRenderRequest &textRequest = registry.textRenderRequests.emplace(d1);
+                            if (door.isPrev) {
+                                textRequest.text = "Previous Room";
+                            } else {
+                                textRequest.text = door.preset.ID;
+                            }
+                            textRequest.x = position.x;
+                            textRequest.y = ws.height - position.y;
+
+                            if (!door.isPrev) {
+                                if (side == 'T') {
+                                    textRequest.y += 80;
+                                } else if (side == 'R') {
+                                    textRequest.y -= 85;
+                                    textRequest.x -= 50;
+                                } else if (side == 'B') {
+                                    textRequest.y -= 85;
+                                } else if (side == 'L') {
+                                    textRequest.y -= 85;
+                                    textRequest.x += 50;
+                                }
+                            }
+
+                            if (side == 'L') {
+                                textRequest.alignment = TextAlignment::RightAlign;
+                            } else if (side == 'R') {
+                                textRequest.alignment = TextAlignment::LeftAlign;
+                            } else {
+                                textRequest.alignment = TextAlignment::CenteredAlign;
+                            }
+                            textRequest.scale = 0.4f;
+                            textRequest.color = COLOR_WHITE;
+                            textRequest.bottomLeftBound = vec2(0);
+                            textRequest.topRightBound = vec2(ws.width, ws.height);
+                            std::cout << "door text added: " << textRequest.text << std::endl;
+                        }
+                    } else {
+                        TextRenderRequest &textRequest = registry.textRenderRequests.get(d1);
+                        textRequest.x = position.x;
+                        textRequest.y = ws.height - position.y;
+                        if (door.isPrev) {
+                            textRequest.text = "Previous Room";
+                        } else {
+                            textRequest.text = door.preset.ID;
+                        }
+                        if (!door.isPrev) {
+                            if (side == 'T') {
+                                textRequest.y += 80;
+                            } else if (side == 'R') {
+                                textRequest.y -= 85;
+                                textRequest.x -= 50;
+                            } else if (side == 'B') {
+                                textRequest.y -= 85;
+                            } else if (side == 'L') {
+                                textRequest.y -= 85;
+                                textRequest.x += 50;
+                            }
+                        }
+
+                        if (side == 'L') {
+                            textRequest.alignment = TextAlignment::RightAlign;
+                        } else if (side == 'R') {
+                            textRequest.alignment = TextAlignment::LeftAlign;
+                        } else {
+                            textRequest.alignment = TextAlignment::CenteredAlign;
+                        }
+                        std::cout << "door text updated: " << textRequest.text << std::endl;
+                    }
+                    break;
+                }
+            }
         } else if (rss.name == "DoorSprite") {
             float offsetAmount = -40.f;
             vec2 offsetPos = vec2(0);

@@ -488,7 +488,7 @@ const RoomPreset EnemyRoomCrabs{
     0.0f,
     5,
     2,
-    "EnemyRoomCrabs",
+    "Crab's Cove",
 };
 
 const RoomPreset EnemyRoomSmall{
@@ -586,7 +586,7 @@ const RoomPreset EnemyRoomAngelTank{
     0.25f,
     5,
     2,
-    "EnemyRoomAngelTank",
+    "An Angel's Touch",
 };
 
 const RoomPreset EnemyRoomTripleBuffEX{
@@ -1206,7 +1206,7 @@ const RoomPreset EnemyRoomLaserFiesta {
     12.0f,
     5,
     2,
-    "EnemyRoomLaserFiesta",
+    "Laser Fiesta",
     false,
     {2500, 2000}
 };

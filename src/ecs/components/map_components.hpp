@@ -63,6 +63,7 @@ struct RoomPresets {
 
 struct Door {
 	RoomType room = None; //room the door leads to
+    RoomPreset preset; //preset of the room
     bool isPrev; //if is previous room, block it
     bool isLocked;
     vec2 startPos, endPos;
