@@ -438,7 +438,7 @@ void UISystem::step(float elapsed_ms) {
 		}
 
 		for (Entity gaugeEntity : registry.gaugeVisuals.entities) {
-			if (!registry.deleteds.has(gaugeEntity)) {
+			if (!registry.deleteds.has(gaugeEntity) && !registry.spawnings.has(gaugeEntity)) {
 				registry.deleteds.emplace(gaugeEntity);
 			}
 		}
