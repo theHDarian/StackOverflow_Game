@@ -26,7 +26,10 @@ public:
 
     int initFreetypeLib();
     void renderMenuUIText();
+    void renderGameOverlayUIText();
+
     void renderGameUIText();
+
     void renderDialogueUIText();
     void renderMenuOverlayUIText();
 

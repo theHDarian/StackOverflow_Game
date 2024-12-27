@@ -398,7 +398,7 @@ void TextSystem::renderMenuOverlayUIText() {
     gl_has_errors();
 }
 
-void TextSystem::renderGameUIText() {
+void TextSystem::renderGameOverlayUIText() {
     glBindVertexArray(VAO);
 
     for (Entity entity : registry.gameOverlayUITexts.entities)
@@ -408,6 +408,15 @@ void TextSystem::renderGameUIText() {
             renderText(textReq, entity, false);
         }
     }
+
+    glBindVertexArray(0);
+    gl_has_errors();
+
+}
+
+
+void TextSystem::renderGameUIText() {
+    glBindVertexArray(VAO);
 
     for (Entity entity : registry.gameUITexts.entities)
     {
@@ -419,7 +428,6 @@ void TextSystem::renderGameUIText() {
 
     glBindVertexArray(0);
     gl_has_errors();
-
 }
 
 void TextSystem::renderDialogueUIText() {
