@@ -363,26 +363,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 								frame = 2;
 							}
 						}
-						if (!registry.textRenderRequests.has(d1))
-						{
-							Door &door = registry.doors.get(d1);
-							if (door.preset.ID != "") {
-								if (!registry.gameUITexts.has(d1))
-                                {
-									GameUIText &text = registry.gameUITexts.emplace(d1);
-                                }
-								TextRenderRequest &textRequest = registry.textRenderRequests.emplace(d1);
-								textRequest.text = door.preset.ID;
-								textRequest.x = offset.x;
-								textRequest.y = offset.y;
-								textRequest.alignment = TextAlignment::CenteredAlign;
-								textRequest.scale = 0.4f;
-								textRequest.color = COLOR_WHITE;
-								textRequest.bottomLeftBound = vec2(0);
-								textRequest.topRightBound = vec2(ws.width, ws.height);
-								std::cout << "door text added: " << textRequest.text << std::endl;
-							}
-						}
 						break;
 					}
 				}
