@@ -1255,6 +1255,108 @@ const RoomPreset HifiRoomSniperBallLauncher {
     {2500, 2000}
 };
 
+const RoomPreset HifiRoomSmall {
+        {
+            {
+                {EnemyHifiWhip,{0.5,0.5}},
+            },
+
+        },
+    {},
+    {},
+    100.0f,
+    5,
+    2,
+    "Wave in a bottle",
+    false,
+    {1200, 1200}
+};
+
+const RoomPreset HifiRoomSmallBallLauncher {
+            {
+                {
+                    {EnemyHifiBallLauncher,{0.5,0.5}},
+                    {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+
+                },
+
+                {
+                    {EnemyHifiTackShooter,{0.5,0.5}},
+                    {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+                        {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+                    {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+                },
+
+            },
+        {},
+        {},
+        100.0f,
+        5,
+        2,
+        "Jack in the box",
+        false,
+        {800, 800}
+};
+
+const RoomPreset HifiRoomAvenue {
+            {
+                {
+                    {EnemyLaserSniper,{0.9,0.2}},
+                    {EnemyLaserSniper,{0.9,0.8}},
+                    {EnemyHifiCannon,{0.9,0.5}},
+
+                },
+
+                {
+                    {EnemyLaserSniper,{0.1,0.2}},
+                    {EnemyLaserSniper,{0.1,0.8}},
+                    {EnemyHifiCannonHard,{0.1,0.5}},
+
+
+                },
+
+            },
+        {},
+        {},
+        30.0f,
+        5,
+        2,
+        "Avenue Ambush",
+        false,
+        {3000, 650}
+};
+
+const RoomPreset HifiRoomLane {
+            {
+                {
+                    {EnemyLaserSniper,{0.2,0.9}},
+                    {EnemyLaserSniper,{0.8,0.9}},
+                    {EnemyHifiCannon,{0.5,0.9}},
+
+                },
+
+                {
+                    {EnemyLaserSniper,{0.2,0.1}},
+                    {EnemyLaserSniper,{0.8,0.1}},
+                    {EnemyHifiCannonHard,{0.5,0.1}},
+
+
+                },
+
+            },
+        {},
+        {},
+        100.0f,
+        5,
+        2,
+        "Laneway Lasers",
+        false,
+        {650, 3000}
+};
+
+
+
+
 const RoomPreset allConsoles {
     {},
     {},
@@ -1294,20 +1396,20 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        // {RoomType::EnemyRoom, {{EnemyRoomLaserFiesta},{}}},
+        // {RoomType::EnemyRoom, {{HifiRoomAvenue, HifiRoomLane},{}}},
         {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens, HifiRoomBasicWave},{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomJellyFish, HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomJellyFish, HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids, HifiRoomSmall, HifiRoomAvenue, HifiRoomLane},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomSniper, TreasureRoom5}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomSmallBallLauncher,HifiRoomSmall, HifiRoomAvenue, HifiRoomLane },{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomSniper, TreasureRoom5}}},
