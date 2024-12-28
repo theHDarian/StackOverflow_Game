@@ -69,6 +69,9 @@ void MapSystem::step(float elapsed_ms)
         map.currRoom.preset.enemies.pop_front();
         map.currRoom.timeElapsed = 0;
         map.currRoom.currentWave++;
+        if (map.currRoom.currentWave > 1) {
+            soundPlayer->playAlarmSound(1);
+        }
 
         // look at boss and zoom out when boss spawns
         if (registry.motions.has(bossEnemy)) {

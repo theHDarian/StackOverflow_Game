@@ -80,6 +80,11 @@ void SoundSystem::step(float elapsed_ms)
 
             case SoundType::PlayerZapped:
                 playPlayerZappedSound();
+            case SoundType::alarm:
+                if (soundRequest.songIndex == -1)
+                    playAlarmSound();
+                else
+                playAlarmSound(soundRequest.songIndex);
 
             default:
                 std::cerr << "Unknown sound type: " << soundRequest.type << std::endl;
@@ -120,6 +125,18 @@ SoundSystem::~SoundSystem()
     {
         if (enemyShootSounds[i] != nullptr)
             Mix_FreeChunk(enemyShootSounds[i]);
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (explosionSounds[i] != nullptr)
+            Mix_FreeChunk(explosionSounds[i]);
+    }
+
+    for (int i = 0; i < 8; i++)
+    {
+        if (alarmSounds[i] != nullptr)
+            Mix_FreeChunk(alarmSounds[i]);
     }
 
     if (Mix_PlayingMusic())
@@ -311,6 +328,17 @@ void SoundSystem::loadSoundEffects()
             throw std::runtime_error("Failed to load explosion sound");
         }
         explosionSounds[i]->volume = 0.6f * MIX_MAX_VOLUME;
+    }
+
+    for (int i = 0; i < 8; i++)
+    {
+        alarmSounds.push_back(Mix_LoadWAV(audio_path("sfx/sfx_alarm_loop" + std::to_string(i + 1) + ".wav").c_str()));
+        if (!alarmSounds[i])
+        {
+            fprintf(stderr, "Failed to load alarm sound: %s\n", Mix_GetError());
+            throw std::runtime_error("Failed to load alarm sound");
+        }
+        alarmSounds[i]->volume = 0.4f * MIX_MAX_VOLUME;
     }
 }
 
@@ -513,6 +541,16 @@ void SoundSystem::playExplosionSound(int sfxNumber)
     {
         Mix_PlayChannel(9, explosionSounds[i], 0);
         Mix_Volume(9, explosionSounds[i]->volume * sfxVolume);
+    }
+}
+
+void SoundSystem::playAlarmSound(int sfxNumber)
+{
+    int i = sfxNumber % 8;
+    if (!Mix_Playing(11))
+    {
+        Mix_PlayChannel(11, alarmSounds[i], 1);
+        Mix_Volume(11, alarmSounds[i]->volume * sfxVolume);
     }
 }
 

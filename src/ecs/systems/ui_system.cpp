@@ -589,6 +589,8 @@ void UISystem::playDialogue() {
 				soundSystem->playRareItemPickupSound();
 			} else if (nextLine.sfx == explosion) {
 				soundSystem->playExplosionSound(2);
+			} else if (nextLine.sfx == alarm) {
+				soundSystem->playAlarmSound();
 			}
 			else {
 				soundSystem->stopIncomingDialogueSound();

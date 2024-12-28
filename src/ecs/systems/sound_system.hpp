@@ -58,6 +58,8 @@ public:
 
     void playExplosionSound(int sfxNumber);
 
+    void playAlarmSound(int sfxNumber = 1);
+
     void playDoorOpenSound();
 
     void playDoorCloseSound();
@@ -99,6 +101,7 @@ private:
     // Mix_Chunk* enemyDeathSound;
     std::vector<Mix_Chunk *> enemyShootSounds;
     std::vector<Mix_Chunk *> explosionSounds;
+    std::vector<Mix_Chunk *> alarmSounds;
 
     Mix_Chunk *doorOpenSound;
     Mix_Chunk *doorCloseSound;

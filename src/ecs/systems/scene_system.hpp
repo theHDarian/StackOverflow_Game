@@ -34,7 +34,8 @@ public:
         {"DoorOpen", SoundType::DoorOpen},
         {"itemPickup", SoundType::itemPickup},
         {"rareItemPickup", SoundType::rareItemPickup},
-        {"explosion", SoundType::explosion}
+        {"explosion", SoundType::explosion},
+        { "alarm", SoundType::alarm }
     };
 
 private:
