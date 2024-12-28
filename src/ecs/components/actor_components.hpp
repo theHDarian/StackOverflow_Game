@@ -80,6 +80,7 @@ struct Player
 struct StackCompile {
     int baseStackSize = 16;
     std::vector<BulletStackEffect> currStack;
+    std::vector<BulletStackEffect> recentRemoved;
 
     std::map<BulletEffectType, float> additives = {
         {BulletDamage,      0},
@@ -188,6 +189,7 @@ struct StackCompile {
         assert(index < currStack.size() && index >= 0);
 
         BulletStackEffect effect = currStack[index];
+        recentRemoved.push_back(effect);
         currStack.erase(currStack.begin() + index);
         if (effect.effectCalc == EffectCalculation::Additive) {
             additives[effect.type] -= effect.value;
@@ -215,6 +217,8 @@ struct StackCompile {
         // Finding the index of val
         auto it = std::find_if(currStack.rbegin(), currStack.rend(), comp);
         if (it == currStack.rend()) return false;
+
+        recentRemoved.clear();
 
         // Interate backwards from end to index, remove each
         int end = (it + 1).base() - currStack.begin();

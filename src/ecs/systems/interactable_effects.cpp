@@ -113,10 +113,12 @@ void resetStack(Entity player, RenderSystem* renderer) {
             createEnemyBullet( renderer, registry.motions.get(player).position + 150.f * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
             i++;
         }
+    	std::vector<BulletStackEffect> temp = reg.currStack;
         // reg.currStack.clear();
         registry.stackCompile.remove(player);
         StackCompile& newreg = registry.stackCompile.emplace(player);
         newreg.baseStackSize = size;
+    	newreg.recentRemoved = temp;
         Player& pl = registry.players.get(player);
         pl.currDashCharges = pl.baseDashNum;
         pl.currDashCooldown = pl.baseDashCDR;
