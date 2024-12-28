@@ -1433,10 +1433,10 @@ inline bool hasLocked(RoomType type, int roomsTraversed) {
     std::map<DifficultyRegion, std::map<RoomType, RoomPresets>> directory = map.directory;
 
     // magic number: means room after boss room 
-    if (roomsTraversed == 13) {
-        directory = getDirectory((MapRegion)(map.currRegion + 1));
-        std::cout << "using next dir: " << map.currRegion + 1 << std::endl;
-    }
+    // if (roomsTraversed == 13) {
+    //     directory = getDirectory((MapRegion)(map.currRegion + 1));
+    //     std::cout << "using next dir: " << map.currRegion + 1 << std::endl;
+    // }
     
     if (type >= RoomType::None) {
         return false;
@@ -1466,10 +1466,10 @@ inline bool hasUnlocked(RoomType type, int roomsTraversed) {
     std::map<DifficultyRegion, std::map<RoomType, RoomPresets>> directory = map.directory;
 
     // magic number: means room after boss room 
-    if (roomsTraversed == 13) {
-        directory = getDirectory((MapRegion)(map.currRegion + 1));
-        std::cout << "using next dir: " << map.currRegion + 1 << std::endl;
-    }
+    // if (roomsTraversed == 13) {
+    //     directory = getDirectory((MapRegion)(map.currRegion + 1));
+    //     std::cout << "using next dir: " << map.currRegion + 1 << std::endl;
+    // }
 
     if (type >= RoomType::None) {
         return false;
