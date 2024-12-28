@@ -265,10 +265,16 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     //update Map Region
     if (map.currRoom.type == TutorialRoom2) {
         map.currRegion = Biology; //Go to bio region at end of tutorial
-    } else if (map.currRoom.type == BossRoom && map.currRegion == Biology) {
-        map.currRegion = Physics;
-        map.directory = getDirectory( map.currRegion );
+    } else if (map.currRoom.type == BossRoom) {
         map.roomsTraversed = 1; //reset rooms traversed to reset difficulty for region
+    }
+
+    int roomTraversed = map.roomsTraversed;
+
+    if (door.room == RoomType::BossRoom) {
+        map.currRegion = (MapRegion)(map.currRegion + 1);
+        map.directory = getDirectory( map.currRegion );
+        roomTraversed = 1;
     }
 
     SoundType old_s = roomTypeToMusic.at(map.currRoom.type);
@@ -350,7 +356,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             lockedRooms++;
         }
 
-        d.preset = getRoomPreset(d.room, d.isLocked);
+        d.preset = getRoomPreset(d.room, d.isLocked, roomTraversed);
 
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }

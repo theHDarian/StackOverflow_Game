@@ -1455,7 +1455,7 @@ inline std::vector<RoomType> getRandomRoomTypes(bool excludeNone, int roomsTrave
     return out;
 }
 
-inline RoomPreset getRoomPreset(RoomType type, bool locked) {
+inline RoomPreset getRoomPreset(RoomType type, bool locked, int roomsTraversed = -1) {
     Map& map = registry.maps.components[0];
     //boss rooms
     if (type == RoomType::BossRoom && map.currRegion == MapRegion::Biology) {
@@ -1475,16 +1475,28 @@ inline RoomPreset getRoomPreset(RoomType type, bool locked) {
     if (!hasLocked(type,map.roomsTraversed) && locked) {
         assert(false);
     }
-
     DifficultyRegion currentRegion;
-    if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
-        currentRegion = DifficultyRegion::Intro;
-    } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
-        currentRegion = DifficultyRegion::Easy;
-    } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
-        currentRegion = DifficultyRegion::Medium;
+    if (roomsTraversed == -1) {
+
+        if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
+            currentRegion = DifficultyRegion::Intro;
+        } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
+            currentRegion = DifficultyRegion::Easy;
+        } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
+            currentRegion = DifficultyRegion::Medium;
+        } else {
+            currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+        }
     } else {
-        currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+        if (roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
+            currentRegion = DifficultyRegion::Intro;
+        } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
+            currentRegion = DifficultyRegion::Easy;
+        } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
+            currentRegion = DifficultyRegion::Medium;
+        } else {
+            currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+        }
     }
 
     nextRoom = Random::ListItem(locked ? map.directory.at(currentRegion).at(type).locked : map.directory.at(currentRegion).at(type).unlocked);
