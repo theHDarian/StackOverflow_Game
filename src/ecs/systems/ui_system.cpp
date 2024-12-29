@@ -1931,8 +1931,8 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 			text = text.substr(0, i) + variables[varNum] + text.substr(closingBraceIndex + 1);
 
 			// make sure to readjust decoration spans too
-			if (!request.decorations.empty() && request.decorations.at(spanNum).startIndex == i) {
-				request.decorations.at(spanNum).endIndex = variables[varNum].length() + request.decorations.at(spanNum).startIndex - 1;
+			if (!request.decorations.empty() && request.decorations.at(spanNum).startIndex <= i) {
+				request.decorations.at(spanNum).endIndex = variables[varNum].length() + i - 1;
 				spanNum++;
 			}
 			

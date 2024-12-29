@@ -71,12 +71,11 @@ That being said, I do recommend you take the route through the Biology wing. The
 Well then, I'll be busy from now on as I try to plot out a more detailed exit route for you. 
 In the meantime, feel free to dial my number for any questions. I'll be leaving my assistant at the phone.
 I wish you luck, little robot.
-[Press <color=teal_light>[C]</color> to <color=teal_light>call the scientist</color> for any questions.]
+[Press <color=teal_light>[C]</color> to <color=teal_light>call</color> the scientist for any questions.]
 SPEAKER N N
 
 SPEAKER N N
 # REMOVE LATER
-# notice how this line is too long so it overlaps with the choices
 # Also this is just a test for story dialogue choices. Player, which fruit do you like more?
 # CHOICES Apples\Cherries
 
