@@ -311,8 +311,8 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					//ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c?page=1&tab=scoredesc#tab-top
 					std::string delim = "\\n";
 					std::string dialogueBody = "";
-					auto start = 0U;
-					auto end = line.find(delim);
+					size_t start = 0U;
+					size_t end = line.find(delim);
 					while (end != std::string::npos)
 					{
 						dialogueBody += line.substr(start, end - start) + '\n';
@@ -321,9 +321,47 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					}
 					dialogueBody += line.substr(start, end);
 
-					std::vector<std::string> tokenizedText = getTokenizedText(dialogueBody);
+					// need to parse for text decoration spans
+					std::string parsedBody = "";
+					std::string openDelim = "<";
+					std::string closedDelim = ">";
+					std::string colorDecoration = "color";
+					std::string equals = "=";
+					std::string endDecoration = "/";
+					std::vector<TextDecorationSpan> decorationSpans;
+					start = 0U;
+					end = dialogueBody.find(openDelim);
+					while (end != std::string::npos)
+					{
+						std::string decoration = "";
+						std::vector<std::string> decorations;
 
-					lines.push_back(Dialogue{ dialogueBody, tokenizedText });
+						parsedBody += dialogueBody.substr(start, end - start);
+						decoration = dialogueBody.substr(end, dialogueBody.find(closedDelim, end) - end + 1);
+						// parse each decoration separated by space
+						// very messy with no error checking, not sure how will handle multiple spans open at once
+						decorations = getTokenizedText(decoration);
+						for (std::string dec : decorations) {
+							assert(dec.length() > 0);
+							// start of color span
+							if (dec.find(colorDecoration) && (dec.at(dec.find(colorDecoration) - 1) != '/')) {
+								std::string color = dec.substr(dec.find(colorDecoration) + colorDecoration.length() + equals.length());
+								color = color.substr(0, color.find(closedDelim));
+								TextDecorationSpan span = TextDecorationSpan{ colorNames.at(color), parsedBody.length()};
+								decorationSpans.push_back(span);
+							}
+							if (dec.find(colorDecoration) && (dec.at(dec.find(colorDecoration) - 1) == '/')) {
+								decorationSpans.back().endIndex = parsedBody.length() - 1;
+							}
+						}
+						start = dialogueBody.find(closedDelim, end) + closedDelim.length();
+						end = dialogueBody.find(openDelim, start);
+					}
+					parsedBody += dialogueBody.substr(start, end);
+
+					std::vector<std::string> tokenizedText = getTokenizedText(parsedBody);
+
+					lines.push_back(Dialogue{ parsedBody, tokenizedText, decorationSpans });
 					//std::cout << "text: " << dialogueBody << std::endl;
 				}
 

@@ -54,11 +54,11 @@ Watch out!
 SCENE TutorialRoom2 3 0 0 -1
 Oh!? It seems you're alright after all?
 SPEAKER Scientist scientist_avatar.png
-For a bullet to have disappeared immediately on contact... It must be the work of the S.T.A.C.K.!
-This "stack" has the special ability to encode anything you come across into pure data.
-And what kind of data exactly? Whether it ends up "good" or "bad", you'd only really know when you take a closer look at it.
-So long as you make sure your S.T.A.C.K. doesn't overflow, I'm sure you can fend off this robot just fine then!
-[Pause by pressing [ESC] and mouse over the bullets in your stack to take a closer look, and shoot to fight off enemies!]
+For a bullet to have disappeared immediately on contact... It must be the work of the <color=teal_light>S.T.A.C.K.!</color>
+This "stack" has the special ability to <color=teal_light>encode</color> anything you come across into <color=teal_light>pure data</color>.
+And what kind of data exactly? Whether it ends up "good" or "bad", you'd only really know when you <color=teal_light>take a closer look at it</color>.
+So long as you make sure your S.T.A.C.K. <color=teal_light>doesn't overflow</color>, I'm sure you can fend off this robot just fine then!
+[<color=teal_light>Pause</color> by pressing <color=teal_light>[ESC]</color> and <color=teal_light>mouse over the bullets in your stack</color> to take a closer look, and <color=teal_light>shoot</color> to fight off enemies!]
 SPEAKER N N
 
 SCENE TutorialRoom2 4 0 1 -1
@@ -71,7 +71,7 @@ That being said, I do recommend you take the route through the Biology wing. The
 Well then, I'll be busy from now on as I try to plot out a more detailed exit route for you. 
 In the meantime, feel free to dial my number for any questions. I'll be leaving my assistant at the phone.
 I wish you luck, little robot.
-[Press [C] to call the scientist for any questions.]
+[Press <color=teal_light>[C]</color> to <color=teal_light>call the scientist</color> for any questions.]
 SPEAKER N N
 
 SPEAKER N N

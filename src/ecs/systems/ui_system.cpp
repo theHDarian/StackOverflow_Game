@@ -259,7 +259,19 @@ void UISystem::step(float elapsed_ms) {
 				bulletEffectShapes.at(stack.currStack[index].type),
 				bulletEffectColors.at(stack.currStack[index].type));
 			std::string message = stack.currStack[index].name + " added onto the stack";
-			createNotifMessage(message);
+			Entity notif = createNotifMessage(message);
+
+			// highlight bullet effect name
+			// do a special check for keys, but can alternatively make all non-bullet items share a colour (teal?)
+			if (stack.currStack[index].type == Key) {
+				registry.textRenderRequests.get(notif).decorations.push_back(
+					TextDecorationSpan{ COLOR_YELLOW, 0, stack.currStack[index].name.length() });
+			}
+			else {
+				registry.textRenderRequests.get(notif).decorations.push_back(
+					TextDecorationSpan{ bulletEffectColors.at(stack.currStack[index].type), 0, stack.currStack[index].name.length() });
+			}
+			
 		}
 	}
 
@@ -308,8 +320,20 @@ void UISystem::step(float elapsed_ms) {
 			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, sprite, vec3(1));
 
 			if (uiRequest.type == UIRequestType::StackNotifReqShuffle ||
-				uiRequest.type == UIRequestType::StackNotifReqShift)
-				createNotifMessage(message);
+				uiRequest.type == UIRequestType::StackNotifReqShift) {
+				Entity notif = createNotifMessage(message);
+				std::string shifted = "shifted";
+				std::string shuffled = "shuffled";
+
+				if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
+					registry.textRenderRequests.get(notif).decorations.push_back(
+						TextDecorationSpan{ COLOR_YELLOW, message.find(shuffled), message.find(shuffled) + shuffled.length() - 1});
+				}
+				else {
+					registry.textRenderRequests.get(notif).decorations.push_back(
+						TextDecorationSpan{ COLOR_TURQUOISE, message.find(shifted), message.find(shifted) + shifted.length() - 1});
+				}
+			}	
 		}
 
 		if (uiRequest.type == UIRequestType::ResetUI) {
@@ -569,13 +593,14 @@ void UISystem::playDialogue() {
 			registry.renderRequests.get(dialogueBox).show = true;
 			TextRenderRequest& text = registry.textRenderRequests.get(dialogueBox);
 			text.tokenizedText = nextLine.tokenizedText;
+			text.text = nextLine.text;
+			text.decorations = nextLine.decorations;
 
 			// check if any script variables need to be bound
 			if (registry.interactableInDialogue.entities.size() > 0) {
 				InteractableObject& currItem = registry.interactables.get(registry.interactableInDialogue.entities[0]);
 				if (currItem.scriptVariables.size() > 0) {
-					std::string bindedDialogue = bindScriptVariables(nextLine.text, currItem.scriptVariables);
-					text.tokenizedText = getTokenizedText(bindedDialogue);
+					bindScriptVariables(text, currItem.scriptVariables, currItem.decorations);
 				}
 			}
 
@@ -626,7 +651,7 @@ void UISystem::playDialogue() {
 			}
 
 			// can draw choices right under dialogue
-			float startingY = wS.height - text.y + text.scale * DEFAULT_FONT_SIZE * text.tokenizedText.size() * 2;
+			float startingY = wS.height - text.y + text.scale * DEFAULT_FONT_SIZE * text.tokenizedText.size() * 2 + DEFAULT_FONT_SIZE * text.scale * 0.5;
 			if (text.tokenizedText.size() > 0 && text.tokenizedText[0].compare(" ") == 0) {
 				startingY = wS.height - text.y - text.scale * DEFAULT_FONT_SIZE;
 			}
@@ -907,6 +932,12 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
 	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
 	textReq.topRightBound = { textReq.x + motion.scale.x - 25, textReq.y };
+	textReq.decorations.clear();
+	vec3 color = bulletEffectColors.at(bullet.type);
+	if (bullet.type == Key) {
+		color = COLOR_YELLOW;
+	}
+	textReq.decorations.push_back(TextDecorationSpan{color, 0, bullet.name.length()});
 	
 	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
 	arrowMotion.position = { position.x, position.y + 51 };
@@ -1884,7 +1915,10 @@ std::string UISystem::reportStats() {
 	return reportString.str();
 }
 
-std::string UISystem::bindScriptVariables(std::string text, std::vector<std::string>& variables) {
+void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::string>& variables, std::vector<std::vector<TextDecorationSpan>> variableDecorations) {
+	std::string text = request.text;
+	int spanNum = 0;
+
 	// assumes script format: {x}, where x corresponds to the index of the variable
 	for (int i = 0; i < text.length(); i++) {
 		char c = text.at(i);
@@ -1895,8 +1929,22 @@ std::string UISystem::bindScriptVariables(std::string text, std::vector<std::str
 			int varNum = std::stoi(text.substr(i + 1, closingBraceIndex)); // assume this will work for now
 			assert(varNum < variables.size());
 			text = text.substr(0, i) + variables[varNum] + text.substr(closingBraceIndex + 1);
+
+			// make sure to readjust decoration spans too
+			if (!request.decorations.empty() && request.decorations.at(spanNum).startIndex == i) {
+				request.decorations.at(spanNum).endIndex = variables[varNum].length() + request.decorations.at(spanNum).startIndex - 1;
+				spanNum++;
+			}
+			
+			if (variableDecorations.size() > varNum) {
+				for (TextDecorationSpan& span : variableDecorations.at(varNum)) {
+					request.decorations.push_back(TextDecorationSpan{span.color, span.startIndex + i, span.endIndex + i});
+				}
+			}
+
 			i += variables[varNum].length();
 		}
 	}
-	return text;
+
+	request.tokenizedText = getTokenizedText(text);
 }

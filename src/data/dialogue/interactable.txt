@@ -7,7 +7,8 @@
 # default/no choice option is -1
 
 # format for body:
-# blah blah text
+# blah blah text <color=red>highligheted text</color>
+# note: color must be lowercase color name corresponding to preset colors (check the colorNames map in utils > colours.hpp)
 
 # format for speaker:
 # SPEAKER speakername speakeravatar
@@ -593,7 +594,7 @@ You... who have been chosen by the Free...
 
 
 ITEM WhiteBoard -1 0
-A board with a blue print tacked onto it. These symbols look like they could come in handy.
+<color=teal_light>A whiteboard</color> with a blue print tacked onto it. These <color=teal_light>symbols</color> look like they could come in <color=teal_light>handy</color>.
 CUT controls.png
 
 ITEM Desk -1 0

@@ -287,6 +287,13 @@ struct AnimationSequence {
 	EFFECT_ASSET_ID nextEffect;
 };
 
+// change colour, etc of text span in text
+struct TextDecorationSpan {
+	vec3 color = vec3(-1); // no colour
+	size_t startIndex = 0; // starting position of span (word)
+	size_t endIndex = 0; // ending position
+};
+
 // used to store info of what text needs to be rendered
 // currently, 1 request per entity (like how render requests work)
 // but may consider changing (eg: emplace with duplicates)
@@ -300,21 +307,26 @@ struct TextRenderRequest {
 
 	// text size = defualt loaded in font size * scale, default is 48 pixels
 	float scale; 
-	glm::vec3 color;
+	glm::vec3 color; // default text colour
 
-	// size of text box
+	// absolute positions of text box
 	vec2 topRightBound;
 	vec2 bottomLeftBound;
 
-	// temp: add for now if it is preloaded
+	// this will be formatted text used for breaking up multilines
 	std::vector<std::string> tokenizedText = std::vector<std::string>();
 
+	// left, right or center alignment
 	TextAlignment alignment = TextAlignment::LeftAlign;
+
+	// define special spans of word colours here
+	std::vector<TextDecorationSpan> decorations;
 };
 
 struct Dialogue {
 	std::string text;
 	std::vector<std::string> tokenizedText;
+	std::vector<TextDecorationSpan> decorations;
 	std::string speakerName;
 	std::string speakerAvatar;
 	std::vector<std::string> choices;
@@ -404,6 +416,7 @@ struct InteractableObject {
 	float timer = 1000;
 	float base = timer;
 	std::vector<std::string> scriptVariables = std::vector<std::string>();
+	std::vector<std::vector<TextDecorationSpan>> decorations; // can define multiple spans per variable
 };
 
 enum DialogueRequestType {

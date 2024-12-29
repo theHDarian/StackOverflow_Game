@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <queue>
 
 TextSystem::TextSystem() {
 
@@ -202,7 +203,7 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
 
     // temp put here to readjust sizes btween diff fonts
     scale *= FONT_ADJUST_FACTOR;
-    scale *=DEFAULT_FONT_SIZE / 256.0f; // so letters still look as same as before after changing texture sizes
+    scale *= DEFAULT_FONT_SIZE / 256.0f; // so letters still look as same as before after changing texture sizes
 
     // do NOT do for now, because if text changes but tokenized text didn't, it'd be outdated
     //if (request.tokenizedText.size() == 0) {
@@ -218,6 +219,19 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     if (registry.drawingTexts.has(entity) && registry.drawingTexts.get(entity).doneDrawing && registry.drawingTexts.get(entity).blink
         && tokenizedText.size() > 0 && tokenizedText[0].compare(" ") != 0) {
         tokenizedText[tokenizedText.size() - 1] += "|";
+    }
+
+    // make a queue out of text decoration spans
+    std::queue<TextDecorationSpan> decorationQueue;
+    for (TextDecorationSpan& span : request.decorations) {
+        decorationQueue.push(span);
+    }
+
+    // start with the current one
+    TextDecorationSpan currentSpan; 
+    if (!decorationQueue.empty()) {
+        currentSpan = decorationQueue.front();
+        decorationQueue.pop();
     }
 
     glUseProgram(program);
@@ -239,6 +253,7 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
     int charCount = 0; // to keep track of how many to draw
+    int word = 0;
 
     Motion motion = Motion(); // placeholder for text motion info
 
@@ -258,6 +273,26 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         std::string::const_iterator c;
         for (c = text.begin(); c != text.end(); c++)
         {
+            // if a decoration span started/ended, then make a draw call
+            if ((currentSpan.startIndex - word) == charCount) {
+                drawInstancedText(currentIndex); 
+                currentIndex = 0;
+                if (currentSpan.color.r >= 0) {
+                    glUniform3f(glGetUniformLocation(program, "textColor"), currentSpan.color.x, currentSpan.color.y, currentSpan.color.z);
+                }
+            }
+            if ((currentSpan.endIndex + 1 - word) == charCount) {
+                drawInstancedText(currentIndex);
+                currentIndex = 0;
+                if (currentSpan.color.r >= 0) {
+                    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
+                }
+                if (!decorationQueue.empty()) {
+                    currentSpan = decorationQueue.front();
+                    decorationQueue.pop();
+                }
+            }
+            
             Character ch = Characters[*c];
 
             // add an extra cursor to the last char for drawing text
@@ -275,6 +310,7 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
                 
             if (*c == ' ') { // skip "blank space characters" by not actually drawing them
                 x += (ch.Advance >> 6) * scale;
+                charCount++;
                 continue;
             }
 
@@ -311,7 +347,28 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
                 currentIndex = 0;
             }
         }
+        // if a decoration span started/ended, then make a draw call
+        if ((currentSpan.startIndex - word) == charCount) {
+            drawInstancedText(currentIndex);
+            currentIndex = 0;
+            if (currentSpan.color.r >= 0) {
+                glUniform3f(glGetUniformLocation(program, "textColor"), currentSpan.color.x, currentSpan.color.y, currentSpan.color.z);
+            }
+        }
+        if ((currentSpan.endIndex + 1 - word) == charCount) {
+            drawInstancedText(currentIndex);
+            currentIndex = 0;
+            if (currentSpan.color.r >= 0) {
+                glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
+            }
+            if (!decorationQueue.empty()) {
+                currentSpan = decorationQueue.front();
+                decorationQueue.pop();
+            }
+        }
+
         y -= ((Characters[65].Size.y)) * 2.0 * scale;
+        word++;
     }
 
     if (registry.drawingTexts.has(entity) && charCount < registry.drawingTexts.get(entity).toDraw) {
