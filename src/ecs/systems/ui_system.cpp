@@ -315,8 +315,9 @@ void UISystem::step(float elapsed_ms) {
 		if (uiRequest.type == UIRequestType::ResetUI) {
 			DialogueLines& lines = registry.dialogueLines.components[0];
 			lines = DialogueLines();
+			DrawingText& drawingText = registry.drawingTexts.get(dialogueBox);
+			drawingText = DrawingText();
 
-			// clear choices here for now
 			for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
 				Entity e = registry.dialogueChoices.entities[i];
 				registry.deleteEntityAndRelatedEntities(e);
@@ -660,6 +661,9 @@ void UISystem::playDialogue() {
 				reminderText.text = "[E] Next";
 				reminderText.x = registry.windowStates.components[0].width - reminderText.text.length() * reminderText.scale * 48 - 35;
 			}
+			// reset timer for animated text
+			DrawingText& drawingText = registry.drawingTexts.get(dialogueBox);
+			drawingText = DrawingText();
 		}
 		// no more lines of dialogue
 		else {
@@ -1251,6 +1255,8 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	// attach list of dialogue lines
 	// probably shouldn't be attached to box, but to some dialogue state entity?
 	auto& lines = registry.dialogueLines.emplace(entity);
+
+	registry.drawingTexts.emplace(entity);
 
 	return entity;
 }

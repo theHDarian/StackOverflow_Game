@@ -151,3 +151,12 @@ struct GaugeVisual {
 struct NotifMessage {
 	// this is a notif message
 };
+
+// currently only used for "drawing text" char by char
+struct DrawingText {
+	float interval = 16; // how fast draw next char (ms)
+	float current = 0;
+	int toDraw = 0; // buffer for how many char to draw this frame based on interval
+	bool doneDrawing = false; // set by text system when done drawing (no outside char counter implemented yet)
+	bool blink = false; // blink the cursor
+};

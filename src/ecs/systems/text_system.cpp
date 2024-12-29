@@ -214,6 +214,12 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         tokenizedText = getFormattedText(getTokenizedText(request.text), request.scale, request.alignment, {x, y}, request.topRightBound, request.bottomLeftBound);
     }
 
+    // add an extra cursor to the last char for drawing text
+    if (registry.drawingTexts.has(entity) && registry.drawingTexts.get(entity).doneDrawing && registry.drawingTexts.get(entity).blink
+        && tokenizedText.size() > 0 && tokenizedText[0].compare(" ") != 0) {
+        tokenizedText[tokenizedText.size() - 1] += "|";
+    }
+
     glUseProgram(program);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glActiveTexture(GL_TEXTURE0);
@@ -232,10 +238,15 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
+    int charCount = 0; // to keep track of how many to draw
 
     Motion motion = Motion(); // placeholder for text motion info
 
     for (std::string text : tokenizedText) {
+        if (registry.drawingTexts.has(entity) && !registry.drawingTexts.get(entity).doneDrawing
+            && charCount >= registry.drawingTexts.get(entity).toDraw)
+            break;
+
         if (request.alignment == TextAlignment::CenteredAlign) {
             textLength = getTextLength(text, request.scale);
         }
@@ -248,6 +259,17 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         for (c = text.begin(); c != text.end(); c++)
         {
             Character ch = Characters[*c];
+
+            // add an extra cursor to the last char for drawing text
+            if (registry.drawingTexts.has(entity) && charCount == registry.drawingTexts.get(entity).toDraw && !registry.drawingTexts.get(entity).doneDrawing
+                && tokenizedText.size() > 0 && tokenizedText[0].compare(" ") != 0) {
+                ch = Characters['|'];
+            }
+
+            if (registry.drawingTexts.has(entity) && !registry.drawingTexts.get(entity).doneDrawing 
+                && charCount > registry.drawingTexts.get(entity).toDraw)
+                break;
+            
             float xpos = x + ch.Bearing.x * scale;
             float ypos = y - (256 - ch.Bearing.y) * scale;
                 
@@ -281,6 +303,7 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
 
             // update index of drawn char
             currentIndex++;
+            charCount++;
 
             // we don't want to draw more than we can fit at once, so issue a draw call when full
             if (currentIndex == INSTANCED_ARRAY_SIZE) {
@@ -289,6 +312,10 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
             }
         }
         y -= ((Characters[65].Size.y)) * 2.0 * scale;
+    }
+
+    if (registry.drawingTexts.has(entity) && charCount < registry.drawingTexts.get(entity).toDraw) {
+        registry.drawingTexts.get(entity).doneDrawing = true;
     }
 
     drawInstancedText(currentIndex);

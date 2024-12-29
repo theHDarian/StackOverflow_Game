@@ -77,7 +77,12 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 
 	// other options for progressing dialogue: Enter, space
 	if (action == GLFW_RELEASE && (key == GLFW_KEY_ENTER || key == GLFW_KEY_SPACE) && (gameState.dialogueScene || ioState.activeMenu > -1)) {
-		ioState.nextDialogue = true;
+		if (gameState.dialogueScene && !registry.drawingTexts.get(registry.dialogueUIs.entities[0]).doneDrawing) {
+			registry.drawingTexts.get(registry.dialogueUIs.entities[0]).doneDrawing = true;
+		}
+		else {
+			ioState.nextDialogue = true;
+		}
 		if (ioState.activeMenu > -1)
 			ioState.confirmedOption = true;
 	}
@@ -96,7 +101,12 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 
 	// interacted with object/play story dialogue
 	if (action == GLFW_RELEASE && key == GLFW_KEY_E && !gameState.gamePaused && !gameState.cutScene) {
-		ioState.nextDialogue = true;
+		if (gameState.dialogueScene && !registry.drawingTexts.get(registry.dialogueUIs.entities[0]).doneDrawing) {
+			registry.drawingTexts.get(registry.dialogueUIs.entities[0]).doneDrawing = true;
+		}
+		else {
+			ioState.nextDialogue = true;
+		}
 
 		// take latest object
 		if (registry.nearbyInteractables.entities.size() > 0) {
