@@ -88,6 +88,26 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
 
 	};
 
+void CreateXPopBullets( RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float offset = 0) {
+	if (!registry.invincibles.has(registry.players.entities[0])) {
+		registry.invincibles.emplace(registry.players.entities[0]);
+	}
+	int i = 0;
+	for (BulletStackEffect b : effects) {
+		AttackData atkData = AttackData();
+		atkData.shape = EnemyBulletShape::RECTANGLE;
+		atkData.defaultEffect = b;
+		atkData.rareBulletEffects = {b};
+		atkData.speed = 200;
+		atkData.size = vec2(60,30);
+		atkData.bulletRange = 9000;
+		atkData.bulletBounce = 3;
+		float angle = ((2 * M_PI / effects.size()) * i) + direction;
+		createEnemyBullet( renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
+		i++;
+	}
+}
+
 void resetStack(Entity player, RenderSystem* renderer) {
 
     //Invincible& inv =registry.invincibles.emplace(player);
@@ -100,19 +120,7 @@ void resetStack(Entity player, RenderSystem* renderer) {
         }
         int size = reg.baseStackSize;
         int i = 0;
-        for (BulletStackEffect b : reg.currStack) {
-            AttackData atkData = AttackData();
-			atkData.shape = EnemyBulletShape::RECTANGLE;
-            atkData.defaultEffect = b;
-            atkData.rareBulletEffects = {b};
-            atkData.speed = 200;
-            atkData.size = vec2(60,30);
-            atkData.bulletRange = 9000;
-            atkData.bulletBounce = 3;
-            float angle = (2 * M_PI / size) * i;
-            createEnemyBullet( renderer, registry.motions.get(player).position + 150.f * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
-            i++;
-        }
+        CreateXPopBullets( renderer, registry.motions.get(player).position, M_PI / 2, reg.currStack, 150.f);
     	std::vector<BulletStackEffect> temp = reg.currStack;
         // reg.currStack.clear();
         registry.stackCompile.remove(player);
@@ -253,6 +261,9 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 			case InteractableRequestType::PopStack:
 			resetStack(player, renderer);
 				break;
+			case InteractableRequestType::PopX:
+				CreateXPopBullets (renderer, registry.motions.get(player).position, M_PI / 2, request.effects);
+				break;
 			case InteractableRequestType::ClearStack:
 			clearStack(player);
 				break;
@@ -329,6 +340,8 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			StackCompile& stack = registry.stackCompile.get(player);
 			if (reaction.choice == 0) {
 				if (stack.useKey()) {
+					StackCompile& stack = registry.stackCompile.get(player);
+					CreateXPopBullets( renderer, registry.motions.get(player).position, M_PI / 2, stack.recentRemoved);
 					soundPlayer->playDoorOpenSound();
 					object.name = "OpenDoor";
 					object.interactType = InteractableType::ActionInteractable;
@@ -605,6 +618,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						// registry.deleteds.emplace(reaction.object);
 						StackCompile& stack = registry.stackCompile.get(player);
 						if (stack.useKey()) {
+							CreateXPopBullets( renderer, registry.motions.get(player).position, M_PI / 2, stack.recentRemoved);
 							req.choice = 7;
 							object.dialogueCount = 1;
 							if (!registry.keyItems.has(player)) {

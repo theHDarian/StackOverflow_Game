@@ -629,6 +629,7 @@ enum InteractableRequestType {
     AddEffect, // adds effect to stack
     RemoveEffect, // removes effect from stack
     SpawnEnemy, // spawns enemy based on region, or can pass in specific enemy
+    PopX, // creates x bullets with effects (used for key)
 };
 
 struct InteractableRequest {
