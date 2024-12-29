@@ -151,14 +151,26 @@ void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameSta
 	if (action == GLFW_PRESS) {
 		if (key == GLFW_KEY_W || key == GLFW_KEY_UP) { // highlight choice above
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
-			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
+			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
 		}
 		else if (key == GLFW_KEY_S || key == GLFW_KEY_DOWN) { // highlight choice below
 			state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
-			state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
-			
+			state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
 		}
 	}
+
+	// this is for when dialogue choices are drawn bottom up
+	//if (action == GLFW_PRESS) {
+	//	if (key == GLFW_KEY_W || key == GLFW_KEY_UP) { // highlight choice above
+	//		state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+	//		state.hoveringDialogueChoice = min(state.hoveringDialogueChoice + 1, (int)registry.dialogueChoices.components.size() - 1);
+	//	}
+	//	else if (key == GLFW_KEY_S || key == GLFW_KEY_DOWN) { // highlight choice below
+	//		state.lastHoverDialogueChoice = state.hoveringDialogueChoice;
+	//		state.hoveringDialogueChoice = max(0, state.hoveringDialogueChoice - 1);
+	//		
+	//	}
+	//}
 }
 
 void IOSystem::mouseClick(int button, int action, int mods) {

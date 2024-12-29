@@ -339,11 +339,12 @@ void UISystem::step(float elapsed_ms) {
 		}
 
 		if (uiRequest.type == UIRequestType::GameOverReport) {
+			TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
 			std::string report = "\n" + reportStats();
 			std::vector<std::string> reportTokenized = getTokenizedText(report);
-			TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
 			text.tokenizedText = uiTexts["GameOver"];
 			text.tokenizedText.insert(text.tokenizedText.end(), reportTokenized.begin(), reportTokenized.end());
+			text.tokenizedText = getFormattedText(text.tokenizedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
 			registry.activeMenus.emplace(registry.menus.entities[MenuType::GameOverMenu]);
 			ioState.activeMenu++;
 		}
@@ -377,20 +378,20 @@ void UISystem::step(float elapsed_ms) {
 	// move positions of notif messages
 	if (registry.notifMessages.size() > 0) {
 		// clean up notifs that have faded out
-		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+		for (int i = 0; i < registry.notifMessages.size(); i++) {
 			Entity e = registry.notifMessages.entities[i];
-			if (!registry.renderRequests.get(e).show)
+			if (!registry.renderRequests.get(e).show) {
 				registry.deleteEntityAndRelatedEntities(e);
+			}	
 		}
 
-		vec2 startingPosition = vec2(50, ws.height - 50);
+		vec2 startingPosition = vec2(50, ws.height);
 		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
 			Entity messageEntity = registry.notifMessages.entities[i];
 			TextRenderRequest& text = registry.textRenderRequests.get(messageEntity);
-			vec2 nextPosition = vec2(startingPosition.x, startingPosition.y 
-				- (registry.notifMessages.size() - 1 - i) * 50);
-			text.x = nextPosition.x;
-			text.y = ws.height - nextPosition.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
+			startingPosition.y -= (text.tokenizedText.size()) * 50;
+			text.x = startingPosition.x;
+			text.y = ws.height - startingPosition.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
 		}
 	}
 
@@ -530,7 +531,7 @@ bool UISystem::init(GLFWwindow* window) {
 	loadBulletEffects();
 	
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
-	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 4));
+	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 3.5));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
 	screenCutIn = createScreenCutIn();
 	bulletUI = createBulletUI();
@@ -565,16 +566,19 @@ void UISystem::playDialogue() {
 		Dialogue nextLine = registry.dialogueLines.get(dialogueBox).next();
 		if (nextLine.text.compare("<end>") != 0) { // there is a next line
 			registry.renderRequests.get(dialogueBox).show = true;
-			registry.textRenderRequests.get(dialogueBox).tokenizedText = nextLine.tokenizedText;
+			TextRenderRequest& text = registry.textRenderRequests.get(dialogueBox);
+			text.tokenizedText = nextLine.tokenizedText;
 
 			// check if any script variables need to be bound
 			if (registry.interactableInDialogue.entities.size() > 0) {
 				InteractableObject& currItem = registry.interactables.get(registry.interactableInDialogue.entities[0]);
 				if (currItem.scriptVariables.size() > 0) {
 					std::string bindedDialogue = bindScriptVariables(nextLine.text, currItem.scriptVariables);
-					registry.textRenderRequests.get(dialogueBox).tokenizedText = getTokenizedText(bindedDialogue);
+					text.tokenizedText = getTokenizedText(bindedDialogue);
 				}
 			}
+
+			text.tokenizedText = getFormattedText(text.tokenizedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
 			
 			// play a sound if there is one
 			if (nextLine.sfx == IncomingDialogue) {
@@ -620,18 +624,31 @@ void UISystem::playDialogue() {
 				}
 			}
 
-			vec2 startingPosition = vec2(400, wS.height - 35);
-			// display options for player if there is one
-			for (int i = nextLine.choices.size() - 1; i >= 0 ; i--) {
-				//std::cout << nextLine.choices[i] << std::endl;
-				vec2 nextPosition = vec2(startingPosition.x, startingPosition.y - (nextLine.choices.size() - 1 - i) * 50);
-				//std::cout << nextPosition.y << std::endl;
-				createDialogueChoice(nextLine.choices[i], nextPosition);
+			// can draw choices right under dialogue
+			float startingY = wS.height - text.y + text.scale * DEFAULT_FONT_SIZE * text.tokenizedText.size() * 2;
+			if (text.tokenizedText.size() > 0 && text.tokenizedText[0].compare(" ") == 0) {
+				startingY = wS.height - text.y - text.scale * DEFAULT_FONT_SIZE;
 			}
+
+			vec2 nextPosition = vec2(text.x, startingY);
+			// first create all choices
+			for (int i = 0; i < nextLine.choices.size(); i++) {
+				Entity choice = createDialogueChoice(nextLine.choices[i], nextPosition);
+			}
+			
+			// then readjust positioning here to allow for multiline choice formatting
+			for (Entity dialogueChoice : registry.dialogueChoices.entities) {
+				TextRenderRequest& choiceText = registry.textRenderRequests.get(dialogueChoice);
+				choiceText.y = wS.height - nextPosition.y;
+				registry.motions.get(dialogueChoice).position = nextPosition - choiceText.scale * DEFAULT_FONT_SIZE * 0.5f;
+				nextPosition.y += (choiceText.tokenizedText.size()) * 50;
+			}
+
 			// set first choice to highlighted by default
 			if (registry.dialogueChoices.components.size() > 0) {
-				input.hoveringDialogueChoice = registry.dialogueChoices.components.size() - 1 - 0;
-				input.lastHoverDialogueChoice = registry.dialogueChoices.components.size() - 1 - 0;
+				input.hoveringDialogueChoice = 0;
+				input.lastHoverDialogueChoice = 0;
+
 				// change dialogue reminder text
 				TextRenderRequest& reminderText = registry.textRenderRequests.get(dialogueReminder);
 				reminderText.text = "[W, S] Select, [E] Confirm";
@@ -666,30 +683,27 @@ Entity UISystem::createNotifMessage(std::string message) {
 	WindowState& windowState = registry.windowStates.components[0];
 
 	auto& rr = registry.renderRequests.insert(
-		entity,
-		{ "enemy_bullet_square.png",
-		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
-	rr.show = true;
+		entity, { "none",
+				 EFFECT_ASSET_ID::EGG,
+				 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
-	registry.dialogueUIs.emplace(entity);
-	registry.dialogueUITexts.emplace(entity);
+	registry.gameUIs.emplace(entity);
+	registry.gameUITexts.emplace(entity);
 
-	Motion& motion = registry.motions.emplace(entity);
-	motion.angle = 0.f;
-	motion.velocity = { 0, 0 };
-	motion.scale = {0, 0};
-	motion.position = vec2(0);
+	//Motion& motion = registry.motions.emplace(entity);
+	//motion.angle = 0.f;
+	//motion.velocity = { 0, 0 };
+	//motion.position = vec2(0);
 
 	auto& text = registry.textRenderRequests.emplace(entity);
 	text.color = vec3(1, 1, 1);
 	text.scale = 0.40;
 	text.text = message;
-	text.tokenizedText = getTokenizedText(message);
-	text.topRightBound = { windowState.width, windowState.height }; // need to update this
+	text.topRightBound = { 700, windowState.height }; // need to update this
 	text.bottomLeftBound = { 0, 0 };
 	text.x = 50;
 	text.y = 50;
+	text.tokenizedText = getFormattedText(getTokenizedText(message), text.scale, text.alignment, {text.x, text.y}, text.topRightBound, text.bottomLeftBound);
 
 	vec3& color = registry.colors.emplace(entity);
 	color = vec3(0.f);
@@ -889,10 +903,13 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
 	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
 	textReq.topRightBound = { textReq.x + motion.scale.x - 25, textReq.y };
-
+	
 	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
 	arrowMotion.position = { position.x, position.y + 51 };
 	registry.renderRequests.get(bulletUIArrow).show = true;
+
+	std::vector<std::string> formatted = getFormattedText(textReq.tokenizedText, textReq.scale, textReq.alignment, { textReq.x, textReq.y }, textReq.topRightBound, textReq.bottomLeftBound);
+	textReq.tokenizedText = formatted;
 }
 
 Entity UISystem::createBulletUIArrow() {
@@ -1096,6 +1113,7 @@ Entity UISystem::createDialogueChoice(std::string choice, vec2 position) {
 	text.text = choice;
 	text.topRightBound = { windowState.width - 75, windowState.height - 25 };
 	text.bottomLeftBound = { text.x + 25, 0 + 25 };
+	text.tokenizedText = getFormattedText(getTokenizedText(text.text), text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
 
 	registry.dialogueChoices.emplace(entity);
 
@@ -1225,7 +1243,7 @@ Entity UISystem::createDialogueBox(vec2 position, vec2 scale)
 	// temp fix for getting window size for now
 	WindowState& windowState = registry.windowStates.components[0];
 	text.x = windowState.width - scale.x + 300;				// 25 is just some padding
-	text.y = windowState.height - position.y + scale.y / 4; // place text slightly above middle of box
+	text.y = windowState.height - position.y + scale.y / 2 - DEFAULT_FONT_SIZE * 1.5; // place text slightly above middle of box
 	text.scale = 0.5;										
 	text.topRightBound = { scale.x - 75, scale.y - 25 };
 	text.bottomLeftBound = { text.x + 25, 0 + 25 };
@@ -1268,11 +1286,12 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 
 	WindowState& windowState = registry.windowStates.components[0];
 	text.scale = 0.5;
-	text.x = position.x - scale.x/2.f + 25;
+	text.x = position.x/* - scale.x/2.f + 25*/;
 	text.y = position.y + scale.y / 2.f - 25.f - text.scale * DEFAULT_FONT_SIZE;
 	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
 	text.tokenizedText = uiTexts["ControlsGuide"];
+	text.alignment = TextAlignment::CenteredAlign;
 
 	UIBorder& border = registry.uiBorders.emplace(entity);
 	border.borderColour = vec3(1.f);
@@ -1285,6 +1304,8 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	menu.offset = { 0, 50 + 30 };
 	menu.type = MenuType::ControlsMenu;
 
+	std::vector<std::string> formatted = getFormattedText(text.tokenizedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
+	text.tokenizedText = formatted;
 	return entity;
 }
 
@@ -1381,12 +1402,12 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 
 	WindowState& windowState = registry.windowStates.components[0];
 	text.scale = 0.7f;
-	text.x = position.x - scale.x / 2.f + 25;
+	text.x = position.x /*- scale.x / 2.f + 25*/;
 	text.y = position.y + scale.y / 2.f - 25.f - text.scale * DEFAULT_FONT_SIZE;
 	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
 	text.bottomLeftBound = { 0, 0 + 25 };
-
-	text.tokenizedText = uiTexts["GameOver"];
+	text.alignment = TextAlignment::CenteredAlign;
+	text.tokenizedText = getFormattedText(uiTexts["GameOver"], text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
 
 	UIBorder& border = registry.uiBorders.emplace(entity);
 	border.borderColour = vec3(1.f);

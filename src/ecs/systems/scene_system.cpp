@@ -26,7 +26,7 @@ void SceneSystem::step(float elapsed_ms) {
 	if (gameState.dialogueScene && input.nextDialogue) {
 		// update choice
 		if (registry.dialogueChoices.entities.size() > 0) {
-			gameState.dialogueChoice = registry.dialogueChoices.components.size() - 1 - input.hoveringDialogueChoice; // commit player choice
+			gameState.dialogueChoice = input.hoveringDialogueChoice; // commit player choice
 			if (!isStoryDialogue) {
 				if (callScientist) {
 					InteractibleDialogue dialogueObject = { "CallScientist", gameState.dialogueChoice, 0 };

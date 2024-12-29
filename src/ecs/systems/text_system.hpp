@@ -9,6 +9,8 @@
 #include "render_system.hpp"
 
 std::vector<std::string> getTokenizedText(std::string text);
+std::vector<std::string> getFormattedText(std::vector<std::string> tokenizedText, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound);
+bool textOverflowed(std::string text, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound);
 
 const float FONT_ADJUST_FACTOR = 1.50;
 const std::string FONT_FILE = "DepartureMono-Regular.otf";

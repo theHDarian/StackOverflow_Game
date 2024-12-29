@@ -175,6 +175,7 @@ float TextSystem::getTextLength(std::string text, float scale) {
     //return length - (lastChar.Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR + (lastChar.Size.x) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
 
     // if just monospaced font, then no need to go through every letter
+    //return text.length() * scale * DEFAULT_FONT_SIZE - scale * DEFAULT_FONT_SIZE * scale;
     return (text.length() - 1) * (Characters[65].Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR + Characters[65].Size.x * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
 }
 
@@ -196,18 +197,7 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     float scale = request.scale;
     float x = request.x;
     float y = request.y;
-
     float textLength = 0;
-
-    // Currently alignment only works for a single line of text, not tokenized
-    if (request.alignment == TextAlignment::CenteredAlign) {
-        textLength = getTextLength(request.text, scale);
-    }
-    else if (request.alignment == TextAlignment::RightAlign) {
-        textLength = getTextLength(request.text, scale) * 2.f;
-    }
-    x -= textLength / 2.f;
-
     float copyX = x;
 
     // temp put here to readjust sizes btween diff fonts
@@ -221,7 +211,7 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
 
     std::vector<std::string> tokenizedText = request.tokenizedText;
     if (request.tokenizedText.size() == 0) {
-        tokenizedText = getTokenizedText(request.text);
+        tokenizedText = getFormattedText(getTokenizedText(request.text), request.scale, request.alignment, {x, y}, request.topRightBound, request.bottomLeftBound);
     }
 
     glUseProgram(program);
@@ -246,69 +236,59 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     Motion motion = Motion(); // placeholder for text motion info
 
     for (std::string text : tokenizedText) {
-
-        // approximate next word length and compare with text box size
-        if ((x + text.length() * (Characters[65].Advance >> 6) * scale) > request.topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
-            if (text.compare("\n") != 0) {
-                y -= ((Characters[65].Size.y)) * 2.0 * scale;
-                x = copyX;
-            }
+        if (request.alignment == TextAlignment::CenteredAlign) {
+            textLength = getTextLength(text, request.scale);
         }
-        if (y > request.topRightBound.y || y < request.bottomLeftBound.y) {
-            // do nothing for now, unless want to write text that goes up and down
+        else if (request.alignment == TextAlignment::RightAlign) {
+            textLength = getTextLength(text, request.scale) * 2.f;
         }
-        
+        x = copyX;
+        x -= textLength / 2.f;
         std::string::const_iterator c;
         for (c = text.begin(); c != text.end(); c++)
         {
             Character ch = Characters[*c];
-            if (*c == '\n') {
-                y -= (Characters[65].Size.y) * 2.0 * scale;
-                x = copyX;
+            float xpos = x + ch.Bearing.x * scale;
+            float ypos = y - (256 - ch.Bearing.y) * scale;
+                
+            if (*c == ' ') { // skip "blank space characters" by not actually drawing them
+                x += (ch.Advance >> 6) * scale;
+                continue;
+            }
+
+            // set up all our stuff here, and pass it in at once at end
+            // set up matrix we'll use to transform our generic triangle strip
+            // this will be where we want to draw our text (translate) and how big (Scale)
+            // but since generic rect = 0 and 1, need to also put in actual char size data for scale
+            // remember we need to take text bearings into account too
+            motion.position = { xpos, ypos };
+            motion.scale = { 256 * scale, 256 * scale };
+            if (isUI) {
+                transforms[currentIndex] = createNormalModel(motion, vec2(0));
             }
             else {
-                float xpos = x + ch.Bearing.x * scale;
-                float ypos = y - (256 - ch.Bearing.y) * scale;
-                
+                WindowState& windowState = registry.windowStates.components[0];
+                transforms[currentIndex] = createFollowCameraModelText(motion, vec2(0));
+            }
 
-                if (*c == ' ') { // skip "blank space characters" by not actually drawing them
-                    x += (ch.Advance >> 6) * scale;
-                    continue;
-                }
+            //transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
+            //    * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
+            // which letter are we drawing?
+            letterMap[currentIndex] = ch.TextureID;
 
-                // set up all our stuff here, and pass it in at once at end
-                // set up matrix we'll use to transform our generic triangle strip
-                // this will be where we want to draw our text (translate) and how big (Scale)
-                // but since generic rect = 0 and 1, need to also put in actual char size data for scale
-                // remember we need to take text bearings into account too
-                motion.position = { xpos, ypos };
-                motion.scale = { 256 * scale, 256 * scale };
-                if (isUI) {
-                    transforms[currentIndex] = createNormalModel(motion, vec2(0));
-                }
-                else {
-                    WindowState& windowState = registry.windowStates.components[0];
-                    transforms[currentIndex] = createFollowCameraModelText(motion, vec2(0));
-                }
+            // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+            x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
 
-                //transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
-                //    * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
-                // which letter are we drawing?
-                letterMap[currentIndex] = ch.TextureID;
+            // update index of drawn char
+            currentIndex++;
 
-                // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-                x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
-
-                // update index of drawn char
-                currentIndex++;
-
-                // we don't want to draw more than we can fit at once, so issue a draw call when full
-                if (currentIndex == INSTANCED_ARRAY_SIZE) {
-                    drawInstancedText(currentIndex);
-                    currentIndex = 0;
-                }
+            // we don't want to draw more than we can fit at once, so issue a draw call when full
+            if (currentIndex == INSTANCED_ARRAY_SIZE) {
+                drawInstancedText(currentIndex);
+                currentIndex = 0;
             }
         }
+        y -= ((Characters[65].Size.y)) * 2.0 * scale;
     }
 
     drawInstancedText(currentIndex);
@@ -330,6 +310,62 @@ void TextSystem::drawInstancedText(int length) {
 
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, length);
     }
+}
+
+bool textOverflowed(std::string text, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound) {
+    if (text.length() == 0) {
+        return false;
+    }
+    // remember to offset by half of the first character's size!
+    vec2 textSize = vec2(text.length() * scale * DEFAULT_FONT_SIZE - scale * DEFAULT_FONT_SIZE * 0.5f, 0); // assume all text drawn left to right horizontally for now
+
+    if (alignment == TextAlignment::CenteredAlign) {
+        textSize.x /= 2.f;
+    }
+    else if (alignment == TextAlignment::RightAlign) {
+        textSize.x *= -1;
+    }
+
+    vec2 textEndPosition = textPosition + textSize;
+    if (textEndPosition.x > topRightBound.x || textEndPosition.x < bottomLeftBound.x) {
+        return true;
+    }
+    if (textEndPosition.y > topRightBound.y || textEndPosition.y < bottomLeftBound.y) {
+        // do nothing for now, unless want to write text that goes up and down
+    }
+    return false;
+}
+
+std::vector<std::string> getFormattedText(std::vector<std::string> tokenizedText, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound) {
+    // first get tokenized
+    //std::vector<std::string> tokenizedText = getTokenizedText(text);
+
+    // then split based on alignment
+    std::vector<std::string> alignedText;
+    std::string currentLine = "";
+
+    // build each line of text
+    for (std::string text : tokenizedText) {
+        // check: would adding current text overflow/is it a new line character?
+        if (text.compare("\n") == 0) {
+            alignedText.push_back(currentLine);
+            currentLine = "";
+        }
+        else if (textOverflowed(currentLine + text.substr(0, text.find_last_of(' ')), scale, alignment, textPosition, topRightBound, bottomLeftBound)) {
+            // get rid of any spaces
+            currentLine = currentLine.substr(0, currentLine.find_last_of(' '));
+            if (currentLine.length() > 0)
+                alignedText.push_back(currentLine);
+            currentLine = text;
+        }
+        else {
+            currentLine += text;
+        }
+    }
+    if (currentLine.length() > 0)
+        alignedText.push_back(currentLine);
+
+    return alignedText;
 }
 
 std::vector<std::string> getTokenizedText(std::string text) {
