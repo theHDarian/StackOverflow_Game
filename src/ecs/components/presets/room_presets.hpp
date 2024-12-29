@@ -46,7 +46,7 @@ const RoomPreset ScientistBossRoom{
     0.0f,
     0 ,
     0,
-    "\"Gatekeeper\"",
+    "\"Viceroy\"",
     false,
     {1600,1300}
 };
