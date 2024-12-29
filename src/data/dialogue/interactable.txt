@@ -599,7 +599,7 @@ CUT controls.png
 ITEM Desk -1 0
 A desk cluttered with paper. Upon closer inspection, there's also purple notebook on it.
 Read the notebook?
-CHOICES Yes why not am i ajsd askjdna aaa aha ha asdpoaj asd ad asdad asdas asda asdsda asd asdasd  asda asdasd asdasd asdas asdadsa asdas asdasd\Maybe no
+CHOICES Yes\Maybe no
 
 ITEM Desk 0 0
 Upon opening the notebook, you realize that all the pages had been torn out save for one.
