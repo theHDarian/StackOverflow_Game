@@ -326,6 +326,7 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					std::string openDelim = "<";
 					std::string closedDelim = ">";
 					std::string colorDecoration = "color";
+					std::string animationDecoration = "animation";
 					std::string equals = "=";
 					std::string endDecoration = "/";
 					std::vector<TextDecorationSpan> decorationSpans;
@@ -343,14 +344,29 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 						decorations = getTokenizedText(decoration);
 						for (std::string dec : decorations) {
 							assert(dec.length() > 0);
-							// start of color span
-							if (dec.find(colorDecoration) && (dec.at(dec.find(colorDecoration) - 1) != '/')) {
-								std::string color = dec.substr(dec.find(colorDecoration) + colorDecoration.length() + equals.length());
-								color = color.substr(0, color.find(closedDelim));
-								TextDecorationSpan span = TextDecorationSpan{ colorNames.at(color), parsedBody.length()};
-								decorationSpans.push_back(span);
+
+							// means it must be start of some span
+							if (dec.find(endDecoration) == std::string::npos && dec.at(0) == '<') {
+								decorationSpans.push_back({});
+								decorationSpans.back().startIndex = parsedBody.length();
 							}
-							if (dec.find(colorDecoration) && (dec.at(dec.find(colorDecoration) - 1) == '/')) {
+
+							// color span
+							if (dec.find(colorDecoration) != std::string::npos && dec.find(endDecoration) == std::string::npos) {
+								std::string color = dec.substr(dec.find(colorDecoration) + colorDecoration.length() + equals.length());
+								color = color.substr(0, min(color.find(closedDelim), color.find(" ")));
+								decorationSpans.back().color = colorNames.at(color);
+							}
+
+							// animation span
+							if (dec.find(animationDecoration) != std::string::npos && dec.find(endDecoration) == std::string::npos) {
+								std::string animation = dec.substr(dec.find(animationDecoration) + animationDecoration.length() + equals.length());
+								animation = animation.substr(0, min(animation.find(closedDelim), animation.find(" ")));
+								decorationSpans.back().animation = textAnimationNames.at(animation);
+							}
+
+							// means it must be end of some span
+							if (dec.find(endDecoration) != std::string::npos && dec.at(0) == '<') {
 								decorationSpans.back().endIndex = parsedBody.length() - 1;
 							}
 						}

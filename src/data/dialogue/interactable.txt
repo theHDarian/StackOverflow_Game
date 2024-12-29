@@ -7,8 +7,10 @@
 # default/no choice option is -1
 
 # format for body:
-# blah blah text <color=red>highligheted text</color>
+# blah blah text <color=red animation=wavy>highligheted text</>
 # note: color must be lowercase color name corresponding to preset colors (check the colorNames map in utils > colours.hpp)
+# similarly, only defined animation names are allowed
+# note: only one span may be active at a time for now
 
 # format for speaker:
 # SPEAKER speakername speakeravatar
@@ -594,7 +596,7 @@ You... who have been chosen by the Free...
 
 
 ITEM WhiteBoard -1 0
-<color=teal_light>A whiteboard</color> with a blue print tacked onto it. These <color=teal_light>symbols</color> look like they could come in <color=teal_light>handy</color>.
+<color=teal_light animation=wavy>A whiteboard</color /animation> with a blue print tacked onto it. These <color=teal_light>symbols</color> look like they could come in <color=teal_light>handy</color>.
 CUT controls.png
 
 ITEM Desk -1 0

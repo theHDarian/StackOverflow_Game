@@ -1,4 +1,5 @@
 #pragma once
+#include "components.hpp"
 
 // defines our palette colours
 // for standardizing colours used for ui 
@@ -61,4 +62,10 @@ const std::unordered_map<std::string, vec3> colorNames = {
 	{"blue_black", COLOR_BLUE_BLACK},
 	{"white", COLOR_WHITE},
 	{"black", COLOR_BLACK}
+};
+
+// map string to text animation types for script writing
+const std::unordered_map<std::string, TextAnimationType> textAnimationNames = {
+	{"wavy", TextAnimationType::WavyText},
+	{"wobbly", TextAnimationType::WobblyText}
 };

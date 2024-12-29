@@ -152,7 +152,7 @@ struct NotifMessage {
 	// this is a notif message
 };
 
-// currently only used for "drawing text" char by char
+// used for drawing text char by char
 struct DrawingText {
 	float interval = 16; // how fast draw next char (ms)
 	float current = 0;

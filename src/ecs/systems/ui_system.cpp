@@ -4,7 +4,7 @@
 #include "text_system.hpp"
 #include "premades.hpp"
 #include <glm/gtx/compatibility.hpp>
-#include "utils/colours.hpp"
+#include "utils/ui_constants.hpp"
 #include <fstream>
 #include <iomanip>
 #include <sstream>
@@ -265,11 +265,11 @@ void UISystem::step(float elapsed_ms) {
 			// do a special check for keys, but can alternatively make all non-bullet items share a colour (teal?)
 			if (stack.currStack[index].type == Key) {
 				registry.textRenderRequests.get(notif).decorations.push_back(
-					TextDecorationSpan{ COLOR_YELLOW, 0, stack.currStack[index].name.length() });
+					TextDecorationSpan{ 0, stack.currStack[index].name.length(), COLOR_YELLOW });
 			}
 			else {
 				registry.textRenderRequests.get(notif).decorations.push_back(
-					TextDecorationSpan{ bulletEffectColors.at(stack.currStack[index].type), 0, stack.currStack[index].name.length() });
+					TextDecorationSpan{ 0, stack.currStack[index].name.length(), bulletEffectColors.at(stack.currStack[index].type) });
 			}
 			
 		}
@@ -327,11 +327,11 @@ void UISystem::step(float elapsed_ms) {
 
 				if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
 					registry.textRenderRequests.get(notif).decorations.push_back(
-						TextDecorationSpan{ COLOR_YELLOW, message.find(shuffled), message.find(shuffled) + shuffled.length() - 1});
+						TextDecorationSpan{ message.find(shuffled), message.find(shuffled) + shuffled.length() - 1, COLOR_YELLOW });
 				}
 				else {
 					registry.textRenderRequests.get(notif).decorations.push_back(
-						TextDecorationSpan{ COLOR_TURQUOISE, message.find(shifted), message.find(shifted) + shifted.length() - 1});
+						TextDecorationSpan{ message.find(shifted), message.find(shifted) + shifted.length() - 1, COLOR_TURQUOISE });
 				}
 			}	
 		}
@@ -937,7 +937,7 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	if (bullet.type == Key) {
 		color = COLOR_YELLOW;
 	}
-	textReq.decorations.push_back(TextDecorationSpan{color, 0, bullet.name.length()});
+	textReq.decorations.push_back(TextDecorationSpan{ 0, bullet.name.length(), color });
 	
 	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
 	arrowMotion.position = { position.x, position.y + 51 };
@@ -1938,7 +1938,7 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 			
 			if (variableDecorations.size() > varNum) {
 				for (TextDecorationSpan& span : variableDecorations.at(varNum)) {
-					request.decorations.push_back(TextDecorationSpan{span.color, span.startIndex + i, span.endIndex + i});
+					request.decorations.push_back(TextDecorationSpan{ span.startIndex + i, span.endIndex + i, span.color, span.animation });
 				}
 			}
 

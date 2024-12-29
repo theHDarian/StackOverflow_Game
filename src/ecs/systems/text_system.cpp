@@ -8,6 +8,8 @@
 #include <iostream>
 #include <sstream>
 #include <queue>
+#include <chrono>
+using Clock = std::chrono::high_resolution_clock;
 
 TextSystem::TextSystem() {
 
@@ -321,6 +323,18 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
             // remember we need to take text bearings into account too
             motion.position = { xpos, ypos };
             motion.scale = { 256 * scale, 256 * scale };
+
+            // since motion is handled per character, no need to initiate another draw call
+            if ((currentSpan.startIndex - word) <= charCount && (currentSpan.endIndex + 1 - word) >= charCount) {
+                // ref: hp bar wobble
+                if (currentSpan.animation == TextAnimationType::WobblyText) {
+                    motion.position += vec2((rand() % 7) - 5, (rand() % 7) - 5);
+                }
+                if (currentSpan.animation == TextAnimationType::WavyText) {
+                    motion.position.y += sin((float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - registry.windowStates.components[0].startTime)).count() / 100000.f + currentIndex / 2.f) * 10.f;
+                }
+            }
+
             if (isUI) {
                 transforms[currentIndex] = createNormalModel(motion, vec2(0));
             }

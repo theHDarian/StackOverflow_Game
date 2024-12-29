@@ -401,7 +401,7 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 		if (effects[i].type == Key) {
 			color = COLOR_YELLOW;
 		}
-		object.decorations.at(0).push_back(TextDecorationSpan{ color, next, effectsString.length() - 2});
+		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
 		next = effectsString.length();
 	}
 	effectsString += effects[effects.size() - 1].name;
@@ -409,7 +409,7 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 	if (effects[effects.size() - 1].type == Key) {
 		color = COLOR_YELLOW;
 	}
-	object.decorations.at(0).push_back(TextDecorationSpan{ color, next, effectsString.length() - 1 });
+	object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
 
 	object.scriptVariables.push_back(effectsString);
 
@@ -470,7 +470,7 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 		 if (effects[i].type == Key) {
 			 color = COLOR_YELLOW;
 		 }
-		 object.decorations.at(0).push_back(TextDecorationSpan{ color, next, effectsString.length() - 2 });
+		 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
 		 next = effectsString.length();
 	 }
 	 effectsString += effects[effects.size() - 1].name;
@@ -478,7 +478,7 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	 if (effects[effects.size() - 1].type == Key) {
 		 color = COLOR_YELLOW;
 	 }
-	 object.decorations.at(0).push_back(TextDecorationSpan{ color, next, effectsString.length() - 1 });
+	 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
 
 	 object.scriptVariables.push_back(effectsString);
 

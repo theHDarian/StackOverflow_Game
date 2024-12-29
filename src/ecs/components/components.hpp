@@ -287,11 +287,18 @@ struct AnimationSequence {
 	EFFECT_ASSET_ID nextEffect;
 };
 
+enum TextAnimationType {
+	WavyText,
+	WobblyText,
+	NoTextAnimation
+};
+
 // change colour, etc of text span in text
 struct TextDecorationSpan {
-	vec3 color = vec3(-1); // no colour
 	size_t startIndex = 0; // starting position of span (word)
 	size_t endIndex = 0; // ending position
+	vec3 color = vec3(-1); // no colour
+	TextAnimationType animation = TextAnimationType::NoTextAnimation;
 };
 
 // used to store info of what text needs to be rendered
@@ -426,13 +433,13 @@ enum DialogueRequestType {
 	ResetDialogue
 };
 
-struct DialogueRequest { // consider adding req types, so that dialogue system knows what type (story/interactible)
+struct DialogueRequest { 
 	DialogueRequestType type = InteractableDialogue;
 	int choice = -1;
 };
 
+// something changed, let the object know what
 struct InteractableReaction {
-	// something changed, let the object know what
 	Entity object;
 	int choice = -1;
 	InteractableReaction(Entity& object, int choice) { this->object = object; this->choice = choice; };

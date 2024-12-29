@@ -4,7 +4,7 @@
 #include <utility>
 #include "actor_components.hpp"
 #include "common.hpp"
-#include "utils/colours.hpp"
+#include "utils/ui_constants.hpp"
 
 const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{BulletDamage,      COLOR_PURPLE_MED},
