@@ -1261,10 +1261,21 @@ const RoomPreset HifiRoomSmall {
                 {EnemyHifiWhip,{0.5,0.5}},
             },
 
+            {
+                    {EnemyHifiBallLauncher,{Random::Float(),Random::Float()}},
+            },
+            {
+                        {EnemyHifiBallLauncher,{Random::Float(),Random::Float()}},
+            },
+
+            {
+                    {EnemyHifiWhip,{0.5,0.5}},
+            },
+
         },
     {},
     {},
-    100.0f,
+    4.0f,
     5,
     2,
     "Wave in a bottle",
@@ -1396,7 +1407,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirector
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory = {
     {DifficultyRegion::Intro,{
-        // {RoomType::EnemyRoom, {{HifiRoomAvenue, HifiRoomLane},{}}},
+        // {RoomType::EnemyRoom, {{HifiRoomSmall},{}}},
         {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens, HifiRoomBasicWave, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane },{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
