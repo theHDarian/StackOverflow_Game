@@ -110,7 +110,6 @@ void MapSystem::step(float elapsed_ms)
     {
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
-            soundPlayer->playNextMusic();
             CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
             cameraReq2.type = CameraRequestType::ChangeTargetAndZoom;
             cameraReq2.newTarget = registry.players.entities[0];
@@ -118,6 +117,10 @@ void MapSystem::step(float elapsed_ms)
             cameraReq2.newZoom = 1.0f;
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2) {
+            if (soundPlayer->currentMusicState != MusicState::FadingOut) {
+                soundPlayer->FadeOutMusic(1500);
+                soundPlayer->currentMusicState = MusicState::FadingOut;
+            }
             UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
             uiReq.type = UIRequestType::DisplayFlashMessage;
             uiReq.text = "Room Cleared";
@@ -143,6 +146,11 @@ void MapSystem::step(float elapsed_ms)
                 registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
             }
         }
+    }
+
+    if (soundPlayer->currentMusicState == MusicState::FadingOut && !soundPlayer->isPlayingMusic()) {
+        soundPlayer->playSpecialMusic();
+        soundPlayer->currentMusicState = MusicState::PlayingSpecial;
     }
 }
 
@@ -280,7 +288,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         roomTraversed = 1;
     }
 
-    SoundType old_s = roomTypeToMusic.at(map.currRoom.type);
+    SoundType old_song = roomTypeToMusic.at(map.currRoom.type);
 
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
@@ -373,19 +381,19 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // clear enemies and obstacles
     clearRoomActors();
 
-    SoundType s = roomTypeToMusic.at(type);
-    if (s != old_s || (s == SoundType::normalBGM && Random::Float( ) < 0.35f)) {
-        if (s == SoundType::normalBGM) {
+    SoundType song = roomTypeToMusic.at(type);
+    if (song != SoundType::specialBGM && soundPlayer->currentMusicState == MusicState::PlayingSpecial) {
+        if (song == SoundType::normalBGM) {
             std::cout << "Playing normal music" << std::endl;
             // soundPlayer->playNextMusic();
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::normalBGM;
-        } else if (s == SoundType::bossBGM) {
+        } else if (song == SoundType::bossBGM) {
             std::cout << "Playing boss music" << std::endl;
             // soundPlayer->playBossMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
-        } else if (s == SoundType::specialBGM) {
+        } else if (song == SoundType::specialBGM) {
             std::cout << "Playing special music" << std::endl;
             // soundPlayer->playSpecialMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());

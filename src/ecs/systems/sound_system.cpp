@@ -196,7 +196,7 @@ void SoundSystem::loadMusic() {
     // Preload special room music
     specialRoomMusic = {
         {SoundType::specialBGM, audio_path("event/event-room-1.wav"), 0.4f, -1},
-        // {SoundType::specialBGM, audio_path("event/event-room-2.wav"), 0.4f, -1},
+        {SoundType::specialBGM, audio_path("event/event-room-2.wav"), 0.6f, -1},
     };
 
     for (auto& track : specialRoomMusic) {
@@ -342,6 +342,17 @@ void SoundSystem::loadSoundEffects()
     }
 }
 
+void SoundSystem::FadeOutMusic(int ms)
+{
+    Mix_FadeOutMusic(ms);
+    currentMusicState = MusicState::FadingOut;
+}
+
+bool SoundSystem::isPlayingMusic()
+{
+    return Mix_PlayingMusic();
+}
+
 void SoundSystem::playNextMusic()
 {
     int nextMusicIndex = Random::Int(normalRoomMusic.size());
@@ -363,6 +374,7 @@ void SoundSystem::playNextMusic(int songIndex) {
     } else {
         fprintf(stderr, "Failed to play background music: %s\n", Mix_GetError());
     }
+    currentMusicState = MusicState::PlayingNormal;
 }
 
 
@@ -379,6 +391,7 @@ void SoundSystem::playTitleMusic()
     } else {
         fprintf(stderr, "Failed to play title music: %s\n", Mix_GetError());
     }
+    currentMusicState = MusicState::PlayingTitle;
 }
 
 void SoundSystem::playBossMusic(int songIndex) {
@@ -395,12 +408,13 @@ void SoundSystem::playBossMusic(int songIndex) {
     } else {
         fprintf(stderr, "Failed to play boss music: %s\n", Mix_GetError());
     }
+    currentMusicState = MusicState::PlayingBoss;
 }
 
 
 void SoundSystem::playSpecialMusic()
 {
-    playSpecialMusic(0);
+    playSpecialMusic(Random::Int(specialRoomMusic.size()));
 }
 
 void SoundSystem::playSpecialMusic(int songIndex) {
@@ -417,6 +431,7 @@ void SoundSystem::playSpecialMusic(int songIndex) {
     } else {
         fprintf(stderr, "Failed to play special music: %s\n", Mix_GetError());
     }
+    currentMusicState = MusicState::PlayingSpecial;
 }
 
 

@@ -4,6 +4,7 @@
 #include "components/map_components.hpp"
 #include "premades.hpp"
 #include "common.hpp"
+#include "sound_system.hpp"
 #include "tiny_ecs_registry.hpp"
 #include "utils/random.hpp"
 
