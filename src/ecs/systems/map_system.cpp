@@ -118,8 +118,7 @@ void MapSystem::step(float elapsed_ms)
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2) {
             if (soundPlayer->currentMusicState != MusicState::FadingOut) {
-                soundPlayer->FadeOutMusic(1500);
-                soundPlayer->currentMusicState = MusicState::FadingOut;
+                soundPlayer->FadeOutMusic(2000);
             }
             UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
             uiReq.type = UIRequestType::DisplayFlashMessage;
@@ -150,7 +149,6 @@ void MapSystem::step(float elapsed_ms)
 
     if (soundPlayer->currentMusicState == MusicState::FadingOut && !soundPlayer->isPlayingMusic()) {
         soundPlayer->playSpecialMusic();
-        soundPlayer->currentMusicState = MusicState::PlayingSpecial;
     }
 }
 
@@ -382,26 +380,22 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     clearRoomActors();
 
     SoundType song = roomTypeToMusic.at(type);
-    if (song != SoundType::specialBGM && soundPlayer->currentMusicState == MusicState::PlayingSpecial) {
-        if (song == SoundType::normalBGM) {
+        if (song == SoundType::normalBGM && soundPlayer->currentMusicState != MusicState::PlayingNormal) {
             std::cout << "Playing normal music" << std::endl;
             // soundPlayer->playNextMusic();
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::normalBGM;
-        } else if (song == SoundType::bossBGM) {
+        } else if (song == SoundType::bossBGM && soundPlayer->currentMusicState != MusicState::PlayingBoss) {
             std::cout << "Playing boss music" << std::endl;
             // soundPlayer->playBossMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
-        } else if (song == SoundType::specialBGM) {
+        } else if (song == SoundType::specialBGM && soundPlayer->currentMusicState != MusicState::PlayingSpecial) {
             std::cout << "Playing special music" << std::endl;
             // soundPlayer->playSpecialMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::specialBGM;
         }
-    } else {
-        std::cout << "Not changing music" << std::endl;
-    }
 
     decorateRoom();
     UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);

@@ -122,7 +122,7 @@ enum SoundType {
 	itemPickup,
 	rareItemPickup,
 	explosion,
-	alarm,
+	AlarmSound,
 };
 struct SoundRequest {
 	SoundType type;

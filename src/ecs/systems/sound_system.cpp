@@ -80,7 +80,7 @@ void SoundSystem::step(float elapsed_ms)
 
             case SoundType::PlayerZapped:
                 playPlayerZappedSound();
-            case SoundType::alarm:
+            case SoundType::AlarmSound:
                 if (soundRequest.songIndex == -1)
                     playAlarmSound();
                 else
