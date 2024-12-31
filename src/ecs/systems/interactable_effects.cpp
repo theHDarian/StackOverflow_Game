@@ -88,6 +88,13 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
 
 	};
 
+std::map<char, float> doorSideToAngle = {
+	{'T', 0},
+	{'R', M_PI / 2},
+	{'B', M_PI},
+	{'L', 3 * M_PI / 2}
+};
+
 void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange = 2 * M_PI, float offset = 150) {
 	if (!registry.invincibles.has(registry.players.entities[0])) {
 		registry.invincibles.emplace(registry.players.entities[0]);
@@ -263,7 +270,7 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 			resetStack(player, renderer);
 				break;
 			case InteractableRequestType::PopX:
-				CreateXPopBullets (renderer, registry.motions.get(player).position, M_PI / 2, request.effects);
+				CreateXPopBullets (renderer, registry.motions.get(player).position, M_PI / 2, request.effects, 2 * M_PI, 150);
 				break;
 			case InteractableRequestType::ClearStack:
 			clearStack(player);
@@ -342,7 +349,8 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			if (reaction.choice == 0) {
 				if (stack.useKey()) {
 					StackCompile& stack = registry.stackCompile.get(player);
-					CreateXPopBullets( renderer, registry.motions.get(player).position, M_PI / 2, stack.recentRemoved);
+					Door& door = registry.doors.get(reaction.object);
+					CreateXPopBullets( renderer, registry.motions.get(player).position, doorSideToAngle.at(door.side), stack.recentRemoved, M_PI, 150);
 					soundPlayer->playDoorOpenSound();
 					object.name = "OpenDoor";
 					object.interactType = InteractableType::ActionInteractable;
