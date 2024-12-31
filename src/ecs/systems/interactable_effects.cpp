@@ -89,9 +89,9 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
 	};
 
 std::map<char, float> doorSideToAngle = {
-	{'T', 0},
+	{'T', M_PI},
 	{'R', M_PI / 2},
-	{'B', M_PI},
+	{'B', 0},
 	{'L', 3 * M_PI / 2}
 };
 
