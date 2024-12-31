@@ -95,12 +95,15 @@ std::map<char, float> doorSideToAngle = {
 	{'L', 3 * M_PI / 2}
 };
 
-void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange = 2 * M_PI, float offset = 150) {
+void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange = 2.0f * M_PI, float offset = 150) {
 	if (!registry.invincibles.has(registry.players.entities[0])) {
 		registry.invincibles.emplace(registry.players.entities[0]);
 	}
-	int i = 0;
-	for (BulletStackEffect b : effects) {
+	int numBullets = effects.size();
+	float angleStep = angleRange / numBullets;
+
+	for (int i = 0; i < numBullets; ++i) {
+		BulletStackEffect b = effects[i];
 		AttackData atkData = AttackData();
 		atkData.shape = EnemyBulletShape::RECTANGLE;
 		atkData.defaultEffect = b;
@@ -109,11 +112,11 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.size = vec2(60,30);
 		atkData.bulletRange = 9000;
 		atkData.bulletBounce = 3;
-		float angle = ((angleRange / effects.size()) * i) + direction;
+		float angle = (angleStep * i) + direction;
 		createEnemyBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
-		i++;
 	}
 }
+
 
 
 void resetStack(Entity player, RenderSystem* renderer) {
@@ -123,12 +126,11 @@ void resetStack(Entity player, RenderSystem* renderer) {
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
-        if (reg.currStack.size() == 0) {
+        if (reg.currStack.empty()) {
             return;
         }
         int size = reg.baseStackSize;
-        int i = 0;
-        CreateXPopBullets( renderer, registry.motions.get(player).position, M_PI / 2, reg.currStack, 150.f);
+        CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, 150.0f);
     	std::vector<BulletStackEffect> temp = reg.currStack;
         // reg.currStack.clear();
         registry.stackCompile.remove(player);

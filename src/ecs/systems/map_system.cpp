@@ -521,9 +521,10 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         }
         
         updateBgPositions();
+        //
         // InteractableRequest& req = registry.interactableRequests.emplace(Entity());
         // req.type = InteractableRequestType::AddEffect;
-        // req.effects = {key, dashUpA, dashCDRDownA, dmgUpM};
+        // req.effects = {key, dashUpA, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUpA, key, dashUpA, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUpA,};
 
         //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
