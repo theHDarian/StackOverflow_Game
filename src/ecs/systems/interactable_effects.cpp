@@ -88,7 +88,7 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
 
 	};
 
-void CreateXPopBullets( RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float offset = 0) {
+void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange = 2 * M_PI, float offset = 150) {
 	if (!registry.invincibles.has(registry.players.entities[0])) {
 		registry.invincibles.emplace(registry.players.entities[0]);
 	}
@@ -102,11 +102,12 @@ void CreateXPopBullets( RenderSystem* renderer, vec2 position, float direction, 
 		atkData.size = vec2(60,30);
 		atkData.bulletRange = 9000;
 		atkData.bulletBounce = 3;
-		float angle = ((2 * M_PI / effects.size()) * i) + direction;
-		createEnemyBullet( renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
+		float angle = ((angleRange / effects.size()) * i) + direction;
+		createEnemyBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
 		i++;
 	}
 }
+
 
 void resetStack(Entity player, RenderSystem* renderer) {
 
