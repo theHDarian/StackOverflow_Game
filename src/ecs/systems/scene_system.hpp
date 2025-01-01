@@ -35,7 +35,7 @@ public:
         {"itemPickup", SoundType::itemPickup},
         {"rareItemPickup", SoundType::rareItemPickup},
         {"explosion", SoundType::explosion},
-        { "alarm", SoundType::alarm }
+        { "alarm", SoundType::AlarmSound }
     };
 
 private:

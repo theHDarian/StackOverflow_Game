@@ -122,7 +122,7 @@ enum SoundType {
 	itemPickup,
 	rareItemPickup,
 	explosion,
-	alarm,
+	AlarmSound,
 };
 struct SoundRequest {
 	SoundType type;
@@ -130,7 +130,7 @@ struct SoundRequest {
 	float volume; //0 to 1
 	int loops;
 	float ticks;
-	int songIndex;
+	int songIndex = -1;
 	Mix_Music* music= nullptr;
 };
 

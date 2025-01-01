@@ -110,7 +110,6 @@ void MapSystem::step(float elapsed_ms)
     {
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
-            soundPlayer->playNextMusic();
             CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
             cameraReq2.type = CameraRequestType::ChangeTargetAndZoom;
             cameraReq2.newTarget = registry.players.entities[0];
@@ -118,6 +117,9 @@ void MapSystem::step(float elapsed_ms)
             cameraReq2.newZoom = 1.0f;
         }
         if (map.currRoom.type == BossRoom || map.currRoom.type == EnemyRoom || map.currRoom.type == TutorialRoom2) {
+            if (soundPlayer->currentMusicState != MusicState::FadingOut) {
+                soundPlayer->FadeOutMusic(2000);
+            }
             UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
             uiReq.type = UIRequestType::DisplayFlashMessage;
             uiReq.text = "Room Cleared";
@@ -143,6 +145,10 @@ void MapSystem::step(float elapsed_ms)
                 registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::ActionInteractable;
             }
         }
+    }
+
+    if (soundPlayer->currentMusicState == MusicState::FadingOut && !soundPlayer->isPlayingMusic()) {
+        soundPlayer->playSpecialMusic();
     }
 }
 
@@ -280,7 +286,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         roomTraversed = 1;
     }
 
-    SoundType old_s = roomTypeToMusic.at(map.currRoom.type);
+    SoundType old_song = roomTypeToMusic.at(map.currRoom.type);
 
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
@@ -373,27 +379,23 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // clear enemies and obstacles
     clearRoomActors();
 
-    SoundType s = roomTypeToMusic.at(type);
-    if (s != old_s || (s == SoundType::normalBGM && Random::Float( ) < 0.35f)) {
-        if (s == SoundType::normalBGM) {
+    SoundType song = roomTypeToMusic.at(type);
+        if (song == SoundType::normalBGM && soundPlayer->currentMusicState != MusicState::PlayingNormal) {
             std::cout << "Playing normal music" << std::endl;
             // soundPlayer->playNextMusic();
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::normalBGM;
-        } else if (s == SoundType::bossBGM) {
+        } else if (song == SoundType::bossBGM && soundPlayer->currentMusicState != MusicState::PlayingBoss) {
             std::cout << "Playing boss music" << std::endl;
             // soundPlayer->playBossMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
-        } else if (s == SoundType::specialBGM) {
+        } else if (song == SoundType::specialBGM && soundPlayer->currentMusicState != MusicState::PlayingSpecial) {
             std::cout << "Playing special music" << std::endl;
             // soundPlayer->playSpecialMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::specialBGM;
         }
-    } else {
-        std::cout << "Not changing music" << std::endl;
-    }
 
     decorateRoom();
     UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
@@ -519,6 +521,11 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         }
         
         updateBgPositions();
+        //
+        // InteractableRequest& req = registry.interactableRequests.emplace(Entity());
+        // req.type = InteractableRequestType::AddEffect;
+        // req.effects = {key, dashUpA, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUpA, key, dashUpA, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUpA,};
+
         //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
         // createGardener(renderer, vec2(1000, 700));

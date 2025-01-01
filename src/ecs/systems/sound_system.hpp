@@ -12,7 +12,10 @@ enum class MusicState {
     Stopped,
     FadingOut,
     FadingIn,
-    Playing,
+    PlayingNormal,
+    PlayingBoss,
+    PlayingSpecial,
+    PlayingTitle,
     Crossfading,
 };
 
@@ -73,9 +76,14 @@ public:
     void playNextDialogueSound();
 
     void stopNextDialogueSound();
+    void FadeOutMusic(int ms);
+
+    bool isPlayingMusic();
 
     float sfxVolume = 0.5f; // note this is overridden by gamestate
     float musicVolume = 0.5f;
+
+    MusicState currentMusicState = MusicState::Stopped;
 
 private:
     int currMusicIndex;
