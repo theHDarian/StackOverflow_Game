@@ -444,6 +444,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
+            d.preset.ID = "";
             d.reset();
             registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
