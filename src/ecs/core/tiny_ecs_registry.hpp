@@ -112,6 +112,7 @@ public:
 	ComponentContainer<Spawning> spawnings;
 	ComponentContainer<GaugeVisual> gaugeVisuals;
 	ComponentContainer<NotifMessage> notifMessages;
+	ComponentContainer<DrawingText> drawingTexts;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -215,6 +216,7 @@ public:
 		registry_list.push_back(&spawnings);
 		registry_list.push_back(&gaugeVisuals);
 		registry_list.push_back(&notifMessages);
+		registry_list.push_back(&drawingTexts);
 	}
 
 	void clear_all_components()

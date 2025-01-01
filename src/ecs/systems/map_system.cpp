@@ -450,6 +450,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
         registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
+        registry.doors.components[2].preset = TutorialRoom2Preset;
         registry.animations.get(registry.doorSymbols.entities[2]).frame = roomTypeToSymbols.at(registry.doors.components[2].room);
         registry.interactables.get(registry.doors.entities[2]).name = "ClosedTutorialDoor";
         registry.interactables.get(registry.doors.entities[2]).interactType = InteractableType::DialogueInteractable;
@@ -519,7 +520,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             d.preset = getRoomPreset(d.room, d.isLocked);
 
         }
-        
+        //map.currRoom.preset = TreasureRoom1;
         updateBgPositions();
         //
         // InteractableRequest& req = registry.interactableRequests.emplace(Entity());

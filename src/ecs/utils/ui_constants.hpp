@@ -1,4 +1,5 @@
 #pragma once
+#include "components.hpp"
 
 // defines our palette colours
 // for standardizing colours used for ui 
@@ -30,3 +31,41 @@ const vec3 COLOR_BLUE_MED =		{ 57 / 255.f, 70 / 255.f, 114/ 255.f };
 const vec3 COLOR_BLUE_DARK =	{ 32 / 255.f, 43 / 255.f, 81/ 255.f };
 const vec3 COLOR_BLUE_BLACK =	{ 14 / 255.f, 20 / 255.f, 38/ 255.f };
 const vec3 COLOR_WHITE =		{ 1.f, 1.f, 1.f };
+const vec3 COLOR_BLACK =		{ 0.f, 0.f, 0.f };
+
+// a string to color map to make script writing easier
+const std::unordered_map<std::string, vec3> colorNames = {
+	{"yellow", COLOR_YELLOW },
+	{"orange", COLOR_ORANGE},
+	{"brown", COLOR_BROWN},
+	{"green", COLOR_GREEN},
+	{"green_light", COLOR_GREEN_LIGHT},
+	{"turquoise", COLOR_TURQUOISE},
+	{"blue", COLOR_BLUE},
+	{"blue_sky", COLOR_BLUE_SKY},
+	{"purple_med", COLOR_PURPLE_MED},
+	{"purple_dark", COLOR_PURPLE_DARK},
+	{"pink", COLOR_PINK},
+	{"red", COLOR_RED},
+	{"magenta_light", COLOR_MAGENTA_LIGHT},
+	{"magenta_med", COLOR_MAGENTA_MED},
+	{"magenta_dark", COLOR_MAGENTA_DARK},
+	{"laet_light", COLOR_LAET_LIGHT},
+	{"teal_light", COLOR_TEAL_LIGHT},
+	{"teal_med", COLOR_TEAL_MED},
+	{"teal_dark", COLOR_TEAL_DARK},
+	{"grey_light", COLOR_GREY_LIGHT},
+	{"grey_med", COLOR_GREY_MED},
+	{"grey_dark", COLOR_GREY_DARK},
+	{"blue_med", COLOR_BLUE_MED},
+	{"blue_dark", COLOR_BLUE_DARK},
+	{"blue_black", COLOR_BLUE_BLACK},
+	{"white", COLOR_WHITE},
+	{"black", COLOR_BLACK}
+};
+
+// map string to text animation types for script writing
+const std::unordered_map<std::string, TextAnimationType> textAnimationNames = {
+	{"wavy", TextAnimationType::WavyText},
+	{"wobbly", TextAnimationType::WobblyText}
+};

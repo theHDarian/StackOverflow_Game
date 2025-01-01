@@ -9,6 +9,8 @@
 #include "render_system.hpp"
 
 std::vector<std::string> getTokenizedText(std::string text);
+std::vector<std::string> getFormattedText(std::vector<std::string> tokenizedText, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound);
+bool textOverflowed(std::string text, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound);
 
 const float FONT_ADJUST_FACTOR = 1.50;
 const std::string FONT_FILE = "DepartureMono-Regular.otf";
@@ -45,6 +47,7 @@ private:
     GLuint VAO, VBO;
     GLuint program;
     std::vector<mat4> transforms;
+    std::vector<vec4> colors;
     std::vector<int> letterMap;
     GLuint textureArray;
     int INSTANCED_ARRAY_SIZE = 100; // note: tutorial used 400, but my pc can only handle 100 lol
@@ -58,4 +61,5 @@ private:
     void renderText(TextRenderRequest& request, Entity entity, bool isUI = true);
     void drawInstancedText(int length);
     float getTextLength(std::string text, float scale);
+    int getIndexLine(std::vector<std::string> lines, int charIndex);
 };

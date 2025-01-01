@@ -103,7 +103,7 @@ private:
 
     void updateFlashMessageDisplay(std::string text);
 
-    std::string bindScriptVariables(std::string text, std::vector<std::string>& variables);
+    void bindScriptVariables(TextRenderRequest& request, std::vector<std::string>& variables, std::vector<std::vector<TextDecorationSpan>> variableDecorations);
 
     Entity createFpsCounter();
     Entity createRoomCounter();

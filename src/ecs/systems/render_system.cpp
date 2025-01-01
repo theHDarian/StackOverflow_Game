@@ -98,6 +98,31 @@ void RenderSystem::step(float elapsed_ms)
 			//std::cout << anim.frame << std::endl;
 		}
 	}
+
+	// put text progression for dialogue here for now
+	for (DrawingText& at : registry.drawingTexts.components) {
+		at.current += elapsed_ms;
+		if (at.current >= at.interval && !at.doneDrawing) {
+			at.toDraw += at.current / at.interval;
+			at.current = 0;
+		}
+		// hard code cursor blink
+		if (at.current >= 500 && at.doneDrawing) {
+			at.blink = !at.blink;
+			at.current = 0;
+		}
+	}
+
+	for (TextRenderRequest& text : registry.textRenderRequests.components) {
+		for (TextDecorationSpan& textDecoration : text.decorations) {
+			if (textDecoration.animationType != TextAnimationType::NoTextAnimation) {
+				textDecoration.timer -= elapsed_ms;
+				if (textDecoration.animationType == TextAnimationType::WobblyText && textDecoration.timer <= 0) {
+					textDecoration.timer = textDecoration.baseTimer;
+				}
+			}
+		}
+	}
 }
 
 void RenderSystem::drawCursor()

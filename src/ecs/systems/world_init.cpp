@@ -389,13 +389,27 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PushStack";
 	object.item = InteractableItem::PushConsole;
+	object.decorations.push_back({});
 	
+	vec3 color;
+	size_t next = 0;
 	// add names of effects
 	std::string effectsString = "";
 	for (int i = 0; i < effects.size() - 1; i++) {
 		effectsString += effects[i].name + ", ";
+		color = bulletEffectColors.at(effects[i].type);
+		if (effects[i].type == Key) {
+			color = COLOR_YELLOW;
+		}
+		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
+		next = effectsString.length();
 	}
 	effectsString += effects[effects.size() - 1].name;
+	color = bulletEffectColors.at(effects[effects.size() - 1].type);
+	if (effects[effects.size() - 1].type == Key) {
+		color = COLOR_YELLOW;
+	}
+	object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
 
 	object.scriptVariables.push_back(effectsString);
 
@@ -441,18 +455,32 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	 CircleCollider &cc = registry.circleColliders.emplace(console);
 	 cc.radius = m.scale.y / 4;
 
-	InteractableObject &object = registry.interactables.emplace(console);
-	object.name = "FightConsole";
-	object.item = InteractableItem::FightConsole;
+	 InteractableObject& object = registry.interactables.emplace(console);
+	 object.name = "FightConsole";
+	 object.item = InteractableItem::FightConsole;
+	 object.decorations.push_back({});
 
-	// add names of effects
-	std::string effectsString = "";
-	for (int i = 0; i < effects.size() - 1; i++) {
-		effectsString += effects[i].name + ", ";
-	}
-	effectsString += effects[effects.size() - 1].name;
+	 vec3 color;
+	 size_t next = 0;
+	 // add names of effects
+	 std::string effectsString = "";
+	 for (int i = 0; i < effects.size() - 1; i++) {
+		 effectsString += effects[i].name + ", ";
+		 color = bulletEffectColors.at(effects[i].type);
+		 if (effects[i].type == Key) {
+			 color = COLOR_YELLOW;
+		 }
+		 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
+		 next = effectsString.length();
+	 }
+	 effectsString += effects[effects.size() - 1].name;
+	 color = bulletEffectColors.at(effects[effects.size() - 1].type);
+	 if (effects[effects.size() - 1].type == Key) {
+		 color = COLOR_YELLOW;
+	 }
+	 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
 
-	object.scriptVariables.push_back(effectsString);
+	 object.scriptVariables.push_back(effectsString);
 
 	Animation &a = registry.animations.emplace(console);
 	a.max_frames = 1;

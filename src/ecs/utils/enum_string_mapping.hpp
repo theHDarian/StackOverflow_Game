@@ -3,7 +3,7 @@
 #include "components/actor_components.hpp"
 
 //used for debug name mapping
-std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = {
+const std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = {
     {BulletDamage, "BulletDamage"},
     {ProjectileSpeed, "ProjectileSpeed"},
     {ProjectileSize, "ProjectileSize"},

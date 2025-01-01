@@ -7,7 +7,27 @@
 # default/no choice option is -1
 
 # format for body:
-# blah blah text
+# blah blah text <color=red animation=wavy>highligheted text</color /animation>
+# note on general span format:
+#		<> should enclose all span tags, and each span tags are separated by a space
+#		starting tags are of the format: <tag={some value}>
+#		ending tags are of the format: </tag>
+#		make sure all span tags are closed at some point
+# note on span types: 
+#		color must be lowercase color name corresponding to preset colors (check the colorNames map in utils > ui_constants.hpp)
+#		similarly, only defined animation names are allowed (currenty: wobbly, wavy) (check the animationNames map in utils > ui_constants.hpp)
+# note on animation parameters:
+#		each animation type has own parameters they use. eg: <animation=wobbly,5,5,50> (make sure to separate by ONLY a comma)
+#		when no parameters supplied, default values are used. eg: <animation=wavy>
+#		wavy: <wave period modifier>, <wave amplitude>, <wave character width> (in the y direction), 
+#			  <wave period modifier>, <wave amplitude>, <wave character width> (in the x direction)
+#			  eg: <animation=wavy,1000,10,5,1,0,1> (default values)
+#		wobbly: <max random offset value 1>, <max random offset value 2>, <timer countdown> (timer is not technically a parameter, but is written like one in script)
+#				eg: <animation=wobbly,5,4,60> (default values)
+# note on nested spans: when nested spans of the same type (color, animation, etc) are defined:
+#		colour: the innermost span colour will be used
+#		animation: all animations are applied simultaneously
+# when in doubt, consult components.hpp -> look for where text decoration spans are declared
 
 # format for speaker:
 # SPEAKER speakername speakeravatar
@@ -593,7 +613,7 @@ You... who have been chosen by the Free...
 
 
 ITEM WhiteBoard -1 0
-A board with a blue print tacked onto it. These symbols look like they could come in handy.
+<color=teal_light animation=wobbly,5,5,600><color=red>A</color> whiteboard</color> with a blue print<color=red> tacked <animation=wavy>onto it.</color> These <color=teal_light>symbols</color> look like</animation color=red> they could come</color> in</animation> <color=teal_light>handy</color>.
 CUT controls.png
 
 ITEM Desk -1 0

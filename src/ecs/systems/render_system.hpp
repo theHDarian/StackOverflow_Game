@@ -11,7 +11,7 @@
 #include "components.hpp"
 #include "actor_components.hpp"
 #include "tiny_ecs.hpp"
-#include "utils/colours.hpp"
+#include "utils/ui_constants.hpp"
 #include "components/presets/enemy_bullet_properties.hpp"
 
 // System responsible for setting up OpenGL and for rendering all the

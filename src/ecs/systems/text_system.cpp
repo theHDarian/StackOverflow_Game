@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <queue>
+#include <algorithm> 
 
 TextSystem::TextSystem() {
 
@@ -123,6 +125,7 @@ int TextSystem::initFreetypeLib() {
     for (int i = 0; i < INSTANCED_ARRAY_SIZE; i++) {
         letterMap.push_back(0);
         transforms.push_back(mat4(1.0f));
+        colors.push_back(vec4(1));
     }
 
     // set up VAO for text rendering specifically
@@ -175,7 +178,21 @@ float TextSystem::getTextLength(std::string text, float scale) {
     //return length - (lastChar.Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR + (lastChar.Size.x) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
 
     // if just monospaced font, then no need to go through every letter
+    //return text.length() * scale * DEFAULT_FONT_SIZE - scale * DEFAULT_FONT_SIZE * scale;
     return (text.length() - 1) * (Characters[65].Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR + Characters[65].Size.x * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
+}
+
+// returns the line index of the given character index
+int TextSystem::getIndexLine(std::vector<std::string> lines, int charIndex) {
+    int lineCount = 0;
+    for (std::string line : lines) {
+        charIndex -= line.length();
+        if (charIndex <= 0) {
+            return lineCount;
+        }
+        lineCount++;
+    }
+    return lineCount;
 }
 
 /*
@@ -196,39 +213,44 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     float scale = request.scale;
     float x = request.x;
     float y = request.y;
-
     float textLength = 0;
-
-    // Currently alignment only works for a single line of text, not tokenized
-    if (request.alignment == TextAlignment::CenteredAlign) {
-        textLength = getTextLength(request.text, scale);
-    }
-    else if (request.alignment == TextAlignment::RightAlign) {
-        textLength = getTextLength(request.text, scale) * 2.f;
-    }
-    x -= textLength / 2.f;
-
     float copyX = x;
 
     // temp put here to readjust sizes btween diff fonts
     scale *= FONT_ADJUST_FACTOR;
-    scale *=DEFAULT_FONT_SIZE / 256.0f; // so letters still look as same as before after changing texture sizes
+    scale *= DEFAULT_FONT_SIZE / 256.0f; // so letters still look as same as before after changing texture sizes
 
     // do NOT do for now, because if text changes but tokenized text didn't, it'd be outdated
     //if (request.tokenizedText.size() == 0) {
     //    request.tokenizedText = getTokenizedText(request.text);
     //}
 
-    std::vector<std::string> tokenizedText = request.tokenizedText;
-    if (request.tokenizedText.size() == 0) {
-        tokenizedText = getTokenizedText(request.text);
+    std::vector<std::string> tokenizedText = request.formattedText;
+    if (request.formattedText.size() == 0) {
+        tokenizedText = getFormattedText(getTokenizedText(request.text), request.scale, request.alignment, {x, y}, request.topRightBound, request.bottomLeftBound);
     }
+
+    // add an extra cursor to the last char for drawing text
+    if (registry.drawingTexts.has(entity) && registry.drawingTexts.get(entity).doneDrawing && registry.drawingTexts.get(entity).blink
+        && tokenizedText.size() > 0 && tokenizedText[0].compare(" ") != 0) {
+        tokenizedText[tokenizedText.size() - 1] += "|";
+    }
+
+    // relies on sorted order.. consider making a container that guarantees sorted order
+    std::sort(request.decorations.begin(), request.decorations.end());
+
+    // make a queue out of text decoration spans
+    std::queue<TextDecorationSpan> decorationQueue;
+    for (TextDecorationSpan& span : request.decorations) {
+        decorationQueue.push(span);
+    }
+
+    std::vector<TextDecorationSpan> currentSpans;
 
     glUseProgram(program);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
 
     float alpha = 1.0f;
     if (registry.fades.has(entity))
@@ -236,79 +258,157 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         Fade& fade = registry.fades.get(entity);
         alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
     }
-    GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-    glUniform1f(alpha_uloc, alpha);
 
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
+    int charCount = 0; // to keep track of how many to draw
 
     Motion motion = Motion(); // placeholder for text motion info
 
     for (std::string text : tokenizedText) {
+        if (registry.drawingTexts.has(entity) && !registry.drawingTexts.get(entity).doneDrawing
+            && charCount >= registry.drawingTexts.get(entity).toDraw)
+            break;
 
-        // approximate next word length and compare with text box size
-        if ((x + text.length() * (Characters[65].Advance >> 6) * scale) > request.topRightBound.x/*|| xpos < bottomLeftBound.x*/) {
-            if (text.compare("\n") != 0) {
-                y -= ((Characters[65].Size.y)) * 2.0 * scale;
-                x = copyX;
-            }
+        if (request.alignment == TextAlignment::CenteredAlign) {
+            textLength = getTextLength(text, request.scale);
         }
-        if (y > request.topRightBound.y || y < request.bottomLeftBound.y) {
-            // do nothing for now, unless want to write text that goes up and down
+        else if (request.alignment == TextAlignment::RightAlign) {
+            textLength = getTextLength(text, request.scale) * 2.f;
         }
-        
+        x = copyX;
+        x -= textLength / 2.f;
         std::string::const_iterator c;
         for (c = text.begin(); c != text.end(); c++)
         {
+            // process starting spans in queue
+            while (!decorationQueue.empty() && 
+                (decorationQueue.front().startIndex - getIndexLine(tokenizedText, decorationQueue.front().startIndex)) == charCount) {
+                // call draw text if needed for decoration type
+                //if (decorationQueue.front().color.r >= 0) {
+                //    drawInstancedText(currentIndex);
+                //    currentIndex = 0;
+                //    glUniform3f(glGetUniformLocation(program, "textColor"), decorationQueue.front().color.x, 
+                //        decorationQueue.front().color.y, decorationQueue.front().color.z);
+                //}
+                currentSpans.push_back(decorationQueue.front());
+                decorationQueue.pop();
+            }
+
+            // clean up old spans that have finished
+            for (int i = currentSpans.size() - 1; i >= 0; i--) {
+                TextDecorationSpan& span = currentSpans[i];
+                if ((span.endIndex + 1 - getIndexLine(tokenizedText, span.endIndex)) == charCount) {
+                    // call draw text if needed for decoration type
+                    //if (span.color.r >= 0) {
+                    //    drawInstancedText(currentIndex);
+                    //    currentIndex = 0;
+                    //    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
+                    //}
+                    currentSpans.erase(currentSpans.begin() + i);
+                }
+            }
+            
             Character ch = Characters[*c];
-            if (*c == '\n') {
-                y -= (Characters[65].Size.y) * 2.0 * scale;
-                x = copyX;
+
+            // add an extra cursor to the last char for drawing text
+            if (registry.drawingTexts.has(entity) && charCount == registry.drawingTexts.get(entity).toDraw && !registry.drawingTexts.get(entity).doneDrawing
+                && tokenizedText.size() > 0 && tokenizedText[0].compare(" ") != 0) {
+                ch = Characters['|'];
+            }
+
+            if (registry.drawingTexts.has(entity) && !registry.drawingTexts.get(entity).doneDrawing 
+                && charCount > registry.drawingTexts.get(entity).toDraw)
+                break;
+            
+            float xpos = x + ch.Bearing.x * scale;
+            float ypos = y - (256 - ch.Bearing.y) * scale;
+                
+            if (*c == ' ') { // skip "blank space characters" by not actually drawing them
+                x += (ch.Advance >> 6) * scale;
+                charCount++;
+                continue;
+            }
+
+            colors[currentIndex] = vec4(request.color, alpha);
+
+            // set up all our stuff here, and pass it in at once at end
+            // set up matrix we'll use to transform our generic triangle strip
+            // this will be where we want to draw our text (translate) and how big (Scale)
+            // but since generic rect = 0 and 1, need to also put in actual char size data for scale
+            // remember we need to take text bearings into account too
+            motion.position = { xpos, ypos };
+            motion.scale = { 256 * scale, 256 * scale };
+
+            // since motion is handled per character, no need to initiate another draw call
+            // if go through list backwards, can (help) ensure innermost span will be applied vs. more outer spans of same type
+            for (int i = currentSpans.size() - 1; i >= 0; i--) {
+                TextDecorationSpan& currentSpan = currentSpans[i];
+                motion.position += currentSpan.animation->getPositionOffset(currentSpan.timer, currentSpan.baseTimer, currentIndex);
+                if (currentSpan.color.r > -1) {
+                    colors[currentIndex] = vec4(currentSpan.color, alpha);
+                }
+            }
+
+            if (isUI) {
+                transforms[currentIndex] = createNormalModel(motion, vec2(0));
             }
             else {
-                float xpos = x + ch.Bearing.x * scale;
-                float ypos = y - (256 - ch.Bearing.y) * scale;
-                
+                WindowState& windowState = registry.windowStates.components[0];
+                transforms[currentIndex] = createFollowCameraModelText(motion, vec2(0));
+            }
 
-                if (*c == ' ') { // skip "blank space characters" by not actually drawing them
-                    x += (ch.Advance >> 6) * scale;
-                    continue;
-                }
+            //transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
+            //    * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
+            // which letter are we drawing?
+            letterMap[currentIndex] = ch.TextureID;
 
-                // set up all our stuff here, and pass it in at once at end
-                // set up matrix we'll use to transform our generic triangle strip
-                // this will be where we want to draw our text (translate) and how big (Scale)
-                // but since generic rect = 0 and 1, need to also put in actual char size data for scale
-                // remember we need to take text bearings into account too
-                motion.position = { xpos, ypos };
-                motion.scale = { 256 * scale, 256 * scale };
-                if (isUI) {
-                    transforms[currentIndex] = createNormalModel(motion, vec2(0));
-                }
-                else {
-                    WindowState& windowState = registry.windowStates.components[0];
-                    transforms[currentIndex] = createFollowCameraModelText(motion, vec2(0));
-                }
+            // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+            x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
 
-                //transforms[currentIndex] = translate(mat4(1.0f), vec3(xpos, ypos, 0))
-                //    * glm::scale(mat4(1.0f), vec3(256 * scale, 256 * scale, 0)); // 256 is size of each char
-                // which letter are we drawing?
-                letterMap[currentIndex] = ch.TextureID;
+            // update index of drawn char
+            currentIndex++;
+            charCount++;
 
-                // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-                x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
-
-                // update index of drawn char
-                currentIndex++;
-
-                // we don't want to draw more than we can fit at once, so issue a draw call when full
-                if (currentIndex == INSTANCED_ARRAY_SIZE) {
-                    drawInstancedText(currentIndex);
-                    currentIndex = 0;
-                }
+            // we don't want to draw more than we can fit at once, so issue a draw call when full
+            if (currentIndex == INSTANCED_ARRAY_SIZE) {
+                drawInstancedText(currentIndex);
+                currentIndex = 0;
             }
         }
+        // another call is required here for anything that needs another render call to work
+        // process starting spans in queue
+        while (!decorationQueue.empty() && (decorationQueue.front().startIndex - getIndexLine(tokenizedText, decorationQueue.front().startIndex)) == charCount) {
+            // call draw text if needed for decoration type
+            //if (decorationQueue.front().color.r >= 0) {
+            //    drawInstancedText(currentIndex);
+            //    currentIndex = 0;
+            //    glUniform3f(glGetUniformLocation(program, "textColor"), decorationQueue.front().color.x,
+            //        decorationQueue.front().color.y, decorationQueue.front().color.z);
+            //}
+            currentSpans.push_back(decorationQueue.front());
+            decorationQueue.pop();
+        }
+
+        // clean up old spans that have finished
+        for (int i = currentSpans.size() - 1; i >= 0; i--) {
+            TextDecorationSpan& span = currentSpans[i];
+            if ((span.endIndex + 1 - getIndexLine(tokenizedText, span.endIndex)) == charCount) {
+                // call draw text if needed for decoration type
+                //if (span.color.r >= 0) {
+                //    drawInstancedText(currentIndex);
+                //    currentIndex = 0;
+                //    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
+                //}
+                currentSpans.erase(currentSpans.begin() + i);
+            }
+        }
+        y -= ((Characters[65].Size.y)) * 2.0 * scale;
+    }
+
+    if (registry.drawingTexts.has(entity) && charCount < registry.drawingTexts.get(entity).toDraw) {
+        registry.drawingTexts.get(entity).doneDrawing = true;
     }
 
     drawInstancedText(currentIndex);
@@ -321,15 +421,74 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
 // length = how many rendering at once
 void TextSystem::drawInstancedText(int length) {
     if (length > 0) {
+        unsigned int colorLoc = glGetUniformLocation(program, "colors");
+        glUniform4fv(colorLoc, length, &colors[0][0]);
+
         unsigned int transformLoc = glGetUniformLocation(program, "transforms");
         glUniformMatrix4fv(transformLoc, length, GL_FALSE, &transforms[0][0][0]); // b/c this is a vector of mat4s, need this many 0s??
-        gl_has_errors();
 
         unsigned int letterMapLoc = glGetUniformLocation(program, "letterMap");
         glUniform1iv(letterMapLoc, length, &letterMap[0]);
 
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, length);
+        gl_has_errors();
     }
+}
+
+bool textOverflowed(std::string text, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound) {
+    if (text.length() == 0) {
+        return false;
+    }
+    // remember to offset by half of the first character's size!
+    vec2 textSize = vec2(text.length() * scale * DEFAULT_FONT_SIZE - scale * DEFAULT_FONT_SIZE * 0.5f, 0); // assume all text drawn left to right horizontally for now
+
+    if (alignment == TextAlignment::CenteredAlign) {
+        textSize.x /= 2.f;
+    }
+    else if (alignment == TextAlignment::RightAlign) {
+        textSize.x *= -1;
+    }
+
+    vec2 textEndPosition = textPosition + textSize;
+    if (textEndPosition.x > topRightBound.x || textEndPosition.x < bottomLeftBound.x) {
+        return true;
+    }
+    if (textEndPosition.y > topRightBound.y || textEndPosition.y < bottomLeftBound.y) {
+        // do nothing for now, unless want to write text that goes up and down
+    }
+    return false;
+}
+
+std::vector<std::string> getFormattedText(std::vector<std::string> tokenizedText, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound) {
+    // first get tokenized
+    //std::vector<std::string> tokenizedText = getTokenizedText(text);
+
+    // then split based on alignment
+    std::vector<std::string> alignedText;
+    std::string currentLine = "";
+
+    // build each line of text
+    for (std::string text : tokenizedText) {
+        // check: would adding current text overflow/is it a new line character?
+        if (text.compare("\n") == 0) {
+            alignedText.push_back(currentLine);
+            currentLine = "";
+        }
+        else if (textOverflowed(currentLine + text.substr(0, text.find_last_of(' ')), scale, alignment, textPosition, topRightBound, bottomLeftBound)) {
+            // get rid of any spaces
+            currentLine = currentLine.substr(0, currentLine.find_last_of(' '));
+            if (currentLine.length() > 0)
+                alignedText.push_back(currentLine);
+            currentLine = text;
+        }
+        else {
+            currentLine += text;
+        }
+    }
+    if (currentLine.length() > 0)
+        alignedText.push_back(currentLine);
+
+    return alignedText;
 }
 
 std::vector<std::string> getTokenizedText(std::string text) {

@@ -7,6 +7,7 @@
 
 in VS_OUT {
     vec2 TexCoords;
+    vec4 TexColor;
     flat int index; 
 }fs_in;
 
@@ -20,12 +21,10 @@ uniform int letterMap[100];
 // reason: directly mapping "abba" would store "a, b, b, a" which is inefficient
 // much easier to have smaller arr for texture and a bigger one of ints
 // (indirect accessing)
-uniform vec3 textColor;
-uniform float alpha = 1.0;
 
 void main()
 {    
     // recall with texture arrays: 3rd = layer/index
     vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, vec3(fs_in.TexCoords.xy, letterMap[fs_in.index])).r);
-    color = vec4(textColor, alpha) * sampled;
+    color = fs_in.TexColor * sampled;
 }  
