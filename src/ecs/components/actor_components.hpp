@@ -189,7 +189,9 @@ struct StackCompile {
         assert(index < currStack.size() && index >= 0);
 
         BulletStackEffect effect = currStack[index];
-        recentRemoved.push_back(effect);
+        if (effect.type != Key) {
+            recentRemoved.push_back(effect);
+        }
         currStack.erase(currStack.begin() + index);
         if (effect.effectCalc == EffectCalculation::Additive) {
             additives[effect.type] -= effect.value;
