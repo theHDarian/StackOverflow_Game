@@ -8,8 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <queue>
-#include <chrono>
-using Clock = std::chrono::high_resolution_clock;
+#include <algorithm> 
 
 TextSystem::TextSystem() {
 
@@ -126,6 +125,7 @@ int TextSystem::initFreetypeLib() {
     for (int i = 0; i < INSTANCED_ARRAY_SIZE; i++) {
         letterMap.push_back(0);
         transforms.push_back(mat4(1.0f));
+        colors.push_back(vec4(1));
     }
 
     // set up VAO for text rendering specifically
@@ -182,6 +182,19 @@ float TextSystem::getTextLength(std::string text, float scale) {
     return (text.length() - 1) * (Characters[65].Advance >> 6) * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR + Characters[65].Size.x * scale *DEFAULT_FONT_SIZE / 256.0f * FONT_ADJUST_FACTOR;
 }
 
+// returns the line index of the given character index
+int TextSystem::getIndexLine(std::vector<std::string> lines, int charIndex) {
+    int lineCount = 0;
+    for (std::string line : lines) {
+        charIndex -= line.length();
+        if (charIndex <= 0) {
+            return lineCount;
+        }
+        lineCount++;
+    }
+    return lineCount;
+}
+
 /*
 ref: https://learnopengl.com/In-Practice/Text-Rendering
 optimizations made based on: https://www.youtube.com/watch?v=S0PyZKX4lyI
@@ -212,8 +225,8 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     //    request.tokenizedText = getTokenizedText(request.text);
     //}
 
-    std::vector<std::string> tokenizedText = request.tokenizedText;
-    if (request.tokenizedText.size() == 0) {
+    std::vector<std::string> tokenizedText = request.formattedText;
+    if (request.formattedText.size() == 0) {
         tokenizedText = getFormattedText(getTokenizedText(request.text), request.scale, request.alignment, {x, y}, request.topRightBound, request.bottomLeftBound);
     }
 
@@ -223,24 +236,21 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         tokenizedText[tokenizedText.size() - 1] += "|";
     }
 
+    // relies on sorted order.. consider making a container that guarantees sorted order
+    std::sort(request.decorations.begin(), request.decorations.end());
+
     // make a queue out of text decoration spans
     std::queue<TextDecorationSpan> decorationQueue;
     for (TextDecorationSpan& span : request.decorations) {
         decorationQueue.push(span);
     }
 
-    // start with the current one
-    TextDecorationSpan currentSpan; 
-    if (!decorationQueue.empty()) {
-        currentSpan = decorationQueue.front();
-        decorationQueue.pop();
-    }
+    std::vector<TextDecorationSpan> currentSpans;
 
     glUseProgram(program);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
 
     float alpha = 1.0f;
     if (registry.fades.has(entity))
@@ -248,14 +258,11 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         Fade& fade = registry.fades.get(entity);
         alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
     }
-    GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-    glUniform1f(alpha_uloc, alpha);
 
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
     int currentIndex = 0;
     int charCount = 0; // to keep track of how many to draw
-    int word = 0;
 
     Motion motion = Motion(); // placeholder for text motion info
 
@@ -275,23 +282,31 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         std::string::const_iterator c;
         for (c = text.begin(); c != text.end(); c++)
         {
-            // if a decoration span started/ended, then make a draw call
-            if ((currentSpan.startIndex - word) == charCount) {
-                drawInstancedText(currentIndex); 
-                currentIndex = 0;
-                if (currentSpan.color.r >= 0) {
-                    glUniform3f(glGetUniformLocation(program, "textColor"), currentSpan.color.x, currentSpan.color.y, currentSpan.color.z);
-                }
+            // process starting spans in queue
+            while (!decorationQueue.empty() && 
+                (decorationQueue.front().startIndex - getIndexLine(tokenizedText, decorationQueue.front().startIndex)) == charCount) {
+                // call draw text if needed for decoration type
+                //if (decorationQueue.front().color.r >= 0) {
+                //    drawInstancedText(currentIndex);
+                //    currentIndex = 0;
+                //    glUniform3f(glGetUniformLocation(program, "textColor"), decorationQueue.front().color.x, 
+                //        decorationQueue.front().color.y, decorationQueue.front().color.z);
+                //}
+                currentSpans.push_back(decorationQueue.front());
+                decorationQueue.pop();
             }
-            if ((currentSpan.endIndex + 1 - word) == charCount) {
-                drawInstancedText(currentIndex);
-                currentIndex = 0;
-                if (currentSpan.color.r >= 0) {
-                    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
-                }
-                if (!decorationQueue.empty()) {
-                    currentSpan = decorationQueue.front();
-                    decorationQueue.pop();
+
+            // clean up old spans that have finished
+            for (int i = currentSpans.size() - 1; i >= 0; i--) {
+                TextDecorationSpan& span = currentSpans[i];
+                if ((span.endIndex + 1 - getIndexLine(tokenizedText, span.endIndex)) == charCount) {
+                    // call draw text if needed for decoration type
+                    //if (span.color.r >= 0) {
+                    //    drawInstancedText(currentIndex);
+                    //    currentIndex = 0;
+                    //    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
+                    //}
+                    currentSpans.erase(currentSpans.begin() + i);
                 }
             }
             
@@ -316,6 +331,8 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
                 continue;
             }
 
+            colors[currentIndex] = vec4(request.color, alpha);
+
             // set up all our stuff here, and pass it in at once at end
             // set up matrix we'll use to transform our generic triangle strip
             // this will be where we want to draw our text (translate) and how big (Scale)
@@ -325,13 +342,12 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
             motion.scale = { 256 * scale, 256 * scale };
 
             // since motion is handled per character, no need to initiate another draw call
-            if ((currentSpan.startIndex - word) <= charCount && (currentSpan.endIndex + 1 - word) >= charCount) {
-                // ref: hp bar wobble
-                if (currentSpan.animation == TextAnimationType::WobblyText) {
-                    motion.position += vec2((rand() % 7) - 5, (rand() % 7) - 5);
-                }
-                if (currentSpan.animation == TextAnimationType::WavyText) {
-                    motion.position.y += sin((float)(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - registry.windowStates.components[0].startTime)).count() / 100000.f + currentIndex / 2.f) * 10.f;
+            // if go through list backwards, can (help) ensure innermost span will be applied vs. more outer spans of same type
+            for (int i = currentSpans.size() - 1; i >= 0; i--) {
+                TextDecorationSpan& currentSpan = currentSpans[i];
+                motion.position += currentSpan.animation->getPositionOffset(currentSpan.timer, currentSpan.baseTimer, currentIndex);
+                if (currentSpan.color.r > -1) {
+                    colors[currentIndex] = vec4(currentSpan.color, alpha);
                 }
             }
 
@@ -361,28 +377,34 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
                 currentIndex = 0;
             }
         }
-        // if a decoration span started/ended, then make a draw call
-        if ((currentSpan.startIndex - word) == charCount) {
-            drawInstancedText(currentIndex);
-            currentIndex = 0;
-            if (currentSpan.color.r >= 0) {
-                glUniform3f(glGetUniformLocation(program, "textColor"), currentSpan.color.x, currentSpan.color.y, currentSpan.color.z);
-            }
-        }
-        if ((currentSpan.endIndex + 1 - word) == charCount) {
-            drawInstancedText(currentIndex);
-            currentIndex = 0;
-            if (currentSpan.color.r >= 0) {
-                glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
-            }
-            if (!decorationQueue.empty()) {
-                currentSpan = decorationQueue.front();
-                decorationQueue.pop();
-            }
+        // another call is required here for anything that needs another render call to work
+        // process starting spans in queue
+        while (!decorationQueue.empty() && (decorationQueue.front().startIndex - getIndexLine(tokenizedText, decorationQueue.front().startIndex)) == charCount) {
+            // call draw text if needed for decoration type
+            //if (decorationQueue.front().color.r >= 0) {
+            //    drawInstancedText(currentIndex);
+            //    currentIndex = 0;
+            //    glUniform3f(glGetUniformLocation(program, "textColor"), decorationQueue.front().color.x,
+            //        decorationQueue.front().color.y, decorationQueue.front().color.z);
+            //}
+            currentSpans.push_back(decorationQueue.front());
+            decorationQueue.pop();
         }
 
+        // clean up old spans that have finished
+        for (int i = currentSpans.size() - 1; i >= 0; i--) {
+            TextDecorationSpan& span = currentSpans[i];
+            if ((span.endIndex + 1 - getIndexLine(tokenizedText, span.endIndex)) == charCount) {
+                // call draw text if needed for decoration type
+                //if (span.color.r >= 0) {
+                //    drawInstancedText(currentIndex);
+                //    currentIndex = 0;
+                //    glUniform3f(glGetUniformLocation(program, "textColor"), request.color.x, request.color.y, request.color.z);
+                //}
+                currentSpans.erase(currentSpans.begin() + i);
+            }
+        }
         y -= ((Characters[65].Size.y)) * 2.0 * scale;
-        word++;
     }
 
     if (registry.drawingTexts.has(entity) && charCount < registry.drawingTexts.get(entity).toDraw) {
@@ -399,14 +421,17 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
 // length = how many rendering at once
 void TextSystem::drawInstancedText(int length) {
     if (length > 0) {
+        unsigned int colorLoc = glGetUniformLocation(program, "colors");
+        glUniform4fv(colorLoc, length, &colors[0][0]);
+
         unsigned int transformLoc = glGetUniformLocation(program, "transforms");
         glUniformMatrix4fv(transformLoc, length, GL_FALSE, &transforms[0][0][0]); // b/c this is a vector of mat4s, need this many 0s??
-        gl_has_errors();
 
         unsigned int letterMapLoc = glGetUniformLocation(program, "letterMap");
         glUniform1iv(letterMapLoc, length, &letterMap[0]);
 
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, length);
+        gl_has_errors();
     }
 }
 

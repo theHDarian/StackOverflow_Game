@@ -288,18 +288,117 @@ struct AnimationSequence {
 };
 
 enum TextAnimationType {
-	WavyText,
-	WobblyText,
+	WavyText, // params: the period of the wave (bigger = longer period), the amplitude of the wave (pixels), the character width of the wave (bigger = more chars)
+	WobblyText, // params: the max random value for offset 1, the max random value for offset 2 
 	NoTextAnimation
+};
+
+// the base text animation class, adds no animation
+struct TextAnimation {
+	std::vector<float> parameters; // parameters used by animations, defined per animation type
+	int requiredParameters = 0;
+	TextAnimation() {
+		this->parameters = std::vector<float>();
+	}
+	TextAnimation(std::vector<float> parameters) {
+		this->parameters = parameters;
+	}
+	virtual vec2 getPositionOffset(float time, float baseTime, int charIndex) { return vec2(0); }
+};
+
+// uses cos/sin functions to give wavy animation to text
+// parameters: {period of wave modifier (bigger = longer period), the amplitude of the wave (in pixels), 
+// the character width of the wave} (in the y direction) (and then same thing in the x direction)
+// make sure period and character width are nonzero!
+struct WavyTextAnimation : public TextAnimation {
+	WavyTextAnimation(std::vector<float> parameters = {1000, 10, 5, 1, 0, 1}) : TextAnimation(parameters) {
+		this->requiredParameters = 6;
+		for (int i = this->parameters.size(); i < this->requiredParameters; i++) {
+			if (i == 1 || i == 4) {
+				this->parameters.push_back(0);
+			}
+			else {
+				this->parameters.push_back(1);
+			}
+		}
+	}
+	vec2 getPositionOffset(float time, float baseTime, int charIndex) override {
+		return vec2(cos(time / parameters.at(3) + charIndex / parameters.at(5)) * parameters.at(4),
+			sin(time / parameters.at(0) + charIndex / parameters.at(2)) * parameters.at(1));
+	}
+};
+
+// every X ms (when timer goes off), offset text by a random amount
+// parameters: {max random value for offset 1, max random value for offset 2}
+struct WobblyTextAnimation : public TextAnimation {
+	WobblyTextAnimation(std::vector<float> parameters = { 5, 4 }) : TextAnimation(parameters) {
+		this->requiredParameters = 2;
+	}
+
+	// ref: hp bar wobble
+	vec2 getPositionOffset(float time, float baseTime, int charIndex) override {
+		if (time == baseTime) {
+			return vec2((rand() % (int)parameters.at(0)) - parameters.at(1), (rand() % (int)parameters.at(0)) - parameters.at(1));
+		}
+		return vec2(0);
+	}
 };
 
 // change colour, etc of text span in text
 struct TextDecorationSpan {
-	size_t startIndex = 0; // starting position of span (word)
-	size_t endIndex = 0; // ending position
+	size_t startIndex = -1; // starting position (character) of span
+	size_t endIndex = -1; // ending position
 	vec3 color = vec3(-1); // no colour
-	TextAnimationType animation = TextAnimationType::NoTextAnimation;
+
+	// consider removing types entirely and having an update timer function?
+	// but also needed right now to reconstruct types...
+	TextAnimationType animationType = TextAnimationType::NoTextAnimation; 
+
+	// the function used for animation. default = no animation
+	// this function returns the {x, y} value that will offset the text position
+	std::shared_ptr<TextAnimation> animation = std::make_shared<TextAnimation>(); 
+	float timer = 60; // used for animations
+	float baseTimer = timer; // used by animations that trigger every X amount of time (in ms)
+
+	bool operator<(const TextDecorationSpan& other) const {
+		return startIndex < other.startIndex;
+	}
 };
+
+/*
+struct TextAnimationSpan : TextDecorationSpan {
+	TextAnimationType animation = TextAnimationType::WavyText;
+	float timer = 60; // used for animations
+	float baseTimer = timer; // used by animations that trigger every X amount of time (in ms)
+
+	TextAnimationSpan(size_t startIndex, size_t endIndex = 0, TextAnimationType animation = TextAnimationType::WavyText,
+		float baseTimer = 60) {
+		this->startIndex = startIndex;
+		this->endIndex = endIndex;
+		this->animation = animation;
+		this->baseTimer = baseTimer;
+		this->timer = baseTimer;
+	}
+};
+
+struct TextColorSpan : TextDecorationSpan {
+	vec3 color = vec3(0);
+
+	TextColorSpan(size_t startIndex, size_t endIndex = 0, vec3 color = vec3(0)) {
+		this->startIndex = startIndex;
+		this->endIndex = endIndex;
+		this->color = color;
+	}
+};
+
+struct TextAnimationSpanList {
+	std::vector<TextAnimationSpan> spans;
+};
+
+struct TextColorSpanList {
+	std::vector<TextColorSpan> spans;
+};
+*/
 
 // used to store info of what text needs to be rendered
 // currently, 1 request per entity (like how render requests work)
@@ -321,7 +420,7 @@ struct TextRenderRequest {
 	vec2 bottomLeftBound;
 
 	// this will be formatted text used for breaking up multilines
-	std::vector<std::string> tokenizedText = std::vector<std::string>();
+	std::vector<std::string> formattedText = std::vector<std::string>();
 
 	// left, right or center alignment
 	TextAlignment alignment = TextAlignment::LeftAlign;
@@ -332,11 +431,10 @@ struct TextRenderRequest {
 
 struct Dialogue {
 	std::string text;
-	std::vector<std::string> tokenizedText;
 	std::vector<TextDecorationSpan> decorations;
 	std::string speakerName;
 	std::string speakerAvatar;
-	std::vector<std::string> choices;
+	std::vector <std::string> choices;
 	std::string cutInTexture;
 	SoundType sfx;
 };

@@ -47,6 +47,7 @@ private:
     GLuint VAO, VBO;
     GLuint program;
     std::vector<mat4> transforms;
+    std::vector<vec4> colors;
     std::vector<int> letterMap;
     GLuint textureArray;
     int INSTANCED_ARRAY_SIZE = 100; // note: tutorial used 400, but my pc can only handle 100 lol
@@ -60,4 +61,5 @@ private:
     void renderText(TextRenderRequest& request, Entity entity, bool isUI = true);
     void drawInstancedText(int length);
     float getTextLength(std::string text, float scale);
+    int getIndexLine(std::vector<std::string> lines, int charIndex);
 };

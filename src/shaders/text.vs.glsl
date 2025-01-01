@@ -7,6 +7,7 @@ layout (location = 0) in vec2 vertex; // since we now only use vec2 as vertex po
 
 out VS_OUT {
     vec2 TexCoords;
+    vec4 TexColor;
     flat int index; 
 }vs_out;
 // Also pass along index so fs knows which char we're drawing. Q: what is flat??
@@ -16,6 +17,7 @@ out VS_OUT {
 // but each individual graphics card has a limit
 // should consult limit online
 uniform mat4 transforms[100]; // to transform each letter
+uniform vec4 colors[100];
 uniform mat4 projection;
 
 void main()
@@ -26,5 +28,6 @@ void main()
     vs_out.index = gl_InstanceID;
     vs_out.TexCoords = vertex.xy;
     vs_out.TexCoords.y = 1.0f - vs_out.TexCoords.y; 
+    vs_out.TexColor = colors[gl_InstanceID];
     // note: our triangle strip is constructed upside down, so have to flip y (lol)
 }  

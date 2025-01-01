@@ -112,6 +112,17 @@ void RenderSystem::step(float elapsed_ms)
 			at.current = 0;
 		}
 	}
+
+	for (TextRenderRequest& text : registry.textRenderRequests.components) {
+		for (TextDecorationSpan& textDecoration : text.decorations) {
+			if (textDecoration.animationType != TextAnimationType::NoTextAnimation) {
+				textDecoration.timer -= elapsed_ms;
+				if (textDecoration.animationType == TextAnimationType::WobblyText && textDecoration.timer <= 0) {
+					textDecoration.timer = textDecoration.baseTimer;
+				}
+			}
+		}
+	}
 }
 
 void RenderSystem::drawCursor()
