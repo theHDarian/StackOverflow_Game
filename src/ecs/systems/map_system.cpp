@@ -525,7 +525,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             d.preset = getRoomPreset(d.room, d.isLocked);
 
         }
-        map.currRoom.preset = TreasureRoom1;
+        //map.currRoom.preset = TreasureRoom1;
         updateBgPositions();
         //
         // InteractableRequest& req = registry.interactableRequests.emplace(Entity());
