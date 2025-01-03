@@ -63,6 +63,8 @@ public:
 
     void playAlarmSound(int sfxNumber = 1);
 
+    void playFanFareSound();
+
     void playDoorOpenSound();
 
     void playDoorCloseSound();
@@ -103,6 +105,8 @@ private:
     Mix_Chunk *itemGetSound;
     Mix_Chunk *rareItemGetSound;
     Mix_Chunk *gameOversound;
+
+    Mix_Chunk *fanFareSound;
 
     // Mix_Chunk* playerDeathSound;
     // Mix_Chunk* enemyHurtSound;

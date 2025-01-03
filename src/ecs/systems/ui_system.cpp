@@ -377,8 +377,11 @@ void UISystem::step(float elapsed_ms) {
 		if (uiRequest.type == UIRequestType::DisplayFlashMessage) {
 			updateFlashMessageDisplay(uiRequest.text);
 			// lazy -- only play for room cleared. Should either use a separate req or at least a string constant
-			if (uiRequest.text.compare("Room Cleared") == 0)
+			if (uiRequest.text.compare("Room Cleared") == 0) {
 				soundSystem->playRareItemPickupSound();
+			} else if (uiRequest.text == "Boss Defeated") {
+				soundSystem->playFanFareSound();
+			}
 		}
 	}
 
@@ -620,8 +623,9 @@ void UISystem::playDialogue() {
 				soundSystem->playExplosionSound(2);
 			} else if (nextLine.sfx == AlarmSound) {
 				soundSystem->playAlarmSound();
-			}
-			else {
+			} else if (nextLine.sfx == FanFare) {
+				 soundSystem->playFanFareSound();
+			} else {
 				soundSystem->stopIncomingDialogueSound();
 				soundSystem->playNextDialogueSound();
 			}

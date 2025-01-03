@@ -122,7 +122,11 @@ void MapSystem::step(float elapsed_ms)
             }
             UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
             uiReq.type = UIRequestType::DisplayFlashMessage;
-            uiReq.text = "Room Cleared";
+            if (map.currRoom.type == BossRoom) {
+                uiReq.text = "Boss Defeated";
+            } else {
+                uiReq.text = "Room Cleared";
+            }
         }
             
     } else if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.type != TutorialRoom1) {
@@ -285,8 +289,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         map.directory = getDirectory( map.currRegion );
         roomTraversed = 1;
     }
-
-    SoundType old_song = roomTypeToMusic.at(map.currRoom.type);
 
     // move player to the starting side of the room
     Entity &playerEntity = registry.players.entities[0];
@@ -484,6 +486,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             else {
                 map.currRoom.preset = ScientistBossRoom;
             }
+            SoundRequest& req = registry.soundRequests.emplace(Entity());
+            req.type = SoundType::bossBGM;
         }
         map.directory = getDirectory(map.currRegion);
         std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);

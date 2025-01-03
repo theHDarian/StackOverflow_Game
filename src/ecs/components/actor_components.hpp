@@ -55,7 +55,7 @@ struct EffectStack {
 // Player component
 struct Player
 {
-    float baseSpeed = 250;
+    float baseSpeed = 300;
     float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
     float baseDashCDR = 3000.0f;

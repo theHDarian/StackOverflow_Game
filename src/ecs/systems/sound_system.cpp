@@ -85,6 +85,8 @@ void SoundSystem::step(float elapsed_ms)
                     playAlarmSound();
                 else
                 playAlarmSound(soundRequest.songIndex);
+            case SoundType::FanFare:
+                playFanFareSound();
 
             default:
                 std::cerr << "Unknown sound type: " << soundRequest.type << std::endl;
@@ -197,6 +199,7 @@ void SoundSystem::loadMusic() {
     specialRoomMusic = {
         {SoundType::specialBGM, audio_path("event/event-room-1.wav"), 0.4f, -1},
         {SoundType::specialBGM, audio_path("event/event-room-2.wav"), 0.6f, -1},
+        {SoundType::specialBGM, audio_path("event/event-room-3.wav"), 0.3f, -1},
     };
 
     for (auto& track : specialRoomMusic) {
@@ -318,6 +321,13 @@ void SoundSystem::loadSoundEffects()
         throw std::runtime_error("Failed to load game over sound");
     }
     gameOversound->volume = 0.8f * MIX_MAX_VOLUME;
+
+    fanFareSound = Mix_LoadWAV(audio_path("sfx/fanfare.wav").c_str());
+    if (!fanFareSound)
+    {
+        fprintf(stderr, "Failed to load fanfare sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load fanfare sound");
+    }
 
     for (int i = 0; i < 5; i++)
     {
@@ -566,6 +576,15 @@ void SoundSystem::playAlarmSound(int sfxNumber)
     {
         Mix_PlayChannel(11, alarmSounds[i], 1);
         Mix_Volume(11, alarmSounds[i]->volume * sfxVolume);
+    }
+}
+
+void SoundSystem::playFanFareSound()
+{
+    if (!Mix_Playing(12))
+    {
+        Mix_PlayChannel(12, fanFareSound, 0);
+        Mix_Volume(12, fanFareSound->volume * sfxVolume);
     }
 }
 
