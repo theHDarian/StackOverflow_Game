@@ -1961,5 +1961,5 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 		}
 	}
 
-	request.formattedText = getTokenizedText(text);
+	request.text = text;
 }
