@@ -167,18 +167,18 @@ void UISystem::step(float elapsed_ms) {
 				}
 				else if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::PauseMenu)
 				{
-					if (clickedButtonIndex == 0) {
+					if (clickedButtonIndex == 1) {
 						//std::cout << "show controls!" << std::endl;
 						registry.activeMenus.emplace(registry.menus.entities[MenuType::ControlsMenu]);
 						ioState.activeMenu++;
 						registry.renderRequests.get(controlsGuide).show = true;
 					}
-					else if (clickedButtonIndex == 1) {
+					else if (clickedButtonIndex == 2) {
 						ioState.shouldRestart = true;
 						gameState.titleScreen = true;
 						//std::cout << "to title!" << std::endl;
 					}
-					else if (clickedButtonIndex == 2) {
+					else if (clickedButtonIndex == 3) {
 						ioState.shouldEnd = true;
 						//std::cout << "quit!" << std::endl;
 					}
@@ -187,7 +187,7 @@ void UISystem::step(float elapsed_ms) {
 						registry.renderRequests.get(pauseMenu).show = false;
 					}
 
-					if (clickedButtonIndex != 0) {
+					if (clickedButtonIndex != 1) {
 						registry.activeMenus.remove(registry.activeMenus.entities[registry.activeMenus.entities.size() - 1]);
 						ioState.activeMenu--;
 						gameState.currentVolume = gameState.previousVolume;
@@ -1401,7 +1401,7 @@ Entity UISystem::createPauseMenu(vec2 position, vec2 scale)
 	border.borderThickness = 10.f;
 
 	Menu& menu = registry.menus.emplace(entity);
-	menu.options = { "Controls", "Title", "Quit", "Resume"};
+	menu.options = { "Resume", "Controls", "Title", "Quit"};
 	menu.startPos = { text.x,  windowState.height - text.y + 100};
 	menu.offset = { 0, 50 + 30 };
 	menu.type = MenuType::PauseMenu;
