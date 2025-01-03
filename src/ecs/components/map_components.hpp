@@ -51,6 +51,7 @@ struct RoomPreset {
     std::string ID;
     bool oneTime = false; //if true, room will not appear again
     vec2 roomSize = { 1600, 1600 };
+    bool hasElite = false;
     bool operator==(const RoomPreset& other) const {
         return ID == other.ID;
     }

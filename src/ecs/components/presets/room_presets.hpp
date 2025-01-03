@@ -1662,3 +1662,16 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
 { RoomType::EventRoom, SoundType::specialBGM }
 
 };
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
+    {{EnemyType::EnemyTwoBee, {0.5f,0.5f}}},
+};
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
+    {{EnemyType::EnemyHifiBoid, {0.5f,0.5f}}},
+};
+
+std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
+    {Biology, Random::ListItem(bioEliteEnemies)},
+    {Physics, Random::ListItem(physicsEliteEnemies)}
+};
