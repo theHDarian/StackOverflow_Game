@@ -95,7 +95,7 @@ void MapSystem::step(float elapsed_ms)
     }
 
     if (map.currRoom.preset.hasElite) {
-        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.size() < 5) ) {
+        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.empty()) ) {
             Entity bossEnemy;
             SpawnEnemiesInList( eliteEnemies.at(map.currRegion), bossEnemy, renderer, true);
             map.currRoom.preset.hasElite = false;

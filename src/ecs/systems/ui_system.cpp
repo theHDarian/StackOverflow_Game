@@ -516,11 +516,14 @@ void UISystem::step(float elapsed_ms) {
 				roomNameText += ", Cleared";
 				if (!roomNameTextComponent.decorations.empty())
 					roomNameTextComponent.decorations.clear();
+				if (!roomCounterText.decorations.empty())
+                    roomCounterText.decorations.clear();
 			}
 			else if (map.currRoom.spawnedElite) {
 				roomNameText += ", Wave ???";
 				if (roomNameTextComponent.decorations.empty()) {
-					roomNameTextComponent.decorations.push_back(TextDecorationSpan{ 0, roomNameText.length() - 1, COLOR_RED, WobblyText, std::make_shared<WobblyTextAnimation>(std::vector<float> { 12, 11 }) });
+					roomNameTextComponent.decorations.push_back(TextDecorationSpan{ 0, roomNameText.length() - 1, COLOR_RED, WobblyText, std::make_shared<WobblyTextAnimation>(std::vector<float> { 12, 12 }) });
+					roomCounterText.decorations.push_back(TextDecorationSpan{ 0, roomCounterText.text.length() - 1, COLOR_RED, WobblyText, std::make_shared<WobblyTextAnimation>(std::vector<float> { 12, 12 }) });
 				}
 			}
 			else {
