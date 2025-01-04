@@ -1668,7 +1668,7 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
-    {{EnemyType::EnemyHifiBoid, {0.5f,0.5f}}},
+    {{EnemyType::EnemyHifiCannonHard, {0.5f,0.5f}}},
 };
 
 std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {

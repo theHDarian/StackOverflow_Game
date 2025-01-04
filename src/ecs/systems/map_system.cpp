@@ -95,7 +95,7 @@ void MapSystem::step(float elapsed_ms)
     }
 
     if (map.currRoom.preset.hasElite) {
-        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && (map.currRoom.currentWave > 1 || registry.enemies.entities.size() < 5))) {
+        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.size() < 5) ) {
             Entity bossEnemy;
             SpawnEnemiesInList( eliteEnemies.at(map.currRegion), bossEnemy, renderer, true);
             map.currRoom.preset.hasElite = false;
@@ -120,7 +120,7 @@ void MapSystem::step(float elapsed_ms)
     }
 
     // set room to cleared if all enemies are defeated
-    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
+    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !map.currRoom.preset.hasElite)
     {
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
@@ -383,7 +383,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         d.preset = getRoomPreset(d.room, d.isLocked, roomTraversed);
 
-        if ( d.room == RoomType::EnemyRoom && Random::Float() < 0.2f) {
+        if ( d.room == RoomType::EnemyRoom && Random:: Float() < 0.2f) {
             d.preset.hasElite = true;
         }
 
