@@ -100,6 +100,8 @@ struct Room {
     float wallThickness = 100.f;
     vec2 roomStart = vec2(0.f);
     vec2 roomEnd = vec2(0.f);
+    bool spawnedElite = false;
+    float eliteTimer = Random::Float(55) + 5;
 };
 enum MapRequestType {
     RestartGame = 'R',

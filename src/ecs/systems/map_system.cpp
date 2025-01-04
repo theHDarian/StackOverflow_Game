@@ -28,7 +28,7 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     soundPlayer->playNextMusic();
 }
 
-void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity& bossEnemy, RenderSystem *renderer)
+void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity& bossEnemy, RenderSystem *renderer, bool isElite = false)
 {
     Map& map = registry.maps.components[0];
     for (auto &e : enemies)
@@ -41,7 +41,11 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             if (registry.bosses.has(enemy)) {
                 bossEnemy = enemy;
             }
-            registry.spawnings.emplace( enemy);
+            registry.spawnings.emplace(enemy);
+            if (isElite) {
+                registry.elites.emplace(enemy);
+                RenderRequest& req = registry.renderRequests.get(enemy);
+            }
         }
     }
 }
@@ -87,6 +91,16 @@ void MapSystem::step(float elapsed_ms)
             cameraReq4.type = CameraRequestType::ChangeTarget;
             cameraReq4.newTarget = registry.players.entities[0];
             cameraReq4.transitionTime = 500;
+        }
+    }
+
+    if (map.currRoom.preset.hasElite) {
+        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && (map.currRoom.currentWave > 1 || registry.enemies.entities.size() < 5))) {
+            Entity bossEnemy;
+            SpawnEnemiesInList( eliteEnemies.at(map.currRegion), bossEnemy, renderer, true);
+            map.currRoom.preset.hasElite = false;
+            map.currRoom.spawnedElite = true;
+            soundPlayer->playAlarmSound(3);
         }
     }
 
@@ -369,6 +383,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         d.preset = getRoomPreset(d.room, d.isLocked, roomTraversed);
 
+        if ( d.room == RoomType::EnemyRoom && Random::Float() < 0.2f) {
+            d.preset.hasElite = true;
+        }
+
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }
 
@@ -403,6 +421,11 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
     uiReq.type = UIRequestType::DisplayFlashMessage;
     uiReq.text = map.currRoom.preset.ID;
+
+    Player& player = registry.players.get(playerEntity);
+    // refresh player Dash charges and cooldown
+    player.currDashCharges = getModifiedValue( PlayerNumDash, player.maxDashCharges);
+    player.currDashCooldown = getModifiedValue( PlayerDashCDR, player.baseDashCDR);
 }
 
 void MapSystem::decorateRoom() {

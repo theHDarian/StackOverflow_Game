@@ -569,6 +569,10 @@ struct Burst {
     vec2 start;
 };
 
+struct Elite {
+    int eliteLevel = 1;
+};
+
 struct HomingBullet {
     Entity target;
     float homingIntensity; // How quickly it can turn towards the target
