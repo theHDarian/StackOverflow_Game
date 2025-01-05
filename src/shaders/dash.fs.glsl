@@ -6,7 +6,6 @@ in vec2 texcoord;
 // Application data
 uniform sampler2D sampler0;
 uniform vec3 fcolor;
-uniform float alpha = 1.0;
 uniform float chargeBoundary = 1.0;
 uniform vec4 unchargedColor;
 uniform int isVertical = 1;
@@ -16,7 +15,7 @@ layout(location = 0) out vec4 color;
 
 void main()
 {
-	color = vec4(fcolor, alpha) * vec4(texture(sampler0, texcoord));
+	color = vec4(fcolor, 1.0) * vec4(texture(sampler0, texcoord));
 	// note: branches are expensive, consider using another shader instead?
 	if (texcoord.y < 1.0-chargeBoundary && isVertical == 1){
 		color.r *= fcolor.r;

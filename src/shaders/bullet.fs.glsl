@@ -5,10 +5,6 @@ in vec2 texcoord;
 
 // Application data
 uniform sampler2D sampler0;
-uniform vec3 fcolor;
-uniform int changeColor = 0;
-uniform float alpha = 1.0;
-uniform float effectAlpha = 1.0;
 uniform float time;
 
 uniform int shape; //0 = rect, 1 = tri, 2 = circ

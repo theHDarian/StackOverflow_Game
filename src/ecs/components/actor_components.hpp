@@ -154,6 +154,25 @@ struct StackCompile {
         {PlayerDashCDR,     100000}
     };
 
+    // 'H' means higher values are better, 'L' means lower
+    std::map<BulletEffectType, char> beneficialDirection = {
+    {BulletDamage,      'H'},
+    {ProjectileSpeed,   'H'},
+    {ProjectileSize,    'H'},
+    {FireRate,          'H'},
+    {BulletRange,       'H'},
+    {BulletSpread,      'L'},
+    {BulletNum,         'H'},
+    {BulletBurst,       'H'},
+    {Bounce,            'H'},
+    {Pierce,            'H'},
+    {Homing,            'H'},
+    {PlayerSpeed,       'H'},
+    {PlayerNumDash,     'H'},
+    {PlayerStackSize,   'H'},
+    {PlayerDashCDR,     'L'}
+    };
+
     bool add(BulletStackEffect effect) {
     	if (effect.type == Lightning) {
 	    if (currStack.size() < 1) return true;
