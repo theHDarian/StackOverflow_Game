@@ -959,6 +959,7 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	symbol.angle = 0;
 	symbol.axis = axis;
 	symbol.offset = vec3(0);
+	symbol.side = side;
 
 	registry.backgrounds.emplace(entity);
 
