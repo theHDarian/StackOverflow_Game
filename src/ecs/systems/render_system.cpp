@@ -295,7 +295,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
             {
 				for (Entity& d : registry.doors.entities) {
 					if ((registry.doors.get(d).side == registry.doorSymbols.get(entity).side) && registry.doors.get(d).preset.hasElite) {
-						std::cout << "symbol: " << registry.doorSymbols.get(entity).side << " door: " << registry.doors.get(d).side << ", preset "<< registry.doors.get(d).preset.ID << std::endl;
+						// std::cout << "symbol: " << registry.doorSymbols.get(entity).side << " door: " << registry.doors.get(d).side << ", preset "<< registry.doors.get(d).preset.ID << std::endl;
 						should_glitch = true;
 						break;
                     }
