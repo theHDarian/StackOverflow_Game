@@ -90,6 +90,7 @@ public:
 	void drawMenuOverlayUI();
 	void drawDialogueUI();
 	void drawBackgroundElements();
+	void drawRoomBound(Entity entity, const mat4& projection, const mat4& view);
 	void drawToScreenExtra(EFFECT_ASSET_ID effect);
 	void drawToScreenFinal();
 	void step(float elapsed_ms);
@@ -105,6 +106,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat4& projection, const mat4& view, bool isUI);
 	void drawMesh(Entity entity, const mat4& projection, const mat4& view);
+	void drawBullet(Entity entity, const mat4& projection, const mat4& view);
 	void drawDashes(const mat4& projection, const mat4& view);
 	void drawHPbar(Entity& entity, const mat4& projection, const mat4& view);
 	void drawEnemyIndicator(Entity& enemy, const mat4& projection, const mat4& view);
