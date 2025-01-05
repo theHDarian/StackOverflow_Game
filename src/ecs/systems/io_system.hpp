@@ -27,8 +27,6 @@ public:
 
 private:
 	GLFWwindow* window;
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();;
-	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
 
     void onKey(int key, int, int action, int mod);
 

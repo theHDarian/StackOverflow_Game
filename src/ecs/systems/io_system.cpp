@@ -20,13 +20,6 @@ bool IOSystem::init(GLFWwindow* window) {
     registry.ioStates.emplace(ent);
 	registry.gameStates.emplace(ent);
 
-	// this->monitor = glfwGetPrimaryMonitor();
-	// this->vidMode = glfwGetVideoMode(monitor);
-
-	WindowState& windowState = registry.windowStates.components[0];
-	// this->windowed_height = windowState.height;
-	// this->windowed_width = windowState.width;
-
     auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onKey(_0, _1, _2, _3); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onMouseMove({ _0, _1 }); };
 	auto mouseClick = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->mouseClick(_0, _1, _2); };
@@ -310,43 +303,25 @@ void AdjustViewport(GLFWwindow* window, int winWidth, int winHeight) {
 }
 
 
-auto IOSystem::ToggleWindowMode() -> void {
-	this->monitor = glfwGetPrimaryMonitor();
-	this->vidMode = glfwGetVideoMode(monitor);
+void IOSystem::ToggleWindowMode() {
+	auto monitor = glfwGetPrimaryMonitor();
+	auto vidMode = glfwGetVideoMode(monitor);
 	WindowState& windowState = registry.windowStates.components[0];
 	IOState& ioState = registry.ioStates.components[0];
 
 	if (!ioState.isFullscreen) {
 		// Switch to fullscreen mode
 		std:: cout << "Fullscreen: " << vidMode->width << ", " << vidMode->height << std::endl;
-		glfwSetWindowMonitor(window, monitor, 0,0 ,windowState.width  , windowState.height, vidMode->refreshRate);
+		glfwSetWindowMonitor(window, monitor, 0,0 , windowState.width  , windowState.height, vidMode->refreshRate);
 		ioState.isFullscreen = true;
 		ioState.isBorderless = false;
-		glViewport(0, 0, windowState.width, windowState.height);
 	} else {
 		// Switch to windowed mode
 		glfwSetWindowMonitor(window, nullptr, 100, 100,  windowState.width, windowState.height, 0);
 		ioState.isFullscreen = false;
 		ioState.isBorderless = false;
 	}
-// 	else {
-// 		// Switch to borderless windowed mode
-// #if defined(__APPLE__)
-// 		glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
-// 		int xpos, ypos;
-// 		glfwGetMonitorPos(monitor, &xpos, &ypos);
-// 		glfwSetWindowPos(window, xpos, ypos);
-// 		glfwSetWindowSize(window, vidMode->width, vidMode->height);
-// #else
-// 		glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
-// 		glfwSetWindowMonitor(window, nullptr, 0, 0, vidMode->width, vidMode->height, vidMode->refreshRate);
-// #endif
-// 		ioState.isBorderless = true;
-// 		ioState.isFullscreen = false;
-// 	}
-	// AdjustViewport(window, windowState.width, windowState.height);
-	// windowState.width = vidMode->width;
-	// windowState.height = vidMode->height;
+	AdjustViewport(window, windowState.width, windowState.height);
 	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
 }
 
