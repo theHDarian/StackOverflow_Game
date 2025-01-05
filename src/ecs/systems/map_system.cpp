@@ -8,6 +8,7 @@
 #include "sound_system.hpp"
 #include <glm/gtx/compatibility.hpp>
 
+const float ELITE_SPAWN_CHANCE = 0.2f;
 
 MapSystem::MapSystem()
 {
@@ -383,7 +384,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         d.preset = getRoomPreset(d.room, d.isLocked, roomTraversed);
 
-        if ( d.room == RoomType::EnemyRoom && Random:: Float() < 0.2f) {
+        if ( d.room == RoomType::EnemyRoom && Random:: Float() < ELITE_SPAWN_CHANCE) {
             d.preset.hasElite = true;
         }
 

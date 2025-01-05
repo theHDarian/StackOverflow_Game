@@ -101,7 +101,7 @@ struct Room {
     vec2 roomStart = vec2(0.f);
     vec2 roomEnd = vec2(0.f);
     bool spawnedElite = false;
-    float eliteTimer = Random::Float(10.0f) + 5.0f;
+    float eliteTimer = Random::Float(12.0f) + 3.0f;
 };
 enum MapRequestType {
     RestartGame = 'R',
