@@ -45,7 +45,6 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             registry.spawnings.emplace(enemy);
             if (isElite) {
                 registry.elites.emplace(enemy);
-                RenderRequest& req = registry.renderRequests.get(enemy);
             }
         }
     }

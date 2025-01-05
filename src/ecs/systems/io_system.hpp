@@ -19,10 +19,17 @@ public:
     bool isGameOver()const;
     bool isDialogue()const;
     bool isCutscene()const;
+
+    void ToggleWindowMode();
+
     bool isTitle()const;
+
 
 private:
 	GLFWwindow* window;
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();;
+	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
+
     void onKey(int key, int, int action, int mod);
 
     void mouseClick(int button, int action, int mods);
