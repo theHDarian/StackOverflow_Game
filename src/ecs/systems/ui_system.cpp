@@ -759,7 +759,9 @@ Entity UISystem::createNotifMessage(std::string message) {
 	border.borderColour = COLOR_WHITE;
 	border.border = UIBorderType::Outlined;
 
-	registry.showTimers.emplace(entity);
+	ShowTimer& showtimer = registry.showTimers.emplace(entity);
+	showtimer.base = 3000;
+	showtimer.timer = showtimer.base;
 
 	registry.notifMessages.emplace(entity);
 

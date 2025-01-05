@@ -901,6 +901,8 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 
 	InteractableObject &object = registry.interactables.emplace(entity);
 	object.name = "LockedDoor";
+	object.base = 500;
+	object.timer = 500;
 
 	registry.renderRequests.insert(
 		entity,
