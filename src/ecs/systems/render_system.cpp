@@ -288,6 +288,25 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_id);
 			glUniform1i(glitch_uloc, 2);
 			gl_has_errors();
+
+			GLuint glitchToggle_uloc = glGetUniformLocation(program, "glitchToggle");
+			bool should_glitch = false;
+			if (registry.doorSymbols.has(entity))
+            {
+				for (Entity& d : registry.doors.entities) {
+					if ((registry.doors.get(d).side == registry.doorSymbols.get(entity).side) && registry.doors.get(d).preset.hasElite) {
+						std::cout << "symbol: " << registry.doorSymbols.get(entity).side << " door: " << registry.doors.get(d).side << ", preset "<< registry.doors.get(d).preset.ID << std::endl;
+						should_glitch = true;
+						break;
+                    }
+				}
+            }
+
+			if (registry.elites.has(entity) || should_glitch) {
+				glUniform1i(glitchToggle_uloc, true);
+			} else {
+                glUniform1i(glitchToggle_uloc, false);
+            }
 		}
 		else
 		{

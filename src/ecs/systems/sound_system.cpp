@@ -572,11 +572,8 @@ void SoundSystem::playExplosionSound(int sfxNumber)
 void SoundSystem::playAlarmSound(int sfxNumber)
 {
     int i = sfxNumber % 8;
-    if (!Mix_Playing(11))
-    {
-        Mix_PlayChannel(11, alarmSounds[i], 1);
-        Mix_Volume(11, alarmSounds[i]->volume * sfxVolume);
-    }
+    Mix_PlayChannel(11, alarmSounds[i], 1);
+    Mix_Volume(11, alarmSounds[i]->volume * sfxVolume);
 }
 
 void SoundSystem::playFanFareSound()

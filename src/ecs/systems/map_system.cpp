@@ -8,6 +8,7 @@
 #include "sound_system.hpp"
 #include <glm/gtx/compatibility.hpp>
 
+const float ELITE_SPAWN_CHANCE = 0.2f;
 
 MapSystem::MapSystem()
 {
@@ -28,7 +29,7 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     soundPlayer->playNextMusic();
 }
 
-void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity& bossEnemy, RenderSystem *renderer)
+void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity& bossEnemy, RenderSystem *renderer, bool isElite = false)
 {
     Map& map = registry.maps.components[0];
     for (auto &e : enemies)
@@ -41,7 +42,11 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             if (registry.bosses.has(enemy)) {
                 bossEnemy = enemy;
             }
-            registry.spawnings.emplace( enemy);
+            registry.spawnings.emplace(enemy);
+            if (isElite) {
+                registry.elites.emplace(enemy);
+                RenderRequest& req = registry.renderRequests.get(enemy);
+            }
         }
     }
 }
@@ -90,6 +95,16 @@ void MapSystem::step(float elapsed_ms)
         }
     }
 
+    if (map.currRoom.preset.hasElite) {
+        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.empty()) ) {
+            Entity bossEnemy;
+            SpawnEnemiesInList( eliteEnemies.at(map.currRegion), bossEnemy, renderer, true);
+            map.currRoom.preset.hasElite = false;
+            map.currRoom.spawnedElite = true;
+            soundPlayer->playAlarmSound(3);
+        }
+    }
+
     if (!map.currRoom.enemiesToSpawn.empty()) {
         SpawnEnemiesInList(map.currRoom.enemiesToSpawn, renderer);
         map.currRoom.enemiesToSpawn.clear();
@@ -106,7 +121,7 @@ void MapSystem::step(float elapsed_ms)
     }
 
     // set room to cleared if all enemies are defeated
-    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1)
+    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !map.currRoom.preset.hasElite)
     {
         map.currRoom.cleared = true;
         if (map.currRoom.type == BossRoom) {
@@ -369,6 +384,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         d.preset = getRoomPreset(d.room, d.isLocked, roomTraversed);
 
+        if ( d.room == RoomType::EnemyRoom && Random:: Float() < ELITE_SPAWN_CHANCE) {
+            d.preset.hasElite = true;
+        }
+
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }
 
@@ -403,6 +422,11 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     UIRequest& uiReq = registry.uiRequests.emplace_with_duplicates(registry.maps.entities[0]);
     uiReq.type = UIRequestType::DisplayFlashMessage;
     uiReq.text = map.currRoom.preset.ID;
+
+    Player& player = registry.players.get(playerEntity);
+    // refresh player Dash charges and cooldown
+    player.currDashCharges = getModifiedValue( PlayerNumDash, player.maxDashCharges);
+    player.currDashCooldown = getModifiedValue( PlayerDashCDR, player.baseDashCDR);
 }
 
 void MapSystem::decorateRoom() {

@@ -51,6 +51,7 @@ struct RoomPreset {
     std::string ID;
     bool oneTime = false; //if true, room will not appear again
     vec2 roomSize = { 1600, 1600 };
+    bool hasElite = false;
     bool operator==(const RoomPreset& other) const {
         return ID == other.ID;
     }
@@ -99,6 +100,8 @@ struct Room {
     float wallThickness = 100.f;
     vec2 roomStart = vec2(0.f);
     vec2 roomEnd = vec2(0.f);
+    bool spawnedElite = false;
+    float eliteTimer = Random::Float(12.0f) + 3.0f;
 };
 enum MapRequestType {
     RestartGame = 'R',
