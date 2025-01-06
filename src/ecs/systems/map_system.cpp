@@ -289,18 +289,21 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         registry.gameReports.components[0].roomsCleared++;
     }
 
+
+    MapRegion region = map.currRegion;
+
     //update Map Region
     if (map.currRoom.type == TutorialRoom2) {
         map.currRegion = Biology; //Go to bio region at end of tutorial
     } else if (map.currRoom.type == BossRoom) {
-        map.roomsTraversed = 1; //reset rooms traversed to reset difficulty for region
+        map.currRegion = (MapRegion)(map.currRegion + 1);
+        map.directory = getDirectory( map.currRegion );
     }
 
     int roomTraversed = map.roomsTraversed;
 
     if (door.room == RoomType::BossRoom && map.currRegion != MapRegion::Physics) {
-        map.currRegion = (MapRegion)(map.currRegion + 1);
-        map.directory = getDirectory( map.currRegion );
+        region = (MapRegion) (region + 1);
         roomTraversed = 1;
     }
 
@@ -381,7 +384,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             lockedRooms++;
         }
 
-        d.preset = getRoomPreset(d.room, d.isLocked, roomTraversed);
+        d.preset = getRoomPreset(d.room,region, d.isLocked, roomTraversed);
 
         if ( d.room == RoomType::EnemyRoom && Random:: Float() < ELITE_SPAWN_CHANCE) {
             d.preset.hasElite = true;
@@ -545,7 +548,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
 
-            d.preset = getRoomPreset(d.room, d.isLocked);
+            d.preset = getRoomPreset(d.room, map.currRegion, d.isLocked);
 
         }
         //map.currRoom.preset = TreasureRoom1;

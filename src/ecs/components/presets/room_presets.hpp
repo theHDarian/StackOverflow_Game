@@ -1568,12 +1568,12 @@ inline std::vector<RoomType> getRandomRoomTypes(bool excludeNone, int roomsTrave
     return out;
 }
 
-inline RoomPreset getRoomPreset(RoomType type, bool locked, int roomsTraversed = -1) {
+inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked, int roomsTraversed = -1) {
     Map& map = registry.maps.components[0];
     //boss rooms
-    if (type == RoomType::BossRoom && map.currRegion == MapRegion::Biology) {
+    if (type == RoomType::BossRoom && currRegion == MapRegion::Biology) {
         return BossRoomBee;
-    } else if (type == RoomType::BossRoom && map.currRegion == MapRegion::Physics) {
+    } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
         return ScientistBossRoom; //TODO change to physics boss
     }
 
@@ -1612,7 +1612,7 @@ inline RoomPreset getRoomPreset(RoomType type, bool locked, int roomsTraversed =
         }
     }
 
-    nextRoom = Random::ListItem(locked ? map.directory.at(currentRegion).at(type).locked : map.directory.at(currentRegion).at(type).unlocked);
+    nextRoom = Random::ListItem(locked ? getDirectory(currRegion).at(currentRegion).at(type).locked : getDirectory(currRegion).at(currentRegion).at(type).unlocked);
 
     // Remove the one-time room from all relevant regions
     if (nextRoom.oneTime) {

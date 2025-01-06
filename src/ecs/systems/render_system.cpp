@@ -379,7 +379,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 			// For changing wall textures per region
 			Map &map = registry.maps.components[0];
-			frame = (map.currRegion <= MapRegion::Biology) ? 0 : 1;
+			frame = max((int)map.currRegion-1, 0);
 		}
 		else if (registry.doorSymbols.has(entity))
 		{
