@@ -91,3 +91,12 @@ struct GameReport {
 	std::chrono::steady_clock::time_point gameStartTime; // different from window, used to calculate run time
 	std::string name;
 };
+
+struct PositionSnapshot {
+    float x;
+	float y;
+	float angle;
+};
+
+struct  AimIndicator {
+};

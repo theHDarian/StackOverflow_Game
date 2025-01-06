@@ -95,6 +95,15 @@ Entity resetPlayer()
 	return ent;
 }
 
+void rescalePlayer()
+{
+	Entity player = registry.players.entities[0];
+    PositionSnapshot& ps = registry.positionSnapshots.get(player);
+	WindowState& ws = registry.windowStates.components[0];
+	Motion& motion = registry.motions.get(player);
+	motion.position = {ws.width * ps.x, ws.height * ps.y};
+}
+
 Entity createAimIndicator(RenderSystem *renderer)
 {
 	// add aim indicator
@@ -109,7 +118,16 @@ Entity createAimIndicator(RenderSystem *renderer)
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 	registry.gameUIs.emplace(aimIndicator);
+	registry.aimIndicators.emplace(aimIndicator);
 	return aimIndicator;
+}
+
+void rescaleAimIndicator()
+{
+    Entity aimIndicator = registry.aimIndicators.entities[0];
+    WindowState &ws = registry.windowStates.components[0];
+    Motion &motion = registry.motions.get(aimIndicator);
+    motion.position = {ws.width / 2, ws.height / 2};
 }
 
 Entity createCritter(RenderSystem *renderer, vec2 pos)
@@ -880,6 +898,7 @@ Entity createWall(RenderSystem *renderer, vec2 startPosition, vec2 endPosition)
 
 	return entity;
 }
+
 Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 {
 	auto entity = Entity();
@@ -934,6 +953,14 @@ Entity createWallThickness(vec2 pos, vec2 scale)
 	return entity;
 }
 
+void rescaleWallThickness(Entity entity, vec2 pos, vec2 scale)
+{
+		auto sld = registry.roomSizeScaleds.get(entity);
+		Motion &motion = registry.motions.get(entity);
+		motion.scale = scale + vec2(200, 200 / 1.33);
+		motion.position = pos;
+}
+
 Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 scale, float symbolAngle, vec3 axis, vec3 offset, vec2 spriteOffset)
 {
 	auto entity = Entity();
@@ -975,6 +1002,28 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	anim.animation_countdown_base = 1000;
 	return entity;
 }
+
+void rescaleDoorSymbol(Entity entity, char side)
+{
+    auto sld = registry.roomSizeScaleds.get(entity);
+    Motion &motion = registry.motions.get(entity);
+    Map &map = registry.maps.components[0];
+    WindowState &ws = registry.windowStates.components[0];
+    vec2 position = vec2(ws.width, ws.height) / 2.f;
+    float of = 200.f;
+    if (side == 'T')
+        position += vec2(0, map.currRoom.preset.roomSize.y / 2 + of);
+    if (side == 'R')
+        position += vec2(map.currRoom.preset.roomSize.x / 2 + of, 0);
+    if (side == 'B')
+        position += vec2(0, -map.currRoom.preset.roomSize.y / 2 - of);
+    if (side == 'L')
+        position += vec2(-map.currRoom.preset.roomSize.x / 2 - of, 0);
+    motion.position = position;
+    motion.angle = 0;
+    motion.scale = vec2(120.f, 120);
+}
+
 Entity createDoors(RenderSystem *renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side)
 {
 	auto entity = Entity();
@@ -1027,6 +1076,35 @@ Entity createDoors(RenderSystem *renderer, vec2 position, float angle, vec2 scal
 														EFFECT_ASSET_ID::ROOM_BOUND,
 														GEOMETRY_BUFFER_ID::SPRITE});
 	return entity;
+}
+
+void rescaleDoors (Entity entity, vec2 position, float angle, char side)
+{
+    auto sld = registry.roomSizeScaleds.get(entity);
+    Motion &motion = registry.motions.get(entity);
+    float offsetAmount = -40.f;
+    vec2 offsetPos = vec2(0);
+    if (side == 'T')
+        offsetPos.y = -offsetAmount;
+    if (side == 'R')
+        offsetPos.x = offsetAmount;
+    if (side == 'B')
+        offsetPos.y = offsetAmount;
+    if (side == 'L')
+        offsetPos.x = -offsetAmount;
+    motion.position = position + offsetPos;
+    motion.angle = angle;
+    float angleOffset = 0.66;
+    if (angle == (M_PI / 2) || angle == (M_PI / 2 + M_PI))
+        angleOffset = 1.0f;
+    if (side == 'L' || side == 'R')
+    {
+        motion.scale = vec2(336, 264) * normalize(vec2(3, 0.5555)) * 1.07f;
+    }
+    else
+    {
+        motion.scale = vec2(336, 264) * normalize(vec2(1920, 1080)) * 0.7f;
+    }
 }
 
 void createRoomBounds(RenderSystem *renderer, vec2 roomCenter, vec2 roomSize)

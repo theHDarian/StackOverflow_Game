@@ -65,7 +65,7 @@ Entity createSwarm(RenderSystem* renderer, vec2 pos);
 
 Entity createWall(RenderSystem* renderer, vec2 startPosition, vec2 endPosition);
 
-Entity createDoor(RenderSystem* renderer, vec2 startPos,vec2 endPos);
+Entity createDoor(RenderSystem* renderer = nullptr, vec2 startPos,vec2 endPos);
 
 Entity createDoors(RenderSystem* renderer, vec2 position, float angle, vec2 scale, float doorAngle, vec3 axis, vec3 offset, char side);
 
@@ -108,3 +108,9 @@ Entity createSkipDialogue();
 float getModifiedValue(BulletEffectType bf, float value);
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial);
+
+void rescaleWallThickness(Entity entity, vec2 pos, vec2 scale);
+
+void rescaleDoorSymbol(Entity entity, char side);
+
+void rescaleDoors (Entity entity, vec2 position, float angle, char side)

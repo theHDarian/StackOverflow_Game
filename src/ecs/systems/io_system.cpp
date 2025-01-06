@@ -300,6 +300,8 @@ void AdjustViewport(GLFWwindow* window, int winWidth, int winHeight) {
 	int yOffset = (winHeight - viewHeight) / 2;
 
 	glViewport(xOffset, yOffset, viewWidth, viewHeight);
+
+	glfwSetWindowAspectRatio(window,viewWidth,viewHeight);
 }
 
 
@@ -308,11 +310,15 @@ void IOSystem::ToggleWindowMode() {
 	auto vidMode = glfwGetVideoMode(monitor);
 	WindowState& windowState = registry.windowStates.components[0];
 	IOState& ioState = registry.ioStates.components[0];
+	auto newWidth = vidMode->width;
+	int newHeight = newWidth * (1080.f/1920.f);
+	Entity player = registry.players.entities[0];
+	Entity aimIndicator = registry.aimIndicators.entities[0];
 
 	if (!ioState.isFullscreen) {
 		// Switch to fullscreen mode
 		std:: cout << "Fullscreen: " << vidMode->width << ", " << vidMode->height << std::endl;
-		glfwSetWindowMonitor(window, monitor, 0,0 , windowState.width  , windowState.height, vidMode->refreshRate);
+		glfwSetWindowMonitor(window, monitor, 0,0 , newWidth ,newHeight, vidMode->refreshRate);
 		ioState.isFullscreen = true;
 		ioState.isBorderless = false;
 	} else {
@@ -321,8 +327,9 @@ void IOSystem::ToggleWindowMode() {
 		ioState.isFullscreen = false;
 		ioState.isBorderless = false;
 	}
-	AdjustViewport(window, windowState.width, windowState.height);
-	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
+	AdjustViewport(window, newWidth, newHeight);
+	windowState.width = newWidth;
+	windowState.height = newHeight;
 }
 
 
