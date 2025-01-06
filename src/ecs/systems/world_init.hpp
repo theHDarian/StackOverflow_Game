@@ -13,7 +13,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos);
 
 Entity resetPlayer();
 
-Entity createAimIndicator(RenderSystem* renderer);
+Entity createAimIndicator(RenderSystem* renderer = nullptr);
 
 Entity createCursor();
 

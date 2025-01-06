@@ -1,12 +1,13 @@
 #include "io_system.hpp"
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <iostream>
 
 #include "tiny_ecs_registry.hpp"
+#include "world_init.hpp"
 #if IMGUI_ENABLED
 #include "imgui_impl_glfw.h"
 #endif
-
 
 IOSystem::IOSystem() {
 }
@@ -54,6 +55,11 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 	if  (key == GLFW_KEY_EQUAL && action != GLFW_RELEASE && !gameState.gamePaused) {
 		gameState.currentVolume = std::min(1.0f, gameState.currentVolume + 0.0125f);
 		gameState.previousVolume = gameState.currentVolume;
+	}
+
+	//toggle fullscreen
+	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
+		ToggleWindowMode();
 	}
 
 	// Resetting game
@@ -276,3 +282,47 @@ bool IOSystem::isDialogue()const {
 bool IOSystem::isCutscene()const {
 	return registry.gameStates.components[0].cutScene;
 }
+
+void AdjustViewport(GLFWwindow* window, int winWidth, int winHeight) {
+
+	float aspectRatio = 16.0f / 9.0f;
+	int viewWidth, viewHeight;
+
+	if (winWidth / (float)winHeight > aspectRatio) {
+		viewHeight = winHeight;
+		viewWidth = (int)(winHeight * aspectRatio);
+	} else {
+		viewWidth = winWidth;
+		viewHeight = (int)(winWidth / aspectRatio);
+	}
+
+	int xOffset = (winWidth - viewWidth) / 2;
+	int yOffset = (winHeight - viewHeight) / 2;
+
+	glViewport(xOffset, yOffset, viewWidth, viewHeight);
+}
+
+
+void IOSystem::ToggleWindowMode() {
+	auto monitor = glfwGetPrimaryMonitor();
+	auto vidMode = glfwGetVideoMode(monitor);
+	WindowState& windowState = registry.windowStates.components[0];
+	IOState& ioState = registry.ioStates.components[0];
+
+	if (!ioState.isFullscreen) {
+		// Switch to fullscreen mode
+		std:: cout << "Fullscreen: " << vidMode->width << ", " << vidMode->height << std::endl;
+		glfwSetWindowMonitor(window, monitor, 0,0 , windowState.width  , windowState.height, vidMode->refreshRate);
+		ioState.isFullscreen = true;
+		ioState.isBorderless = false;
+	} else {
+		// Switch to windowed mode
+		glfwSetWindowMonitor(window, nullptr, 100, 100,  windowState.width, windowState.height, 0);
+		ioState.isFullscreen = false;
+		ioState.isBorderless = false;
+	}
+	AdjustViewport(window, windowState.width, windowState.height);
+	glfwSetWindowAspectRatio(window,windowState.width,windowState.height);
+}
+
+

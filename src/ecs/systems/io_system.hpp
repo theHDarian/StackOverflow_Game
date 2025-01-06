@@ -19,10 +19,15 @@ public:
     bool isGameOver()const;
     bool isDialogue()const;
     bool isCutscene()const;
+
+    void ToggleWindowMode();
+
     bool isTitle()const;
+
 
 private:
 	GLFWwindow* window;
+
     void onKey(int key, int, int action, int mod);
 
     void mouseClick(int button, int action, int mods);
