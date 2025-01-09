@@ -1427,16 +1427,63 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDire
     }},
 };
 
+const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory = {
+    {DifficultyRegion::Intro,{
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens, HifiRoomBasicWave, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane },{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::RestRoom, {{},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
+        {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
+    }},
+    {DifficultyRegion::Easy,{
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomJellyFish, HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids, HifiRoomSmall, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomSniper, TreasureRoom5}}},
+    }},
+    {DifficultyRegion::Medium,{
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomSmallBallLauncher,HifiRoomSmall, },{EnemyRoomLaserFiesta}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{}}},
+        {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomSniper, TreasureRoom5}}},
+    }},
+};
+
+const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDirectory = {
+    {DifficultyRegion::Intro,{
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens, HifiRoomBasicWave, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane },{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::RestRoom, {{},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
+        {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
+    }},
+    {DifficultyRegion::Easy,{
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomJellyFish, HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids, HifiRoomSmall, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt},{TreasureRoomSniper, TreasureRoom5}}},
+    }},
+    {DifficultyRegion::Medium,{
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomSmallBallLauncher,HifiRoomSmall, },{EnemyRoomLaserFiesta}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{}}},
+        {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
+        {RoomType::TreasureRoom, {{TreasureRoom1,TreasureRoom2,TreasureRoom3,TreasureRoomBlunt, TreasureRoom4, TreasureRoomKey, TreasureRoomKeys},{TreasureRoomSniper, TreasureRoom5}}},
+    }},
+};
+
 inline std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> getDirectory(MapRegion region) {
-    if (region == Biology || region == Tutorial) {
-        return bioRoomDirectory;
-    } else if (region == Physics) {
-        return physicsRoomDirectory;
-    }
-    else {
-        return bioRoomDirectory;
-    }
-    return bioRoomDirectory;
+   switch ( region ) {
+       case MapRegion::Tutorial:
+           return bioRoomDirectory;
+       case MapRegion::Biology:
+           return bioRoomDirectory;
+       case MapRegion::Physics:
+           return physicsRoomDirectory;
+       case MapRegion::Mining:
+           return MiningRoomDirectory;
+       case MapRegion::Medical:
+           return MedicalRoomDirectory;
+       default:
+           return bioRoomDirectory;
+   }
 }
 
 inline bool hasLocked(RoomType type, int roomsTraversed) {
@@ -1636,8 +1683,6 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
 bool operator>=(DifficultyRegion lhs, DifficultyRegion rhs) {
     return static_cast<int>(lhs) >= static_cast<int>(rhs);
 }
-
-
 
 const std::map<RoomType,int> roomTypeToSymbols = {
     {RoomType::EnemyRoom,3},

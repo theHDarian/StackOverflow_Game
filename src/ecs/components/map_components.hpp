@@ -112,8 +112,10 @@ enum MapRequestType {
 enum MapRegion {
     Tutorial = 0,
     Biology = 1,
-    Physics = 2,
-    Final = 3
+    Mining = 2,
+    Physics = 3,
+    Medical = 4,
+    Final = 5
 };
 
 struct MapRequest {
