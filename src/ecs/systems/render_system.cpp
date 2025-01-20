@@ -302,7 +302,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 				}
             }
 
-			if (registry.elites.has(entity) || should_glitch) {
+			if (registry.elites.has(entity) || should_glitch || registry.invincibles.has(entity)) {
 				glUniform1i(glitchToggle_uloc, true);
 			} else {
                 glUniform1i(glitchToggle_uloc, false);

@@ -396,6 +396,12 @@ struct AttackData {
     std::vector<vec2> spawnPosition = {};
 };
 
+enum class SpecialStates {
+    NORMAL,
+    INVISIBLE,
+    INVINCIBLE
+};
+
 enum class EnemyBehavior {
     // this is the basic
     RANDOM,
@@ -452,6 +458,8 @@ enum class ReactionType {
 struct Reaction {
     ReactionType React;
     int index;
+    //trigger effect when reaction is met
+    SpecialStates specialState = SpecialStates::NORMAL;
 };
 
 struct InvisibleEnemy {
@@ -493,6 +501,9 @@ struct EnemyPattern {
     float currAtkCD;
     float maxAtkCD;
     AttackData atkData;
+
+    //special states, for if the enemy has some special attributes like being invisible or invincible
+    SpecialStates specialState = SpecialStates::NORMAL;
 };
 struct Boid {
     vec2 velocity;

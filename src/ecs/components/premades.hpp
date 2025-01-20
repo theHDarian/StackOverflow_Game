@@ -401,6 +401,13 @@ const BulletStackEffect Freedom = {
 	"\"Freedom\"",
 	""};
 
+const BulletStackEffect serum = {
+	ProjectileSize,
+	Additive,
+	2,
+	"Unknown Serum",
+	""};
+
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
@@ -1347,7 +1354,8 @@ struct BeeHive : Enemy
 		0};
 	Reaction halfHP{
 		ReactionType::TWENTYFIVE_HEALTH,
-		2};
+		2,
+		};
 	Reaction finalIdle{
 
 		ReactionType::DURATION,
@@ -1880,6 +1888,35 @@ struct EnemyTestPatrol : Enemy
 		rotatePower = 0.f;
 	}
 };
+//----------------------------------------- MEDICAL REGION ENEMIES ---------------------------------
+
+
+struct MedBoid : Enemy
+{
+
+	Reaction boid{
+		ReactionType::DURATION,
+		0};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+	MedBoid()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {boidState};
+		sprite = {
+			"Syringe.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({25.f, 25.f});
+		patternIndex = 0;
+		collisionBullet = serum;
+	}
+};
+
+
+
+
 
 //----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------
 struct TwinLaserVertical1 : Enemy
@@ -3012,7 +3049,8 @@ struct ScientistBossEnemy : Enemy
 
 	Reaction secondPhase{
 		ReactionType::FIFTY_HEALTH,
-		9};
+		9,
+	SpecialStates::INVINCIBLE};
 
 	Reaction secondPhasePlayerClose{
 		ReactionType::PLAYER_CLOSE,

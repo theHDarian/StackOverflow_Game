@@ -31,6 +31,57 @@ vec2 boundPosition(vec2 position, Entity entity)
 	return glm::clamp(position, min, max);
 }
 
+void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
+{
+
+	switch (currPattern.specialState) {
+		case SpecialStates::INVINCIBLE:
+			if (!registry.invincibles.has(entity)) {
+				auto inv = registry.invincibles.emplace(entity);
+
+					inv.countdown = currPattern.maxDuration;
+
+				std::cout << "invincible: " << inv.countdown << std::endl;
+			}
+		std::cout << "invincible"<< std::endl;
+		break;
+		case SpecialStates::INVISIBLE:
+			if (!registry.invisibles.has(entity)) {
+				auto inv = registry.invisibles.emplace(entity);
+
+					inv.countdown = registry.bosses.has( entity ) ? 30000 : Random::Float( 10000 ) + 3000;
+
+				std::cout << "invisible: " << inv.countdown << std::endl;
+			}
+		break;
+		default: break;
+	}
+}
+
+void handleSpecialStates (Reaction reaction, Entity entity)
+{
+	switch (reaction.specialState) {
+		case SpecialStates::INVINCIBLE:
+			if (!registry.invincibles.has(entity)) {
+				auto& inv = registry.invincibles.emplace(entity);
+				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 2500.f) : Random::Float( 10000 ) + 3000;
+				inv.countdown = inv.max;
+			} else {
+                // registry.invincibles.get(entity).countdown = registry.invincibles.get(entity).max;
+				auto inv = registry.invincibles.get(entity);
+            }
+
+		break;
+		case SpecialStates::INVISIBLE:
+			if (!registry.invisibles.has(entity)) {
+				auto inv = registry.invisibles.emplace(entity);
+				inv.countdown = registry.bosses.has( entity ) ? 30000 : Random::Float( 10000 ) + 3000;
+			}
+		break;
+		default: break;
+	}
+}
+
 void AISystem::step(float elapsed_ms)
 {
 	auto &movement_registry = registry.enemyMovement;
@@ -51,6 +102,8 @@ void AISystem::step(float elapsed_ms)
 		updateState(enemy, movement, entity);
 		// std::cout << enemy.newPattern << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
+
+		handleSpecialStates( currPattern, entity );
 		if (registry.boids.has(entity))
 		{
 			Boid &boid = registry.boids.get(entity);
@@ -260,6 +313,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
+			handleSpecialStates( *reaction, entity);
 		}
 	}
 	if (distance < closeDistance && reaction_found == false)
@@ -271,6 +325,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
+			handleSpecialStates( *reaction, entity);
 		}
 	}
 	else if (hpPercent < 0.75f)
@@ -281,6 +336,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
+			handleSpecialStates( *reaction, entity);
 		}
 		// PLAYER BULLET CLOSE TO BE IMPELMENTED..
 		// DEFAULT STATE (CHANGE BY DURATION)
