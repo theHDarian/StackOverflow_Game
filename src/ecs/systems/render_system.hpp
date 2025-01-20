@@ -91,11 +91,14 @@ public:
 	void drawDialogueUI();
 	void drawBackgroundElements();
 	void drawRoomBound(Entity entity, const mat4& projection, const mat4& view);
+	void drawDash(Entity entity, const mat4& projection, const mat4& view);
 	void drawToScreenExtra(EFFECT_ASSET_ID effect);
 	void drawToScreenFinal();
 	void step(float elapsed_ms);
 
 	void drawCursor();
+
+	void effectToDrawCall(Entity entity, const mat4& projection, const mat4& view, bool isUI);
 
 	mat3 createProjectionMatrix();
 
@@ -104,7 +107,8 @@ public:
 
 private:
 	// Internal drawing functions for each entity type
-	void drawTexturedMesh(Entity entity, const mat4& projection, const mat4& view, bool isUI);
+	void drawTextured(Entity entity, const mat4& projection, const mat4& view, bool isUI);
+	void drawAnimate(Entity entity, const mat4& projection, const mat4& view, bool isUI);
 	void drawMesh(Entity entity, const mat4& projection, const mat4& view);
 	void drawBullet(Entity entity, const mat4& projection, const mat4& view);
 	void drawDashes(const mat4& projection, const mat4& view);
