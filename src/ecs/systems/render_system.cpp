@@ -241,10 +241,6 @@ void RenderSystem::drawTextured(Entity entity,
 
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float*)&color);
-
-
 
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
@@ -305,6 +301,9 @@ void RenderSystem::drawTextured(Entity entity,
 		glUniform3fv(border_color_uloc, 1, (float*)&uiBorder.borderColour);
 		glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	}
+
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
 
 	mat4 transform = glm::mat4(1.0);
 	if (!isUI)
