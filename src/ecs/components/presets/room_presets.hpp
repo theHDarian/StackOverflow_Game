@@ -865,6 +865,18 @@ const RoomPreset BossRoomBee{
 
 };
 
+
+const RoomPreset BossRoomCrab{
+    {{{BossCrab, {0.5f, 0.5f}}, {EnemyType::EnemyMedicalBoid,{0.5f, 0.75f}}}},
+    {},
+    {{{Ram,{}}, {0.5f, 0.5f}}},
+    0.0f,
+    20,
+    5,
+    "\"Crustacean\"",
+
+};
+
 const RoomPreset HifiRoomTwinLaserShurikens {
         {
             {

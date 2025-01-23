@@ -44,7 +44,9 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             }
             registry.spawnings.emplace(enemy);
             if (isElite) {
-                registry.elites.emplace(enemy);
+                auto& elt = registry.elites.emplace(enemy);
+                int randomlvl = Random::Int((registry.maps.components[0].currRegion) * 1.5) + 1;
+                elt.eliteLevel = randomlvl > 9 ? randomlvl : 9;
             }
         }
     }
@@ -507,13 +509,16 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         }
         else {
             if (map.currRegion == Biology) {
-                map.currRoom.preset = BossRoomBee;
+                map.currRoom.preset = BossRoomCrab;
             }
             else {
                 map.currRoom.preset = ScientistBossRoom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
+            // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+            // req2.type = InteractableRequestType::AddEffect;
+            // req2.effects = {numBulletsUpA, numBulletsUpA};
         }
         map.directory = getDirectory(map.currRegion);
         std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);

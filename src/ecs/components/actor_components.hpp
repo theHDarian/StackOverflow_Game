@@ -345,6 +345,9 @@ enum EnemyType {
     ScientistBoss,
     ScientistHand,
     EnemyHifiBoidFish,
+    BossCrab,
+    BossCrabLaser,
+    EnemyMedicalBoid,
 };
 
 enum class EnemyAttackPattern {
@@ -503,6 +506,7 @@ struct EnemyPattern {
     AttackData atkData;
 
     //special states, for if the enemy has some special attributes like being invisible or invincible
+    //the state will last for the duration of the current pattern
     SpecialStates specialState = SpecialStates::NORMAL;
 };
 struct Boid {

@@ -1529,6 +1529,32 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		registry.hand.emplace(entity);
 		break;
 	}
+	case BossCrab:
+    {
+        enemy = BossChimeraCrab();
+        auto &boss = registry.bosses.emplace(entity);
+        boss.name = "Chimeric Crab";
+        break;
+    }
+	case BossCrabLaser :
+	{
+		enemy = chimeraCrabSniper();
+		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
+		BossParts& bp = registry.bossParts.emplace(entity);
+		break;
+	}
+	case EnemyMedicalBoid :
+    {
+        enemy = MedBoid();
+        Boid &boid = registry.boids.emplace(entity);
+        boid.position = pos;
+        float randomX = getRandomFloat(-150.f, 150.f);
+        float randomY = getRandomFloat(-150.f, 150.f);
+        boid.velocity = vec2(randomX, randomY);
+        boid.maxSpeed = 500.f;
+        break;
+    }
+
 		default:
 			assert(false);
 	};

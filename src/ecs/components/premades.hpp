@@ -1128,6 +1128,191 @@ struct EvilCrab : Enemy
 	};
 };
 
+struct BossChimeraCrab : Enemy {
+	const AttackData crabLaser{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{APRounds},
+		dashCDRDownA,
+		1,
+		0,
+		{20, 20},
+		0,
+		10000000,
+		{4, 0},
+		0,
+		0,
+		0};
+
+	const AttackData radialSquare{
+		EnemyAttackPattern::RADIAL_POLYGON,
+		CIRCLE,
+		{sizeUpA},
+		sluggish,
+		5,
+		M_PI / 4,
+		{20, 20},
+		150,
+		30000,
+		{0, 0},
+		0,
+		2,
+		0};
+
+	const AttackData radialSquarephase2{
+		EnemyAttackPattern::RADIAL_POLYGON,
+		CIRCLE,
+		{sizeUpA},
+		spreadUpA,
+		5,
+		M_PI / 4,
+		{20, 20},
+		150,
+		15000,
+		{0, 0},
+		0,
+		1,
+		0};
+
+	const AttackData twoPincerShot{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{hardShell},
+		blunt,
+		2,
+		M_PI / 1.5,
+		{40, 40},
+		500,
+		1700,
+		{600, -2 * M_PI / 3.0},
+		0,
+		2,
+		0};
+
+	std::vector<EnemyType> crabs = {EnemyType::EnemyCrab, EnemyType::EnemyEvilCrab, EnemyType::EnemyLaserCrab};
+
+	const AttackData crabSummon{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{numBulletsUpA},
+		playerSpeedDownA,
+		Random::Int(3),
+		M_PI,
+		{20, 20},
+		600,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		Random::ListItem(crabs),
+		{}};
+	const AttackData laserSummon{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{numBulletsUpA},
+		playerSpeedDownA,
+		1,
+		M_PI,
+		{20, 20},
+		600,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		BossCrabLaser,
+		{}};
+	const AttackData laserRotate{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{APRounds},
+		dashCDRDownA,
+		3,
+		0,
+		{0, 20},
+		0,
+		8000,
+		{1.2, M_PI / 300},
+		0,
+		0,
+		0};
+
+	std::vector<AttackData> phase2Normals = {twoPincerShot, radialSquare, crabLaser};
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		1};
+	Reaction threeQuertershp = {
+        ReactionType::SEVENTYFIVE_HEALTH,
+        4,
+        };
+	Reaction halfhp = {
+		ReactionType::FIFTY_HEALTH,
+		9,
+		SpecialStates::INVINCIBLE};
+	Reaction playerClose = {
+        ReactionType::PLAYER_CLOSE,
+        5};
+
+	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration,halfhp, threeQuertershp}, 1, false, 0.f, 0.f, crabSummon, SpecialStates::INVINCIBLE};
+	EnemyPattern idleState = {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration,halfhp, threeQuertershp}, 2, true, 0.f, 1000.f, radialSquare};
+	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration,halfhp, threeQuertershp}, 3, false, 0.f, 0.f, twoPincerShot};
+	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, halfhp, threeQuertershp}, 0, true, 0.f, 300.f, missile};
+	EnemyPattern laserState = {"LASER", EnemyBehavior::PATROLLING, {{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()},{Random::Float(), Random::Float()},}, 0, 10000.f, 10000.f, {duration, halfhp}, 7, true, 0.f, 100.f, laserRotate};
+
+
+	EnemyPattern HalfHPSummon = {"RANDOM POSITION", EnemyBehavior::IDLE, {}, 0, 500.f, 500.f, {duration}, 7, true, 0.f, 15000.f, laserSummon, };
+
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RETREAT, {}, 0, 2000.f, 2000.f, {duration,}, 6, true, 0.f, 75.f,  wave};
+	EnemyPattern randomStateHalfHP = {"RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration,playerClose}, 7, true, 0.f, 15000.f, crabSummon, SpecialStates::INVINCIBLE};
+	EnemyPattern walkingRageHalfhp = {"WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration,playerClose}, 8, true, 0.f, 100.f, twoPincerShot, SpecialStates::INVINCIBLE};
+	EnemyPattern randomlaserState = {"PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 2000.f, 2000.f, {duration,playerClose}, 6, true, 0.f, 200.f, radialSquarephase2};
+	BossChimeraCrab()
+	{
+		maxHealth = 650;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState, idleState, walkingRage, shootMisile, laserState,  RetreatAndShoot, randomStateHalfHP, walkingRageHalfhp, randomlaserState, HalfHPSummon};
+		patternIndex = 0;
+		sprite = {
+			"chimera_crab_boss",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			4,
+			150};
+		scale = vec2({336.0f , 240.f });
+		rotatePower = 0.8f;
+		speedMultiplier = 2.5f;
+	};
+};
+
+struct chimeraCrabSniper : Enemy
+{
+	EnemyPattern randomState = {"Follow", EnemyBehavior::FOLLOW_PLAYER, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 150.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
+	EnemyPattern charging = {"Charge", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
+
+	chimeraCrabSniper()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = {randomState};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_007.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE};
+		scale = vec2({160.0f / 2, 160.f / 2});
+		rotatePower = 90.0f;
+		speedMultiplier = 1.3;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+	};
+};
+
 struct BigC : Enemy
 {
 

@@ -37,19 +37,17 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 	switch (currPattern.specialState) {
 		case SpecialStates::INVINCIBLE:
 			if (!registry.invincibles.has(entity)) {
-				auto inv = registry.invincibles.emplace(entity);
+				auto& inv = registry.invincibles.emplace(entity);
 
 					inv.countdown = currPattern.maxDuration;
 
-				std::cout << "invincible: " << inv.countdown << std::endl;
 			}
-		std::cout << "invincible"<< std::endl;
 		break;
 		case SpecialStates::INVISIBLE:
 			if (!registry.invisibles.has(entity)) {
-				auto inv = registry.invisibles.emplace(entity);
+				auto& inv = registry.invisibles.emplace(entity);
 
-					inv.countdown = registry.bosses.has( entity ) ? 30000 : Random::Float( 10000 ) + 3000;
+				inv.countdown = currPattern.maxDuration;
 
 				std::cout << "invisible: " << inv.countdown << std::endl;
 			}
