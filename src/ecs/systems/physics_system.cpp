@@ -88,6 +88,10 @@ void PhysicsSystem::step(float elapsed_ms)
 				{
 					motion.angle = start.angle;
 				}
+				else if (enemy.rotationBehaviour == EnemyRotationBehavior::LASER_CONTROL)
+				{
+					motion.angle = start.angle + laser.rotation;
+				}
 				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
 					motion.angle = laser.rotation * motion.angle + (1.f - laser.rotation) * start.angle;
 				}

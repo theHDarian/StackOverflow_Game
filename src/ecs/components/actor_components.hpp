@@ -440,7 +440,8 @@ enum class EnemyRotationBehavior {
     FACE_CENTER,
     FACE_PLAYER,
     FACE_TWIN,
-    SPIN
+    SPIN,
+    LASER_CONTROL
 };
 
 

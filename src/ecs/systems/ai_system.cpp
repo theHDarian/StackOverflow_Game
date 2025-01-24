@@ -172,6 +172,9 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	float closeToBeeDistance = 100.f;
 	bool closeToBee = false;
 
+	//std::cout << currPattern.name << std::endl;
+
+
 	if (registry.bees.has(entity))
 	{
 		if (registry.bees.get(entity).nearbyBees.size() == 0)
@@ -244,7 +247,6 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			}
 		}
 	}
-
 	if (registry.hand.has(entity))
 	{
 		EnemyPattern &pattern = enemy.currEnemyPattern();
@@ -275,7 +277,6 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			registry.animations.get(entity).frame = -1;
 		}
 	}
-
 	if (registry.healers.has(entity))
 	{
 		reaction_found = updateHealerState(enemy, entity);
@@ -292,34 +293,11 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			reaction_found = true;
 		}
 	}
-	// else if (closeToBee)
-	// {
-
-	// 	auto reaction = getReactions(currPattern.reactions, ReactionType::BEE_CLOSE);
-	// 	if (reaction)
-	// 	{
-	// 		enemy.patternIndex = reaction->index;
-	// 		reaction_found = true;
-	// 		std::cout << "bee close!" << enemy.currEnemyPattern().name << std::endl;
-	// 	}
-	// }
 	else if (hpPercent < 0.5f)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FIFTY_HEALTH);
 		if (reaction)
 		{
-			enemy.patternIndex = reaction->index;
-			enemy.newPattern = true;
-			reaction_found = true;
-			handleSpecialStates( *reaction, entity);
-		}
-	}
-	if (distance < closeDistance && reaction_found == false)
-	{
-		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
-		if (reaction)
-		{
-			// std::cout << "got reaction for follow player" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
@@ -334,10 +312,39 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
-			handleSpecialStates( *reaction, entity);
+			handleSpecialStates(*reaction, entity);
 		}
 		// PLAYER BULLET CLOSE TO BE IMPELMENTED..
 		// DEFAULT STATE (CHANGE BY DURATION)
+	}
+	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::FINISH_PATROL) && currPattern.pathIndex == currPattern.path.size() - 1) {
+		auto reaction = getReactions(currPattern.reactions, ReactionType::FINISH_PATROL);
+
+		vec2 patrolFactor = currPattern.path[currPattern.path.size() - 1];
+		vec4 roomBounds = getRoomBounds(entity);
+		vec2 min = { roomBounds.x, roomBounds.y };
+		vec2 max = { roomBounds.z, roomBounds.w };
+		
+		vec2 endPoint = glm::lerp(min, max, patrolFactor);
+
+		if (glm::distance(EnemyPos, endPoint) < 0.001) {
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+	if (!reaction_found && distance < closeDistance)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
+		if (reaction)
+		{
+			// std::cout << "got reaction for follow player" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates( *reaction, entity);
+		}
 	}
 	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::DURATION))
 	{

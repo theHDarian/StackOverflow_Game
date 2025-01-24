@@ -1905,6 +1905,9 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	laser.length = 0;
 	laser.growth = atkData.veer.x;
 	laser.rotation = atkData.veer.y;
+	if (registry.enemies.get(start).rotationBehaviour == EnemyRotationBehavior::LASER_CONTROL) {
+		laser.rotation = angle;
+	}
 
 	ParticleProps props = enemyBulletDeathParticle;
 	props.lifetime = 200.f;
