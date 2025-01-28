@@ -1598,7 +1598,7 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
 
 inline std::vector<RoomType> getRandomRoomTypes(bool excludeNone, int roomsTraversed)
 {
-    const int bossRoomNum = 2;
+    const int bossRoomNum = 12;
     if (roomsTraversed % bossRoomNum == bossRoomNum - 1) {
         return { RoomType::BossRoom,RoomType::BossRoom ,RoomType::BossRoom ,RoomType::BossRoom };
     }
