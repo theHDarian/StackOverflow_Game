@@ -867,13 +867,15 @@ const RoomPreset BossRoomBee{
 
 
 const RoomPreset BossRoomCrab{
-    {{{BossCrab, {0.5f, 0.5f}}, {EnemyType::EnemyMedicalBoid,{0.5f, 0.75f}}}},
+    {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{Random::Float(), Random::Float()}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,
     20,
     5,
-    "\"Crustacean\"",
+    "Carcinisation",
+    false,
+    {3000, 3000}
 
 };
 
@@ -1596,7 +1598,7 @@ inline RoomType getRandomRoomType(bool excludeNone, int roomsTraversed)
 
 inline std::vector<RoomType> getRandomRoomTypes(bool excludeNone, int roomsTraversed)
 {
-    const int bossRoomNum = 12;
+    const int bossRoomNum = 2;
     if (roomsTraversed % bossRoomNum == bossRoomNum - 1) {
         return { RoomType::BossRoom,RoomType::BossRoom ,RoomType::BossRoom ,RoomType::BossRoom };
     }
@@ -1631,7 +1633,8 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     Map& map = registry.maps.components[0];
     //boss rooms
     if (type == RoomType::BossRoom && currRegion == MapRegion::Biology) {
-        return BossRoomBee;
+        std::vector<RoomPreset> biobosses = {BossRoomBee, BossRoomCrab};
+        return Random::ListItem(biobosses);
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
         return ScientistBossRoom; //TODO change to physics boss
     }

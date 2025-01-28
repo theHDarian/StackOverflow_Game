@@ -1182,11 +1182,11 @@ struct BossChimeraCrab : Enemy {
 		5,
 		M_PI / 4,
 		{20, 20},
-		150,
+		250,
 		15000,
 		{0, 0},
 		0,
-		1,
+		12,
 		0};
 
 	const AttackData twoPincerShot{
@@ -1198,10 +1198,10 @@ struct BossChimeraCrab : Enemy {
 		M_PI / 1.5,
 		{30, 30},
 		500,
-		1700,
+		4700,
 		{600, -2 * M_PI / 3.0},
 		0,
-		2,
+		1,
 		0};
 
 	std::vector<EnemyType> crabs = {EnemyType::EnemyCrab, EnemyType::EnemyEvilCrab, EnemyType::EnemyLaserCrab};
@@ -1255,6 +1255,22 @@ struct BossChimeraCrab : Enemy {
 		0,
 		0};
 
+	const AttackData missile{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{spreadUpA, sizeUpA},
+		dmgDownA,
+		2,
+		 M_PI / 1.5,
+		{50, 30},
+		350,
+		10000,
+		{0, 0},
+		0,
+		0,
+		0.015,
+		EnemyBulletDeath::EXPLODE};
+
 	std::vector<AttackData> phase2Normals = {twoPincerShot, radialSquare, crabLaser};
 
 	Reaction duration = {
@@ -1271,15 +1287,15 @@ struct BossChimeraCrab : Enemy {
 	EnemyPattern randomState = {"RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration,halfhp}, 1, false, 0.f, 0.f, crabSummon, SpecialStates::INVINCIBLE};
 	EnemyPattern idleState = {"IDLE SHOOTING", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration,halfhp}, 2, true, 0.f, 1000.f, radialSquare};
 	EnemyPattern walkingRage = {"WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration,halfhp}, 3, false, 0.f, 0.f, twoPincerShot};
-	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, halfhp}, 0, true, 0.f, 300.f, missile};
+	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, halfhp}, 0, true, 0.f, 500.f, missile};
 
 	EnemyPattern HalfHPRepostion = { "RANDOM POSITION", EnemyBehavior::PATROLLING, {{0.5, 0.5},{0.5, 0.5}}, 0, 1000.f, 1000.f, {repositioned}, 5, true, 0.f, 500.f, radialSquare, SpecialStates::INVINCIBLE };
-	EnemyPattern HalfHPLaser = { "RANDOM POSITION", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {duration}, 6, true, 0.f, 15000.f, broadsideLasers, SpecialStates::INVINCIBLE };
+	EnemyPattern HalfHPLaser = { "Laser Spin", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 25000.f, 25000.f, {duration}, 6, true, 0.f, 5000.f, broadsideLasers, SpecialStates::INVINCIBLE };
 
 	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RETREAT, {}, 0, 2000.f, 2000.f, {duration,}, 7, true, 0.f, 75.f,  wave};
 	EnemyPattern randomStateHalfHP = {"RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration}, 8, true, 0.f, 15000.f, crabSummon, SpecialStates::INVINCIBLE};
 	EnemyPattern walkingRageHalfhp = {"WALKING RAGE", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration}, 9, true, 0.f, 100.f, twoPincerShot};
-	EnemyPattern randomlaserState = {"PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 2000.f, 2000.f, {duration}, 6, true, 0.f, 200.f, radialSquarephase2};
+	EnemyPattern randomlaserState = {"PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 2000.f, 2000.f, {duration}, 6, true, 0.f, 120.f, radialSquarephase2};
 
 	BossChimeraCrab()
 	{
