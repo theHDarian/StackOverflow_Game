@@ -1128,6 +1128,7 @@ struct EvilCrab : Enemy
 	};
 };
 
+
 struct BossChimeraCrab : Enemy {
 	const AttackData crabLaser{
 		EnemyAttackPattern::LASER,
@@ -1995,6 +1996,11 @@ struct Sword : Enemy
 	}
 };
 
+struct Mage : Enemy
+{
+
+};
+
 struct HealerAngel : Enemy
 {
 
@@ -2110,6 +2116,184 @@ struct MedBoid : Enemy
 		patternIndex = 0;
 		collisionBullet = serum;
 	}
+};
+
+//----------------------------------------- MINING REGION ENEMIES ---------------------------------
+
+struct SmallBoulder : Enemy
+{
+	/**
+	 *
+	 */
+	const BulletStackEffect playerSpeedDownASmall = {
+		PlayerSpeed,
+		Additive,
+		-30,
+		"Movement Speed Down Small (+)",
+		""};
+
+	const AttackData launch{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{bulletBounceUpA},
+		buzz,
+		8,
+		M_PI / 8.f,
+		{5, 5},
+		200,
+		2000,
+		{0, 0},
+		0,
+		2,
+		0};
+
+	EnemyPattern IdleState = {
+		"Follow Player",
+		EnemyBehavior::IDLE,
+		{},
+		0,
+		500.f,
+		500.f,
+		{
+				{ReactionType::DURATION, 1},
+			},
+			1,
+			true,
+			0.f,
+			0.f,
+			NoAttack};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::CHARGING,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		0.f,
+		200.f,
+		launch};
+
+	SmallBoulder()
+	{
+		maxHealth = 140;
+		currHealth = maxHealth;
+
+		enemyPatterns = {IdleState, shootingState};
+		rotationBehaviour = EnemyRotationBehavior::REGULAR;
+
+		patternIndex = 0;
+		sprite = {
+			"SmallBoulder.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.4f;
+		speedMultiplier = 0;
+		rotatePower = 2;
+	};
+};
+
+struct BigBoulder : Enemy
+{
+	/**
+	 *
+	 */
+	const BulletStackEffect playerSpeedDownABig = {
+		PlayerSpeed,
+		Additive,
+		-60,
+		"Movement Speed Down Big (+)",
+		""};
+
+	const AttackData launch{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{bulletBounceUpA},
+		buzz,
+		8,
+		M_PI / 8.f,
+		{5, 5},
+		200,
+		2000,
+		{0, 0},
+		0,
+		2,
+		0};
+
+	const Reaction PlayerClose = {
+		ReactionType::PLAYER_CLOSE,
+		2};
+
+	EnemyPattern teleport = {
+		"Follow Player",
+		EnemyBehavior::TELEPORT,
+		{{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}},
+		0,
+		500.f,
+		500.f,
+		{
+				{ReactionType::DURATION, 1},
+			},
+			0,
+			true,
+			0.f,
+			0.f,
+			NoAttack};
+
+	EnemyPattern IdleState = {
+		"Follow Player",
+		EnemyBehavior::IDLE,
+		{{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}},
+		0,
+		2500.f,
+		5000.f,
+		{
+					{ReactionType::DURATION,  1},
+					PlayerClose
+				},
+				1,
+				true,
+				100.f,
+				1500.f,
+				fourAllAround};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::CHARGING,
+		{},
+		0,
+		1000.f,
+		1000.f,
+		{{ReactionType::DURATION, 0}},
+		0,
+		true,
+		0.f,
+		200.f,
+		launch};
+
+	BigBoulder()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = {IdleState,teleport, shootingState};
+		rotationBehaviour = EnemyRotationBehavior::REGULAR;
+
+		patternIndex = 0;
+		sprite = {
+			"BigBoulder.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2(240, 240) * 0.65f;
+		speedMultiplier = 0;
+		rotatePower = 2;
+
+	};
 };
 
 

@@ -1555,6 +1555,17 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
         break;
     }
 
+	case EnemyMiningBoulderSmall:
+		{
+			enemy = SmallBoulder();
+			break;
+		}
+	case EnemyMiningBoulderBig:
+		{
+			enemy = BigBoulder();
+			break;
+		}
+
 		default:
 			assert(false);
 	};

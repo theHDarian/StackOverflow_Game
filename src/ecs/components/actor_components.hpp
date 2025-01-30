@@ -314,6 +314,7 @@ enum EnemyType {
     EnemyEvilSkull,
     EnemyHifiBoid,
     EnemySword,
+    EnemyMage,
     EnemyHealer,
     EnemyBioBoid,
     ScientistlaserAttack,
@@ -348,6 +349,8 @@ enum EnemyType {
     BossCrab,
     BossCrabLaser,
     EnemyMedicalBoid,
+    EnemyMiningBoulderSmall,
+    EnemyMiningBoulderBig,
 };
 
 enum class EnemyAttackPattern {
