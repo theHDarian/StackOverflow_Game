@@ -526,6 +526,21 @@ const AttackData wave{
 	0,
 	0};
 
+const AttackData HomingWave{
+	EnemyAttackPattern::WAVE,
+	CIRCLE,
+	{numBulletsUpA, dmgDownA},
+	blunt,
+	5,
+	0,
+	{20, 20},
+	200,
+	3000,
+	{0, 0},
+	0,
+	0,
+	.02};
+
 const AttackData laserNoRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
@@ -1998,7 +2013,160 @@ struct Sword : Enemy
 
 struct Mage : Enemy
 {
+	const BulletStackEffect playerSpeedDownABig = {
+		PlayerSpeed,
+		Additive,
+		-60,
+		"Movement Speed Down Big (+)",
+		""};
 
+	const AttackData launch{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{bulletBounceUpA},
+		buzz,
+		8,
+		M_PI / 8.f,
+		{5, 5},
+		200,
+		2000,
+		{0, 0},
+		0,
+		2,
+		0};
+
+	const AttackData wave{
+		EnemyAttackPattern::WAVE,
+		TRIANGLE,
+		{ dmgUpA},
+		buzz,
+		5,
+		0,
+		{20, 20},
+		600,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0.1};
+
+	const AttackData snailTrail{
+		EnemyAttackPattern::TRAIL,
+		CIRCLE,
+		{},
+		buzz,
+		1,
+		0,
+		{20, 20},
+		0,
+		8000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER};
+
+	const AttackData sniperShot{
+		EnemyAttackPattern::BURST,
+		TRIANGLE,
+		{dmgUpM, bulletRangeUpM},
+		APRounds,
+		3,
+		0,
+		{30, 20},
+		600,
+		10000,
+		{100, 0},
+		0,
+		2,
+		0};
+
+	const Reaction AllyHurt = {
+        ReactionType::TEAM_HURT,
+        3};
+
+	const Reaction PlayerBullet = {
+		ReactionType::PLAYER_BULLET_CLOSE,
+		1};
+
+	const Reaction PlayerClose = {
+		ReactionType::PLAYER_CLOSE,
+		1};
+
+
+
+	EnemyPattern teleport = {
+		"Follow Player",
+		EnemyBehavior::TELEPORT,
+		{},
+		0,
+		500.f,
+		500.f,
+		{
+					{ReactionType::DURATION, 1},
+				},
+				0,
+				true,
+				0.f,
+				0.f,
+				NoAttack};
+
+	EnemyPattern IdleState = {
+		"Follow Player",
+		EnemyBehavior::PATROLLING,
+		{{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}},
+		0,
+		15000.f,
+		15000.f,
+		{
+						{ReactionType::DURATION,  1},
+						PlayerClose,
+			PlayerBullet,
+			AllyHurt
+					},
+					2,
+					true,
+					0.f,
+					1500.f,
+					sniperShot};
+
+	EnemyPattern shootingState = {
+		"ROTATE",
+		EnemyBehavior::RANDOM_FAR,
+		{},
+		0,
+		1200.f,
+		1200.f,
+		{{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet, AllyHurt},
+		0,
+		true,
+		0.f,
+		400.f,
+		twelveSpiralShot};
+
+	EnemyPattern healState = {"HEAL", EnemyBehavior::HEALING, {}, 0, 10000.f, 10000.f, {{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RETREAT, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 75.f,  wave};
+
+
+	Mage()
+	{
+		maxHealth = 150;
+		currHealth = maxHealth;
+		enemyPatterns = {IdleState, teleport, shootingState, healState, RetreatAndShoot};
+		sprite = {
+			"mage",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			4,
+			200};
+		patternIndex = 0;
+		scale = vec2(216.f, 264.f) * 0.7f;
+		rotatePower = 0.f;
+		speedMultiplier = 2.5f;
+
+	};
 };
 
 struct HealerAngel : Enemy
@@ -2369,8 +2537,8 @@ struct TwinLaserHorizontal2 : TwinLaserHorizontal1
 
 struct HifiLaserSniper : Enemy
 {
-	EnemyPattern randomState = {"PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
-	EnemyPattern charging = {"Charge", EnemyBehavior::CHARGING, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
+	EnemyPattern randomState = {"Laser active", EnemyBehavior::IDLE, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
+	EnemyPattern charging = {"Charge", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
 
 	HifiLaserSniper()
 	{

@@ -1295,6 +1295,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = Magnet();
 		break;
+	}case EnemyType::EnemyMage:
+	{
+		enemy = Mage();
+		break;
 	}
 	case EnemyType::EnemyOneBee:
 	{

@@ -1383,7 +1383,12 @@ const RoomPreset HifiRoomLane {
 
 
 const RoomPreset allConsoles {
-    {},
+    { {
+        {EnemyMage, {Random::Float(), Random::Float()}},
+{EnemyMage, {Random::Float(), Random::Float()}},
+{EnemyMage, {Random::Float(), Random::Float()}},
+{EnemyMage, {Random::Float(), Random::Float()}},
+    }},
     {},
     {{{PushConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
     {{PopConsole,{fireRateUpM, bulletBounceUpM}}, {0.25f, 0.5f}},
@@ -1724,14 +1729,45 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
-    {{EnemyType::EnemyTwoBee, {0.5f,0.5f}}},
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+            {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+            {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+    {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+    },
+
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
-    {{EnemyType::EnemyHifiCannonHard, {0.5f,0.5f}}},
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        },
+};
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>> > medicalEliteEnemies = {
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        },
+};
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>> > miningEliteEnemies = {
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        },
 };
 
 std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
     {Biology, Random::ListItem(bioEliteEnemies)},
-    {Physics, Random::ListItem(physicsEliteEnemies)}
+    {Physics, Random::ListItem(physicsEliteEnemies)},
+    {Medical, Random::ListItem(medicalEliteEnemies)},
+    {Mining, Random::ListItem(miningEliteEnemies)}
 };
