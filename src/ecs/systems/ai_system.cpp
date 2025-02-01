@@ -454,6 +454,10 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getTeleportPos(entity);
 	case EnemyBehavior::FOLLOWSCIENTIST:
 		return getScientistPos(entity);
+	case EnemyBehavior::GRANTINGBUFFS:
+		return getTeamPos(entity);
+		case EnemyBehavior::GRANTINGAOEBUFFS:
+    	return Random::Int( 2 ) == 0 ? getTeamPos(entity) : generateRandomPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};

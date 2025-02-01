@@ -2043,12 +2043,12 @@ struct Mage : Enemy
 		5,
 		0,
 		{20, 20},
-		600,
+		400,
 		3000,
 		{0, 0},
 		0,
 		0,
-		0.1};
+		0};
 
 	const AttackData snailTrail{
 		EnemyAttackPattern::TRAIL,
@@ -2081,17 +2081,18 @@ struct Mage : Enemy
 		2,
 		0};
 
-	const Reaction AllyHurt = {
-        ReactionType::TEAM_HURT,
-        3};
-
 	const Reaction PlayerBullet = {
-		ReactionType::PLAYER_BULLET_CLOSE,
-		1};
+		ReactionType::TWENTYFIVE_HEALTH,
+		3,
+	SpecialStates::INVISIBLE};
 
 	const Reaction PlayerClose = {
 		ReactionType::PLAYER_CLOSE,
 		1};
+
+	const Reaction PlayerClose2 = {
+		ReactionType::PLAYER_CLOSE,
+		4};
 
 
 
@@ -2108,21 +2109,20 @@ struct Mage : Enemy
 				0,
 				true,
 				0.f,
-				0.f,
-				NoAttack};
+				250.f,
+				radialPolygon};
 
 	EnemyPattern IdleState = {
 		"Follow Player",
 		EnemyBehavior::PATROLLING,
 		{{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}},
 		0,
-		15000.f,
-		15000.f,
+		6000.f,
+		6000.f,
 		{
 						{ReactionType::DURATION,  1},
 						PlayerClose,
-			PlayerBullet,
-			AllyHurt
+			PlayerBullet
 					},
 					2,
 					true,
@@ -2137,22 +2137,36 @@ struct Mage : Enemy
 		0,
 		1200.f,
 		1200.f,
-		{{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet, AllyHurt},
+		{{ReactionType::DURATION, 1}, PlayerClose, PlayerBullet},
 		0,
 		true,
 		0.f,
-		400.f,
+		600.f,
 		twelveSpiralShot};
 
 	EnemyPattern healState = {"HEAL", EnemyBehavior::HEALING, {}, 0, 10000.f, 10000.f, {{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RETREAT, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 75.f,  wave};
-
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::PATROLLING, {{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, PlayerClose2}, 4, true, 0.f, 75.f,  wave};
+	EnemyPattern teleport2 = {
+		"Follow Player",
+		EnemyBehavior::TELEPORT,
+		{},
+		0,
+		500.f,
+		500.f,
+		{
+						{ReactionType::DURATION, 1},
+					},
+					0,
+					true,
+					0.f,
+					300.f,
+					twelveSpiralShot};
 
 	Mage()
 	{
-		maxHealth = 150;
+		maxHealth = 100;
 		currHealth = maxHealth;
-		enemyPatterns = {IdleState, teleport, shootingState, healState, RetreatAndShoot};
+		enemyPatterns = {IdleState, teleport, shootingState,  RetreatAndShoot, teleport2};
 		sprite = {
 			"mage",
 			EFFECT_ASSET_ID::ANIMATE,
@@ -2284,6 +2298,31 @@ struct MedBoid : Enemy
 		patternIndex = 0;
 		collisionBullet = serum;
 	}
+};
+
+struct BMP : Enemy {
+	Reaction AttackLaser{
+		ReactionType::DURATION,
+		0};
+	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::GRANTINGAOEBUFFS, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, false, 0.f, 10000.f, laserRotate};
+	BMP()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = {laserState};
+		sprite = {
+			"skull",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::REGULAR,
+			4,
+			500};
+		patternIndex = 0;
+		scale = vec2(168.0f, 216.f) / 1.5f;
+		rotatePower = 0.f;
+	};
+
 };
 
 //----------------------------------------- MINING REGION ENEMIES ---------------------------------

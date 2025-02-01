@@ -405,7 +405,8 @@ struct AttackData {
 enum class SpecialStates {
     NORMAL,
     INVISIBLE,
-    INVINCIBLE
+    INVINCIBLE,
+    VULNERABLE,
 };
 
 enum class EnemyBehavior {
@@ -433,7 +434,9 @@ enum class EnemyBehavior {
     DEATHSTATE,
     BOIDSWARMPLAYER,
     BOIDSFISH,
-    FOLLOWSCIENTIST
+    FOLLOWSCIENTIST,
+    GRANTINGBUFFS, // for enemies that give effects to other enemies, using this makes specials states apply to the other entity rather than itself
+    GRANTINGAOEBUFFS, // for enemies that give effects to all other enemies
 };
 
 enum class EnemyRotationBehavior {
@@ -512,6 +515,9 @@ struct EnemyPattern {
     //special states, for if the enemy has some special attributes like being invisible or invincible
     //the state will last for the duration of the current pattern
     SpecialStates specialState = SpecialStates::NORMAL;
+
+    //for enemies that can grant buffs to other enemies, this will be the effect that is granted
+    SpecialStates buffEffect = SpecialStates::NORMAL;
 };
 struct Boid {
     vec2 velocity;
@@ -525,6 +531,15 @@ struct Healer {
     float maxCoolDown = 3000.f;
     int healPower = 35;
     Entity targetEntity;
+};
+
+struct Buffer {
+    float cooldown;
+    float maxCoolDown = 5000;
+    float duration = 2000.f;
+    float range = 200.f;
+    SpecialStates buffEffect = SpecialStates::NORMAL;
+
 };
 
 

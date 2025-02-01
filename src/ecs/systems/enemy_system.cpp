@@ -91,6 +91,16 @@ void EnemySystem::step(float elapsed_ms)
             heal(entity, pattern);
         }
 
+        if (registry.buffers.has(entity) && (pattern.type == EnemyBehavior::GRANTINGBUFFS || pattern.type == EnemyBehavior::GRANTINGAOEBUFFS))
+        {
+            Buffer& buffer = registry.buffers.get(entity);
+            buffer.cooldown -= elapsed_ms;
+            if (buffer.cooldown <= 0) {
+                grantBuff(entity, pattern);
+                buffer.cooldown = buffer.maxCoolDown;
+            }
+        }
+
         if (pattern.type == EnemyBehavior::DEATHSTATE)
         {
             // std::cout << "got here" << std::endl;
@@ -414,6 +424,46 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
     sound->playEnemyShootSound(sfxNum, 0);
     burst.curBurst--;
     burst.burstCooldown = 150;
+}
+
+void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
+{
+    Buffer &buffer = registry.buffers.get(entity);
+    EnemyBehavior behavior = pattern.type;
+    SpecialStates buff = pattern.buffEffect;
+    switch ( buff ) {
+        case SpecialStates::INVINCIBLE: {
+            for (Entity& e : registry.enemies.entities) {
+               Motion& m = registry.motions.get(e);
+                    if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                        if (!registry.invincibles.has(e)) {
+                            Invincible &inv = registry.invincibles.emplace(e);
+                            inv.countdown = buffer.duration;
+                        }
+                    }
+                if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                    break;
+                }
+            }
+            break;
+        }
+        case SpecialStates::INVISIBLE: {
+            for (Entity& e : registry.enemies.entities) {
+                Motion& m = registry.motions.get(e);
+                if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                    if (!registry.invisibles.has(e)) {
+                        Invisible &inv = registry.invisibles.emplace(e);
+                        inv.countdown = buffer.duration;
+                    }
+                }
+                if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
 }
 
 void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)

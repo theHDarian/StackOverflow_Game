@@ -1298,6 +1298,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}case EnemyType::EnemyMage:
 	{
 		enemy = Mage();
+		// Healer& healer = registry.healers.emplace(entity);
+		// healer.coolDown = 1000.f;
+		// healer.healPower = 15.f;
 		break;
 	}
 	case EnemyType::EnemyOneBee:

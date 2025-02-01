@@ -338,6 +338,13 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					region = Physics;
 					room = BossRoom;
 				}
+				else if (reaction.choice == 5) {
+					region = Mining;
+				}
+				else if (reaction.choice == 6) {
+					region = Mining;
+					room = BossRoom;
+				}
 			}
 			MapRequest& req = registry.mapRequests.emplace(player, NewGame);
 			req.type = room;
