@@ -2304,22 +2304,23 @@ struct BMP : Enemy {
 	Reaction AttackLaser{
 		ReactionType::DURATION,
 		0};
-	EnemyPattern laserState = {"ATTACK LASER", EnemyBehavior::GRANTINGAOEBUFFS, {}, 0, 5000.f, 5000.f, {AttackLaser}, 0, false, 0.f, 10000.f, laserRotate};
+	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 7500.f, 7500.f, {AttackLaser, {ReactionType::PLAYER_CLOSE, 1}}, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
+	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {AttackLaser}, 0, true, 0.f, 600.f, twelveSpiralShot, SpecialStates::INVINCIBLE, SpecialStates::NORMAL};
 	BMP()
 	{
-		maxHealth = 100;
+		maxHealth = 300;
 		currHealth = maxHealth;
-		enemyPatterns = {laserState};
+		enemyPatterns = {heal_state, telePortState};
 		sprite = {
-			"skull",
+			"heart_monitor",
 			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0),
 			AnimationTypes::REGULAR,
-			4,
+			5,
 			500};
 		patternIndex = 0;
-		scale = vec2(168.0f, 216.f) / 1.5f;
+		scale = vec2(140, 140);
 		rotatePower = 0.f;
 	};
 

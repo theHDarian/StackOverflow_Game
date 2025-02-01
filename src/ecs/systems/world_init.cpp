@@ -1573,6 +1573,14 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			break;
 		}
 
+	case EnemyMedicalBMP:
+		{
+			enemy = BMP();
+			Buffer& buffer = registry.buffers.emplace(entity);
+			buffer.range = 500.f;
+			break;
+		}
+
 		default:
 			assert(false);
 	};

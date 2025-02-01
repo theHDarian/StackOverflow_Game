@@ -115,6 +115,7 @@ public:
 	ComponentContainer<DrawingText> drawingTexts;
 	ComponentContainer<Elite> elites;
 	ComponentContainer<Buffer> buffers;
+	ComponentContainer<Vulnerability> vulnerabilities;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -221,6 +222,7 @@ public:
 		registry_list.push_back(&drawingTexts);
 		registry_list.push_back(&elites);
 		registry_list.push_back(&buffers);
+		registry_list.push_back(&vulnerabilities);
 	}
 
 	void clear_all_components()

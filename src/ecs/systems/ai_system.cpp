@@ -51,6 +51,12 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 
 				std::cout << "invisible: " << inv.countdown << std::endl;
 			}
+		case SpecialStates::VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 2.f;
+			}
 		break;
 		default: break;
 	}
@@ -64,16 +70,19 @@ void handleSpecialStates (Reaction reaction, Entity entity)
 				auto& inv = registry.invincibles.emplace(entity);
 				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 2500.f) : Random::Float( 10000 ) + 3000;
 				inv.countdown = inv.max;
-			} else {
-                // registry.invincibles.get(entity).countdown = registry.invincibles.get(entity).max;
-				auto inv = registry.invincibles.get(entity);
-            }
-
+			}
 		break;
 		case SpecialStates::INVISIBLE:
 			if (!registry.invisibles.has(entity)) {
 				auto inv = registry.invisibles.emplace(entity);
-				inv.countdown = registry.bosses.has( entity ) ? 30000 : Random::Float( 10000 ) + 3000;
+				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 2500.f) : Random::Float( 10000 ) + 3000;
+
+			}
+		case SpecialStates::VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 7500.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 2.f;
 			}
 		break;
 		default: break;
@@ -456,7 +465,7 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getScientistPos(entity);
 	case EnemyBehavior::GRANTINGBUFFS:
 		return getTeamPos(entity);
-		case EnemyBehavior::GRANTINGAOEBUFFS:
+		case EnemyBehavior::GRANTINGBUFFSAOE:
     	return Random::Int( 2 ) == 0 ? getTeamPos(entity) : generateRandomPos(entity);
 	default:
 		return getCurrentPos(entity);

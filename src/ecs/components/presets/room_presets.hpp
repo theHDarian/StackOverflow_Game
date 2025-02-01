@@ -1384,10 +1384,9 @@ const RoomPreset HifiRoomLane {
 
 const RoomPreset allConsoles {
     { {
-        {EnemyMage, {Random::Float(), Random::Float()}},
-{EnemyMage, {Random::Float(), Random::Float()}},
-{EnemyMage, {Random::Float(), Random::Float()}},
-{EnemyMage, {Random::Float(), Random::Float()}},
+        {EnemyMedicalBMP, {Random::Float(), Random::Float()}},
+{EnemyOneBee, {Random::Float(), Random::Float()}},
+
     }},
     {},
     {{{PushConsole,{numBulletsUpA}}, {0.5f, 0.5f}},

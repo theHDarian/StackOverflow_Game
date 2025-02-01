@@ -91,11 +91,11 @@ void EnemySystem::step(float elapsed_ms)
             heal(entity, pattern);
         }
 
-        if (registry.buffers.has(entity) && (pattern.type == EnemyBehavior::GRANTINGBUFFS || pattern.type == EnemyBehavior::GRANTINGAOEBUFFS))
+        if (registry.buffers.has(entity) && (pattern.type == EnemyBehavior::GRANTINGBUFFS || pattern.type == EnemyBehavior::GRANTINGBUFFSAOE))
         {
             Buffer& buffer = registry.buffers.get(entity);
             buffer.cooldown -= elapsed_ms;
-            if (buffer.cooldown <= 0) {
+            if (buffer.cooldown < 0) {
                 grantBuff(entity, pattern);
                 buffer.cooldown = buffer.maxCoolDown;
             }
@@ -258,7 +258,12 @@ void EnemySystem::step(float elapsed_ms)
             PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
             EnemyPattern &pattern = enemyStat.currEnemyPattern();
 
-            enemyStat.currHealth -= registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.1) * bulletStat.damage), 1.f) : bulletStat.damage;
+            float damage = registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.1) * bulletStat.damage), 1.f) : bulletStat.damage;
+            if (registry.vulnerabilities.has(entity))
+            {
+                max((float)(damage * registry.vulnerabilities.get(entity).modifier), 1.f);
+            }
+            enemyStat.currHealth -= damage;
             if (enemyStat.currHealth <= 0)
             {
                 if (registry.scientist.has(entity))
@@ -431,24 +436,31 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
     Buffer &buffer = registry.buffers.get(entity);
     EnemyBehavior behavior = pattern.type;
     SpecialStates buff = pattern.buffEffect;
-    switch ( buff ) {
-        case SpecialStates::INVINCIBLE: {
+    switch ( buff )
+    {
+    case SpecialStates::INVINCIBLE: {
             for (Entity& e : registry.enemies.entities) {
-               Motion& m = registry.motions.get(e);
-                    if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
-                        if (!registry.invincibles.has(e)) {
-                            Invincible &inv = registry.invincibles.emplace(e);
-                            inv.countdown = buffer.duration;
-                        }
+                if (e == entity) {
+                    continue;
+                }
+                Motion& m = registry.motions.get(e);
+                if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                    if (!registry.invincibles.has(e)) {
+                        Invincible &inv = registry.invincibles.emplace(e);
+                        inv.countdown = buffer.duration;
                     }
+                }
                 if (behavior == EnemyBehavior::GRANTINGBUFFS) {
                     break;
                 }
             }
             break;
-        }
-        case SpecialStates::INVISIBLE: {
+    }
+    case SpecialStates::INVISIBLE: {
             for (Entity& e : registry.enemies.entities) {
+                if (e == entity) {
+                    continue;
+                }
                 Motion& m = registry.motions.get(e);
                 if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
                     if (!registry.invisibles.has(e)) {
@@ -461,7 +473,28 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                 }
             }
             break;
-        }
+    }
+    case SpecialStates::VULNERABLE: {
+            for (Entity& e : registry.enemies.entities) {
+                if (e == entity) {
+                    continue;
+                }
+                Motion& m = registry.motions.get(e);
+                if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                    if (!registry.vulnerabilities.has(e)) {
+                        auto& vul = registry.vulnerabilities.emplace(e);
+                        vul.modifier = 2.f;
+                        vul.countdown = buffer.duration;
+                    }
+                }
+                if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                    break;
+                }
+            }
+            break;
+    }
+        default:
+            break;
     }
 
 }

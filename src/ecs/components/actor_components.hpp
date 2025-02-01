@@ -267,6 +267,11 @@ struct Invisible {
     float countdown = 1000;
 };
 
+struct Vulnerability {
+    float countdown = 1000;
+    float modifier = 1.f;
+};
+
 struct PlayerAttackData {
     float currFiringInterval = 0.0f;
     float maxFiringInterval = 300.0f;
@@ -351,6 +356,7 @@ enum EnemyType {
     EnemyMedicalBoid,
     EnemyMiningBoulderSmall,
     EnemyMiningBoulderBig,
+    EnemyMedicalBMP,
 };
 
 enum class EnemyAttackPattern {
@@ -436,7 +442,7 @@ enum class EnemyBehavior {
     BOIDSFISH,
     FOLLOWSCIENTIST,
     GRANTINGBUFFS, // for enemies that give effects to other enemies, using this makes specials states apply to the other entity rather than itself
-    GRANTINGAOEBUFFS, // for enemies that give effects to all other enemies
+    GRANTINGBUFFSAOE, // for enemies that give effects to all other enemies
 };
 
 enum class EnemyRotationBehavior {
@@ -538,7 +544,7 @@ struct Buffer {
     float maxCoolDown = 5000;
     float duration = 2000.f;
     float range = 200.f;
-    SpecialStates buffEffect = SpecialStates::NORMAL;
+    // SpecialStates buffEffect = SpecialStates::NORMAL;
 
 };
 
