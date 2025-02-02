@@ -169,7 +169,7 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::SPIN)
                 {
-                    float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
+                    float angularSpeed = movement.angularSpeed * M_PI / 360.0f;
                     float rotationChange = angularSpeed * elapsed_ms / 1000.f;
                     motion.angle += rotationChange;
                 }
@@ -192,11 +192,18 @@ void EnemySystem::step(float elapsed_ms)
                     vec2 mid = twinMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
+
                 if (pattern.type == EnemyBehavior::TELEPORT)
                 {
 
                     std::cout << "teleporting in" << movement.posB[0] << ": " << movement.posB[1] << std::endl;
                     motion.position = movement.posB;
+                } else if (pattern.type == EnemyBehavior::ROLLING)
+                {
+                    motion.velocity = glm::normalize(movement.posB - movement.posA) * movement.speed;
+                    float angularSpeed = movement.angularSpeed * 20.f * M_PI / 360.0f;
+                    float rotationChange = angularSpeed * elapsed_ms / 1000.f;
+                    motion.angle += rotationChange * sign(motion.velocity.x) * enemy.rotatePower;
                 }
                 else
                 {
@@ -522,7 +529,8 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     {
         // Sound is kinda annoying yeah, and its not really "shooting? I guess?
         // sound->playEnemyShootSound(sfxNum, atkData.numBullets);
-        shootShotgun(velocity, pos, atkData);
+        float a = (float)(rand()) / (float)(RAND_MAX);
+        shootShotgun(vec2(cos(a), sin(a)), pos, atkData);
         currPattern.currAtkCD = 600;
     }
     else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)

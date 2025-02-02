@@ -867,7 +867,7 @@ const RoomPreset BossRoomBee{
 
 
 const RoomPreset BossRoomCrab{
-    {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{Random::Float(), Random::Float()}}}},
+    {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,
@@ -875,7 +875,7 @@ const RoomPreset BossRoomCrab{
     5,
     "Carcinisation",
     false,
-    {3000, 3000}
+    {1500, 1500}
 
 };
 

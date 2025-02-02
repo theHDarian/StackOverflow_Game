@@ -1354,6 +1354,20 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = Skull();
 		break;
 	}
+	case EnemyType::EnemySmallBoulder:
+	{
+		enemy = SmallBoulder();
+		float a = (float)(rand()) / (float)(RAND_MAX);
+		movement.posB = vec2(cos(a), sin(a)) * 1000.f;
+		break;
+	}
+	case EnemyType::EnemyBigBoulder:
+	{
+		enemy = BigBoulder();
+		float a = (float)(rand()) / (float)(RAND_MAX);
+		movement.posB = vec2(cos(a), sin(a)) * 1000.f;
+		break;
+	}
 	case EnemyType::EnemyEvilSkull:
 	{
 		enemy = EvilSkull();

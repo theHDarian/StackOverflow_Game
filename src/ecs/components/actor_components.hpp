@@ -317,6 +317,8 @@ enum EnemyType {
     EnemyMage,
     EnemyHealer,
     EnemyBioBoid,
+    EnemySmallBoulder,
+    EnemyBigBoulder,
     ScientistlaserAttack,
     EnemyFishBoid,
     EnemyTwinLaserVertical1,
@@ -411,6 +413,7 @@ enum class SpecialStates {
 enum class EnemyBehavior {
     // this is the basic
     RANDOM,
+    ROLLING,
     RANDOM_NEAR,
     RANDOM_FAR,
     FOLLOW_PLAYER,

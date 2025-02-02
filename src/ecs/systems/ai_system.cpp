@@ -8,6 +8,7 @@
 #include <random>
 #include <glm/glm.hpp>
 #include <glm/gtx/compatibility.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 // returns a vec4(min position, max position)
 vec4 getRoomBounds(Entity entity)
@@ -108,14 +109,10 @@ void AISystem::step(float elapsed_ms)
 			computeBoidVelocity(entity, boid);
 			continue;
 		}
-		// THINKING
-		// if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
-		// {
-		// 	movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
-		// 	movement.posA = motion.position;
-		// 	movement.distanceTraveled = 0.0f;
-		// }
-		if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
+
+		if (currPattern.type == EnemyBehavior::ROLLING) {
+			movement.posB = getRollingPos(entity);
+		} else if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
 			// std::cout << currPattern.name << "after update" << std::endl;
 			// if (registry.hand.has(entity) && currPattern.type == EnemyBehavior::IDLE) {
@@ -428,6 +425,8 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::RANDOM_FAR:
 		// std::cout << "random!" << std::endl;
 		return generateRandomPosInRadius(entity, 500, 1000);
+	case EnemyBehavior::ROLLING:
+		return getRollingPos(entity);
 	case EnemyBehavior::FOLLOW_PLAYER:
 		// std::cout << "follow!" << std::endl;
 		return getPlayerPos();
@@ -657,6 +656,51 @@ vec2 AISystem::getPlayerPos()
 	Entity &entity = player_register.entities[0];
 	Motion &motion = registry.motions.get(entity);
 	return motion.position;
+}
+
+vec2 AISystem::getRollingPos(Entity entity)
+{
+	auto& movement_register = registry.enemyMovement;
+	auto& motion_register = registry.motions;
+	EnemyMovement& movement = movement_register.get(entity);
+	Motion& enemyMotion = motion_register.get(entity);
+
+	vec4 roomBounds = getRoomBounds(entity);
+	vec2 min = { roomBounds.x, roomBounds.y };
+	vec2 max = { roomBounds.z, roomBounds.w };
+
+	vec2 direction = glm::normalize(movement.posB - movement.posA);
+	float distance = glm::length(max - min);
+
+	// Wall collisions and bouncing
+	vec2 norm = vec2(0, 0);
+	if (enemyMotion.position.x <= min.x && direction.x < 0.0) {
+		norm = vec2(1, 0);
+	}
+	else if (enemyMotion.position.x >= max.x && direction.x > 0.0) {
+		norm = vec2(-1, 0);
+	}
+	else if (enemyMotion.position.y <= min.y && direction.y < 0.0) {
+		norm = vec2(0, 1);
+	}
+	else if (enemyMotion.position.y >= max.y && direction.y > 0.0) {
+		norm = vec2(0, -1);
+	}
+	if (norm != vec2(0, 0)) {
+
+		vec2 newDirection = glm::reflect(direction, norm);
+		vec2 intersection = vec2((norm.x < 0.0) ? max.x : (norm.x == 0.0) ? enemyMotion.position.x : min.x, 
+							     (norm.y < 0.0) ? max.y : (norm.y == 0.0) ? enemyMotion.position.y : min.y);
+
+		std::cout << glm::to_string(movement.posB) << " : " << glm::to_string(min) << " : " << glm::to_string(max) << std::endl;
+		std::cout << glm::to_string(intersection) << " : " << glm::to_string(norm) << " : " << glm::to_string(direction) << " : " << glm::to_string(glm::reflect(direction, norm)) << std::endl;
+		std::cout << glm::to_string(enemyMotion.position) << ", " << glm::to_string(intersection + newDirection * distance) << std::endl;
+
+		movement.posA = intersection;
+		return intersection + newDirection * distance;
+	}
+
+	return movement.posB;
 }
 
 vec2 AISystem::evadeBullet(Entity entity)
@@ -1087,4 +1131,19 @@ void AISystem::boidComputeAllFactor(Entity entity, Boid &boid, float multiplierC
 		boid.velocity[0] += (avgVelocity[0] - boid.velocity[0]) * matchingFactor;
 		boid.velocity[1] += (avgVelocity[1] - boid.velocity[1]) * matchingFactor;
 	}
+}
+
+
+
+bool AISystem::LineToLine(vec2 line1Start, vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint)
+{
+	auto cross = [](const glm::vec2& v1, const glm::vec2& v2)
+		{ return v1.x * v2.y - v1.y * v2.x; };
+	glm::vec2 r = line1End - line1Start, s = line2End - line2Start, pq = line2Start - line1Start;
+	float rxs = cross(r, s);
+	if (rxs == 0)
+		return false; // Lines are parallel
+	float t = cross(pq, s) / rxs, u = cross(pq, r) / rxs;
+	intersectionPoint = line1Start + t * r;
+	return (t >= 0 && t <= 1 && u >= 0 && u <= 1);
 }
