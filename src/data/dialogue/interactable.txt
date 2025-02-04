@@ -55,7 +55,7 @@ ITEM SkipTutorial -1 0
 #Select where you would like to start in:
  
 CUT blackscreen.png
-CHOICES Start in Tutorial\Start in Biology Region\Start in Physics Region\Start in Biology Boss\Start in Physics Boss
+CHOICES Start in Tutorial\Start in Biology Region\Start in Physics Region\Start in Biology Boss\Start in Mining Boss\Start in Physics Boss
 
 ITEM ClosedTutorialDoor -1 0
 The door seems to be locked. Maybe there's something in this room that could help...

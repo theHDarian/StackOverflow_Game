@@ -136,8 +136,10 @@ void EnemySystem::step(float elapsed_ms)
                 if (enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
                     rotationChange *= enemy.rotatePower;
                 motion.angle += rotationChange;
-            }
-            else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
+            } else if (registry.wormBodies.has(entity) || registry.wormHeads.has(entity))
+            {
+                // Do nothing!
+            } else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
             {
                 float targetAngle = atan2(direction.y, direction.x);
                 float deltaAngle = targetAngle - motion.angle;
@@ -255,36 +257,12 @@ void EnemySystem::step(float elapsed_ms)
             PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
             EnemyPattern &pattern = enemyStat.currEnemyPattern();
 
-            enemyStat.currHealth -= registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.1) * bulletStat.damage), 1.f) : bulletStat.damage;
-            if (enemyStat.currHealth <= 0)
-            {
-                if (registry.scientist.has(entity))
-                {
-                    Scientist &scien = registry.scientist.get(entity);
-                    if (!registry.deleteds.has(scien.hand))
-                    {
-                        registry.deleteds.emplace(scien.hand);
-                    }
-                }
-                if (!registry.deleteds.has(entity))
-                {
-                    Fade &f = registry.fades.emplace(entity);
-                    registry.deleteds.emplace(entity);
-
-                    ParticleProps props = enemyDeath;
-                    registry.emitParticles.replace(entity, PExplode, props, f.max, Random::Int(20) + 20);
-                    if (registry.enemyGroups.has(entity))
-                    {
-                        for (Entity other : registry.enemyGroups.get(entity).others)
-                        {
-                            if (!registry.deleteds.has(other))
-                                registry.deleteds.emplace(other);
-                            registry.emitParticles.replace(other, PExplode, props, f.max, Random::Int(20) + 20);
-                        }
-                    }
-                }
-
-                // std::cout << "enemy " << entity << "has died" << std::endl;
+            if (registry.wormBodies.has(entity)) {
+               Enemy& head = registry.enemies.get(registry.wormBodies.get(entity).head);
+               head.currHealth -= bulletStat.damage;
+            }
+            else {
+                enemyStat.currHealth -= registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.1) * bulletStat.damage), 1.f) : bulletStat.damage;
             }
 
             bulletStat.bulletPierce -= 1;
@@ -299,6 +277,39 @@ void EnemySystem::step(float elapsed_ms)
             else if (registry.damageds.has(entity))
             {
                 registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
+            }
+        }
+    }
+
+    // Handle death by no health left
+    for (Entity entity : registry.enemies.entities) {
+        Enemy& enemyStat = registry.enemies.get(entity);
+        if (enemyStat.currHealth <= 0)
+        {
+            if (registry.scientist.has(entity))
+            {
+                Scientist& scien = registry.scientist.get(entity);
+                if (!registry.deleteds.has(scien.hand))
+                {
+                    registry.deleteds.emplace(scien.hand);
+                }
+            }
+            if (!registry.deleteds.has(entity))
+            {
+                Fade& f = registry.fades.emplace(entity);
+                registry.deleteds.emplace(entity);
+
+                ParticleProps props = enemyDeath;
+                registry.emitParticles.replace(entity, PExplode, props, f.max, Random::Int(20) + 20);
+                if (registry.enemyGroups.has(entity))
+                {
+                    for (Entity other : registry.enemyGroups.get(entity).others)
+                    {
+                        if (!registry.deleteds.has(other))
+                            registry.deleteds.emplace(other);
+                        registry.emitParticles.replace(other, PExplode, props, f.max, Random::Int(20) + 20);
+                    }
+                }
             }
         }
     }

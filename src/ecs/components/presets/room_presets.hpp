@@ -879,6 +879,19 @@ const RoomPreset BossRoomCrab{
 
 };
 
+const RoomPreset BossRoomWorm{
+    {{{BossDrillWormHead, {1.5f, 1.5f}}}},
+    {},
+    {{{Ram,{}}, {0.5f, 0.5f}}},
+    0.0f,
+    20,
+    5,
+    "Carcinisation",
+    false,
+    {1500, 1500}
+
+};
+
 const RoomPreset HifiRoomTwinLaserShurikens {
         {
             {

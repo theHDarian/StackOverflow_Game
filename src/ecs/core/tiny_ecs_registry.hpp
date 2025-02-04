@@ -114,6 +114,8 @@ public:
 	ComponentContainer<NotifMessage> notifMessages;
 	ComponentContainer<DrawingText> drawingTexts;
 	ComponentContainer<Elite> elites;
+	ComponentContainer<WormHead> wormHeads;
+	ComponentContainer<WormBody> wormBodies;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -219,6 +221,8 @@ public:
 		registry_list.push_back(&notifMessages);
 		registry_list.push_back(&drawingTexts);
 		registry_list.push_back(&elites);
+		registry_list.push_back(&wormHeads);
+		registry_list.push_back(&wormBodies);
 	}
 
 	void clear_all_components()

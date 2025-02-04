@@ -316,6 +316,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Worm body deletion
+	if (registry.wormBodies.entities.size() > 0)
+	{
+		for (int i = (int)registry.wormBodies.components.size() - 1; i >= 0; --i) {
+			if (!registry.deleteds.has(registry.wormBodies.entities[i]) && registry.deleteds.has(registry.wormBodies.components[i].head))
+				registry.deleteds.emplace(registry.wormBodies.entities[i]);
+		}
+	}
+
 	interact(elapsed_ms_since_last_update, player, renderer, soundPlayer);
 
 	return true;

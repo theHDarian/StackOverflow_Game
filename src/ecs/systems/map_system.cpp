@@ -511,7 +511,13 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             if (map.currRegion == Biology) {
                 map.currRoom.preset = BossRoomCrab;
             }
-            else {
+            else if (map.currRegion == Mining) {
+                map.currRoom.preset = BossRoomWorm;
+            }
+            else if (map.currRegion == Physics) {
+                map.currRoom.preset = ScientistBossRoom;
+            }
+            else if (map.currRegion == Medical) {
                 map.currRoom.preset = ScientistBossRoom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());

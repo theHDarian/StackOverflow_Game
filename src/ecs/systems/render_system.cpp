@@ -1431,7 +1431,7 @@ void RenderSystem::drawGameUI()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
+		if (!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
 			drawHPbar(entity, projection, view);
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);

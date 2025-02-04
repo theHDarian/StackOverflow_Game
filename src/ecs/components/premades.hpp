@@ -2351,8 +2351,87 @@ struct BigBoulder : Enemy
 	};
 };
 
+struct DrillWormHead : Enemy
+{
+	Reaction gotTo = {
+		ReactionType::FINISH_PATROL,
+		1 };
+
+	Reaction gotTo2 = {
+		ReactionType::FINISH_PATROL,
+		2 };
 
 
+	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_GOTO, { vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo2}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern followState = { "LOOP", EnemyBehavior::WORM_FOLLOW, {}, 0, 1000000.f, 1000000.f, {gotTo2}, 0, false, 0.f, 5000.f, quadShot };
+
+	DrillWormHead()
+	{
+		maxHealth = 5000;
+		currHealth = maxHealth;
+
+		enemyPatterns = { startState, loopState, followState };
+
+		patternIndex = 0;
+		sprite = {
+			"drill_worm_head",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			AnimationTypes::REGULAR,
+			2,
+			60};
+		scale = vec2({ 288.0f / 2, 192.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+
+		headData.size = 10;
+		headData.body = BossDrillWormBody;
+		headData.constrainDistance = 126.f;
+	};
+};
+
+struct DrillWormBody : Enemy
+{
+
+	const AttackData dualShot{
+	EnemyAttackPattern::RADIAL,
+	TRIANGLE,
+	{},
+	blunt,
+	2,
+	M_PI * 0.5f,
+	{20, 20},
+	200,
+	1000,
+	{0.0, 0.0},
+	0,
+	0,
+	0 };
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 2500.f, dualShot };
+
+	DrillWormBody()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"drill_worm_body",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			AnimationTypes::REGULAR,
+			4,
+			50
+		};
+		scale = vec2({ 288.0f / 2, 192.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
 
 
 //----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------

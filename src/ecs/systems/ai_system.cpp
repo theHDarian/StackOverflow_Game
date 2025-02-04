@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/spline.hpp>
 
 // returns a vec4(min position, max position)
 vec4 getRoomBounds(Entity entity)
@@ -112,6 +113,65 @@ void AISystem::step(float elapsed_ms)
 
 		if (currPattern.type == EnemyBehavior::ROLLING) {
 			movement.posB = getRollingPos(entity);
+		}
+		else if (registry.wormBodies.has(entity) || registry.wormHeads.has(entity)) {
+			auto& wormHead_registry = registry.wormHeads;
+			auto& wormBody_registry = registry.wormBodies;
+
+			// Update all segment locations
+			if (wormHead_registry.has(entity)) {
+				WormHead& head = wormHead_registry.get(entity);
+				float dist = 0.f;
+				// Move target location
+				switch (currPattern.type) {
+				case EnemyBehavior::WORM_FOLLOW:
+					head.points[0] = glm::lerp(head.points[0], registry.motions.get(registry.players.entities[0]).position, 0.02f * enemy.speedMultiplier);
+					break;
+				case EnemyBehavior::WORM_PATROL:
+					// Worm will Teleport to first position in spline if not there
+					// Remedy using WORM_GOTO
+					head.points[0] = catmullRomSplineLerp(currPattern.path, movement.t);
+					currPattern.pathIndex = currPattern.path.size() - 1;
+					movement.t += 0.01 * enemy.speedMultiplier;
+					if (movement.t > movement.points.size()) movement.t -= (float)currPattern.path.size();
+					break;
+				case EnemyBehavior::WORM_RANDOM:
+					// TODO
+					// Should choose 1-4 points ahead of worm to draw curved path
+					head.points[0] = catmullRomSpline(movement.points, movement.t);
+					movement.t += 0.01 * enemy.speedMultiplier;
+					if (movement.t > movement.points.size()) movement.t -= (float)movement.points.size();
+					break;
+				case EnemyBehavior::WORM_GOTO:
+					head.points[0] = glm::lerp(head.points[0], lerpToRoom(currPattern.path[currPattern.path.size() - 1]), movement.t);
+					currPattern.pathIndex = currPattern.path.size() - 1;
+					movement.t = (movement.t > 1.f) ? 0.f : movement.t + 0.0001 * enemy.speedMultiplier;
+					break;
+				default:
+					assert(false);
+				}
+
+				// Update constraints
+				for (int i = 1; i < head.size + 1; i++) {
+					//Pull the next segment to the previous one
+					head.points[i] = constrainDistance(head.points[i], head.points[i - 1], head.constrainDistance);
+				}
+
+				// Move head enemy
+				vec2 direction = (head.points[0] - head.points[1]);
+				motion.position = head.points[1] + 0.5f * direction;
+				motion.angle = atan2(direction.y, direction.x);
+			}
+			else {
+				// Move body enemy
+				WormBody& body = wormBody_registry.get(entity);
+				WormHead& head = wormHead_registry.get(body.head);
+
+				vec2 direction = (head.points[body.index] - head.points[body.index + 1]);
+				motion.position = head.points[body.index + 1] + 0.5f * direction;
+				motion.angle = atan2(direction.y, direction.x);
+			}
+
 		} else if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
 			// std::cout << currPattern.name << "after update" << std::endl;
@@ -225,11 +285,11 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 	if (registry.scientist.has(entity))
 	{
-		Scientist &scien = registry.scientist.get(entity);
+		Scientist& scien = registry.scientist.get(entity);
 		if (scien.shield && registry.enemies.has(scien.shield))
 		{
 
-			Enemy &shield = registry.enemies.get(scien.shield);
+			Enemy& shield = registry.enemies.get(scien.shield);
 			// std::cout << shield.currHealth << "shield health" << std::endl;
 			if (shield.currHealth <= 0)
 			{
@@ -246,8 +306,8 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 	if (registry.hand.has(entity))
 	{
-		EnemyPattern &pattern = enemy.currEnemyPattern();
-		RenderRequest &rr = registry.renderRequests.get(entity);
+		EnemyPattern& pattern = enemy.currEnemyPattern();
+		RenderRequest& rr = registry.renderRequests.get(entity);
 		if (pattern.type == EnemyBehavior::CHARGING)
 		{
 			rr.texture_name = "hand_idletocharge";
@@ -255,7 +315,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			if (registry.animations.get(entity).frame == -1 && !registry.animationSequences.has(entity))
 			{
 				// registry.animations.get(entity).frame == 1;
-				AnimationSequence &as = registry.animationSequences.emplace(entity);
+				AnimationSequence& as = registry.animationSequences.emplace(entity);
 				as.nextEffect = EFFECT_ASSET_ID::TEXTURED;
 				as.nextSprite = "hand_charging.png";
 				// std::cout << registry.animations.get(entity).frame << std::endl;
@@ -298,7 +358,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
-			handleSpecialStates( *reaction, entity);
+			handleSpecialStates(*reaction, entity);
 		}
 	}
 	else if (hpPercent < 0.75f)
@@ -318,13 +378,9 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FINISH_PATROL);
 
 		vec2 patrolFactor = currPattern.path[currPattern.path.size() - 1];
-		vec4 roomBounds = getRoomBounds(entity);
-		vec2 min = { roomBounds.x, roomBounds.y };
-		vec2 max = { roomBounds.z, roomBounds.w };
-		
-		vec2 endPoint = glm::lerp(min, max, patrolFactor);
+		vec2 endPoint = lerpToRoom(patrolFactor);
 
-		if (glm::distance(EnemyPos, endPoint) < 0.001) {
+		if (glm::distance(EnemyPos, endPoint) < 0.001 || (registry.wormHeads.has(entity) && glm::distance(registry.wormHeads.get(entity).points[0], endPoint) < 0.05)) {
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
@@ -1133,8 +1189,6 @@ void AISystem::boidComputeAllFactor(Entity entity, Boid &boid, float multiplierC
 	}
 }
 
-
-
 bool AISystem::LineToLine(vec2 line1Start, vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint)
 {
 	auto cross = [](const glm::vec2& v1, const glm::vec2& v2)
@@ -1146,4 +1200,41 @@ bool AISystem::LineToLine(vec2 line1Start, vec2 line1End, vec2 line2Start, vec2 
 	float t = cross(pq, s) / rxs, u = cross(pq, r) / rxs;
 	intersectionPoint = line1Start + t * r;
 	return (t >= 0 && t <= 1 && u >= 0 && u <= 1);
+}
+
+vec2 AISystem::constrainDistance(vec2 point, vec2 anchor, float distance) {
+	return (glm::normalize(point - anchor) * distance) + anchor;
+}
+
+vec2 AISystem::catmullRomSplineLerp(const std::vector<glm::vec2>& cp, float t)
+{
+	// indices of the relevant control points
+	int i0 = glm::clamp<int>(t - 1, 0, cp.size() - 1);
+	int i1 = glm::clamp<int>(t + 0, 0, cp.size() - 1);
+	int i2 = glm::clamp<int>(t + 1, 0, cp.size() - 1);
+	int i3 = glm::clamp<int>(t + 2, 0, cp.size() - 1);
+
+	// parameter on the local curve interval
+	float local_t = glm::fract(t);
+
+	return glm::catmullRom(lerpToRoom(cp[i0]), lerpToRoom(cp[i1]), lerpToRoom(cp[i2]), lerpToRoom(cp[i3]), local_t);
+}
+
+vec2 AISystem::catmullRomSpline(const std::vector<glm::vec2>& cp, float t)
+{
+	// indices of the relevant control points
+	int i0 = glm::clamp<int>(t - 1, 0, cp.size() - 1);
+	int i1 = glm::clamp<int>(t, 0, cp.size() - 1);
+	int i2 = glm::clamp<int>(t + 1, 0, cp.size() - 1);
+	int i3 = glm::clamp<int>(t + 2, 0, cp.size() - 1);
+
+	// parameter on the local curve interval
+	float local_t = glm::fract(t);
+
+	return glm::catmullRom(cp[i0], cp[i1], cp[i2], cp[i3], local_t);
+}
+
+vec2 AISystem::lerpToRoom(vec2 point) {
+	Map& map = registry.maps.components[0];
+	return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, point);
 }

@@ -1583,6 +1583,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			enemy = BigBoulder();
 			break;
 		}
+	case BossDrillWormHead:
+	{
+		enemy = DrillWormHead();
+		break;
+	}
 
 		default:
 			assert(false);
@@ -1595,14 +1600,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	motion.velocity = vec2(0, 0);
 	motion.scale = enemy.scale;
 
-	// if (enemy.behavior == EnemyBehavior::PATROLLING) {
-	// 	movement.posA = enemy.patrolPath[0];
-	// } else {
-	// 	movement.posA = pos;
-	// }
-	// std::cout << "building enemy with type: " << enemy.currEnemyPattern().name << std::endl;
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
-	// std::cout<< movement.posA.x << movement.posA.y  << " " << movement.posB.x << movement.posB.y << std::endl;
 	movement.speed = 100.0f * enemy.speedMultiplier;
 	movement.distanceTraveled = 0.0f;
 
@@ -1656,7 +1654,82 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		createEnemy(renderer, pos + vec2(-118, 72), EnemyType::BossBeehiveGun);
 	}
 
+	if (enemy.headData.size != -1) {
+		WormHead& head = registry.wormHeads.emplace(entity);
+		head.size = enemy.headData.size;
+		head.constrainDistance = enemy.headData.constrainDistance;
+		head.body = enemy.headData.body;
+
+		Map& map = registry.maps.components[0];
+		vec2 mid = map.currRoom.roomStart + 0.5f * (map.currRoom.roomEnd - map.currRoom.roomStart);
+		vec2 offset = head.constrainDistance * glm::normalize(pos - mid);
+		head.points.push_back(pos);
+		for (int i = 1; i < head.size + 1; i++) {
+			vec2 posi = pos + (float)i * offset;
+			head.points.push_back(posi);
+			if (i < head.size) createWormBody(renderer, posi, head.body, entity, i);
+		}
+	}
+
 	return entity;
+};
+
+void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity head, int index)
+{
+	auto entity = Entity();
+
+	EnemyMovement& movement = registry.enemyMovement.emplace(entity);
+	movement.posA = pos;
+
+	Enemy& enemy = registry.enemies.emplace(entity);
+	switch (type)
+	{
+	case BossDrillWormBody:
+		enemy = DrillWormBody();
+		break;
+	default:
+		assert(false);
+	};
+
+	WormBody& body = registry.wormBodies.emplace(entity);
+	body.head = head;
+	body.index = index;
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.position = pos;
+	motion.velocity = vec2(0, 0);
+	motion.scale = enemy.scale;
+
+	registry.bursts.emplace(entity);
+
+	if (enemy.sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
+	{
+		CircleCollider& cc = registry.circleColliders.emplace(entity);
+		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
+		Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+		registry.meshPtrs.emplace(entity, &mesh);
+	}
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			enemy.sprite.texturePath,
+			enemy.sprite.effectId,
+			enemy.sprite.geometryId,
+			true,
+			enemy.sprite.offset // manually set an offset for now
+		});
+
+	// need to also add an animate component
+	if (enemy.sprite.effectId == EFFECT_ASSET_ID::ANIMATE)
+	{
+		auto& animate = registry.animations.emplace(entity);
+		animate.animate = enemy.sprite.animationType;
+		animate.max_frames = enemy.sprite.max_Frames;
+		animate.animation_countdown = enemy.sprite.countdown;
+		animate.animation_countdown_base = animate.animation_countdown;
+	}
 };
 
 void createEnemyGroup(RenderSystem *renderer, vec2 pos, EnemyType type)

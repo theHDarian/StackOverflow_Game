@@ -319,6 +319,8 @@ enum EnemyType {
     EnemyBioBoid,
     EnemySmallBoulder,
     EnemyBigBoulder,
+    BossDrillWormHead,
+    BossDrillWormBody,
     ScientistlaserAttack,
     EnemyFishBoid,
     EnemyTwinLaserVertical1,
@@ -436,7 +438,14 @@ enum class EnemyBehavior {
     DEATHSTATE,
     BOIDSWARMPLAYER,
     BOIDSFISH,
-    FOLLOWSCIENTIST
+    FOLLOWSCIENTIST,
+    WORM_FOLLOW,
+    // Worm will Teleport to first position in spline if not there
+    // Remedy using WORM_GOTO
+    WORM_PATROL,
+    WORM_RANDOM,
+    WORM_GOTO,
+    WORM_BODY
 };
 
 enum class EnemyRotationBehavior {
@@ -447,7 +456,8 @@ enum class EnemyRotationBehavior {
     FACE_PLAYER,
     FACE_TWIN,
     SPIN,
-    LASER_CONTROL
+    LASER_CONTROL,
+    WORM
 };
 
 
@@ -523,6 +533,18 @@ struct Boid {
     float maxSpeed;
 };
 
+struct WormHead {
+    std::vector<vec2> points = {};
+    float constrainDistance;
+    int size = -1;
+    EnemyType body;
+};
+
+struct WormBody {
+    Entity head;
+    int index;
+};
+
 struct Healer {
     float coolDown;
     float maxCoolDown = 3000.f;
@@ -567,6 +589,7 @@ struct Enemy {
     float rotatePower;
     EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
+    WormHead headData;
 };
 
 struct EnemyGroup {
@@ -579,6 +602,10 @@ struct EnemyMovement {
     float distanceTraveled;
     float speed = 20000;
     float angularSpeed = 90.0f;
+
+    // Worm curves!
+    std::vector<vec2> points = { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2)};
+    float t = 0.f;
 };
 
 struct BossEnemy {
