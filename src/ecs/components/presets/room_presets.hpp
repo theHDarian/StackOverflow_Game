@@ -1379,13 +1379,54 @@ const RoomPreset HifiRoomLane {
         {650, 3000}
 };
 
+const RoomPreset BossBigCRoom {
+
+            {
+                {
+                    {BossBigC, {0.5f, 0.5f}},
+                },
+                {
+                     {EnemyLaserSniper,{0.5, 0.63}},
+                        {EnemyLaserSniper,{0.38, 0.42}},
+                    {EnemyLaserSniper,{1-0.38, 0.42}},
+                },
+                {
+                        {EnemyLaserSniper,{0.5, 1-0.63}},
+                            {EnemyLaserSniper,{0.38, 1-0.42}},
+                        {EnemyLaserSniper,{1-0.38, 1-0.42}},
+                },
+                {
+                        {EnemyLaserSniperHard,{Random::Float(), Random::Float()}},
+                            {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+                },
+
+
+
+
+
+
+            },
+        {},
+        {{{Ram,{}}, {0.5f, 0.5f}}},
+        16.0f,
+        20,
+        5,
+        "Big C",
+    false,
+    {2200, 2500}
+
+};
+
 
 
 
 const RoomPreset allConsoles {
     { {
         {EnemyMedicalBMP, {Random::Float(), Random::Float()}},
-{EnemyOneBee, {Random::Float(), Random::Float()}},
+{EnemyBeeHive, {Random::Float(), Random::Float()}},
+{EnemyBeeHive, {Random::Float(), Random::Float()}},
 
     }},
     {},

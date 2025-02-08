@@ -221,6 +221,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				}
 			}
 		}
+		//check vulnerability countdown
+		if (registry.vulnerabilities.entities.size() > 0) {
+			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {
+				auto& entity = registry.vulnerabilities.components[i];
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+					registry.vulnerabilities.remove(registry.vulnerabilities.entities[i]);
+				}
+			}
+		}
+
 		// Updating the bullet ranges
 		if (registry.playerBullets.entities.size() > 0) {
 			for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {

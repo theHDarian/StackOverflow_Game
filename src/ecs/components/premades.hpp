@@ -331,6 +331,13 @@ const BulletStackEffect APRounds = {
 	"AP Rounds",
 	""};
 
+const BulletStackEffect FragileRounds = {
+	Pierce,
+	Additive,
+	-1,
+	"Fragile Rounds",
+	""};
+
 const BulletStackEffect ConcentratedFire = {
 	BulletNum,
 	Additive,
@@ -1338,7 +1345,7 @@ struct BossChimeraCrab : Enemy {
 struct chimeraCrabSniper : Enemy
 {
 	EnemyPattern randomState = {"Follow", EnemyBehavior::FOLLOW_PLAYER, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 150.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
-	EnemyPattern charging = {"Charge", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
+	// EnemyPattern charging = {"Charge", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
 
 	chimeraCrabSniper()
 	{
@@ -1351,7 +1358,7 @@ struct chimeraCrabSniper : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE};
 		scale = vec2({160.0f / 2, 160.f / 2});
-		rotatePower = 90.0f;
+		rotatePower = 1.0f;
 		speedMultiplier = 1.3;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	};
@@ -1360,21 +1367,198 @@ struct chimeraCrabSniper : Enemy
 struct BigC : Enemy
 {
 
+	const AttackData FastLaser{
+		EnemyAttackPattern::LASER
+		,CIRCLE
+		,{dashUpA, dashCDRDownA}
+		,FragileRounds
+		,1
+		,0
+		,{70, 70}
+		,0
+		, 5000
+		,{5000, 0}
+		,0
+		,0
+		,0
+		,EnemyBulletDeath::NONE
+		};
+
+	const AttackData shortFastLaser{
+		EnemyAttackPattern::LASER
+		,CIRCLE
+		,{dashUpA, dashCDRDownA}
+		,FragileRounds
+		,1
+		,0
+		,{70, 70}
+		,0
+		, 2000
+		,{5000, 0}
+		,0
+		,0
+		,0
+		,EnemyBulletDeath::NONE
+		};
+
 	BigC()
 	{
-		maxHealth = 1000;
+		maxHealth = 10000;
 
 		currHealth = maxHealth;
 
+		Reaction duration = {
+            ReactionType::DURATION,
+            1};
+
+		EnemyPattern idleState = {
+            "IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {duration}, 3, true, 2500, 7000.f, FastLaser};
+
+		EnemyPattern LaserSpin = {
+            "FOLLOW", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {duration}, 3, true, 0.f, 10000.f, FastLaser};
+
+		EnemyPattern LineUp = {
+            "FOLLOW", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration}, 3, false, 0.f, 5000.f, NoAttack, };
+
+		EnemyPattern LaserAim = {
+			"FOLLOW", EnemyBehavior::IDLE, {}, 0, 15000.f, 15000.f, {duration}, 0, true, 3000.f, 6000, shortFastLaser, SpecialStates::VULNERABLE};
+
 		enemyPatterns = {
-			{"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {}, 0, false, 0.f, 5000.f, twelveSpiralShot}};
+			idleState, LaserSpin, LineUp, LaserAim};
 		patternIndex = 0;
 		sprite = {// registry.sprites.get(entity).sprites[SPRITE_STATE::BASE],
 				  "none",
 				  EFFECT_ASSET_ID::MESH,
 				  GEOMETRY_BUFFER_ID::MESH_GB};
-		rotatePower = 1.f;
+		rotatePower = 0.5f;
 		scale = vec2({700, 700 * (1.998858f / 1.923352f)});
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+
+	};
+};
+
+struct BossBigCCore : Enemy{
+
+	const AttackData laserRotate{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{APRounds},
+		dashCDRDownA,
+		3,
+		0,
+		{0, 20},
+		0,
+		4000,
+		{1.2, M_PI / 300},
+		0,
+		0,
+		0};
+
+
+	const AttackData spawning{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		6,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyHifiTemporaryBoid};
+
+	const AttackData laser2{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{dashUpA},
+		dashCDRDownA,
+		8,
+		0,
+		{20, 20},
+		0,
+		1500,
+		{500, 0},
+		0,
+		0,
+		0};
+
+	const AttackData laser1{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{dashUpA},
+		dashCDRDownA,
+		8,
+		M_PI / 8.f,
+		{20, 20},
+		0,
+		1500,
+		{500, 0},
+		0,
+		0,
+		0};
+
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		1};
+	Reaction halfhp = {
+		ReactionType::SEVENTYFIVE_HEALTH,
+		4,
+		SpecialStates::INVINCIBLE};
+	Reaction repositioned = {
+		ReactionType::FINISH_PATROL,
+		5 };
+	Reaction playerClose = {
+        ReactionType::PLAYER_CLOSE,
+        1};
+	Reaction playerCloseHalfHP = {
+        ReactionType::PLAYER_CLOSE,
+        2};
+
+	EnemyPattern idleState = {
+		"IDLE", EnemyBehavior::IDLE, {}, 0, 15000.f, 15000.f, {duration, halfhp, playerClose}, 0, false, 0.f, 1000.f,
+		NoAttack
+	};
+
+	EnemyPattern PlayerClose = {
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration, halfhp, }, 0, true, 0.f, 3000.f,
+		twelveSpiralShot, SpecialStates::VULNERABLE
+	};
+
+	EnemyPattern PlayerCloseHalfHP = {
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 3, false, 2000.f, 500.f, NoAttack,
+	};
+
+	EnemyPattern PlayerCloseHalfHPLaser = {"PlayerClose", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration}, 5, true, 0.f, 100.f, laserRotate, SpecialStates::VULNERABLE};
+
+	EnemyPattern randomStateHalfHP = {
+		"RANDOM POSITION", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, playerCloseHalfHP}, 5, true,
+		0.f, 1500.f, spawning, SpecialStates::PROTECTED
+	};
+	EnemyPattern laserState1 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP}, 6, true, 0.f, 2000.f, laser1, SpecialStates::VULNERABLE};
+	EnemyPattern laserState2 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP}, 4, true, 0.f, 2000.f, laser2, SpecialStates::VULNERABLE};
+
+	BossBigCCore()
+	{
+		maxHealth =900;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			idleState, PlayerClose, PlayerCloseHalfHP, PlayerCloseHalfHPLaser, randomStateHalfHP, laserState1, laserState2};
+		patternIndex = 0;
+		sprite = {
+			"BigCBoss.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({180.0f , 180.f });
+		rotatePower = 0.8f;
+		rotationBehaviour = EnemyRotationBehavior::NONE,
+		speedMultiplier = 4.5f;
 	};
 };
 
@@ -2006,7 +2190,7 @@ struct Sword : Enemy
 		};
 		scale = vec2({864 / 8.f, 480 / 8.f}) * 1.5f;
 		patternIndex = 0;
-		rotatePower = 1.0f;
+		rotatePower = 2.0f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	}
 };
@@ -2114,8 +2298,8 @@ struct Mage : Enemy
 
 	EnemyPattern IdleState = {
 		"Follow Player",
-		EnemyBehavior::PATROLLING,
-		{{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}},
+		EnemyBehavior::RANDOM_FAR,
+		{},
 		0,
 		6000.f,
 		6000.f,
@@ -2145,7 +2329,7 @@ struct Mage : Enemy
 		twelveSpiralShot};
 
 	EnemyPattern healState = {"HEAL", EnemyBehavior::HEALING, {}, 0, 10000.f, 10000.f, {{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::PATROLLING, {{Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}, {Random::Float(), Random::Float()}}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, PlayerClose2}, 4, true, 0.f, 75.f,  wave};
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, PlayerClose2}, 4, true, 0.f, 75.f,  wave};
 	EnemyPattern teleport2 = {
 		"Follow Player",
 		EnemyBehavior::TELEPORT,
@@ -2274,6 +2458,9 @@ struct EnemyTestPatrol : Enemy
 		rotatePower = 0.f;
 	}
 };
+
+
+
 //----------------------------------------- MEDICAL REGION ENEMIES ---------------------------------
 
 
@@ -2304,8 +2491,8 @@ struct BMP : Enemy {
 	Reaction AttackLaser{
 		ReactionType::DURATION,
 		0};
-	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 7500.f, 7500.f, {AttackLaser, {ReactionType::PLAYER_CLOSE, 1}}, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
-	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {AttackLaser}, 0, true, 0.f, 600.f, twelveSpiralShot, SpecialStates::INVINCIBLE, SpecialStates::NORMAL};
+	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {AttackLaser, }, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
+	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 0, true, 0.f, 700.f, twelveSpiralShot, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	BMP()
 	{
 		maxHealth = 300;
@@ -2578,7 +2765,6 @@ struct TwinLaserHorizontal2 : TwinLaserHorizontal1
 struct HifiLaserSniper : Enemy
 {
 	EnemyPattern randomState = {"Laser active", EnemyBehavior::IDLE, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
-	EnemyPattern charging = {"Charge", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
 
 	HifiLaserSniper()
 	{
@@ -2591,7 +2777,30 @@ struct HifiLaserSniper : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE};
 		scale = vec2({160.0f / 2, 160.f / 2});
-		rotatePower = 90.0f;
+		rotatePower = 0.55f;
+		speedMultiplier = 1.3;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+	};
+};
+
+struct HifiLaserSniperHard : Enemy
+{
+	EnemyPattern randomState = {"Laser active", EnemyBehavior::IDLE, {}, 0, 0.f, 700.f, {{ReactionType::DURATION, 0}}, 1, true, 0.f, 700.f, FastLaser};
+	EnemyPattern Teleport = {"Charge", EnemyBehavior::TELEPORT, {}, 0, 300.f, 300.f, {{ReactionType::DURATION, 0}}, 2, true, 0.f, 350.f, twelveSpiralShot};
+	EnemyPattern CoolDown = {"CoolDown", EnemyBehavior::IDLE, {}, 0, 0.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 5000.f, NoAttack};
+
+	HifiLaserSniperHard()
+	{
+		maxHealth = 150;
+		currHealth = maxHealth;
+		enemyPatterns = {randomState, Teleport, CoolDown};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_007_alt1.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE};
+		scale = vec2({160.0f / 2, 160.f / 2});
+		rotatePower = 0.6f;
 		speedMultiplier = 1.3;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	};
@@ -2645,7 +2854,7 @@ struct HifiSniper : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({160.f / 2.f, 160.f / 2.f});
-		rotatePower = 90.f;
+		rotatePower = 1.5f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 0.4;
 	};
@@ -2702,7 +2911,7 @@ struct HifiSniperHard : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({160.f / 2.f, 160.f / 2.f});
-		rotatePower = 90.f;
+		rotatePower = 1.5f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 1.5;
 	};
@@ -2731,7 +2940,7 @@ struct HifiCharger : Enemy
 		};
 		scale = vec2({480 / 8.f, 480 / 8.f});
 		patternIndex = 0;
-		rotatePower = 90.f;
+		rotatePower = 1.8f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 1.6f;
 	}
@@ -2778,7 +2987,7 @@ struct HifiChargerHard : Enemy
 		};
 		scale = vec2({480 / 8.f, 480 / 8.f});
 		patternIndex = 0;
-		rotatePower = 90.f;
+		rotatePower = 1.8f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 2.6f;
 	}
@@ -3445,7 +3654,7 @@ struct HifiCannon : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({240.f / 2.f, 240.f / 2.f});
-		rotatePower = 0.5f;
+		rotatePower = 1.0f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 0.3;
 	};
@@ -3508,7 +3717,7 @@ struct HifiCannonHard : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({300.f / 2.f, 300.f / 2.f});
-		rotatePower = 0.5f;
+		rotatePower = 1.f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 0.3;
 	};

@@ -512,7 +512,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 map.currRoom.preset = BossRoomCrab;
             }
             else {
-                map.currRoom.preset = ScientistBossRoom;
+                map.currRoom.preset = BossBigCRoom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;

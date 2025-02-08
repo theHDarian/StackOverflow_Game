@@ -1279,10 +1279,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	case EnemyType::BossBigC:
 	{
-		enemy = BigC();
+		enemy = BossBigCCore();
 		auto &boss = registry.bosses.emplace(entity);
 		boss.name = "BigC";
-		movement.angularSpeed = 20;
+		break;
+	}
+		case EnemyType::BossBigCShield:
+	{
+		enemy = BigC();
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case EnemyType::BossBeehiveGun:
@@ -1444,6 +1449,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::EnemyLaserSniper:
 		enemy = HifiLaserSniper();
 		break;
+	case EnemyType::EnemyLaserSniperHard:
+		enemy = HifiLaserSniperHard();
+		break;
 	case EnemyType::EnemyHifiCharger:
 		enemy = HifiCharger();
 		break;
@@ -1578,6 +1586,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			enemy = BMP();
 			Buffer& buffer = registry.buffers.emplace(entity);
 			buffer.range = 500.f;
+			buffer.maxCoolDown = 1000.f;
 			break;
 		}
 
@@ -1652,6 +1661,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		createEnemy(renderer, pos + vec2(97, -95), EnemyType::BossBeehiveGun);
 		createEnemy(renderer, pos + vec2(-118, 72), EnemyType::BossBeehiveGun);
 	}
+
+	if (type == EnemyType::BossBigC)
+    {
+        createEnemy(renderer, pos + vec2(0, 0), EnemyType::BossBigCShield);
+    }
 
 	return entity;
 };

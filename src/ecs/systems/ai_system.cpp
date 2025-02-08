@@ -51,12 +51,26 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 
 				std::cout << "invisible: " << inv.countdown << std::endl;
 			}
+		case SpecialStates::PROTECTED:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 0.5;
+			} else {
+				auto& vul = registry.vulnerabilities.emplace(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 0.5;
+			}
 		case SpecialStates::VULNERABLE:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
 				vul.countdown = currPattern.maxDuration;
 				vul.modifier = 2.f;
-			}
+			} else {
+                auto& vul = registry.vulnerabilities.emplace(entity);
+                vul.countdown = currPattern.maxDuration;
+                vul.modifier = 2.f;
+            }
 		break;
 		default: break;
 	}
@@ -68,22 +82,38 @@ void handleSpecialStates (Reaction reaction, Entity entity)
 		case SpecialStates::INVINCIBLE:
 			if (!registry.invincibles.has(entity)) {
 				auto& inv = registry.invincibles.emplace(entity);
-				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 2500.f) : Random::Float( 10000 ) + 3000;
+				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
 				inv.countdown = inv.max;
 			}
 		break;
 		case SpecialStates::INVISIBLE:
 			if (!registry.invisibles.has(entity)) {
 				auto inv = registry.invisibles.emplace(entity);
-				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 2500.f) : Random::Float( 10000 ) + 3000;
+				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
 
 			}
+
+		case SpecialStates::PROTECTED:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 0.5;
+			} else {
+				auto& vul = registry.vulnerabilities.emplace(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 0.5;
+			}
+
 		case SpecialStates::VULNERABLE:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 7500.f) : Random::Float( 10000 ) + 10000;
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 				vul.modifier = 2.f;
-			}
+			} else {
+                auto& vul = registry.vulnerabilities.emplace(entity);
+                vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+                vul.modifier = 2.f;
+            }
 		break;
 		default: break;
 	}
@@ -466,7 +496,7 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::GRANTINGBUFFS:
 		return getTeamPos(entity);
 		case EnemyBehavior::GRANTINGBUFFSAOE:
-    	return Random::Int( 2 ) == 0 ? getTeamPos(entity) : generateRandomPos(entity);
+    	return getTeamPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
@@ -660,8 +690,35 @@ vec2 AISystem::getTeamPos(Entity entity)
 
 			return goalPosition;
 		}
+	} else if (registry.buffers.has(entity))
+	{
+		Buffer& buffer = registry.buffers.get(entity);
+		Entity teammates = buffer.targetEntity;
+		if (teammates != NULL && registry.motions.has(teammates))
+		{
+			Motion &teammateMotion = registry.motions.get(teammates);
+			Motion &bufferMotion = registry.motions.get(entity);
+
+			vec2 direction = teammateMotion.position - bufferMotion.position;
+			if (glm::length(direction) > 0)
+			{
+				direction = glm::normalize(direction);
+			}
+			float backDistance = buffer.range * 0.5f;
+
+			vec2 goalPosition = teammateMotion.position - direction * backDistance;
+
+			vec4 roomBounds = getRoomBounds(entity);
+			vec2 min = {roomBounds.x, roomBounds.y};
+			vec2 max = {roomBounds.z, roomBounds.w};
+
+			goalPosition = glm::clamp(goalPosition, min, max);
+
+			return goalPosition;
+		}
 	}
-	return getCurrentPos(entity);
+
+	return generateRandomPos(entity);
 };
 
 vec2 AISystem::getPlayerPos()

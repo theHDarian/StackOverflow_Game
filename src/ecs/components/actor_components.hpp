@@ -303,6 +303,7 @@ enum EnemyType {
     // HardEnemyBehavior
     EnemyPufferfish,
     BossBigC,
+    BossBigCShield,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -337,6 +338,7 @@ enum EnemyType {
     EnemyHifiTrailHard,
     EnemyHifiCannonHard,
     EnemyLaserSniper,
+    EnemyLaserSniperHard,
     EnemyHifiTemporaryBoid,
     EnemyHifiJellyFish,
     EnemyHifiTackShooter,
@@ -413,6 +415,7 @@ enum class SpecialStates {
     INVISIBLE,
     INVINCIBLE,
     VULNERABLE,
+    PROTECTED,
 };
 
 enum class EnemyBehavior {
@@ -499,6 +502,16 @@ struct Scientist {
 struct Hand {
 
 };
+//
+// struct StatChange {
+//     float max = 5000;
+//     float countdown = max;
+//     float rotationPowerMultiplier = 1.0f;
+//     float speedMultiplier = 1.0f;
+//     float scaleMultiplier = 1.0f;
+//     float HPMultiplier = 1.0f;
+//     EnemyRotationBehavior rotationBehaviour;
+// };
 
 // act like a state that can move depending on enemies reactions
 struct EnemyPattern {
@@ -524,13 +537,16 @@ struct EnemyPattern {
 
     //for enemies that can grant buffs to other enemies, this will be the effect that is granted
     SpecialStates buffEffect = SpecialStates::NORMAL;
+
 };
+
 struct Boid {
     vec2 velocity;
     vec2 position;
     float wanderAngle;
     float maxSpeed;
 };
+
 
 struct Healer {
     float coolDown;
@@ -544,6 +560,7 @@ struct Buffer {
     float maxCoolDown = 5000;
     float duration = 2000.f;
     float range = 200.f;
+    Entity targetEntity;
     // SpecialStates buffEffect = SpecialStates::NORMAL;
 
 };
