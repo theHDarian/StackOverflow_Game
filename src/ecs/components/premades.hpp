@@ -1444,12 +1444,12 @@ struct BossBigCCore : Enemy{
 		CIRCLE,
 		{APRounds},
 		dashCDRDownA,
-		3,
-		0,
+		6,
+		M_PI / 6,
 		{0, 20},
 		0,
-		4000,
-		{1.2, M_PI / 300},
+		2000,
+		{2.5, M_PI / 300},
 		0,
 		0,
 		0};
@@ -1531,10 +1531,10 @@ struct BossBigCCore : Enemy{
 	};
 
 	EnemyPattern PlayerCloseHalfHP = {
-		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 3, false, 2000.f, 500.f, NoAttack,
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 3, false, 2000.f, 500.f, NoAttack, SpecialStates::VULNERABLE
 	};
 
-	EnemyPattern PlayerCloseHalfHPLaser = {"PlayerClose", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration}, 5, true, 0.f, 100.f, laserRotate, SpecialStates::VULNERABLE};
+	EnemyPattern PlayerCloseHalfHPLaser = {"PlayerClose", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration}, 5, true, 0.f, 100.f, laserRotate, SpecialStates::INVINCIBLE};
 
 	EnemyPattern randomStateHalfHP = {
 		"RANDOM POSITION", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, playerCloseHalfHP}, 5, true,

@@ -1395,12 +1395,12 @@ const RoomPreset BossBigCRoom {
                             {EnemyLaserSniper,{0.38, 1-0.42}},
                         {EnemyLaserSniper,{1-0.38, 1-0.42}},
                 },
-                {
-                        {EnemyLaserSniperHard,{Random::Float(), Random::Float()}},
-                            {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
-            {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
-            {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
-                },
+            //     {
+            //             {EnemyLaserSniperHard,{Random::Float(), Random::Float()}},
+            //                 {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            // {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            // {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            //     },
 
 
 
@@ -1410,7 +1410,7 @@ const RoomPreset BossBigCRoom {
             },
         {},
         {{{Ram,{}}, {0.5f, 0.5f}}},
-        16.0f,
+        24.0f,
         20,
         5,
         "Big C",
