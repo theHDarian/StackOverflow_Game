@@ -511,8 +511,10 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             if (map.currRegion == Biology) {
                 map.currRoom.preset = BossRoomCrab;
             }
-            else {
+            else if (map.currRegion == Physics) {
                 map.currRoom.preset = BossBigCRoom;
+            } else {
+                map.currRoom.preset = ScientistBossRoom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
@@ -520,6 +522,10 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             // req2.type = InteractableRequestType::AddEffect;
             // req2.effects = {numBulletsUpA, numBulletsUpA};
         }
+        InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
+        extendstack.type = InteractableRequestType::ExtendStack;
+        extendstack.choice = 8*max(0,((int)map.currRegion - 1));
+
         map.directory = getDirectory(map.currRegion);
         std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
         for (int i = 0; i < 4; i++)
