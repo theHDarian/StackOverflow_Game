@@ -1100,7 +1100,7 @@ void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
-	float intensity = (float)stack.currStack.size() / ((stack.baseStackSize + stack.additives[PlayerStackSize]) * stack.multiplicatives[PlayerStackSize]);
+	float intensity = (float)stack.currStack.size() / (stack.baseStackSize + stack.Call(PlayerStackSize));
 	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
 	glUniform1f(chrom_abb_intensity_uloc, intensity);
 	gl_has_errors();

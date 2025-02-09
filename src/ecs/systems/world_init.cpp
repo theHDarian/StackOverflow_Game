@@ -2040,7 +2040,7 @@ Entity createLightningBullet(RenderSystem *renderer, vec2 pos)
 	bullet.bulletRange = 5000;
 	bullet.bulletBounce = 10;
 	bullet.bulletPierce = 10000;
-	(type) ? bullet.bulletEffects = {lightning1} : bullet.bulletEffects = {lightning2};
+	(type) ? bullet.bulletEffects = {lightningRotate} : bullet.bulletEffects = {lightningShuffle};
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -2208,9 +2208,7 @@ Entity createSkipDialogue()
 float getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity &player = registry.players.entities[0];
-	return min(
-		registry.stackCompile.get(player).maximums[bf],
-		max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]));
+	return registry.stackCompile.get(player).Call(bf) + value;
 }
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpecial)

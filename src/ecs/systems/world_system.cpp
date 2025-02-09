@@ -781,10 +781,7 @@ void WorldSystem::movePlayer() {
 float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity& pl = registry.players.entities[0];
-	return min(
-			registry.stackCompile.get(pl).maximums[bf],
-			max(registry.stackCompile.get(pl).minimums[bf], (value + registry.stackCompile.get(pl).additives[bf]) * registry.stackCompile.get(pl).multiplicatives[bf])
-		);
+	return registry.stackCompile.get(pl).Call(bf) + value;
 }
 
 void WorldSystem::handlePlayerHit(Entity& other) {
@@ -813,7 +810,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		registry.invincibles.emplace(player);
 		ParticleProps props;
 		if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
-			if (registry.enemyBullets.get(other).bulletEffects[0].effectCalc == Multiplicative) {
+			if (registry.enemyBullets.get(other).bulletEffects[0].value == 1) {
 				//yellow is multiplicative
 				props = playerZappedYellow;
 				if (!registry.uiRequests.has(player))
