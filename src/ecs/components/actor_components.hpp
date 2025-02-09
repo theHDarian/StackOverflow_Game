@@ -359,6 +359,7 @@ enum EnemyType {
     EnemyMiningBoulderSmall,
     EnemyMiningBoulderBig,
     EnemyMedicalBMP,
+    EnemyScissors,
 };
 
 enum class EnemyAttackPattern {

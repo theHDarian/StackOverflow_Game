@@ -1425,8 +1425,8 @@ const RoomPreset BossBigCRoom {
 const RoomPreset allConsoles {
     { {
         {EnemyMedicalBMP, {Random::Float(), Random::Float()}},
-{EnemyBeeHive, {Random::Float(), Random::Float()}},
-{EnemyBeeHive, {Random::Float(), Random::Float()}},
+{EnemyScissors, {Random::Float(), Random::Float()}},
+{EnemyScissors, {Random::Float(), Random::Float()}},
 
     }},
     {},
@@ -1680,8 +1680,12 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     if (type == RoomType::BossRoom && currRegion == MapRegion::Biology) {
         std::vector<RoomPreset> biobosses = {BossRoomBee, BossRoomCrab};
         return Random::ListItem(biobosses);
+    } else if (type == RoomType::BossRoom && currRegion == MapRegion::Medical) {
+        return ScientistBossRoom;
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
-        return ScientistBossRoom; //TODO change to physics boss
+        return BossBigCRoom;
+    } else if (type == RoomType::BossRoom && currRegion == MapRegion::Mining) {
+        return ScientistBossRoom; //TODO change to mining boss
     }
 
     // Tutorial rooms

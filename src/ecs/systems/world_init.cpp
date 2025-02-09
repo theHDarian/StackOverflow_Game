@@ -1589,6 +1589,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			buffer.maxCoolDown = 1000.f;
 			break;
 		}
+		case EnemyScissors:
+        {
+            enemy = Scissors();
+            break;
+        }
 
 		default:
 			assert(false);
