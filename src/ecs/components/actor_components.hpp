@@ -267,6 +267,11 @@ struct Invisible {
     float countdown = 1000;
 };
 
+struct Vulnerability {
+    float countdown = 1000;
+    float modifier = 1.f;
+};
+
 struct PlayerAttackData {
     float currFiringInterval = 0.0f;
     float maxFiringInterval = 300.0f;
@@ -298,6 +303,7 @@ enum EnemyType {
     // HardEnemyBehavior
     EnemyPufferfish,
     BossBigC,
+    BossBigCShield,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -336,6 +342,7 @@ enum EnemyType {
     EnemyHifiTrailHard,
     EnemyHifiCannonHard,
     EnemyLaserSniper,
+    EnemyLaserSniperHard,
     EnemyHifiTemporaryBoid,
     EnemyHifiJellyFish,
     EnemyHifiTackShooter,
@@ -355,6 +362,8 @@ enum EnemyType {
     EnemyMedicalBoid,
     EnemyMiningBoulderSmall,
     EnemyMiningBoulderBig,
+    EnemyMedicalBMP,
+    EnemyScissors,
 };
 
 enum class EnemyAttackPattern {
@@ -409,7 +418,9 @@ struct AttackData {
 enum class SpecialStates {
     NORMAL,
     INVISIBLE,
-    INVINCIBLE
+    INVINCIBLE,
+    VULNERABLE,
+    PROTECTED,
 };
 
 enum class EnemyBehavior {
@@ -445,7 +456,9 @@ enum class EnemyBehavior {
     WORM_PATROL,
     WORM_RANDOM,
     WORM_GOTO,
-    WORM_BODY
+    WORM_BODY,
+    GRANTINGBUFFS, // for enemies that give effects to other enemies, using this makes specials states apply to the other entity rather than itself
+    GRANTINGBUFFSAOE, // for enemies that give effects to all other enemies
 };
 
 enum class EnemyRotationBehavior {
@@ -525,6 +538,10 @@ struct EnemyPattern {
     //special states, for if the enemy has some special attributes like being invisible or invincible
     //the state will last for the duration of the current pattern
     SpecialStates specialState = SpecialStates::NORMAL;
+
+    //for enemies that can grant buffs to other enemies, this will be the effect that is granted
+    SpecialStates buffEffect = SpecialStates::NORMAL;
+
 };
 struct Boid {
     vec2 velocity;
@@ -550,6 +567,16 @@ struct Healer {
     float maxCoolDown = 3000.f;
     int healPower = 35;
     Entity targetEntity;
+};
+
+struct Buffer {
+    float cooldown;
+    float maxCoolDown = 5000;
+    float duration = 2000.f;
+    float range = 200.f;
+    Entity targetEntity;
+    // SpecialStates buffEffect = SpecialStates::NORMAL;
+
 };
 
 
@@ -589,6 +616,7 @@ struct Enemy {
     float rotatePower;
     EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
+    int armour = 1;
     WormHead headData;
 };
 

@@ -1279,10 +1279,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	case EnemyType::BossBigC:
 	{
-		enemy = BigC();
+		enemy = BossBigCCore();
 		auto &boss = registry.bosses.emplace(entity);
 		boss.name = "BigC";
-		movement.angularSpeed = 20;
+		break;
+	}
+		case EnemyType::BossBigCShield:
+	{
+		enemy = BigC();
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case EnemyType::BossBeehiveGun:
@@ -1298,6 +1303,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}case EnemyType::EnemyMage:
 	{
 		enemy = Mage();
+		// Healer& healer = registry.healers.emplace(entity);
+		// healer.coolDown = 1000.f;
+		// healer.healPower = 15.f;
 		break;
 	}
 	case EnemyType::EnemyOneBee:
@@ -1455,6 +1463,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::EnemyLaserSniper:
 		enemy = HifiLaserSniper();
 		break;
+	case EnemyType::EnemyLaserSniperHard:
+		enemy = HifiLaserSniperHard();
+		break;
 	case EnemyType::EnemyHifiCharger:
 		enemy = HifiCharger();
 		break;
@@ -1589,6 +1600,20 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		break;
 	}
 
+	case EnemyMedicalBMP:
+		{
+			enemy = BMP();
+			Buffer& buffer = registry.buffers.emplace(entity);
+			buffer.range = 500.f;
+			buffer.maxCoolDown = 1000.f;
+			break;
+		}
+		case EnemyScissors:
+        {
+            enemy = Scissors();
+            break;
+        }
+
 		default:
 			assert(false);
 	};
@@ -1670,6 +1695,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			if (i < head.size) createWormBody(renderer, posi, head.body, entity, i);
 		}
 	}
+
+	if (type == EnemyType::BossBigC)
+    {
+        createEnemy(renderer, pos + vec2(0, 0), EnemyType::BossBigCShield);
+    }
 
 	return entity;
 };
