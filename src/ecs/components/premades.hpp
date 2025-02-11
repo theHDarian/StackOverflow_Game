@@ -981,6 +981,7 @@ struct Snail : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0, 0)};
 		scale = vec2(336, 216) * 0.5f;
+		armour = 2;
 	};
 };
 
@@ -1021,6 +1022,7 @@ struct EvilSnail : Enemy
 		scale = vec2(336, 216) * 0.5f;
 		speedMultiplier = 1.15;
 		rotatePower = 0.5;
+		armour = 2;
 	};
 };
 
@@ -1063,6 +1065,7 @@ struct Crab : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE};
 		scale = vec2({336.0f / 2, 240.f / 2});
 		rotatePower = 0.8f;
+		armour = 2;
 	};
 };
 
@@ -1104,6 +1107,7 @@ struct LaserCrab : Enemy
 		rotatePower = 1.0f;
 		speedMultiplier = 2.6;
 		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
+		armour = 2;
 	};
 };
 
@@ -1147,6 +1151,7 @@ struct EvilCrab : Enemy
 		scale = vec2({336.0f / 2, 240.f / 2});
 		rotatePower = 0.8f;
 		speedMultiplier = 1.5f;
+		armour = 2;
 	};
 };
 
@@ -1339,6 +1344,7 @@ struct BossChimeraCrab : Enemy {
 		rotatePower = 0.8f;
 		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
 		speedMultiplier = 4.5f;
+		armour = 3;
 	};
 };
 
@@ -1433,7 +1439,7 @@ struct BigC : Enemy
 		rotatePower = 0.5f;
 		scale = vec2({700, 700 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
-
+		armour = 10;
 	};
 };
 
@@ -1559,6 +1565,7 @@ struct BossBigCCore : Enemy{
 		rotatePower = 0.8f;
 		rotationBehaviour = EnemyRotationBehavior::NONE,
 		speedMultiplier = 4.5f;
+		armour = 2;
 	};
 };
 
@@ -1965,6 +1972,7 @@ struct BossBeeHive : Enemy
 			800};
 		patternIndex = 0;
 		scale = vec2(384, 480);
+		armour = 2;
 	};
 };
 
@@ -2577,6 +2585,7 @@ struct BMP : Enemy {
 		patternIndex = 0;
 		scale = vec2(140, 140);
 		rotatePower = 0.f;
+		armour = 3;
 	};
 
 };
@@ -2755,7 +2764,7 @@ struct BigBoulder : Enemy
 		scale = vec2(240, 240) * 0.65f;
 		speedMultiplier = 0;
 		rotatePower = 2;
-
+		armour = 2;
 	};
 };
 
@@ -3725,6 +3734,7 @@ struct HifiCannon : Enemy
 		rotatePower = 1.0f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 0.3;
+		armour = 2;
 	};
 };
 
@@ -3788,6 +3798,7 @@ struct HifiCannonHard : Enemy
 		rotatePower = 1.f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 0.3;
+		armour = 3;
 	};
 };
 
@@ -4182,6 +4193,7 @@ struct ScientistBossEnemy : Enemy
 		patternIndex = 8;
 		scale = vec2(250, 250);
 		rotatePower = 0.f;
+		armour = 10;
 	}
 };
 
@@ -4205,6 +4217,7 @@ struct ScientistSheildEnemy : Enemy
 		patternIndex = 0;
 		scale = vec2(300, 300);
 		rotatePower = 0.f;
+		armour = 10;
 	}
 };
 
@@ -4540,21 +4553,21 @@ struct ScientistHandEnemy : Enemy
 		0,
 		0};
 
-	EnemyPattern idling = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
 	EnemyPattern chargePlayer = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 3000.f, 3000.f, {duration}, 2, false, 0.f, 0.f, NoAttack};
-	EnemyPattern idling2 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling2 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 3, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
 	EnemyPattern BombingState = {"PATROL", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 6000.f, 6000.f, {duration}, 4, true, 1000.f, 1000.f, HandBomb};
-	EnemyPattern idling3 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 5, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling3 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 5, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
 	EnemyPattern teleportToScientist2 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 6, true, 500.f, 1000.f, quakeShot};
 	EnemyPattern laserAttackPrepareState = {"PATROL", EnemyBehavior::TELEPORT, {{1, 0.1}}, 0, 2000.f, 2000.f, {duration}, 7, false, 1000.f, 1000.f, NoAttack};
 	EnemyPattern patrolLaserState = {"PATROLLING", EnemyBehavior::PATROLLING, {{1, 0.1}, {1, 0.95}}, 0, 15000.f, 15000.f, {duration}, 8, true, 0.f, 15000.f, laserOne};
 	EnemyPattern teleportToScientist3 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 9, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling4 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 10, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling4 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 10, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
 	EnemyPattern SprayingState = {"PATROL", EnemyBehavior::PATROLLING, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 11, true, 1000.f, 1000.f, sprayingShot};
 	EnemyPattern teleportToScientist4 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 12, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling5 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 13, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling5 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 13, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
 	EnemyPattern sprayHomingState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 6000.f, 6000.f, {duration}, 14, true, 0.f, 3000.f, sprayHoming};
-	EnemyPattern idling6 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 15, false, 0.f, 0.f, NoAttack};
+	EnemyPattern idling6 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 15, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
 	EnemyPattern teleportToScientist5 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 16, true, 500.f, 1000.f, quakeShot};
 	EnemyPattern teleportToWall = {"TELEPORT", EnemyBehavior::TELEPORT, {{1, 0.5}}, 0, 2000.f, 2000.f, {duration}, 17, false, 1000.f, 1000.f, NoAttack};
 	EnemyPattern laserRotateState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 3000.f, laserArea};
@@ -4587,6 +4600,7 @@ struct ScientistHandEnemy : Enemy
 			"Pop the stack",
 			""
 		};
+		armour =2;
 	};
 };
 

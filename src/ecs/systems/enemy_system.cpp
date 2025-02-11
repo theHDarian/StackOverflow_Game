@@ -376,7 +376,7 @@ void EnemySystem::step(float elapsed_ms)
                 // std::cout << "enemy " << entity << "has died" << std::endl;
             }
 
-            bulletStat.bulletPierce -= 1;
+            bulletStat.bulletPierce -= enemyStat.armour;
             registry.ignores.get(other_entity).ignores.push_back(entity);
 
             if (!registry.deleteds.has(other_entity) && bulletStat.bulletPierce < 0 && (!registry.boids.has(entity) || (registry.boids.has(entity) && registry.enemies.components.size() > registry.boids.components.size())))

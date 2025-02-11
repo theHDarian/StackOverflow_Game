@@ -603,6 +603,7 @@ struct Enemy {
     float rotatePower;
     EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
+    int armour = 1;
 };
 
 struct EnemyGroup {
