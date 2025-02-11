@@ -336,7 +336,6 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				}
 				else if (reaction.choice == 4) {
 					region = Mining;
-					room = BossRoom;
 				}
 				else if (reaction.choice == 5) {
 					region = Physics;
