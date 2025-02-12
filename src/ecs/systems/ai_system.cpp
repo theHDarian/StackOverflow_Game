@@ -164,7 +164,7 @@ void AISystem::step(float elapsed_ms)
 				// Move target location
 				switch (currPattern.type) {
 				case EnemyBehavior::WORM_FOLLOW:
-					head.points[0] = glm::lerp(head.points[0], registry.motions.get(registry.players.entities[0]).position, 0.02f * enemy.speedMultiplier);
+					head.points[0] = moveTowards(head.points[0], registry.motions.get(registry.players.entities[0]).position, 3.f * enemy.speedMultiplier);
 					break;
 				case EnemyBehavior::WORM_PATROL:
 					// Worm will Teleport to first position in spline if not there
@@ -182,9 +182,12 @@ void AISystem::step(float elapsed_ms)
 					if (movement.t > movement.points.size()) movement.t -= (float)movement.points.size();
 					break;
 				case EnemyBehavior::WORM_GOTO:
-					head.points[0] = glm::lerp(head.points[0], lerpToRoom(currPattern.path[currPattern.path.size() - 1]), movement.t);
+					head.points[0] = moveTowards(head.points[0], lerpToRoom(currPattern.path[currPattern.path.size() - 1]), 5.f * enemy.speedMultiplier);
 					currPattern.pathIndex = currPattern.path.size() - 1;
 					movement.t = (movement.t > 1.f) ? 0.f : movement.t + 0.0001 * enemy.speedMultiplier;
+					break;
+				case EnemyBehavior::IDLE:
+					movement.t = 0.f;
 					break;
 				default:
 					assert(false);
@@ -195,11 +198,19 @@ void AISystem::step(float elapsed_ms)
 					//Pull the next segment to the previous one
 					head.points[i] = constrainDistance(head.points[i], head.points[i - 1], head.constrainDistance);
 				}
+				if (head.anchor) {
+					head.points[head.size] = constrainDistance(head.points[head.size], lerpToRoom(head.anchorPoint), head.constrainDistance);
+					for (int i = head.size - 1; i >= 0; i--) {
+						//Pull the next segment to the previous one
+						head.points[i] = constrainDistance(head.points[i], head.points[i+1], head.constrainDistance);
+					}
+				}
 
 				// Move head enemy
 				vec2 direction = (head.points[0] - head.points[1]);
 				motion.position = head.points[1] + 0.5f * direction;
 				motion.angle = atan2(direction.y, direction.x);
+				if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) motion.angle = 0;
 			}
 			else {
 				// Move body enemy
@@ -1307,4 +1318,15 @@ vec2 AISystem::catmullRomSpline(const std::vector<glm::vec2>& cp, float t)
 vec2 AISystem::lerpToRoom(vec2 point) {
 	Map& map = registry.maps.components[0];
 	return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, point);
+}
+
+ vec2 AISystem::moveTowards(vec2 current, vec2 target, float maxDistanceDelta)
+{
+	vec2 a = target - current;
+	float magnitude = glm::length(a);
+	if (magnitude <= maxDistanceDelta || magnitude == 0.f)
+	{
+		return target;
+	}
+	return current + a / magnitude * maxDistanceDelta;
 }

@@ -41,4 +41,5 @@ private:
 	static vec2 catmullRomSplineLerp(const std::vector<glm::vec2>& cp, float t);
 	static vec2 catmullRomSpline(const std::vector<glm::vec2>& cp, float t);
 	static vec2 lerpToRoom(vec2 point);
+	static vec2 moveTowards(vec2 current, vec2 target, float maxDistanceDelta);
 };
