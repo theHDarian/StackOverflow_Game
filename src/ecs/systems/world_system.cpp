@@ -663,7 +663,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 
 	if (pl.currFiringInterval <= 0) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
-		pl.currFiringInterval = (1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000;
+		pl.currFiringInterval = getModifiedValue(FireRate, pl.maxFiringInterval);
 	}
 
 	if (pl.bulletBurstCooldown <= 0 && pl.currBulletBurst > 0) {
@@ -677,56 +677,36 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		// create bullet
 		vec2 bulletPos = playerPos + bulletDir;
 
-		if (cluster == 1) {
+		float angle = atan2(bulletDir.y, bulletDir.x);
+		float angleOffset = radians(getModifiedValue(BulletSpread, 20));
+
+		if (cluster % 2 == 0) {
+			for (int i = 0; i < cluster / 2; i++) {
+				float a1 = angle + (i + 0.5) * angleOffset;
+				float a2 = angle + (i - 0.5) * angleOffset;
+				createPlayerBullet(renderer, bulletPos, { cos(a1), sin(a1) });
+				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
+				soundPlayer->playPlayerShootSound(max(250.0f, min(
+					50.0f,
+					((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+						BulletBurst, pl.maxBulletBurst))));
+			}
+		} else {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
 			soundPlayer->playPlayerShootSound(max(250.0f, min(
-			50.0f,
-			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst))));
-
-			return;
-		}
-
-		// Calculate the offset between bullets for cluster shots
-
-		float offSet = radians(getModifiedValue(BulletSpread, 30)) / cluster;
-		// Create a rotation matrix
-		glm::mat2 rotationMatrix = glm::mat2(
-			glm::cos(offSet), -glm::sin(offSet),
-			glm::sin(offSet),  glm::cos(offSet)
-		);
-
-
-		if (cluster == 2) {
-			createPlayerBullet(renderer, bulletPos, bulletDir*rotationMatrix);
-			createPlayerBullet(renderer, bulletPos, bulletDir*glm::transpose(rotationMatrix));
-			soundPlayer->playPlayerShootSound(max(250.0f, min(
-			50.0f,
-			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst))));
-
-			return;
-		}
-
-		for (int i = 0; i < cluster; i++) {
-			if (i == 0) {
-				createPlayerBullet(renderer, bulletPos, bulletDir);
-				continue;
+				50.0f,
+				((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+					BulletBurst, pl.maxBulletBurst))));
+			for (int i = 0; i < (cluster - 1) / 2; i++) {
+				float a1 = angle + (i + 1) * angleOffset;
+				float a2 = angle - (i + 1) * angleOffset;
+				createPlayerBullet(renderer, bulletPos, { cos(a1), sin(a1) });
+				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
+				soundPlayer->playPlayerShootSound(max(250.0f, min(
+					50.0f,
+					((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
+						BulletBurst, pl.maxBulletBurst))));
 			}
-			for (int j = 0; j < i; j++) {
-				if (i % 2 == 0) {
-					bulletDir = bulletDir * rotationMatrix;
-				}
-				else {
-					bulletDir = bulletDir * glm::transpose(rotationMatrix);
-				}
-			}
-			createPlayerBullet(renderer, bulletPos, bulletDir);
-			soundPlayer->playPlayerShootSound(max(250.0f, min(
-			50.0f,
-			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst))));
-
 		}
 	}
 }

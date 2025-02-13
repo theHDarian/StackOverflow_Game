@@ -50,9 +50,8 @@ struct EffectStack {
 struct Player
 {
     float baseSpeed = 300;
-    float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
-    float baseDashCDR = 3000.0f;
+    float baseDashCDR = 2000.0f;
     float baseDashSpeed = 2500.0f;
 
     float dashSpeed = baseDashSpeed;
@@ -77,21 +76,23 @@ struct StackCompile {
     std::vector<BulletStackEffect> recentRemoved;
 
     typedef float (StackCompile ::* FP)(int);
-    float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 10.f, 1000.f); };
-    float projectileSpeedFunc(int x)    { return clamp(0.f, (float)x * 10.f, 2000.f); };
-    float projectileSizeFunc(int x)     { return clamp(0.f, (float)x * 5.f, 100.f); };
-    float fireRateFunc(int x)           { return clamp(0.f, (float)x, 500.f); };
-    float bulletRangeFunc(int x)        { return clamp(0.f, (float)x, 1000000.f); };
-    float bulletSpreadFunc(int x)       { return clamp(0.f, (float)x, 1000000.f); };
+    // x<0 does nothing (except waste space on stack)
+    float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
+    float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * 80.f, 1400.f); };
+    // x=5 is tier limit reached
+    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? (x < 5) ? (float)x * 8.f : ((float)x - 5) * 5.f : (float)x, 80.f); };
+    float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? -500.f + 1000.f / ((float)x + 2.f) : -50.f * (float)x, 1000.f); };
+    float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
+    float bulletSpreadFunc(int x)       { return clamp(-15.f, (x > 0) ? -2.f * (float)x : -20.f * (float)x, 330.f); };
     float bulletNumFunc(int x)          { return clamp(0.f, (float)x, 50.f); };
     float bulletBurstFunc(int x)        { return clamp(0.f, (float)x, 50.f); };
     float bounceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
     float pierceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
-    float homingFunc(int x)             { return clamp(0.f, (float)x / 10.f, 1.f); };
-    float playerSpeedFunc(int x)        { return clamp(0.f, (float)x, 1000.f); };
+    float homingFunc(int x)             { return clamp(0.f, (float)x / 20.f, 1.f); };
+    float playerSpeedFunc(int x)        { return clamp(-150.f, (float)x * 20.f, 300.f); };
     float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 20.f); };
     float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 4.f, 64.f); };
-    float playerDashCDRFunc(int x)      { return clamp(0.f, (float)x, 1000000.f); };
+    float playerDashCDRFunc(int x)      { return clamp(-1500.f, (x > 0) ? (float)x * -150.f : (float)x * -200.f, 8000.f); };
 
     std::map<BulletEffectType, FP> functions = {
         {BulletDamage,      &StackCompile::bulletDamageFunc},
@@ -111,9 +112,11 @@ struct StackCompile {
         {PlayerDashCDR,     &StackCompile::playerDashCDRFunc}
     };
 
-    float Call(const BulletEffectType& s) {
+    // Use extra when you want to find what a higher/lower value would yield
+    // Useful for UI info
+    float Call(const BulletEffectType& s, int extra = 0) {
         FP fp = functions[s];
-        return (this->*fp)(values[s]);
+        return (this->*fp)(values[s] + extra);
     }
 
     std::map<BulletEffectType, float> values = {
@@ -238,8 +241,7 @@ struct Invisible {
 
 struct PlayerAttackData {
     float currFiringInterval = 0.0f;
-    float maxFiringInterval = 300.0f;
-    float bulletSpeed = 400;
+    float maxFiringInterval = 500.0f;
 
     int maxBulletBurst = 1;
     int currBulletBurst = 1;
@@ -250,7 +252,7 @@ struct PlayerBullet {
     float damage = 10;
     float bulletSpeed = 600;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange = 6000;
+    float bulletRange = 1000;
     // Player bullet only scale in all directions?
     float bulletSize = 20;
     int bulletPierce = 0;
