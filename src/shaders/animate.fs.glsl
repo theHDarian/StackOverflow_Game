@@ -1,4 +1,10 @@
 #version 330
+/*
+
+		DO NOT TOUCH, ONLY EXISTS TO NOT BREAK CODE lol
+
+*/
+
 
 // From vertex shader
 in vec2 texcoord;

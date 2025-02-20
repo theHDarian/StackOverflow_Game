@@ -107,8 +107,7 @@ public:
 
 private:
 	// Internal drawing functions for each entity type
-	void drawTextured(Entity entity, const mat4& projection, const mat4& view, bool isUI);
-	void drawAnimate(Entity entity, const mat4& projection, const mat4& view, bool isUI);
+	void drawAnimateTextured(Entity entity, const mat4& projection, const mat4& view, bool isUI);
 	void drawMesh(Entity entity, const mat4& projection, const mat4& view);
 	void drawBullet(Entity entity, const mat4& projection, const mat4& view);
 	void drawDashes(const mat4& projection, const mat4& view);
