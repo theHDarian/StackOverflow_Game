@@ -292,7 +292,6 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniform1f(effectAlpha, 1);
 
 	// fade out entity if needed
-	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	float alpha = 1;
 	if (registry.fades.has(entity))
 	{
@@ -313,6 +312,8 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	else if (registry.shield.has(entity)) {
 		alpha = 0.3;
 	}
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, alpha);
 
 	// Setting uniform values to the currently bound program
 	WindowState& windowState = registry.windowStates.components[0];
