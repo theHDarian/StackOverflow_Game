@@ -931,7 +931,7 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	Motion& motion = registry.motions.get(bulletUI);
 	WindowState& windowState = registry.windowStates.components[0];
-	motion.position.x = position.x;
+	motion.position = position;
 	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
 		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
 	}
@@ -943,7 +943,6 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 		uiTexts.insert({ "HoverBullet_" + bullet.name, getTokenizedText(tooltip) });
 	}
 
-	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
 	textReq.bottomLeftBound = {textReq.x, 0};
 	textReq.topRightBound = { textReq.x + motion.scale.x - 25, 10000 };
@@ -975,6 +974,7 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	// scale box vertically to number of lines
 	motion.scale.y = textReq.formattedText.size() * 50;
 	motion.position.y = position.y + motion.scale.y / 2 + 50 + 10;
+	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 }
 
 Entity UISystem::createBulletUIArrow() {
