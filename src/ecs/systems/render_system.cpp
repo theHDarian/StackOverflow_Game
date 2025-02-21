@@ -1953,7 +1953,8 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 			bulletColor = bulletEffectColors.at(stack.currStack[i].type);
 		}
 
-		// start from bottom to top
+		// start from left to right
+		// might be easier if these were entities instead...
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
 					 bulletColor, bulletShape, projection, view);
 	}
@@ -1965,13 +1966,15 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	motion.scale = bullet_size;
 	motion.position = position;
 
-	// for now, draw bullets using textures
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
+	GLuint used_effect_enum = static_cast<GLuint>(EFFECT_ASSET_ID::BULLET);
+	if (shape.compare(bulletEffectShapes.at(BulletEffectType::Key)) == 0) {
+		used_effect_enum = static_cast<GLuint>(EFFECT_ASSET_ID::TEXTURED);
+	}
 	const GLuint program = (GLuint)effects[used_effect_enum];
 
 	// Setting shaders
 	glUseProgram(program);
-	gl_has_errors();
+	//gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
 	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -1979,67 +1982,100 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	// Setting vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
+	//gl_has_errors();
 
 	GLint in_position_loc = glGetAttribLocation(program, "in_position");
 	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
+	//gl_has_errors();
 
 	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-						  sizeof(TexturedVertex), (void *)0);
-	gl_has_errors();
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+	//gl_has_errors();
 
 	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(
-		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		(void *)sizeof(
-			vec3)); // note the stride to skip the preceeding vertex position
+	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+	//gl_has_errors();
 
-	// Enabling and binding texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
+	GLuint time_uloc = glGetUniformLocation(program, "time");
+	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 
-	GLuint texture_id =
-		texture_gl_handles[(GLuint)name_to_texture[shape]];
+	GLint laser_uloc = glGetUniformLocation(program, "laser");
+	glUniform1i(laser_uloc, 0);
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
-	gl_has_errors();
+	GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
+	glUniform1i(onDeath_uloc, 0);
 
-	// Getting uniform locations for glUniform* calls
+	int size = 1;
+	GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
+	glUniform1i(effect_size_uloc, size);
+
+	GLint shape_uloc = glGetUniformLocation(program, "shape");
+	glUniform1i(shape_uloc, EnemyBulletShape::RECTANGLE);
+
+	GLint scale_uloc = glGetUniformLocation(program, "scale");
+	glUniform2fv(scale_uloc, 1, (float*)&bullet_size);
+
+	vec3 c2, c3, c4, c5;
+	c2 = c3 = c4 = c5 = vec3(-1.0);
+	vec3 c1 = color;
+
+	GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
+	glUniform3fv(bcolor1_uloc, 1, (float*)&c1);
+	GLint bcolor2_uloc = glGetUniformLocation(program, "bcolor2");
+	glUniform3fv(bcolor2_uloc, 1, (float*)&c2);
+	GLint bcolor3_uloc = glGetUniformLocation(program, "bcolor3");
+	glUniform3fv(bcolor3_uloc, 1, (float*)&c3);
+	GLint bcolor4_uloc = glGetUniformLocation(program, "bcolor4");
+	glUniform3fv(bcolor4_uloc, 1, (float*)&c4);
+	GLint bcolor5_uloc = glGetUniformLocation(program, "bcolor5");
+	glUniform3fv(bcolor5_uloc, 1, (float*)&c5);
+
+	// textured gluniforms
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color_uloc, 1, (float *)&color);
-	// want to overwrite the colour with given; could also use a separate shader program
+	glUniform3fv(color_uloc, 1, (float*)&color);
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, 1);
-	gl_has_errors();
 
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
+	//gl_has_errors();
 
-	GLsizei num_indices = size / sizeof(uint16_t);
-	// GLsizei num_triangles = num_indices / 3;
+	// Enable and bind the texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[shape]];
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Setting uniform values to the currently bound program
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size_i = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size_i);
+
+	//gl_has_errors();
+
+	GLsizei num_indices = size_i / sizeof(uint16_t);
+
+	//gl_has_errors();
+
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	float wallThickness = 100 + 50;
+	float zoom = 1;
+	// note: perspective seems to make no difference?
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 
-	mat4 transform = createNormalModel(motion, vec2(0));
-
+	mat4 transform = glm::mat4(1.0);
+	transform = createNormalModel(motion, vec2(0));
 	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float *)&transform);
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float *)&view);
-	gl_has_errors();
+	//gl_has_errors();
+
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
 	gl_has_errors();
 }
 
