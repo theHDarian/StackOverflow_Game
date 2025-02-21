@@ -1736,7 +1736,9 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
             currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
         }
     }
-
+    if (type == RoomType::None) {
+        return nextRoom;
+    }
     nextRoom = Random::ListItem(locked ? getDirectory(currRegion).at(currentRegion).at(type).locked : getDirectory(currRegion).at(currentRegion).at(type).unlocked);
 
     // Remove the one-time room from all relevant regions
@@ -1782,7 +1784,8 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
     {RoomType::TutorialRoom, SoundType::titleBGM},
     {RoomType::TutorialRoom1, SoundType::titleBGM},
     {RoomType::TutorialRoom2, SoundType::normalBGM},
-{ RoomType::EventRoom, SoundType::specialBGM }
+{ RoomType::EventRoom, SoundType::specialBGM },
+{ RoomType::None, SoundType::specialBGM }
 
 };
 
