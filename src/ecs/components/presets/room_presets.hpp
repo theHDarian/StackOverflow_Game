@@ -881,12 +881,13 @@ const RoomPreset BossRoomCrab{
 
 const RoomPreset BossRoomWorm{
     {{{BossDrillWormHead, {1.5f, 1.5f}}}},
+    //{{{EnemyChainDogHead, {0.45f, 0.45f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,
     20,
     5,
-    "Carcinisation",
+    "Tunnel Troubles",
     false,
     {1500, 1500}
 

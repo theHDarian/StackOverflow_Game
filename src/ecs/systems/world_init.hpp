@@ -39,7 +39,7 @@ Entity createGardener(RenderSystem* renderer, vec2 pos);
 
 Entity createBibleTree(RenderSystem* renderer, vec2 pos);
 
-Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink = vec2(1.f));
+Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink = vec2(1.f), bool solid = true);
 
 Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect = EFFECT_ASSET_ID::TEXTURED);
 
@@ -110,3 +110,5 @@ Entity createSkipDialogue();
 float getModifiedValue(BulletEffectType bf, float value);
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial);
+
+vec2 lerpToRoom(vec2 point);

@@ -880,6 +880,62 @@ struct Pufferfish : Enemy
 	};
 };
 
+struct ChainDogHead : Enemy
+{
+	
+	EnemyPattern followState = { "Follow", EnemyBehavior::WORM_FOLLOW, {}, 0, 3000.f, 3000.f, {}, 0, false, 0.f, 5000.f, quadShot };
+
+	ChainDogHead()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+
+		enemyPatterns = { followState };
+
+		patternIndex = 0;
+		sprite = {
+			"DogBall.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 120.0f / 2, 120.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::FACE_UP;
+
+		speedMultiplier = 2.5f;
+
+		headData.size = 10;
+		headData.body = EnemyChainDogBody;
+		headData.constrainDistance = 30.f;
+		headData.anchor = true;
+		headData.anchorPoint = { 0.5f, 0.5f };
+	};
+};
+
+struct ChainDogBody : Enemy
+{
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none };
+
+	ChainDogBody()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"Chain.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 96.0f / 2, 72.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
 struct Quadshooter : Enemy
 {
 

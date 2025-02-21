@@ -302,6 +302,8 @@ enum EnemyType {
     // EasyEnemySniper,
     // HardEnemyBehavior
     EnemyPufferfish,
+    EnemyChainDogHead,
+    EnemyChainDogBody,
     BossBigC,
     BossBigCShield,
     BossBeehiveGun,
@@ -555,6 +557,9 @@ struct WormHead {
     float constrainDistance;
     int size = -1;
     EnemyType body;
+
+    bool anchor = false;
+    vec2 anchorPoint;
 };
 
 struct WormBody {
@@ -585,7 +590,7 @@ struct SpriteData
 	std::string texturePath;
 	EFFECT_ASSET_ID effectId;
 	GEOMETRY_BUFFER_ID geometryId;
-	vec2 offset;
+	vec2 offset = vec2(0);
     int animationType = 1;
     int max_Frames = 1;
     float countdown = 20;

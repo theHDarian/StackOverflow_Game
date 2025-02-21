@@ -1324,6 +1324,14 @@ void RenderSystem::drawGameElements()
 			drawAllColliders(entity, projection, view);
 	}
 
+	// Re-draw worm heads so they always on top of bodies
+	for (Entity& entity : registry.wormHeads.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
+			continue;
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
+	}
+
 	for (Entity &entity : registry.players.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
