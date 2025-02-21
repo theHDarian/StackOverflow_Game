@@ -613,6 +613,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	{
 		Damaged &damaged = registry.damageds.get(entity);
 		vec3 color = {1.2, 0.5, 0.5}; // red
+		if (registry.invincibles.has(entity)) {
+			color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
+		}
 		glUniform3fv(color_uloc, 1, (float *)&color);
 		glUniform1i(change_color_uloc, 1);
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);
@@ -2376,7 +2379,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 		HPBarMotion.scale = {100, 10};
 	}
 
-	if (registry.damageds.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
+	if (registry.damageds.has(entity) && !registry.invincibles.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
 	{
 		HPBarMotion.position.x += (rand() % 10) - 5;
 		HPBarMotion.position.y += (rand() % 10) - 5;
