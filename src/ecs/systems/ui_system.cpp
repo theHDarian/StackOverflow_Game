@@ -931,26 +931,22 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	Motion& motion = registry.motions.get(bulletUI);
 	WindowState& windowState = registry.windowStates.components[0];
-	motion.position = vec2(position.x, position.y + motion.scale.y / 2 + 50 + 10);
+	motion.position.x = position.x;
 	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
 		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
 	}
 	registry.renderRequests.get(bulletUI).show = true;
 
 	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
-	if (uiTexts.count("HoverBullet_" + bullet.name) > 0) {
-		textReq.formattedText = uiTexts["HoverBullet_" + bullet.name];
-	}
-	else {
-		// need to generate text and tokenize it
+	if (uiTexts.count("HoverBullet_" + bullet.name) == 0) { // new effect, need to generate text and tokenize it
 		std::string tooltip = makeBulletTooltip(bullet);
 		uiTexts.insert({ "HoverBullet_" + bullet.name, getTokenizedText(tooltip) });
-		textReq.formattedText = uiTexts["HoverBullet_" + bullet.name];
 	}
+
 	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
-	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
-	textReq.topRightBound = { textReq.x + motion.scale.x - 25, textReq.y };
+	textReq.bottomLeftBound = {textReq.x, 0};
+	textReq.topRightBound = { textReq.x + motion.scale.x - 25, 10000 };
 	textReq.decorations.clear();
 	vec3 color = bulletEffectColors.at(bullet.type);
 	if (bullet.type == Key) {
@@ -963,8 +959,22 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	arrowMotion.position = { position.x, position.y + 51 };
 	registry.renderRequests.get(bulletUIArrow).show = true;
 
-	std::vector<std::string> formatted = getFormattedText(textReq.formattedText, textReq.scale, textReq.alignment, { textReq.x, textReq.y }, textReq.topRightBound, textReq.bottomLeftBound);
+	std::vector<std::string> tokenized = uiTexts["HoverBullet_" + bullet.name];
+
+	// if the bullet is not a key, report its value
+	if (bullet.type != BulletEffectType::Key) {
+		std::vector<std::string> tokenizedValue = getTokenizedText("\n\nValue: " + std::to_string(bullet.value));
+		tokenized.insert(tokenized.end(), tokenizedValue.begin(), tokenizedValue.end());
+	}
+
+	// get formatted text based on bounds
+	std::vector<std::string> formatted = 
+		getFormattedText(tokenized, textReq.scale, textReq.alignment, {textReq.x, textReq.y}, textReq.topRightBound, textReq.bottomLeftBound);
 	textReq.formattedText = formatted;
+
+	// scale box vertically to number of lines
+	motion.scale.y = textReq.formattedText.size() * 50;
+	motion.position.y = position.y + motion.scale.y / 2 + 50 + 10;
 }
 
 Entity UISystem::createBulletUIArrow() {
