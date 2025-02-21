@@ -631,7 +631,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	PlayerAttackData& pl = registry.shoots.get(player);
     Motion& player_motion = registry.motions.get(player);
     vec2 playerPos = player_motion.position;
-    
+
 	WindowState& windowState = registry.windowStates.components[0];
 	Camera& camera = registry.cameras.components[0];
 	Room& room = registry.maps.components[0].currRoom;
@@ -683,7 +683,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		if (cluster % 2 == 0) {
 			for (int i = 0; i < cluster / 2; i++) {
 				float a1 = angle + (i + 0.5) * angleOffset;
-				float a2 = angle + (i - 0.5) * angleOffset;
+				float a2 = angle - (i + 0.5) * angleOffset;
 				createPlayerBullet(renderer, bulletPos, { cos(a1), sin(a1) });
 				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
 				soundPlayer->playPlayerShootSound(max(250.0f, min(
