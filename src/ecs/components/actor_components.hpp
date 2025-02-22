@@ -31,15 +31,9 @@ enum BulletEffectType {
     Pop, // Bullet that pops the stack, should only be a contact effect
 };
 
-enum EffectCalculation {
-    Additive,
-    Multiplicative
-};
-
 struct BulletStackEffect {
 	BulletEffectType type = BulletEffectType::Inert;
-    EffectCalculation effectCalc;
-    float value;
+    int value;
 
     // For UIq
     std::string name;
@@ -56,9 +50,8 @@ struct EffectStack {
 struct Player
 {
     float baseSpeed = 300;
-    float baseFiringInterval = 300.0f;
     int baseDashNum = 3;
-    float baseDashCDR = 3000.0f;
+    float baseDashCDR = 2000.0f;
     float baseDashSpeed = 2500.0f;
 
     float dashSpeed = baseDashSpeed;
@@ -82,7 +75,51 @@ struct StackCompile {
     std::vector<BulletStackEffect> currStack;
     std::vector<BulletStackEffect> recentRemoved;
 
-    std::map<BulletEffectType, float> additives = {
+    typedef float (StackCompile ::* FP)(int);
+    // x<0 does nothing (except waste space on stack)
+    float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
+    float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * 80.f, 1400.f); };
+    // x=5 is tier limit reached
+    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? (x < 5) ? (float)x * 8.f : ((float)x - 5) * 5.f : (float)x, 80.f); };
+    float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? -500.f + 1000.f / ((float)x + 2.f) : -50.f * (float)x, 1000.f); };
+    float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
+    float bulletSpreadFunc(int x)       { return clamp(-15.f, (x > 0) ? -2.f * (float)x : -20.f * (float)x, 330.f); };
+    float bulletNumFunc(int x)          { return clamp(0.f, (float)x, 50.f); };
+    float bulletBurstFunc(int x)        { return clamp(0.f, (float)x, 50.f); };
+    float bounceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
+    float pierceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
+    float homingFunc(int x)             { return clamp(0.f, (float)x / 20.f, 1.f); };
+    float playerSpeedFunc(int x)        { return clamp(-150.f, (float)x * 20.f, 300.f); };
+    float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 20.f); };
+    float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 4.f, 64.f); };
+    float playerDashCDRFunc(int x)      { return clamp(-1500.f, (x > 0) ? (float)x * -150.f : (float)x * -200.f, 8000.f); };
+
+    std::map<BulletEffectType, FP> functions = {
+        {BulletDamage,      &StackCompile::bulletDamageFunc},
+        {ProjectileSpeed,   &StackCompile::projectileSpeedFunc},
+        {ProjectileSize,    &StackCompile::projectileSizeFunc},
+        {FireRate,          &StackCompile::fireRateFunc},
+        {BulletRange,       &StackCompile::bulletRangeFunc},
+        {BulletSpread,      &StackCompile::bulletSpreadFunc},
+        {BulletNum,         &StackCompile::bulletNumFunc},
+        {BulletBurst,       &StackCompile::bulletBurstFunc},
+        {Bounce,            &StackCompile::bounceFunc},
+        {Pierce,            &StackCompile::pierceFunc},
+        {Homing,            &StackCompile::homingFunc},
+        {PlayerSpeed,       &StackCompile::playerSpeedFunc},
+        {PlayerNumDash,     &StackCompile::playerNumDashFunc},
+        {PlayerStackSize,   &StackCompile::playerStackSizeFunc},
+        {PlayerDashCDR,     &StackCompile::playerDashCDRFunc}
+    };
+
+    // Use extra when you want to find what a higher/lower value would yield
+    // Useful for UI info
+    float Call(const BulletEffectType& s, int extra = 0) {
+        FP fp = functions[s];
+        return (this->*fp)(values[s] + extra);
+    }
+
+    std::map<BulletEffectType, float> values = {
         {BulletDamage,      0},
         {ProjectileSpeed,   0},
         {ProjectileSize,    0},
@@ -99,94 +136,40 @@ struct StackCompile {
         {PlayerStackSize,   0},
         {PlayerDashCDR,     0}
     };
-    std::map<BulletEffectType, float> multiplicatives = {
-        {BulletDamage,      1},
-        {ProjectileSpeed,   1},
-        {ProjectileSize,    1},
-        {FireRate,          1},
-        {BulletRange,       1},
-        {BulletSpread,      1},
-        {BulletNum,         1},
-        {BulletBurst,       1},
-        {Bounce,            1},
-        {Pierce,            1},
-        {Homing,            1},
-        {PlayerSpeed,       1},
-        {PlayerNumDash,     1},
-        {PlayerStackSize,   1},
-        {PlayerDashCDR,     1}
-    };
-
-    // TODO choose reasonable minimums
-    std::map<BulletEffectType, float> minimums = {
-        {BulletDamage,      1},
-        {ProjectileSpeed,   1},
-        {ProjectileSize,    1},
-        {FireRate,          0.5},
-        {BulletRange,       10},
-        {BulletSpread,      1},
-        {BulletNum,         1},
-        {BulletBurst,       1},
-        {Bounce,            0},
-        {Pierce,            0},
-        {Homing,            0},
-        {PlayerSpeed,       50},
-        {PlayerNumDash,     0},
-        {PlayerStackSize,   1},
-        {PlayerDashCDR,     1}
-    };
-
-    std::map<BulletEffectType, float> maximums = {
-        {BulletDamage,      100000},
-        {ProjectileSpeed,   2000},
-        {ProjectileSize,    50},
-        {FireRate,          100000},
-        {BulletRange,       100000},
-        {BulletSpread,      100000},
-        {BulletNum,         50},
-        {BulletBurst,       50},
-        {Bounce,            100},
-        {Pierce,            100},
-        {Homing,            1.0f},
-        {PlayerSpeed,       1000},
-        {PlayerNumDash,     20},
-        {PlayerStackSize,   100},
-        {PlayerDashCDR,     100000}
-    };
-
-    // 'H' means higher values are better, 'L' means lower
-    std::map<BulletEffectType, char> beneficialDirection = {
-    {BulletDamage,      'H'},
-    {ProjectileSpeed,   'H'},
-    {ProjectileSize,    'H'},
-    {FireRate,          'H'},
-    {BulletRange,       'H'},
-    {BulletSpread,      'L'},
-    {BulletNum,         'H'},
-    {BulletBurst,       'H'},
-    {Bounce,            'H'},
-    {Pierce,            'H'},
-    {Homing,            'H'},
-    {PlayerSpeed,       'H'},
-    {PlayerNumDash,     'H'},
-    {PlayerStackSize,   'H'},
-    {PlayerDashCDR,     'L'}
-    };
 
     bool add(BulletStackEffect effect) {
     	if (effect.type == Lightning) {
-	    if (currStack.size() < 1) return true;
-	    if (effect.effectCalc == Additive) {
-		std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
-	    }
-	    else {
-		std::random_device rd;
-		std::mt19937 g(rd());
-		std::shuffle(currStack.begin(), currStack.end(), g);
-	    }
+	        if (currStack.size() < 1) return true;
+	        if (effect.value == -1) {
+		        std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+                if ((currStack.size() > 1) && (currStack[0].type == currStack[1].type) && (abs(currStack[0].value + currStack[1].value) <= 3)) {
+                    currStack[1].value += currStack[0].value;
+                    currStack.erase(currStack.begin());
+                    if (currStack[0].value == 0) currStack.erase(currStack.begin());
+                }
+	        }
+	        else {
+		        std::random_device rd;
+		        std::mt19937 g(rd());
+		        std::shuffle(currStack.begin(), currStack.end(), g);
+
+                if (currStack.size() > 1) {
+                    int i = 0;
+                    while (i < currStack.size()-1) {
+                        if ((currStack[i].type == currStack[i+1].type) && (abs(currStack[i].value + currStack[i+1].value) <= 3)) {
+                            currStack[i].value += currStack[i+1].value;
+                            currStack.erase(currStack.begin() + i + 1);
+                            if (currStack[i].value == 0) currStack.erase(currStack.begin() + i);
+                        }
+                        else {
+                            i++;
+                        }
+                    }
+                }
+	        }
     	    return true;
         }
-        int maxStackSize = (baseStackSize + additives[PlayerStackSize]) * multiplicatives[PlayerStackSize];
+        int maxStackSize = baseStackSize + Call(PlayerStackSize);
         if (currStack.size() >= maxStackSize) {
             return false;
         }
@@ -194,12 +177,13 @@ struct StackCompile {
             currStack.push_back(effect);
             return true;
         }
-        if (effect.effectCalc == Additive) {
-            additives[effect.type] += effect.value;
-        } else {
-            multiplicatives[effect.type] += effect.value;
-        }
+        values[effect.type] += effect.value;
         currStack.push_back(effect);
+        if ((currStack.size() > 1) && (currStack[currStack.size() - 1].type == currStack[currStack.size() - 2].type) && (abs(currStack[currStack.size() - 1].value + currStack[currStack.size() - 2].value) <= 3)) {
+            currStack[currStack.size() - 2].value += currStack[currStack.size() - 1].value;
+            currStack.pop_back();
+            if (currStack[currStack.size() - 1].value == 0) currStack.pop_back();
+        }
         return true;
     }
 
@@ -212,24 +196,10 @@ struct StackCompile {
             recentRemoved.push_back(effect);
         }
         currStack.erase(currStack.begin() + index);
-        if (effect.effectCalc == EffectCalculation::Additive) {
-            additives[effect.type] -= effect.value;
-        } else {
-            multiplicatives[effect.type] /= effect.value;
-        }
+        values[effect.type] -= effect.value;
         return effect;
     }
-    BulletStackEffect modify(int index) {
-        printf("modify %d\n",index);
-        BulletStackEffect effect = remove(index);
-        if (effect.effectCalc == EffectCalculation::Additive) {
-            effect.value = -effect.value;
-        } else {
-            effect.value = 1 / effect.value;
-        }
-        add(effect);
-        return effect;
-    }
+
     bool useKey() {
         auto comp = [](BulletStackEffect a) {
             return a.type == BulletEffectType::Key;
@@ -250,9 +220,11 @@ struct StackCompile {
         return true;
     }
     void printStack() {
+        std::cout << "STACK START" << std::endl;
         for (auto& element : currStack) {
-            std::cout << element.name << std::endl;
+            std::cout << element.name << " : " << element.value << std::endl;
         }
+        std::cout << "STACK END" << std::endl;
     }
 };
 
@@ -274,8 +246,7 @@ struct Vulnerability {
 
 struct PlayerAttackData {
     float currFiringInterval = 0.0f;
-    float maxFiringInterval = 300.0f;
-    float bulletSpeed = 400;
+    float maxFiringInterval = 500.0f;
 
     int maxBulletBurst = 1;
     int currBulletBurst = 1;
@@ -286,7 +257,7 @@ struct PlayerBullet {
     float damage = 10;
     float bulletSpeed = 600;
     // Number than counts down every step, delete bullet when <0
-    float bulletRange = 6000;
+    float bulletRange = 1000;
     // Player bullet only scale in all directions?
     float bulletSize = 20;
     int bulletPierce = 0;
@@ -554,10 +525,9 @@ struct Boid {
 
 struct WormHead {
     std::vector<vec2> points = {};
-    float constrainDistance;
+    float constrainDistance = 100;
     int size = -1;
-    EnemyType body;
-
+    EnemyType body = EnemyType::BossDrillWormBody;
     bool anchor = false;
     vec2 anchorPoint;
 };
@@ -588,8 +558,8 @@ struct Buffer {
 struct SpriteData
 {
 	std::string texturePath;
-	EFFECT_ASSET_ID effectId;
-	GEOMETRY_BUFFER_ID geometryId;
+	EFFECT_ASSET_ID effectId = EFFECT_ASSET_ID::TEXTURED;
+	GEOMETRY_BUFFER_ID geometryId = GEOMETRY_BUFFER_ID::SPRITE;
 	vec2 offset = vec2(0);
     int animationType = 1;
     int max_Frames = 1;
@@ -605,8 +575,7 @@ struct Enemy {
     vec2 velocity;
     BulletStackEffect collisionBullet = {
         Inert,
-        Additive,
-        0,
+        1,
         "Inert",
         "" 
     };
@@ -615,10 +584,10 @@ struct Enemy {
     EnemyPattern& currEnemyPattern() {
         return enemyPatterns[patternIndex];
     };
-    vec2 scale;
+    vec2 scale = vec2(1);
     SpriteData sprite;
     bool newPattern = false;
-    float rotatePower;
+    float rotatePower = 1.f;
     EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
     int armour = 1;

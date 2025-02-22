@@ -1808,67 +1808,52 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 		// ordinary bullets
 		// format: [increases/decreases] [effect] by [amount]
 
-		if (bullet.effectCalc == Additive) {
-			if (bullet.value < 0) {
-				modify = "Decreases ";
-				if (abs(bullet.value) - abs((int)bullet.value) > 0) {
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
-					amount = amountString.str();
-				}
-				else {
-					amount = std::to_string(abs((int)bullet.value));
-				}
-				if (bullet.type == BulletEffectType::PlayerDashCDR) {
-					intermediaryAmount = abs(bullet.value / 1000.f);
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
-					amount = amountString.str();
-				}
-				if (bullet.type == BulletEffectType::Homing) {
-					intermediaryAmount = bullet.value * 100;
-					std::stringstream amountString;
-					amountString << (int)intermediaryAmount << "%";
-					amount = amountString.str();
-				}
+		if (bullet.value < 0) {
+			modify = "Decreases ";
+			if (abs(bullet.value) - abs((int)bullet.value) > 0) {
+				std::stringstream amountString;
+				amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+				amount = amountString.str();
 			}
 			else {
-				modify = "Increases ";
-				if (bullet.value - (int)bullet.value > 0) {
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
-					amount = amountString.str();
-				}
-				else {
-					amount = std::to_string(abs((int)bullet.value));
-				}
-				if (bullet.type == BulletEffectType::PlayerDashCDR) {
-					intermediaryAmount = abs(bullet.value / 1000.f);
-
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
-					amount = amountString.str();
-				}
-				if (bullet.type == BulletEffectType::Homing) {
-					intermediaryAmount = bullet.value * 100;
-					std::stringstream amountString;
-					amountString << (int)intermediaryAmount << "%";
-					amount = amountString.str();
-				}
+				amount = std::to_string(abs((int)bullet.value));
+			}
+			if (bullet.type == BulletEffectType::PlayerDashCDR) {
+				intermediaryAmount = abs(bullet.value / 1000.f);
+				std::stringstream amountString;
+				amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+				amount = amountString.str();
+			}
+			if (bullet.type == BulletEffectType::Homing) {
+				intermediaryAmount = bullet.value * 100;
+				std::stringstream amountString;
+				amountString << (int)intermediaryAmount << "%";
+				amount = amountString.str();
 			}
 		}
-		else if (bullet.effectCalc == Multiplicative) {
-			if (bullet.value < 0) {
-				modify = "Decreases ";
-				intermediaryAmount = (-bullet.value) * 100;
+		else {
+			modify = "Increases ";
+			if (bullet.value - (int)bullet.value > 0) {
+				std::stringstream amountString;
+				amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+				amount = amountString.str();
 			}
 			else {
-				modify = "Increases ";
-				intermediaryAmount = (bullet.value) * 100;
+				amount = std::to_string(abs((int)bullet.value));
 			}
-			std::stringstream amountString;
-			amountString << (int)intermediaryAmount << "%";
-			amount = amountString.str();
+			if (bullet.type == BulletEffectType::PlayerDashCDR) {
+				intermediaryAmount = abs(bullet.value / 1000.f);
+
+				std::stringstream amountString;
+				amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+				amount = amountString.str();
+			}
+			if (bullet.type == BulletEffectType::Homing) {
+				intermediaryAmount = bullet.value * 100;
+				std::stringstream amountString;
+				amountString << (int)intermediaryAmount << "%";
+				amount = amountString.str();
+			}
 		}
 
 		switch (bullet.type) {
