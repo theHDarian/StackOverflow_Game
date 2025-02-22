@@ -118,7 +118,7 @@ private:
 	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat4& projection, const mat4& view);
 	void drawAllColliders(Entity entity, const mat4& projection, const mat4& view);
 	void drawCollider(Entity entity, std::string shape, const mat4& projection, const mat4& view);
-	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat4& projection, const mat4& view);
+	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, int bullet_value, const mat4& projection, const mat4& view);
 	void drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view);
 	void drawBulletStack(const mat4& projection, const mat4& view);
 

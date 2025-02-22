@@ -1772,11 +1772,11 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 		// start from left to right
 		// might be easier if these were entities instead...
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
-					 bulletColor, bulletShape, projection, view);
+					 bulletColor, bulletShape, stack.currStack[i].value, projection, view);
 	}
 }
 
-void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat4 &projection, const mat4 &view)
+void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, int bullet_value, const mat4 &projection, const mat4 &view)
 {
 	Motion motion = Motion();
 	motion.scale = bullet_size;
@@ -1814,6 +1814,9 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 
 	GLuint time_uloc = glGetUniformLocation(program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
+	GLint frame_uloc = glGetUniformLocation(program, "frame");
+	glUniform1i(frame_uloc, bullet_value + 3);
 
 	GLint laser_uloc = glGetUniformLocation(program, "laser");
 	glUniform1i(laser_uloc, 0);
