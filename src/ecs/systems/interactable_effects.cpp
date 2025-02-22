@@ -196,6 +196,10 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
+		registry.uiRequests.remove(player);
+		UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+		req.type = UIRequestType::StackNotifBullet;
+		req.effects = effects;
         for (BulletStackEffect b : effects) {
             printf("Adding: %s\n",b.name.c_str());
             bool success = reg.add(b);
@@ -206,9 +210,8 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
         		gameState.currentVolume *= 0.15f;
         		soundPlayer->playGameOverSound();
         		soundPlayer->setMusicVolume(gameState.currentVolume);
-        		if (!registry.uiRequests.has(player)) {
-        			registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
-        		}
+				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+				req.type = UIRequestType::GameOverReport;
         	}
         	if (b.type == BulletEffectType::PlayerStackSize) {
 				StackUI& ui = registry.stackUI.components[0];

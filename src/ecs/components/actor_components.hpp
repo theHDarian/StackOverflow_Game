@@ -33,7 +33,7 @@ enum BulletEffectType {
 
 struct BulletStackEffect {
 	BulletEffectType type = BulletEffectType::Inert;
-    int value;
+    int value = 0;
 
     // For UIq
     std::string name;
@@ -170,7 +170,10 @@ struct StackCompile {
     	    return true;
         }
         int maxStackSize = baseStackSize + Call(PlayerStackSize);
-        if (currStack.size() >= maxStackSize) {
+        if (currStack.size() >= maxStackSize 
+            && (currStack[currStack.size() - 1].type != effect.type || 
+                (abs(currStack[currStack.size() - 1].value + effect.value) > 3 || currStack[currStack.size() - 1].value == 0))) {
+            // value = 0 means unstackable, 3 is max stack value
             return false;
         }
         if (effect.type == Inert || effect.type == Key) {
@@ -575,7 +578,7 @@ struct Enemy {
     vec2 velocity;
     BulletStackEffect collisionBullet = {
         Inert,
-        1,
+        0,
         "Inert",
         "" 
     };
@@ -713,4 +716,15 @@ struct InteractableRequest {
     int choice = -1;
     std::vector<std::tuple<EnemyType,vec2>> enemies = {};
     std::vector<BulletStackEffect> effects = {};
+};
+
+struct UIRequest {
+    UIRequestType type = UIRequestType::ResetUI;
+    std::string text = "";
+    std::vector<BulletStackEffect> effects = {};
+    UIRequest(UIRequestType type = UIRequestType::ResetUI, std::string text = "", std::vector<BulletStackEffect> effects = {}) {
+        this->type = type;
+        this->text = text;
+        this->effects = effects;
+    }
 };

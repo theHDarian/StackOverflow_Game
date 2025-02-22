@@ -368,7 +368,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	{
 		Invincible& invincible = registry.invincibles.get(entity);
 		alpha = 1 - abs(sin(invincible.countdown / invincible.max * 10) * 0.3);
-		glUniform1f(effectAlpha, alpha);
+		glUniform1f(alpha_uloc, alpha);
 	}
 
 	if (registry.damageds.has(entity))
@@ -512,6 +512,9 @@ void RenderSystem::drawBullet(Entity entity,
 	glEnableVertexAttribArray(in_texcoord_loc);
 	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
 	//gl_has_errors();
+
+	GLint frame_uloc = glGetUniformLocation(program, "frame");
+	glUniform1i(frame_uloc, registry.enemyBullets.get(entity).bulletEffects[0].value + 3);
 
 	GLuint time_uloc = glGetUniformLocation(program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));

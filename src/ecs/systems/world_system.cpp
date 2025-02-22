@@ -393,7 +393,7 @@ void WorldSystem::restartGame() {
 	report.gameStartTime = Clock::now();
 	report.roomsCleared = 0;
 
-	UIRequest& uireq = registry.uiRequests.emplace(player);
+	UIRequest& uireq = registry.uiRequests.emplace_with_duplicates(player);
 	uireq.type = UIRequestType::ResetUI;
 }
 
@@ -788,7 +788,6 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		}
 	}
 
-
 	//play hit sound
 	if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
 		soundPlayer->playPlayerZappedSound();
@@ -798,77 +797,75 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	//add player invincibility frames
 	if (!registry.invincibles.has(player)) {
 		registry.invincibles.emplace(player);
-		ParticleProps props;
-		if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
-			if (registry.enemyBullets.get(other).bulletEffects[0].value == 1) {
-				//yellow is multiplicative
-				props = playerZappedYellow;
-				if (!registry.uiRequests.has(player))
-					registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
-			} else {
-				props = playerZappedBlue;
-				if (!registry.uiRequests.has(player))
-					registry.uiRequests.insert(player, { UIRequestType::StackNotifReqShift });
-			}
-		} else {
-			props = playerDamaged;
-		}
-		registry.emitParticles.replace(player,PExplode, props,100, 1);
 	}
 
-	//add to stack for enemy bullets
-	if (registry.enemyBullets.has(other)) {
-		// check tutorial condition here for now
-		if (registry.ioStates.components[0].lockControls) {
-			DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
-			req.type = DialogueRequestType::StoryDialogue;
-			registry.ioStates.components[0].lockControls = false;
-			//std::cout << registry.maps.components[0].currRoom.dialogueCount << std::endl;
-		}
+	// check tutorial condition - unlock controls if hit in tutorial
+	if (registry.ioStates.components[0].lockControls) {
+		DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
+		req.type = DialogueRequestType::StoryDialogue;
+		registry.ioStates.components[0].lockControls = false;
+	}
 
+	std::vector<BulletStackEffect> effects;
+	if (registry.enemyBullets.has(other)) {
 		EnemyBullet& eBullet = registry.enemyBullets.get(other);
-		for (int i = 0; i < eBullet.bulletEffects.size(); i++) {
-			if (eBullet.bulletEffects[i].type == BulletEffectType::Pop) {
-				InteractableRequest& req = registry.interactableRequests.emplace(Entity());
-				req.type = InteractableRequestType::PopStack;
-			} else {
-				bool success = registry.stackCompile.get(player).add(eBullet.bulletEffects[i]);
-				if (!success) {
-					GameState& gameState = registry.gameStates.components[0];
-					gameState.gameOver = true;
-					gameState.currentVolume *= 0.15f;
-					soundPlayer->playGameOverSound();
-					soundPlayer->setMusicVolume(gameState.currentVolume);
-					if (!registry.uiRequests.has(player)) {
-						registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
-					}
-				} else if (eBullet.isSpecial) {
-					registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn--;
-				}
-			}
+		effects = eBullet.bulletEffects;
+		if (eBullet.isSpecial) { // kept effect same as original code
+			registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn -= effects.size();
 		}
 	}
 	else if (registry.enemies.has(other)) {
 		// Boid touch enemy, it die
 		if (registry.boids.has(other) && !registry.deleteds.has(other)) registry.deleteds.emplace(other);
 		Enemy& e = registry.enemies.get(other);
-		if (e.collisionBullet.type == BulletEffectType::Pop) {
+		effects.push_back(e.collisionBullet);
+	}
+
+	//add to stack for enemy bullets
+	for (int i = 0; i < effects.size(); i++) {
+		if (effects[i].type == BulletEffectType::Pop) {
 			InteractableRequest& req = registry.interactableRequests.emplace(Entity());
 			req.type = InteractableRequestType::PopStack;
-		} else {
-			bool success = registry.stackCompile.get(player).add(e.collisionBullet);
+		}
+		else {
+			bool success = registry.stackCompile.get(player).add(effects[i]);
 			if (!success) {
-				registry.gameStates.components[0].gameOver = true;
 				GameState& gameState = registry.gameStates.components[0];
+				gameState.gameOver = true;
 				gameState.currentVolume *= 0.15f;
 				soundPlayer->playGameOverSound();
 				soundPlayer->setMusicVolume(gameState.currentVolume);
-				if (!registry.uiRequests.has(player)) {
-					registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
-				}
+				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+				req.type = UIRequestType::GameOverReport;
 			}
 		}
 	}
+
+	// emit particles and send stack notifs
+	ParticleProps props;
+	if (registry.enemyBullets.has(other) && registry.enemyBullets.get(other).bulletEffects[0].type == Lightning) {
+		if (registry.enemyBullets.get(other).bulletEffects[0].value == 1) {
+			//yellow is multiplicative
+			props = playerZappedYellow;
+			UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+			req.type = UIRequestType::StackNotifReqShuffle;
+		}
+		else {
+			props = playerZappedBlue;
+			UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+			req.type = UIRequestType::StackNotifReqShift;
+		}
+	}
+	else {
+		props = playerDamaged;
+		// don't send notif if game is over for now
+		if (!registry.gameStates.components[0].gameOver) {
+			UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+			req.type = UIRequestType::StackNotifBullet;
+			req.effects = effects;
+		}
+	}
+	registry.emitParticles.replace(player, PExplode, props, 100, 1);
 }
 
 void WorldSystem::clearDeleteQueue() {
