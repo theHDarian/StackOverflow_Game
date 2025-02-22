@@ -514,6 +514,9 @@ void RenderSystem::drawBullet(Entity entity,
 	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
 	//gl_has_errors();
 
+	GLint frame_uloc = glGetUniformLocation(program, "frame");
+	glUniform1i(frame_uloc, registry.enemyBullets.get(entity).bulletEffects[0].value + 3);
+
 	GLuint time_uloc = glGetUniformLocation(program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 
