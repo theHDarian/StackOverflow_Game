@@ -1,4 +1,10 @@
 #version 330
+/*
+
+		DO NOT TOUCH, ONLY EXISTS TO NOT BREAK CODE lol
+
+*/
+
 
 // From vertex shader
 in vec2 texcoord;
@@ -7,7 +13,6 @@ in vec2 texcoord;
 uniform sampler2DArray sampler0;
 uniform vec3 fcolor;
 uniform int changeColor = 0;
-uniform float alpha = 1.0;
 uniform float effectAlpha = 1.0;
 uniform int frame = 1;
 
@@ -27,7 +32,7 @@ vec2 clampedGlitchOffset(vec2 offset) {
 void main()
 {
 
-	color = vec4(fcolor, alpha) * texture(sampler0, vec3(texcoord.x, texcoord.y, frame));
+	color = vec4(fcolor, 1.0) * texture(sampler0, vec3(texcoord.x, texcoord.y, frame));
 	if (glitchToggle) {
 		float a = texture(glitchMask, vec3(texcoord.x, texcoord.y, floor(64.0 * mod(0.01 * time, 1)))).a;
 		if (a > 0.5 && (

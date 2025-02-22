@@ -141,21 +141,49 @@ void RenderSystem::drawCursor()
 	Entity Cursor = registry.cursors.entities[0];
 	if (registry.renderRequests.has(Cursor) && registry.motions.has(Cursor))
 	{
-		drawTexturedMesh(Cursor, projection, view, true);
+		effectToDrawCall(Cursor, projection, view, true);
 	}
 	glBindVertexArray(0);
 }
 
-void RenderSystem::drawTexturedMesh(Entity entity,
-									const mat4 &projection, const mat4 &view, bool isUI = false)
+void RenderSystem::effectToDrawCall(Entity entity,
+	const mat4& projection, const mat4& view, bool isUI = false) {
+	
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	switch (render_request.used_effect) {
+		case ROOM_BOUND:
+			drawRoomBound(entity, projection, view);
+			break;
+		case BULLET:
+			drawBullet(entity, projection, view);
+			break;
+		case MESH || EGG:
+			drawMesh(entity, projection, view);
+			break;
+		case DASH:
+			drawDash(entity, projection, view);
+			break;
+		case ANIMATE:
+			drawAnimateTextured(entity, projection, view, isUI);
+			break;
+		case TEXTURED:
+			drawAnimateTextured(entity, projection, view, isUI);
+			break;
+		default:
+			assert(false);
+	}
+}
+
+void RenderSystem::drawAnimateTextured(Entity entity,
+	const mat4& projection, const mat4& view, bool isUI = false)
 {
 	assert(registry.renderRequests.has(entity));
-	const RenderRequest &render_request = registry.renderRequests.get(entity);
-	Motion &motion = registry.motions.get(entity);
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	Motion& motion = registry.motions.get(entity);
 	vec2 offset = render_request.offset;
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
-	const GLuint program = (GLuint)effects[used_effect_enum];
+	const GLuint program = (GLuint)effects[static_cast<GLuint>(EFFECT_ASSET_ID::TEXTURED)];
 
 	// Setting shaders
 	glUseProgram(program);
@@ -171,337 +199,78 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::BULLET || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED 
-		|| render_request.used_effect == EFFECT_ASSET_ID::ANIMATE || render_request.used_effect == EFFECT_ASSET_ID::DASH)
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+	gl_has_errors();
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, render_request.idealScale.x > 0);
+	gl_has_errors();
+
+  vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
+	GLint tiling_uloc = glGetUniformLocation(program, "tiling");
+	glUniform2fv(tiling_uloc, 1, (float*)&tiling);
+	gl_has_errors();
+
+	GLint frame_uloc = glGetUniformLocation(program, "frame");
+	glUniform1i(frame_uloc, (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) ? 0 : registry.animations.get(entity).frame);
+	GLuint time_uloc = glGetUniformLocation(program, "time");
+	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+	gl_has_errors();
+
+	// Enable and bind the texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+	assert(registry.renderRequests.has(entity));
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
+
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
+	gl_has_errors();
+
+	GLuint glitch_mask_id = texture_gl_handles[(GLuint)name_to_texture["glitch_mask"]];
+	GLuint glitch_mask_uloc = glGetUniformLocation(program, "glitchMask");
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_mask_id);
+	glUniform1i(glitch_mask_uloc, 1);
+
+	GLuint glitch_id = texture_gl_handles[(GLuint)name_to_texture["glitch"]];
+	GLuint glitch_uloc = glGetUniformLocation(program, "glitch");
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_id);
+	glUniform1i(glitch_uloc, 2);
+	gl_has_errors();
+
+	GLuint glitchToggle_uloc = glGetUniformLocation(program, "glitchToggle");
+	bool should_glitch = false;
+	if (registry.doorSymbols.has(entity))
 	{
-		GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-		gl_has_errors();
-		assert(in_texcoord_loc >= 0);
-
-		glEnableVertexAttribArray(in_position_loc);
-		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void *)0);
-		gl_has_errors();
-
-		glEnableVertexAttribArray(in_texcoord_loc);
-		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void *)sizeof(vec3));
-		gl_has_errors();
-
-		if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED)
-		{
-			GLint tile_uloc = glGetUniformLocation(program, "tile");
-			glUniform1i(tile_uloc, render_request.idealScale.x > 0);
-			gl_has_errors();
-
-			vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
-			GLint tiling_uloc = glGetUniformLocation(program, "tiling");
-			glUniform2fv(tiling_uloc, 1, (float *)&tiling);
-			gl_has_errors();
-		}
-
-		if (render_request.used_effect == EFFECT_ASSET_ID::DASH) {
-			assert(registry.gaugeVisuals.has(entity));
-			GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
-			GLint chargeBoundary_uloc = glGetUniformLocation(program, "chargeBoundary");
-			glUniform1f(chargeBoundary_uloc, gauge.chargeBoundary);
-			GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
-			glUniform4fv(uncharged_uloc, 1, (float*)&gauge.unchargedColor);
-			GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
-			glUniform1i(chargeDir_uloc, gauge.isVertical ? 1 : 0);
-			gl_has_errors();
-		}
-
-		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
-		{
-			GLint frame_uloc = glGetUniformLocation(program, "frame");
-			glUniform1i(frame_uloc, registry.animations.get(entity).frame);
-			GLuint time_uloc = glGetUniformLocation(program, "time");
-			glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-			gl_has_errors();
-		}
-
-		if (render_request.used_effect == EFFECT_ASSET_ID::BULLET)
-		{
-			GLuint time_uloc = glGetUniformLocation(program, "time");
-			glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-
-			GLint laser_uloc = glGetUniformLocation(program, "laser");
-			glUniform1i(laser_uloc, registry.lasers.has(entity));
-
-			GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
-			glUniform1i(onDeath_uloc, registry.enemyBullets.get(entity).onDeath != EnemyBulletDeath::NONE);
-
-			int size = registry.enemyBullets.get(entity).bulletEffects.size();
-			std::vector<BulletStackEffect> bse = registry.enemyBullets.get(entity).bulletEffects;
-			GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
-			glUniform1i(effect_size_uloc, size);
-
-			GLint shape_uloc = glGetUniformLocation(program, "shape");
-			glUniform1i(shape_uloc, registry.enemyBullets.get(entity).shape);
-
-			GLint scale_uloc = glGetUniformLocation(program, "scale");
-			glUniform2fv(scale_uloc, 1, (float *)&registry.motions.get(entity).scale);
-
-			vec3 c1, c2, c3, c4, c5;
-			c1 = (size > 0) ? bulletEffectColors.at(bse[0].type) : vec3(-1.0);
-			c2 = (size > 1) ? bulletEffectColors.at(bse[1].type) : vec3(-1.0);
-			c3 = (size > 2) ? bulletEffectColors.at(bse[2].type) : vec3(-1.0);
-			c4 = (size > 3) ? bulletEffectColors.at(bse[3].type) : vec3(-1.0);
-			c5 = (size > 4) ? bulletEffectColors.at(bse[4].type) : vec3(-1.0);
-
-			GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
-			glUniform3fv(bcolor1_uloc, 1, (float *)&c1);
-			GLint bcolor2_uloc = glGetUniformLocation(program, "bcolor2");
-			glUniform3fv(bcolor2_uloc, 1, (float *)&c2);
-			GLint bcolor3_uloc = glGetUniformLocation(program, "bcolor3");
-			glUniform3fv(bcolor3_uloc, 1, (float *)&c3);
-			GLint bcolor4_uloc = glGetUniformLocation(program, "bcolor4");
-			glUniform3fv(bcolor4_uloc, 1, (float *)&c4);
-			GLint bcolor5_uloc = glGetUniformLocation(program, "bcolor5");
-			glUniform3fv(bcolor5_uloc, 1, (float *)&c5);
-
-			gl_has_errors();
-		}
-
-		// Enable and bind the texture to slot 0
-		glActiveTexture(GL_TEXTURE0);
-		gl_has_errors();
-		assert(registry.renderRequests.has(entity));
-		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
-
-		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATE)
-		{
-			GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
-			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-			glUniform1i(texture_uloc, 0);
-			gl_has_errors();
-
-			GLuint glitch_mask_id = texture_gl_handles[(GLuint)name_to_texture["glitch_mask"]];
-			GLuint glitch_mask_uloc = glGetUniformLocation(program, "glitchMask");
-			glActiveTexture(GL_TEXTURE0 + 1);
-			glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_mask_id);
-			glUniform1i(glitch_mask_uloc, 1);
-
-			GLuint glitch_id = texture_gl_handles[(GLuint)name_to_texture["glitch"]];
-			GLuint glitch_uloc = glGetUniformLocation(program, "glitch");
-			glActiveTexture(GL_TEXTURE0 + 2);
-			glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_id);
-			glUniform1i(glitch_uloc, 2);
-			gl_has_errors();
-
-			GLuint glitchToggle_uloc = glGetUniformLocation(program, "glitchToggle");
-			bool should_glitch = false;
-			if (registry.doorSymbols.has(entity))
-            {
-				for (Entity& d : registry.doors.entities) {
-					if ((registry.doors.get(d).side == registry.doorSymbols.get(entity).side) && registry.doors.get(d).preset.hasElite) {
-						// std::cout << "symbol: " << registry.doorSymbols.get(entity).side << " door: " << registry.doors.get(d).side << ", preset "<< registry.doors.get(d).preset.ID << std::endl;
-						should_glitch = true;
-						break;
-                    }
-				}
-            }
-
-			if (registry.elites.has(entity) || should_glitch || registry.invincibles.has(entity)) {
-				glUniform1i(glitchToggle_uloc, true);
-			} else {
-                glUniform1i(glitchToggle_uloc, false);
-            }
-		}
-		else
-		{
-			glBindTexture(GL_TEXTURE_2D, texture_id);
-		}
-		gl_has_errors();
-	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::MESH || render_request.used_effect == EFFECT_ASSET_ID::EGG)
-	{
-		GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		gl_has_errors();
-
-		glEnableVertexAttribArray(in_position_loc);
-		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(ColoredVertex), (void *)0);
-		gl_has_errors();
-
-		GLuint time_uloc = glGetUniformLocation(program, "time");
-		glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-
-		GLuint angle_uloc = glGetUniformLocation(program, "angle");
-		glUniform1f(angle_uloc, (float)(registry.motions.get(entity).angle));
-
-		if (render_request.used_effect == EFFECT_ASSET_ID::EGG)
-		{
-			GLint in_color_loc = glGetAttribLocation(program, "in_color");
-			gl_has_errors();
-
-			glEnableVertexAttribArray(in_color_loc);
-			glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
-								  sizeof(ColoredVertex), (void *)sizeof(vec3));
-
-			gl_has_errors();
-		}
-	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::ROOM_BOUND)
-	{
-		GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-		gl_has_errors();
-		assert(in_texcoord_loc >= 0);
-
-		glEnableVertexAttribArray(in_position_loc);
-		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void *)0);
-		gl_has_errors();
-
-		glEnableVertexAttribArray(in_texcoord_loc);
-		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void *)sizeof(vec3));
-		gl_has_errors();
-
-		// Enable and bind the texture to slot 0
-		glActiveTexture(GL_TEXTURE0);
-		gl_has_errors();
-		assert(registry.renderRequests.has(entity));
-		GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
-
-		WindowState &ws = registry.windowStates.components[0];
-		float angle;
-		vec3 axis;
-		vec3 offset;
-		int frame = 0;
-		vec2 tiling = vec2(1.0);
-		if (registry.bounds.has(entity))
-		{
-			Bound &b = registry.bounds.get(entity);
-			angle = b.angle;
-			axis = b.axis;
-			offset = b.offset;
-			tiling = vec2(registry.maps.components[0].currRoom.preset.roomSize.x / render_request.idealScale.x, 1);
-
-			// For changing wall textures per region
-			Map &map = registry.maps.components[0];
-			frame = max((int)map.currRegion-1, 0);
-		}
-		else if (registry.doorSymbols.has(entity))
-		{
-			DoorSymbol &d = registry.doorSymbols.get(entity);
-			angle = d.angle;
-			axis = d.axis;
-			offset = d.offset;
-			if (d.door)
-			{
-				frame = 2;
-				for (Entity &d1 : registry.doors.entities)
-				{
-					if (registry.doors.get(d1).side == d.side)
-					{
-						if (registry.interactables.has(d1))
-						{
-							if (registry.interactables.get(d1).name == "ClosedDoor")
-							{
-								frame = 0;
-							}
-							else if (registry.interactables.get(d1).name == "ClosedTutorialDoor")
-							{
-								frame = 0;
-							}
-							else if (registry.interactables.get(d1).name == "EmptyDoor")
-							{
-								frame = 0;
-							}
-							else if (registry.interactables.get(d1).name == "PrevDoor")
-							{
-								frame = 0;
-							}
-							else if (registry.interactables.get(d1).name == "LockedDoor")
-							{
-								frame = 1;
-							}
-							else if (registry.interactables.get(d1).name == "OpenDoor")
-							{
-								frame = 2;
-							}
-						}
-						break;
-					}
-				}
+		for (Entity& d : registry.doors.entities) {
+			if ((registry.doors.get(d).side == registry.doorSymbols.get(entity).side) && registry.doors.get(d).preset.hasElite) {
+				// std::cout << "symbol: " << registry.doorSymbols.get(entity).side << " door: " << registry.doors.get(d).side << ", preset "<< registry.doors.get(d).preset.ID << std::endl;
+				should_glitch = true;
+				break;
 			}
 		}
-		else
-		{
-			assert(false);
-		}
-
-		GLint frame_uloc = glGetUniformLocation(program, "frame");
-		glUniform1i(frame_uloc, frame);
-		gl_has_errors();
-
-		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-		gl_has_errors();
-
-		GLint tile_uloc = glGetUniformLocation(program, "tile");
-		glUniform1i(tile_uloc, render_request.idealScale.x > 0);
-		gl_has_errors();
-
-		GLint tiling_uloc = glGetUniformLocation(program, "tiling");
-		glUniform2fv(tiling_uloc, 1, (float *)&tiling);
-		gl_has_errors();
-
-		//Motion &targetMotion = registry.motions.get(registry.players.entities[0]);
-		Camera &camera = registry.cameras.components[0];
-		//Motion& targetMotion = registry.motions.get(camera.target);
-		Room &room = registry.maps.components[0].currRoom;
-
-		vec2 roomCenterOffset = vec2(0);
-		if ((room.preset.roomSize.x / 2) < (ws.width / 2) || (room.preset.roomSize.y / 2) < (ws.height / 2))
-			roomCenterOffset += -1.f * camera.zoom * vec2((ws.width / 2 - room.preset.roomSize.x / 2) * (1 - ((room.preset.roomSize.x * 0.33f) / 2.f / (ws.width / 2.f))), 0);
-		if ((room.preset.roomSize.y / 2) < (ws.height / 2))
-			roomCenterOffset += -1.f * camera.zoom * vec2(0, (ws.height / 2 - room.preset.roomSize.y / 2) * 1.8f * (1 - ((room.preset.roomSize.y * 0.33f) / 2.f / (ws.height / 2))));
-
-		vec3 clampedTranslate = vec3(clamp(motion.position.x - camera.lookAtPos.x * 1.1f + ws.width * 0.1f / 2.f,
-										   motion.position.x - room.preset.roomSize.x / clampAmount * 1.1f / 2 + ws.width / clampAmount * 0.1f / 2 - room.wallThickness * 1.5f * 1.1f / 2 - 25,
-										   motion.position.x + room.preset.roomSize.x * 1.1f / 2 - ws.width * clampAmount * 1.1f / 2 - ws.width * clampAmount / 2 + room.wallThickness * 1.5f * 1.1f / 2 + 25),
-									 clamp(motion.position.y + camera.lookAtPos.y * 2.f - ws.height * 2.f / 2.f - ws.height / 2.f,
-										   motion.position.y + ws.height / clampAmount / 2.f - room.preset.roomSize.y / clampAmount - room.wallThickness * 1.5f,
-										   motion.position.y - ws.height * clampAmount * 2.f + ws.height * clampAmount / 2.f + room.preset.roomSize.y + room.wallThickness * 1.5f),
-									 -room.wallThickness * 1.5f + 50);
-		vec3 unclampedTranslate = vec3(motion.position.x - camera.lookAtPos.x * 1.1f + ws.width * 0.1f / 2.f,
-									   motion.position.y + camera.lookAtPos.y * 2.f - ws.height * 2.f / 2.f - ws.height / 2.f,
-									   -room.wallThickness * 1.5f + 50);
-		mat4 model =
-			glm::translate(glm::mat4(1.0f), vec3(ws.width / 2, ws.height / 2, 0)) * glm::scale(glm::mat4(1.0f), vec3(camera.zoom, camera.zoom, 1.0f)) * glm::translate(glm::mat4(1.0f), clampedTranslate)
-			// minor offset to close "gap" btween floor & wall
-			* glm::rotate(glm::mat4(1.0f), motion.angle, vec3(0, 0, 1)) * glm::translate(glm::mat4(1.0f), vec3(0))
-			/** glm::rotate(glm::mat4(1.0f),angle + radians(30.f) * (distance(targetMotion.position / 2.f, motion.position)), axis) //rotate to be vertical on z axis*/ // this generates wind turbine walls lmao
-			* glm::rotate(glm::mat4(1.0f), angle, axis) * glm::scale(glm::mat4(1.0f), vec3(motion.scale, 1.0f));
-		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float *)&model);
-
-		glm::vec3 cameraPos = glm::vec3(ws.width / 2, ws.height / 2, ws.height / 6.575 + ws.width / 6.575); // Position above the XY plane
-		cameraPos += vec3(roomCenterOffset, 0);
-		glm::vec3 cameraTarget = glm::vec3(ws.width / 2, ws.height / 2, 0.0f);
-		cameraTarget += vec3(roomCenterOffset, 0);
-		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-
-		glm::mat4 view_roomBounds = glm::lookAt(cameraPos, cameraTarget, up);
-
-		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float *)&view_roomBounds);
-		vec3 clampOffset = unclampedTranslate - clampedTranslate;
-		glm::mat4 translateAfterClamp = glm::translate(glm::mat4(1.0f),
-													   (clampOffset * vec3(1.8f, 1, 1)) * camera.zoom * vec3(room.preset.roomSize.x / ws.width, room.preset.roomSize.y / ws.height, 1) / vec3(room.preset.roomSize.x, room.preset.roomSize.y, 1));
-		translateAfterClamp = glm::translate(translateAfterClamp, (vec3(roomCenterOffset, 0) * vec3(1.8f, 1, 1)) * vec3(room.preset.roomSize.x / ws.width, room.preset.roomSize.y / ws.height, 1) / vec3(room.preset.roomSize.x, room.preset.roomSize.y, 1));
-
-		glUniformMatrix4fv(glGetUniformLocation(program, "translateAfterClamp"), 1, GL_FALSE, (float *)&translateAfterClamp);
-
-		float fov = 125.0f; // makes walls appear larger the less there is
-		float aspectRatio = (ws.width) / (ws.height);
-		float near_var = 0.1f;
-		float far_var = 10000.0f;
-		mat4 proj4 = glm::perspective(glm::radians(fov), aspectRatio, near_var, far_var);
-		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float *)&proj4);
 	}
-	else
-	{
-		assert(false && "Type of render request not supported");
+
+	if (registry.elites.has(entity) || should_glitch) {
+		glUniform1i(glitchToggle_uloc, true);
 	}
+	else {
+		glUniform1i(glitchToggle_uloc, false);
+	}
+	gl_has_errors();
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
@@ -514,8 +283,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-
-	float alpha = 1;
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
 
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
@@ -523,14 +292,15 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	glUniform1f(effectAlpha, 1);
 
 	// fade out entity if needed
+	float alpha = 1;
 	if (registry.fades.has(entity))
 	{
-		Fade &fade = registry.fades.get(entity);
+		Fade& fade = registry.fades.get(entity);
 		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
 		if (registry.enemies.has(entity))
 		{
-			vec3 color = {1.2, 0.5, 0.5}; // red
-			glUniform3fv(color_uloc, 1, (float *)&color);
+			vec3 color = { 1.2, 0.5, 0.5 }; // red
+			glUniform3fv(color_uloc, 1, (float*)&color);
 			glUniform1f(effectAlpha, alpha);
 			glUniform1i(change_color_uloc, 1);
 		}
@@ -542,80 +312,70 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	else if (registry.shield.has(entity)) {
 		alpha = 0.3;
 	}
-
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, alpha);
 
 	// Setting uniform values to the currently bound program
-	if (render_request.used_effect != EFFECT_ASSET_ID::ROOM_BOUND)
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	float wallThickness = 100 + 50;
+	float zoom = 1;
+	// note: perspective seems to make no difference?
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	// draw the border first
+	if (registry.uiBorders.has(entity) && registry.uiBorders.get(entity).border == UIBorderType::Outlined)
 	{
-		WindowState &windowState = registry.windowStates.components[0];
-		Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
-		float wallThickness = 100 + 50;
-		float zoom = 1;
-		// note: perspective seems to make no difference?
-		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-		glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
+		UIBorder& uiBorder = registry.uiBorders.get(entity);
+		mat4 border_transform = glm::mat4(1.0);
+		Motion borderMotion = motion;
+		borderMotion.scale += vec2(uiBorder.borderThickness);
 
-		// draw the border first
-		if (registry.uiBorders.has(entity) && registry.uiBorders.get(entity).border == UIBorderType::Outlined)
-		{
-			UIBorder &uiBorder = registry.uiBorders.get(entity);
-			mat4 border_transform = glm::mat4(1.0);
-			Motion borderMotion = motion;
-			borderMotion.scale += vec2(uiBorder.borderThickness);
-
-			GLuint border_transform_loc = glGetUniformLocation(currProgram, "model");
-			if (!isUI)
-			{
-				border_transform = createFollowCameraModel(borderMotion, offset);
-			}
-			else
-			{
-				border_transform = createNormalModel(borderMotion, offset);
-			}
-			glUniformMatrix4fv(border_transform_loc, 1, GL_FALSE, (float *)&border_transform);
-			GLint border_color_uloc = glGetUniformLocation(program, "fcolor");
-			glUniform3fv(border_color_uloc, 1, (float *)&uiBorder.borderColour);
-			glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-		}
-
-		mat4 transform = glm::mat4(1.0);
+		GLuint border_transform_loc = glGetUniformLocation(currProgram, "model");
 		if (!isUI)
 		{
-			transform = createFollowCameraModel(motion, offset);
+			border_transform = createFollowCameraModel(borderMotion, offset);
 		}
 		else
 		{
-			transform = createNormalModel(motion, offset);
+			border_transform = createNormalModel(borderMotion, offset);
 		}
-		GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-		glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float *)&transform);
-		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float *)&view);
-
-		gl_has_errors();
+		glUniformMatrix4fv(border_transform_loc, 1, GL_FALSE, (float*)&border_transform);
+		GLint border_color_uloc = glGetUniformLocation(program, "fcolor");
+		glUniform3fv(border_color_uloc, 1, (float*)&uiBorder.borderColour);
+		glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	}
 
-	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float *)&color);
+	const vec3 coloring = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&coloring);
 
-	gl_has_errors();
+	mat4 transform = glm::mat4(1.0);
+	if (!isUI)
+	{
+		transform = createFollowCameraModel(motion, offset);
+	}
+	else
+	{
+		transform = createNormalModel(motion, offset);
+	}
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
 	// change opacity of entity if needed
 	if (registry.invincibles.has(entity))
 	{
-		Invincible &invincible = registry.invincibles.get(entity);
+		Invincible& invincible = registry.invincibles.get(entity);
 		alpha = 1 - abs(sin(invincible.countdown / invincible.max * 10) * 0.3);
-		glUniform1f(alpha_uloc, alpha);
+		glUniform1f(effectAlpha, alpha);
 	}
 
 	if (registry.damageds.has(entity))
 	{
-		Damaged &damaged = registry.damageds.get(entity);
+    Damaged &damaged = registry.damageds.get(entity);
 		vec3 color = {1.2, 0.5, 0.5}; // red
-		if (registry.invincibles.has(entity)) {
-			color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
-		}
+		if (registry.invincibles.has(entity)) color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
 		glUniform3fv(color_uloc, 1, (float *)&color);
 		glUniform1i(change_color_uloc, 1);
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);
@@ -624,52 +384,12 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	if (registry.spawnings.has(entity))
 	{
-		Spawning &spawning = registry.spawnings.get(entity);
+		Spawning& spawning = registry.spawnings.get(entity);
 		//change color to grey
 		vec3 Color = COLOR_GREY_LIGHT;
-		glUniform3fv(color_uloc, 1, (float *)&Color);
+		glUniform3fv(color_uloc, 1, (float*)&Color);
 		glUniform1i(change_color_uloc, 0);
 		alpha = glm::lerp(0.f, 2.f, (spawning.max - spawning.countdown) / spawning.max);
-		// GLuint effects_enum = static_cast<GLuint>(EFFECT_ASSET_ID::DASH);
-		// GLuint Program = (GLuint)effects[effects_enum];
-		// glUseProgram(Program);
-		// gl_has_errors();
-		// glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		// gl_has_errors();
-		// GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		// GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-		// gl_has_errors();
-		// assert(in_texcoord_loc >= 0);
-		//
-		// glEnableVertexAttribArray(in_position_loc);
-		// glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-		// 					  sizeof(TexturedVertex), (void *)0);
-		// gl_has_errors();
-		//
-		// glEnableVertexAttribArray(in_texcoord_loc);
-		// glVertexAttribPointer(
-		// 	in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		// 	(void *)sizeof(
-		// 		vec3)); // note the stride to skip the preceeding vertex position
-		//
-		// // Enabling and binding texture to slot 0
-		// glActiveTexture(GL_TEXTURE0);
-		// gl_has_errors();
-		//
-		// GLuint texture_id =
-		// 	texture_gl_handles[(GLuint)name_to_texture["chevron.png"]];
-		//
-		// glBindTexture(GL_TEXTURE_2D, texture_id);
-		// gl_has_errors();
-		// GLuint Change_color_uloc = glGetUniformLocation(Program, "changeColor");
-		// glUniform1i(Change_color_uloc, 1);
-		//
-		// GLint Color_uloc = glGetUniformLocation(Program, "fcolor");
-		// glUniform3fv(Color_uloc, 1, (float *)&Color);
-		// GLuint chargeBoundary_uloc = glGetUniformLocation(Program, "chargeBoundary");
-		// glUniform1f(chargeBoundary_uloc, glm::lerp(1.f, 0.f, (spawning.max - spawning.countdown) / spawning.max));
-
 	}
 	// GLsizei num_triangles = num_indices / 3;
 
@@ -727,7 +447,10 @@ void RenderSystem::drawMesh(Entity entity,
 	gl_has_errors();
 
 	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture["hexagon.png"]];
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
@@ -760,12 +483,6 @@ void RenderSystem::drawBullet(Entity entity,
 	const mat4& projection, const mat4& view) {
 
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
-
-	// TODO REMOVE LATER
-	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
-		drawTexturedMesh(entity, projection, view);
-		return;
-	}
 
 	Motion& motion = registry.motions.get(entity);
 	vec2 offset = render_request.offset;
@@ -840,7 +557,10 @@ void RenderSystem::drawBullet(Entity entity,
 	glActiveTexture(GL_TEXTURE0);
 	assert(registry.renderRequests.has(entity));
 	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
@@ -1065,6 +785,96 @@ void RenderSystem::drawRoomBound(Entity entity,
 	//gl_has_errors();
 }
 
+void RenderSystem::drawDash(Entity entity,
+	const mat4& projection, const mat4& view) {
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	Motion& motion = registry.motions.get(entity);
+	vec2 offset = render_request.offset;
+	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
+	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+	gl_has_errors();
+
+	assert(registry.gaugeVisuals.has(entity));
+	GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+	GLint chargeBoundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+	glUniform1f(chargeBoundary_uloc, gauge.chargeBoundary);
+	GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
+	glUniform4fv(uncharged_uloc, 1, (float*)&gauge.unchargedColor);
+	GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
+	glUniform1i(chargeDir_uloc, gauge.isVertical ? 1 : 0);
+	gl_has_errors();
+
+	// Enable and bind the texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+	assert(registry.renderRequests.has(entity));
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
+
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
+
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	float wallThickness = 100 + 50;
+	float zoom = 1;
+	// note: perspective seems to make no difference?
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform = glm::mat4(1.0);
+	transform = createFollowCameraModel(motion, offset);
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+}
+
 // draw the intermediate texture to the screen, with some distortion to simulate
 // water
 void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
@@ -1238,7 +1048,7 @@ void RenderSystem::drawBackgroundElements()
 	{
 		if (!registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection, view);
+		effectToDrawCall(entity, projection, view);
 	}
 
 	for (Entity &entity : registry.objects.entities)
@@ -1247,7 +1057,7 @@ void RenderSystem::drawBackgroundElements()
 			continue;
 		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f >= registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset)
 		{
-			drawTexturedMesh(entity, projection, view);
+			effectToDrawCall(entity, projection, view);
 			if (ioState.debugMode)
 				drawAllColliders(entity, projection, view);
 		}
@@ -1290,7 +1100,7 @@ void RenderSystem::drawGameElements()
 			continue;
 		if (registry.lasers.has(entity) && registry.enemies.has(registry.lasers.get(entity).start))
 			drawLaserIndicator(entity, projection, view);
-		drawTexturedMesh(entity, projection, view);
+		effectToDrawCall(entity, projection, view);
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
 	}
@@ -1299,7 +1109,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection, view);
+		effectToDrawCall(entity, projection, view);
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
 	}
@@ -1308,7 +1118,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
+		(!registry.meshColliders.has(entity)) ? effectToDrawCall(entity, projection, view) : drawMesh(entity, projection, view);
 
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
@@ -1318,7 +1128,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
 			continue;
-		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
+		(!registry.meshColliders.has(entity)) ? effectToDrawCall(entity, projection, view) : drawMesh(entity, projection, view);
 
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
@@ -1336,7 +1146,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection, view);
+		effectToDrawCall(entity, projection, view);
 		if (ioState.debugMode)
 			drawAllColliders(entity, projection, view);
 	}
@@ -1347,7 +1157,7 @@ void RenderSystem::drawGameElements()
 			continue;
 		if (registry.motions.get(registry.players.entities[0]).position.y + registry.motions.get(registry.players.entities[0]).scale.y / 2.f < registry.motions.get(entity).position.y + registry.objects.get(entity).baseOffset)
 		{
-			drawTexturedMesh(entity, projection, view);
+			effectToDrawCall(entity, projection, view);
 			if (ioState.debugMode)
 				drawAllColliders(entity, projection, view);
 		}
@@ -1358,7 +1168,7 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.backgrounds.has(entity))
 			continue;
 		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
-			drawTexturedMesh(entity, projection, view);
+			effectToDrawCall(entity, projection, view);
 	}
 
 	for (Entity &entity : registry.doors.entities)
@@ -1366,14 +1176,14 @@ void RenderSystem::drawGameElements()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		if (registry.renderRequests.get(entity).used_effect == EFFECT_ASSET_ID::ROOM_BOUND || ioState.debugMode)
-			drawTexturedMesh(entity, projection, view);
+			effectToDrawCall(entity, projection, view);
 	}
 
 	for (Entity &entity : registry.critters.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		drawTexturedMesh(entity, projection, view);
+		effectToDrawCall(entity, projection, view);
 	}
 
 	glBindVertexArray(0);
@@ -1403,7 +1213,7 @@ void RenderSystem::drawGameOverlayUI()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection, view, false);
+		effectToDrawCall(entity, projection, view, false);
 	}
 
 	glBindVertexArray(0);
@@ -1486,7 +1296,7 @@ void RenderSystem::drawGameUI()
 		}
 		else
 		{
-			drawTexturedMesh(entity, projection, view, false);
+			effectToDrawCall(entity, projection, view, false);
 		}
 	}
 
@@ -1519,14 +1329,14 @@ void RenderSystem::drawDialogueUI()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection, view, true);
+		effectToDrawCall(entity, projection, view, true);
 	}
 
 	for (Entity &entity : registry.dialogueUIs.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection, view, true);
+		effectToDrawCall(entity, projection, view, true);
 	}
 
 	glBindVertexArray(0);
@@ -1556,7 +1366,7 @@ void RenderSystem::drawMenuUI()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection, view, true);
+		effectToDrawCall(entity, projection, view, true);
 	}
 
 	glBindVertexArray(0);
@@ -1591,7 +1401,7 @@ void RenderSystem::drawMenuOverlayUI()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
-		drawTexturedMesh(entity, projection, view, true);
+		effectToDrawCall(entity, projection, view, true);
 	}
 
 	glBindVertexArray(0);
@@ -1773,7 +1583,10 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 	GLuint texture_id =
 		texture_gl_handles[(GLuint)name_to_texture[indicatorName]];
 	
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -1868,7 +1681,10 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 	GLuint texture_id =
 		texture_gl_handles[(GLuint)name_to_texture["enemy_bullet_square.png"]];
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 	gl_has_errors();
 
 	// Getting uniform locations for glUniform* calls
@@ -2001,8 +1817,8 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 
 	GLint laser_uloc = glGetUniformLocation(program, "laser");
 	glUniform1i(laser_uloc, 0);
-
-	GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
+  
+  GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
 	glUniform1i(onDeath_uloc, 0);
 
 	int size = 1;
@@ -2043,7 +1859,11 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	// Enable and bind the texture to slot 0
 	glActiveTexture(GL_TEXTURE0);
 	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[shape]];
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
+	gl_has_errors();
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
@@ -2132,7 +1952,10 @@ void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, con
 	gl_has_errors();
 	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture["LaserIndicator.png"]];
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 	gl_has_errors();
 
 	GLint currProgram;
@@ -2239,7 +2062,10 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	GLuint texture_id =
 		texture_gl_handles[(GLuint)name_to_texture[shape]];
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -2342,7 +2168,10 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 	GLuint texture_id =
 		texture_gl_handles[(GLuint)name_to_texture["chevron.png"]];
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 	gl_has_errors();
 
 	// Getting uniform locations for glUniform* calls
@@ -2471,7 +2300,10 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	GLuint texture_id =
 		texture_gl_handles[(GLuint)name_to_texture["parallelogram.png"]];
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
 	gl_has_errors();
 
 	vec3 color = {11.50, 0.0, 0.0}; // red

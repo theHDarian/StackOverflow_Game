@@ -4,7 +4,7 @@
 in vec2 vpos; // Distance from local origin
 
 // Application data
-uniform sampler2D sampler0;
+uniform sampler2DArray sampler0;
 uniform vec3 fcolor;
 uniform int light_up;
 uniform float time;
@@ -96,7 +96,7 @@ float fbm(vec2 p) {
 
 void main()
 {
-	if (texture(sampler0, vpos + vec2(0.5)).a < 0.5) {
+	if (texture(sampler0, vec3(vpos + vec2(0.5), 0)).a < 0.5) {
 		float a = POWER * fbm(SCALE * rotate(vpos, angle)) + BIAS;
 		a = (a > 0.5) ? 0.8 : (a > 0.3) ? 0.5 : 0.3;
 		color = vec4(0.0, 1.0, 1.0, a);
