@@ -4,6 +4,7 @@
 #include "premades.hpp"
 #include "ai_system.hpp"
 #include "utils/random.hpp"
+#include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "components/presets/particle_presets.hpp"
 #include "utils/vector_operations.hpp"
@@ -781,7 +782,7 @@ Entity createBibleTree(RenderSystem *renderer, vec2 pos)
 }
 
 // For creating top-down props with four walls (like planters)
-Entity createProp(RenderSystem *renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink)
+Entity createProp(RenderSystem *renderer, vec2 pos, std::string filename, vec2 scale, vec2 shrink, bool solid)
 {
 	Entity e = Entity();
 
@@ -791,13 +792,14 @@ Entity createProp(RenderSystem *renderer, vec2 pos, std::string filename, vec2 s
 	m.scale = scale;
 
 	scale *= shrink;
-	Entity ew = createWall(renderer, pos + vec2(+scale.x / 2.f, +scale.y / 2.f), pos + vec2(+scale.x / 2.f, -scale.y / 2.f));
-	createWall(renderer, pos + vec2(-scale.x / 2.f, +scale.y / 2.f), pos + vec2(-scale.x / 2.f, -scale.y / 2.f));
-	createWall(renderer, pos + vec2(+scale.x / 2.f, +scale.y / 2.f), pos + vec2(-scale.x / 2.f, +scale.y / 2.f));
-	createWall(renderer, pos + vec2(+scale.x / 2.f, -scale.y / 2.f), pos + vec2(-scale.x / 2.f, -scale.y / 2.f));
-
-	Parent &p = registry.parents.emplace(ew);
-	p.children.push_back(e);
+	if (solid) {
+		Entity ew = createWall(renderer, pos + vec2(+scale.x / 2.f, +scale.y / 2.f), pos + vec2(+scale.x / 2.f, -scale.y / 2.f));
+		createWall(renderer, pos + vec2(-scale.x / 2.f, +scale.y / 2.f), pos + vec2(-scale.x / 2.f, -scale.y / 2.f));
+		createWall(renderer, pos + vec2(+scale.x / 2.f, +scale.y / 2.f), pos + vec2(-scale.x / 2.f, +scale.y / 2.f));
+		createWall(renderer, pos + vec2(+scale.x / 2.f, -scale.y / 2.f), pos + vec2(-scale.x / 2.f, -scale.y / 2.f));
+		Parent& p = registry.parents.emplace(ew);
+		p.children.push_back(e);
+	}
 
 	auto &object = registry.objects.emplace(e);
 	object.baseOffset;
@@ -1279,10 +1281,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	case EnemyType::BossBigC:
 	{
-		enemy = BigC();
+		enemy = BossBigCCore();
 		auto &boss = registry.bosses.emplace(entity);
 		boss.name = "BigC";
-		movement.angularSpeed = 20;
+		break;
+	}
+		case EnemyType::BossBigCShield:
+	{
+		enemy = BigC();
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case EnemyType::BossBeehiveGun:
@@ -1298,6 +1305,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}case EnemyType::EnemyMage:
 	{
 		enemy = Mage();
+		// Healer& healer = registry.healers.emplace(entity);
+		// healer.coolDown = 1000.f;
+		// healer.healPower = 15.f;
 		break;
 	}
 	case EnemyType::EnemyOneBee:
@@ -1455,6 +1465,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::EnemyLaserSniper:
 		enemy = HifiLaserSniper();
 		break;
+	case EnemyType::EnemyLaserSniperHard:
+		enemy = HifiLaserSniperHard();
+		break;
 	case EnemyType::EnemyHifiCharger:
 		enemy = HifiCharger();
 		break;
@@ -1588,6 +1601,25 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = DrillWormHead();
 		break;
 	}
+	case EnemyChainDogHead:
+	{
+		enemy = ChainDogHead();
+		createProp(renderer, lerpToRoom(enemy.headData.anchorPoint), "Anchor.png", vec2(120 / 2), vec2(1), false);
+		break;
+	}
+	case EnemyMedicalBMP:
+		{
+			enemy = BMP();
+			Buffer& buffer = registry.buffers.emplace(entity);
+			buffer.range = 500.f;
+			buffer.maxCoolDown = 1000.f;
+			break;
+		}
+		case EnemyScissors:
+        {
+            enemy = Scissors();
+            break;
+        }
 
 		default:
 			assert(false);
@@ -1659,6 +1691,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		head.size = enemy.headData.size;
 		head.constrainDistance = enemy.headData.constrainDistance;
 		head.body = enemy.headData.body;
+		head.anchor = enemy.headData.anchor;
+		head.anchorPoint = enemy.headData.anchorPoint;
 
 		Map& map = registry.maps.components[0];
 		vec2 mid = map.currRoom.roomStart + 0.5f * (map.currRoom.roomEnd - map.currRoom.roomStart);
@@ -1670,6 +1704,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			if (i < head.size) createWormBody(renderer, posi, head.body, entity, i);
 		}
 	}
+
+	if (type == EnemyType::BossBigC)
+    {
+        createEnemy(renderer, pos + vec2(0, 0), EnemyType::BossBigCShield);
+    }
 
 	return entity;
 };
@@ -1686,6 +1725,9 @@ void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity hea
 	{
 	case BossDrillWormBody:
 		enemy = DrillWormBody();
+		break;
+	case EnemyChainDogBody:
+		enemy = ChainDogBody();
 		break;
 	default:
 		assert(false);
@@ -2224,4 +2266,11 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 	}
 	isSpecial = false;
 	return {atkData.defaultEffect};
+
+}
+
+vec2 lerpToRoom(vec2 point) {
+	Map& map = registry.maps.components[0];
+	//return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, point);
+	return map.currRoom.roomStart * (vec2(1) - point) + map.currRoom.roomEnd * point;
 }

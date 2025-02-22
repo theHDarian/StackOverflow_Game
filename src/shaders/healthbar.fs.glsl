@@ -4,7 +4,7 @@
 in vec2 texcoord;
 
 // Application data
-uniform sampler2D sampler0;
+uniform sampler2DArray sampler0;
 uniform vec3 fcolor;
 uniform int changeColor = 0;
 uniform float alpha = 1.0;
@@ -14,7 +14,7 @@ uniform float chargeBoundary = 1.0;
 layout(location = 0) out vec4 color;
 
 void main() {
-    vec4 texColor = texture(sampler0, texcoord);
+    vec4 texColor = texture(sampler0, vec3(texcoord.xy, 0));
 
     // Create a diagonal boundary
     float diagonalBoundary = 1.0 - chargeBoundary + (-0.06125 * texcoord.y);

@@ -116,6 +116,8 @@ public:
 	ComponentContainer<Elite> elites;
 	ComponentContainer<WormHead> wormHeads;
 	ComponentContainer<WormBody> wormBodies;
+	ComponentContainer<Buffer> buffers;
+	ComponentContainer<Vulnerability> vulnerabilities;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -223,6 +225,8 @@ public:
 		registry_list.push_back(&elites);
 		registry_list.push_back(&wormHeads);
 		registry_list.push_back(&wormBodies);
+		registry_list.push_back(&buffers);
+		registry_list.push_back(&vulnerabilities);
 	}
 
 	void clear_all_components()

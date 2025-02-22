@@ -190,18 +190,18 @@ struct Mesh
 // should ask why that's the case/why it works fine even w/o inherent casting
 
 enum  EFFECT_ASSET_ID : unsigned int {
-	COLOURED = 0,
-	EGG = COLOURED + 1,
-	MESH = EGG + 1,
+	COLOURED = 0,						// Unused
+	EGG = COLOURED + 1,					// Has own call
+	MESH = EGG + 1,						// Has own call
 	TEXTURED = MESH + 1,
-	POSTPROCESS1 = TEXTURED + 1,
-	POSTPROCESS2 = POSTPROCESS1 + 1,
-	POSTPROCESS3 = POSTPROCESS2 + 1,
-	DASH = POSTPROCESS3 + 1,
-	HP_BAR = DASH + 1,
-	ROOM_BOUND = HP_BAR + 1,
+	POSTPROCESS1 = TEXTURED + 1,		// Extra
+	POSTPROCESS2 = POSTPROCESS1 + 1,	// Extra
+	POSTPROCESS3 = POSTPROCESS2 + 1,	// Extra
+	DASH = POSTPROCESS3 + 1,			// Has own call
+	HP_BAR = DASH + 1,					// Has own call
+	ROOM_BOUND = HP_BAR + 1,			// Has own call
 	ANIMATE = ROOM_BOUND + 1,
-	BULLET = ANIMATE + 1,
+	BULLET = ANIMATE + 1,				// Has own call
 	EFFECT_COUNT = BULLET + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;

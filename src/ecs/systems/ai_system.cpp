@@ -53,6 +53,26 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 
 				std::cout << "invisible: " << inv.countdown << std::endl;
 			}
+		case SpecialStates::PROTECTED:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 0.5;
+			} else {
+				auto& vul = registry.vulnerabilities.emplace(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 0.5;
+			}
+		case SpecialStates::VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 2.f;
+			} else {
+                auto& vul = registry.vulnerabilities.emplace(entity);
+                vul.countdown = currPattern.maxDuration;
+                vul.modifier = 2.f;
+            }
 		break;
 		default: break;
 	}
@@ -64,19 +84,38 @@ void handleSpecialStates (Reaction reaction, Entity entity)
 		case SpecialStates::INVINCIBLE:
 			if (!registry.invincibles.has(entity)) {
 				auto& inv = registry.invincibles.emplace(entity);
-				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 7500) + 2500.f) : Random::Float( 10000 ) + 3000;
+				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
 				inv.countdown = inv.max;
-			} else {
-                // registry.invincibles.get(entity).countdown = registry.invincibles.get(entity).max;
-				auto inv = registry.invincibles.get(entity);
-            }
-
+			}
 		break;
 		case SpecialStates::INVISIBLE:
 			if (!registry.invisibles.has(entity)) {
 				auto inv = registry.invisibles.emplace(entity);
-				inv.countdown = registry.bosses.has( entity ) ? 30000 : Random::Float( 10000 ) + 3000;
+				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
+
 			}
+
+		case SpecialStates::PROTECTED:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 0.5;
+			} else {
+				auto& vul = registry.vulnerabilities.emplace(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 0.5;
+			}
+
+		case SpecialStates::VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 2.f;
+			} else {
+                auto& vul = registry.vulnerabilities.emplace(entity);
+                vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+                vul.modifier = 2.f;
+            }
 		break;
 		default: break;
 	}
@@ -125,7 +164,7 @@ void AISystem::step(float elapsed_ms)
 				// Move target location
 				switch (currPattern.type) {
 				case EnemyBehavior::WORM_FOLLOW:
-					head.points[0] = glm::lerp(head.points[0], registry.motions.get(registry.players.entities[0]).position, 0.02f * enemy.speedMultiplier);
+					head.points[0] = moveTowards(head.points[0], registry.motions.get(registry.players.entities[0]).position, 3.f * enemy.speedMultiplier);
 					break;
 				case EnemyBehavior::WORM_PATROL:
 					// Worm will Teleport to first position in spline if not there
@@ -143,9 +182,12 @@ void AISystem::step(float elapsed_ms)
 					if (movement.t > movement.points.size()) movement.t -= (float)movement.points.size();
 					break;
 				case EnemyBehavior::WORM_GOTO:
-					head.points[0] = glm::lerp(head.points[0], lerpToRoom(currPattern.path[currPattern.path.size() - 1]), movement.t);
+					head.points[0] = moveTowards(head.points[0], lerpToRoom(currPattern.path[currPattern.path.size() - 1]), 5.f * enemy.speedMultiplier);
 					currPattern.pathIndex = currPattern.path.size() - 1;
 					movement.t = (movement.t > 1.f) ? 0.f : movement.t + 0.0001 * enemy.speedMultiplier;
+					break;
+				case EnemyBehavior::IDLE:
+					movement.t = 0.f;
 					break;
 				default:
 					assert(false);
@@ -156,11 +198,19 @@ void AISystem::step(float elapsed_ms)
 					//Pull the next segment to the previous one
 					head.points[i] = constrainDistance(head.points[i], head.points[i - 1], head.constrainDistance);
 				}
+				if (head.anchor) {
+					head.points[head.size] = constrainDistance(head.points[head.size], lerpToRoom(head.anchorPoint), head.constrainDistance);
+					for (int i = head.size - 1; i >= 0; i--) {
+						//Pull the next segment to the previous one
+						head.points[i] = constrainDistance(head.points[i], head.points[i+1], head.constrainDistance);
+					}
+				}
 
 				// Move head enemy
 				vec2 direction = (head.points[0] - head.points[1]);
 				motion.position = head.points[1] + 0.5f * direction;
 				motion.angle = atan2(direction.y, direction.x);
+				if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) motion.angle = 0;
 			}
 			else {
 				// Move body enemy
@@ -509,6 +559,10 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getTeleportPos(entity);
 	case EnemyBehavior::FOLLOWSCIENTIST:
 		return getScientistPos(entity);
+	case EnemyBehavior::GRANTINGBUFFS:
+		return getTeamPos(entity);
+		case EnemyBehavior::GRANTINGBUFFSAOE:
+    	return getTeamPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
@@ -702,8 +756,35 @@ vec2 AISystem::getTeamPos(Entity entity)
 
 			return goalPosition;
 		}
+	} else if (registry.buffers.has(entity))
+	{
+		Buffer& buffer = registry.buffers.get(entity);
+		Entity teammates = buffer.targetEntity;
+		if (teammates != NULL && registry.motions.has(teammates))
+		{
+			Motion &teammateMotion = registry.motions.get(teammates);
+			Motion &bufferMotion = registry.motions.get(entity);
+
+			vec2 direction = teammateMotion.position - bufferMotion.position;
+			if (glm::length(direction) > 0)
+			{
+				direction = glm::normalize(direction);
+			}
+			float backDistance = buffer.range * 0.5f;
+
+			vec2 goalPosition = teammateMotion.position - direction * backDistance;
+
+			vec4 roomBounds = getRoomBounds(entity);
+			vec2 min = {roomBounds.x, roomBounds.y};
+			vec2 max = {roomBounds.z, roomBounds.w};
+
+			goalPosition = glm::clamp(goalPosition, min, max);
+
+			return goalPosition;
+		}
 	}
-	return getCurrentPos(entity);
+
+	return generateRandomPos(entity);
 };
 
 vec2 AISystem::getPlayerPos()
@@ -1237,4 +1318,15 @@ vec2 AISystem::catmullRomSpline(const std::vector<glm::vec2>& cp, float t)
 vec2 AISystem::lerpToRoom(vec2 point) {
 	Map& map = registry.maps.components[0];
 	return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, point);
+}
+
+ vec2 AISystem::moveTowards(vec2 current, vec2 target, float maxDistanceDelta)
+{
+	vec2 a = target - current;
+	float magnitude = glm::length(a);
+	if (magnitude <= maxDistanceDelta || magnitude == 0.f)
+	{
+		return target;
+	}
+	return current + a / magnitude * maxDistanceDelta;
 }
