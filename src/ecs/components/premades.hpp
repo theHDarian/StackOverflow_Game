@@ -1223,8 +1223,8 @@ struct BigC : Enemy
 	const AttackData FastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUpA, dashCDRDownA}
-		,FragileRounds
+		,{dashUp, dashCDRDown}
+		,bulletPierceDown
 		,1
 		,0
 		,{70, 70}
@@ -1240,8 +1240,8 @@ struct BigC : Enemy
 	const AttackData shortFastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUpA, dashCDRDownA}
-		,FragileRounds
+		,{dashUp, dashCDRDown}
+		,bulletPierceDown
 		,1
 		,0
 		,{70, 70}
@@ -1295,8 +1295,8 @@ struct BossBigCCore : Enemy{
 	const AttackData laserRotate{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		6,
 		M_PI / 6,
 		{0, 20},
@@ -1328,8 +1328,8 @@ struct BossBigCCore : Enemy{
 	const AttackData laser2{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		8,
 		0,
 		{20, 20},
@@ -1343,8 +1343,8 @@ struct BossBigCCore : Enemy{
 	const AttackData laser1{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		8,
 		M_PI / 8.f,
 		{20, 20},
@@ -2342,7 +2342,7 @@ struct Scissors : Enemy
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
 		{},
-		buzz,
+		playerSpeedUp,
 		1,
 		0,
 		{20, 20},
