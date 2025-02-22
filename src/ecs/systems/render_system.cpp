@@ -1139,7 +1139,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
 			continue;
-		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
+		(!registry.meshColliders.has(entity)) ? effectToDrawCall(entity, projection, view) : drawMesh(entity, projection, view);
 	}
 
 	for (Entity &entity : registry.players.entities)
