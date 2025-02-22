@@ -14,6 +14,7 @@ private:
 	static vec2 generateRandomPos(Entity entity);
 	static vec2 generateRandomPosInRadius(Entity entity, int radiusNear, int radiusFar);
 	static vec2 getPlayerPos();
+	static vec2 getRollingPos(Entity entity);
 	static vec2 getCurrentPos(Entity entity);
 	static vec2 evadeBullet(Entity entity);
 	static vec2 getNextPatrolPos(Entity entity);
@@ -35,4 +36,10 @@ private:
 	static void boidCircleRoom(Entity entity, Boid& boid, float multiplier, float angularSpeed);
 	static void boidEvadePlayer(Entity entity, Boid &boid, float multiplier);
 	static void boidComputeAllFactor(Entity entity, Boid &boid, float multiplierCoherence,float multiplierSeperation, float multiplierAlignment, float range);
+	static bool LineToLine(vec2 line1Start, vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint);
+	static vec2 constrainDistance(vec2 point, vec2 anchor, float distance);
+	static vec2 catmullRomSplineLerp(const std::vector<glm::vec2>& cp, float t);
+	static vec2 catmullRomSpline(const std::vector<glm::vec2>& cp, float t);
+	static vec2 lerpToRoom(vec2 point);
+	static vec2 moveTowards(vec2 current, vec2 target, float maxDistanceDelta);
 };

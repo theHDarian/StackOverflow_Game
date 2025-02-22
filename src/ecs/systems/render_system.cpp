@@ -216,7 +216,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniform1i(tile_uloc, render_request.idealScale.x > 0);
 	gl_has_errors();
 
-	vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
+  vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
 	GLint tiling_uloc = glGetUniformLocation(program, "tiling");
 	glUniform2fv(tiling_uloc, 1, (float*)&tiling);
 	gl_has_errors();
@@ -373,9 +373,10 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	if (registry.damageds.has(entity))
 	{
-		Damaged& damaged = registry.damageds.get(entity);
-		vec3 color = { 1.2, 0.5, 0.5 }; // red
-		glUniform3fv(color_uloc, 1, (float*)&color);
+    Damaged &damaged = registry.damageds.get(entity);
+		vec3 color = {1.2, 0.5, 0.5}; // red
+		if (registry.invincibles.has(entity)) color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
+		glUniform3fv(color_uloc, 1, (float *)&color);
 		glUniform1i(change_color_uloc, 1);
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);
 		glUniform1f(effectAlpha, alpha);
@@ -1133,6 +1134,14 @@ void RenderSystem::drawGameElements()
 			drawAllColliders(entity, projection, view);
 	}
 
+	// Re-draw worm heads so they always on top of bodies
+	for (Entity& entity : registry.wormHeads.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bosses.has(entity))
+			continue;
+		(!registry.meshColliders.has(entity)) ? drawTexturedMesh(entity, projection, view) : drawMesh(entity, projection, view);
+	}
+
 	for (Entity &entity : registry.players.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -1243,7 +1252,7 @@ void RenderSystem::drawGameUI()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
+		if (!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
 			drawHPbar(entity, projection, view);
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);
@@ -1760,7 +1769,8 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 			bulletColor = bulletEffectColors.at(stack.currStack[i].type);
 		}
 
-		// start from bottom to top
+		// start from left to right
+		// might be easier if these were entities instead...
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
 					 bulletColor, bulletShape, projection, view);
 	}
@@ -1772,13 +1782,15 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	motion.scale = bullet_size;
 	motion.position = position;
 
-	// for now, draw bullets using textures
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
+	GLuint used_effect_enum = static_cast<GLuint>(EFFECT_ASSET_ID::BULLET);
+	if (shape.compare(bulletEffectShapes.at(BulletEffectType::Key)) == 0) {
+		used_effect_enum = static_cast<GLuint>(EFFECT_ASSET_ID::TEXTURED);
+	}
 	const GLuint program = (GLuint)effects[used_effect_enum];
 
 	// Setting shaders
 	glUseProgram(program);
-	gl_has_errors();
+	//gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
 	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -1786,70 +1798,104 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	// Setting vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
+	//gl_has_errors();
 
 	GLint in_position_loc = glGetAttribLocation(program, "in_position");
 	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
+	//gl_has_errors();
 
 	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-						  sizeof(TexturedVertex), (void *)0);
-	gl_has_errors();
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+	//gl_has_errors();
 
 	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(
-		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		(void *)sizeof(
-			vec3)); // note the stride to skip the preceeding vertex position
+	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+	//gl_has_errors();
 
-	// Enabling and binding texture to slot 0
+	GLuint time_uloc = glGetUniformLocation(program, "time");
+	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
+	GLint laser_uloc = glGetUniformLocation(program, "laser");
+	glUniform1i(laser_uloc, 0);
+  
+  GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
+	glUniform1i(onDeath_uloc, 0);
+
+	int size = 1;
+	GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
+	glUniform1i(effect_size_uloc, size);
+
+	GLint shape_uloc = glGetUniformLocation(program, "shape");
+	glUniform1i(shape_uloc, EnemyBulletShape::RECTANGLE);
+
+	GLint scale_uloc = glGetUniformLocation(program, "scale");
+	glUniform2fv(scale_uloc, 1, (float*)&bullet_size);
+
+	vec3 c2, c3, c4, c5;
+	c2 = c3 = c4 = c5 = vec3(-1.0);
+	vec3 c1 = color;
+
+	GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
+	glUniform3fv(bcolor1_uloc, 1, (float*)&c1);
+	GLint bcolor2_uloc = glGetUniformLocation(program, "bcolor2");
+	glUniform3fv(bcolor2_uloc, 1, (float*)&c2);
+	GLint bcolor3_uloc = glGetUniformLocation(program, "bcolor3");
+	glUniform3fv(bcolor3_uloc, 1, (float*)&c3);
+	GLint bcolor4_uloc = glGetUniformLocation(program, "bcolor4");
+	glUniform3fv(bcolor4_uloc, 1, (float*)&c4);
+	GLint bcolor5_uloc = glGetUniformLocation(program, "bcolor5");
+	glUniform3fv(bcolor5_uloc, 1, (float*)&c5);
+
+	// textured gluniforms
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 0);
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
+
+	//gl_has_errors();
+
+	// Enable and bind the texture to slot 0
 	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-
-	GLuint texture_id =
-		texture_gl_handles[(GLuint)name_to_texture[shape]];
-
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[shape]];
 	//glBindTexture(GL_TEXTURE_2D, texture_id);
 	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
 	glUniform1i(texture_uloc, 0);
 	gl_has_errors();
 
-	// Getting uniform locations for glUniform* calls
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color_uloc, 1, (float *)&color);
-	// want to overwrite the colour with given; could also use a separate shader program
-	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-	glUniform1i(change_color_uloc, 0);
-	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, 1);
-	gl_has_errors();
-
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
-	// GLsizei num_triangles = num_indices / 3;
-
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Setting uniform values to the currently bound program
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size_i = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size_i);
+
+	//gl_has_errors();
+
+	GLsizei num_indices = size_i / sizeof(uint16_t);
+
+	//gl_has_errors();
+
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+	float wallThickness = 100 + 50;
+	float zoom = 1;
+	// note: perspective seems to make no difference?
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
 
-	mat4 transform = createNormalModel(motion, vec2(0));
-
+	mat4 transform = glm::mat4(1.0);
+	transform = createNormalModel(motion, vec2(0));
 	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float *)&transform);
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float *)&view);
-	gl_has_errors();
+	//gl_has_errors();
+
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+
 	gl_has_errors();
 }
 
@@ -2206,7 +2252,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 		HPBarMotion.scale = {100, 10};
 	}
 
-	if (registry.damageds.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
+	if (registry.damageds.has(entity) && !registry.invincibles.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
 	{
 		HPBarMotion.position.x += (rand() % 10) - 5;
 		HPBarMotion.position.y += (rand() % 10) - 5;

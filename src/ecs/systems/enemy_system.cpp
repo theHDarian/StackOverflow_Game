@@ -91,6 +91,16 @@ void EnemySystem::step(float elapsed_ms)
             heal(entity, pattern);
         }
 
+        if (registry.buffers.has(entity) && (pattern.type == EnemyBehavior::GRANTINGBUFFS || pattern.type == EnemyBehavior::GRANTINGBUFFSAOE))
+        {
+            Buffer& buffer = registry.buffers.get(entity);
+            buffer.cooldown -= elapsed_ms;
+            if (buffer.cooldown < 0) {
+                grantBuff(entity, pattern);
+                buffer.cooldown = buffer.maxCoolDown;
+            }
+        }
+
         if (pattern.type == EnemyBehavior::DEATHSTATE)
         {
             // std::cout << "got here" << std::endl;
@@ -136,8 +146,10 @@ void EnemySystem::step(float elapsed_ms)
                 if (enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
                     rotationChange *= enemy.rotatePower;
                 motion.angle += rotationChange;
-            }
-            else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
+            } else if (registry.wormBodies.has(entity) || registry.wormHeads.has(entity))
+            {
+                // Do nothing!
+            } else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
             {
                 float targetAngle = atan2(direction.y, direction.x);
                 float deltaAngle = targetAngle - motion.angle;
@@ -169,7 +181,7 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::SPIN)
                 {
-                    float angularSpeed = movement.angularSpeed * 2 * M_PI / 360.0f;
+                    float angularSpeed = movement.angularSpeed * M_PI / 360.0f;
                     float rotationChange = angularSpeed * elapsed_ms / 1000.f;
                     motion.angle += rotationChange;
                 }
@@ -182,9 +194,50 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
-                    vec2 mid = playerMotion.position - motion.position;
-                    motion.angle = atan2(mid.y, mid.x);
+                    if (!registry.bosses.has(entity) && !registry.bossParts.has(entity))
+                    {
+                        Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
+                        vec2 mid = playerMotion.position - motion.position;
+                        motion.angle = atan2(mid.y, mid.x);
+                    } else {
+                        // Assuming you have a deltaTime variable that represents the time elapsed since the last frame
+                        float deltaTime = elapsed_ms / 1000.f; // Set this to the appropriate value
+
+                        // Define a rotation speed (radians per second)
+                        float rotationSpeed = enemy.rotatePower; // Adjust this value to control the turning speed
+
+                        // Define a minimum turning speed (radians per second)
+                        float minTurningSpeed = enemy.rotatePower/2.f; // Adjust this value to control the minimum turning speed
+
+                        // Get the current angle of the object
+                        float currentAngle = motion.angle;
+
+                        // Calculate the target angle towards the player
+                        vec2 mid = playerMotion.position - motion.position;
+                        float targetAngle = atan2(mid.y, mid.x);
+
+                        // Calculate the shortest angle difference
+                        float angleDifference = targetAngle - currentAngle;
+                        if (angleDifference > M_PI) {
+                            angleDifference -= 2 * M_PI;
+                        } else if (angleDifference < -M_PI) {
+                            angleDifference += 2 * M_PI;
+                        }
+
+                        // Calculate the desired angle change for this frame
+                        float desiredAngleChange = rotationSpeed * deltaTime;
+
+                        // Ensure the angle change is at least the minimum turning speed
+                        if (std::abs(angleDifference) < minTurningSpeed * deltaTime) {
+                            angleDifference = (angleDifference > 0 ? 1 : -1) * minTurningSpeed * deltaTime;
+                        } else if (std::abs(angleDifference) > desiredAngleChange) {
+                            angleDifference = (angleDifference > 0 ? 1 : -1) * desiredAngleChange;
+                        }
+
+                        // Update the object's angle
+                        motion.angle = currentAngle + angleDifference;
+                    }
+
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_TWIN)
                 {
@@ -192,11 +245,18 @@ void EnemySystem::step(float elapsed_ms)
                     vec2 mid = twinMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
+
                 if (pattern.type == EnemyBehavior::TELEPORT)
                 {
 
                     std::cout << "teleporting in" << movement.posB[0] << ": " << movement.posB[1] << std::endl;
                     motion.position = movement.posB;
+                } else if (pattern.type == EnemyBehavior::ROLLING)
+                {
+                    motion.velocity = glm::normalize(movement.posB - movement.posA) * movement.speed;
+                    float angularSpeed = movement.angularSpeed * 20.f * M_PI / 360.0f;
+                    float rotationChange = angularSpeed * elapsed_ms / 1000.f;
+                    motion.angle += rotationChange * sign(motion.velocity.x) * enemy.rotatePower;
                 }
                 else
                 {
@@ -209,9 +269,49 @@ void EnemySystem::step(float elapsed_ms)
             {
                 if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
-                    vec2 mid = playerMotion.position - motion.position;
-                    motion.angle = atan2(mid.y, mid.x);
+                     if (!registry.bosses.has(entity) && !registry.bossParts.has(entity))
+                    {
+                         Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
+                         vec2 mid = playerMotion.position - motion.position;
+                         motion.angle = atan2(mid.y, mid.x);
+                    } else {
+                        // Assuming you have a deltaTime variable that represents the time elapsed since the last frame
+                        float deltaTime = elapsed_ms / 1000.f; // Set this to the appropriate value
+
+                        // Define a rotation speed (radians per second)
+                        float rotationSpeed = enemy.rotatePower; // Adjust this value to control the turning speed
+
+                        // Define a minimum turning speed (radians per second)
+                        float minTurningSpeed = enemy.rotatePower/2.f; // Adjust this value to control the minimum turning speed
+
+                        // Get the current angle of the object
+                        float currentAngle = motion.angle;
+
+                        // Calculate the target angle towards the player
+                        vec2 mid = playerMotion.position - motion.position;
+                        float targetAngle = atan2(mid.y, mid.x);
+
+                        // Calculate the shortest angle difference
+                        float angleDifference = targetAngle - currentAngle;
+                        if (angleDifference > M_PI) {
+                            angleDifference -= 2 * M_PI;
+                        } else if (angleDifference < -M_PI) {
+                            angleDifference += 2 * M_PI;
+                        }
+
+                        // Calculate the desired angle change for this frame
+                        float desiredAngleChange = rotationSpeed * deltaTime;
+
+                        // Ensure the angle change is at least the minimum turning speed
+                        if (std::abs(angleDifference) < minTurningSpeed * deltaTime) {
+                            angleDifference = (angleDifference > 0 ? 1 : -1) * minTurningSpeed * deltaTime;
+                        } else if (std::abs(angleDifference) > desiredAngleChange) {
+                            angleDifference = (angleDifference > 0 ? 1 : -1) * desiredAngleChange;
+                        }
+
+                        // Update the object's angle
+                        motion.angle = currentAngle + angleDifference;
+                    }
                 }
             }
         }
@@ -248,39 +348,36 @@ void EnemySystem::step(float elapsed_ms)
             PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
             EnemyPattern &pattern = enemyStat.currEnemyPattern();
 
-            enemyStat.currHealth -= bulletStat.damage;
-            if (enemyStat.currHealth <= 0)
+            if (registry.invincibles.has(entity))
             {
-                if (registry.scientist.has(entity))
+                //if enemy is invincible, block damage and destroy bullet
+                if (!registry.deleteds.has(other_entity) && (!registry.boids.has(entity) || (registry.boids.has(entity) && registry.enemies.components.size() > registry.boids.components.size())))
+                    registry.deleteds.emplace(other_entity);
+                if (!registry.damageds.has(entity) && enemyStat.currHealth > 0)
                 {
-                    Scientist &scien = registry.scientist.get(entity);
-                    if (!registry.deleteds.has(scien.hand))
-                    {
-                        registry.deleteds.emplace(scien.hand);
-                    }
+                    registry.damageds.emplace(entity);
                 }
-                if (!registry.deleteds.has(entity))
+                else if (registry.damageds.has(entity))
                 {
-                    Fade &f = registry.fades.emplace(entity);
-                    registry.deleteds.emplace(entity);
-
-                    ParticleProps props = enemyDeath;
-                    registry.emitParticles.replace(entity, PExplode, props, f.max, Random::Int(20) + 20);
-                    if (registry.enemyGroups.has(entity))
-                    {
-                        for (Entity other : registry.enemyGroups.get(entity).others)
-                        {
-                            if (!registry.deleteds.has(other))
-                                registry.deleteds.emplace(other);
-                            registry.emitParticles.replace(other, PExplode, props, f.max, Random::Int(20) + 20);
-                        }
-                    }
+                    registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
                 }
-
-                // std::cout << "enemy " << entity << "has died" << std::endl;
+                continue;
             }
 
-            bulletStat.bulletPierce -= 1;
+            float damage = registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.1) * bulletStat.damage), 1.f) : bulletStat.damage;
+            if (registry.vulnerabilities.has(entity))
+            {
+                damage = max((float)(damage * registry.vulnerabilities.get(entity).modifier), 1.f);
+            }
+            if (registry.wormBodies.has(entity)) {
+               Enemy& head = registry.enemies.get(registry.wormBodies.get(entity).head);
+               head.currHealth -= damage;
+            }
+            else {
+                enemyStat.currHealth -= damage;
+            }
+
+            bulletStat.bulletPierce -= enemyStat.armour;
             registry.ignores.get(other_entity).ignores.push_back(entity);
 
             if (!registry.deleteds.has(other_entity) && bulletStat.bulletPierce < 0 && (!registry.boids.has(entity) || (registry.boids.has(entity) && registry.enemies.components.size() > registry.boids.components.size())))
@@ -292,6 +389,39 @@ void EnemySystem::step(float elapsed_ms)
             else if (registry.damageds.has(entity))
             {
                 registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
+            }
+        }
+    }
+
+    // Handle death by no health left
+    for (Entity entity : registry.enemies.entities) {
+        Enemy& enemyStat = registry.enemies.get(entity);
+        if (enemyStat.currHealth <= 0)
+        {
+            if (registry.scientist.has(entity))
+            {
+                Scientist& scien = registry.scientist.get(entity);
+                if (!registry.deleteds.has(scien.hand))
+                {
+                    registry.deleteds.emplace(scien.hand);
+                }
+            }
+            if (!registry.deleteds.has(entity))
+            {
+                Fade& f = registry.fades.emplace(entity);
+                registry.deleteds.emplace(entity);
+
+                ParticleProps props = enemyDeath;
+                registry.emitParticles.replace(entity, PExplode, props, f.max, Random::Int(20) + 20);
+                if (registry.enemyGroups.has(entity))
+                {
+                    for (Entity other : registry.enemyGroups.get(entity).others)
+                    {
+                        if (!registry.deleteds.has(other))
+                            registry.deleteds.emplace(other);
+                        registry.emitParticles.replace(other, PExplode, props, f.max, Random::Int(20) + 20);
+                    }
+                }
             }
         }
     }
@@ -416,6 +546,104 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
     burst.burstCooldown = 150;
 }
 
+void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
+{
+    Buffer &buffer = registry.buffers.get(entity);
+    EnemyBehavior behavior = pattern.type;
+    SpecialStates buff = pattern.buffEffect;
+    switch ( buff )
+    {
+    case SpecialStates::INVINCIBLE: {
+            for (Entity& e : registry.enemies.entities) {
+                if (e == entity) {
+                    continue;
+                }
+                Motion& m = registry.motions.get(e);
+                if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                    if (!registry.invincibles.has(e)) {
+                        Invincible &inv = registry.invincibles.emplace(e);
+                        inv.countdown = buffer.duration;
+                        buffer.targetEntity = e;
+                    }
+                }
+                if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                    break;
+                }
+            }
+            break;
+    }
+    case SpecialStates::INVISIBLE: {
+            for (Entity& e : registry.enemies.entities) {
+                if (e == entity) {
+                    continue;
+                }
+                Motion& m = registry.motions.get(e);
+                if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                    if (!registry.invisibles.has(e)) {
+                        Invisible &inv = registry.invisibles.emplace(e);
+                        inv.countdown = buffer.duration;
+                        buffer.targetEntity = e;
+                    }
+                }
+                if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                    break;
+                }
+            }
+            break;
+    }
+        case SpecialStates::PROTECTED: {
+        for (Entity& e : registry.enemies.entities) {
+            if (e == entity) {
+                continue;
+            }
+            Motion& m = registry.motions.get(e);
+            if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                if (!registry.vulnerabilities.has(e)) {
+                    auto& vul = registry.vulnerabilities.emplace(e);
+                    vul.modifier = 0.5;
+                    vul.countdown = buffer.duration;
+                    buffer.targetEntity = e;
+                } else {
+                    registry.vulnerabilities.get(e).countdown = buffer.duration;
+                    registry.vulnerabilities.get(e).modifier = 0.5;
+                }
+            }
+            if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                break;
+            }
+        }
+        break;
+        }
+
+    case SpecialStates::VULNERABLE: {
+            for (Entity& e : registry.enemies.entities) {
+                if (e == entity) {
+                    continue;
+                }
+                Motion& m = registry.motions.get(e);
+                if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                    if (!registry.vulnerabilities.has(e)) {
+                        auto& vul = registry.vulnerabilities.emplace(e);
+                        vul.modifier = 2.f;
+                        vul.countdown = buffer.duration;
+                        buffer.targetEntity = e;
+                    } else {
+                        registry.vulnerabilities.get(e).countdown = buffer.duration;
+                        registry.vulnerabilities.get(e).modifier = 2.f;
+                    }
+                }
+                if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                    break;
+                }
+            }
+            break;
+    }
+        default:
+            break;
+    }
+
+}
+
 void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
 {
     int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1
@@ -522,7 +750,8 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     {
         // Sound is kinda annoying yeah, and its not really "shooting? I guess?
         // sound->playEnemyShootSound(sfxNum, atkData.numBullets);
-        shootShotgun(velocity, pos, atkData);
+        float a = (float)(rand()) / (float)(RAND_MAX);
+        shootShotgun(vec2(cos(a), sin(a)), pos, atkData);
         currPattern.currAtkCD = 600;
     }
     else if (atkData.attackType == EnemyAttackPattern::BURST || atkData.attackType == EnemyAttackPattern::SPRAY)

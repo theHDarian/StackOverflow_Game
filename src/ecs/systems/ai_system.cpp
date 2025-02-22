@@ -8,6 +8,8 @@
 #include <random>
 #include <glm/glm.hpp>
 #include <glm/gtx/compatibility.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/spline.hpp>
 
 // returns a vec4(min position, max position)
 vec4 getRoomBounds(Entity entity)
@@ -31,6 +33,94 @@ vec2 boundPosition(vec2 position, Entity entity)
 	return glm::clamp(position, min, max);
 }
 
+void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
+{
+
+	switch (currPattern.specialState) {
+		case SpecialStates::INVINCIBLE:
+			if (!registry.invincibles.has(entity)) {
+				auto& inv = registry.invincibles.emplace(entity);
+
+					inv.countdown = currPattern.maxDuration;
+
+			}
+		break;
+		case SpecialStates::INVISIBLE:
+			if (!registry.invisibles.has(entity)) {
+				auto& inv = registry.invisibles.emplace(entity);
+
+				inv.countdown = currPattern.maxDuration;
+
+				std::cout << "invisible: " << inv.countdown << std::endl;
+			}
+		case SpecialStates::PROTECTED:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 0.5;
+			} else {
+				auto& vul = registry.vulnerabilities.emplace(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 0.5;
+			}
+		case SpecialStates::VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = currPattern.maxDuration;
+				vul.modifier = 2.f;
+			} else {
+                auto& vul = registry.vulnerabilities.emplace(entity);
+                vul.countdown = currPattern.maxDuration;
+                vul.modifier = 2.f;
+            }
+		break;
+		default: break;
+	}
+}
+
+void handleSpecialStates (Reaction reaction, Entity entity)
+{
+	switch (reaction.specialState) {
+		case SpecialStates::INVINCIBLE:
+			if (!registry.invincibles.has(entity)) {
+				auto& inv = registry.invincibles.emplace(entity);
+				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
+				inv.countdown = inv.max;
+			}
+		break;
+		case SpecialStates::INVISIBLE:
+			if (!registry.invisibles.has(entity)) {
+				auto inv = registry.invisibles.emplace(entity);
+				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
+
+			}
+
+		case SpecialStates::PROTECTED:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 0.5;
+			} else {
+				auto& vul = registry.vulnerabilities.emplace(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 0.5;
+			}
+
+		case SpecialStates::VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				vul.modifier = 2.f;
+			} else {
+                auto& vul = registry.vulnerabilities.emplace(entity);
+                vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+                vul.modifier = 2.f;
+            }
+		break;
+		default: break;
+	}
+}
+
 void AISystem::step(float elapsed_ms)
 {
 	auto &movement_registry = registry.enemyMovement;
@@ -51,20 +141,88 @@ void AISystem::step(float elapsed_ms)
 		updateState(enemy, movement, entity);
 		// std::cout << enemy.newPattern << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
+
+		handleSpecialStates( currPattern, entity );
 		if (registry.boids.has(entity))
 		{
 			Boid &boid = registry.boids.get(entity);
 			computeBoidVelocity(entity, boid);
 			continue;
 		}
-		// THINKING
-		// if (currPattern.type == EnemyBehavior::FOLLOW_PLAYER)
-		// {
-		// 	movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
-		// 	movement.posA = motion.position;
-		// 	movement.distanceTraveled = 0.0f;
-		// }
-		if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
+
+		if (currPattern.type == EnemyBehavior::ROLLING) {
+			movement.posB = getRollingPos(entity);
+		}
+		else if (registry.wormBodies.has(entity) || registry.wormHeads.has(entity)) {
+			auto& wormHead_registry = registry.wormHeads;
+			auto& wormBody_registry = registry.wormBodies;
+
+			// Update all segment locations
+			if (wormHead_registry.has(entity)) {
+				WormHead& head = wormHead_registry.get(entity);
+				float dist = 0.f;
+				// Move target location
+				switch (currPattern.type) {
+				case EnemyBehavior::WORM_FOLLOW:
+					head.points[0] = moveTowards(head.points[0], registry.motions.get(registry.players.entities[0]).position, 3.f * enemy.speedMultiplier);
+					break;
+				case EnemyBehavior::WORM_PATROL:
+					// Worm will Teleport to first position in spline if not there
+					// Remedy using WORM_GOTO
+					head.points[0] = catmullRomSplineLerp(currPattern.path, movement.t);
+					currPattern.pathIndex = currPattern.path.size() - 1;
+					movement.t += 0.01 * enemy.speedMultiplier;
+					if (movement.t > movement.points.size()) movement.t -= (float)currPattern.path.size();
+					break;
+				case EnemyBehavior::WORM_RANDOM:
+					// TODO
+					// Should choose 1-4 points ahead of worm to draw curved path
+					head.points[0] = catmullRomSpline(movement.points, movement.t);
+					movement.t += 0.01 * enemy.speedMultiplier;
+					if (movement.t > movement.points.size()) movement.t -= (float)movement.points.size();
+					break;
+				case EnemyBehavior::WORM_GOTO:
+					head.points[0] = moveTowards(head.points[0], lerpToRoom(currPattern.path[currPattern.path.size() - 1]), 5.f * enemy.speedMultiplier);
+					currPattern.pathIndex = currPattern.path.size() - 1;
+					movement.t = (movement.t > 1.f) ? 0.f : movement.t + 0.0001 * enemy.speedMultiplier;
+					break;
+				case EnemyBehavior::IDLE:
+					movement.t = 0.f;
+					break;
+				default:
+					assert(false);
+				}
+
+				// Update constraints
+				for (int i = 1; i < head.size + 1; i++) {
+					//Pull the next segment to the previous one
+					head.points[i] = constrainDistance(head.points[i], head.points[i - 1], head.constrainDistance);
+				}
+				if (head.anchor) {
+					head.points[head.size] = constrainDistance(head.points[head.size], lerpToRoom(head.anchorPoint), head.constrainDistance);
+					for (int i = head.size - 1; i >= 0; i--) {
+						//Pull the next segment to the previous one
+						head.points[i] = constrainDistance(head.points[i], head.points[i+1], head.constrainDistance);
+					}
+				}
+
+				// Move head enemy
+				vec2 direction = (head.points[0] - head.points[1]);
+				motion.position = head.points[1] + 0.5f * direction;
+				motion.angle = atan2(direction.y, direction.x);
+				if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) motion.angle = 0;
+			}
+			else {
+				// Move body enemy
+				WormBody& body = wormBody_registry.get(entity);
+				WormHead& head = wormHead_registry.get(body.head);
+
+				vec2 direction = (head.points[body.index] - head.points[body.index + 1]);
+				motion.position = head.points[body.index + 1] + 0.5f * direction;
+				motion.angle = atan2(direction.y, direction.x);
+			}
+
+		} else if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
 			// std::cout << currPattern.name << "after update" << std::endl;
 			// if (registry.hand.has(entity) && currPattern.type == EnemyBehavior::IDLE) {
@@ -121,6 +279,9 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	float closeToBeeDistance = 100.f;
 	bool closeToBee = false;
 
+	//std::cout << currPattern.name << std::endl;
+
+
 	if (registry.bees.has(entity))
 	{
 		if (registry.bees.get(entity).nearbyBees.size() == 0)
@@ -174,11 +335,11 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 	if (registry.scientist.has(entity))
 	{
-		Scientist &scien = registry.scientist.get(entity);
+		Scientist& scien = registry.scientist.get(entity);
 		if (scien.shield && registry.enemies.has(scien.shield))
 		{
 
-			Enemy &shield = registry.enemies.get(scien.shield);
+			Enemy& shield = registry.enemies.get(scien.shield);
 			// std::cout << shield.currHealth << "shield health" << std::endl;
 			if (shield.currHealth <= 0)
 			{
@@ -193,11 +354,10 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			}
 		}
 	}
-
 	if (registry.hand.has(entity))
 	{
-		EnemyPattern &pattern = enemy.currEnemyPattern();
-		RenderRequest &rr = registry.renderRequests.get(entity);
+		EnemyPattern& pattern = enemy.currEnemyPattern();
+		RenderRequest& rr = registry.renderRequests.get(entity);
 		if (pattern.type == EnemyBehavior::CHARGING)
 		{
 			rr.texture_name = "hand_idletocharge";
@@ -205,7 +365,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			if (registry.animations.get(entity).frame == -1 && !registry.animationSequences.has(entity))
 			{
 				// registry.animations.get(entity).frame == 1;
-				AnimationSequence &as = registry.animationSequences.emplace(entity);
+				AnimationSequence& as = registry.animationSequences.emplace(entity);
 				as.nextEffect = EFFECT_ASSET_ID::TEXTURED;
 				as.nextSprite = "hand_charging.png";
 				// std::cout << registry.animations.get(entity).frame << std::endl;
@@ -224,7 +384,6 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			registry.animations.get(entity).frame = -1;
 		}
 	}
-
 	if (registry.healers.has(entity))
 	{
 		reaction_found = updateHealerState(enemy, entity);
@@ -241,17 +400,6 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			reaction_found = true;
 		}
 	}
-	// else if (closeToBee)
-	// {
-
-	// 	auto reaction = getReactions(currPattern.reactions, ReactionType::BEE_CLOSE);
-	// 	if (reaction)
-	// 	{
-	// 		enemy.patternIndex = reaction->index;
-	// 		reaction_found = true;
-	// 		std::cout << "bee close!" << enemy.currEnemyPattern().name << std::endl;
-	// 	}
-	// }
 	else if (hpPercent < 0.5f)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FIFTY_HEALTH);
@@ -260,17 +408,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
-		}
-	}
-	if (distance < closeDistance && reaction_found == false)
-	{
-		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
-		if (reaction)
-		{
-			// std::cout << "got reaction for follow player" << std::endl;
-			enemy.patternIndex = reaction->index;
-			enemy.newPattern = true;
-			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
 		}
 	}
 	else if (hpPercent < 0.75f)
@@ -281,9 +419,35 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
 		}
 		// PLAYER BULLET CLOSE TO BE IMPELMENTED..
 		// DEFAULT STATE (CHANGE BY DURATION)
+	}
+	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::FINISH_PATROL) && currPattern.pathIndex == currPattern.path.size() - 1) {
+		auto reaction = getReactions(currPattern.reactions, ReactionType::FINISH_PATROL);
+
+		vec2 patrolFactor = currPattern.path[currPattern.path.size() - 1];
+		vec2 endPoint = lerpToRoom(patrolFactor);
+
+		if (glm::distance(EnemyPos, endPoint) < 0.001 || (registry.wormHeads.has(entity) && glm::distance(registry.wormHeads.get(entity).points[0], endPoint) < 0.05)) {
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+	if (!reaction_found && distance < closeDistance)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
+		if (reaction)
+		{
+			// std::cout << "got reaction for follow player" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates( *reaction, entity);
+		}
 	}
 	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::DURATION))
 	{
@@ -367,6 +531,8 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::RANDOM_FAR:
 		// std::cout << "random!" << std::endl;
 		return generateRandomPosInRadius(entity, 500, 1000);
+	case EnemyBehavior::ROLLING:
+		return getRollingPos(entity);
 	case EnemyBehavior::FOLLOW_PLAYER:
 		// std::cout << "follow!" << std::endl;
 		return getPlayerPos();
@@ -393,6 +559,10 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getTeleportPos(entity);
 	case EnemyBehavior::FOLLOWSCIENTIST:
 		return getScientistPos(entity);
+	case EnemyBehavior::GRANTINGBUFFS:
+		return getTeamPos(entity);
+		case EnemyBehavior::GRANTINGBUFFSAOE:
+    	return getTeamPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
@@ -586,8 +756,35 @@ vec2 AISystem::getTeamPos(Entity entity)
 
 			return goalPosition;
 		}
+	} else if (registry.buffers.has(entity))
+	{
+		Buffer& buffer = registry.buffers.get(entity);
+		Entity teammates = buffer.targetEntity;
+		if (teammates != NULL && registry.motions.has(teammates))
+		{
+			Motion &teammateMotion = registry.motions.get(teammates);
+			Motion &bufferMotion = registry.motions.get(entity);
+
+			vec2 direction = teammateMotion.position - bufferMotion.position;
+			if (glm::length(direction) > 0)
+			{
+				direction = glm::normalize(direction);
+			}
+			float backDistance = buffer.range * 0.5f;
+
+			vec2 goalPosition = teammateMotion.position - direction * backDistance;
+
+			vec4 roomBounds = getRoomBounds(entity);
+			vec2 min = {roomBounds.x, roomBounds.y};
+			vec2 max = {roomBounds.z, roomBounds.w};
+
+			goalPosition = glm::clamp(goalPosition, min, max);
+
+			return goalPosition;
+		}
 	}
-	return getCurrentPos(entity);
+
+	return generateRandomPos(entity);
 };
 
 vec2 AISystem::getPlayerPos()
@@ -596,6 +793,51 @@ vec2 AISystem::getPlayerPos()
 	Entity &entity = player_register.entities[0];
 	Motion &motion = registry.motions.get(entity);
 	return motion.position;
+}
+
+vec2 AISystem::getRollingPos(Entity entity)
+{
+	auto& movement_register = registry.enemyMovement;
+	auto& motion_register = registry.motions;
+	EnemyMovement& movement = movement_register.get(entity);
+	Motion& enemyMotion = motion_register.get(entity);
+
+	vec4 roomBounds = getRoomBounds(entity);
+	vec2 min = { roomBounds.x, roomBounds.y };
+	vec2 max = { roomBounds.z, roomBounds.w };
+
+	vec2 direction = glm::normalize(movement.posB - movement.posA);
+	float distance = glm::length(max - min);
+
+	// Wall collisions and bouncing
+	vec2 norm = vec2(0, 0);
+	if (enemyMotion.position.x <= min.x && direction.x < 0.0) {
+		norm = vec2(1, 0);
+	}
+	else if (enemyMotion.position.x >= max.x && direction.x > 0.0) {
+		norm = vec2(-1, 0);
+	}
+	else if (enemyMotion.position.y <= min.y && direction.y < 0.0) {
+		norm = vec2(0, 1);
+	}
+	else if (enemyMotion.position.y >= max.y && direction.y > 0.0) {
+		norm = vec2(0, -1);
+	}
+	if (norm != vec2(0, 0)) {
+
+		vec2 newDirection = glm::reflect(direction, norm);
+		vec2 intersection = vec2((norm.x < 0.0) ? max.x : (norm.x == 0.0) ? enemyMotion.position.x : min.x, 
+							     (norm.y < 0.0) ? max.y : (norm.y == 0.0) ? enemyMotion.position.y : min.y);
+
+		std::cout << glm::to_string(movement.posB) << " : " << glm::to_string(min) << " : " << glm::to_string(max) << std::endl;
+		std::cout << glm::to_string(intersection) << " : " << glm::to_string(norm) << " : " << glm::to_string(direction) << " : " << glm::to_string(glm::reflect(direction, norm)) << std::endl;
+		std::cout << glm::to_string(enemyMotion.position) << ", " << glm::to_string(intersection + newDirection * distance) << std::endl;
+
+		movement.posA = intersection;
+		return intersection + newDirection * distance;
+	}
+
+	return movement.posB;
 }
 
 vec2 AISystem::evadeBullet(Entity entity)
@@ -1026,4 +1268,65 @@ void AISystem::boidComputeAllFactor(Entity entity, Boid &boid, float multiplierC
 		boid.velocity[0] += (avgVelocity[0] - boid.velocity[0]) * matchingFactor;
 		boid.velocity[1] += (avgVelocity[1] - boid.velocity[1]) * matchingFactor;
 	}
+}
+
+bool AISystem::LineToLine(vec2 line1Start, vec2 line1End, vec2 line2Start, vec2 line2End, vec2& intersectionPoint)
+{
+	auto cross = [](const glm::vec2& v1, const glm::vec2& v2)
+		{ return v1.x * v2.y - v1.y * v2.x; };
+	glm::vec2 r = line1End - line1Start, s = line2End - line2Start, pq = line2Start - line1Start;
+	float rxs = cross(r, s);
+	if (rxs == 0)
+		return false; // Lines are parallel
+	float t = cross(pq, s) / rxs, u = cross(pq, r) / rxs;
+	intersectionPoint = line1Start + t * r;
+	return (t >= 0 && t <= 1 && u >= 0 && u <= 1);
+}
+
+vec2 AISystem::constrainDistance(vec2 point, vec2 anchor, float distance) {
+	return (glm::normalize(point - anchor) * distance) + anchor;
+}
+
+vec2 AISystem::catmullRomSplineLerp(const std::vector<glm::vec2>& cp, float t)
+{
+	// indices of the relevant control points
+	int i0 = glm::clamp<int>(t - 1, 0, cp.size() - 1);
+	int i1 = glm::clamp<int>(t + 0, 0, cp.size() - 1);
+	int i2 = glm::clamp<int>(t + 1, 0, cp.size() - 1);
+	int i3 = glm::clamp<int>(t + 2, 0, cp.size() - 1);
+
+	// parameter on the local curve interval
+	float local_t = glm::fract(t);
+
+	return glm::catmullRom(lerpToRoom(cp[i0]), lerpToRoom(cp[i1]), lerpToRoom(cp[i2]), lerpToRoom(cp[i3]), local_t);
+}
+
+vec2 AISystem::catmullRomSpline(const std::vector<glm::vec2>& cp, float t)
+{
+	// indices of the relevant control points
+	int i0 = glm::clamp<int>(t - 1, 0, cp.size() - 1);
+	int i1 = glm::clamp<int>(t, 0, cp.size() - 1);
+	int i2 = glm::clamp<int>(t + 1, 0, cp.size() - 1);
+	int i3 = glm::clamp<int>(t + 2, 0, cp.size() - 1);
+
+	// parameter on the local curve interval
+	float local_t = glm::fract(t);
+
+	return glm::catmullRom(cp[i0], cp[i1], cp[i2], cp[i3], local_t);
+}
+
+vec2 AISystem::lerpToRoom(vec2 point) {
+	Map& map = registry.maps.components[0];
+	return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, point);
+}
+
+ vec2 AISystem::moveTowards(vec2 current, vec2 target, float maxDistanceDelta)
+{
+	vec2 a = target - current;
+	float magnitude = glm::length(a);
+	if (magnitude <= maxDistanceDelta || magnitude == 0.f)
+	{
+		return target;
+	}
+	return current + a / magnitude * maxDistanceDelta;
 }

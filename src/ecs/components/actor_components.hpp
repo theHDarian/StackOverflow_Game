@@ -267,6 +267,11 @@ struct Invisible {
     float countdown = 1000;
 };
 
+struct Vulnerability {
+    float countdown = 1000;
+    float modifier = 1.f;
+};
+
 struct PlayerAttackData {
     float currFiringInterval = 0.0f;
     float maxFiringInterval = 300.0f;
@@ -297,7 +302,10 @@ enum EnemyType {
     // EasyEnemySniper,
     // HardEnemyBehavior
     EnemyPufferfish,
+    EnemyChainDogHead,
+    EnemyChainDogBody,
     BossBigC,
+    BossBigCShield,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -314,8 +322,13 @@ enum EnemyType {
     EnemyEvilSkull,
     EnemyHifiBoid,
     EnemySword,
+    EnemyMage,
     EnemyHealer,
     EnemyBioBoid,
+    EnemySmallBoulder,
+    EnemyBigBoulder,
+    BossDrillWormHead,
+    BossDrillWormBody,
     ScientistlaserAttack,
     EnemyFishBoid,
     EnemyTwinLaserVertical1,
@@ -331,6 +344,7 @@ enum EnemyType {
     EnemyHifiTrailHard,
     EnemyHifiCannonHard,
     EnemyLaserSniper,
+    EnemyLaserSniperHard,
     EnemyHifiTemporaryBoid,
     EnemyHifiJellyFish,
     EnemyHifiTackShooter,
@@ -345,6 +359,13 @@ enum EnemyType {
     ScientistBoss,
     ScientistHand,
     EnemyHifiBoidFish,
+    BossCrab,
+    BossCrabLaser,
+    EnemyMedicalBoid,
+    EnemyMiningBoulderSmall,
+    EnemyMiningBoulderBig,
+    EnemyMedicalBMP,
+    EnemyScissors,
 };
 
 enum class EnemyAttackPattern {
@@ -396,9 +417,18 @@ struct AttackData {
     std::vector<vec2> spawnPosition = {};
 };
 
+enum class SpecialStates {
+    NORMAL,
+    INVISIBLE,
+    INVINCIBLE,
+    VULNERABLE,
+    PROTECTED,
+};
+
 enum class EnemyBehavior {
     // this is the basic
     RANDOM,
+    ROLLING,
     RANDOM_NEAR,
     RANDOM_FAR,
     FOLLOW_PLAYER,
@@ -421,7 +451,16 @@ enum class EnemyBehavior {
     DEATHSTATE,
     BOIDSWARMPLAYER,
     BOIDSFISH,
-    FOLLOWSCIENTIST
+    FOLLOWSCIENTIST,
+    WORM_FOLLOW,
+    // Worm will Teleport to first position in spline if not there
+    // Remedy using WORM_GOTO
+    WORM_PATROL,
+    WORM_RANDOM,
+    WORM_GOTO,
+    WORM_BODY,
+    GRANTINGBUFFS, // for enemies that give effects to other enemies, using this makes specials states apply to the other entity rather than itself
+    GRANTINGBUFFSAOE, // for enemies that give effects to all other enemies
 };
 
 enum class EnemyRotationBehavior {
@@ -431,7 +470,9 @@ enum class EnemyRotationBehavior {
     FACE_CENTER,
     FACE_PLAYER,
     FACE_TWIN,
-    SPIN
+    SPIN,
+    LASER_CONTROL,
+    WORM
 };
 
 
@@ -452,6 +493,8 @@ enum class ReactionType {
 struct Reaction {
     ReactionType React;
     int index;
+    //trigger effect when reaction is met
+    SpecialStates specialState = SpecialStates::NORMAL;
 };
 
 struct InvisibleEnemy {
@@ -493,12 +536,35 @@ struct EnemyPattern {
     float currAtkCD;
     float maxAtkCD;
     AttackData atkData;
+
+    //special states, for if the enemy has some special attributes like being invisible or invincible
+    //the state will last for the duration of the current pattern
+    SpecialStates specialState = SpecialStates::NORMAL;
+
+    //for enemies that can grant buffs to other enemies, this will be the effect that is granted
+    SpecialStates buffEffect = SpecialStates::NORMAL;
+
 };
 struct Boid {
     vec2 velocity;
     vec2 position;
     float wanderAngle;
     float maxSpeed;
+};
+
+struct WormHead {
+    std::vector<vec2> points = {};
+    float constrainDistance;
+    int size = -1;
+    EnemyType body;
+
+    bool anchor = false;
+    vec2 anchorPoint;
+};
+
+struct WormBody {
+    Entity head;
+    int index;
 };
 
 struct Healer {
@@ -508,13 +574,23 @@ struct Healer {
     Entity targetEntity;
 };
 
+struct Buffer {
+    float cooldown;
+    float maxCoolDown = 5000;
+    float duration = 2000.f;
+    float range = 200.f;
+    Entity targetEntity;
+    // SpecialStates buffEffect = SpecialStates::NORMAL;
+
+};
+
 
 struct SpriteData
 {
 	std::string texturePath;
 	EFFECT_ASSET_ID effectId;
 	GEOMETRY_BUFFER_ID geometryId;
-	vec2 offset;
+	vec2 offset = vec2(0);
     int animationType = 1;
     int max_Frames = 1;
     float countdown = 20;
@@ -545,6 +621,8 @@ struct Enemy {
     float rotatePower;
     EnemyRotationBehavior rotationBehaviour = EnemyRotationBehavior::REGULAR;
     float speedMultiplier = 1.0f;
+    int armour = 1;
+    WormHead headData;
 };
 
 struct EnemyGroup {
@@ -557,6 +635,10 @@ struct EnemyMovement {
     float distanceTraveled;
     float speed = 20000;
     float angularSpeed = 90.0f;
+
+    // Worm curves!
+    std::vector<vec2> points = { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2)};
+    float t = 0.f;
 };
 
 struct BossEnemy {

@@ -44,7 +44,9 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             }
             registry.spawnings.emplace(enemy);
             if (isElite) {
-                registry.elites.emplace(enemy);
+                auto& elt = registry.elites.emplace(enemy);
+                int randomlvl = Random::Int((registry.maps.components[0].currRegion) * 1.5) + 1;
+                elt.eliteLevel = randomlvl > 9 ? randomlvl : 9;
             }
         }
     }
@@ -435,7 +437,7 @@ void MapSystem::decorateRoom() {
     // Create floor decorations
     Map& map = registry.maps.components[0];
     WindowState& ws = registry.windowStates.components[0];
-    std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : (map.currRegion == Physics) ? "hifi_floor_addons" : "tutorial_floor_addons";
+    std::string filename = (map.currRegion == Biology) ? "bio_floor_addons" : (map.currRegion == Physics) ? "hifi_floor_addons" : (map.currRegion == Mining) ? "mining_floor_addons" : (map.currRegion == Medical) ? "medical_floor_addons" : "tutorial_floor_addons";
     vec2 placements = vec2(floor(0.8 * map.currRoom.preset.roomSize.x / 192.f), floor( 0.8 * map.currRoom.preset.roomSize.y / 192.f));
     vec2 dividers = vec2(0.9090 * map.currRoom.preset.roomSize.x / placements.x, 0.9090 * map.currRoom.preset.roomSize.y / placements.y);
     vec2 roomOffset = vec2(-map.currRoom.preset.roomSize.x / 2.2f, -map.currRoom.preset.roomSize.y / 2.2f) + vec2(ws.width, ws.height) / 2.f;
@@ -507,14 +509,29 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         }
         else {
             if (map.currRegion == Biology) {
-                map.currRoom.preset = BossRoomBee;
+                map.currRoom.preset = BossRoomCrab;
             }
-            else {
+            else if (map.currRegion == Mining) {
+                map.currRoom.preset = BossRoomWorm;
+            }
+            else if (map.currRegion == Medical) {
+                 map.currRoom.preset = ScientistBossRoom;
+            }
+            else if (map.currRegion == Physics) {
+                map.currRoom.preset = BossBigCRoom;
+            } else {
                 map.currRoom.preset = ScientistBossRoom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
+            // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+            // req2.type = InteractableRequestType::AddEffect;
+            // req2.effects = {numBulletsUpA, numBulletsUpA};
         }
+        InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
+        extendstack.type = InteractableRequestType::ExtendStack;
+        extendstack.choice = 8*max(0,((int)map.currRegion - 1));
+
         map.directory = getDirectory(map.currRegion);
         std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
         for (int i = 0; i < 4; i++)

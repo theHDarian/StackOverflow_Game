@@ -35,7 +35,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		motion.velocity += motion.veer * step_seconds;
 
 		// slightly broken
-		if (!registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1)|| registry.playerBullets.has(entity)))
+		if (glm::length(motion.velocity) > 0.01 && !registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1) || registry.playerBullets.has(entity)))
 			motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 
 		if (registry.homes.has(entity))
@@ -87,6 +87,10 @@ void PhysicsSystem::step(float elapsed_ms)
 				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER)
 				{
 					motion.angle = start.angle;
+				}
+				else if (enemy.rotationBehaviour == EnemyRotationBehavior::LASER_CONTROL)
+				{
+					motion.angle = start.angle + laser.rotation;
 				}
 				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER) {
 					motion.angle = laser.rotation * motion.angle + (1.f - laser.rotation) * start.angle;

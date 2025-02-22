@@ -88,12 +88,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	int window_width_px,window_height_px;
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
-	//window_width_px = vidMode->width;
-	//window_height_px = window_width_px * (1080.f/1920.f);
+	window_width_px = vidMode->width;
+	window_height_px = window_width_px * (1080.f/1920.f);
 	// window_width_px = 1280;
 	// window_height_px = 720;
-	  window_width_px = 1920;
-	  window_height_px = 1080;
+	  // window_width_px = 1920;
+	  // window_height_px = 1080;
 	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
@@ -221,6 +221,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				}
 			}
 		}
+		//check vulnerability countdown
+		if (registry.vulnerabilities.entities.size() > 0) {
+			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {
+				auto& entity = registry.vulnerabilities.components[i];
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+					registry.vulnerabilities.remove(registry.vulnerabilities.entities[i]);
+				}
+			}
+		}
+
 		// Updating the bullet ranges
 		if (registry.playerBullets.entities.size() > 0) {
 			for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
@@ -313,6 +323,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.bossParts.components.size() - 1; i >= 0; --i) {
 			if (!registry.deleteds.has(registry.bossParts.entities[i]))
 				registry.deleteds.emplace(registry.bossParts.entities[i]);
+		}
+	}
+
+	// Worm body deletion
+	if (registry.wormBodies.entities.size() > 0)
+	{
+		for (int i = (int)registry.wormBodies.components.size() - 1; i >= 0; --i) {
+			if (!registry.deleteds.has(registry.wormBodies.entities[i]) && registry.deleteds.has(registry.wormBodies.components[i].head))
+				registry.deleteds.emplace(registry.wormBodies.entities[i]);
 		}
 	}
 

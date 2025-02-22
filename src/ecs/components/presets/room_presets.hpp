@@ -865,6 +865,34 @@ const RoomPreset BossRoomBee{
 
 };
 
+
+const RoomPreset BossRoomCrab{
+    {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
+    {},
+    {{{Ram,{}}, {0.5f, 0.5f}}},
+    0.0f,
+    20,
+    5,
+    "Carcinisation",
+    false,
+    {1500, 1500}
+
+};
+
+const RoomPreset BossRoomWorm{
+    {{{BossDrillWormHead, {1.5f, 1.5f}}}},
+    //{{{EnemyChainDogHead, {0.45f, 0.45f}}}},
+    {},
+    {{{Ram,{}}, {0.5f, 0.5f}}},
+    0.0f,
+    20,
+    5,
+    "Tunnel Troubles",
+    false,
+    {1500, 1500}
+
+};
+
 const RoomPreset HifiRoomTwinLaserShurikens {
         {
             {
@@ -1365,11 +1393,56 @@ const RoomPreset HifiRoomLane {
         {650, 3000}
 };
 
+const RoomPreset BossBigCRoom {
+
+            {
+                {
+                    {BossBigC, {0.5f, 0.5f}},
+                },
+                {
+                     {EnemyLaserSniper,{0.5, 0.63}},
+                        {EnemyLaserSniper,{0.38, 0.42}},
+                    {EnemyLaserSniper,{1-0.38, 0.42}},
+                },
+                {
+                        {EnemyLaserSniper,{0.5, 1-0.63}},
+                            {EnemyLaserSniper,{0.38, 1-0.42}},
+                        {EnemyLaserSniper,{1-0.38, 1-0.42}},
+                },
+            //     {
+            //             {EnemyLaserSniperHard,{Random::Float(), Random::Float()}},
+            //                 {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            // {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            // {EnemyHifiChargerHard,{Random::Float(), Random::Float()}},
+            //     },
+
+
+
+
+
+
+            },
+        {},
+        {{{Ram,{}}, {0.5f, 0.5f}}},
+        24.0f,
+        20,
+        5,
+        "Big C",
+    false,
+    {2200, 2500}
+
+};
+
 
 
 
 const RoomPreset allConsoles {
-    {},
+    { {
+        {EnemyMedicalBMP, {Random::Float(), Random::Float()}},
+{EnemyScissors, {Random::Float(), Random::Float()}},
+{EnemyScissors, {Random::Float(), Random::Float()}},
+
+    }},
     {},
     {{{PushConsole,{numBulletsUpA}}, {0.5f, 0.5f}},
     {{PopConsole,{fireRateUpM, bulletBounceUpM}}, {0.25f, 0.5f}},
@@ -1429,7 +1502,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDire
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomBasicEnemy,HifiRoomBoidSnipers,HifiRoomTwinLaserChargers,HifiRoomTwinLaserShurikens, HifiRoomBasicWave, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane },{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::EnemyRoom, {{allConsoles },{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{TreasureRoom2,TreasureRoom3,TreasureRoom4, TreasureRoomKey},{TreasureRoomSniper, TreasureRoom5}}},
@@ -1619,9 +1692,14 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     Map& map = registry.maps.components[0];
     //boss rooms
     if (type == RoomType::BossRoom && currRegion == MapRegion::Biology) {
-        return BossRoomBee;
+        std::vector<RoomPreset> biobosses = {BossRoomBee, BossRoomCrab};
+        return Random::ListItem(biobosses);
+    } else if (type == RoomType::BossRoom && currRegion == MapRegion::Medical) {
+        return ScientistBossRoom;
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
-        return ScientistBossRoom; //TODO change to physics boss
+        return BossBigCRoom;
+    } else if (type == RoomType::BossRoom && currRegion == MapRegion::Mining) {
+        return ScientistBossRoom; //TODO change to mining boss
     }
 
     // Tutorial rooms
@@ -1709,14 +1787,45 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
-    {{EnemyType::EnemyTwoBee, {0.5f,0.5f}}},
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+            {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+            {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+    {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+    },
+
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
-    {{EnemyType::EnemyHifiCannonHard, {0.5f,0.5f}}},
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        },
+};
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>> > medicalEliteEnemies = {
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        },
+};
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>> > miningEliteEnemies = {
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        },
 };
 
 std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
     {Biology, Random::ListItem(bioEliteEnemies)},
-    {Physics, Random::ListItem(physicsEliteEnemies)}
+    {Physics, Random::ListItem(physicsEliteEnemies)},
+    {Medical, Random::ListItem(medicalEliteEnemies)},
+    {Mining, Random::ListItem(miningEliteEnemies)}
 };
