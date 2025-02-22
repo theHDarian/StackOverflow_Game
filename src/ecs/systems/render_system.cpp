@@ -216,10 +216,14 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniform1i(tile_uloc, render_request.idealScale.x > 0);
 	gl_has_errors();
 
-  vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
+    vec2 tiling = registry.maps.components[0].currRoom.preset.roomSize / render_request.idealScale;
 	GLint tiling_uloc = glGetUniformLocation(program, "tiling");
 	glUniform2fv(tiling_uloc, 1, (float*)&tiling);
 	gl_has_errors();
+
+	vec2 scale = motion.scale / min(motion.scale.x, motion.scale.y);
+	GLint scale_uloc = glGetUniformLocation(program, "scale");
+	glUniform2fv(scale_uloc, 1, (float*)&scale);
 
 	GLint frame_uloc = glGetUniformLocation(program, "frame");
 	glUniform1i(frame_uloc, (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) ? 0 : registry.animations.get(entity).frame);
@@ -251,6 +255,13 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniform1i(glitch_uloc, 2);
 	gl_has_errors();
 
+	GLuint hexagon_id = texture_gl_handles[(GLuint)name_to_texture["hexagon.png"]];
+	GLuint shieldMask_uloc = glGetUniformLocation(program, "shieldMask");
+	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, hexagon_id);
+	glUniform1i(shieldMask_uloc, 3);
+	gl_has_errors();
+
 	GLuint glitchToggle_uloc = glGetUniformLocation(program, "glitchToggle");
 	bool should_glitch = false;
 	if (registry.doorSymbols.has(entity))
@@ -264,12 +275,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		}
 	}
 
-	if (registry.elites.has(entity) || should_glitch) {
-		glUniform1i(glitchToggle_uloc, true);
-	}
-	else {
-		glUniform1i(glitchToggle_uloc, false);
-	}
+	glUniform1i(glitchToggle_uloc, (registry.elites.has(entity) || should_glitch));
 	gl_has_errors();
 
 	GLint currProgram;
@@ -363,13 +369,8 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
-	// change opacity of entity if needed
-	if (registry.invincibles.has(entity))
-	{
-		Invincible& invincible = registry.invincibles.get(entity);
-		alpha = 1 - abs(sin(invincible.countdown / invincible.max * 10) * 0.3);
-		glUniform1f(effectAlpha, alpha);
-	}
+	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
+	glUniform1i(shielded_uloc, (registry.invincibles.has(entity)));
 
 	if (registry.damageds.has(entity))
 	{
@@ -1098,7 +1099,7 @@ void RenderSystem::drawGameElements()
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (registry.lasers.has(entity) && registry.enemies.has(registry.lasers.get(entity).start))
+		if (registry.lasers.has(entity) && registry.enemies.has(registry.lasers.get(entity).start) && registry.lasers.get(entity).growth > 300.f)
 			drawLaserIndicator(entity, projection, view);
 		effectToDrawCall(entity, projection, view);
 		if (ioState.debugMode)

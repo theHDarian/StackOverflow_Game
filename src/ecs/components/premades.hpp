@@ -1284,13 +1284,28 @@ struct BigC : Enemy
 				  EFFECT_ASSET_ID::MESH,
 				  GEOMETRY_BUFFER_ID::MESH_GB};
 		rotatePower = 0.5f;
-		scale = vec2({700, 700 * (1.998858f / 1.923352f)});
+		scale = vec2({800, 800 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		armour = 10;
 	};
 };
 
 struct BossBigCCore : Enemy{
+
+	const AttackData sixShot{
+	EnemyAttackPattern::RADIAL,
+	TRIANGLE,
+	{numBulletsUp, spreadUp},
+	blunt,
+	6,
+	0.0,
+	{20, 20},
+	400,
+	1000,
+	{300, M_PI},
+	0,
+	0,
+	0 };
 
 	const AttackData laserRotate{
 		EnemyAttackPattern::LASER,
@@ -1380,7 +1395,7 @@ struct BossBigCCore : Enemy{
 
 	EnemyPattern PlayerClose = {
 		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration, halfhp, }, 0, true, 0.f, 3000.f,
-		twelveSpiralShot, SpecialStates::VULNERABLE
+		sixShot, SpecialStates::VULNERABLE
 	};
 
 	EnemyPattern PlayerCloseHalfHP = {
