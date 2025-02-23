@@ -1640,9 +1640,24 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 
 	if (enemy.sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
 	{
-		CircleCollider &cc = registry.circleColliders.emplace(entity);
-		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
-		Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+		// Check how rectangular
+		// If ration between side lengths > 1:1.25
+		// Use poly colliders instead
+		if (abs(max(motion.scale.x, motion.scale.y) / min(motion.scale.x, motion.scale.y)) > 1.25) {
+			PolyCollider& pc = registry.polyColliders.emplace(entity);
+			pc.offsetVertices = {
+				{motion.scale.x / 2, motion.scale.y / 2},
+				{motion.scale.x / 2, -motion.scale.y / 2},
+				{-motion.scale.x / 2, -motion.scale.y / 2},
+				{-motion.scale.x / 2, motion.scale.y / 2} };
+			pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+			pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		}
+		else {
+			CircleCollider& cc = registry.circleColliders.emplace(entity);
+			cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.0;
+		}
+		Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 		registry.meshPtrs.emplace(entity, &mesh);
 	}
 	else
@@ -1747,8 +1762,23 @@ void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity hea
 
 	if (enemy.sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
 	{
-		CircleCollider& cc = registry.circleColliders.emplace(entity);
-		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
+		// Check how rectangular
+		// If ration between side lengths > 1:1.25
+		// Use poly colliders instead
+		if (abs(max(motion.scale.x, motion.scale.y) / min(motion.scale.x, motion.scale.y)) > 1.25) {
+			PolyCollider& pc = registry.polyColliders.emplace(entity);
+			pc.offsetVertices = {
+				{motion.scale.x / 2, motion.scale.y / 2},
+				{motion.scale.x / 2, -motion.scale.y / 2},
+				{-motion.scale.x / 2, -motion.scale.y / 2},
+				{-motion.scale.x / 2, motion.scale.y / 2} };
+			pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+			pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		}
+		else {
+			CircleCollider& cc = registry.circleColliders.emplace(entity);
+			cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.0;
+		}
 		Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 		registry.meshPtrs.emplace(entity, &mesh);
 	}

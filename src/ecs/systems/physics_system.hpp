@@ -21,8 +21,8 @@ private:
 	bool CircleToMesh(Entity circle, Entity mesh);
 	bool PolyToWall(Entity poly, Entity wall);
 	bool AABBToCircle(Entity aabb, Entity circle);
-	bool AABBToPoly(Entity circle, Entity poly);
-	bool AABBToMesh(Entity circle, Entity poly);
+	bool AABBToPoly(Entity aabb, Entity poly);
+	bool AABBToMesh(Entity aabb, Entity poly);
 	bool AABBToAABB(Entity aabb1, Entity aabb2);
 
 	bool CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3);
