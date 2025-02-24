@@ -109,11 +109,11 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.defaultEffect = b;
 		atkData.rareBulletEffects = {b};
 		atkData.speed = 200;
-		atkData.size = vec2(60,30);
+		atkData.size = vec2(20,50);
 		atkData.bulletRange = 9000;
 		atkData.bulletBounce = 3;
 		float angle = (angleStep * i) + direction;
-		createEnemyBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
+		createPopBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
 	}
 }
 
@@ -518,6 +518,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						//}
 						addEffect( player, {lightningShuffle}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
+						// VVV BUG HERE "Entity already contained in ECS registry" VVV
 						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
 						object.dialogueCount++;
 					}

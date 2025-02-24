@@ -35,6 +35,8 @@ Entity createWhiteBoard(RenderSystem* renderer, vec2 pos);
 
 Entity createPopConsole(RenderSystem* renderer, vec2 pos);
 
+Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData);
+
 Entity createGardener(RenderSystem* renderer, vec2 pos);
 
 Entity createBibleTree(RenderSystem* renderer, vec2 pos);

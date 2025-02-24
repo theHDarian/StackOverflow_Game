@@ -36,7 +36,7 @@ void PhysicsSystem::step(float elapsed_ms)
 
 		// slightly broken
 		if (glm::length(motion.velocity) > 0.01 && !registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1) || registry.playerBullets.has(entity)))
-			motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+			motion.angle = atan2(motion.velocity.y, motion.velocity.x) + motion.angleOffset;
 
 		if (registry.homes.has(entity))
 		{

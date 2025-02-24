@@ -80,7 +80,7 @@ struct StackCompile {
     float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
     float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * 80.f, 1400.f); };
     // x=5 is tier limit reached
-    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? (x < 5) ? (float)x * 8.f : ((float)x - 5) * 5.f : (float)x, 80.f); };
+    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < 5) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
     float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? -500.f + 1000.f / ((float)x + 2.f) : -50.f * (float)x, 1000.f); };
     float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
     float bulletSpreadFunc(int x)       { return clamp(-15.f, (x > 0) ? -2.f * (float)x : -20.f * (float)x, 330.f); };
@@ -667,10 +667,12 @@ struct Dash {
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };
-	float angle = 0;
+	float angle = 0.f;
 	vec2 velocity = { 0, 0 };
 	vec2 scale = { 10, 10 };
     vec2 veer = { 0,0 };
+
+    float angleOffset = 0.f;
 };
 
 struct Damaged {
