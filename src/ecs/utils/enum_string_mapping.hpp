@@ -9,7 +9,7 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = 
     {ProjectileSize, "ProjectileSize"},
     {FireRate, "FireRate"},
     {BulletRange, "BulletRange"},
-    {BulletSpread, "BulletSpread"},
+    {BulletAccuracy, "BulletAccuracy"},
     {BulletNum, "BulletNum"},
     {BulletBurst, "BulletBurst"},
     {Bounce, "Bounce"},
@@ -18,7 +18,7 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = 
     {PlayerSpeed, "PlayerSpeed"},
     {PlayerNumDash, "PlayerNumDash"},
     {PlayerStackSize, "PlayerStackSize"},
-    {PlayerDashCDR, "PlayerDashCDR"},
+    {PlayerDashRecharge, "PlayerDashRecharge"},
     {Inert, "Inert"}
 };
 

@@ -2119,7 +2119,7 @@ void RenderSystem::drawDashes(const mat4 &projection, const mat4 &view)
 	// draw currently charging dash charge, if any
 	if (player.currDashCharges < WorldSystem::getModifiedValue(PlayerNumDash, player.maxDashCharges))
 	{
-		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, WorldSystem::getModifiedValue(PlayerDashCDR, player.baseDashCDR), projection, view);
+		drawDashCharges(vec2(pos.x + player.currDashCharges * (scale.x + offset), pos.y), scale, true, player.currDashCooldown, WorldSystem::getModifiedValue(PlayerDashRecharge, player.baseDashCDR), projection, view);
 	}
 
 	// draw empty dash charges last, if any

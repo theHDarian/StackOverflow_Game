@@ -592,7 +592,7 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
         	pl.currDashCooldown -= elapsed_ms_since_last_update;
 		} else {
             pl.currDashCharges++;
-            pl.currDashCooldown = getModifiedValue(PlayerDashCDR, pl.dashCooldown);
+            pl.currDashCooldown = getModifiedValue(PlayerDashRecharge, pl.dashCooldown);
         }
     }
 	// Player wants to start a new dash
@@ -688,7 +688,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		vec2 bulletPos = playerPos + bulletDir;
 
 		float angle = atan2(bulletDir.y, bulletDir.x);
-		float angleOffset = radians(getModifiedValue(BulletSpread, 20));
+		float angleOffset = radians(getModifiedValue(BulletAccuracy, 20));
 
 		if (cluster % 2 == 0) {
 			for (int i = 0; i < cluster / 2; i++) {

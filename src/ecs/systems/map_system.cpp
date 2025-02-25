@@ -434,7 +434,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     Player& player = registry.players.get(playerEntity);
     // refresh player Dash charges and cooldown
     player.currDashCharges = getModifiedValue( PlayerNumDash, player.maxDashCharges);
-    player.currDashCooldown = getModifiedValue( PlayerDashCDR, player.baseDashCDR);
+    player.currDashCooldown = getModifiedValue( PlayerDashRecharge, player.baseDashCDR);
 }
 
 void MapSystem::decorateRoom() {
@@ -513,7 +513,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         }
         else {
             if (map.currRegion == Biology) {
-                map.currRoom.preset = BossRoomCrab;
+                std::vector<RoomPreset> bioBossRooms = {BossRoomCrab, BossRoomBee};
+                map.currRoom.preset = Random::ListItem( bioBossRooms);
+                // map.currRoom.preset = RestRoomOracleCrab;
             }
             else if (map.currRegion == Mining) {
                 map.currRoom.preset = BossRoomWorm;

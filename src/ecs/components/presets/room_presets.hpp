@@ -721,7 +721,7 @@ const RoomPreset RestRoomOracleCrab{
 const RoomPreset TreasureRoom1{
     {},
     {},
-    {{{PushConsole,{numBulletsUp, sizeUp}}, {0.5f, 0.5f}}},
+    {{{FightConsole,{numBulletsUp, sizeUp}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
@@ -757,7 +757,7 @@ const RoomPreset TreasureRoom3{
 const RoomPreset TreasureRoom4{
     {},
     {},
-    {{{FightConsole,{dashCDRDown}}, {0.5f, 0.5f}}},
+    {{{PushConsole,{dashRechargeUp}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
@@ -769,11 +769,47 @@ const RoomPreset TreasureRoom4{
 const RoomPreset TreasureRoom5{
     {},
     {},
-    {{{PushConsole,{dashCDRDown}}, {0.5f, 0.5f}}},
+    {{{PushConsole,{accuracyUp}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
     "TreasureRoom5",
+    false,
+     {1300, 1300},
+};
+
+const RoomPreset TreasureRoom6 {
+    {},
+    {},
+    {{{PushConsole,{bulletSpeedUp}}, {0.5f, 0.5f}}},
+    0.0f,
+    5,
+    0,
+    "TreasureRoom6",
+    false,
+     {1300, 1300},
+};
+
+const RoomPreset TreasureRoom7 {
+    {},
+    {},
+    {{{PushConsole,{bulletPierceUp}}, {0.5f, 0.5f}}},
+    0.0f,
+    5,
+    0,
+    "TreasureRoom7",
+    false,
+     {1300, 1300},
+};
+
+const RoomPreset TreasureRoom8 {
+    {},
+    {},
+    {{{PushConsole,{bulletBounceUp}}, {0.5f, 0.5f}}},
+    0.0f,
+    5,
+    0,
+    "TreasureRoom8",
     false,
      {1300, 1300},
 };
@@ -793,7 +829,7 @@ const RoomPreset TreasureRoomKey{
 const RoomPreset TreasureRoomBlunt{
     {},
     {},
-    {{{PushConsole,{blunt, blunt, blunt}}, {0.5f, 0.5f}}},
+    {{{PushConsole,{blunt, blunt, blunt, dmgUp, dmgUp}}, {0.5f, 0.5f}}},
     0.0f,
     0,
     0,

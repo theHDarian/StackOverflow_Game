@@ -1845,7 +1845,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			//else {
 			//	amount = std::to_string(abs((int)bullet.value));
 			//}
-			//if (bullet.type == BulletEffectType::PlayerDashCDR) {
+			//if (bullet.type == BulletEffectType::PlayerDashRecharge) {
 			//	intermediaryAmount = abs(bullet.value / 1000.f);
 			//	std::stringstream amountString;
 			//	amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
@@ -1868,7 +1868,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			//else {
 			//	amount = std::to_string(abs((int)bullet.value));
 			//}
-			//if (bullet.type == BulletEffectType::PlayerDashCDR) {
+			//if (bullet.type == BulletEffectType::PlayerDashRecharge) {
 			//	intermediaryAmount = abs(bullet.value / 1000.f);
 
 			//	std::stringstream amountString;
@@ -1899,8 +1899,8 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 		case BulletRange:
 			effect = "bullet range.";
 			break;
-		case BulletSpread:
-			effect = "the spread of bullets.";
+		case BulletAccuracy:
+			effect = "the accuracy of bullets fired.";
 			break;
 		case BulletNum:
 			effect = "the number of bullets shot at once.";
@@ -1926,8 +1926,8 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 		case PlayerStackSize:
 			effect = "stack size.";
 			break;
-		case PlayerDashCDR:
-			effect = "dash cooldown.";
+		case PlayerDashRecharge:
+			effect = "dash recharge rate.";
 			break;
 		default:
 			effect = "This bullet is not in the list?? Report immediately!";

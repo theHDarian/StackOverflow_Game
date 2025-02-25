@@ -519,7 +519,8 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						addEffect( player, {lightningShuffle}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
 						// VVV BUG HERE "Entity already contained in ECS registry" VVV
-						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
+						// auto& req = registry.uiRequests.emplace_with_duplicates(player);
+						// req.type = UIRequestType::StackNotifReqShuffle;
 						object.dialogueCount++;
 					}
 					break;
@@ -540,7 +541,8 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 							spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
 							spriteTimer.nextEffect = EFFECT_ASSET_ID::TEXTURED;
 						}
-						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
+						// auto& req = registry.uiRequests.emplace_with_duplicates(player);
+						// req.type = UIRequestType::StackNotifReqShuffle;
 					} else if (reaction.choice == 1) {
 						// auto atkdata = AttackData();
 						// atkdata.defaultEffect = lightningRotate;
@@ -556,7 +558,8 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 							spriteTimer.nextSprite = spriteMap[SPRITE_STATE::BASE];
 							spriteTimer.nextEffect = EFFECT_ASSET_ID::TEXTURED;
 						}
-						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShift});
+						// auto& req = registry.uiRequests.emplace_with_duplicates(player);
+						// req.type = UIRequestType::StackNotifReqShift;
 					}
 					break;
 				}

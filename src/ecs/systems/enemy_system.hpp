@@ -18,7 +18,7 @@ public:
     void step(float elapsed_ms);
 
 private:
-    // void shoot(::Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletSpread);
+    // void shoot(::Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletAccuracy);
     void shootShotgun(vec2 velocity, vec2 pos, AttackData atkData);
     void shootAllDirection(vec2 pos, float offset, AttackData atkData);
     void shootRadialPolygon(vec2 pos, AttackData atkData);

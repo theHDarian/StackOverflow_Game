@@ -15,7 +15,7 @@ enum BulletEffectType {
     ProjectileSize,
     FireRate,
     BulletRange,
-    BulletSpread,
+    BulletAccuracy,
     BulletNum, // Number of bullets fired in a single shot
     BulletBurst, // Number of bullets fired in a burst
     Bounce,
@@ -24,7 +24,7 @@ enum BulletEffectType {
     PlayerSpeed,
     PlayerNumDash,
     PlayerStackSize,
-    PlayerDashCDR,
+    PlayerDashRecharge,
     Inert, // Bullet that does nothing but take up stack space
     Lightning,
     Key,
@@ -100,7 +100,7 @@ struct StackCompile {
         {ProjectileSize,    &StackCompile::projectileSizeFunc},
         {FireRate,          &StackCompile::fireRateFunc},
         {BulletRange,       &StackCompile::bulletRangeFunc},
-        {BulletSpread,      &StackCompile::bulletSpreadFunc},
+        {BulletAccuracy,      &StackCompile::bulletSpreadFunc},
         {BulletNum,         &StackCompile::bulletNumFunc},
         {BulletBurst,       &StackCompile::bulletBurstFunc},
         {Bounce,            &StackCompile::bounceFunc},
@@ -109,7 +109,7 @@ struct StackCompile {
         {PlayerSpeed,       &StackCompile::playerSpeedFunc},
         {PlayerNumDash,     &StackCompile::playerNumDashFunc},
         {PlayerStackSize,   &StackCompile::playerStackSizeFunc},
-        {PlayerDashCDR,     &StackCompile::playerDashCDRFunc}
+        {PlayerDashRecharge,     &StackCompile::playerDashCDRFunc}
     };
 
     // Use extra when you want to find what a higher/lower value would yield
@@ -125,7 +125,7 @@ struct StackCompile {
         {ProjectileSize,    0},
         {FireRate,          0},
         {BulletRange,       0},
-        {BulletSpread,      0},
+        {BulletAccuracy,      0},
         {BulletNum,         0},
         {BulletBurst,       0},
         {Bounce,            0},
@@ -134,7 +134,7 @@ struct StackCompile {
         {PlayerSpeed,       0},
         {PlayerNumDash,     0},
         {PlayerStackSize,   0},
-        {PlayerDashCDR,     0}
+        {PlayerDashRecharge,     0}
     };
 
     bool add(BulletStackEffect effect) {
