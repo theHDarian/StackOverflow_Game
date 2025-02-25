@@ -530,7 +530,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req.type = SoundType::bossBGM;
             // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             // req2.type = InteractableRequestType::AddEffect;
-            // req2.effects = {numBulletsUpA, numBulletsUpA};
+            // req2.effects = {numBulletsUp, numBulletsUp};
         }
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
@@ -577,7 +577,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         //
         // InteractableRequest& req = registry.interactableRequests.emplace(Entity());
         // req.type = InteractableRequestType::AddEffect;
-        // req.effects = {key, dashUpA, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUpA, key, dashUpA, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUpA,};
+        // req.effects = {key, dashUp, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUp, key, dashUp, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUp,};
 
         //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
         // createBibleTree(renderer, vec2(700, 500));
@@ -585,7 +585,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
         // createEnemy(renderer, vec2(1000, 300), EnemyType::EnemyPufferfish);
         // createRamStick(renderer, vec2(500, 500));
-        // createPushConsole(renderer, vec2(500, 500), {dashUpA, dashCDRDownA, dmgUpM});
+        // createPushConsole(renderer, vec2(500, 500), {dashUp, dashCDRDownA, dmgUpM});
         //createWishGranter(renderer, vec2(500,500));
         //createEnemy(renderer, vec2(500, 500), ScientistBoss);
     }

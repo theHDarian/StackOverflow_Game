@@ -109,11 +109,11 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.defaultEffect = b;
 		atkData.rareBulletEffects = {b};
 		atkData.speed = 200;
-		atkData.size = vec2(60,30);
+		atkData.size = vec2(20,50);
 		atkData.bulletRange = 9000;
 		atkData.bulletBounce = 3;
 		float angle = (angleStep * i) + direction;
-		createEnemyBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
+		createPopBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
 	}
 }
 
@@ -196,6 +196,10 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
+		registry.uiRequests.remove(player);
+		UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+		req.type = UIRequestType::StackNotifBullet;
+		req.effects = effects;
         for (BulletStackEffect b : effects) {
             printf("Adding: %s\n",b.name.c_str());
             bool success = reg.add(b);
@@ -206,9 +210,8 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
         		gameState.currentVolume *= 0.15f;
         		soundPlayer->playGameOverSound();
         		soundPlayer->setMusicVolume(gameState.currentVolume);
-        		if (!registry.uiRequests.has(player)) {
-        			registry.uiRequests.insert(player, { UIRequestType::GameOverReport });
-        		}
+				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
+				req.type = UIRequestType::GameOverReport;
         	}
         	if (b.type == BulletEffectType::PlayerStackSize) {
 				StackUI& ui = registry.stackUI.components[0];
@@ -232,7 +235,7 @@ void spawnEnemies (SoundSystem* soundPlayer,std::vector<std::vector<std::tuple<E
 void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* soundPlayer) {
 	switch (choice) {
 		case 0: {
-			addEffect(player, {fireRateUpA, dmgUpM, numBulletsUpA }, soundPlayer);
+			addEffect(player, {fireRateUp, dmgUp, numBulletsUp }, soundPlayer);
 			spawnEnemies( soundPlayer, {
 			{EnemyType::EnemyHifiCharger, {0.25f,0.5f}},
 			{EnemyType::EnemyHifiCharger, {0.75f,0.5f}},
@@ -251,7 +254,7 @@ void grantWish (Entity player, RenderSystem* renderer, int choice, SoundSystem* 
 		}
 		case 2: {
 			extendStack(player, 4);
-			addEffect(player, {playerSpeedDownA}, soundPlayer);
+			addEffect(player, {playerSpeedDown}, soundPlayer);
 			break;
 		}
 		case 3: {
@@ -479,7 +482,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				case 2 : {
 					if (reaction.choice == 0) {
 						if (reaction.choice == 0) {
-							addEffect(player, {WeaponOfWar}, soundPlayer);
+							addEffect(player, {homingUp}, soundPlayer);
 						}
 						object.dialogueCount = 4;
 					}
@@ -498,7 +501,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				case 1 : {
 					if (reaction.choice == 0) {
 						// auto atkdata = AttackData();
-						// atkdata.defaultEffect = lightning2;
+						// atkdata.defaultEffect = lightningShuffle;
 						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
 						auto& spriteMap = registry.sprites.get(player).sprites;
 						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
@@ -513,8 +516,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						//if (!registry.invincibles.has(player)) {
 						//	registry.invincibles.emplace(player);
 						//}
-						addEffect( player, {lightning2}, soundPlayer);
+						addEffect( player, {lightningShuffle}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
+						// VVV BUG HERE "Entity already contained in ECS registry" VVV
 						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
 						object.dialogueCount++;
 					}
@@ -523,9 +527,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				case 2 : {
 					if (reaction.choice == 0) {
 						// auto atkdata = AttackData();
-						// atkdata.defaultEffect = lightning2;
+						// atkdata.defaultEffect = lightningShuffle;
 						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
-						addEffect( player, {lightning2}, soundPlayer);
+						addEffect( player, {lightningShuffle}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
 						auto& spriteMap = registry.sprites.get(player).sprites;
 						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
@@ -539,9 +543,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						registry.uiRequests.insert(player, {UIRequestType::StackNotifReqShuffle});
 					} else if (reaction.choice == 1) {
 						// auto atkdata = AttackData();
-						// atkdata.defaultEffect = lightning1;
+						// atkdata.defaultEffect = lightningRotate;
 						// createEnemyBullet(renderer, registry.motions.get(player).position, {0,0}, vec2(0), atkdata);
-						addEffect( player, {lightning1}, soundPlayer);
+						addEffect( player, {lightningRotate}, soundPlayer);
 						soundPlayer->playPlayerZappedSound();
 						auto& spriteMap = registry.sprites.get(player).sprites;
 						registry.renderRequests.get(player).texture_name = spriteMap[SPRITE_STATE::DAMAGED];
@@ -587,7 +591,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				}
 				case 1 : {
 					if (reaction.choice == 0) {
-						addEffect(player, {theCurse, Freedom}, soundPlayer);
+						addEffect(player, {homingDown, playerSpeedUp}, soundPlayer);
 						object.dialogueCount++;
 					}
 					break;

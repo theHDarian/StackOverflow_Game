@@ -4,7 +4,8 @@
 in vec2 texcoord;
 
 // Application data
-uniform sampler2D sampler0;
+uniform sampler2DArray sampler0;
+uniform int frame = 0;
 uniform float time;
 
 uniform int shape; //0 = rect, 1 = tri, 2 = circ
@@ -135,7 +136,7 @@ void main()
 		if (onDeath && distance(texcoord * scale, vec2(0.5) * scale) < 0.1 * scale.x) color.rgb = vec3(sin(time), 0.0, 0.0);
 		break;
 	}
-	color.a *= texture(sampler0, texcoord).a;
+	color.a *= texture(sampler0, vec3(texcoord.xy, frame)).a;
 
 	if (laser) {
 		color += vec4(vec3(laserColoring()), 0.0);

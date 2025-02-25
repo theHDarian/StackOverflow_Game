@@ -87,7 +87,7 @@ private:
 
     Entity createStackAddTail();
 
-    Entity createStackAddNotif(vec2 position, vec2 scale, std::string sprite, vec3 color);
+    Entity createStackAddNotif(vec2 position, vec2 scale, std::string sprite, vec3 color, BulletStackEffect effect);
 
     Entity createDialogueReminder();
 

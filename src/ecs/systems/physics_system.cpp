@@ -36,7 +36,7 @@ void PhysicsSystem::step(float elapsed_ms)
 
 		// slightly broken
 		if (glm::length(motion.velocity) > 0.01 && !registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1) || registry.playerBullets.has(entity)))
-			motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+			motion.angle = atan2(motion.velocity.y, motion.velocity.x) + motion.angleOffset;
 
 		if (registry.homes.has(entity))
 		{
@@ -337,7 +337,8 @@ void PhysicsSystem::step(float elapsed_ms)
 	// Enemies -> PlayerBullets	(Circle to Circle)
 	for (uint i = 0; i < enemies.components.size(); i++)
 	{
-		if ((registry.circleColliders.has(enemies.entities[i]) && CircleToCircle(player, enemies.entities[i])) ||
+		if ((registry.circleColliders.has(enemies.entities[i]) && AABBToCircle(player, enemies.entities[i])) ||
+			(registry.polyColliders.has(enemies.entities[i]) && AABBToPoly(player, enemies.entities[i])) ||
 			registry.meshColliders.has(enemies.entities[i]) && (AABBToMesh(player, enemies.entities[i])) ||
 			registry.aabbs.has(enemies.entities[i]) && (AABBToAABB(player, enemies.entities[i])))
 		{
@@ -346,6 +347,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		for (uint j = 0; j < pBullets.components.size(); j++)
 		{
 			if (registry.circleColliders.has(enemies.entities[i]) && CircleToCircle(enemies.entities[i], pBullets.entities[j]) ||
+				registry.polyColliders.has(enemies.entities[i]) && CircleToPoly(pBullets.entities[j], enemies.entities[i]) ||
 				(registry.meshColliders.has(enemies.entities[i]) && CircleToMesh(pBullets.entities[j], enemies.entities[i])))
 			{
 				if (!ignores.get(pBullets.entities[j]).has(enemies.entities[i]))
@@ -611,8 +613,9 @@ bool PhysicsSystem::AABBToPoly(Entity aabb, Entity poly)
 	vec2 offset = {mA.position.x - mB.position.x, mA.position.y - mB.position.y};
 
 	// Quick test to remove obviously not overlapping shapes
-	if (!CheapCircleToCircle(mA.position, max(mA.scale.x, mA.scale.y), mB.position, s.maxLength))
+	if (!CheapCircleToCircle(mA.position, max(mA.scale.x, mA.scale.y), mB.position, s.maxLength)) {
 		return false;
+	}
 
 	// Offset the circle position to be relative to the origin (like the polygon points)
 	// Test the lines formed by every 2 adjacent polygon points against the circle
@@ -622,13 +625,44 @@ bool PhysicsSystem::AABBToPoly(Entity aabb, Entity poly)
 	//}
 
 	// Cheap hacky alternative, just check if a poly vertex is in AABB OR center is in AABB
-	if (!PointInAABB(vec2(0), offset + ab.bottomRight, offset + ab.topLeft))
+	if (!PointInAABB(vec2(0), offset + ab.bottomRight, offset + ab.topLeft)) {
 		return true;
+	}
 	for (uint i = 0; i < s.offsetVertices.size(); i++)
 	{
-		if (!PointInAABB(rotate(s.offsetVertices[i], mB.angle), offset + ab.bottomRight, offset + ab.topLeft))
+		if (!PointInAABB(rotate(s.offsetVertices[i], mB.angle), offset + ab.bottomRight, offset + ab.topLeft)) {
 			return true;
+		}
 	}
+
+	// Check if any of the 4 AABB corners are in the polygon
+	std::vector<int> counts = { 0,0,0,0 };
+	std::vector<vec2> aabbPoints = {
+		vec2(offset + ab.bottomRight),
+		vec2(offset + ab.topLeft),
+		vec2(offset.x + ab.topLeft.x, offset.y + ab.bottomRight.y),
+		vec2(offset.x + ab.bottomRight.x, offset.y + ab.topLeft.y)
+	};
+	int n = s.offsetVertices.size();
+	for (int i = 0; i < n; i++) {
+		vec2 p1 = rotate(s.offsetVertices[i], mB.angle);
+		vec2 p2 = rotate(s.offsetVertices[(i + 1) % n], mB.angle);
+		for (int j = 0; j < 4; j++) {
+			if ((aabbPoints[j].y > min(p1.y, p2.y))
+				&& (aabbPoints[j].y <= max(p1.y, p2.y))
+				&& (aabbPoints[j].x <= max(p1.x, p2.x)))
+			{
+				double xIntersect = (aabbPoints[j].y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
+				if (p1.x == p2.x || aabbPoints[j].x <= xIntersect) {
+					counts[j]++;
+				}
+			}
+		}
+	}
+	for (int j = 0; j < 4; j++) {
+		if (counts[j] % 2 == 1) return true;
+	}
+
 	return false;
 }
 

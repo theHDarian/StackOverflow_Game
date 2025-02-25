@@ -342,11 +342,27 @@ void EnemySystem::step(float elapsed_ms)
         }
         const Collision &collision = registry.collisions.get(entity);
         Entity other_entity = collision.other;
-        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity) && !registry.deleteds.has(other_entity) && !registry.spawnings.has(entity) && !registry.invincibles.has(entity))
+        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity) && !registry.deleteds.has(other_entity) && !registry.spawnings.has(entity))
         {
             Enemy &enemyStat = registry.enemies.get(entity);
             PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);
             EnemyPattern &pattern = enemyStat.currEnemyPattern();
+
+            if (registry.invincibles.has(entity))
+            {
+                //if enemy is invincible, block damage and destroy bullet
+                if (!registry.deleteds.has(other_entity) && (!registry.boids.has(entity) || (registry.boids.has(entity) && registry.enemies.components.size() > registry.boids.components.size())))
+                    registry.deleteds.emplace(other_entity);
+                if (!registry.damageds.has(entity) && enemyStat.currHealth > 0)
+                {
+                    registry.damageds.emplace(entity);
+                }
+                else if (registry.damageds.has(entity))
+                {
+                    registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
+                }
+                continue;
+            }
 
             float damage = registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.1) * bulletStat.damage), 1.f) : bulletStat.damage;
             if (registry.vulnerabilities.has(entity))

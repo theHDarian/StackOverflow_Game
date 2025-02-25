@@ -21,446 +21,237 @@ struct BulletStackEffect {
 
 const BulletStackEffect blunt = {
 	Inert,
-	Additive,
 	0,
 	"Inert",
 	""};
 
-const BulletStackEffect lightning1 = {
+const BulletStackEffect lightningRotate = {
 	Lightning,
-	Additive,
-	0,
+	-1,
 	"Lightning",
 	""};
 
-const BulletStackEffect lightning2 = {
+const BulletStackEffect lightningShuffle = {
 	Lightning,
-	Multiplicative,
-	0,
+	1,
 	"Lightning",
 	""};
 
-const BulletStackEffect dmgDownA = {
+const BulletStackEffect dmgDown = {
 	BulletDamage,
-	Additive,
-	-2.0,
-	"Damage Down (+)",
+	-1,
+	"Damage Down",
 	""};
 
-const BulletStackEffect dmgDownM = {
+const BulletStackEffect dmgUp = {
 	BulletDamage,
-	Multiplicative,
-	-0.3,
-	"Damage Down (%)",
+	1,
+	"Damage Up",
 	""};
 
-const BulletStackEffect dmgUpA = {
-	BulletDamage,
-	Additive,
-	5.0,
-	"Damage Up (+)",
-	""};
-
-const BulletStackEffect dmgUpM = {
-	BulletDamage,
-	Multiplicative,
-	0.5,
-	"Damage Up (%)",
-	""};
-
-const BulletStackEffect numBulletsUpA = {
+const BulletStackEffect numBulletsUp = {
 	BulletNum,
-	Additive,
 	1,
-	"Bullet Count Up (+)",
+	"Bullet Count Up",
 	""};
 
-const BulletStackEffect sizeUpA = {
-	ProjectileSize,
-	Additive,
-	10,
-	"Bullet Size Up (+)",
-	""};
-const BulletStackEffect sizeUpM = {
-	ProjectileSize,
-	Multiplicative,
-	0.5,
-	"Bullet Size Up (+)",
-	""};
+const BulletStackEffect numBulletsDown = {
+	BulletNum,
+	-1,
+	"Bullet Count Down",
+	"" };
 
-const BulletStackEffect spreadUpA = {
+const BulletStackEffect sizeUp = {
+	ProjectileSize,
+	1,
+	"Bullet Size Up",
+	"" };
+
+const BulletStackEffect sizeDown = {
+	ProjectileSize,
+	-1,
+	"Bullet Size Up",
+	"" };
+
+
+const BulletStackEffect spreadUp = {
 	BulletSpread,
-	Additive,
-	15,
-	"Bullet Spread Up (+)",
+	1,
+	"Bullet Spread Up",
 	""};
 
-const BulletStackEffect bulletSpeedUpA = {
+const BulletStackEffect spreadDown = {
+	BulletSpread,
+	-1,
+	"Bullet Spread Down",
+	"" };
+
+const BulletStackEffect bulletSpeedUp = {
 	ProjectileSpeed,
-	Additive,
-	50,
-	"Bullet Speed Up (+)",
+	1,
+	"Bullet Speed Up",
 	""};
 
-const BulletStackEffect bulletSpeedUpM = {
+const BulletStackEffect bulletSpeedDown = {
 	ProjectileSpeed,
-	Multiplicative,
-	0.5,
-	"Bullet Speed Up (%)",
+	-1,
+	"Bullet Speed Up",
 	""};
 
-const BulletStackEffect bulletRangeUpA = {
+const BulletStackEffect bulletRangeUp = {
 	BulletRange,
-	Additive,
-	500,
-	"Range Up (+)",
+	1,
+	"Range Up",
 	""};
 
-const BulletStackEffect bulletRangeUpM = {
+const BulletStackEffect bulletRangeDown = {
 	BulletRange,
-	Multiplicative,
-	0.5,
-	"Range Up (%)",
+	-1,
+	"Range Down",
 	""};
 
-const BulletStackEffect bulletBurstUpA = {
+const BulletStackEffect bulletBurstUp = {
 	BulletBurst,
-	Additive,
 	1,
-	"Burst Up (+)",
+	"Burst Up",
 	""};
 
-const BulletStackEffect bulletBurstUpM = {
+const BulletStackEffect bulletBurstDown = {
 	BulletBurst,
-	Multiplicative,
-	.5,
-	"Burst Up (%)",
+	-1,
+	"Burst Down",
 	""};
 
-const BulletStackEffect bulletPierceUpA = {
+const BulletStackEffect bulletPierceUp = {
 	Pierce,
-	Additive,
 	1,
-	"Pierce Up (+)",
-	""};
-const BulletStackEffect bulletPierceUpAII = {
-	Pierce,
-	Additive,
-	2,
-	"Pierce Up II (+)",
+	"Pierce Up",
 	""};
 
-const BulletStackEffect bulletPierceUpM = {
+const BulletStackEffect bulletPierceDown = {
 	Pierce,
-	Multiplicative,
-	0.5,
-	"Pierce Up (%)",
+	-1,
+	"Pierce Down",
 	""};
 
-const BulletStackEffect bulletBounceUpA = {
+const BulletStackEffect bulletBounceUp = {
 	Bounce,
-	Additive,
 	1,
-	"Bounce Up (+)",
+	"Bounce Up",
 	""};
 
-const BulletStackEffect bulletBounceUpM = {
+const BulletStackEffect bulletBounceDown = {
 	Bounce,
-	Multiplicative,
-	1,
-	"Bounce Up (%)",
+	-1,
+	"Bounce Down",
 	""};
 
-const BulletStackEffect dashUpA = {
+const BulletStackEffect dashUp = {
 	PlayerNumDash,
-	Additive,
 	1,
-	"Dash Count Up (+)",
+	"Dash Count Up",
 	""};
 
-const BulletStackEffect dashUpM = {
+const BulletStackEffect dashDown = {
 	PlayerNumDash,
-	Multiplicative,
+	-1,
+	"Dash Count Down",
+	""};
+
+const BulletStackEffect stackSizeUp = {
+	PlayerStackSize,
 	1,
-	"Dash Count Up (%)",
+	"Stack Size Up",
 	""};
 
-const BulletStackEffect stackSizeUpA = {
+const BulletStackEffect stackSizeDown = {
 	PlayerStackSize,
-	Additive,
-	4,
-	"Stack Size Up (+)",
+	-1,
+	"Stack Size Down",
 	""};
 
-const BulletStackEffect stackSizeUpM = {
-	PlayerStackSize,
-	Multiplicative,
-	.5,
-	"Stack Size Up (%)",
-	""};
-
-const BulletStackEffect dashCDRUpA = {
+const BulletStackEffect dashCDRUp = {
 	PlayerDashCDR,
-	Additive,
-	500,
-	"Dash Cooldown Up (+)",
+	1,
+	"Dash Cooldown Up",
 	""};
 
-const BulletStackEffect dashCDRUpM = {
+const BulletStackEffect dashCDRDown = {
 	PlayerDashCDR,
-	Multiplicative,
-	.25,
-	"Dash Cooldown Up (%)",
+	-1,
+	"Dash Cooldown Down",
 	""};
 
-const BulletStackEffect dashCDRDownA = {
-	PlayerDashCDR,
-	Additive,
-	-150,
-	"Dash Cooldown Down (+)",
-	""};
-
-const BulletStackEffect dashCDRDownM = {
-	PlayerDashCDR,
-	Multiplicative,
-	-0.5,
-	"Dash Cooldown Down (%)",
-	""};
-
-const BulletStackEffect playerSpeedUpA = {
+const BulletStackEffect playerSpeedUp = {
 	PlayerSpeed,
-	Additive,
-	100,
-	"Movement Speed Up (+)",
+	1,
+	"Movement Speed Up",
 	""};
 
-const BulletStackEffect playerSpeedUpM = {
+const BulletStackEffect playerSpeedDown = {
 	PlayerSpeed,
-	Multiplicative,
-	.1,
-	"Movement Speed Up (%)",
+	-1,
+	"Movement Speed Down",
 	""};
 
-const BulletStackEffect playerSpeedDownA = {
-	PlayerSpeed,
-	Additive,
-	-100,
-	"Movement Speed Down (+)",
-	""};
-
-const BulletStackEffect playerSpeedDownM = {
-	PlayerSpeed,
-	Multiplicative,
-	-0.2,
-	"Movement Speed Down (%)",
-	""};
-
-const BulletStackEffect fireRateUpA = {
+const BulletStackEffect fireRateUp = {
 	FireRate,
-	Additive,
-	1.5,
-	"Fire Rate Up (+)",
+	1,
+	"Fire Rate Up",
 	""};
 
-const BulletStackEffect fireRateUpM = {
+const BulletStackEffect fireRateDown = {
 	FireRate,
-	Multiplicative,
-	.2,
-	"Fire Rate Up (%)",
-	""};
-const BulletStackEffect fireRateDownM = {
-	FireRate,
-	Multiplicative,
-	-0.2,
-	"Fire Rate Down (%)",
-	""};
-
-const BulletStackEffect ostrichWarrior = {
-	PlayerSpeed,
-	Multiplicative,
-	2,
-	"Ostrich Warrior",
-	""};
-
-const BulletStackEffect ostrichWarriorDownside = {
-	PlayerDashCDR,
-	Multiplicative,
-	2,
-	"Ostrich Warrior Downside",
+	-1,
+	"Fire Rate Down",
 	""};
 
 const BulletStackEffect key = {
 	Key,
-	Additive,
 	0,
 	"Key",
 	""};
 
-const BulletStackEffect homingUpA = {
+const BulletStackEffect homingUp = {
 	Homing,
-	Additive,
-	0.1,
-	"Homing Accuracy (+)",
-	""};
-
-const BulletStackEffect buzz = {
-	PlayerSpeed,
-	Additive,
-	15,
-	"Buzz",
-	""};
-
-const BulletStackEffect sluggish = {
-	ProjectileSpeed,
-	Additive,
-	-20,
-	"Sluggish Bullets",
-	""};
-
-const BulletStackEffect hardShell = {
-	Bounce,
-	Additive,
 	1,
-	"Hard Shell",
-	""};
+	"Homing Accuracy Up",
+	"" };
 
-const BulletStackEffect APRounds = {
-	Pierce,
-	Additive,
-	1,
-	"AP Rounds",
-	""};
-
-const BulletStackEffect FragileRounds = {
-	Pierce,
-	Additive,
+const BulletStackEffect homingDown = {
+	Homing,
 	-1,
-	"Fragile Rounds",
-	""};
-
-const BulletStackEffect ConcentratedFire = {
-	BulletNum,
-	Additive,
-	-1,
-	"Concentrated Fire",
-	""};
-
-const BulletStackEffect SniperPower = {
-	BulletDamage,
-	Multiplicative,
-	1.5,
-	"Sniper's Prowess",
-	""};
-
-const BulletStackEffect SniperSpeed = {
-	ProjectileSpeed,
-	Additive,
-	500,
-	"Sniper's Speed",
-	""};
-
-const BulletStackEffect SniperLethargy = {
-	FireRate,
-	Additive,
-	-750,
-	"Sniper's Lethargy",
-	""};
-
-const BulletStackEffect SniperBurden = {
-	PlayerSpeed,
-	Multiplicative,
-	-0.6,
-	"Sniper's Burden",
-	""};
-
-const BulletStackEffect DataCompression = {
-	PlayerStackSize,
-	Multiplicative,
-	.5,
-	"Data Compression",
-	""};
-
-const BulletStackEffect WarMachine = {
-	BulletBurst,
-	Additive,
-	2,
-	"War Machine",
-	""};
-
-const BulletStackEffect WeaponOfWar = {
-	Homing,
-	Additive,
-	1,
-	"Weapon of War",
-	""};
-
-const BulletStackEffect theCurse = {
-	Homing,
-	Additive,
-	-0.5,
-	"\"The Curse\"",
-	""};
-
-const BulletStackEffect Freedom = {
-	PlayerSpeed,
-	Multiplicative,
-	1.5,
-	"\"Freedom\"",
-	""};
-
-const BulletStackEffect serum = {
-	ProjectileSize,
-	Additive,
-	2,
-	"Unknown Serum",
-	""};
+	"Homing Accuracy Down",
+	"" };
 
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
 	blunt,
-	dmgDownA,
-	dmgDownM,
-	dmgUpA,
-	dmgUpM,
-	numBulletsUpA,
-	sizeUpA,
-	spreadUpA,
-	bulletSpeedUpA,
-	bulletSpeedUpM,
-	bulletRangeUpA,
-	bulletRangeUpM,
-	bulletBurstUpA,
-	bulletBurstUpM,
-	bulletPierceUpA,
-	bulletPierceUpM,
-	bulletBounceUpA,
-	bulletBounceUpM,
-	dashUpA,
-	dashUpM,
-	stackSizeUpA,
-	stackSizeUpM,
-	dashCDRUpA,
-	dashCDRUpM,
-	dashCDRDownA,
-	dashCDRDownM,
-	playerSpeedUpA,
-	playerSpeedUpM,
-	ostrichWarrior,
-	ostrichWarriorDownside,
+	dmgDown,
+	dmgUp,
+	numBulletsUp,
+	sizeUp,
+	spreadUp,
+	bulletSpeedUp,
+	bulletSpeedDown,
+	bulletRangeUp,
+	bulletRangeDown,
+	bulletBurstUp,
+	bulletBurstDown,
+	bulletPierceUp,
+	bulletBounceUp,
+	bulletBounceDown,
+	dashUp,
+	dashDown,
+	stackSizeUp,
+	stackSizeDown,
+	dashCDRUp,
+	dashCDRDown,
+	playerSpeedUp,
+	playerSpeedDown,
 	key,
-	homingUpA,
-	buzz,
-	sluggish,
-	hardShell,
-	APRounds,
-	ConcentratedFire,
-	SniperPower,
-	SniperSpeed,
-	SniperLethargy,
-	SniperBurden,
-	DataCompression,
-	SniperBurden,
+	homingUp
 };
 
 //////////////////////////////////////////
@@ -506,7 +297,7 @@ const AttackData none{
 const AttackData trail{
 	EnemyAttackPattern::TRAIL,
 	CIRCLE,
-	{dmgUpA},
+	{dmgUp},
 	blunt,
 	1,
 	0,
@@ -521,7 +312,7 @@ const AttackData trail{
 const AttackData wave{
 	EnemyAttackPattern::WAVE,
 	CIRCLE,
-	{numBulletsUpA, dmgDownA},
+	{numBulletsUp, dmgDown},
 	blunt,
 	5,
 	0,
@@ -536,7 +327,7 @@ const AttackData wave{
 const AttackData HomingWave{
 	EnemyAttackPattern::WAVE,
 	CIRCLE,
-	{numBulletsUpA, dmgDownA},
+	{numBulletsUp, dmgDown},
 	blunt,
 	5,
 	0,
@@ -551,8 +342,8 @@ const AttackData HomingWave{
 const AttackData laserNoRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{dashUpA},
-	dashCDRDownA,
+	{dashUp},
+	dashCDRDown,
 	3,
 	0,
 	{20, 20},
@@ -566,8 +357,8 @@ const AttackData laserNoRotate{
 const AttackData laserRotate{
 	EnemyAttackPattern::LASER,
 	CIRCLE,
-	{APRounds},
-	dashCDRDownA,
+	{bulletPierceUp},
+	dashCDRDown,
 	3,
 	0,
 	{0, 20},
@@ -581,7 +372,7 @@ const AttackData laserRotate{
 const AttackData threeShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
-	{dashCDRDownM},
+	{dashCDRDown},
 	blunt,
 	3,
 	M_PI / 6.0,
@@ -596,8 +387,8 @@ const AttackData threeShot{
 const AttackData missile{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{spreadUpA, sizeUpA},
-	dmgDownA,
+	{spreadUp, sizeUp},
+	dmgDown,
 	1,
 	0,
 	{50, 30},
@@ -627,7 +418,7 @@ const AttackData sixShot{
 const AttackData radialBurst{
 	EnemyAttackPattern::BURST_RADIAL,
 	CIRCLE,
-	{numBulletsUpA, sizeUpA},
+	{numBulletsUp, sizeUp},
 	blunt,
 	40,
 	M_PI / 40,
@@ -642,7 +433,7 @@ const AttackData radialBurst{
 const AttackData radialPolygon{
 	EnemyAttackPattern::RADIAL_POLYGON,
 	CIRCLE,
-	{numBulletsUpA, sizeUpA},
+	{numBulletsUp, sizeUp},
 	blunt,
 	5,
 	M_PI / 40,
@@ -672,7 +463,7 @@ const AttackData fourAllAround{
 const AttackData twoPincerShot{
 	EnemyAttackPattern::SHOTGUN,
 	CIRCLE,
-	{dmgUpA},
+	{dmgUp},
 	blunt,
 	2,
 	M_PI / 1.0,
@@ -687,7 +478,7 @@ const AttackData twoPincerShot{
 const AttackData twelveSpiralShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{numBulletsUpA, spreadUpA},
+	{numBulletsUp, spreadUp},
 	blunt,
 	12,
 	0.0,
@@ -702,7 +493,7 @@ const AttackData twelveSpiralShot{
 const AttackData threeHomingShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{dmgDownA, dmgDownM},
+	{dmgDown, dmgDown},
 	blunt,
 	3,
 	M_PI / 4.0,
@@ -717,8 +508,8 @@ const AttackData threeHomingShot{
 const AttackData threeBurst{
 	EnemyAttackPattern::BURST,
 	CIRCLE,
-	{numBulletsUpA},
-	sizeUpA,
+	{numBulletsUp},
+	sizeUp,
 	4,
 	M_PI / 6,
 	{20, 20},
@@ -732,7 +523,7 @@ const AttackData threeBurst{
 const AttackData fiveBurst{
 	EnemyAttackPattern::BURST,
 	TRIANGLE,
-	{numBulletsUpA, sizeUpA},
+	{numBulletsUp, sizeUp},
 	blunt,
 	6,
 	M_PI / 6,
@@ -748,7 +539,7 @@ const AttackData fiveBurst{
 const AttackData threeSpray{
 	EnemyAttackPattern::SPRAY,
 	CIRCLE,
-	{dmgUpA},
+	{dmgUp},
 	blunt,
 	3,
 	M_PI / 16,
@@ -763,7 +554,7 @@ const AttackData threeSpray{
 const AttackData SniperShot{
 	EnemyAttackPattern::SHOTGUN,
 	TRIANGLE,
-	{APRounds, dmgUpM, ConcentratedFire},
+	{bulletPierceUp, dmgUp, numBulletsDown},
 	blunt,
 	1,
 	0,
@@ -808,8 +599,8 @@ const AttackData quadShot{
 const AttackData FastLaser{
 	EnemyAttackPattern::LASER
 	,CIRCLE
-	,{dashUpA, dashCDRUpA}
-	,dashCDRDownM
+	,{dashUp, dashCDRUp}
+	,dashCDRDown
 	,1
 	,0
 	,{20, 20}
@@ -965,7 +756,7 @@ struct TutorialQuadshooter : Enemy
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
 		{},
-		dashUpA,
+		dashUp,
 		4,
 		0.0,
 		{20, 20},
@@ -1007,8 +798,8 @@ struct Snail : Enemy
 	const AttackData snailTrail{
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
-		{hardShell},
-		sluggish,
+		{bulletBounceUp},
+		playerSpeedDown,
 		1,
 		0,
 		{20, 20},
@@ -1046,8 +837,8 @@ struct EvilSnail : Enemy
 	const AttackData snailTrail{
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
-		{hardShell},
-		sluggish,
+		{bulletBounceUp},
+		playerSpeedDown,
 		1,
 		0,
 		{20, 20},
@@ -1088,7 +879,7 @@ struct Crab : Enemy
 	const AttackData twoPincerShot{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{hardShell},
+		{bulletBounceUp},
 		blunt,
 		2,
 		M_PI / 1.5,
@@ -1131,8 +922,8 @@ struct LaserCrab : Enemy
 	const AttackData crabLaser{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		1,
 		0,
 		{20, 20},
@@ -1173,8 +964,8 @@ struct EvilCrab : Enemy
 	const AttackData radialSquare{
 		EnemyAttackPattern::RADIAL_POLYGON,
 		CIRCLE,
-		{sizeUpA},
-		sluggish,
+		{sizeUp},
+		playerSpeedDown,
 		5,
 		M_PI / 4,
 		{20, 20},
@@ -1216,8 +1007,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData crabLaser{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		1,
 		0,
 		{20, 20},
@@ -1231,8 +1022,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData broadsideLasers{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		2,
 		0,
 		{60, 60},
@@ -1246,8 +1037,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData radialSquare{
 		EnemyAttackPattern::RADIAL_POLYGON,
 		CIRCLE,
-		{sizeUpA},
-		sluggish,
+		{sizeUp},
+		playerSpeedDown,
 		5,
 		M_PI / 4,
 		{20, 20},
@@ -1261,8 +1052,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData radialSquarephase2{
 		EnemyAttackPattern::RADIAL_POLYGON,
 		CIRCLE,
-		{sizeUpA},
-		spreadUpA,
+		{sizeUp},
+		spreadUp,
 		5,
 		M_PI / 4,
 		{20, 20},
@@ -1276,7 +1067,7 @@ struct BossChimeraCrab : Enemy {
 	const AttackData twoPincerShot{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{hardShell},
+		{bulletBounceUp},
 		blunt,
 		2,
 		M_PI / 1.5,
@@ -1293,8 +1084,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData crabSummon{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{numBulletsUpA},
-		playerSpeedDownA,
+		{numBulletsUp},
+		playerSpeedDown,
 		1,
 		M_PI,
 		{20, 20},
@@ -1310,8 +1101,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData laserSummon{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{numBulletsUpA},
-		playerSpeedDownA,
+		{numBulletsUp},
+		playerSpeedDown,
 		1,
 		M_PI,
 		{20, 20},
@@ -1327,8 +1118,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData laserRotate{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		3,
 		0,
 		{0, 20},
@@ -1342,8 +1133,8 @@ struct BossChimeraCrab : Enemy {
 	const AttackData missile{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{spreadUpA, sizeUpA},
-		dmgDownA,
+		{spreadUp, sizeUp},
+		dmgDown,
 		2,
 		 M_PI / 1.5,
 		{50, 30},
@@ -1432,8 +1223,8 @@ struct BigC : Enemy
 	const AttackData FastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUpA, dashCDRDownA}
-		,FragileRounds
+		,{dashUp, dashCDRDown}
+		,bulletPierceDown
 		,1
 		,0
 		,{70, 70}
@@ -1449,8 +1240,8 @@ struct BigC : Enemy
 	const AttackData shortFastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUpA, dashCDRDownA}
-		,FragileRounds
+		,{dashUp, dashCDRDown}
+		,bulletPierceDown
 		,1
 		,0
 		,{70, 70}
@@ -1493,7 +1284,7 @@ struct BigC : Enemy
 				  EFFECT_ASSET_ID::MESH,
 				  GEOMETRY_BUFFER_ID::MESH_GB};
 		rotatePower = 0.5f;
-		scale = vec2({700, 700 * (1.998858f / 1.923352f)});
+		scale = vec2({800, 800 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		armour = 10;
 	};
@@ -1501,11 +1292,26 @@ struct BigC : Enemy
 
 struct BossBigCCore : Enemy{
 
+	const AttackData sixShot{
+	EnemyAttackPattern::RADIAL,
+	TRIANGLE,
+	{numBulletsUp, spreadUp},
+	blunt,
+	6,
+	0.0,
+	{20, 20},
+	400,
+	1000,
+	{300, M_PI},
+	0,
+	0,
+	0 };
+
 	const AttackData laserRotate{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		6,
 		M_PI / 6,
 		{0, 20},
@@ -1537,8 +1343,8 @@ struct BossBigCCore : Enemy{
 	const AttackData laser2{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		8,
 		0,
 		{20, 20},
@@ -1552,8 +1358,8 @@ struct BossBigCCore : Enemy{
 	const AttackData laser1{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		8,
 		M_PI / 8.f,
 		{20, 20},
@@ -1589,7 +1395,7 @@ struct BossBigCCore : Enemy{
 
 	EnemyPattern PlayerClose = {
 		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration, halfhp, }, 0, true, 0.f, 3000.f,
-		twelveSpiralShot, SpecialStates::VULNERABLE
+		sixShot, SpecialStates::VULNERABLE
 	};
 
 	EnemyPattern PlayerCloseHalfHP = {
@@ -1692,7 +1498,7 @@ struct OneBee : Enemy
 		scale = vec2({864 / 8.f, 480 / 8.f});
 		rotatePower = 1.f;
 		speedMultiplier = 3.0f;
-		collisionBullet = buzz;
+		collisionBullet = playerSpeedUp;
 	};
 };
 
@@ -1752,8 +1558,8 @@ struct ThreeBee : Enemy
 	const AttackData beeSpray{
 		EnemyAttackPattern::SPRAY,
 		TRIANGLE,
-		{numBulletsUpA, dmgDownA},
-		sluggish,
+		{numBulletsUp, dmgDown},
+		playerSpeedDown,
 		15,
 		M_PI,
 		{20, 20},
@@ -1965,8 +1771,8 @@ struct BossBeeHive : Enemy
 	const AttackData radialBeehiveBurst1{
 		EnemyAttackPattern::BURST_RADIAL,
 		TRIANGLE,
-		{numBulletsUpA, dmgDownA},
-		buzz,
+		{numBulletsUp, dmgDown},
+		playerSpeedUp,
 		128,
 		M_PI / 20,
 		{20, 20},
@@ -1980,8 +1786,8 @@ struct BossBeeHive : Enemy
 	const AttackData radialBeehiveBurst2{
 		EnemyAttackPattern::BURST_RADIAL,
 		TRIANGLE,
-		{numBulletsUpA, dmgDownA},
-		sluggish,
+		{numBulletsUp, dmgDown},
+		playerSpeedDown,
 		192,
 		-M_PI / 20,
 		{20, 20},
@@ -2038,7 +1844,7 @@ struct BeehiveGun : Enemy
 	const AttackData beehivesentry{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{APRounds, bulletSpeedUpA},
+		{bulletPierceUp, bulletSpeedUp},
 		blunt,
 		1,
 		0.0,
@@ -2102,8 +1908,8 @@ struct EvilSkull : Enemy
 	const AttackData laser2{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		8,
 		0,
 		{20, 20},
@@ -2117,8 +1923,8 @@ struct EvilSkull : Enemy
 	const AttackData laser1{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		8,
 		M_PI / 8.f,
 		{20, 20},
@@ -2261,18 +2067,12 @@ struct Sword : Enemy
 
 struct Mage : Enemy
 {
-	const BulletStackEffect playerSpeedDownABig = {
-		PlayerSpeed,
-		Additive,
-		-60,
-		"Movement Speed Down Big (+)",
-		""};
 
 	const AttackData launch{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{bulletBounceUpA},
-		buzz,
+		{bulletBounceUp},
+		playerSpeedUp,
 		8,
 		M_PI / 8.f,
 		{5, 5},
@@ -2286,8 +2086,8 @@ struct Mage : Enemy
 	const AttackData wave{
 		EnemyAttackPattern::WAVE,
 		TRIANGLE,
-		{ dmgUpA},
-		buzz,
+		{ dmgUp},
+		playerSpeedUp,
 		5,
 		0,
 		{20, 20},
@@ -2302,7 +2102,7 @@ struct Mage : Enemy
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
 		{},
-		buzz,
+		playerSpeedUp,
 		1,
 		0,
 		{20, 20},
@@ -2317,8 +2117,8 @@ struct Mage : Enemy
 	const AttackData sniperShot{
 		EnemyAttackPattern::BURST,
 		TRIANGLE,
-		{dmgUpM, bulletRangeUpM},
-		APRounds,
+		{dmgUp, bulletRangeDown},
+		bulletPierceUp,
 		3,
 		0,
 		{30, 20},
@@ -2477,7 +2277,7 @@ struct BioBoid : Enemy
 		};
 		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
-		collisionBullet = buzz;
+		collisionBullet = playerSpeedUp;
 	}
 };
 
@@ -2547,7 +2347,7 @@ struct MedBoid : Enemy
 		};
 		scale = vec2({25.f, 25.f});
 		patternIndex = 0;
-		collisionBullet = serum;
+		collisionBullet = sizeUp;
 	}
 };
 
@@ -2557,7 +2357,7 @@ struct Scissors : Enemy
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
 		{},
-		buzz,
+		playerSpeedUp,
 		1,
 		0,
 		{20, 20},
@@ -2678,7 +2478,7 @@ struct BigBoulder : Enemy
 		EnemyAttackPattern::TRAIL,
 		TRIANGLE,
 		{},
-		buzz,
+		playerSpeedUp,
 		1,
 		0,
 		{80, 80},
@@ -2910,7 +2710,7 @@ struct HifiSniper : Enemy
 	const AttackData HifiSniperShot{
 		EnemyAttackPattern::BURST,
 		TRIANGLE,
-		{bulletPierceUpAII, bulletSpeedUpM},
+		{bulletPierceDown, bulletSpeedDown},
 		blunt,
 		4,
 		0,
@@ -2924,7 +2724,7 @@ struct HifiSniper : Enemy
 	const AttackData spray{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{numBulletsUpA, playerSpeedDownM},
+		{numBulletsUp, playerSpeedDown},
 		blunt,
 		3,
 		M_PI / 12,
@@ -2967,7 +2767,7 @@ struct HifiSniperHard : Enemy
 	const AttackData sniperShot{
 		EnemyAttackPattern::BURST,
 		TRIANGLE,
-		{APRounds, dmgUpM, bulletRangeUpM},
+		{bulletPierceUp, dmgUp, bulletRangeDown},
 		blunt,
 		3,
 		0,
@@ -2981,7 +2781,7 @@ struct HifiSniperHard : Enemy
 	const AttackData spray{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{numBulletsUpA, spreadUpA},
+		{numBulletsUp, spreadUp},
 		blunt,
 		3,
 		M_PI / 12,
@@ -3098,7 +2898,7 @@ struct HifiTrail : Enemy
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
 		{},
-		buzz,
+		playerSpeedUp,
 		1,
 		0,
 		{20, 20},
@@ -3113,7 +2913,7 @@ struct HifiTrail : Enemy
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{numBulletsUpA, dmgDownM},
+		{numBulletsUp, dmgDown},
 		blunt,
 		12,
 		0.0,
@@ -3212,7 +3012,7 @@ struct HifiTrailHard : Enemy
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
 		{},
-		buzz,
+		playerSpeedUp,
 		1,
 		0,
 		{20, 20},
@@ -3227,7 +3027,7 @@ struct HifiTrailHard : Enemy
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{numBulletsUpA, dmgDownM},
+		{numBulletsUp, dmgDown},
 		blunt,
 		12,
 		0.0,
@@ -3322,17 +3122,11 @@ struct HifiJellyFish : Enemy
 	/**
 	 * Jellyfish pattern attacks
 	 */
-	const BulletStackEffect playerSpeedDownASmall = {
-		PlayerSpeed,
-		Additive,
-		-30,
-		"Movement Speed Down Small (+)",
-		""};
 
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{numBulletsUpA, playerSpeedDownASmall},
+		{numBulletsUp, playerSpeedDown},
 		blunt,
 		10,
 		0.0,
@@ -3346,7 +3140,7 @@ struct HifiJellyFish : Enemy
 	const AttackData spiky{
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
-		{numBulletsUpA, dashCDRDownA},
+		{numBulletsUp, dashCDRDown},
 		blunt,
 		6,
 		0.0,
@@ -3468,18 +3262,12 @@ struct HifiTackShooter : Enemy
 	/**
 	 * Stationary turret that attacks within a range around it
 	 */
-	const BulletStackEffect playerSpeedDownASmall = {
-		PlayerSpeed,
-		Additive,
-		-30,
-		"Movement Speed Down Small (+)",
-		""};
 
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
-		{APRounds},
-		sluggish,
+		{bulletPierceUp},
+		playerSpeedDown,
 		10,
 		0.0,
 		{20, 20},
@@ -3559,17 +3347,11 @@ struct HifiBallLauncher : Enemy
 	/**
 	 *
 	 */
-	const BulletStackEffect playerSpeedDownASmall = {
-		PlayerSpeed,
-		Additive,
-		-30,
-		"Movement Speed Down Small (+)",
-		""};
 
 	const AttackData launch{
 		EnemyAttackPattern::RADIAL,
 		CIRCLE,
-		{bulletBounceUpM, bulletBounceUpA},
+		{bulletBounceDown, bulletBounceUp},
 		blunt,
 		4,
 		M_PI / 4.f,
@@ -3639,7 +3421,7 @@ struct HifiWhip : Enemy
 	const AttackData whip{
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
-		{dmgUpA},
+		{dmgUp},
 		blunt,
 		2,
 		-M_PI / 4.f,
@@ -3706,8 +3488,8 @@ struct HifiCannon : Enemy
 	const AttackData cannonShot{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{SniperPower, SniperSpeed, sizeUpM},
-		{fireRateDownM},
+		{dmgUp, bulletSpeedUp, sizeUp},
+		{fireRateDown},
 		2,
 		M_PI / 2,
 		{60, 60},
@@ -3721,7 +3503,7 @@ struct HifiCannon : Enemy
 	const AttackData cluster{
 		EnemyAttackPattern::BURST,
 		CIRCLE,
-		{numBulletsUpA, bulletSpeedUpM},
+		{numBulletsUp, bulletSpeedDown},
 		blunt,
 		4,
 		0,
@@ -3768,8 +3550,8 @@ struct HifiCannonHard : Enemy
 	const AttackData cannonShot{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{SniperPower, SniperSpeed},
-		{playerSpeedDownM},
+		{dmgUp, bulletSpeedUp},
+		{playerSpeedDown},
 		2,
 		M_PI / 2,
 		{120, 120},
@@ -3833,7 +3615,7 @@ struct HifiBossEnemy : Enemy
 		EnemyAttackPattern::TRAIL,
 		CIRCLE,
 		{},
-		buzz,
+		playerSpeedUp,
 		1,
 		0,
 		{20, 20},
@@ -3848,7 +3630,7 @@ struct HifiBossEnemy : Enemy
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{numBulletsUpA, dmgDownM},
+		{numBulletsUp, dmgDown},
 		blunt,
 		12,
 		0.0,
@@ -3959,7 +3741,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnLaserRotating{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{sizeUpA},
+		{sizeUp},
 		blunt,
 		1,
 		0,
@@ -4013,7 +3795,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnLaserHorizontal{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{sizeUpA},
+		{sizeUp},
 		blunt,
 		5,
 		0,
@@ -4031,7 +3813,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnLaserVertical{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{sizeUpA},
+		{sizeUp},
 		blunt,
 		5,
 		0,
@@ -4049,7 +3831,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnTurret{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{sizeUpA},
+		{sizeUp},
 		blunt,
 		2,
 		0,
@@ -4067,7 +3849,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnExplosive{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{sizeUpA},
+		{sizeUp},
 		blunt,
 		2,
 		0,
@@ -4085,7 +3867,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnShield{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{dashCDRUpA},
+		{dashCDRUp},
 		blunt,
 		1,
 		0,
@@ -4103,7 +3885,7 @@ struct ScientistBossEnemy : Enemy
 	const AttackData spawnHand{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{dashCDRUpA},
+		{dashCDRUp},
 		blunt,
 		1,
 		0,
@@ -4121,8 +3903,8 @@ struct ScientistBossEnemy : Enemy
 	const AttackData lethalShot{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{dmgDownM},
-		dmgDownA,
+		{dmgDown},
+		dmgDown,
 		1,
 		M_PI,
 		{20, 20},
@@ -4136,8 +3918,8 @@ struct ScientistBossEnemy : Enemy
 	const AttackData laserBoss{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		8,
 		0,
 		{0, 20},
@@ -4166,8 +3948,8 @@ struct ScientistBossEnemy : Enemy
 	const AttackData boidFishSummon{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
-		{numBulletsUpA},
-		playerSpeedDownA,
+		{numBulletsUp},
+		playerSpeedDown,
 		30,
 		M_PI,
 		{20, 20},
@@ -4249,7 +4031,7 @@ struct InvisibleTurretEnemy : Enemy
 	const AttackData radialScientistBurst{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{numBulletsUpA, dmgDownA},
+		{numBulletsUp, dmgDown},
 		blunt,
 		100,
 		-M_PI / 20,
@@ -4287,8 +4069,8 @@ struct InvisibleRotateLaserEnemy : Enemy
 	const AttackData laserRotateBoss{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{APRounds},
-		dashCDRDownA,
+		{bulletPierceUp},
+		dashCDRDown,
 		8,
 		0,
 		{0, 20},
@@ -4328,8 +4110,8 @@ struct InvisibleLaserEnemy : Enemy
 	const AttackData laserGrid{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		1,
 		0,
 		{20, 20},
@@ -4367,8 +4149,8 @@ struct InvisibleLaserEnemyVertical : Enemy
 	const AttackData laserGrid{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{dashUpA},
-		dashCDRDownA,
+		{dashUp},
+		dashCDRDown,
 		1,
 		M_PI / 2.f,
 		{20, 20},
@@ -4403,8 +4185,8 @@ struct InvisibleExplosiveEnemy : Enemy
 	const AttackData ScientistCannonShot{
 		EnemyAttackPattern::RADIAL_POLYGON,
 		CIRCLE,
-		{bulletBounceUpM},
-		{bulletPierceUpA},
+		{bulletBounceDown},
+		{bulletPierceUp},
 		5,
 		M_PI / 16,
 		{50, 50},
@@ -4486,7 +4268,7 @@ struct ScientistHandEnemy : Enemy
 	const AttackData HandBomb{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{numBulletsUpA, dmgDownA},
+		{numBulletsUp, dmgDown},
 		blunt,
 		7,
 		-M_PI / 20,
@@ -4502,8 +4284,8 @@ struct ScientistHandEnemy : Enemy
 	const AttackData laserOne{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{numBulletsUpA, dmgDownA},
-		dmgDownA,
+		{numBulletsUp, dmgDown},
+		dmgDown,
 		1,
 		M_PI,
 		{100, 100},
@@ -4533,8 +4315,8 @@ struct ScientistHandEnemy : Enemy
 	const AttackData sprayingShot{
 		EnemyAttackPattern::SPRAY,
 		CIRCLE,
-		{numBulletsUpA},
-		playerSpeedDownA,
+		{numBulletsUp},
+		playerSpeedDown,
 		50,
 		-M_PI / 20,
 		{20, 20},
@@ -4548,8 +4330,8 @@ struct ScientistHandEnemy : Enemy
 	const AttackData sprayHoming{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{dmgDownM},
-		playerSpeedUpA,
+		{dmgDown},
+		playerSpeedUp,
 		20,
 		-M_PI / 20,
 		{20, 20},
@@ -4563,8 +4345,8 @@ struct ScientistHandEnemy : Enemy
 	const AttackData laserArea{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{numBulletsUpA},
-		dmgDownA,
+		{numBulletsUp},
+		dmgDown,
 		1,
 		M_PI / 2,
 		{75, 75},
@@ -4617,7 +4399,6 @@ struct ScientistHandEnemy : Enemy
 		speedMultiplier = 4.f;
 		collisionBullet = {
 			Pop,
-			Additive,
 			0,
 			"Pop the stack",
 			""

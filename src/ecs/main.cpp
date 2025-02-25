@@ -137,12 +137,11 @@ int main() {
 		renderer.drawBackgroundElements();
 		particleSystem.render();
 		renderer.drawGameElements();
-		renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS1));
+		renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS1));	// Chromatic Abberation
 		renderer.drawGameOverlayUI();
 		textSystem.renderGameOverlayUIText();
 		renderer.drawGameUI();
 		textSystem.renderGameUIText();
-		if (ioSystem.isPaused() || ioSystem.isGameOver()) renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS3));
 		renderer.drawDialogueUI();
 		textSystem.renderDialogueUIText();
 		renderer.drawMenuUI();
@@ -150,7 +149,8 @@ int main() {
 		renderer.drawMenuOverlayUI();
 		textSystem.renderMenuOverlayUIText();
 		renderer.drawCursor();
-		renderer.drawToScreenFinal(); //postprocessing
+		if (ioSystem.isPaused() || ioSystem.isGameOver()) renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS3)); // Wibbly wobbly effect
+		renderer.drawToScreenFinal(); // Final postprocessing
 
 		glfwSwapBuffers(window);
 	}

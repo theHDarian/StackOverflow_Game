@@ -96,7 +96,7 @@ void UISystem::step(float elapsed_ms) {
 			// process hovered
 			int lastChoice = registry.ioStates.components[0].lastHoverMenuChoice;
 			int hoveringChoice = registry.ioStates.components[0].hoveringMenuChoice;
-			
+
 			int currHover = 0;
 			// process mouse hovered
 			for (Entity button : registry.buttons.entities) {
@@ -134,7 +134,7 @@ void UISystem::step(float elapsed_ms) {
 					UIButton& buttonComponent = registry.buttons.get(button);
 					if (ioState.mousePosition.x > (buttonComponent.position.x - buttonComponent.buttonSize.x / 2) && ioState.mousePosition.x < (buttonComponent.position.x + buttonComponent.buttonSize.x / 2)
 						&& ioState.mousePosition.y >(buttonComponent.position.y - buttonComponent.buttonSize.y / 2) && ioState.mousePosition.y < (buttonComponent.position.y + buttonComponent.buttonSize.y / 2)) {
-						if (count == hoveringChoice) { 
+						if (count == hoveringChoice) {
 							clickedButtonIndex = count;
 							break;
 						}
@@ -152,7 +152,7 @@ void UISystem::step(float elapsed_ms) {
 				ioState.clickedButton = false;
 				registry.ioStates.components[0].lastHoverMenuChoice = -1;
 				registry.ioStates.components[0].hoveringMenuChoice = -1;
-				
+
 				if (registry.menus.get(registry.activeMenus.entities[ioState.activeMenu]).type == MenuType::TitleMenu) {
 					if (clickedButtonIndex == 0) {
 						gameState.titleScreen = false;
@@ -221,58 +221,19 @@ void UISystem::step(float elapsed_ms) {
 	StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
 	StackUI& stackui = registry.stackUI.get(stackUI);
 
-	// update bullet ui positions, add stack notifs
+	// update bullet ui positions
 	if (stack.currStack.size() > stackui.bulletPositions.size()) {
-
-		// clean up stack add notifs
-		for (int i = registry.stackAddNotifs.size() - 1; i >= 0; i--) {
-			Entity e = registry.stackAddNotifs.entities[i];
-			registry.deleteEntityAndRelatedEntities(e);
-		}
-
 		int diff = stack.currStack.size() - stackui.bulletPositions.size();
-		// set up bubble first
 		vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
-		registry.renderRequests.get(stackAddBubble).show = true;
-		registry.renderRequests.get(stackAddTail).show = true;
-		updateStackAddBubble(playerPos, diff);
-		
-		if (!registry.showTimers.has(stackAddBubble)) {
-			if (registry.fades.has(stackAddBubble)) {
-				registry.fades.remove(stackAddBubble);
-				registry.fades.remove(stackAddTail);
-			}
-			registry.showTimers.emplace(stackAddBubble);
-			registry.showTimers.emplace(stackAddTail);
-		}
-		
 		vec2 bulletStartPos = playerPos;
 		for (int i = 0; i < diff; i++) {
 			int index = i + stack.currStack.size() - diff;
 			stackui.bulletPositions.push_back(vec2(stackui.bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset,
 				stackui.bulletStartPos.y));
-			// can notify player when stack has changed here
-			// NOTE: does not work for lightning bullets. Lightning bullets detected in handle player collision 
-			// this spawn position is also v incorrect, corrected later in usual update
-			createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y), 
-				registry.stackUI.components[0].bulletSize* STACK_NOTIF_SCALE,
-				bulletEffectShapes.at(stack.currStack[index].type),
-				bulletEffectColors.at(stack.currStack[index].type));
-			std::string message = stack.currStack[index].name + " added onto the stack";
-			Entity notif = createNotifMessage(message);
-
-			// highlight bullet effect name
-			// do a special check for keys, but can alternatively make all non-bullet items share a colour (teal?)
-			if (stack.currStack[index].type == Key) {
-				registry.textRenderRequests.get(notif).decorations.push_back(
-					TextDecorationSpan{ 0, stack.currStack[index].name.length(), COLOR_YELLOW });
-			}
-			else {
-				registry.textRenderRequests.get(notif).decorations.push_back(
-					TextDecorationSpan{ 0, stack.currStack[index].name.length(), bulletEffectColors.at(stack.currStack[index].type) });
-			}
-			
 		}
+	}
+	else if (stack.currStack.size() < stackui.bulletPositions.size()) {
+		stackui.bulletPositions.resize(stack.currStack.size());
 	}
 
 	// clean up stack add notifs that have faded out
@@ -284,19 +245,27 @@ void UISystem::step(float elapsed_ms) {
 
 	// handle ui requests
 	for (UIRequest& uiRequest : registry.uiRequests.components) {
-		if (uiRequest.type == UIRequestType::StackNotifReqShift 
-			|| uiRequest.type == UIRequestType::StackNotifReqShuffle 
-			|| uiRequest.type == UIRequestType::CallNotif) {
-			// clean up stack add notifs
+		if (uiRequest.type == UIRequestType::StackNotifReqShift
+			|| uiRequest.type == UIRequestType::StackNotifReqShuffle
+			|| uiRequest.type == UIRequestType::CallNotif
+			|| uiRequest.type == UIRequestType::StackNotifBullet) {
+
+			// clean up previous stack add notifs
 			for (int i = registry.stackAddNotifs.size() - 1; i >= 0; i--) {
 				Entity e = registry.stackAddNotifs.entities[i];
 				registry.deleteEntityAndRelatedEntities(e);
 			}
-			
+
 			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
 			registry.renderRequests.get(stackAddBubble).show = true;
 			registry.renderRequests.get(stackAddTail).show = true;
-			updateStackAddBubble(playerPos,1);
+
+			if (uiRequest.effects.size() > 0) {
+				updateStackAddBubble(playerPos, uiRequest.effects.size());
+			}
+			else {
+				updateStackAddBubble(playerPos, 1);
+			}
 
 			if (!registry.showTimers.has(stackAddBubble)) {
 				if (registry.fades.has(stackAddBubble)) {
@@ -306,261 +275,295 @@ void UISystem::step(float elapsed_ms) {
 				registry.showTimers.emplace(stackAddBubble);
 				registry.showTimers.emplace(stackAddTail);
 			}
+
 			vec2 bulletStartPos = playerPos;
-			std::string sprite = "stackNotifShift.png";
-			std::string message = "Stack has been shifted by 1";
-			if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
-				sprite = "stackNotifShuffle.png";
-				message = "Stack has been shuffled";
+
+			if (uiRequest.effects.size() > 0 && uiRequest.type == UIRequestType::StackNotifBullet) {
+				for (int index = 0; index < uiRequest.effects.size(); index++) {
+					createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y),
+						registry.stackUI.components[0].bulletSize * STACK_NOTIF_SCALE,
+						bulletEffectShapes.at(uiRequest.effects[index].type),
+						bulletEffectColors.at(uiRequest.effects[index].type),
+						uiRequest.effects[index]);
+					// build the effect value string, reporting values that aren't 0
+					std::string valueString = "";
+					if (uiRequest.effects[index].value != 0) {
+						valueString += " ";
+						if (uiRequest.effects[index].value > 0) {
+							valueString += "+";
+						}
+						valueString += std::to_string(uiRequest.effects[index].value);
+					}
+
+					std::string message = uiRequest.effects[index].name + valueString + " added onto the stack";
+					Entity notif = createNotifMessage(message);
+
+					// highlight bullet effect name
+					// do a special check for keys, but can alternatively make all non-bullet items share a colour (teal?)
+					if (uiRequest.effects[index].type == Key) {
+						registry.textRenderRequests.get(notif).decorations.push_back(
+							TextDecorationSpan{ 0, uiRequest.effects[index].name.length(), COLOR_YELLOW });
+					}
+					else {
+						registry.textRenderRequests.get(notif).decorations.push_back(
+							TextDecorationSpan{ 0, uiRequest.effects[index].name.length() + valueString.length(), bulletEffectColors.at(uiRequest.effects[index].type) });
+					}
+				}
 			}
-			else if (uiRequest.type == UIRequestType::CallNotif) {
-				sprite = "callNotif.png";
-			}
-
-			createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, sprite, vec3(1));
-
-			if (uiRequest.type == UIRequestType::StackNotifReqShuffle ||
-				uiRequest.type == UIRequestType::StackNotifReqShift) {
-				Entity notif = createNotifMessage(message);
-				std::string shifted = "shifted";
-				std::string shuffled = "shuffled";
-
+			else {
+				std::string sprite = "stackNotifShift.png";
+				std::string message = "Shifted stack by 1";
 				if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
-					registry.textRenderRequests.get(notif).decorations.push_back(
-						TextDecorationSpan{ message.find(shuffled), message.find(shuffled) + shuffled.length() - 1, COLOR_YELLOW });
+					sprite = "stackNotifShuffle.png";
+					message = "Shuffled stack";
+				}
+				else if (uiRequest.type == UIRequestType::CallNotif) {
+					sprite = "callNotif.png";
+				}
+
+				createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, sprite, vec3(1), BulletStackEffect());
+
+				if (uiRequest.type == UIRequestType::StackNotifReqShuffle ||
+					uiRequest.type == UIRequestType::StackNotifReqShift) {
+					Entity notif = createNotifMessage(message);
+					std::string shifted = "shifted";
+					std::string shuffled = "shuffled";
+
+					if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
+						registry.textRenderRequests.get(notif).decorations.push_back(
+							TextDecorationSpan{ 0, shuffled.length(), COLOR_YELLOW });
+					}
+					else {
+						registry.textRenderRequests.get(notif).decorations.push_back(
+							TextDecorationSpan{ 0, shifted.length(), COLOR_TURQUOISE });
+					}
+				}
+			}
+		}
+
+			if (uiRequest.type == UIRequestType::ResetUI) {
+				DialogueLines& lines = registry.dialogueLines.components[0];
+				lines = DialogueLines();
+				DrawingText& drawingText = registry.drawingTexts.get(dialogueBox);
+				drawingText = DrawingText();
+
+				for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
+					Entity e = registry.dialogueChoices.entities[i];
+					registry.deleteEntityAndRelatedEntities(e);
+				}
+				for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
+					Entity e = registry.menuChoices.entities[i];
+					registry.deleteEntityAndRelatedEntities(e);
+				}
+				for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+					Entity e = registry.notifMessages.entities[i];
+					registry.deleteEntityAndRelatedEntities(e);
+				}
+
+				registry.activeMenus.clear();
+				ioState.activeMenu = -1;
+				registry.renderRequests.get(stackAddBubble).show = false;
+				registry.renderRequests.get(stackAddTail).show = false;
+				registry.renderRequests.get(controlsGuide).show = false;
+				registry.renderRequests.get(flashMessageDisplay).show = false;
+				registry.textRenderRequests.get(roomName).decorations.clear();
+				registry.textRenderRequests.get(roomCounter).decorations.clear();
+			}
+
+			if (uiRequest.type == UIRequestType::GameOverReport) {
+				//std::cout << "Game over report!" << std::endl;
+				TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
+				std::string report = "\n" + reportStats();
+				std::vector<std::string> reportTokenized = getTokenizedText(report);
+				text.formattedText = uiTexts["GameOver"];
+				text.formattedText.insert(text.formattedText.end(), reportTokenized.begin(), reportTokenized.end());
+				text.formattedText = getFormattedText(text.formattedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
+				registry.activeMenus.emplace(registry.menus.entities[MenuType::GameOverMenu]);
+				ioState.activeMenu++;
+			}
+
+			if (uiRequest.type == UIRequestType::DisplayFlashMessage) {
+				updateFlashMessageDisplay(uiRequest.text);
+				// lazy -- only play for room cleared. Should either use a separate req or at least a string constant
+				if (uiRequest.text.compare("Room Cleared") == 0) {
+					soundSystem->playRareItemPickupSound();
+				}
+				else if (uiRequest.text == "Boss Defeated") {
+					soundSystem->playFanFareSound();
+				}
+			}
+	}
+
+		registry.uiRequests.clear();
+
+		// move position of bullet add notif
+		if (registry.stackAddNotifs.entities.size() > 0) {
+			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+			vec2 bulletStartPos = playerPos + abs(registry.motions.get(registry.players.entities[0]).scale) * vec2(1, -1);
+			updateStackAddBubble(bulletStartPos, registry.stackAddNotifs.entities.size());
+			int index = 0;
+			for (Entity entity : registry.stackAddNotifs.entities) {
+				registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * STACK_NOTIF_SCALE + index * stackui.bulletOffset * STACK_NOTIF_SCALE, bulletStartPos.y);
+				index++;
+			}
+			if (registry.showTimers.has(registry.stackAddNotifs.entities[0])) {
+				registry.showTimers.get(stackAddBubble).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
+				registry.showTimers.get(stackAddTail).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
+			}
+		}
+
+		// move positions of notif messages
+		if (registry.notifMessages.size() > 0) {
+			// clean up notifs that have faded out
+			for (int i = 0; i < registry.notifMessages.size(); i++) {
+				Entity e = registry.notifMessages.entities[i];
+				if (!registry.renderRequests.get(e).show) {
+					registry.deleteEntityAndRelatedEntities(e);
+				}
+			}
+
+			vec2 startingPosition = vec2(50, ws.height);
+			for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
+				Entity messageEntity = registry.notifMessages.entities[i];
+				TextRenderRequest& text = registry.textRenderRequests.get(messageEntity);
+				startingPosition.y -= (text.formattedText.size()) * 50;
+				text.x = startingPosition.x;
+				text.y = ws.height - startingPosition.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
+			}
+		}
+
+		if (gameState.gamePaused || gameState.dialogueScene || registry.maps.components[0].currRoom.cleared || gameState.gameOver) {
+			// is the player hovering over a stack ui bullet right now?
+			// bad: copies code from render system; consider making each bullet an entity
+			// may optimize using some other method like colour picking/just limiting search size
+			// in the future (since search space is pretty deterministic)
+			int bulletHoveredIndex = -1;
+			int count = -1;
+			vec2 bulletSize = stackui.bulletSize;
+			// should check first: is it in stack ui at all?
+			// this is point in aabb detection
+			if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+				&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+				for (vec2 bulletPos : stackui.bulletPositions) {
+					count++;
+					if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+						&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+						bulletHoveredIndex = count;
+						break;
+					}
+				}
+				if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
+					updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset,
+						stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+				}
+				else if (bulletHoveredIndex == -1) {
+					registry.renderRequests.get(bulletUI).show = false;
+					registry.renderRequests.get(bulletUIArrow).show = false;
 				}
 				else {
-					registry.textRenderRequests.get(notif).decorations.push_back(
-						TextDecorationSpan{ message.find(shifted), message.find(shifted) + shifted.length() - 1, COLOR_TURQUOISE });
 				}
-			}	
-		}
-
-		if (uiRequest.type == UIRequestType::ResetUI) {
-			DialogueLines& lines = registry.dialogueLines.components[0];
-			lines = DialogueLines();
-			DrawingText& drawingText = registry.drawingTexts.get(dialogueBox);
-			drawingText = DrawingText();
-
-			for (int i = registry.dialogueChoices.size() - 1; i >= 0; i--) {
-				Entity e = registry.dialogueChoices.entities[i];
-				registry.deleteEntityAndRelatedEntities(e);
+				lastHoveredBullet = bulletHoveredIndex;
 			}
-			for (int i = registry.menuChoices.size() - 1; i >= 0; i--) {
-				Entity e = registry.menuChoices.entities[i];
-				registry.deleteEntityAndRelatedEntities(e);
-			}
-			for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
-				Entity e = registry.notifMessages.entities[i];
-				registry.deleteEntityAndRelatedEntities(e);
-			}
-
-			registry.activeMenus.clear();
-			ioState.activeMenu = -1;
-			registry.renderRequests.get(stackAddBubble).show = false;
-			registry.renderRequests.get(stackAddTail).show = false;
-			registry.renderRequests.get(controlsGuide).show = false;
-			registry.renderRequests.get(flashMessageDisplay).show = false;
-		}
-
-		if (uiRequest.type == UIRequestType::GameOverReport) {
-			TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
-			std::string report = "\n" + reportStats();
-			std::vector<std::string> reportTokenized = getTokenizedText(report);
-			text.formattedText = uiTexts["GameOver"];
-			text.formattedText.insert(text.formattedText.end(), reportTokenized.begin(), reportTokenized.end());
-			text.formattedText = getFormattedText(text.formattedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
-			registry.activeMenus.emplace(registry.menus.entities[MenuType::GameOverMenu]);
-			ioState.activeMenu++;
-		}
-
-		if (uiRequest.type == UIRequestType::DisplayFlashMessage) {
-			updateFlashMessageDisplay(uiRequest.text);
-			// lazy -- only play for room cleared. Should either use a separate req or at least a string constant
-			if (uiRequest.text.compare("Room Cleared") == 0) {
-				soundSystem->playRareItemPickupSound();
-			} else if (uiRequest.text == "Boss Defeated") {
-				soundSystem->playFanFareSound();
-			}
-		}
-	}
-
-	registry.uiRequests.clear();
-
-	// move position of bullet add notif
-	if (registry.stackAddNotifs.entities.size() > 0) {
-		vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
-		vec2 bulletStartPos = playerPos + abs(registry.motions.get(registry.players.entities[0]).scale) * vec2(1, -1);
-		updateStackAddBubble(bulletStartPos, registry.stackAddNotifs.entities.size());
-		int index = 0;
-		for (Entity entity : registry.stackAddNotifs.entities) {
-			registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * STACK_NOTIF_SCALE + index * stackui.bulletOffset * STACK_NOTIF_SCALE, bulletStartPos.y);
-			index++;
-		}
-		if (registry.showTimers.has(registry.stackAddNotifs.entities[0])) {
-			registry.showTimers.get(stackAddBubble).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
-			registry.showTimers.get(stackAddTail).timer = registry.showTimers.get(registry.stackAddNotifs.entities[0]).timer;
-		}
-	}
-
-	// move positions of notif messages
-	if (registry.notifMessages.size() > 0) {
-		// clean up notifs that have faded out
-		for (int i = 0; i < registry.notifMessages.size(); i++) {
-			Entity e = registry.notifMessages.entities[i];
-			if (!registry.renderRequests.get(e).show) {
-				registry.deleteEntityAndRelatedEntities(e);
-			}	
-		}
-
-		vec2 startingPosition = vec2(50, ws.height);
-		for (int i = registry.notifMessages.size() - 1; i >= 0; i--) {
-			Entity messageEntity = registry.notifMessages.entities[i];
-			TextRenderRequest& text = registry.textRenderRequests.get(messageEntity);
-			startingPosition.y -= (text.formattedText.size()) * 50;
-			text.x = startingPosition.x;
-			text.y = ws.height - startingPosition.y - text.scale * DEFAULT_FONT_SIZE / 2.f;
-		}
-	}
-
-	else if (stack.currStack.size() < stackui.bulletPositions.size()) {
-		// much harder to know what bullets got removed from stack though
-		// need to rely on interact system for that (seems to be the only way bullets are popped?)
-		stackui.bulletPositions.resize(stack.currStack.size());
-	}
-
-	if (gameState.gamePaused || gameState.dialogueScene || registry.maps.components[0].currRoom.cleared || gameState.gameOver) {
-		// is the player hovering over a stack ui bullet right now?
-		// bad: copies code from render system; consider making each bullet an entity
-		// may optimize using some other method like colour picking/just limiting search size
-		// in the future (since search space is pretty deterministic)
-		int bulletHoveredIndex = -1;
-		int count = -1;
-		vec2 bulletSize = stackui.bulletSize;
-		// should check first: is it in stack ui at all?
-		// this is point in aabb detection
-		if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
-			&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
-			for (vec2 bulletPos : stackui.bulletPositions) {
-				count++;
-				if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
-					&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
-					bulletHoveredIndex = count;
-					break;
-				}
-			}
-			if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
-				updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset,
-					stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
-			}
-			else if (bulletHoveredIndex == -1) {
+			else {
 				registry.renderRequests.get(bulletUI).show = false;
 				registry.renderRequests.get(bulletUIArrow).show = false;
 			}
-			else {
+
+			for (Entity gaugeEntity : registry.gaugeVisuals.entities) {
+				if (!registry.deleteds.has(gaugeEntity)) {
+					registry.deleteds.emplace(gaugeEntity);
+				}
 			}
-			lastHoveredBullet = bulletHoveredIndex;
+
+			// update guages of all interactables whose timers have gone off
+			for (Entity interactEntity : registry.interactables.entities) {
+				InteractableObject& interactable = registry.interactables.get(interactEntity);
+				if (interactable.timer < interactable.base) {
+					// if don't already have gauge drawn, then make gauge ui
+					// else, just update timer
+					// dumb method: do like interact indicators, and just clear all prev frames
+					createInteractGauge(registry.motions.get(interactEntity).position, interactable.timer, interactable.base);
+				}
+			}
 		}
 		else {
 			registry.renderRequests.get(bulletUI).show = false;
 			registry.renderRequests.get(bulletUIArrow).show = false;
 		}
 
-		for (Entity gaugeEntity : registry.gaugeVisuals.entities) {
-			if (!registry.deleteds.has(gaugeEntity)) {
-				registry.deleteds.emplace(gaugeEntity);
-			}
-		}
+		if (!gameState.gameOver) {
+			// toggling basic menu uis on/off
+			registry.renderRequests.get(pauseMenu).show = gameState.gamePaused && !registry.renderRequests.get(controlsGuide).show;
+			registry.renderRequests.get(controlsGuide).show = registry.renderRequests.get(controlsGuide).show && gameState.gamePaused;
+			registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
+			registry.renderRequests.get(dialogueReminder).show = gameState.dialogueScene;
 
-		// update guages of all interactables whose timers have gone off
-		for (Entity interactEntity : registry.interactables.entities) {
-			InteractableObject& interactable = registry.interactables.get(interactEntity);
-			if (interactable.timer < interactable.base) {
-				// if don't already have gauge drawn, then make gauge ui
-				// else, just update timer
-				// dumb method: do like interact indicators, and just clear all prev frames
-				createInteractGauge(registry.motions.get(interactEntity).position, interactable.timer, interactable.base);
-			}
-		}
-	}
-	else {
-		registry.renderRequests.get(bulletUI).show = false;
-		registry.renderRequests.get(bulletUIArrow).show = false;
-	}
+			StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
+			StackUI& stackui = registry.stackUI.get(stackUI);
 
-	if (!gameState.gameOver) {
-		// toggling basic menu uis on/off
-		registry.renderRequests.get(pauseMenu).show = gameState.gamePaused && !registry.renderRequests.get(controlsGuide).show;
-		registry.renderRequests.get(controlsGuide).show = registry.renderRequests.get(controlsGuide).show && gameState.gamePaused;
-		registry.renderRequests.get(dialogueBox).show = gameState.dialogueScene;
-		registry.renderRequests.get(dialogueReminder).show = gameState.dialogueScene;
+			// update stack ui
+			registry.textRenderRequests.get(stackUI).text = "STACK: " + std::to_string(stack.currStack.size()) + " / " + std::to_string((int)getModifiedValue(PlayerStackSize, stack.baseStackSize));
 
-		StackCompile& stack = registry.stackCompile.get(registry.players.entities[0]);
-		StackUI& stackui = registry.stackUI.get(stackUI);
-
-		// update stack ui
-		registry.textRenderRequests.get(stackUI).text = "STACK: " + std::to_string(stack.currStack.size()) + " / " + std::to_string((int)getModifiedValue(PlayerStackSize, stack.baseStackSize));
-		
-		Map& map = registry.maps.components[0];
-		TextRenderRequest& roomCounterText = registry.textRenderRequests.get(roomCounter);
-		std::string region;
-		if (map.currRegion == Tutorial) region = "Tutorial";
-		if (map.currRegion == Biology) region = "Biology";
-		if (map.currRegion == Physics) region = "Physics";
-		roomCounterText.text = region + " Room " + std::to_string(map.roomsTraversed);
-		auto& roomNameTextComponent = registry.textRenderRequests.get(roomName);
-		auto& roomNameText = roomNameTextComponent.text;
-		roomNameText = map.currRoom.preset.ID;
-		if (map.currRoom.type == EnemyRoom || map.currRoom.type == BossRoom) {
-			if (map.currRoom.cleared) {
-				roomNameText += ", Cleared";
-				if (!roomNameTextComponent.decorations.empty())
-					roomNameTextComponent.decorations.clear();
-				if (!roomCounterText.decorations.empty())
-                    roomCounterText.decorations.clear();
-			}
-			else if (map.currRoom.spawnedElite) {
-				roomNameText += ", Wave ???";
-				if (roomNameTextComponent.decorations.empty()) {
-					roomNameTextComponent.decorations.push_back(TextDecorationSpan{ 0, roomNameText.length() - 1, COLOR_RED, WobblyText, std::make_shared<WobblyTextAnimation>(std::vector<float> { 12, 12 }) });
-					roomCounterText.decorations.push_back(TextDecorationSpan{ 0, roomCounterText.text.length() - 1, COLOR_RED, WobblyText, std::make_shared<WobblyTextAnimation>(std::vector<float> { 12, 12 }) });
+			Map& map = registry.maps.components[0];
+			TextRenderRequest& roomCounterText = registry.textRenderRequests.get(roomCounter);
+			std::string region;
+			if (map.currRegion == Tutorial) region = "Tutorial";
+			if (map.currRegion == Biology) region = "Biology";
+			if (map.currRegion == Physics) region = "Physics";
+			roomCounterText.text = region + " Room " + std::to_string(map.roomsTraversed);
+			auto& roomNameTextComponent = registry.textRenderRequests.get(roomName);
+			auto& roomNameText = roomNameTextComponent.text;
+			roomNameText = map.currRoom.preset.ID;
+			if (map.currRoom.type == EnemyRoom || map.currRoom.type == BossRoom) {
+				if (map.currRoom.cleared) {
+					roomNameText += ", Cleared";
+					if (!roomNameTextComponent.decorations.empty())
+						roomNameTextComponent.decorations.clear();
+					if (!roomCounterText.decorations.empty())
+						roomCounterText.decorations.clear();
 				}
-			}
-			else {
-				roomNameText += ", Wave " + std::to_string(map.currRoom.currentWave);
-			}
-		}
-
-		if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
-			registry.renderRequests.get(dialogueAvatar).show = false;
-			registry.renderRequests.get(screenCutIn).show = false;
-			// clear prev frame's e indicators
-			for (Entity entity : registry.interactIndicators.entities) {
-				if (!registry.deleteds.has(entity)) {
-					registry.deleteds.emplace(entity);
+				else if (map.currRoom.spawnedElite) {
+					roomNameText += ", Wave ???";
+					if (roomNameTextComponent.decorations.empty()) {
+						roomNameTextComponent.decorations.push_back(TextDecorationSpan{ 0, roomNameText.length() - 1, COLOR_RED, WobblyText, std::make_shared<WobblyTextAnimation>(std::vector<float> { 12, 12 }) });
+						roomCounterText.decorations.push_back(TextDecorationSpan{ 0, roomCounterText.text.length() - 1, COLOR_RED, WobblyText, std::make_shared<WobblyTextAnimation>(std::vector<float> { 12, 12 }) });
+					}
+				}
+				else {
+					roomNameText += ", Wave " + std::to_string(map.currRoom.currentWave);
 				}
 			}
 
-			// draw "press e to interact" over all items in nearby interactables list
-			for (Entity entity : registry.nearbyInteractables.entities) {
-				createInteractIndicator(registry.motions.get(entity).position);
+			if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
+				registry.renderRequests.get(dialogueAvatar).show = false;
+				registry.renderRequests.get(screenCutIn).show = false;
+				// clear prev frame's e indicators
+				for (Entity entity : registry.interactIndicators.entities) {
+					if (!registry.deleteds.has(entity)) {
+						registry.deleteds.emplace(entity);
+					}
+				}
+
+				// draw "press e to interact" over all items in nearby interactables list
+				for (Entity entity : registry.nearbyInteractables.entities) {
+					createInteractIndicator(registry.motions.get(entity).position);
+				}
+
 			}
-		
-		} 
-		if (gameState.dialogueScene) {
-			// update which dialogue choice is highlighted. Consider updating only when necessary?
-			if (registry.dialogueChoices.entities.size() > 0) {
-				int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
-				int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
-				// unhighlight the last hovered choice
-				registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
-				registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
-				// highlight current choice
-				registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
-				registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
+			if (gameState.dialogueScene) {
+				// update which dialogue choice is highlighted. Consider updating only when necessary?
+				if (registry.dialogueChoices.entities.size() > 0) {
+					int lastChoice = registry.ioStates.components[0].lastHoverDialogueChoice;
+					int hoveringChoice = registry.ioStates.components[0].hoveringDialogueChoice;
+					// unhighlight the last hovered choice
+					registry.renderRequests.get(registry.dialogueChoices.entities[lastChoice]).show = false;
+					registry.textRenderRequests.get(registry.dialogueChoices.entities[lastChoice]).color = vec3(1, 1, 1);
+					// highlight current choice
+					registry.renderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).show = true;
+					registry.textRenderRequests.get(registry.dialogueChoices.entities[hoveringChoice]).color = vec3(1, 1, 0);
+				}
 			}
 		}
-	}
 }
 
 bool UISystem::init(GLFWwindow* window) {
@@ -610,11 +613,19 @@ void UISystem::playDialogue() {
 			text.text = nextLine.text;
 			text.decorations = nextLine.decorations;
 
+			// TODO: remove later
+			text.y = wS.height - registry.motions.get(dialogueBox).position.y + registry.motions.get(dialogueBox).scale.y / 2 - DEFAULT_FONT_SIZE * 1.5;
+
 			// check if any script variables need to be bound
 			if (registry.interactableInDialogue.entities.size() > 0) {
 				InteractableObject& currItem = registry.interactables.get(registry.interactableInDialogue.entities[0]);
 				if (currItem.scriptVariables.size() > 0) {
 					bindScriptVariables(text, currItem.scriptVariables, currItem.decorations);
+				}
+
+				// TODO: remove later
+				if (currItem.name.compare("SkipTutorial") == 0) {
+					text.y = wS.height - 100;
 				}
 			}
 
@@ -884,7 +895,7 @@ Entity UISystem::createStackAddBubble() {
 	return entity;
 }
 
-Entity UISystem::createStackAddNotif(vec2 position, vec2 scale, std::string sprite, vec3 c) {
+Entity UISystem::createStackAddNotif(vec2 position, vec2 scale, std::string sprite, vec3 c, BulletStackEffect effect) {
 	Entity entity = Entity();
 
 	Motion& motion = registry.motions.emplace(entity);
@@ -900,6 +911,12 @@ Entity UISystem::createStackAddNotif(vec2 position, vec2 scale, std::string spri
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.show = true;
+
+	if (effect.value != 0) {
+		rr.used_effect = EFFECT_ASSET_ID::BULLET;
+		EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+		bullet.bulletEffects = { effect };
+	}
 
 	registry.gameUIs.emplace(entity);
 
@@ -931,40 +948,60 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	Motion& motion = registry.motions.get(bulletUI);
 	WindowState& windowState = registry.windowStates.components[0];
-	motion.position = vec2(position.x, position.y + motion.scale.y / 2 + 50 + 10);
+	motion.position = position;
 	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
 		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
 	}
 	registry.renderRequests.get(bulletUI).show = true;
 
 	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
-	if (uiTexts.count("HoverBullet_" + bullet.name) > 0) {
-		textReq.formattedText = uiTexts["HoverBullet_" + bullet.name];
-	}
-	else {
-		// need to generate text and tokenize it
+	if (uiTexts.count("HoverBullet_" + bullet.name) == 0) { // new effect, need to generate text and tokenize it
 		std::string tooltip = makeBulletTooltip(bullet);
 		uiTexts.insert({ "HoverBullet_" + bullet.name, getTokenizedText(tooltip) });
-		textReq.formattedText = uiTexts["HoverBullet_" + bullet.name];
 	}
-	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
+
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
-	textReq.bottomLeftBound = {textReq.x, textReq.y - motion.scale.y + 25};
-	textReq.topRightBound = { textReq.x + motion.scale.x - 25, textReq.y };
+	textReq.bottomLeftBound = {textReq.x, 0};
+	textReq.topRightBound = { textReq.x + motion.scale.x - 25, 10000 };
 	textReq.decorations.clear();
 	vec3 color = bulletEffectColors.at(bullet.type);
 	if (bullet.type == Key) {
 		color = COLOR_YELLOW;
 	}
-	// not sure why a + 1 is needed...
-	textReq.decorations.push_back(TextDecorationSpan{ 0, bullet.name.length() + 1, color });
 	
 	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
 	arrowMotion.position = { position.x, position.y + 51 };
 	registry.renderRequests.get(bulletUIArrow).show = true;
 
-	std::vector<std::string> formatted = getFormattedText(textReq.formattedText, textReq.scale, textReq.alignment, { textReq.x, textReq.y }, textReq.topRightBound, textReq.bottomLeftBound);
+	std::vector<std::string> tokenizedBody = uiTexts["HoverBullet_" + bullet.name];
+	std::string name = bullet.name;
+
+	if (bullet.value != 0) {
+		name += " (";
+		if (bullet.value > 0)
+			name += "+";
+		name += std::to_string(bullet.value) + ")";
+	}
+	else {
+		name += " (unstackable)";
+	}
+	name += "\n\n";
+
+	std::vector<std::string> tokenizedName = getTokenizedText(name);
+	tokenizedName.insert(tokenizedName.end(), tokenizedBody.begin(), tokenizedBody.end());
+
+	// note: -1 because when tokenized, \n\n will be replaced with a single space to delimit
+	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 1, color });
+
+	// get formatted text based on bounds
+	std::vector<std::string> formatted = 
+		getFormattedText(tokenizedName, textReq.scale, textReq.alignment, {textReq.x, textReq.y}, textReq.topRightBound, textReq.bottomLeftBound);
 	textReq.formattedText = formatted;
+
+	// scale box vertically to number of lines
+	motion.scale.y = textReq.formattedText.size() * 50;
+	motion.position.y = position.y + motion.scale.y / 2 + 50 + 10;
+	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
 }
 
 Entity UISystem::createBulletUIArrow() {
@@ -1778,7 +1815,7 @@ void UISystem::loadText() {
 }
 
 std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
-	std::string tooltip = bullet.name + "\n\n";
+	std::string tooltip = /*"bullet.name + "\n\n"*/"";
 	std::string modify = "";
 	std::string effect = "";
 	std::string amount = "";
@@ -1791,126 +1828,111 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 	else if (bullet.type == BulletEffectType::Key) {
 		tooltip += "A keycard used for unlocking doors. Pops all subsequent bullets on the stack after use.";
 	}
-	else if (bullet.type == BulletEffectType::Lightning) {
+	else if (bullet.type == BulletEffectType::Lightning) { // not actually used
 		tooltip += "Shifts the bullets in the stack over by 1.";
 	}
 	else {
 		// ordinary bullets
 		// format: [increases/decreases] [effect] by [amount]
 
-		if (bullet.effectCalc == Additive) {
-			if (bullet.value < 0) {
-				modify = "Decreases ";
-				if (abs(bullet.value) - abs((int)bullet.value) > 0) {
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
-					amount = amountString.str();
-				}
-				else {
-					amount = std::to_string(abs((int)bullet.value));
-				}
-				if (bullet.type == BulletEffectType::PlayerDashCDR) {
-					intermediaryAmount = abs(bullet.value / 1000.f);
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
-					amount = amountString.str();
-				}
-				if (bullet.type == BulletEffectType::Homing) {
-					intermediaryAmount = bullet.value * 100;
-					std::stringstream amountString;
-					amountString << (int)intermediaryAmount << "%";
-					amount = amountString.str();
-				}
-			}
-			else {
-				modify = "Increases ";
-				if (bullet.value - (int)bullet.value > 0) {
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
-					amount = amountString.str();
-				}
-				else {
-					amount = std::to_string(abs((int)bullet.value));
-				}
-				if (bullet.type == BulletEffectType::PlayerDashCDR) {
-					intermediaryAmount = abs(bullet.value / 1000.f);
-
-					std::stringstream amountString;
-					amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
-					amount = amountString.str();
-				}
-				if (bullet.type == BulletEffectType::Homing) {
-					intermediaryAmount = bullet.value * 100;
-					std::stringstream amountString;
-					amountString << (int)intermediaryAmount << "%";
-					amount = amountString.str();
-				}
-			}
+		if (bullet.value < 0) {
+			modify = "Decreases ";
+			//if (abs(bullet.value) - abs((int)bullet.value) > 0) {
+			//	std::stringstream amountString;
+			//	amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+			//	amount = amountString.str();
+			//}
+			//else {
+			//	amount = std::to_string(abs((int)bullet.value));
+			//}
+			//if (bullet.type == BulletEffectType::PlayerDashCDR) {
+			//	intermediaryAmount = abs(bullet.value / 1000.f);
+			//	std::stringstream amountString;
+			//	amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+			//	amount = amountString.str();
+			//}
+			//if (bullet.type == BulletEffectType::Homing) {
+			//	intermediaryAmount = bullet.value * 100;
+			//	std::stringstream amountString;
+			//	amountString << (int)intermediaryAmount << "%";
+			//	amount = amountString.str();
+			//}
 		}
-		else if (bullet.effectCalc == Multiplicative) {
-			if (bullet.value < 0) {
-				modify = "Decreases ";
-				intermediaryAmount = (-bullet.value) * 100;
-			}
-			else {
-				modify = "Increases ";
-				intermediaryAmount = (bullet.value) * 100;
-			}
-			std::stringstream amountString;
-			amountString << (int)intermediaryAmount << "%";
-			amount = amountString.str();
+		else {
+			modify = "Increases ";
+			//if (bullet.value - (int)bullet.value > 0) {
+			//	std::stringstream amountString;
+			//	amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
+			//	amount = amountString.str();
+			//}
+			//else {
+			//	amount = std::to_string(abs((int)bullet.value));
+			//}
+			//if (bullet.type == BulletEffectType::PlayerDashCDR) {
+			//	intermediaryAmount = abs(bullet.value / 1000.f);
+
+			//	std::stringstream amountString;
+			//	amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
+			//	amount = amountString.str();
+			//}
+			//if (bullet.type == BulletEffectType::Homing) {
+			//	intermediaryAmount = bullet.value * 100;
+			//	std::stringstream amountString;
+			//	amountString << (int)intermediaryAmount << "%";
+			//	amount = amountString.str();
+			//}
 		}
 
 		switch (bullet.type) {
 		case BulletDamage:
-			effect = "the damage of bullets ";
+			effect = "the damage of bullets.";
 			break;
 		case ProjectileSpeed:
-			effect = "bullet speed ";
+			effect = "bullet speed.";
 			break;
 		case ProjectileSize:
-			effect = "the size of bullets ";
+			effect = "the size of bullets.";
 			break;
 		case FireRate:
-			effect = "bullet fire rate ";
+			effect = "bullet fire rate.";
 			break;
 		case BulletRange:
-			effect = "bullet range ";
+			effect = "bullet range.";
 			break;
 		case BulletSpread:
-			effect = "the spread of bullets ";
+			effect = "the spread of bullets.";
 			break;
 		case BulletNum:
-			effect = "the number of bullets shot at once ";
+			effect = "the number of bullets shot at once.";
 			break;
 		case BulletBurst:
-			effect = "the number of bullets shot in a burst shot ";
+			effect = "the number of bullets shot in a burst shot.";
 			break;
 		case Bounce:
-			effect = "the number of times bullets bounce ";
+			effect = "the number of times bullets bounce.";
 			break;
 		case Pierce:
-			effect = "the pierce of bullets ";
+			effect = "the pierce of bullets.";
 			break;
 		case Homing:
-			effect = "the homing accuracy of bullets ";
+			effect = "the homing accuracy of bullets.";
 			break;
 		case PlayerSpeed:
-			effect = "movement speed ";
+			effect = "movement speed.";
 			break;
 		case PlayerNumDash:
-			effect = "the number of dashes ";
+			effect = "the number of dashes.";
 			break;
 		case PlayerStackSize:
-			effect = "stack size ";
+			effect = "stack size.";
 			break;
 		case PlayerDashCDR:
-			effect = "dash cooldown ";
+			effect = "dash cooldown.";
 			break;
 		default:
 			effect = "This bullet is not in the list?? Report immediately!";
 		}
-		tooltip += modify + effect + "by " + amount + ".";
+		tooltip += modify + effect/* + "by " + amount + "."*/;
 	}
 	return tooltip;
 }

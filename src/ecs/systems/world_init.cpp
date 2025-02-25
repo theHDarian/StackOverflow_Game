@@ -1640,9 +1640,24 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 
 	if (enemy.sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
 	{
-		CircleCollider &cc = registry.circleColliders.emplace(entity);
-		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
-		Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+		// Check how rectangular
+		// If ration between side lengths > 1:1.25
+		// Use poly colliders instead
+		if (abs(max(motion.scale.x, motion.scale.y) / min(motion.scale.x, motion.scale.y)) > 1.25) {
+			PolyCollider& pc = registry.polyColliders.emplace(entity);
+			pc.offsetVertices = {
+				{motion.scale.x / 2.1, motion.scale.y / 2.1},
+				{motion.scale.x / 2.1, -motion.scale.y / 2.1},
+				{-motion.scale.x / 2.1, -motion.scale.y / 2.1},
+				{-motion.scale.x / 2.1, motion.scale.y / 2.1} };
+			pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+			pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		}
+		else {
+			CircleCollider& cc = registry.circleColliders.emplace(entity);
+			cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.0;
+		}
+		Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 		registry.meshPtrs.emplace(entity, &mesh);
 	}
 	else
@@ -1747,8 +1762,23 @@ void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity hea
 
 	if (enemy.sprite.geometryId == GEOMETRY_BUFFER_ID::SPRITE)
 	{
-		CircleCollider& cc = registry.circleColliders.emplace(entity);
-		cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.5;
+		// Check how rectangular
+		// If ration between side lengths > 1:1.25
+		// Use poly colliders instead
+		if (abs(max(motion.scale.x, motion.scale.y) / min(motion.scale.x, motion.scale.y)) > 1.25) {
+			PolyCollider& pc = registry.polyColliders.emplace(entity);
+			pc.offsetVertices = {
+				{motion.scale.x / 2, motion.scale.y / 2},
+				{motion.scale.x / 2, -motion.scale.y / 2},
+				{-motion.scale.x / 2, -motion.scale.y / 2},
+				{-motion.scale.x / 2, motion.scale.y / 2} };
+			pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+			pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+		}
+		else {
+			CircleCollider& cc = registry.circleColliders.emplace(entity);
+			cc.radius = abs(min(motion.scale.x, motion.scale.y)) / 2.0;
+		}
 		Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 		registry.meshPtrs.emplace(entity, &mesh);
 	}
@@ -1805,6 +1835,109 @@ void createEnemyGroup(RenderSystem *renderer, vec2 pos, EnemyType type)
 			eg.others.push_back(other);
 		}
 	}
+}
+
+Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
+	bullet.bulletSpeed = atkData.speed;
+	bullet.bulletRange = atkData.bulletRange;
+	bullet.bulletBounce = atkData.bulletBounce;
+	bullet.bulletPierce = atkData.bulletPierce;
+	bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
+	bullet.shape = atkData.shape;
+	if (atkData.onDeath != EnemyBulletDeath::NONE)
+		bullet.onDeath = atkData.onDeath;
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = atan2(velocity.y, velocity.x);
+	motion.position = pos;
+	motion.velocity = velocity * bullet.bulletSpeed;
+	motion.scale = atkData.size; // Ensure scale is initialized
+	motion.veer = veer;
+
+	if (bullet.bulletEffects[0].type == BulletEffectType::Key)
+	{
+		motion.scale = 16.f * vec2(2.8, 1);
+		motion.velocity = velocity * 400.f;
+		motion.veer = vec2(0);
+		bullet.bulletBounce = 10;
+		bullet.bulletPierce = 0;
+		bullet.bulletRange = 5000;
+
+		PolyCollider& pc = registry.polyColliders.emplace(entity);
+		pc.offsetVertices = {
+			{motion.scale.x / 2, motion.scale.y / 2},
+			{motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2, -motion.scale.y / 2},
+			{-motion.scale.x / 2, motion.scale.y / 2} };
+		pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+		pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+
+		registry.renderRequests.insert(
+			entity,
+			{ "enemy_bullet_key.png",
+			 EFFECT_ASSET_ID::TEXTURED,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+
+		ParticleProps props = enemyBullet;
+		props.colors.push_back(enemyBulletParticleColors.at(Key));
+		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
+
+		return entity;
+	}
+
+	motion.angleOffset = M_PI / 2.f;
+	motion.angle += M_PI / 2.f;
+
+	std::string renderShape;
+	PolyCollider& pc = registry.polyColliders.emplace(entity);
+	pc.offsetVertices = {
+		{motion.scale.x / 2, motion.scale.y / 2},
+		{motion.scale.x / 2, -motion.scale.y / 2},
+		{-motion.scale.x / 2, -motion.scale.y / 2},
+		{-motion.scale.x / 2, motion.scale.y / 2} };
+	pc.maxLength = glm::length(vec2(motion.scale.x / 2, motion.scale.y / 2));
+	pc.minLength = min(motion.scale.x / 2, motion.scale.y / 2);
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = "bullet_values";
+	renderShape = "bullet_values";
+	
+	registry.renderRequests.insert(
+		entity,
+		{ renderShape,
+		 EFFECT_ASSET_ID::BULLET,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	// bullet trail
+	ParticleProps props = enemyBullet;
+	for (const BulletStackEffect& effect : bullet.bulletEffects)
+	{
+		BulletEffectType type = effect.type;
+		if (type == BulletEffectType::Inert)
+			continue;
+		if (enemyBulletParticleColors.count(type) > 0)
+		{
+			props.colors.push_back(enemyBulletParticleColors.at(type));
+		}
+		else
+		{
+			printf("Warning: enemy bullet color not defined\n");
+		}
+	}
+	if (!props.colors.empty())
+	{
+		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
+	}
+
+	return entity;
 }
 
 Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData)
@@ -2082,7 +2215,7 @@ Entity createLightningBullet(RenderSystem *renderer, vec2 pos)
 	bullet.bulletRange = 5000;
 	bullet.bulletBounce = 10;
 	bullet.bulletPierce = 10000;
-	(type) ? bullet.bulletEffects = {lightning1} : bullet.bulletEffects = {lightning2};
+	(type) ? bullet.bulletEffects = {lightningRotate} : bullet.bulletEffects = {lightningShuffle};
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);
@@ -2250,15 +2383,13 @@ Entity createSkipDialogue()
 float getModifiedValue(BulletEffectType bf, float value)
 {
 	Entity &player = registry.players.entities[0];
-	return min(
-		registry.stackCompile.get(player).maximums[bf],
-		max(registry.stackCompile.get(player).minimums[bf], (value + registry.stackCompile.get(player).additives[bf]) * registry.stackCompile.get(player).multiplicatives[bf]));
+	return registry.stackCompile.get(player).Call(bf) + value;
 }
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpecial)
 {
-	// TODO add logic from room data about whether a bullet should be default effect or special effects
-	float prob = (1.0f / registry.enemies.components.size()); // reduce probability to spawn if there are more enemies
+	// Fixed chance of special bullet
+	float prob = 0.2f;
 	Map &map = registry.maps.components[0];
 
 	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)

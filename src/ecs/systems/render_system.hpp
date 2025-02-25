@@ -91,11 +91,14 @@ public:
 	void drawDialogueUI();
 	void drawBackgroundElements();
 	void drawRoomBound(Entity entity, const mat4& projection, const mat4& view);
+	void drawDash(Entity entity, const mat4& projection, const mat4& view);
 	void drawToScreenExtra(EFFECT_ASSET_ID effect);
 	void drawToScreenFinal();
 	void step(float elapsed_ms);
 
 	void drawCursor();
+
+	void effectToDrawCall(Entity entity, const mat4& projection, const mat4& view, bool isUI);
 
 	mat3 createProjectionMatrix();
 
@@ -104,7 +107,7 @@ public:
 
 private:
 	// Internal drawing functions for each entity type
-	void drawTexturedMesh(Entity entity, const mat4& projection, const mat4& view, bool isUI);
+	void drawAnimateTextured(Entity entity, const mat4& projection, const mat4& view, bool isUI);
 	void drawMesh(Entity entity, const mat4& projection, const mat4& view);
 	void drawBullet(Entity entity, const mat4& projection, const mat4& view);
 	void drawDashes(const mat4& projection, const mat4& view);
@@ -115,7 +118,7 @@ private:
 	void drawDashCharges(vec2 position, vec2 scale, int isCharging, float cooldown, float max, const mat4& projection, const mat4& view);
 	void drawAllColliders(Entity entity, const mat4& projection, const mat4& view);
 	void drawCollider(Entity entity, std::string shape, const mat4& projection, const mat4& view);
-	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, const mat4& projection, const mat4& view);
+	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, int bullet_value, const mat4& projection, const mat4& view);
 	void drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view);
 	void drawBulletStack(const mat4& projection, const mat4& view);
 

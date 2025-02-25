@@ -110,12 +110,8 @@ enum UIRequestType {
 	ResetUI,
 	GameOverReport,
 	CallNotif,
-	DisplayFlashMessage
-};
-
-struct UIRequest {
-	UIRequestType type;
-	std::string text;
+	DisplayFlashMessage,
+	StackNotifBullet
 };
 
 struct UIButton {
