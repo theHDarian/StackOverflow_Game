@@ -194,7 +194,7 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    if (!registry.bosses.has(entity) && !registry.bossParts.has(entity))
+                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity)) && !registry.specialRotators.has(entity))
                     {
                         Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
                         vec2 mid = playerMotion.position - motion.position;
@@ -269,7 +269,7 @@ void EnemySystem::step(float elapsed_ms)
             {
                 if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                     if (!registry.bosses.has(entity) && !registry.bossParts.has(entity))
+                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity))  && !registry.specialRotators.has(entity))
                     {
                          Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
                          vec2 mid = playerMotion.position - motion.position;

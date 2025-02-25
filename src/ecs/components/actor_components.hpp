@@ -730,3 +730,7 @@ struct UIRequest {
         this->effects = effects;
     }
 };
+
+struct specialRotators {
+
+};

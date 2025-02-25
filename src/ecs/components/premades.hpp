@@ -599,14 +599,14 @@ const AttackData quadShot{
 const AttackData FastLaser{
 	EnemyAttackPattern::LASER
 	,CIRCLE
-	,{dashUp, dashRechargeUp}
-	,dashRechargeDown
+	,{dashUp, playerSpeedUp, playerSpeedUp}
+	,dashRechargeUp
 	,1
 	,0
 	,{20, 20}
 	,0
 	, 2000
-	,{5000, 0.97}
+	,{5000, 0}
 	,0
 	,0
 	,0
@@ -1283,7 +1283,7 @@ struct BigC : Enemy
 				  "none",
 				  EFFECT_ASSET_ID::MESH,
 				  GEOMETRY_BUFFER_ID::MESH_GB};
-		rotatePower = 0.5f;
+		rotatePower = 0.6f;
 		scale = vec2({800, 800 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		armour = 10;
