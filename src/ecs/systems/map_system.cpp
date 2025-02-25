@@ -676,7 +676,11 @@ void MapSystem::updateBgPositions() {
                             if (door.isPrev) {
                                 textRequest.text = "Previous Room";
                             } else {
-                                textRequest.text = door.preset.ID;
+                                if (door.room == TreasureRoom && !door.isLocked) {
+                                    textRequest.text = "Treasure Room";
+                                } else {
+                                    textRequest.text = door.preset.ID;
+                                }
                             }
                             textRequest.x = position.x;
                             textRequest.y = ws.height - position.y;
