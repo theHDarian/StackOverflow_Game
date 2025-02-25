@@ -2068,151 +2068,121 @@ struct Sword : Enemy
 struct Mage : Enemy
 {
 
-	const AttackData launch{
-		EnemyAttackPattern::RADIAL,
-		TRIANGLE,
-		{bulletBounceUp},
-		playerSpeedUp,
-		8,
-		M_PI / 8.f,
-		{5, 5},
-		200,
-		2000,
-		{0, 0},
-		0,
-		2,
-		0};
-
-	const AttackData wave{
-		EnemyAttackPattern::WAVE,
-		TRIANGLE,
-		{ dmgUp},
-		playerSpeedUp,
-		5,
-		0,
-		{20, 20},
-		400,
-		3000,
-		{0, 0},
-		0,
-		0,
-		0};
-
-	const AttackData snailTrail{
-		EnemyAttackPattern::TRAIL,
-		CIRCLE,
+	const AttackData iceWall{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
 		{},
-		playerSpeedUp,
-		1,
-		0,
-		{20, 20},
-		0,
-		8000,
+		bulletPierceUp,
+		4,
+		M_PI / 2.f,
+		{20, 400},
+		200,
+		10000,
 		{0, 0},
 		0,
-		0,
-		0,
-		EnemyBulletDeath::CLUSTER};
+		-100,
+		0
+	};
 
-	const AttackData sniperShot{
-		EnemyAttackPattern::BURST,
+	const AttackData magicMissile{
+		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
 		{dmgUp, bulletRangeDown},
 		bulletPierceUp,
-		3,
+		10,
 		0,
-		{30, 20},
+		{20, 40},
 		600,
-		10000,
+		1500,
 		{100, 0},
 		0,
-		2,
-		0};
+		0,
+		0.02
+	};
+
+	const AttackData fireball{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{accuracyUp},
+		accuracyDown,
+		1,
+		0,
+		{80, 80},
+		300,
+		4000,
+		{0, 0},
+		0,
+		0,
+		0.07,
+		EnemyBulletDeath::EXPLODE 
+	};
+
+	const AttackData radialSquare{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	RECTANGLE,
+	{fireRateUp},
+	bulletSpeedUp,
+	4,
+	0,
+	{30, 30},
+	400,
+	2000,
+	{0, 0},
+	0,
+	0,
+	0 
+	};
+
+	const AttackData radialTriangle{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	TRIANGLE,
+	{fireRateUp},
+	bulletSpeedUp,
+	3,
+	0,
+	{30, 30},
+	400,
+	2000,
+	{0, 0},
+	0,
+	0,
+	0 
+	};
 
 	const Reaction PlayerBullet = {
-		ReactionType::TWENTYFIVE_HEALTH,
+		ReactionType::PLAYER_BULLET_CLOSE,
 		3,
-	SpecialStates::INVISIBLE};
+	};
+
+	const Reaction HalfHP = {
+		ReactionType::FIFTY_HEALTH,
+		3,
+	};
 
 	const Reaction PlayerClose = {
 		ReactionType::PLAYER_CLOSE,
-		1};
+		1
+	};
 
 	const Reaction PlayerClose2 = {
 		ReactionType::PLAYER_CLOSE,
-		4};
+		4
+	};
 
 
+	EnemyPattern IdleState = { "Follow Player", EnemyBehavior::RANDOM_NEAR, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION,  2}, PlayerBullet}, 2, true, 0.f, 2500.f, magicMissile };
 
-	EnemyPattern teleport = {
-		"Follow Player",
-		EnemyBehavior::TELEPORT,
-		{},
-		0,
-		500.f,
-		500.f,
-		{
-					{ReactionType::DURATION, 1},
-				},
-				0,
-				true,
-				0.f,
-				250.f,
-				radialPolygon};
+	EnemyPattern teleport = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 0}, HalfHP}, 0, true, 0.f, 500.f, radialTriangle};
+	
+	EnemyPattern shootingState = { "ROTATE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet}, 0, true, 0.f, 1000.f, iceWall};
 
-	EnemyPattern IdleState = {
-		"Follow Player",
-		EnemyBehavior::RANDOM_FAR,
-		{},
-		0,
-		6000.f,
-		6000.f,
-		{
-						{ReactionType::DURATION,  1},
-						PlayerClose,
-			PlayerBullet
-					},
-					2,
-					true,
-					0.f,
-					1500.f,
-					sniperShot};
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 4}, PlayerClose2}, 4, true, 0.f, 3000.f,  fireball};
 
-	EnemyPattern shootingState = {
-		"ROTATE",
-		EnemyBehavior::RANDOM_FAR,
-		{},
-		0,
-		1200.f,
-		1200.f,
-		{{ReactionType::DURATION, 1}, PlayerClose, PlayerBullet},
-		0,
-		true,
-		0.f,
-		600.f,
-		twelveSpiralShot};
-
-	EnemyPattern healState = {"HEAL", EnemyBehavior::HEALING, {}, 0, 10000.f, 10000.f, {{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, PlayerClose2}, 4, true, 0.f, 75.f,  wave};
-	EnemyPattern teleport2 = {
-		"Follow Player",
-		EnemyBehavior::TELEPORT,
-		{},
-		0,
-		500.f,
-		500.f,
-		{
-						{ReactionType::DURATION, 1},
-					},
-					0,
-					true,
-					0.f,
-					300.f,
-					twelveSpiralShot};
+	EnemyPattern teleport2 = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 0}, HalfHP}, 0, true, 0.f, 500.f, radialSquare};
 
 	Mage()
 	{
-		maxHealth = 100;
+		maxHealth = 150;
 		currHealth = maxHealth;
 		enemyPatterns = {IdleState, teleport, shootingState,  RetreatAndShoot, teleport2};
 		sprite = {
@@ -2224,9 +2194,9 @@ struct Mage : Enemy
 			4,
 			200};
 		patternIndex = 0;
-		scale = vec2(216.f, 264.f) * 0.7f;
+		scale = vec2(216.f, 264.f) * 0.4f;
 		rotatePower = 0.f;
-		speedMultiplier = 2.5f;
+		speedMultiplier = 2.f;
 
 	};
 };

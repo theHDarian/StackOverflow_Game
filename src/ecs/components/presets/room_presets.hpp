@@ -954,7 +954,7 @@ const RoomPreset BossRoomCrab{
 
 const RoomPreset BossRoomWorm{
     {{{BossDrillWormHead, {1.5f, 1.5f}}}},
-    //{{{EnemyChainDogHead, {0.45f, 0.45f}}}},
+    //{{{EnemyMage, {0.45f, 0.45f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,
@@ -1865,12 +1865,15 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
     {{EnemyType::EnemyMage, {0.5f,0.5f}}},
-    {
-            {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-            {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-    {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-    },
+};
 
+std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
+    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+        },
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
@@ -1882,16 +1885,7 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
         },
 };
 
-std::vector<std::vector<std::tuple<EnemyType,vec2>> > medicalEliteEnemies = {
-    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
-    {
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-        },
-};
-
-std::vector<std::vector<std::tuple<EnemyType,vec2>> > miningEliteEnemies = {
+std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
     {{EnemyType::EnemyMage, {0.5f,0.5f}}},
     {
                 {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
