@@ -1464,9 +1464,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	case EnemyType::EnemyLaserSniper:
 		enemy = HifiLaserSniper();
+		registry.specialRotators.emplace(entity);
 		break;
 	case EnemyType::EnemyLaserSniperHard:
 		enemy = HifiLaserSniperHard();
+		registry.specialRotators.emplace(entity);
 		break;
 	case EnemyType::EnemyHifiCharger:
 		enemy = HifiCharger();
