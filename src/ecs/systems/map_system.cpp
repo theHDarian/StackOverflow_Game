@@ -361,6 +361,10 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         d.room = newRooms[i];
 
+        if (d.room == RoomType::BossRoom && ((spawnIndex + 2) % 4 != i)) {
+            d.room = RoomType::None;
+        }
+
         if ((lockedRooms + noneRooms < 2) && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
             //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
             std:: cout << "Spawning locked room" << std::endl;
