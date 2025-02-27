@@ -1703,7 +1703,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		createEnemy(renderer, pos + vec2(-118, 72), EnemyType::BossBeehiveGun);
 	}
 
-	if (enemy.headData.size != -1) {
+	if (enemy.headData.size > 0) {
+
 		WormHead& head = registry.wormHeads.emplace(entity);
 		head.size = enemy.headData.size;
 		head.constrainDistance = enemy.headData.constrainDistance;
