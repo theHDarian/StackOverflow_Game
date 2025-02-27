@@ -221,6 +221,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				}
 			}
 		}
+		//check Mole countdown
+		if (registry.moles.entities.size() > 0) {
+			for (int i = (int)registry.moles.components.size()-1; i>=0; --i) {
+				Mole& entity = registry.moles.components[i];
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+					registry.moles.remove(registry.moles.entities[i]);
+				}
+			}
+		}
+
 		//check vulnerability countdown
 		if (registry.vulnerabilities.entities.size() > 0) {
 			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {
@@ -410,7 +420,7 @@ void WorldSystem::handleCollisions() {
 		// Player centric collision handling
 		if (registry.players.has(entity)) {
 			// Checking Player - Deadly collisions
-			if (!registry.invincibles.has(entity) && !registry.spawnings.has(entity_other)
+			if (!registry.invincibles.has(entity) && !registry.spawnings.has(entity_other) && !registry.moles.has(entity_other)
 				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))) {
 				handlePlayerHit(entity_other);
 				if (registry.enemyBullets.has(entity_other) 

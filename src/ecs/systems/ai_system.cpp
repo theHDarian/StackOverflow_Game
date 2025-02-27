@@ -42,7 +42,6 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 				auto& inv = registry.invincibles.emplace(entity);
 
 					inv.countdown = currPattern.maxDuration;
-
 			}
 		break;
 		case SpecialStates::INVISIBLE:
@@ -53,6 +52,7 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 
 				std::cout << "invisible: " << inv.countdown << std::endl;
 			}
+		break;
 		case SpecialStates::PROTECTED:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
@@ -60,9 +60,10 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 				vul.modifier = 0.5;
 			} else {
 				auto& vul = registry.vulnerabilities.emplace(entity);
-				vul.countdown = currPattern.maxDuration;
+				vul.countdown = currPattern.curDuration;
 				vul.modifier = 0.5;
 			}
+		break;
 		case SpecialStates::VULNERABLE:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
@@ -70,9 +71,15 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 				vul.modifier = 2.f;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
-                vul.countdown = currPattern.maxDuration;
+                vul.countdown = currPattern.curDuration;
                 vul.modifier = 2.f;
             }
+		break;
+		case SpecialStates::UNDERGROUND:
+			if (!registry.moles.has(entity)) {
+				auto& under = registry.moles.emplace(entity);
+				under.countdown = currPattern.maxDuration;
+			}
 		break;
 		default: break;
 	}
@@ -86,15 +93,20 @@ void handleSpecialStates (Reaction reaction, Entity entity)
 				auto& inv = registry.invincibles.emplace(entity);
 				inv.max = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
 				inv.countdown = inv.max;
+			} else {
+				auto& inv = registry.invincibles.get(entity);
+				inv.countdown = inv.max;
 			}
 		break;
 		case SpecialStates::INVISIBLE:
 			if (!registry.invisibles.has(entity)) {
 				auto inv = registry.invisibles.emplace(entity);
 				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
-
+			} else {
+				auto& inv = registry.invisibles.get(entity);
+				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
 			}
-
+		break;
 		case SpecialStates::PROTECTED:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
@@ -105,7 +117,7 @@ void handleSpecialStates (Reaction reaction, Entity entity)
 				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 				vul.modifier = 0.5;
 			}
-
+		break;
 		case SpecialStates::VULNERABLE:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
@@ -116,6 +128,15 @@ void handleSpecialStates (Reaction reaction, Entity entity)
                 vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
                 vul.modifier = 2.f;
             }
+		break;
+		case SpecialStates::UNDERGROUND:
+			if (!registry.moles.has(entity)) {
+				auto& under = registry.moles.emplace(entity);
+				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			} else {
+				auto& under = registry.moles.get(entity);
+				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			}
 		break;
 		default: break;
 	}

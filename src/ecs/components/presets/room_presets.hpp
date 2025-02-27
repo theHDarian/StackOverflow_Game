@@ -578,34 +578,58 @@ const RoomPreset EnemyRoomAngelTank{
             {EnemyType::EnemyMagnet, {0.8f, 0.2f}},
             {EnemyType::EnemyCrab, {0.5f, 0.5f}},
             {EnemyType::EnemyHealer, {0.8, 0.8}},
-            {EnemyType::EnemyHealer, {0.2, 0.2}}}
+            {EnemyType::EnemyHealer, {0.2, 0.2}}},
+{{EnemyType::EnemySword, {0.2f, 0.8f}},
+{EnemyType::EnemySword, {0.8f, 0.2f}},
+{EnemyType::EnemyEvilCrab, {0.5f, 0.5f}},
+{EnemyType::EnemyHealer, {0.8, 0.8}},
+{EnemyType::EnemyHealer, {0.2, 0.2}}}
         },
      
     {},
     {},
-    0.25f,
+    12.25f,
     5,
     2,
     "An Angel's Touch",
 };
 
-const RoomPreset EnemyRoomTripleBuffEX{
+const RoomPreset EnemyRoomMagic{
         {
-            {{EnemyType::EnemyMagnet, {0.2f, 0.8f}},
-               {EnemyType::EnemyCrab, {0.2f, 0.2f}},
-           {EnemyType::EnemyEvilCrab, {0.6f, 0.2f}},
-           {EnemyType::EnemyCrab, {0.2f, 0.6f}},
-               {EnemySnail, {0.7f, 0.7f}},
-               {EnemyEvilSnail, {0.7f, 0.3f}},
-           }
+            {
+                {EnemyType::EnemyMage, {0.25f, 0.25f}},
+                {EnemyType::EnemyMage, {0.75f, 0.75f}},
+                {EnemyType::EnemyMage, {0.25f, 0.75f}},
+                {EnemyType::EnemyMage, {0.75f, 0.25f}},
+           },
+                {
+                    {EnemyType::EnemyQuadshooter, {0.25f, 0.25f}},
+                    {EnemyType::EnemyQuadshooter, {0.75f, 0.75f}},
+                    {EnemyType::EnemyQuadshooter, {0.25f, 0.75f}},
+                    {EnemyType::EnemyQuadshooter, {0.75f, 0.25f}},
+
+                },
+
+            {
+                {EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
+                {EnemyType::EnemySword, {Random::Float(), Random::Float()}},
+                    {EnemyType::EnemyHealer, {Random::Float(), Random::Float()}},
+                {EnemyType::EnemyHealer, {Random::Float(), Random::Float()}},
+            },
+
+            {
+                    {EnemyType::EnemyEvilSkull, {0.5f, 0.5f}},
+            }
         },
     {},
-    {{{PushConsole,{bulletBounceUp, bulletPierceUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
+    {{{PushConsole,{bulletBounceUp,bulletBounceUp, bulletPierceUp,bulletPierceUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
     },
-    0.0f,
+    13.0f,
     35,
     5,
-    "EnemyRoomTripleBuffEX"
+    "Magical Trickeries",
+    false,
+    {3000, 3000}
 };
 
 
@@ -1545,7 +1569,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
         {RoomType::TreasureRoom, {{Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomTripleBuffEX}}},
+        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomMagic}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},

@@ -119,6 +119,7 @@ public:
 	ComponentContainer<Buffer> buffers;
 	ComponentContainer<Vulnerability> vulnerabilities;
 	ComponentContainer<specialRotators> specialRotators;
+	ComponentContainer<Mole> moles;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -229,6 +230,7 @@ public:
 		registry_list.push_back(&buffers);
 		registry_list.push_back(&vulnerabilities);
 		registry_list.push_back(&specialRotators);
+		registry_list.push_back(&moles);
 	}
 
 	void clear_all_components()

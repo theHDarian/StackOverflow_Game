@@ -304,7 +304,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
     int roomTraversed = map.roomsTraversed;
 
-    if (door.room == RoomType::BossRoom && map.currRegion != MapRegion::Physics) {
+    if (door.room == RoomType::BossRoom && map.currRegion != MapRegion::Final) {
         region = (MapRegion) (region + 1);
         roomTraversed = 1;
     }

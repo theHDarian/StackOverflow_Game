@@ -397,6 +397,7 @@ enum class SpecialStates {
     INVINCIBLE,
     VULNERABLE,
     PROTECTED,
+    UNDERGROUND,
 };
 
 enum class EnemyBehavior {
@@ -733,4 +734,9 @@ struct UIRequest {
 
 struct specialRotators {
 
+};
+
+struct Mole {
+    float max = 1000;
+    float countdown = max;
 };
