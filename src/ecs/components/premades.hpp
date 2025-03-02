@@ -1538,6 +1538,7 @@ struct TwoBee : Enemy
 			5};
 		scale = vec2({864 / 8.f, 480 / 8.f});
 		rotatePower = 1.f;
+		collisionBullet = playerSpeedUp;
 	};
 };
 
@@ -1587,6 +1588,7 @@ struct ThreeBee : Enemy
 			8};
 		scale = vec2({864 / 8.f, 720 / 8.f});
 		rotatePower = 1.f;
+		collisionBullet = playerSpeedUp;
 	};
 };
 

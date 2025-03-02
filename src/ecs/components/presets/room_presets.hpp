@@ -1560,7 +1560,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3,EnemyRoomSmall },{}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop},}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
-        {RoomType::TreasureRoom, {{Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),},{}}},
+        {RoomType::TreasureRoom, {{Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),},{EnemyRoomSwarm}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1,EnemyRoomCrabs,EnemyRoomSmall, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
@@ -1569,7 +1569,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
         {RoomType::TreasureRoom, {{Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),Random::ListItem(regularTreasureRooms),},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomMagic}}},
+        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomMagic, EnemyRoomSwarm}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
@@ -1600,19 +1600,19 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
 
 std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{allConsoles },{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::EnemyRoom, {{allConsoles },{EnemyRoomMagic}}},
         {RoomType::RestRoom, {{},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomJellyFish, HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids, HifiRoomSmall, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane},{HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{HifiRoomSniperBallLauncher,HifiRoomJellyFish, HifiRoomCannonLasers,HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomCannonBoids, HifiRoomSmall, Random::Float() < 0.5f ?  HifiRoomAvenue : HifiRoomLane},{EnemyRoomMagic}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomSmallBallLauncher,HifiRoomSmall, },{EnemyRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomSmallBallLauncher,HifiRoomSmall, },{EnemyRoomMagic}}},
         {RoomType::RestRoom, {{RestingRoomPop},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
