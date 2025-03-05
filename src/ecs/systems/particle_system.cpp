@@ -306,10 +306,10 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
         //assign the plus/minus/rectangular particle
         if(effect.amount > 0) {
             //render a plus sign particle which is in last row
-            particle.textureIndex = Random::Int(2) * 2;
+            particle.textureIndex = Random::Int(2) * 2 + 1;
         } else if (effect.amount < 0) {
             // render minus sign particle
-            particle.textureIndex = Random::Int(2) * 2 + 1;
+            particle.textureIndex = Random::Int(2) * 2;
             
         } else {
             particle.textureIndex = -1;
@@ -336,8 +336,11 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
             particle.lifeRemaining = 0;
         }
     }
-
-    particle.rotation = Random::Float(2.0f) * glm::pi<float>();
+    if (props.textureRowIndex == 5 || props.textureRowIndex < 0 || props.textureRowIndex == 7) {
+        particle.rotation = M_PI;
+    } else {
+        particle.rotation = Random::Float(2.0f) * glm::pi<float>();
+    }
 
     poolIndex = (poolIndex-1) % particlePool.size();
     return index;
