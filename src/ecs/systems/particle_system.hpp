@@ -7,7 +7,7 @@
 #include "particle_components.hpp"
 #define POOLSIZE 3000
 #define TEXTURE_ROW_SIZE 4 //number of textures per row in the spritesheet
-#define TEXTURE_NUM_ROWS 7
+#define TEXTURE_NUM_ROWS 8
 
 class ParticleSystem {
 public:

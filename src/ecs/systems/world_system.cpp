@@ -268,12 +268,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 							if (type == BulletEffectType::Inert)
 								continue;
 							if(enemyBulletParticleColors.count(type) > 0) {
-								props.colors.push_back(enemyBulletParticleColors.at(type));
+								props.colorEffects.push_back({enemyBulletParticleColors.at(type),effect.value});
 							} else {
 								printf("Warning: enemy bullet color not defined\n");
 							}
 						}
-						if (!props.colors.empty())
+						if (!props.colorEffects.empty())
 						{
 							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PExplode,props,150,2);
@@ -502,12 +502,12 @@ void WorldSystem::handleCollisions() {
 							if (type == BulletEffectType::Inert)
 								continue;
 							if(enemyBulletParticleColors.count(type) > 0) {
-								props.colors.push_back(enemyBulletParticleColors.at(type));
+								props.colorEffects.push_back({enemyBulletParticleColors.at(type),effect.value});
 							} else {
 								printf("Warning: enemy bullet color not defined\n");
 							}
 						}
-						if (!props.colors.empty())
+						if (!props.colorEffects.empty())
 						{
 							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);

@@ -241,9 +241,9 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             
             if (motion.velocity == vec2(0.f,0.f)) { //stationary trails have special emission
                 request.props.velocity.variation = {100,100};
-                for (Vec4StartEnd& color : request.props.colors) {
-                    color.start.w = 0.5f;
-                    color.end.w = 0.f;
+                for (ColorEffect& ce : request.props.colorEffects) {
+                    ce.color.start.w = 0.5f;
+                    ce.color.end.w = 0.f;
                 }
                 request.props.size.end = 0.f;
                 emitCount = min(1,emitCount);
@@ -299,22 +299,45 @@ int ParticleSystem::activateParticle(const ParticleProps& props) {
         particle.position = props.position.base + (Random::Vec2(props.position.variation * 2.f) - props.position.variation);
     }
     particle.velocity = props.velocity.base + (Random::Vec2(props.velocity.variation * 2.f) - props.velocity.variation);
-    Vec4StartEnd color = Random::ListItem(props.colors);
-    particle.colorBegin = color.start;
-    particle.colorEnd = color.end;
+    ColorEffect effect = Random::ListItem(props.colorEffects);
+    particle.colorBegin = effect.color.start;
+    particle.colorEnd = effect.color.end;
+    if (props.textureRowIndex < 0) {
+        //assign the plus/minus/rectangular particle
+        if(effect.amount > 0) {
+            //render a plus sign particle which is in last row
+            particle.textureIndex = Random::Int(2) * 2;
+        } else if (effect.amount < 0) {
+            // render minus sign particle
+            particle.textureIndex = Random::Int(2) * 2 + 1;
+            
+        } else {
+            particle.textureIndex = -1;
+        }
+    } else {
+        //flip so that index starts at top row (instead of bottom for textures)
+        particle.textureIndex = (TEXTURE_ROW_SIZE * (TEXTURE_NUM_ROWS - 1 - props.textureRowIndex)) + Random::Int(TEXTURE_ROW_SIZE); //get random texture in row
+    }
 
     particle.lifetime = props.lifetime;
     particle.lifeRemaining = props.lifetime;
     particle.sizeBegin = props.size.start + (Random::Float(props.size.variation*2.f) - props.size.variation);
     particle.sizeEnd = props.size.end;
 
-    particle.rotation = Random::Float(2.0f) * glm::pi<float>();
-    if (props.textureRowIndex >= 0) {
-        //flip so that index starts at top row (instead of bottom for textures)
-        particle.textureIndex = (TEXTURE_ROW_SIZE * (TEXTURE_NUM_ROWS - 1 - props.textureRowIndex)) + Random::Int(TEXTURE_ROW_SIZE); //get random texture in row
-    } else {
-        particle.textureIndex = -1;
+    //plus and minus texture should be more visible
+    if (effect.amount != 0) {
+        particle.sizeBegin *= 4;
+        particle.sizeEnd *= 2;
+        particle.velocity /= 4;
+        particle.lifetime *= 2;
+        particle.lifeRemaining *= 2;
+        //also emit half as often
+        if (Random::Int(2) == 1) {
+            particle.lifeRemaining = 0;
+        }
     }
+
+    particle.rotation = Random::Float(2.0f) * glm::pi<float>();
 
     poolIndex = (poolIndex-1) % particlePool.size();
     return index;

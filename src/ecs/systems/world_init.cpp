@@ -616,8 +616,6 @@ Entity createSwarm(RenderSystem *renderer, vec2 pos)
 	interact.name = "Swarm";
 	interact.item = InteractableItem::Swarm;
 	registry.circleColliders.emplace(entity).radius = motion.scale.x;
-	// auto& effect = registry.emitParticles.emplace(entity, PBulletTrail, playerBulletTrail, 999999, 1);
-	// effect.props.colors = {{0.f, 1.f, 0.f,1.f},{0.f, 1.f, 0.f,1.f}}},
 
 	return entity;
 }
@@ -694,7 +692,6 @@ Entity createRamStick(RenderSystem *renderer, vec2 pos)
 	interact.item = InteractableItem::Ram;
 	registry.circleColliders.emplace(entity).radius = motion.scale.x / 2;
 	auto &effect = registry.emitParticles.emplace(entity, PBulletTrail, playerBulletTrail, 999999, 1);
-	// effect.props.colors = {{0.f, 1.f, 0.f,1.f},{0.f, 1.f, 0.f,1.f}}},
 
 	return entity;
 }
@@ -1889,7 +1886,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 			 GEOMETRY_BUFFER_ID::SPRITE });
 
 		ParticleProps props = enemyBullet;
-		props.colors.push_back(enemyBulletParticleColors.at(Key));
+		props.colorEffects.push_back({enemyBulletParticleColors.at(Key),0});
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
@@ -1927,14 +1924,14 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 			continue;
 		if (enemyBulletParticleColors.count(type) > 0)
 		{
-			props.colors.push_back(enemyBulletParticleColors.at(type));
+			props.colorEffects.push_back({enemyBulletParticleColors.at(type),effect.value});
 		}
 		else
 		{
 			printf("Warning: enemy bullet color not defined\n");
 		}
 	}
-	if (!props.colors.empty())
+	if (!props.colorEffects.empty())
 	{
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
@@ -2000,7 +1997,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 			 GEOMETRY_BUFFER_ID::SPRITE});
 
 		ParticleProps props = enemyBullet;
-		props.colors.push_back(enemyBulletParticleColors.at(Key));
+		props.colorEffects.push_back({enemyBulletParticleColors.at(Key),0});
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 
@@ -2071,14 +2068,14 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 				continue;
 			if (enemyBulletParticleColors.count(type) > 0)
 			{
-				props.colors.push_back(enemyBulletParticleColors.at(type));
+				props.colorEffects.push_back({enemyBulletParticleColors.at(type),effect.value});
 			}
 			else
 			{
 				printf("Warning: enemy bullet color not defined\n");
 			}
 		}
-		if (!props.colors.empty())
+		if (!props.colorEffects.empty())
 		{
 			props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 			EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
@@ -2141,14 +2138,14 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 			continue;
 		if (enemyBulletParticleColors.count(type) > 0)
 		{
-			props.colors.push_back(enemyBulletParticleColors.at(type));
+			props.colorEffects.push_back({enemyBulletParticleColors.at(type),effect.value});
 		}
 		else
 		{
 			printf("Warning: enemy bullet color not defined\n");
 		}
 	}
-	if (!props.colors.empty())
+	if (!props.colorEffects.empty())
 	{
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
@@ -2192,7 +2189,7 @@ Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity st
 	ParticleProps props = enemyBulletDeathParticle;
 	props.lifetime = 200.f;
 	props.velocity.variation = {200, 200};
-	props.colors.push_back({{1, 1, 1, 1}, {1, 1, 1, 1}});
+	props.colorEffects.push_back({{{1, 1, 1, 1}, {1, 1, 1, 1}},0});
 	registry.emitParticles.emplace(entity, PLaser, props, 100000, 1);
 
 	registry.renderRequests.insert(
@@ -2291,7 +2288,7 @@ Entity createKeyBullet(RenderSystem *renderer, vec2 pos)
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	ParticleProps props = enemyBullet;
-	props.colors.push_back(enemyBulletParticleColors.at(Key));
+	props.colorEffects.push_back({enemyBulletParticleColors.at(Key),0});
 	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 	EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
 

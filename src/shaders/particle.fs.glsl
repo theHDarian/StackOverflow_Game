@@ -21,6 +21,13 @@ void main()
         vec2 base = vec2(currCol, currRow) / vec2(float(particle_texture_row_size), float(particle_texture_num_rows));
         vec2 offset = texcoord / vec2(particle_texture_row_size, particle_texture_num_rows);
         out_color = texture(particle_sampler, base + offset);
+        if ( currRow == 0 ) {
+            //handle plus/minus particles
+            if (out_color.w > 0.0) {
+                //replace the color of this with the specified color
+                out_color.xyz = color.xyz;
+            }
+        }
         // out_color = texture(particle_sampler, texcoord);
     }
 }
