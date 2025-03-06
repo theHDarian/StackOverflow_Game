@@ -180,12 +180,14 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	assert(registry.renderRequests.has(entity));
 	RenderRequest render_request;
 	Motion motion = registry.motions.get(entity);
+
 	if (registry.moles.has(entity)) {
 		render_request = underGroundTexture;
-		motion.scale = vec2(150, 150);
+		motion.scale = vec2(264, 288) / 2.f;
 	} else {
         render_request = registry.renderRequests.get(entity);
     }
+
 	vec2 offset = render_request.offset;
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));

@@ -2506,6 +2506,56 @@ struct RodOfA : Enemy {
 
 
 //----------------------------------------- MINING REGION ENEMIES ---------------------------------
+struct SmallMole : Enemy
+{
+	const AttackData dirtBlast{
+		EnemyAttackPattern::BURST,
+		CIRCLE,
+		{dmgUp},
+		playerSpeedDown,
+		5,
+		0,
+		{30, 30},
+		400,
+		6000,
+		{0, 0},
+		0,
+		10,
+		0
+	};
+
+	Reaction duration0 = {
+		ReactionType::DURATION,
+		0 };
+
+
+	Reaction duration1 = {
+		ReactionType::DURATION,
+		1 };
+
+	EnemyPattern shootingState = { "Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration1}, 1, true, 0.f, 1000.f, dirtBlast };
+	EnemyPattern diggingState = { "Digging", EnemyBehavior::RANDOM_FAR, {}, 0, 1500.f, 1500.f, {duration0}, 0, false, 0.f, 5000.f, quadShot, SpecialStates::UNDERGROUND };
+
+	SmallMole()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+
+		enemyPatterns = { shootingState, diggingState };
+
+		patternIndex = 0;
+		sprite = {
+			"Mole.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2({ 264.0f / 2, 288.f / 2 });
+		rotatePower = 1.0;
+		speedMultiplier = 5.0f;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+	};
+};
+
 struct SmallBoulder : Enemy
 {
 

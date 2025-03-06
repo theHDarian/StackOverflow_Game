@@ -1361,6 +1361,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = Skull();
 		break;
 	}
+	case EnemyType::EnemySmallMole:
+	{
+		enemy = SmallMole();
+		break;
+	}
 	case EnemyType::EnemySmallBoulder:
 	{
 		enemy = SmallBoulder();

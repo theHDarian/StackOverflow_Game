@@ -149,7 +149,7 @@ void EnemySystem::step(float elapsed_ms)
             } else if (registry.wormBodies.has(entity) || registry.wormHeads.has(entity))
             {
                 // Do nothing!
-            } else if (direction != vec2(0, 0) && enemy.rotationBehaviour != EnemyRotationBehavior::NONE)
+            } else if (direction != vec2(0, 0))
             {
                 float targetAngle = atan2(direction.y, direction.x);
                 float deltaAngle = targetAngle - motion.angle;
@@ -245,13 +245,17 @@ void EnemySystem::step(float elapsed_ms)
                     vec2 mid = twinMotion.position - motion.position;
                     motion.angle = atan2(mid.y, mid.x);
                 }
+                else if (enemy.rotationBehaviour == EnemyRotationBehavior::NONE)
+                {
+                    motion.angle = 0.f;
+                }
 
                 if (pattern.type == EnemyBehavior::TELEPORT)
                 {
-
                     std::cout << "teleporting in" << movement.posB[0] << ": " << movement.posB[1] << std::endl;
                     motion.position = movement.posB;
-                } else if (pattern.type == EnemyBehavior::ROLLING)
+                }
+                else if (pattern.type == EnemyBehavior::ROLLING)
                 {
                     motion.velocity = glm::normalize(movement.posB - movement.posA) * movement.speed;
                     float angularSpeed = movement.angularSpeed * 20.f * M_PI / 360.0f;

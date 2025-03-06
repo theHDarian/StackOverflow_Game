@@ -69,7 +69,7 @@ class RenderSystem {
 			{SpecialStates::REGENERATING, {0, 1, 0}}, // green
 	};
 	const RenderRequest underGroundTexture = {
-		"enemy_bullet_circle.png",
+		"underground.png",
 		EFFECT_ASSET_ID::TEXTURED,
 		GEOMETRY_BUFFER_ID::SPRITE,
 		true,

@@ -639,7 +639,8 @@ vec2 AISystem::getCurrentPos(Entity entity)
 {
 	EnemyMovement &movement = registry.enemyMovement.get(entity);
 	Motion &motion = registry.motions.get(entity);
-	movement.speed = 100.f;
+	// This resets movement speed to ignore speedModifier...
+	//movement.speed = 100.f;
 	return motion.position;
 }
 

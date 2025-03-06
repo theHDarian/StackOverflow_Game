@@ -299,6 +299,7 @@ enum EnemyType {
     EnemyMage,
     EnemyHealer,
     EnemyBioBoid,
+    EnemySmallMole,
     EnemySmallBoulder,
     EnemyBigBoulder,
     BossDrillWormHead,
