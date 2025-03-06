@@ -546,6 +546,25 @@ void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float 
     burst.burstCooldown = 150;
 }
 
+void EnemySystem::createAOEIndicator(vec2 pos, float radius, SpecialStates buff, float timer)
+{
+    Entity entity = Entity();
+    auto& aoe = registry.aoeIndicators.emplace(entity);
+    aoe.type = buff;
+    auto& motion = registry.motions.emplace(entity);
+    motion.position = pos;
+    motion.scale = vec2(radius * 1.1 , radius * 1.1);
+    RenderRequest& request = registry.renderRequests.emplace(entity);
+    request.texture_name = "enemy_bullet_circle.png";
+    request.used_effect = TEXTURED;
+    request.used_geometry = GEOMETRY_BUFFER_ID::SPRITE;
+    request.show = true;
+    request.offset = { 0, 0 }; // how much the position should be shifted so that center of texture = center of object
+    request.idealScale = vec2(-1); //Used for tiling textures. Tiling is based on difference between idealScale and motion.scale
+    Fade& fade = registry.fades.emplace(entity);
+    fade.max = timer;
+}
+
 void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
 {
     Buffer &buffer = registry.buffers.get(entity);
@@ -563,12 +582,19 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                     if (!registry.invincibles.has(e)) {
                         Invincible &inv = registry.invincibles.emplace(e);
                         inv.countdown = buffer.duration;
-                        buffer.targetEntity = e;
+                        if (registry.buffers.has(e)) {
+                            inv.countdown = inv.countdown / 2;
+                        } else {
+                            buffer.targetEntity = e;
+                        }
                     }
                 }
                 if (behavior == EnemyBehavior::GRANTINGBUFFS) {
                     break;
                 }
+            }
+            if (behavior == EnemyBehavior::GRANTINGBUFFSAOE) {
+                createAOEIndicator( registry.motions.get(entity).position, buffer.range, SpecialStates::INVINCIBLE, buffer.duration);
             }
             break;
     }
@@ -582,13 +608,21 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                     if (!registry.invisibles.has(e)) {
                         Invisible &inv = registry.invisibles.emplace(e);
                         inv.countdown = buffer.duration;
-                        buffer.targetEntity = e;
+                        if (registry.buffers.has(e)) {
+                            inv.countdown = inv.countdown / 2;
+                        } else {
+                            buffer.targetEntity = e;
+                        }
                     }
                 }
                 if (behavior == EnemyBehavior::GRANTINGBUFFS) {
                     break;
                 }
             }
+            if (behavior == EnemyBehavior::GRANTINGBUFFSAOE) {
+                createAOEIndicator( registry.motions.get(entity).position, buffer.range, SpecialStates::INVISIBLE, buffer.duration);
+            }
+
             break;
     }
         case SpecialStates::PROTECTED: {
@@ -602,7 +636,11 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                     auto& vul = registry.vulnerabilities.emplace(e);
                     vul.modifier = 0.5;
                     vul.countdown = buffer.duration;
-                    buffer.targetEntity = e;
+                    if (registry.buffers.has(e)) {
+                        vul.countdown = vul.countdown / 2;
+                    } else {
+                        buffer.targetEntity = e;
+                    }
                 } else {
                     registry.vulnerabilities.get(e).countdown = buffer.duration;
                     registry.vulnerabilities.get(e).modifier = 0.5;
@@ -612,6 +650,10 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                 break;
             }
         }
+        if (behavior == EnemyBehavior::GRANTINGBUFFSAOE) {
+            createAOEIndicator( registry.motions.get(entity).position, buffer.range, SpecialStates::PROTECTED, buffer.duration);
+        }
+
         break;
         }
 
@@ -626,7 +668,11 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                         auto& vul = registry.vulnerabilities.emplace(e);
                         vul.modifier = 2.f;
                         vul.countdown = buffer.duration;
-                        buffer.targetEntity = e;
+                        if (registry.buffers.has(e)) {
+                            vul.countdown = vul.countdown / 2;
+                        } else {
+                            buffer.targetEntity = e;
+                        }
                     } else {
                         registry.vulnerabilities.get(e).countdown = buffer.duration;
                         registry.vulnerabilities.get(e).modifier = 2.f;
@@ -636,8 +682,46 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                     break;
                 }
             }
+
+            if (behavior == EnemyBehavior::GRANTINGBUFFSAOE) {
+                createAOEIndicator( registry.motions.get(entity).position, buffer.range, SpecialStates::VULNERABLE, buffer.duration);
+            }
             break;
     }
+    case SpecialStates::REGENERATING: {
+        for (Entity& e : registry.enemies.entities) {
+            if (e == entity) {
+                continue;
+            }
+            Motion& m = registry.motions.get(e);
+            if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                if (!registry.regenerates.has(e)) {
+                    auto& regen = registry.regenerates.emplace(e);
+                    if (registry.healers.has(entity)) {
+                        regen.healAmount = registry.healers.get(entity).healPower;
+                    } else {
+                        regen.healAmount = registry.enemies.get(e).maxHealth * 0.015;
+                    }
+                    regen.countdown = buffer.duration;
+                    if (registry.buffers.has(e)) {
+                        regen.countdown = regen.countdown / 2;
+                    } else {
+                        buffer.targetEntity = e;
+                    }
+                } else {
+                    registry.regenerates.get(e).countdown = buffer.duration;
+                }
+            }
+            if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                break;
+            }
+        }
+        if (behavior == EnemyBehavior::GRANTINGBUFFSAOE) {
+            createAOEIndicator( registry.motions.get(entity).position, buffer.range, SpecialStates::REGENERATING, buffer.duration);
+        }
+        break;
+    }
+        
         default:
             break;
     }

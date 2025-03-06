@@ -81,6 +81,17 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 				under.countdown = currPattern.maxDuration;
 			}
 		break;
+		case SpecialStates::REGENERATING:
+			if (!registry.regenerates.has(entity)) {
+				auto& regen = registry.regenerates.emplace(entity);
+				regen.countdown = currPattern.maxDuration;
+				if (registry.healers.has(entity)) {
+					regen.healAmount = registry.healers.get(entity).healPower;
+				} else {
+					regen.healAmount = registry.enemies.get(entity).maxHealth * 0.015;
+				}
+			}
+		break;
 		default: break;
 	}
 }
@@ -138,6 +149,20 @@ void handleSpecialStates (Reaction reaction, Entity entity)
 				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 			}
 		break;
+		case SpecialStates::REGENERATING:
+			if (!registry.regenerates.has(entity)) {
+				auto& under = registry.regenerates.emplace(entity);
+				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (registry.healers.has(entity)) {
+					under.healAmount = registry.healers.get(entity).healPower;
+				} else {
+					under.healAmount = registry.enemies.get(entity).maxHealth * 0.015;
+				}
+			} else {
+				auto& under = registry.regenerates.get(entity);
+				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			}
+
 		default: break;
 	}
 }
@@ -164,6 +189,17 @@ void AISystem::step(float elapsed_ms)
 		// std::cout << currPattern.name << "after update" << std::endl;
 
 		handleSpecialStates( currPattern, entity );
+
+		if (registry.regenerates.has(entity)) {
+			auto& regen = registry.regenerates.get(entity);
+			if ((regen.currHealInterval -= elapsed_ms) <= 0) {
+				enemy.currHealth += regen.healAmount;
+				if (enemy.currHealth > enemy.maxHealth) enemy.currHealth = enemy.maxHealth;
+				regen.currHealInterval = regen.healInterval;
+			}
+		}
+
+
 		if (registry.boids.has(entity))
 		{
 			Boid &boid = registry.boids.get(entity);

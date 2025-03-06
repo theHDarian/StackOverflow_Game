@@ -231,6 +231,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
+		//check regen countdown
+		if (registry.regenerates.entities.size() > 0) {
+            for (int i = (int)registry.regenerates.components.size()-1; i>=0; --i) {
+                Regenerate& entity = registry.regenerates.components[i];
+                if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+                    registry.regenerates.remove(registry.regenerates.entities[i]);
+                }
+            }
+        }
+
 		//check vulnerability countdown
 		if (registry.vulnerabilities.entities.size() > 0) {
 			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {

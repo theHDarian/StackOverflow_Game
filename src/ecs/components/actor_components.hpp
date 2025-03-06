@@ -340,6 +340,8 @@ enum EnemyType {
     EnemyMiningBoulderBig,
     EnemyMedicalBMP,
     EnemyScissors,
+    EnemyMedicalRodA,
+    EnemyMedicalRodC,
 };
 
 enum class EnemyAttackPattern {
@@ -398,6 +400,7 @@ enum class SpecialStates {
     VULNERABLE,
     PROTECTED,
     UNDERGROUND,
+    REGENERATING,
 };
 
 enum class EnemyBehavior {
@@ -739,4 +742,16 @@ struct specialRotators {
 struct Mole {
     float max = 1000;
     float countdown = max;
+};
+
+struct AOEIndicator {
+    SpecialStates type;
+};
+
+struct Regenerate {
+    float max = 1000;
+    float countdown = max;
+    float healAmount = 1;
+    float healInterval = 250;
+    float currHealInterval = 0;
 };

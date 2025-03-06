@@ -178,8 +178,14 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	const mat4& projection, const mat4& view, bool isUI = false)
 {
 	assert(registry.renderRequests.has(entity));
-	const RenderRequest& render_request = registry.renderRequests.get(entity);
-	Motion& motion = registry.motions.get(entity);
+	RenderRequest render_request;
+	Motion motion = registry.motions.get(entity);
+	if (registry.moles.has(entity)) {
+		render_request = underGroundTexture;
+		motion.scale = vec2(150, 150);
+	} else {
+        render_request = registry.renderRequests.get(entity);
+    }
 	vec2 offset = render_request.offset;
 	const GLuint used_effect_enum = static_cast<GLuint>(render_request.used_effect);
 	assert(used_effect_enum < static_cast<GLuint>(EFFECT_ASSET_ID::EFFECT_COUNT));
@@ -235,7 +241,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glActiveTexture(GL_TEXTURE0);
 	gl_has_errors();
 	assert(registry.renderRequests.has(entity));
-	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[registry.renderRequests.get(entity).texture_name]];
+	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[render_request.texture_name]];
 
 	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
@@ -371,6 +377,12 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
 	glUniform1i(shielded_uloc, (registry.invincibles.has(entity)));
+
+	if (registry.aoeIndicators.has(entity)) {
+		auto& aoe = registry.aoeIndicators.get(entity);
+		vec3 color = specialStatesToColor.at( aoe.type);
+		glUniform3fv(color_uloc, 1, (float*)&color);
+	}
 
 	if (registry.damageds.has(entity))
 	{
@@ -1098,6 +1110,12 @@ void RenderSystem::drawGameElements()
 	// Note, its not very efficient to access elements indirectly via the entity
 	// albeit iterating through all Sprites in sequence. A good point to optimize
 
+	for (Entity &entity : registry.aoeIndicators.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
+			continue;
+		registry.renderRequests.get(entity).show ? effectToDrawCall(entity, projection, view) : void();
+	}
 	for (Entity &entity : registry.enemyBullets.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))

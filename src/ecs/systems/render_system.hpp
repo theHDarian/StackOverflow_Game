@@ -58,6 +58,23 @@ class RenderSystem {
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
+
+	const std::map<SpecialStates, vec3> specialStatesToColor = {
+		{SpecialStates::NORMAL, {1, 1, 1}},
+		{SpecialStates::INVINCIBLE, {1, 1, 0.3}}, // yellow
+		{SpecialStates::PROTECTED,  { 0, 1, 1}}, // cyan
+		{SpecialStates::VULNERABLE, {0, 0, 1}}, // blue
+		{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
+		{SpecialStates::UNDERGROUND, {1, 0.4, 1}}, // magenta
+			{SpecialStates::REGENERATING, {0, 1, 0}}, // green
+	};
+	const RenderRequest underGroundTexture = {
+		"enemy_bullet_circle.png",
+		EFFECT_ASSET_ID::TEXTURED,
+		GEOMETRY_BUFFER_ID::SPRITE,
+		true,
+		vec2(0, 0),
+	};
 public:
 	// Initialize the window
 	bool init(GLFWwindow* window);

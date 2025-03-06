@@ -2360,21 +2360,22 @@ struct Scissors : Enemy
 
 
 	EnemyPattern randomPos = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::PLAYER_CLOSE, 1}, {ReactionType::DURATION, 1}}, 1, true, 0.f, 1000.f, NoAttack};
-	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 2}}, 2, true, 50.f, 50.f, explode};
-	EnemyPattern idleStateCD1 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 3}}, 3, false, 0.f, 0.f, NoAttack};
-	EnemyPattern chargingMidState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 4}}, 4, true, 50.f, 50.f, explode};
-	EnemyPattern idleStateCD2 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 5}}, 5, false, 0.f, 0.f, NoAttack};
-	EnemyPattern chargingEndState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 6}}, 6, true, 50.f, 50.f, explode};
-	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 7}}, 7, false, 0.f, 0.f, NoAttack};
-	EnemyPattern explodingCharge = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 8}}, 8, true, 50.f, 50.f, explode};
-	EnemyPattern idleState3 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 9}}, 9, false, 0.f, 0.f, NoAttack};
-	EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 1000.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 2}}, 2, true, 0.f, 5.f, explode, SpecialStates::VULNERABLE};
+	EnemyPattern idleStateCD1 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 3}}, 3, false, 0.f, 0.f, NoAttack, SpecialStates::PROTECTED};
+	EnemyPattern chargingMidState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 2}}, 0, true, 50.f, 50.f, fourAllAround, SpecialStates::VULNERABLE};
+
+	EnemyPattern idleStateCD2 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 5}}, 5, false, 0.f, 0.f, NoAttack, SpecialStates::PROTECTED};
+	EnemyPattern chargingEndState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 1500.f, 1500.f, {{ReactionType::DURATION, 6}}, 6, true, 0.f, 50.f, fourAllAround, SpecialStates::VULNERABLE};
+	EnemyPattern idleState = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 7}}, 7, false, 0.f, 0.f, NoAttack, SpecialStates::PROTECTED};
+	EnemyPattern explodingCharge = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 8}}, 8, true, 0.f, 5.f, explode, SpecialStates::VULNERABLE};
+	EnemyPattern idleState3 = {"IDLE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 9}}, 0, false, 0.f, 0.f, NoAttack ,SpecialStates::PROTECTED};
+	// EnemyPattern randomPosNoCharge = {"RANDOM", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 1000.f, NoAttack};
 
 	Scissors()
 	{
 		maxHealth = 120;
 		currHealth = maxHealth;
-		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3, randomPosNoCharge};
+		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3};
 		sprite = {
 			"scissors",
 			EFFECT_ASSET_ID::ANIMATE,
@@ -2411,12 +2412,98 @@ struct BMP : Enemy {
 			5,
 			500};
 		patternIndex = 0;
-		scale = vec2(140, 140);
+		scale = vec2({216 / 1.5f, 216 / 1.5f});
+		rotatePower = 0.f;
+	};
+
+};
+
+struct RodOfC : Enemy {
+	const AttackData whip{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{dmgUp},
+		blunt,
+		4,
+		-M_PI / 4.f,
+		{15, 15},
+		400,
+		2000,
+		{200, M_PI / 1.5},
+		0,
+		2,
+		0};
+
+	const AttackData Spawn{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		1,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyMedicalRodA};
+
+	Reaction AttackLaser{
+		ReactionType::DURATION,
+		0};
+	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {AttackLaser, }, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::REGENERATING};
+	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 1500.f, 1500.f, {AttackLaser}, 2, true, 0.f, 700.f, twelveSpiralShot, };
+	EnemyPattern whipState = {"WHIP", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 3, true, 0.f, 100.f, whip};
+	EnemyPattern protection_pulse = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {AttackLaser, }, 4, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::PROTECTED};
+	EnemyPattern Spawning = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 1500.f, 1500.f, {AttackLaser}, 0, true, 0.f, 700.f, Spawn, SpecialStates::PROTECTED, SpecialStates::NORMAL};
+	RodOfC()
+	{
+		maxHealth = 800;
+		currHealth = maxHealth;
+		enemyPatterns = {heal_state, telePortState, whipState, protection_pulse, Spawning};
+		sprite = {
+			"RodOfCaduceus.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(912, 240) / 1.5f;
 		rotatePower = 0.f;
 		armour = 3;
 	};
 
 };
+
+struct RodOfA : Enemy {
+	Reaction AttackLaser{
+		ReactionType::DURATION,
+		0};
+	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {AttackLaser, }, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::REGENERATING};
+	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 2, true, 0.f, 700.f, twelveSpiralShot, SpecialStates::UNDERGROUND, SpecialStates::NORMAL};
+	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 2}}, 0, true, 50.f, 50.f, fourAllAround};
+
+	RodOfA()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+		enemyPatterns = {heal_state, telePortState, chargingState};
+		sprite = {
+			"RodOfAsclepius.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(768, 288) / 4.f;
+		rotatePower = 0.2f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		armour = 1;
+	};
+
+};
+
 
 //----------------------------------------- MINING REGION ENEMIES ---------------------------------
 struct SmallBoulder : Enemy

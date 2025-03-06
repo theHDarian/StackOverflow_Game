@@ -36,6 +36,7 @@ private:
     void creatingMergeBee(int count, vec2 pos);
     void destruct(Enemy& enemy);
     void heal(Entity entoty, EnemyPattern &currPattern);
+    void createAOEIndicator(vec2 pos, float radius, SpecialStates buff, float timer);
     RenderSystem *render;
     SoundSystem *sound;
 };

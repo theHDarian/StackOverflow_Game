@@ -1612,16 +1612,36 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			Buffer& buffer = registry.buffers.emplace(entity);
 			buffer.range = 500.f;
 			buffer.maxCoolDown = 1000.f;
+			buffer.duration = 1000.f;
 			break;
-		}
-		case EnemyScissors:
+	}
+	case EnemyScissors:
+    {
+        enemy = Scissors();
+        break;
+    }
+	case EnemyMedicalRodA:
         {
-            enemy = Scissors();
+            enemy = RodOfA();
+			Buffer& buffer = registry.buffers.emplace(entity);
+			buffer.range = 500.f;
+			buffer.maxCoolDown = 2000.f;
+			// Healer& healer = registry.healers.emplace(entity);
+			// healer.healPower = 15.f;
             break;
         }
-
-		default:
-			assert(false);
+	case EnemyMedicalRodC:
+        {
+            enemy = RodOfC();
+            Buffer& buffer = registry.buffers.emplace(entity);
+            buffer.range = 2500.f;
+            buffer.maxCoolDown = 5000.f;
+			// Healer& healer = registry.healers.emplace(entity);
+			// healer.healPower = 15.f;
+            break;
+        }
+	default:
+		assert(false);
 	};
 
 

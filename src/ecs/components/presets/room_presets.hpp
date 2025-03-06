@@ -1538,6 +1538,8 @@ const RoomPreset allConsoles {
         {EnemyMedicalBMP, {Random::Float(), Random::Float()}},
 {EnemyScissors, {Random::Float(), Random::Float()}},
 {EnemyScissors, {Random::Float(), Random::Float()}},
+{EnemyMedicalRodA, {Random::Float(), Random::Float()}},
+{EnemyMedicalRodC, {Random::Float(), Random::Float()}},
 
     }},
     {},
