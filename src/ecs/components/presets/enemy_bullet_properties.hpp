@@ -7,7 +7,8 @@
 #include "utils/ui_constants.hpp"
 
 const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
-			{BulletDamage,      COLOR_PURPLE_MED},
+			//{BulletDamage,      COLOR_PURPLE_MED},
+			{BulletDamage,      {1.f, 0.f, 0.f}},
 			{ProjectileSpeed,   COLOR_PINK},
 			{ProjectileSize,    COLOR_MAGENTA_LIGHT},
 			{FireRate,          COLOR_MAGENTA_MED},

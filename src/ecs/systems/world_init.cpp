@@ -1645,6 +1645,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			// healer.healPower = 15.f;
             break;
         }
+	case EnemyEyeCube:
+	{
+		enemy = EyeCube();
+		break;
+	}
 	default:
 		assert(false);
 	};
@@ -2177,20 +2182,24 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 	return entity;
 }
 
-Entity createEnemyLaser(RenderSystem *renderer, vec2 pos, float angle, Entity start, AttackData atkData)
+Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity start, AttackData atkData)
 {
 	auto entity = Entity();
 
-	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	EnemyBullet &bullet = registry.enemyBullets.emplace(entity);
+	EnemyBullet& bullet = registry.enemyBullets.emplace(entity);
 	bullet.bulletSpeed = 0;
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.initialRange = atkData.bulletRange;
 	bullet.bulletBounce = 0;
 	bullet.bulletPierce = 10000;
-	bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
+
+	// No more laser special effects, too easy to farm
+	bullet.bulletEffects = {atkData.defaultEffect};
+	//bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
+	
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);

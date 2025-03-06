@@ -16,6 +16,7 @@ private:
 	static vec2 getPlayerPos();
 	static vec2 getRollingPos(Entity entity);
 	static vec2 getCurrentPos(Entity entity);
+	static vec2 getRookPos(Entity entity);
 	static vec2 evadeBullet(Entity entity);
 	static vec2 getNextPatrolPos(Entity entity);
 	static vec2 getCharginPos(Entity entity);

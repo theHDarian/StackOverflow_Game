@@ -593,6 +593,9 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::FOLLOW_PLAYER:
 		// std::cout << "follow!" << std::endl;
 		return getPlayerPos();
+	case EnemyBehavior::ROOK_FOLLOW:
+		// std::cout << "rook follow!" << std::endl;
+		return getRookPos(entity);
 	case EnemyBehavior::PATROLLING:
 		return getNextPatrolPos(entity);
 	case EnemyBehavior::EVADEBULLET:
@@ -642,6 +645,13 @@ vec2 AISystem::getCurrentPos(Entity entity)
 	// This resets movement speed to ignore speedModifier...
 	//movement.speed = 100.f;
 	return motion.position;
+}
+
+vec2 AISystem::getRookPos(Entity entity)
+{
+	vec2 dir = (getPlayerPos() - getCurrentPos(entity));
+	bool dir2 = (abs(dir.x) > abs(dir.y));
+	return getCurrentPos(entity) + (dir * vec2(dir2, !dir2));
 }
 
 vec2 AISystem::getTeleportPos(Entity entity)

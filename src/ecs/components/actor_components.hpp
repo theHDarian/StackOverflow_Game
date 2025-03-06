@@ -343,6 +343,7 @@ enum EnemyType {
     EnemyScissors,
     EnemyMedicalRodA,
     EnemyMedicalRodC,
+    EnemyEyeCube,
 };
 
 enum class EnemyAttackPattern {
@@ -408,6 +409,7 @@ enum class EnemyBehavior {
     // this is the basic
     RANDOM,
     ROLLING,
+    ROOK_FOLLOW,
     RANDOM_NEAR,
     RANDOM_FAR,
     FOLLOW_PLAYER,

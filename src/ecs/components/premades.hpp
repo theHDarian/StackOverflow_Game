@@ -2298,8 +2298,6 @@ struct EnemyTestPatrol : Enemy
 
 
 //----------------------------------------- MEDICAL REGION ENEMIES ---------------------------------
-
-
 struct MedBoid : Enemy
 {
 
@@ -4516,9 +4514,55 @@ struct ScientistHandEnemy : Enemy
 	};
 };
 
-// struct EvilSkull : {
 
-// 	EvilSkull() {
+// ---------- MILITARY REGION ENEMIES -----------------------------------------------------------------------------------------------------------------------------
 
-// 	};
-// };
+struct EyeCube : Enemy {
+	const AttackData laserSweep{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{},
+	dmgDown,
+	1,
+	0,
+	{75, 75},
+	150,
+	3000.f,
+	{400, M_PI / 100},
+	0,
+	0,
+	0 };
+
+
+	Reaction duration0 = {
+	ReactionType::DURATION,
+	0 };
+
+
+	Reaction duration1 = {
+		ReactionType::DURATION,
+		1 };
+
+
+	EnemyPattern followState = { "ROLLING", EnemyBehavior::ROOK_FOLLOW, {}, 0, 7000.f, 7000.f, {duration1}, 1, false, 0.f, 5000.f, quadShot };
+	EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration0}, 0, true, 0.f, 3000.f, laserSweep };
+
+	EyeCube()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+
+		enemyPatterns = { followState, attackState };
+
+		patternIndex = 0;
+		sprite = {
+			"EyeCube.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2({ 336.0f / 2, 336.f / 2 });
+		rotatePower = 1.0;
+		speedMultiplier = 4.0f;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+	};
+};
