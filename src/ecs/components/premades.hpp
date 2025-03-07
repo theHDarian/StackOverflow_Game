@@ -270,7 +270,7 @@ struct AttackData {
 	float speed = 200;
 	float bulletRange = 3000;
 	vec2 veer = { 0,0 }; // {magnitude, angle}, {growth, rotation} lasers, {#bullets per shot, burst CD} radial burst
-	int bulletPierce = 0;
+	int bulletPierce = 0; // Very low pierce implies ignore walls
 	int bulletBounce = 0; // Very low bounce implies piledriver (bullet sticks into the wall until duration)
 	float homing = 0;
 	EnemyBulletDeath 
@@ -4534,6 +4534,22 @@ struct EyeCube : Enemy {
 	0 };
 
 
+	const AttackData wallTest{
+	EnemyAttackPattern::TWO_WALL,
+	CIRCLE,
+	{},
+	dmgDown,
+	5,
+	M_PI / 4.f,
+	{40, 40},
+	150,
+	14000.f,
+	{0,0},
+	-100,
+	0,
+	0 };
+
+
 	Reaction duration0 = {
 	ReactionType::DURATION,
 	0 };
@@ -4546,6 +4562,8 @@ struct EyeCube : Enemy {
 
 	EnemyPattern followState = { "ROLLING", EnemyBehavior::ROOK_FOLLOW, {}, 0, 7000.f, 7000.f, {duration1}, 1, false, 0.f, 5000.f, quadShot };
 	EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration0}, 0, true, 0.f, 3000.f, laserSweep };
+	//EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration0}, 0, true, 0.f, 2000.f, wallTest };
+
 
 	EyeCube()
 	{

@@ -358,6 +358,8 @@ enum class EnemyAttackPattern {
     LASER,
     TWIN_LASER,
     TRAIL,
+    ONE_WALL,
+    TWO_WALL,
     SPAWNING,
     NONE
 };

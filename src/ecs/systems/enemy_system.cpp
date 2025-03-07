@@ -757,6 +757,54 @@ void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burs
     burst.burstCooldown = 200;
 }
 
+void EnemySystem::shootOneWall(AttackData atkData, float angle, float elapsed_ms)
+{
+    Map& map = registry.maps.components[0];
+    vec2 roomStartPos = map.currRoom.roomStart;
+    vec2 roomEndPos = map.currRoom.roomEnd;
+    float roomDiagonal = glm::distance(roomStartPos, roomEndPos);
+
+    vec2 velocity = vec2(cos(angle), sin(angle));
+    vec2 perp = vec2(-velocity.y, velocity.x);
+    vec2 startPos = (roomEndPos + ((roomStartPos - roomEndPos) / 2.f)) - velocity * roomDiagonal / 1.9f;
+    int numBullets = floor(roomDiagonal / (atkData.size.x * 3.f));
+   
+    float segment = roomDiagonal / (2.f * numBullets);
+
+    vec2 veer = atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y));
+
+    for (int i = 0; i < numBullets; i++) {
+        createEnemyBullet(render, startPos + perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+        createEnemyBullet(render, startPos - perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+    }
+}
+
+void EnemySystem::shootTwoWall(AttackData atkData, float angle, float elapsed_ms)
+{
+    Map& map = registry.maps.components[0];
+    vec2 roomStartPos = map.currRoom.roomStart;
+    vec2 roomEndPos = map.currRoom.roomEnd;
+    float roomDiagonal = glm::distance(roomStartPos, roomEndPos);
+
+    vec2 velocity = vec2(cos(angle), sin(angle));
+    vec2 perp = vec2(-velocity.y, velocity.x);
+    vec2 startPosA = (roomEndPos + ((roomStartPos - roomEndPos) / 2.f)) - velocity * roomDiagonal / 1.9f;
+    vec2 startPosB = (roomEndPos + ((roomStartPos - roomEndPos) / 2.f)) - perp * roomDiagonal / 1.9f;
+    int numBullets = floor(roomDiagonal / (atkData.size.x * 3.f));
+
+    float segment = roomDiagonal / (2.f * numBullets);\
+
+    vec2 veer = atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y));
+
+    for (int i = 0; i < numBullets; i++) {
+        createEnemyBullet(render, startPosA + perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+        createEnemyBullet(render, startPosA - perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+
+        createEnemyBullet(render, startPosB + velocity * (segment * (i + 0.5f)), perp, veer, atkData);
+        createEnemyBullet(render, startPosB - velocity * (segment * (i + 0.5f)), perp, veer, atkData);
+    }
+}
+
 void EnemySystem::shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
 {
     // std::cout << burst.curBurst << std::endl;
@@ -881,6 +929,14 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
             burst.curBurst = atkData.numBullets;
             burst.burstCooldown = 0;
         }
+    } else if (atkData.attackType == EnemyAttackPattern::ONE_WALL)
+    {
+        shootOneWall(atkData, atkData.angleOffset, elapsed_ms);
+        currPattern.currAtkCD = currPattern.maxAtkCD;
+    } else if (atkData.attackType == EnemyAttackPattern::TWO_WALL)
+    {
+        shootTwoWall(atkData, atkData.angleOffset, elapsed_ms);
+        currPattern.currAtkCD = currPattern.maxAtkCD;
     }
 }
 
