@@ -111,6 +111,11 @@ You decide not to pop your stack.
 ITEM PopStack -1 1
 You've already used this! Thinking back, why does a run-down lab have a machine like this anyway?
 
+ITEM PopStack -1 2
+Would you like to pop your stack?
+Speaker Pop Console pop_console.png
+CHOICES Yes\No
+
 ITEM PushStack -1 0
 This seems to be one of those machines that can directly link to robots and push data onto their stacks.
 This one in particular seems to have the following data: {0}
