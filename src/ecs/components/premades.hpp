@@ -2424,11 +2424,11 @@ struct RodOfC : Enemy {
 		RECTANGLE,
 		{dmgUp},
 		blunt,
-		4,
+		8,
 		-M_PI / 4.f,
 		{15, 15},
 		400,
-		2000,
+		5000,
 		{200, M_PI / 1.5},
 		0,
 		2,
@@ -2451,19 +2451,92 @@ struct RodOfC : Enemy {
 		EnemyBulletDeath::NONE,
 		EnemyType::EnemyMedicalRodA};
 
-	Reaction AttackLaser{
+	const AttackData iceWall{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
+		{},
+		sizeUp,
+		12,
+		M_PI / 6.f,
+		{500, 15},
+		250,
+		10000,
+		{125, 0},
+		0,
+		-100,
+		0
+	};
+
+	const AttackData magicMissile{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{dmgUp, bulletRangeDown},
+		bulletPierceUp,
+		5,
+		0,
+		{20, 40},
+		500,
+		2000,
+		{120, 30},
+		0,
+		0,
+		0.02
+	};
+
+	const AttackData fireball{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{accuracyUp},
+		accuracyDown,
+		1,
+		0,
+		{80, 80},
+		300,
+		4000,
+		{0, 0},
+		0,
+		0,
+		0.07,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	const AttackData HomingShot{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{dmgDown, dmgDown},
+		blunt,
+		3,
+		M_PI / 4.0,
+		{20, 20},
+		500,
+		3000,
+		{0.0, 0.0},
+		0,
+		0,
+		0.01};
+
+	Reaction duration{
 		ReactionType::DURATION,
 		0};
-	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {AttackLaser, }, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::REGENERATING};
-	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 1500.f, 1500.f, {AttackLaser}, 2, true, 0.f, 700.f, twelveSpiralShot, };
-	EnemyPattern whipState = {"WHIP", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {AttackLaser}, 3, true, 0.f, 100.f, whip};
-	EnemyPattern protection_pulse = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {AttackLaser, }, 4, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::PROTECTED};
-	EnemyPattern Spawning = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 1500.f, 1500.f, {AttackLaser}, 0, true, 0.f, 700.f, Spawn, SpecialStates::PROTECTED, SpecialStates::NORMAL};
+
+	Reaction lowHP{
+		ReactionType::TWENTYFIVE_HEALTH,
+		8};
+
+	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, lowHP}, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::REGENERATING};
+	EnemyPattern random_pos = {"TELEPORT", EnemyBehavior::RANDOM, {}, 0, 1500.f, 1500.f, {duration, lowHP}, 2, true, 0.f, 700.f, magicMissile, };
+	EnemyPattern coolDown = {"IDLE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration, lowHP}, 6, false, 0.f, 0.f, NoAttack, SpecialStates::PROTECTED};
+	EnemyPattern whipState = {"WHIP", EnemyBehavior::IDLE, {}, 0, 2500.f, 2500.f, {duration, lowHP}, 7, true, 0.f, 100.f, whip};
+	EnemyPattern coolDown2 = {"IDLE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration, lowHP}, 5, false, 0.f, 0.f, NoAttack, SpecialStates::VULNERABLE};
+	EnemyPattern protection_pulse = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, lowHP}, 3, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::INVISIBLE};
+	EnemyPattern wall = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, lowHP}, 4, true, 0.f, 1000.f, iceWall, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
+	EnemyPattern coolDown3 = {"IDLE", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {duration, lowHP}, 0, true, 100.f, 750.f, HomingShot, SpecialStates::VULNERABLE};
+	EnemyPattern Spawning = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 2500.f, Spawn, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	RodOfC()
 	{
 		maxHealth = 800;
 		currHealth = maxHealth;
-		enemyPatterns = {heal_state, telePortState, whipState, protection_pulse, Spawning};
+		enemyPatterns = {heal_state, random_pos, coolDown, whipState, coolDown2, protection_pulse, wall, coolDown3, Spawning};
 		sprite = {
 			"RodOfCaduceus.png",
 			EFFECT_ASSET_ID::TEXTURED,
@@ -2481,9 +2554,23 @@ struct RodOfA : Enemy {
 	Reaction AttackLaser{
 		ReactionType::DURATION,
 		0};
+	const AttackData spray{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{numBulletsUp, playerSpeedDown},
+		blunt,
+		3,
+		M_PI / 12,
+		{30, 20},
+		400,
+		500,
+		{400, -M_PI / 2},
+		0,
+		0,
+		0};
 	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {AttackLaser, }, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::REGENERATING};
-	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 2, true, 0.f, 700.f, twelveSpiralShot, SpecialStates::UNDERGROUND, SpecialStates::NORMAL};
-	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 2}}, 0, true, 50.f, 50.f, fourAllAround};
+	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 2, true, 0.f, 700.f, fourAllAround, SpecialStates::NORMAL, SpecialStates::NORMAL};
+	EnemyPattern chargingState = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 2}}, 0, true, 50.f, 250.f, spray, SpecialStates::VULNERABLE};
 
 	RodOfA()
 	{

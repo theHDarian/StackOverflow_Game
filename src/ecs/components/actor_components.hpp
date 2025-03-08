@@ -750,7 +750,7 @@ struct AOEIndicator {
 };
 
 struct Regenerate {
-    float max = 1000;
+    float max = 2000;
     float countdown = max;
     float healAmount = 1;
     float healInterval = 250;
