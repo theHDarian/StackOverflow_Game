@@ -2323,6 +2323,116 @@ struct MedBoid : Enemy
 	}
 };
 
+struct PillBoid : Enemy
+{
+	Reaction normalboid{
+		ReactionType::DURATION,
+		0};
+
+	Reaction singularityTransition1{
+		ReactionType::DURATION,
+		1};
+
+	Reaction supernovaTransition1{
+		ReactionType::DURATION,
+		2};
+	Reaction singularityTransition2{
+		ReactionType::DURATION,
+		3};
+
+	Reaction supernovaTransition2{
+		ReactionType::DURATION,
+		4};
+
+	Reaction allyHurt{
+		ReactionType::TEAM_HURT,
+		1};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern singularityState1 = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 1000.f, 1000.f, {supernovaTransition1}, 2, false, 0.f, 0.f, NoAttack};
+	EnemyPattern supernovaState1 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 3000.f, 3000.f, {singularityTransition2}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern singularityState2 = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 1000.f, 1000.f, {supernovaTransition2}, 4, false, 0.f, 0.f, NoAttack};
+	EnemyPattern supernovaState2 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 5, false, 0.f, 0.f, NoAttack};
+	// EnemyPattern FishBoidState = {"BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+	EnemyPattern giveRegen = {"GIVE REGEN", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 500.f, 500.f, {normalboid}, 0, false, 0.f, 0.f, NoAttack};
+	PillBoid()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {boidState, singularityState1, supernovaState1, singularityState2, supernovaState2, giveRegen};
+		sprite = {
+			"PillBoid.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({48.f, 24.f});
+		patternIndex = 0;
+		rotatePower = 1.f;
+	}
+};
+
+struct PillBoidSpawner : Enemy
+{
+
+	const AttackData cannonShot{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{dmgUp, bulletSpeedUp},
+		{playerSpeedDown},
+		2,
+		M_PI / 2,
+		{120, 120},
+		60,
+		10000,
+		{400, -M_PI / 4},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER};
+	const AttackData spawning{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		2,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyMedicalPillBoid};
+
+	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, {ReactionType::PLAYER_CLOSE, 4}}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern chargingState = {"CHARGING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 2}}, 2, false, 0.f, 0.f, NoAttack};
+	EnemyPattern backUp = {"RECOIL", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 3, false, 0.f, 0.f, NoAttack};
+	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, cannonShot};
+	EnemyPattern spawn = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 5}}, 5, true, 0.f, 200.f, spawning};
+	EnemyPattern rest = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 2000.f, NoAttack};
+	EnemyPattern laser = {"LASER", EnemyBehavior::IDLE, {}, 0, 0.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, FastLaser};
+
+	PillBoidSpawner()
+	{
+		maxHealth = 400;
+		currHealth = maxHealth;
+		enemyPatterns = {random1, chargingState, backUp, shootCannon, spawn, rest, laser};
+		patternIndex = 0;
+		sprite = {
+			"enemy_hifi_003_hard.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({300.f / 2.f, 300.f / 2.f});
+		rotatePower = 1.f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 0.3;
+		armour = 3;
+	};
+};
+
+
 struct Scissors : Enemy
 {
 	const AttackData explode{

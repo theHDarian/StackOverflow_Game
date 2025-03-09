@@ -1645,6 +1645,20 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			// healer.healPower = 15.f;
             break;
         }
+	case EnemyMedicalPillBoid:
+		{
+			enemy = PillBoid();
+			Boid &boid = registry.boids.emplace(entity);
+			boid.position = pos;
+			float randomX = getRandomFloat(-150.f, 150.f);
+			float randomY = getRandomFloat(-150.f, 150.f);
+			boid.velocity = vec2(randomX, randomY);
+			boid.maxSpeed = 500.f;
+			Buffer& buffer = registry.buffers.emplace(entity);
+			buffer.range = 500.f;
+			buffer.maxCoolDown = 1000.f;
+			break;
+		}
 	default:
 		assert(false);
 	};

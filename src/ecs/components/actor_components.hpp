@@ -343,6 +343,9 @@ enum EnemyType {
     EnemyScissors,
     EnemyMedicalRodA,
     EnemyMedicalRodC,
+    EnemyMedicalPillBoid,
+    EnemyMedicalPillBoidSpawner,
+
 };
 
 enum class EnemyAttackPattern {
