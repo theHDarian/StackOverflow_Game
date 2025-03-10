@@ -1605,6 +1605,16 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = DrillWormHead();
 		break;
 	}
+	case EnemySpinePatrolWormHead:
+	{
+		enemy = SpinePatrolWormHead();
+		break;
+	}
+	case EnemySpineFollowWormHead:
+	{
+		enemy = SpineFollowWormHead();
+		break;
+	}
 	case EnemyDynamite:
 	{
 		enemy = Dynamite();
@@ -1783,6 +1793,12 @@ void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity hea
 		break;
 	case EnemyChainDogBody:
 		enemy = ChainDogBody();
+		break;
+	case EnemySpinePatrolWormBody:
+		enemy = SpinePatrolWormBody();
+		break;
+	case EnemySpineFollowWormBody:
+		enemy = SpineFollowWormBody();
 		break;
 	default:
 		assert(false);

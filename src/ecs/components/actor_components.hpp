@@ -346,6 +346,10 @@ enum EnemyType {
     EnemyMedicalRodC,
     EnemyEyeCube,
     EnemyProstheticHand,
+    EnemySpinePatrolWormHead,
+    EnemySpinePatrolWormBody,
+    EnemySpineFollowWormHead,
+    EnemySpineFollowWormBody,
 };
 
 enum class EnemyAttackPattern {

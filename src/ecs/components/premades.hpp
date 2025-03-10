@@ -2558,6 +2558,136 @@ struct ProstheticHand : Enemy
 	};
 };
 
+struct SpinePatrolWormHead : Enemy
+{
+	Reaction gotTo = {
+		ReactionType::FINISH_PATROL,
+		1 };
+
+	Reaction gotTo2 = {
+		ReactionType::FINISH_PATROL,
+		2 };
+
+
+	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_GOTO, { vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {}, 1, false, 0.f, 5000.f, quadShot };
+
+	SpinePatrolWormHead()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { startState, loopState};
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_0.png",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+
+		headData.size = 20;
+		headData.body = EnemySpinePatrolWormBody;
+		headData.constrainDistance = 50.f;
+	};
+};
+
+struct SpinePatrolWormBody : Enemy
+{
+	const AttackData dualShot{
+	EnemyAttackPattern::RADIAL,
+	TRIANGLE,
+	{},
+	sizeUp,
+	2,
+	M_PI * 0.5f,
+	{20, 20},
+	200,
+	2000,
+	{0.0, 0.0},
+	0,
+	0,
+	0 };
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 2500.f, dualShot };
+
+	SpinePatrolWormBody()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_0.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
+struct SpineFollowWormHead : Enemy
+{
+	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_FOLLOW, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 5000.f, quadShot };
+
+	SpineFollowWormHead()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { startState};
+
+		collisionBullet = playerSpeedUp;
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_8.png",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+
+		headData.size = 10;
+		headData.body = EnemySpineFollowWormBody;
+		headData.constrainDistance = 50.f;
+	};
+};
+
+struct SpineFollowWormBody : Enemy
+{
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none };
+
+	SpineFollowWormBody()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+
+		collisionBullet = playerSpeedUp;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_8.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
 
 //----------------------------------------- MINING REGION ENEMIES ---------------------------------
 struct SmallMole : Enemy
@@ -2565,8 +2695,8 @@ struct SmallMole : Enemy
 	const AttackData dirtBlast{
 		EnemyAttackPattern::BURST,
 		CIRCLE,
-		{dmgUp},
-		playerSpeedDown,
+		{dashRechargeUp},
+		dashRechargeDown,
 		5,
 		0,
 		{30, 30},
