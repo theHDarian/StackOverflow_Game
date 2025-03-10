@@ -463,6 +463,7 @@ enum class EnemyRotationBehavior {
 
 enum class ReactionType {
     DURATION,
+    PLAYER_FAR,
     PLAYER_CLOSE,
     PLAYER_REALLY_CLOSE,
     PLAYER_BULLET_CLOSE,

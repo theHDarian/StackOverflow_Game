@@ -329,6 +329,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	vec2 EnemyPos = movement.posA;
 	vec2 EnemyPosMotion = registry.motions.get(entity).position;
 	float distance = glm::distance(playerPos, EnemyPos);
+	float farDistance = 800.f;
 	float closeDistance = 400.f;
 	float reallyCloseDistance = 100.f;
 	float hpPercent = static_cast<float>(enemy.currHealth) / static_cast<float>(enemy.maxHealth);
@@ -519,6 +520,18 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 				reaction_found = true;
 				handleSpecialStates(*reaction, entity);
 			}
+		}
+	}
+	if (!reaction_found && distance > farDistance)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_FAR);
+		if (reaction)
+		{
+			// std::cout << "got reaction for follow player" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
 		}
 	}
 	if (!reaction_found && (currPattern.reactions.size() == 0 || getReactions(currPattern.reactions, ReactionType::DURATION)))
