@@ -1659,6 +1659,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			buffer.maxCoolDown = 1000.f;
 			break;
 		}
+	case EnemyMedicalPillBoidSpawner:
+		{
+			enemy = PillBoidSpawner();
+			break;
+		}
 	default:
 		assert(false);
 	};
