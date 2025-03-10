@@ -2502,6 +2502,62 @@ struct RodOfA : Enemy {
 
 };
 
+struct ProstheticHand : Enemy
+{
+
+	const AttackData bloodTrail{
+		EnemyAttackPattern::TRAIL,
+		TRIANGLE,
+		{dmgUp},
+		dmgDown,
+		1,
+		0,
+		{15, 15},
+		0,
+		4000,
+		{0, 0},
+		0,
+		0,
+		0
+	};
+
+	Reaction duration0 = {
+		ReactionType::DURATION,
+		0 
+	};
+
+
+	Reaction duration1 = {
+		ReactionType::DURATION,
+		1 
+	};
+
+	EnemyPattern restingState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 400.f, 400.f, {duration1}, 1, false, 0.f, 5000.f, quadShot };
+	EnemyPattern movingState = { "ROLLING", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 800.f, 800.f, {duration0}, 0, true, 0.f, 50.f, bloodTrail };
+
+	ProstheticHand()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { restingState, movingState };
+
+		patternIndex = 0;
+		sprite = {
+			"hand_prosthetic",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			1,
+			3,
+			400
+		};
+		scale = vec2({ 240.0f / 2, 120.f / 2 });
+		rotatePower = 10.0;
+		speedMultiplier = 2.0f;
+	};
+};
+
 
 //----------------------------------------- MINING REGION ENEMIES ---------------------------------
 struct SmallMole : Enemy
@@ -2578,6 +2634,58 @@ struct SmallBoulder : Enemy
 	};
 };
 
+struct Dynamite : Enemy
+{
+	const AttackData blowup{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		blunt,
+		10,
+		0.0,
+		{20, 20},
+		300,
+		200,
+		{0.0, 0.0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	Reaction playerClose = {
+		ReactionType::PLAYER_REALLY_CLOSE,
+		1 };
+
+	Reaction bulletClose = {
+		ReactionType::PLAYER_BULLET_CLOSE,
+		1 };
+
+	EnemyPattern waitingState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 1000000.f, 1000000.f, {playerClose, bulletClose}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern explodingState = { "ROLLING", EnemyBehavior::DEATHSTATE, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 5000.f, blowup };
+
+	Dynamite()
+	{
+		maxHealth = 40;
+		currHealth = maxHealth;
+
+		enemyPatterns = { waitingState, explodingState };
+
+		patternIndex = 0;
+		sprite = {
+			"dynamite",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			1,
+			4,
+			200
+		};
+		scale = vec2({ 96.f / 2, 48.f / 2 });
+		rotatePower = 0.0;
+		speedMultiplier = 0.0f;
+	};
+};
 
 struct BigBoulder : Enemy
 {

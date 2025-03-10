@@ -980,6 +980,7 @@ const RoomPreset BossRoomWorm{
     {{{BossDrillWormHead, {1.5f, 1.5f}}}},
     //{{{EnemyEyeCube, {0.45f, 0.45f}}}},
     //{{{EnemySmallMole, {0.45f, 0.45f}}}},
+    //{{{EnemyDynamite, {0.2f, 0.2f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,

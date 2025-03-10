@@ -330,6 +330,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	vec2 EnemyPosMotion = registry.motions.get(entity).position;
 	float distance = glm::distance(playerPos, EnemyPos);
 	float closeDistance = 400.f;
+	float reallyCloseDistance = 100.f;
 	float hpPercent = static_cast<float>(enemy.currHealth) / static_cast<float>(enemy.maxHealth);
 	EnemyPattern &currPattern = enemy.currEnemyPattern();
 	bool reaction_found = false;
@@ -496,17 +497,31 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 	if (!reaction_found && distance < closeDistance)
 	{
-		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
-		if (reaction)
+		if (distance < reallyCloseDistance)
 		{
-			// std::cout << "got reaction for follow player" << std::endl;
-			enemy.patternIndex = reaction->index;
-			enemy.newPattern = true;
-			reaction_found = true;
-			handleSpecialStates( *reaction, entity);
+			auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_REALLY_CLOSE);
+			if (reaction)
+			{
+				// std::cout << "got reaction for follow player" << std::endl;
+				enemy.patternIndex = reaction->index;
+				enemy.newPattern = true;
+				reaction_found = true;
+				handleSpecialStates(*reaction, entity);
+			}
+		}
+		else {
+			auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
+			if (reaction)
+			{
+				// std::cout << "got reaction for follow player" << std::endl;
+				enemy.patternIndex = reaction->index;
+				enemy.newPattern = true;
+				reaction_found = true;
+				handleSpecialStates(*reaction, entity);
+			}
 		}
 	}
-	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::DURATION))
+	if (!reaction_found && (currPattern.reactions.size() == 0 || getReactions(currPattern.reactions, ReactionType::DURATION)))
 	{
 		// std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
 		if (currPattern.curDuration < 0.f)
@@ -516,6 +531,24 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			// std::cout << currPattern.next << " index currPattern.next" << std::endl;
 			currPattern.curDuration = currPattern.maxDuration;
 			// std::cout << "change to " << enemy.currEnemyPattern().name << std::endl;
+		}
+	}
+	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::PLAYER_BULLET_CLOSE))
+	{
+		float closestPBullet = 100000.f;
+		for (Entity e : registry.playerBullets.entities) {
+			Motion& m = registry.motions.get(e);
+			closestPBullet = min(closestPBullet, glm::distance(m.position, EnemyPos));
+		}
+
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_BULLET_CLOSE);
+		if (reaction && closestPBullet < reallyCloseDistance)
+		{
+			// std::cout << "got reaction for follow player" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
 		}
 	}
 }

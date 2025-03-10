@@ -1605,6 +1605,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = DrillWormHead();
 		break;
 	}
+	case EnemyDynamite:
+	{
+		enemy = Dynamite();
+		break;
+	}
 	case EnemyChainDogHead:
 	{
 		enemy = ChainDogHead();
@@ -1625,6 +1630,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
         enemy = Scissors();
         break;
     }
+	case EnemyProstheticHand:
+	{
+		enemy = ProstheticHand();
+		break;
+	}
 	case EnemyMedicalRodA:
         {
             enemy = RodOfA();

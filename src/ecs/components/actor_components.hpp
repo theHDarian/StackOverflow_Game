@@ -300,6 +300,7 @@ enum EnemyType {
     EnemyHealer,
     EnemyBioBoid,
     EnemySmallMole,
+    EnemyDynamite,
     EnemySmallBoulder,
     EnemyBigBoulder,
     BossDrillWormHead,
@@ -344,6 +345,7 @@ enum EnemyType {
     EnemyMedicalRodA,
     EnemyMedicalRodC,
     EnemyEyeCube,
+    EnemyProstheticHand,
 };
 
 enum class EnemyAttackPattern {
@@ -462,6 +464,7 @@ enum class EnemyRotationBehavior {
 enum class ReactionType {
     DURATION,
     PLAYER_CLOSE,
+    PLAYER_REALLY_CLOSE,
     PLAYER_BULLET_CLOSE,
     FINISH_PATROL,
     SEVENTYFIVE_HEALTH,
