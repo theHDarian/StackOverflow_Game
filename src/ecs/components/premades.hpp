@@ -264,7 +264,7 @@ struct AttackData {
 	EnemyBulletShape shape = EnemyBulletShape::CIRCLE;
 	std::vector<BulletStackEffect> rareBulletEffects;
 	BulletStackEffect defaultEffect;
-	int numBullets = 1;
+	int numBullets = 1; //For Wall attacks, refers to number of holes in the wall
 	int angleOffset = 0;
 	vec2 size = { 20,20 };
 	float speed = 200;
@@ -4539,8 +4539,8 @@ struct EyeCube : Enemy {
 	CIRCLE,
 	{},
 	dmgDown,
-	5,
-	M_PI / 4.f,
+	0,
+	0,
 	{40, 40},
 	150,
 	14000.f,

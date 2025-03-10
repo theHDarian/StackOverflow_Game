@@ -768,14 +768,24 @@ void EnemySystem::shootOneWall(AttackData atkData, float angle, float elapsed_ms
     vec2 perp = vec2(-velocity.y, velocity.x);
     vec2 startPos = (roomEndPos + ((roomStartPos - roomEndPos) / 2.f)) - velocity * roomDiagonal / 1.9f;
     int numBullets = floor(roomDiagonal / (atkData.size.x * 3.f));
-   
     float segment = roomDiagonal / (2.f * numBullets);
-
     vec2 veer = atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y));
 
+    bool hole = (atkData.numBullets % 2 != 0);
+    int holeSize = 2 * numBullets / (2 * atkData.numBullets + 1);
+    int holeTracker = holeSize / 2;
+
     for (int i = 0; i < numBullets; i++) {
-        createEnemyBullet(render, startPos + perp * (segment * (i + 0.5f)), velocity, veer, atkData);
-        createEnemyBullet(render, startPos - perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+        if (hole) {
+            holeTracker++;
+            hole = (holeTracker != holeSize);
+        }
+        else {
+            createEnemyBullet(render, startPos + perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+            createEnemyBullet(render, startPos - perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+            holeTracker -= (atkData.numBullets > 0) ? 1 : 0;
+            hole = (holeTracker == 0);
+        }
     }
 }
 
@@ -791,17 +801,28 @@ void EnemySystem::shootTwoWall(AttackData atkData, float angle, float elapsed_ms
     vec2 startPosA = (roomEndPos + ((roomStartPos - roomEndPos) / 2.f)) - velocity * roomDiagonal / 1.9f;
     vec2 startPosB = (roomEndPos + ((roomStartPos - roomEndPos) / 2.f)) - perp * roomDiagonal / 1.9f;
     int numBullets = floor(roomDiagonal / (atkData.size.x * 3.f));
-
     float segment = roomDiagonal / (2.f * numBullets);\
-
     vec2 veer = atkData.veer.x * vec2(cos(atkData.veer.y), sin(atkData.veer.y));
 
-    for (int i = 0; i < numBullets; i++) {
-        createEnemyBullet(render, startPosA + perp * (segment * (i + 0.5f)), velocity, veer, atkData);
-        createEnemyBullet(render, startPosA - perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+    bool hole = (atkData.numBullets % 2 != 0);
+    int holeSize = 2 * numBullets / (2 * atkData.numBullets + 1);
+    int holeTracker = holeSize / 2;
 
-        createEnemyBullet(render, startPosB + velocity * (segment * (i + 0.5f)), perp, veer, atkData);
-        createEnemyBullet(render, startPosB - velocity * (segment * (i + 0.5f)), perp, veer, atkData);
+    for (int i = 0; i < numBullets; i++) {
+        if (hole) {
+            holeTracker++;
+            hole = (holeTracker != holeSize);
+        }
+        else 
+        {
+            createEnemyBullet(render, startPosA + perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+            createEnemyBullet(render, startPosA - perp * (segment * (i + 0.5f)), velocity, veer, atkData);
+
+            createEnemyBullet(render, startPosB + velocity * (segment * (i + 0.5f)), perp, veer, atkData);
+            createEnemyBullet(render, startPosB - velocity * (segment * (i + 0.5f)), perp, veer, atkData);
+            holeTracker -= (atkData.numBullets > 0) ? 1 : 0;
+            hole = (holeTracker == 0);
+        }
     }
 }
 
