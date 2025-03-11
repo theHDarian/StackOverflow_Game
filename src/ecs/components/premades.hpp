@@ -264,13 +264,13 @@ struct AttackData {
 	EnemyBulletShape shape = EnemyBulletShape::CIRCLE;
 	std::vector<BulletStackEffect> rareBulletEffects;
 	BulletStackEffect defaultEffect;
-	int numBullets = 1;
+	int numBullets = 1; //For Wall attacks, refers to number of holes in the wall
 	int angleOffset = 0;
 	vec2 size = { 20,20 };
 	float speed = 200;
 	float bulletRange = 3000;
 	vec2 veer = { 0,0 }; // {magnitude, angle}, {growth, rotation} lasers, {#bullets per shot, burst CD} radial burst
-	int bulletPierce = 0;
+	int bulletPierce = 0; // Very low pierce implies ignore walls
 	int bulletBounce = 0; // Very low bounce implies piledriver (bullet sticks into the wall until duration)
 	float homing = 0;
 	EnemyBulletDeath 
@@ -2372,8 +2372,6 @@ struct EnemyTestPatrol : Enemy
 
 
 //----------------------------------------- MEDICAL REGION ENEMIES ---------------------------------
-
-
 struct MedBoid : Enemy
 {
 
@@ -2790,6 +2788,192 @@ struct RodOfA : Enemy {
 
 };
 
+struct ProstheticHand : Enemy
+{
+
+	const AttackData bloodTrail{
+		EnemyAttackPattern::TRAIL,
+		TRIANGLE,
+		{dmgUp},
+		dmgDown,
+		1,
+		0,
+		{15, 15},
+		0,
+		4000,
+		{0, 0},
+		0,
+		0,
+		0
+	};
+
+	Reaction duration0 = {
+		ReactionType::DURATION,
+		0 
+	};
+
+
+	Reaction duration1 = {
+		ReactionType::DURATION,
+		1 
+	};
+
+	EnemyPattern restingState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 400.f, 400.f, {duration1}, 1, false, 0.f, 5000.f, quadShot };
+	EnemyPattern movingState = { "ROLLING", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 800.f, 800.f, {duration0}, 0, true, 0.f, 50.f, bloodTrail };
+
+	ProstheticHand()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { restingState, movingState };
+
+		patternIndex = 0;
+		sprite = {
+			"hand_prosthetic",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			1,
+			3,
+			400
+		};
+		scale = vec2({ 240.0f / 2, 120.f / 2 });
+		rotatePower = 10.0;
+		speedMultiplier = 2.0f;
+	};
+};
+
+struct SpinePatrolWormHead : Enemy
+{
+	Reaction gotTo = {
+		ReactionType::FINISH_PATROL,
+		1 };
+
+	Reaction gotTo2 = {
+		ReactionType::FINISH_PATROL,
+		2 };
+
+
+	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_GOTO, { vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {}, 1, false, 0.f, 5000.f, quadShot };
+
+	SpinePatrolWormHead()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { startState, loopState};
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_0.png",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+
+		headData.size = 20;
+		headData.body = EnemySpinePatrolWormBody;
+		headData.constrainDistance = 50.f;
+	};
+};
+
+struct SpinePatrolWormBody : Enemy
+{
+	const AttackData dualShot{
+	EnemyAttackPattern::RADIAL,
+	TRIANGLE,
+	{},
+	sizeUp,
+	2,
+	M_PI * 0.5f,
+	{20, 20},
+	200,
+	2000,
+	{0.0, 0.0},
+	0,
+	0,
+	0 };
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 2500.f, dualShot };
+
+	SpinePatrolWormBody()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_0.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
+struct SpineFollowWormHead : Enemy
+{
+	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_FOLLOW, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 5000.f, quadShot };
+
+	SpineFollowWormHead()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { startState};
+
+		collisionBullet = playerSpeedUp;
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_8.png",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+
+		headData.size = 10;
+		headData.body = EnemySpineFollowWormBody;
+		headData.constrainDistance = 50.f;
+	};
+};
+
+struct SpineFollowWormBody : Enemy
+{
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none };
+
+	SpineFollowWormBody()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+
+		collisionBullet = playerSpeedUp;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_8.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
 
 //----------------------------------------- MINING REGION ENEMIES ---------------------------------
 struct SmallMole : Enemy
@@ -2797,8 +2981,8 @@ struct SmallMole : Enemy
 	const AttackData dirtBlast{
 		EnemyAttackPattern::BURST,
 		CIRCLE,
-		{dmgUp},
-		playerSpeedDown,
+		{dashRechargeUp},
+		dashRechargeDown,
 		5,
 		0,
 		{30, 30},
@@ -2866,6 +3050,58 @@ struct SmallBoulder : Enemy
 	};
 };
 
+struct Dynamite : Enemy
+{
+	const AttackData blowup{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		blunt,
+		10,
+		0.0,
+		{20, 20},
+		300,
+		200,
+		{0.0, 0.0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	Reaction playerClose = {
+		ReactionType::PLAYER_REALLY_CLOSE,
+		1 };
+
+	Reaction bulletClose = {
+		ReactionType::PLAYER_BULLET_CLOSE,
+		1 };
+
+	EnemyPattern waitingState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 1000000.f, 1000000.f, {playerClose, bulletClose}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern explodingState = { "ROLLING", EnemyBehavior::DEATHSTATE, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 5000.f, blowup };
+
+	Dynamite()
+	{
+		maxHealth = 40;
+		currHealth = maxHealth;
+
+		enemyPatterns = { waitingState, explodingState };
+
+		patternIndex = 0;
+		sprite = {
+			"dynamite",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			1,
+			4,
+			200
+		};
+		scale = vec2({ 96.f / 2, 48.f / 2 });
+		rotatePower = 0.0;
+		speedMultiplier = 0.0f;
+	};
+};
 
 struct BigBoulder : Enemy
 {
@@ -4802,9 +5038,73 @@ struct ScientistHandEnemy : Enemy
 	};
 };
 
-// struct EvilSkull : {
 
-// 	EvilSkull() {
+// ---------- MILITARY REGION ENEMIES -----------------------------------------------------------------------------------------------------------------------------
 
-// 	};
-// };
+struct EyeCube : Enemy {
+	const AttackData laserSweep{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{},
+	dmgDown,
+	1,
+	0,
+	{75, 75},
+	150,
+	3000.f,
+	{400, M_PI / 100},
+	0,
+	0,
+	0 };
+
+
+	const AttackData wallTest{
+	EnemyAttackPattern::TWO_WALL,
+	CIRCLE,
+	{},
+	dmgDown,
+	0,
+	0,
+	{40, 40},
+	150,
+	14000.f,
+	{0,0},
+	-100,
+	0,
+	0 };
+
+
+	Reaction duration0 = {
+	ReactionType::DURATION,
+	0 };
+
+
+	Reaction duration1 = {
+		ReactionType::DURATION,
+		1 };
+
+
+	EnemyPattern followState = { "ROLLING", EnemyBehavior::ROOK_FOLLOW, {}, 0, 7000.f, 7000.f, {duration1}, 1, false, 0.f, 5000.f, quadShot };
+	EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration0}, 0, true, 0.f, 3000.f, laserSweep };
+	//EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration0}, 0, true, 0.f, 2000.f, wallTest };
+
+
+	EyeCube()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+
+		enemyPatterns = { followState, attackState };
+
+		patternIndex = 0;
+		sprite = {
+			"EyeCube.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2({ 336.0f / 2, 336.f / 2 });
+		rotatePower = 1.0;
+		speedMultiplier = 4.0f;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+	};
+};

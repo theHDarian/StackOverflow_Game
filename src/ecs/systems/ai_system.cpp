@@ -329,7 +329,9 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	vec2 EnemyPos = movement.posA;
 	vec2 EnemyPosMotion = registry.motions.get(entity).position;
 	float distance = glm::distance(playerPos, EnemyPos);
+	float farDistance = 800.f;
 	float closeDistance = 400.f;
+	float reallyCloseDistance = 100.f;
 	float hpPercent = static_cast<float>(enemy.currHealth) / static_cast<float>(enemy.maxHealth);
 	EnemyPattern &currPattern = enemy.currEnemyPattern();
 	bool reaction_found = false;
@@ -496,17 +498,43 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	}
 	if (!reaction_found && distance < closeDistance)
 	{
-		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
+		if (distance < reallyCloseDistance)
+		{
+			auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_REALLY_CLOSE);
+			if (reaction)
+			{
+				// std::cout << "got reaction for follow player" << std::endl;
+				enemy.patternIndex = reaction->index;
+				enemy.newPattern = true;
+				reaction_found = true;
+				handleSpecialStates(*reaction, entity);
+			}
+		}
+		else {
+			auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_CLOSE);
+			if (reaction)
+			{
+				// std::cout << "got reaction for follow player" << std::endl;
+				enemy.patternIndex = reaction->index;
+				enemy.newPattern = true;
+				reaction_found = true;
+				handleSpecialStates(*reaction, entity);
+			}
+		}
+	}
+	if (!reaction_found && distance > farDistance)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_FAR);
 		if (reaction)
 		{
 			// std::cout << "got reaction for follow player" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
-			handleSpecialStates( *reaction, entity);
+			handleSpecialStates(*reaction, entity);
 		}
 	}
-	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::DURATION))
+	if (!reaction_found && (currPattern.reactions.size() == 0 || getReactions(currPattern.reactions, ReactionType::DURATION)))
 	{
 		// std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
 		if (currPattern.curDuration < 0.f)
@@ -516,6 +544,24 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			// std::cout << currPattern.next << " index currPattern.next" << std::endl;
 			currPattern.curDuration = currPattern.maxDuration;
 			// std::cout << "change to " << enemy.currEnemyPattern().name << std::endl;
+		}
+	}
+	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::PLAYER_BULLET_CLOSE))
+	{
+		float closestPBullet = 100000.f;
+		for (Entity e : registry.playerBullets.entities) {
+			Motion& m = registry.motions.get(e);
+			closestPBullet = min(closestPBullet, glm::distance(m.position, EnemyPos));
+		}
+
+		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_BULLET_CLOSE);
+		if (reaction && closestPBullet < reallyCloseDistance)
+		{
+			// std::cout << "got reaction for follow player" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
 		}
 	}
 }
@@ -593,6 +639,9 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::FOLLOW_PLAYER:
 		// std::cout << "follow!" << std::endl;
 		return getPlayerPos();
+	case EnemyBehavior::ROOK_FOLLOW:
+		// std::cout << "rook follow!" << std::endl;
+		return getRookPos(entity);
 	case EnemyBehavior::PATROLLING:
 		return getNextPatrolPos(entity);
 	case EnemyBehavior::EVADEBULLET:
@@ -642,6 +691,13 @@ vec2 AISystem::getCurrentPos(Entity entity)
 	// This resets movement speed to ignore speedModifier...
 	//movement.speed = 100.f;
 	return motion.position;
+}
+
+vec2 AISystem::getRookPos(Entity entity)
+{
+	vec2 dir = (getPlayerPos() - getCurrentPos(entity));
+	bool dir2 = (abs(dir.x) > abs(dir.y));
+	return getCurrentPos(entity) + (dir * vec2(dir2, !dir2));
 }
 
 vec2 AISystem::getTeleportPos(Entity entity)

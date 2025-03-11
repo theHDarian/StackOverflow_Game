@@ -184,6 +184,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	if (registry.moles.has(entity)) {
 		render_request = underGroundTexture;
 		motion.scale = vec2(264, 288) / 2.f;
+		motion.angle = 0.f;
 	} else {
         render_request = registry.renderRequests.get(entity);
     }

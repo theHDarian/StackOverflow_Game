@@ -300,6 +300,7 @@ enum EnemyType {
     EnemyHealer,
     EnemyBioBoid,
     EnemySmallMole,
+    EnemyDynamite,
     EnemySmallBoulder,
     EnemyBigBoulder,
     BossDrillWormHead,
@@ -346,6 +347,12 @@ enum EnemyType {
     EnemyMedicalPillBoid,
     EnemyMedicalPillBoidSpawner,
 
+    EnemyEyeCube,
+    EnemyProstheticHand,
+    EnemySpinePatrolWormHead,
+    EnemySpinePatrolWormBody,
+    EnemySpineFollowWormHead,
+    EnemySpineFollowWormBody,
 };
 
 enum class EnemyAttackPattern {
@@ -360,6 +367,8 @@ enum class EnemyAttackPattern {
     LASER,
     TWIN_LASER,
     TRAIL,
+    ONE_WALL,
+    TWO_WALL,
     SPAWNING,
     NONE
 };
@@ -411,6 +420,7 @@ enum class EnemyBehavior {
     // this is the basic
     RANDOM,
     ROLLING,
+    ROOK_FOLLOW,
     RANDOM_NEAR,
     RANDOM_FAR,
     FOLLOW_PLAYER,
@@ -460,7 +470,9 @@ enum class EnemyRotationBehavior {
 
 enum class ReactionType {
     DURATION,
+    PLAYER_FAR,
     PLAYER_CLOSE,
+    PLAYER_REALLY_CLOSE,
     PLAYER_BULLET_CLOSE,
     FINISH_PATROL,
     SEVENTYFIVE_HEALTH,

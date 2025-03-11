@@ -235,9 +235,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		EnemyBullet &eBullet = registry.enemyBullets.components[i];
 		Motion &motion = motion_registry.get(entity);
 
-		if (registry.lasers.has(entity))
-			continue;
-		if (eBullet.bulletSpeed <= 300)
+		if ((eBullet.bulletSpeed <= 300) || (eBullet.bulletPierce < -50) || (registry.lasers.has(entity)))
 			continue;
 
 		// check if dashing entity will intersect a wall
@@ -310,10 +308,13 @@ void PhysicsSystem::step(float elapsed_ms)
 		{
 			registry.collisions.emplace_with_duplicates(player, eBullets.entities[i]);
 		}
+		EnemyBullet& eBullet = registry.enemyBullets.components[i];
 		for (uint j = 0; j < walls.components.size(); j++)
 		{
 			// Should check for collision for piledriver bullets too, because their speed gets set to 0 on collision
-			if ((registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
+
+			if ((eBullet.bulletPierce > -1) &&
+				(registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
 				(registry.polyColliders.has(eBullets.entities[i]) && PolyToWall(eBullets.entities[i], walls.entities[j])))
 			{
 				registry.collisions.emplace_with_duplicates(eBullets.entities[i], walls.entities[j]);
