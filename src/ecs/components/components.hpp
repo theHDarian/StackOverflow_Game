@@ -233,7 +233,8 @@ struct RenderRequest {
 enum AnimationTypes {
 	NONE = 0,
 	REGULAR = 1,
-	ONCE = 2
+	ONCE = 2,
+	RANDOM = 3
 };
 
 struct Animation {

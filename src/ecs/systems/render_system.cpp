@@ -80,8 +80,11 @@ void RenderSystem::step(float elapsed_ms)
 				{
 					anim.frame = (anim.frame + 1 >= anim.max_frames) ? 0 : anim.frame + 1;
 				}
-				else
+				else if (anim.animate == AnimationTypes::RANDOM)
 				{
+					anim.frame = rand() % anim.max_frames;
+				}
+				else {
 					anim.frame = (anim.frame + 1) % anim.max_frames;
 				}
 			}
