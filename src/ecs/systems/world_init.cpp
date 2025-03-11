@@ -1466,11 +1466,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	case EnemyType::EnemyLaserSniper:
 		enemy = HifiLaserSniper();
-		registry.specialRotators.emplace(entity);
+		// registry.specialRotators.emplace(entity);
 		break;
 	case EnemyType::EnemyLaserSniperHard:
 		enemy = HifiLaserSniperHard();
-		registry.specialRotators.emplace(entity);
+		// registry.specialRotators.emplace(entity);
 		break;
 	case EnemyType::EnemyHifiCharger:
 		enemy = HifiCharger();
@@ -1665,7 +1665,26 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			// healer.healPower = 15.f;
             break;
         }
-	case EnemyEyeCube:
+	case EnemyMedicalPillBoid:
+		{
+			enemy = PillBoid();
+			Boid &boid = registry.boids.emplace(entity);
+			boid.position = pos;
+			float randomX = getRandomFloat(-150.f, 150.f);
+			float randomY = getRandomFloat(-150.f, 150.f);
+			boid.velocity = vec2(randomX, randomY);
+			boid.maxSpeed = 500.f;
+			Buffer& buffer = registry.buffers.emplace(entity);
+			buffer.range = 500.f;
+			buffer.maxCoolDown = 1000.f;
+			break;
+		}
+	case EnemyMedicalPillBoidSpawner:
+		{
+			enemy = PillBoidSpawner();
+			break;
+		}
+		case EnemyEyeCube:
 	{
 		enemy = EyeCube();
 		break;
@@ -2225,7 +2244,7 @@ Entity createEnemyLaser(RenderSystem* renderer, vec2 pos, float angle, Entity st
 	// No more laser special effects, too easy to farm
 	bullet.bulletEffects = {atkData.defaultEffect};
 	//bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
-	
+
 	bullet.shape = RECTANGLE;
 
 	Motion &motion = registry.motions.emplace(entity);

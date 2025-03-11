@@ -280,6 +280,7 @@ enum EnemyType {
     EnemyChainDogBody,
     BossBigC,
     BossBigCShield,
+    EnemySmallCShield,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -344,6 +345,9 @@ enum EnemyType {
     EnemyScissors,
     EnemyMedicalRodA,
     EnemyMedicalRodC,
+    EnemyMedicalPillBoid,
+    EnemyMedicalPillBoidSpawner,
+
     EnemyEyeCube,
     EnemyProstheticHand,
     EnemySpinePatrolWormHead,
@@ -593,12 +597,12 @@ struct Enemy {
     int maxHealth;
     int currHealth;
     vec2 velocity;
-    BulletStackEffect collisionBullet = {
+    std::vector<BulletStackEffect> collisionBullet = {{
         Inert,
         0,
         "Inert",
         "" 
-    };
+    }};
     std::vector<EnemyPattern> enemyPatterns;
     int patternIndex;
     EnemyPattern& currEnemyPattern() {
@@ -762,7 +766,7 @@ struct AOEIndicator {
 };
 
 struct Regenerate {
-    float max = 1000;
+    float max = 2000;
     float countdown = max;
     float healAmount = 1;
     float healInterval = 250;
