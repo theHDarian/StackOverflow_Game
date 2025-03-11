@@ -280,6 +280,7 @@ enum EnemyType {
     EnemyChainDogBody,
     BossBigC,
     BossBigCShield,
+    EnemySmallCShield,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -596,12 +597,12 @@ struct Enemy {
     int maxHealth;
     int currHealth;
     vec2 velocity;
-    BulletStackEffect collisionBullet = {
+    std::vector<BulletStackEffect> collisionBullet = {{
         Inert,
         0,
         "Inert",
         "" 
-    };
+    }};
     std::vector<EnemyPattern> enemyPatterns;
     int patternIndex;
     EnemyPattern& currEnemyPattern() {

@@ -224,6 +224,13 @@ const BulletStackEffect homingDown = {
 	"Homing Accuracy Down",
 	"" };
 
+const BulletStackEffect popCurrentStack = {
+	Pop,
+	0,
+	"Pop the stack",
+	""
+};
+
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
@@ -606,7 +613,7 @@ const AttackData FastLaser{
 	,{20, 20}
 	,0
 	, 2000
-	,{5000, 0}
+	,{5000, 0.97}
 	,0
 	,0
 	,0
@@ -1265,7 +1272,7 @@ struct SmallC : Enemy
 			1};
 
 		EnemyPattern idleState = {
-			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {duration}, 2, true, 2500, 7000.f, FastLaser};
+			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {duration}, 2, false, 2500, 7000.f, FastLaser};
 
 		EnemyPattern LaserSpin = {
 			"FOLLOW", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {duration}, 3, true, 0.f, 10000.f, FastLaser};
@@ -1284,7 +1291,7 @@ struct SmallC : Enemy
 			EFFECT_ASSET_ID::MESH,
 			GEOMETRY_BUFFER_ID::MESH_GB};
 		rotatePower = 0.6f;
-		scale = vec2({800, 800 * (1.998858f / 1.923352f)});
+		scale = vec2({300, 300 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		armour = 3;
 	};
@@ -1572,7 +1579,7 @@ struct OneBee : Enemy
 		scale = vec2({864 / 8.f, 480 / 8.f});
 		rotatePower = 1.f;
 		speedMultiplier = 3.0f;
-		collisionBullet = playerSpeedUp;
+		collisionBullet = {playerSpeedUp};
 	};
 };
 
@@ -1612,7 +1619,7 @@ struct TwoBee : Enemy
 			5};
 		scale = vec2({864 / 8.f, 480 / 8.f});
 		rotatePower = 1.f;
-		collisionBullet = playerSpeedUp;
+		collisionBullet = {playerSpeedUp};
 	};
 };
 
@@ -1662,7 +1669,7 @@ struct ThreeBee : Enemy
 			8};
 		scale = vec2({864 / 8.f, 720 / 8.f});
 		rotatePower = 1.f;
-		collisionBullet = playerSpeedUp;
+		collisionBullet = {playerSpeedUp};
 	};
 };
 
@@ -2323,7 +2330,7 @@ struct BioBoid : Enemy
 		};
 		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
-		collisionBullet = playerSpeedUp;
+		collisionBullet = {playerSpeedUp};
 	}
 };
 
@@ -2391,7 +2398,7 @@ struct MedBoid : Enemy
 		};
 		scale = vec2({25.f, 25.f});
 		patternIndex = 0;
-		collisionBullet = sizeUp;
+		collisionBullet = {sizeUp};
 	}
 };
 
@@ -2419,18 +2426,19 @@ struct PillBoid : Enemy
 	Reaction allyHurt{
 		ReactionType::TEAM_HURT,
 		1};
-	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {singularityTransition1}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {singularityTransition1}, 1, true, 0.f, 250.f, trail};
 	EnemyPattern singularityState1 = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 1000.f, 1000.f, {supernovaTransition1}, 2, false, 0.f, 0.f, NoAttack};
 	EnemyPattern supernovaState1 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 3000.f, 3000.f, {singularityTransition2}, 3, false, 0.f, 0.f, NoAttack};
 	EnemyPattern singularityState2 = {"GROUPING", EnemyBehavior::BOIDSGROUP, {}, 0, 1000.f, 1000.f, {supernovaTransition2}, 4, false, 0.f, 0.f, NoAttack};
-	EnemyPattern supernovaState2 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 5, false, 0.f, 0.f, NoAttack};
+	EnemyPattern supernovaState2 = {"EXPLODE", EnemyBehavior::BOIDSEXPLODE, {}, 0, 5000.f, 5000.f, {normalboid}, 0, true, 0.f, 200.f, trail};
+	// EnemyPattern charge = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 500.f, 500.f, {singularityTransition1}, 0, true, 0.f, 0.f, NoAttack};
 	// EnemyPattern FishBoidState = {"BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
-	EnemyPattern giveRegen = {"GIVE REGEN", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 500.f, 500.f, {singularityTransition1}, 0, false, 0.f, 0.f, NoAttack};
+	// EnemyPattern giveRegen = {"GIVE REGEN", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 500.f, 500.f, {singularityTransition1}, 0, false, 0.f, 0.f, NoAttack};
 	PillBoid()
 	{
 		maxHealth = 1;
 		currHealth = maxHealth;
-		enemyPatterns = {boidState, singularityState1, supernovaState1, singularityState2, supernovaState2, giveRegen};
+		enemyPatterns = {boidState, singularityState1, supernovaState1, singularityState2, supernovaState2};
 		sprite = {
 			"PillBoid.png",
 			EFFECT_ASSET_ID::TEXTURED,
@@ -2439,6 +2447,7 @@ struct PillBoid : Enemy
 		scale = vec2({48.f, 24.f});
 		patternIndex = 0;
 		rotatePower = 1.f;
+		collisionBullet = {sizeDown, sizeDown};
 	}
 };
 
@@ -2446,11 +2455,11 @@ struct PillBoidSpawner : Enemy
 {
 
 	const AttackData cannonShot{
-		EnemyAttackPattern::SHOTGUN,
+		EnemyAttackPattern::BURST,
 		CIRCLE,
 		{dmgUp, bulletSpeedUp},
 		{playerSpeedDown},
-		2,
+		3,
 		M_PI / 2,
 		{120, 70},
 		100,
@@ -2460,6 +2469,20 @@ struct PillBoidSpawner : Enemy
 		0,
 		0.01,
 		EnemyBulletDeath::CLUSTER};
+	const AttackData broadsideLasers{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{dmgUp, blunt},
+		bulletRangeUp,
+		2,
+		0,
+		{60, 60},
+		0,
+		4000,
+		{5000, 0},
+		0,
+		0,
+		0 };
 	const AttackData spawning{
 		EnemyAttackPattern::SPAWNING,
 		CIRCLE,
@@ -2480,22 +2503,22 @@ struct PillBoidSpawner : Enemy
 		EnemyAttackPattern::SHOTGUN,
 		RECTANGLE,
 		{},
-		bulletRangeUp,
-		3,
-		M_PI / 6.f,
-		{900, 7},
-		500,
+		sizeUp,
+		2,
+		M_PI / 2.f,
+		{20, 400},
+		200,
 		10000,
-		{125, 0},
+		{0, 0},
 		0,
 		-100,
-		0.04
+		0
 	};
 
 	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, {ReactionType::PLAYER_CLOSE, 4}}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern chargingState = {"CHARGING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 2}}, 2, false, 0.f, 0.f, NoAttack, SpecialStates::PROTECTED};
 	EnemyPattern backUp = {"RECOIL", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 3, false, 0.f, 0.f, NoAttack, SpecialStates::VULNERABLE};
-	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, cannonShot};
+	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, broadsideLasers};
 	EnemyPattern spawn = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 5}}, 5, true, 0.f, 200.f, spawning};
 	EnemyPattern rest = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 800.f, 800.f, {{ReactionType::DURATION, 0}}, 6, false, 0.f, 200.f, NoAttack};
 	EnemyPattern laser = {"LASER", EnemyBehavior::IDLE, {}, 0, 0.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, iceWall};
@@ -2513,9 +2536,10 @@ struct PillBoidSpawner : Enemy
 		};
 		scale = vec2({128 * 1.5, 48 * 1.5});
 		rotatePower = 1.f;
-		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
 		speedMultiplier = 0.3;
 		armour = 3;
+		collisionBullet = {sizeDown, sizeDown, sizeDown};
 	};
 };
 
@@ -2930,7 +2954,7 @@ struct SpineFollowWormHead : Enemy
 
 		enemyPatterns = { startState};
 
-		collisionBullet = playerSpeedUp;
+		collisionBullet = {playerSpeedUp};
 
 		patternIndex = 0;
 		sprite = {
@@ -2958,7 +2982,7 @@ struct SpineFollowWormBody : Enemy
 		maxHealth = 200;
 		currHealth = maxHealth;
 
-		collisionBullet = playerSpeedUp;
+		collisionBullet = {playerSpeedUp};
 
 		enemyPatterns = { state };
 
@@ -5028,12 +5052,7 @@ struct ScientistHandEnemy : Enemy
 		scale = vec2(200, 200);
 		rotatePower = 0.f;
 		speedMultiplier = 4.f;
-		collisionBullet = {
-			Pop,
-			0,
-			"Pop the stack",
-			""
-		};
+		collisionBullet = {popCurrentStack, blunt, blunt, blunt};
 		armour =2;
 	};
 };

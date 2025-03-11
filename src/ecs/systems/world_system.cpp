@@ -838,7 +838,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		// Boid touch enemy, it die
 		if (registry.boids.has(other) && !registry.deleteds.has(other)) registry.deleteds.emplace(other);
 		Enemy& e = registry.enemies.get(other);
-		effects.push_back(e.collisionBullet);
+		effects.insert(effects.end(), e.collisionBullet.begin(), e.collisionBullet.end() );
 	}
 
 	//add to stack for enemy bullets
