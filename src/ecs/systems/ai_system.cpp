@@ -204,7 +204,7 @@ void AISystem::step(float elapsed_ms)
 		{
 			Boid &boid = registry.boids.get(entity);
 			computeBoidVelocity(entity, boid);
-			continue;
+			if (!registry.wormHeads.has(entity)) continue;
 		}
 
 		if (currPattern.type == EnemyBehavior::ROLLING) {
@@ -226,10 +226,12 @@ void AISystem::step(float elapsed_ms)
 				case EnemyBehavior::WORM_PATROL:
 					// Worm will Teleport to first position in spline if not there
 					// Remedy using WORM_GOTO
-					head.points[0] = catmullRomSplineLerp(currPattern.path, movement.t);
-					currPattern.pathIndex = currPattern.path.size() - 1;
-					movement.t += 0.01 * enemy.speedMultiplier;
-					if (movement.t > movement.points.size()) movement.t -= (float)currPattern.path.size();
+					//head.points[0] = catmullRomSplineLerp(currPattern.path, movement.t);
+					//currPattern.pathIndex = currPattern.path.size() - 1;
+					//movement.t += 0.01 * enemy.speedMultiplier;
+					//if (movement.t > movement.points.size()) movement.t -= (float)currPattern.path.size();
+					head.points[0] = moveTowards(head.points[0], lerpToRoom(currPattern.path[currPattern.pathIndex]), 3.f * enemy.speedMultiplier);
+					if (glm::distance(lerpToRoom(currPattern.path[currPattern.pathIndex]), head.points[0]) < 0.5) getNextPatrolPos(entity);
 					break;
 				case EnemyBehavior::WORM_RANDOM:
 					// TODO
@@ -247,7 +249,8 @@ void AISystem::step(float elapsed_ms)
 					movement.t = 0.f;
 					break;
 				default:
-					assert(false);
+					//assert(false);
+					head.points[0] = motion.position;
 				}
 
 				// Update constraints
@@ -265,7 +268,7 @@ void AISystem::step(float elapsed_ms)
 
 				// Move head enemy
 				vec2 direction = (head.points[0] - head.points[1]);
-				motion.position = head.points[1] + 0.5f * direction;
+				if (!registry.boids.has(entity)) motion.position = head.points[1] + 0.5f * direction;
 				motion.angle = atan2(direction.y, direction.x);
 				if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) motion.angle = 0;
 			}
@@ -740,11 +743,11 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 {
 	Enemy &enemy = registry.enemies.get(entity);
 	EnemyPattern &pattern = enemy.currEnemyPattern();
-	if (pattern.type != EnemyBehavior::PATROLLING)
-	{
-		// std::cout << "Different EnemyBehavior!" << std::endl;
-		return getCurrentPos(entity);
-	}
+	//if (pattern.type != EnemyBehavior::PATROLLING)
+	//{
+	//	// std::cout << "Different EnemyBehavior!" << std::endl;
+	//	return getCurrentPos(entity);
+	//}
 	// std::cout << "current state: " << pattern.name << std::endl;
 	pattern.pathIndex += 1;
 	if (pattern.pathIndex >= pattern.path.size())

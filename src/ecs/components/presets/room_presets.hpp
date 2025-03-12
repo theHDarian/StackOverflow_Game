@@ -978,7 +978,7 @@ const RoomPreset BossRoomCrab{
 
 const RoomPreset BossRoomWorm{
     {{{BossDrillWormHead, {1.5f, 1.5f}}}},
-    //{{{EnemyEyeCube, {0.45f, 0.45f}}}},
+    //{{{EnemySpinePatrolWormHead, {0.45f, 0.45f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,

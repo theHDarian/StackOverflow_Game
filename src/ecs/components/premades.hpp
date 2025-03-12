@@ -2880,7 +2880,8 @@ struct SpinePatrolWormHead : Enemy
 
 
 	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_GOTO, { vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot };
-	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {}, 1, false, 0.f, 5000.f, quadShot };
+	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.9, 0.5), vec2(0.8,0.8), vec2(0.5, 0.9), vec2(0.2, 0.8), vec2(0.1, 0.5), vec2(0.2,0.2), vec2(0.5, 0.1), vec2(0.9,0.2)}, 0, 1000000.f, 1000000.f, {}, 1, false, 0.f, 5000.f, quadShot};
+
 
 	SpinePatrolWormHead()
 	{
