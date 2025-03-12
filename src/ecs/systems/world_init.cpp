@@ -1605,6 +1605,17 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = DrillWormHead();
 		break;
 	}
+	case EnemyMiningBoidWormHead:
+	{
+		enemy = MiningBoidWormHead();
+		Boid& boid = registry.boids.emplace(entity);
+		boid.position = pos;
+		float randomX = getRandomFloat(-150.f, 150.f);
+		float randomY = getRandomFloat(-150.f, 150.f);
+		boid.velocity = vec2(randomX, randomY);
+		boid.maxSpeed = 500.f;
+		break;
+	}
 	case EnemySpinePatrolWormHead:
 	{
 		enemy = SpinePatrolWormHead();
@@ -1818,6 +1829,9 @@ void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity hea
 		break;
 	case EnemySpineFollowWormBody:
 		enemy = SpineFollowWormBody();
+		break;
+	case EnemyMiningBoidWormBody:
+		enemy = MiningBoidWormBody();
 		break;
 	default:
 		assert(false);

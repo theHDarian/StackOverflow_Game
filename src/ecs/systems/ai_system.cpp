@@ -249,8 +249,7 @@ void AISystem::step(float elapsed_ms)
 					movement.t = 0.f;
 					break;
 				default:
-					//assert(false);
-					head.points[0] = motion.position;
+					if (registry.boids.has(entity)) head.points[0] = registry.boids.get(entity).position;
 				}
 
 				// Update constraints
@@ -268,7 +267,7 @@ void AISystem::step(float elapsed_ms)
 
 				// Move head enemy
 				vec2 direction = (head.points[0] - head.points[1]);
-				if (!registry.boids.has(entity)) motion.position = head.points[1] + 0.5f * direction;
+				motion.position = head.points[1] + 0.5f * direction;
 				motion.angle = atan2(direction.y, direction.x);
 				if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP) motion.angle = 0;
 			}

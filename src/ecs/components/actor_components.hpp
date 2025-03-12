@@ -268,19 +268,21 @@ struct PlayerBullet {
 };
 
 enum EnemyType {
-    TutorialEnemyQuadshooter,
+
+    // Generic
+    EnemyMage,
+    EnemySkull,
+    EnemyEvilSkull,
+    EnemySword,
+    EnemyHealer,
     EnemyQuadshooter,
-    // //MediumEnemyClusterShot,
     EnemyMagnet,
-    // MediumEnemyHoming,
-    // EasyEnemySniper,
-    // HardEnemyBehavior
-    EnemyPufferfish,
-    EnemyChainDogHead,
-    EnemyChainDogBody,
-    BossBigC,
-    BossBigCShield,
     EnemySmallCShield,
+    TutorialEnemyQuadshooter,
+    
+    // Biology
+    BossCrab,
+    BossCrabLaser,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -291,23 +293,13 @@ enum EnemyType {
     EnemyCrab,
     EnemyEvilCrab,
     EnemyLaserCrab,
+    EnemyBioBoid,
+    EnemyPufferfish,
     EnemyBeeHive,
     HardEnemyAngel,
-    EnemySkull,
-    EnemyEvilSkull,
-    EnemyHifiBoid,
-    EnemySword,
-    EnemyMage,
-    EnemyHealer,
-    EnemyBioBoid,
-    EnemySmallMole,
-    EnemyDynamite,
-    EnemySmallBoulder,
-    EnemyBigBoulder,
-    BossDrillWormHead,
-    BossDrillWormBody,
-    ScientistlaserAttack,
-    EnemyFishBoid,
+
+    // Hifi
+    EnemyHifiBoidFish,
     EnemyTwinLaserVertical1,
     EnemyTwinLaserVertical2,
     EnemyHifiTwinLaserHorizontal1,
@@ -327,6 +319,39 @@ enum EnemyType {
     EnemyHifiTackShooter,
     EnemyHifiBallLauncher,
     EnemyHifiWhip,
+    BossBigC,
+    BossBigCShield,
+    EnemyHifiBoid,
+    EnemyFishBoid, // Unsure if this is hifi lol
+
+    // Mining
+    EnemyMiningBoulderSmall,
+    EnemyMiningBoulderBig,
+    EnemySmallMole,
+    EnemyDynamite,
+    EnemySmallBoulder,
+    EnemyBigBoulder,
+    BossDrillWormHead,
+    BossDrillWormBody,
+    EnemyChainDogHead,
+    EnemyChainDogBody,
+    EnemyMiningBoidWormHead,
+    EnemyMiningBoidWormBody,
+
+    // Medical
+    EnemyProstheticHand,
+    EnemyMedicalBoid,
+    EnemySpinePatrolWormHead,
+    EnemySpinePatrolWormBody,
+    EnemySpineFollowWormHead,
+    EnemySpineFollowWormBody,
+    EnemyMedicalBMP,
+    EnemyScissors,
+    EnemyMedicalRodA,
+    EnemyMedicalRodC,
+    EnemyMedicalPillBoid,
+    EnemyMedicalPillBoidSpawner,
+
     ScientistradialAttack,
     ScientistexplosiveAttack,
     ScientistHomingAttack,
@@ -335,25 +360,10 @@ enum EnemyType {
     ScientistShield,
     ScientistBoss,
     ScientistHand,
-    EnemyHifiBoidFish,
-    BossCrab,
-    BossCrabLaser,
-    EnemyMedicalBoid,
-    EnemyMiningBoulderSmall,
-    EnemyMiningBoulderBig,
-    EnemyMedicalBMP,
-    EnemyScissors,
-    EnemyMedicalRodA,
-    EnemyMedicalRodC,
-    EnemyMedicalPillBoid,
-    EnemyMedicalPillBoidSpawner,
+    ScientistlaserAttack,
 
+    // Military
     EnemyEyeCube,
-    EnemyProstheticHand,
-    EnemySpinePatrolWormHead,
-    EnemySpinePatrolWormBody,
-    EnemySpineFollowWormHead,
-    EnemySpineFollowWormBody,
 };
 
 enum class EnemyAttackPattern {
