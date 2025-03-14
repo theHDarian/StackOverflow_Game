@@ -270,6 +270,7 @@ struct PlayerBullet {
 enum EnemyType {
     TutorialEnemyQuadshooter,
     EnemyQuadshooter,
+    EnemyQuadshooterElite,
     // //MediumEnemyClusterShot,
     EnemyMagnet,
     // MediumEnemyHoming,
@@ -445,6 +446,7 @@ enum class EnemyBehavior {
     BOIDSWARMPLAYER,
     BOIDSFISH,
     FOLLOWSCIENTIST,
+    FOLLOWPARENT,
     WORM_FOLLOW,
     // Worm will Teleport to first position in spline if not there
     // Remedy using WORM_GOTO
@@ -771,4 +773,10 @@ struct Regenerate {
     float healAmount = 1;
     float healInterval = 250;
     float currHealInterval = 0;
+};
+
+struct EnemyPart {
+    Entity parent;
+    vec2 offset;
+    bool alwaysFollow = false;
 };

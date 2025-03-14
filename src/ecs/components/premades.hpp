@@ -757,6 +757,75 @@ struct Quadshooter : Enemy
 	};
 };
 
+struct EliteQuadshooter : Enemy
+{
+	const AttackData whip{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{dmgUp},
+		 blunt,
+		4,
+		M_PI/16,
+		{15, 15},
+		400,
+		2500,
+		{200, M_PI / 1.5},
+		0,
+		0,
+		0};
+
+	const AttackData broadsideLasers{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{bulletPierceUp},
+		dashRechargeUp,
+		4,
+		0,
+		{30, 30},
+		0,
+		4500,
+		{10, 0},
+		0,
+		0,
+		0 };
+
+	Reaction LowHP = {
+		ReactionType::FIFTY_HEALTH,
+		3,
+		SpecialStates::INVINCIBLE
+	};
+
+	Reaction Duration = {
+		ReactionType::DURATION,
+		1};
+
+	EnemyPattern rotateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 3500.f, 3500.f, {Duration, LowHP}, 1, true, 0.f, 100.f, whip};
+	EnemyPattern CoolDownState1 = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 6000.f, 6000.f, {Duration, LowHP}, 2, false, 0.f, 5000.f, NoAttack, SpecialStates::VULNERABLE};
+	EnemyPattern TelePort = {"TELEPORT", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 1000.f, 1000.f, {Duration, LowHP}, 0, false, 0.f, 500.f, NoAttack,SpecialStates::VULNERABLE};
+	EnemyPattern LaserRoatateState = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 5000.f, 5000.f, {Duration}, 4, true, 0.f, 5000.f, broadsideLasers,  };
+	EnemyPattern rotateState2 = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 4500.f, 4500.f, {Duration}, 5, true, 0.f, 100.f, whip};
+	EnemyPattern CoolDownState2 = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 5000.f, 6000.f, {Duration}, 6, false, 0.f, 5000.f, NoAttack, SpecialStates::VULNERABLE};
+	EnemyPattern TelePort2 = {"TELEPORT", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 1000.f, 1000.f, {Duration}, 3, false, 0.f, 500.f, NoAttack,SpecialStates::VULNERABLE};
+	EliteQuadshooter()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = {rotateState, CoolDownState1, TelePort, LaserRoatateState,  rotateState2, CoolDownState2, TelePort2};
+
+		patternIndex = 0;
+		sprite = {
+			"enemy_OverClockedQuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)};
+		scale = vec2({240.0f / 1.5, 240.f / 1.5});
+		rotatePower = 0.7f;
+		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
+	};
+};
+
+
 struct TutorialQuadshooter : Enemy
 {
 	const AttackData tutorialQuadShot{
@@ -930,7 +999,7 @@ struct LaserCrab : Enemy
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{bulletPierceUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		1,
 		0,
 		{20, 20},
@@ -1015,7 +1084,7 @@ struct BossChimeraCrab : Enemy {
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{bulletPierceUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		1,
 		0,
 		{20, 20},
@@ -1030,7 +1099,7 @@ struct BossChimeraCrab : Enemy {
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{bulletPierceUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		2,
 		0,
 		{60, 60},
@@ -1126,7 +1195,7 @@ struct BossChimeraCrab : Enemy {
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{bulletPierceUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		3,
 		0,
 		{0, 20},
@@ -1230,7 +1299,7 @@ struct SmallC : Enemy
 	const AttackData FastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUp, dashRechargeDown}
+		,{dashUp, dashRechargeUp}
 		,bulletPierceDown
 		,1
 		,0
@@ -1247,7 +1316,7 @@ struct SmallC : Enemy
 	const AttackData shortFastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUp, dashRechargeDown}
+		,{dashUp, dashRechargeUp}
 		,bulletPierceDown
 		,1
 		,0
@@ -1304,7 +1373,7 @@ struct BigC : Enemy
 	const AttackData FastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUp, dashRechargeDown}
+		,{dashUp, dashRechargeUp}
 		,bulletPierceDown
 		,1
 		,0
@@ -1321,7 +1390,7 @@ struct BigC : Enemy
 	const AttackData shortFastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
-		,{dashUp, dashRechargeDown}
+		,{dashUp, dashRechargeUp}
 		,bulletPierceDown
 		,1
 		,0
@@ -1392,7 +1461,7 @@ struct BossBigCCore : Enemy{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{bulletPierceUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		6,
 		M_PI / 6,
 		{0, 20},
@@ -1425,7 +1494,7 @@ struct BossBigCCore : Enemy{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		8,
 		0,
 		{20, 20},
@@ -1440,7 +1509,7 @@ struct BossBigCCore : Enemy{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		8,
 		M_PI / 8.f,
 		{20, 20},
@@ -1992,7 +2061,7 @@ struct EvilSkull : Enemy
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		8,
 		0,
 		{20, 20},
@@ -2007,7 +2076,7 @@ struct EvilSkull : Enemy
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		8,
 		M_PI / 8.f,
 		{20, 20},
@@ -2447,7 +2516,7 @@ struct PillBoid : Enemy
 		scale = vec2({48.f, 24.f});
 		patternIndex = 0;
 		rotatePower = 1.f;
-		collisionBullet = {sizeDown, sizeDown};
+		collisionBullet = {bulletRangeDown, bulletRangeDown};
 	}
 };
 
@@ -2503,7 +2572,7 @@ struct PillBoidSpawner : Enemy
 		EnemyAttackPattern::SHOTGUN,
 		RECTANGLE,
 		{},
-		sizeUp,
+		bulletRangeUp,
 		2,
 		M_PI / 2.f,
 		{20, 400},
@@ -2535,11 +2604,11 @@ struct PillBoidSpawner : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		scale = vec2({128 * 1.5, 48 * 1.5});
-		rotatePower = 1.f;
+		rotatePower = 0.6f;
 		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
 		speedMultiplier = 0.3;
 		armour = 3;
-		collisionBullet = {sizeDown, sizeDown, sizeDown};
+		collisionBullet = {bulletRangeDown, bulletRangeDown, blunt};
 	};
 };
 
@@ -2610,6 +2679,7 @@ struct Scissors : Enemy
 		rotatePower = 1.8f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 2.6f;
+		collisionBullet = {dmgDown};
 	}
 };
 
@@ -2617,8 +2687,22 @@ struct BMP : Enemy {
 	Reaction AttackLaser{
 		ReactionType::DURATION,
 		0};
+	const AttackData spiral{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{dmgUp},
+		blunt,
+		6,
+		0.0,
+		{20, 20},
+		300,
+		5000,
+		{200, -2 * M_PI / 2.0},
+		0,
+		0,
+		0};
 	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {AttackLaser, }, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
-	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 0, true, 0.f, 700.f, twelveSpiralShot, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
+	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 0, true, 0.f, 700.f, spiral, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	BMP()
 	{
 		maxHealth = 300;
@@ -2635,6 +2719,7 @@ struct BMP : Enemy {
 		patternIndex = 0;
 		scale = vec2({216 / 1.5f, 216 / 1.5f});
 		rotatePower = 0.f;
+		collisionBullet = {dmgDown};
 	};
 
 };
@@ -2767,6 +2852,7 @@ struct RodOfC : Enemy {
 		scale = vec2(912, 240) / 1.5f;
 		rotatePower = 0.f;
 		armour = 3;
+		collisionBullet = {playerSpeedDown, dmgDown};
 	};
 
 };
@@ -2808,6 +2894,7 @@ struct RodOfA : Enemy {
 		rotatePower = 0.2f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		armour = 1;
+		collisionBullet = {playerSpeedDown, playerSpeedDown};
 	};
 
 };
@@ -3006,7 +3093,7 @@ struct SmallMole : Enemy
 		EnemyAttackPattern::BURST,
 		CIRCLE,
 		{dashRechargeUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		5,
 		0,
 		{30, 30},
@@ -3795,7 +3882,7 @@ struct HifiJellyFish : Enemy
 	const AttackData spiky{
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
-		{numBulletsUp, dashRechargeDown},
+		{numBulletsUp, dashRechargeUp},
 		blunt,
 		6,
 		0.0,
@@ -4006,7 +4093,7 @@ struct HifiBallLauncher : Enemy
 	const AttackData launch{
 		EnemyAttackPattern::RADIAL,
 		CIRCLE,
-		{bulletBounceDown, bulletBounceUp},
+		{bulletBounceUp},
 		blunt,
 		4,
 		M_PI / 4.f,
@@ -4574,7 +4661,7 @@ struct ScientistBossEnemy : Enemy
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{bulletPierceUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		8,
 		0,
 		{0, 20},
@@ -4725,7 +4812,7 @@ struct InvisibleRotateLaserEnemy : Enemy
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{bulletPierceUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		8,
 		0,
 		{0, 20},
@@ -4766,7 +4853,7 @@ struct InvisibleLaserEnemy : Enemy
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		1,
 		0,
 		{20, 20},
@@ -4805,7 +4892,7 @@ struct InvisibleLaserEnemyVertical : Enemy
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeDown,
+		dashRechargeUp,
 		1,
 		M_PI / 2.f,
 		{20, 20},

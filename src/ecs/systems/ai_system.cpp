@@ -292,6 +292,14 @@ void AISystem::step(float elapsed_ms)
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
 		}
+		if (registry.enemyParts.has(entity) ) {
+			if (registry.enemyParts.get(entity).alwaysFollow) {
+				Motion& motion = registry.motions.get(entity);
+				if (registry.motions.has(registry.enemyParts.get(entity).parent)) {
+					motion.position = registry.motions.get(registry.enemyParts.get(entity).parent).position + registry.enemyParts.get(entity).offset;
+				}
+			}
+		}
 
 		if (registry.scientist.has(entity))
 		{
@@ -665,6 +673,8 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getTeleportPos(entity);
 	case EnemyBehavior::FOLLOWSCIENTIST:
 		return getScientistPos(entity);
+	case EnemyBehavior::FOLLOWPARENT:
+		return getParentPos(entity);
 	case EnemyBehavior::GRANTINGBUFFS:
 		return getTeamPos(entity);
 		case EnemyBehavior::GRANTINGBUFFSAOE:
@@ -673,6 +683,14 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getCurrentPos(entity);
 	};
 };
+
+vec2 AISystem::getParentPos(Entity entity)
+{
+	auto& ep = registry.enemyParts.get(entity);
+	Motion &motion = registry.motions.get(ep.parent);
+	return motion.position + ep.offset;
+}
+
 
 vec2 AISystem::getScientistPos(Entity entity)
 {

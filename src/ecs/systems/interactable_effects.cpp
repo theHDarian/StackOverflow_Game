@@ -88,6 +88,42 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsBio =
 
 	};
 
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMining =
+	{
+	{
+		{EnemyType::EnemyBigBoulder, {0.5f, 0.5f}},
+{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
+{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
+{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
+	},
+{
+		{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
+	{EnemyType::EnemyBigBoulder, {Random::Float(), Random::Float()}},
+	{EnemyType::EnemySmallMole, {Random::Float(), Random::Float()}},
+{EnemyType::EnemySmallMole, {Random::Float(), Random::Float()}},
+{EnemyType::EnemySmallMole, {Random::Float(), Random::Float()}},
+		},
+
+		};
+
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMedical =
+	{
+	{
+		{EnemyType::EnemyScissors, {0.5f, 0.5f}},
+	{EnemyMedicalBMP, {0.2f, 0.8f}},
+{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
+{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
+	{EnemyMagnet, {0.2f, 0.4f}},
+	},
+{
+		{EnemyType::EnemyMedicalRodA, {0.8f, 0.8f}},
+{EnemyType::EnemyMedicalRodA, {0.2f, 0.2f}},
+	{EnemyType::EnemyMedicalRodC, {0.5f, 0.5f}},
+		},
+
+		};
+
+
 std::map<char, float> doorSideToAngle = {
 	{'T', M_PI},
 	{'R', M_PI / 2},
@@ -110,8 +146,8 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.rareBulletEffects = {b};
 		atkData.speed = 200;
 		atkData.size = vec2(20,50);
-		atkData.bulletRange = 9000;
-		atkData.bulletBounce = 3;
+		atkData.bulletRange = max(6000.f, numBullets * 500.f);
+		atkData.bulletBounce = max(2, numBullets / 4);
 		float angle = (angleStep * i) + direction;
 		createPopBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
 	}
@@ -351,6 +387,20 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					region = Mining;
 					room = BossRoom;
 				}
+				else if (reaction.choice == 7) {
+					region = Medical;
+				}
+				else if (reaction.choice == 8) {
+					region = Medical;
+					room = BossRoom;
+				}
+				else if (reaction.choice == 9) {
+					region = Final;
+				}
+				else if (reaction.choice == 10) {
+					region = Final;
+					room = BossRoom;
+				}
 			}
 			MapRequest& req = registry.mapRequests.emplace(player, NewGame);
 			req.type = room;
@@ -583,6 +633,20 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 						spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsBio));
 						break;
 					}
+					case Mining: {
+						spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsMining));
+						break;
+					}
+					case Medical: {
+						spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsMedical));
+						break;
+					}
+					case Tutorial: {
+						// spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsTutorial));
+						break;
+					}
+					default:
+						break;
 				}
 			}
 		}

@@ -1271,6 +1271,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = Quadshooter();
 		break;
 	}
+		case EnemyType::EnemyQuadshooterElite: {
+		enemy = EliteQuadshooter();
+		break;
+	}
 		case EnemyType::TutorialEnemyQuadshooter:
 	{
 		enemy = TutorialQuadshooter();
@@ -1287,6 +1291,14 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = BigC();
 		registry.bossParts.emplace(entity);
+		break;
+	}
+		case EnemyType::EnemySmallCShield: {
+		enemy = SmallC();
+		auto& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.specialRotators.emplace(entity);
 		break;
 	}
 	case EnemyType::BossBeehiveGun:
@@ -1697,8 +1709,31 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.position = pos;
+	if (registry.enemyParts.has(entity)) {
+		auto& ep = registry.enemyParts.get(entity);
+		if (!registry.enemies.has(ep.parent)) {
+			float mindistence = 1000000;
+			for (Entity e  : registry.enemies.entities) {
+				Motion &motion = registry.motions.get(e);
+				if (glm::distance(motion.position, pos) < mindistence && !registry.enemyParts.has(e) && e != entity && !registry.bossParts.has(e)) {
+					ep.parent = e;
+					mindistence = glm::distance(motion.position, pos);
+				}
+			}
+		}
+		if (registry.motions.has(ep.parent)) {
+			motion.position = registry.motions.get(ep.parent).position + ep.offset;
+		} else {
+			registry.deleteds.emplace(entity);
+		}
+	}
 	motion.velocity = vec2(0, 0);
 	motion.scale = enemy.scale;
+	if (type == EnemyType::EnemySmallCShield && registry.motions.has(registry.enemyParts.get(entity).parent)) {
+		Motion& parentMotion = registry.motions.get(registry.enemyParts.get(entity).parent);
+		motion.scale.x = min(max(parentMotion.scale.x, parentMotion.scale.y) * 1.75f, min(parentMotion.scale.x, parentMotion.scale.y) + 120.f);
+		motion.scale.y = motion.scale.x * (1.998858f / 1.923352f);
+	}
 
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
 	movement.speed = 100.0f * enemy.speedMultiplier;

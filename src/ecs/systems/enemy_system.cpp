@@ -76,6 +76,13 @@ void EnemySystem::step(float elapsed_ms)
                 createKeyBullet(render, motion.position);
         }
 
+        if (registry.enemyParts.has(entity)) {
+            EnemyPart &part = registry.enemyParts.get(entity);
+            if (!registry.enemies.has(part.parent) || registry.fades.has(part.parent) || registry.deleteds.has(part.parent)){
+                destruct(enemy);
+            }
+        }
+
         // merge bee logic
         EnemyPattern &pattern = enemy.currEnemyPattern();
         if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
@@ -368,7 +375,7 @@ void EnemySystem::step(float elapsed_ms)
                 continue;
             }
 
-            float damage = registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.1) * bulletStat.damage), 1.f) : bulletStat.damage;
+            float damage = registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.03) * bulletStat.damage), 1.f) : bulletStat.damage;
             if (registry.vulnerabilities.has(entity))
             {
                 damage = max((float)(damage * registry.vulnerabilities.get(entity).modifier), 1.f);
