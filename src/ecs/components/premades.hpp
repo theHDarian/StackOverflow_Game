@@ -2967,7 +2967,8 @@ struct SpinePatrolWormHead : Enemy
 
 
 	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_GOTO, { vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot };
-	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {}, 1, false, 0.f, 5000.f, quadShot };
+	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.9, 0.5), vec2(0.8,0.8), vec2(0.5, 0.9), vec2(0.2, 0.8), vec2(0.1, 0.5), vec2(0.2,0.2), vec2(0.5, 0.1), vec2(0.9,0.2)}, 0, 1000000.f, 1000000.f, {}, 1, false, 0.f, 5000.f, quadShot};
+
 
 	SpinePatrolWormHead()
 	{
@@ -3331,6 +3332,59 @@ struct DrillWormBody : Enemy
 			50
 		};
 		scale = vec2({ 288.0f / 2, 192.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
+struct MiningBoidWormHead : Enemy
+{
+
+
+	EnemyPattern startState = { "LOOP", EnemyBehavior::BOIDSWARMPLAYER, { vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 5000.f, quadShot };
+
+	MiningBoidWormHead()
+	{
+		maxHealth = 30;
+		currHealth = maxHealth;
+
+		enemyPatterns = { startState };
+
+		patternIndex = 0;
+		sprite = {
+			"MiningBoidWormHead.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 48.0f / 2, 48.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+
+		headData.size = 15;
+		headData.body = EnemyMiningBoidWormBody;
+		headData.constrainDistance = 24.f;
+	};
+};
+
+struct MiningBoidWormBody : Enemy
+{
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none };
+
+	MiningBoidWormBody()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"MiningBoidWormBody.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 48.0f / 2, 48.f / 2 });
 		rotationBehaviour = EnemyRotationBehavior::WORM;
 	};
 };
