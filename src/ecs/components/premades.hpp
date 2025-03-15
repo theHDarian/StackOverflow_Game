@@ -2450,22 +2450,27 @@ struct EnemyTestPatrol : Enemy
 //----------------------------------------- MEDICAL REGION ENEMIES ---------------------------------
 struct MedBoid : Enemy
 {
-
-	Reaction boid{
+	Reaction boid1{
 		ReactionType::DURATION,
-		0};
-	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
+		1};
+	Reaction boid0{
+		ReactionType::DURATION,
+		0 };
+
+	EnemyPattern boidState1 = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {boid1}, 1, false, 0.f, 0.f, NoAttack};
+	EnemyPattern boidState2 = { "BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {boid0}, 0, false, 0.f, 0.f, NoAttack };
+	
 	MedBoid()
 	{
-		maxHealth = 1;
+		maxHealth = 9;
 		currHealth = maxHealth;
-		enemyPatterns = {boidState};
+		enemyPatterns = { boidState1, boidState2 };
 		sprite = {
-			"Syringe.png",
+			"SyringeBoid.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
-		scale = vec2({25.f, 25.f});
+		scale = vec2({72.f / 2, 48.f / 2});
 		patternIndex = 0;
 		collisionBullet = {sizeUp};
 	}
@@ -3138,6 +3143,45 @@ struct SmallMole : Enemy
 	};
 };
 
+struct PileDriverTurret : Enemy
+{
+	const AttackData pileDrive{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
+		{},
+		blunt,
+		2,
+		M_PI/30.f,
+		{300, 20},
+		400,
+		12000,
+		{0, 0},
+		100,
+		-100,
+		0
+	};
+
+	EnemyPattern shootingState = { "Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {}, 0, true, 0.f, 1000.f, pileDrive };
+
+	PileDriverTurret()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+
+		enemyPatterns = { shootingState };
+
+		patternIndex = 0;
+		sprite = {
+			"SwivelPiledriver.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2({ 168.f, 96.f });
+		rotatePower = 1.0;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+	};
+};
+
 struct SmallBoulder : Enemy
 {
 
@@ -3332,6 +3376,74 @@ struct DrillWormBody : Enemy
 			50
 		};
 		scale = vec2({ 288.0f / 2, 192.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
+struct SmallMiningWormHead : Enemy
+{
+
+	const AttackData miningLaser{
+	EnemyAttackPattern::LASER,
+	RECTANGLE,
+	{dashUp},
+	dashRechargeUp,
+	1,
+	0,
+	{20, 20},
+	100,
+	500,
+	{4, 0},
+	0,
+	0,
+	0 };
+
+	EnemyPattern followState = { "LOOP", EnemyBehavior::WORM_FOLLOW, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 200.f, miningLaser };
+
+	SmallMiningWormHead()
+	{
+		maxHealth = 200;
+		currHealth = maxHealth;
+
+		enemyPatterns = { followState };
+
+		patternIndex = 0;
+		sprite = {
+			"SmallWormHead.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 96.0f / 2, 72.f / 2 });
+		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
+		speedMultiplier = 0.8f;
+
+		headData.size = 15;
+		headData.body = EnemySmallMiningWormBody;
+		headData.constrainDistance = 45.f;
+	};
+};
+
+struct SmallMiningWormBody : Enemy
+{
+
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none };
+
+	SmallMiningWormBody()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"SmallWormBody.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 96.0f / 2, 72.f / 2 });
 		rotationBehaviour = EnemyRotationBehavior::WORM;
 	};
 };

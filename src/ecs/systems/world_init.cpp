@@ -1612,9 +1612,19 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			enemy = BigBoulder();
 			break;
 		}
+	case EnemyPileDriverTurret:
+	{
+		enemy = PileDriverTurret();
+		break;
+	}
 	case BossDrillWormHead:
 	{
 		enemy = DrillWormHead();
+		break;
+	}
+	case EnemySmallMiningWormHead:
+	{
+		enemy = SmallMiningWormHead();
 		break;
 	}
 	case EnemyMiningBoidWormHead:
@@ -1867,6 +1877,9 @@ void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity hea
 		break;
 	case EnemyMiningBoidWormBody:
 		enemy = MiningBoidWormBody();
+		break;
+	case EnemySmallMiningWormBody:
+		enemy = SmallMiningWormBody();
 		break;
 	default:
 		assert(false);

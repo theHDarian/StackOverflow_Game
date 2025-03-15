@@ -973,8 +973,9 @@ const RoomPreset BossRoomCrab{
 };
 
 const RoomPreset BossRoomWorm{
-    //{{{BossDrillWormHead, {1.5f, 1.5f}}}},
-    {{{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}}}},
+    {{{BossDrillWormHead, {1.5f, 1.5f}}}},
+    //{{{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}}}},
+    //{{{EnemySmallMiningWormHead, {0.45f, 0.45f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,

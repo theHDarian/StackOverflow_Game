@@ -299,6 +299,23 @@ enum EnemyType {
     EnemyBeeHive,
     HardEnemyAngel,
 
+    // Mining
+    EnemyMiningBoulderSmall,
+    EnemyMiningBoulderBig,
+    EnemySmallMole,
+    EnemyDynamite,
+    EnemySmallBoulder,
+    EnemyBigBoulder,
+    BossDrillWormHead,
+    BossDrillWormBody,
+    EnemyChainDogHead,
+    EnemyChainDogBody,
+    EnemyMiningBoidWormHead,
+    EnemyMiningBoidWormBody,
+    EnemyPileDriverTurret,
+    EnemySmallMiningWormHead,
+    EnemySmallMiningWormBody,
+
     // Hifi
     EnemyHifiBoidFish,
     EnemyTwinLaserVertical1,
@@ -324,20 +341,6 @@ enum EnemyType {
     BossBigCShield,
     EnemyHifiBoid,
     EnemyFishBoid, // Unsure if this is hifi lol
-
-    // Mining
-    EnemyMiningBoulderSmall,
-    EnemyMiningBoulderBig,
-    EnemySmallMole,
-    EnemyDynamite,
-    EnemySmallBoulder,
-    EnemyBigBoulder,
-    BossDrillWormHead,
-    BossDrillWormBody,
-    EnemyChainDogHead,
-    EnemyChainDogBody,
-    EnemyMiningBoidWormHead,
-    EnemyMiningBoidWormBody,
 
     // Medical
     EnemyProstheticHand,
