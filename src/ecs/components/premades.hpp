@@ -2459,7 +2459,7 @@ struct MedBoid : Enemy
 
 	EnemyPattern boidState1 = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {boid1}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern boidState2 = { "BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {boid0}, 0, false, 0.f, 0.f, NoAttack };
-	
+
 	MedBoid()
 	{
 		maxHealth = 9;
@@ -2470,9 +2470,9 @@ struct MedBoid : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
-		scale = vec2({72.f / 2, 48.f / 2});
+		scale = vec2({72.f / 1.25, 48.f / 1.25});
 		patternIndex = 0;
-		collisionBullet = {sizeUp};
+		collisionBullet = {bulletPierceDown};
 	}
 };
 
@@ -2695,7 +2695,7 @@ struct BMP : Enemy {
 	const AttackData spiral{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{dmgUp},
+		{dmgUp, numBulletsDown},
 		blunt,
 		6,
 		0.0,
@@ -2728,6 +2728,95 @@ struct BMP : Enemy {
 	};
 
 };
+
+struct Syringe : Enemy
+{
+	/**
+	 * Based on hifisniperHard - can regenerate health of other enemies when far from player
+	 */
+	const AttackData sniperShot{
+		EnemyAttackPattern::BURST,
+		CIRCLE,
+		{sizeUp, dmgUp, bulletRangeDown},
+		sizeDown,
+		4,
+		0,
+		{30, 20},
+		700,
+		10000,
+		{100, 0},
+		0,
+		1,
+		0.01,
+		EnemyBulletDeath::CLUSTER};
+	const AttackData spray{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{numBulletsUp, sizeUp},
+		sizeDown,
+		3,
+		M_PI / 12,
+		{30, 20},
+		200,
+		2000,
+		{400, -M_PI / 2},
+		0,
+		0,
+		0.01,
+		EnemyBulletDeath::CLUSTER};
+
+	const AttackData Spawn{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{},
+		blunt,
+		1,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{600, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyMedicalBoid};
+
+	Reaction playerFar{
+        ReactionType::PLAYER_FAR,
+        4};
+
+	EnemyPattern random = {"STATIONARY", EnemyBehavior::RANDOM, {}, 0, 1500.f, 1500.f, {{ReactionType::PLAYER_CLOSE, 1}, playerFar,{ReactionType::DURATION, 0}}, 0, true, 0, 3000.f, sniperShot};
+	EnemyPattern random2 = {"STATIONARY", EnemyBehavior::CHARGING, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 2}}, 2, true, 0, 0.f, NoAttack, SpecialStates::VULNERABLE};
+	EnemyPattern random3 = {"STATIONARY", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 3, true, 0, 0.f, NoAttack, SpecialStates::VULNERABLE};
+	EnemyPattern random4 = {"STATIONARY", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0, 1000.f, spray};
+
+	EnemyPattern healing = {"HEAL", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}, {ReactionType::PLAYER_CLOSE, 1}}, 5, false, 0, 0.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::REGENERATING};
+	EnemyPattern spawn = {"GRANT BUFF", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 0},{ReactionType::PLAYER_CLOSE, 1}}, 6, true, 0, 500.f, Spawn, SpecialStates::VULNERABLE};
+	EnemyPattern charge = {"STATIONARY", EnemyBehavior::CHARGING, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 2}}, 7, true, 0, 0.f, NoAttack, SpecialStates::PROTECTED};
+	EnemyPattern recoil = {"STATIONARY", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 8, true, 0, 0.f, NoAttack, SpecialStates::VULNERABLE};
+	EnemyPattern farRandom = {"STATIONARY", EnemyBehavior::RANDOM_FAR, {}, 0, 1500.f, 1500.f, {{ReactionType::PLAYER_CLOSE, 1}, {ReactionType::DURATION, 0}}, 4, true, 0, 1500.f, sniperShot, SpecialStates::VULNERABLE};
+
+
+	Syringe()
+	{
+		maxHealth = 150;
+		currHealth = maxHealth;
+		enemyPatterns = {random, random2, random3, random4, healing, spawn,  charge, recoil, farRandom};
+		patternIndex = 0;
+		sprite = {
+			"Syringe.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		scale = vec2({240.f / 1.75f, 72.f / 1.75f});
+		rotatePower = 1.5f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		speedMultiplier = 1.25f;
+	};
+};
+
+
 
 struct RodOfC : Enemy {
 	const AttackData whip{

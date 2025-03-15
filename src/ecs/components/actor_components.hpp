@@ -355,6 +355,7 @@ enum EnemyType {
     EnemyMedicalRodC,
     EnemyMedicalPillBoid,
     EnemyMedicalPillBoidSpawner,
+    EnemyMedicalSyringe,
 
     ScientistradialAttack,
     ScientistexplosiveAttack,
