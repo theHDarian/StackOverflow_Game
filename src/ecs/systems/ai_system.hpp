@@ -24,7 +24,7 @@ private:
 	static vec2 getTeamPos(Entity entity);
 	static vec2 getTeleportPos(Entity entity);
 	static vec2 getScientistPos(Entity entity);
-	static vec2 AISystem::getParentPos(Entity entity);
+	static vec2 getParentPos(Entity entity);
 	static void updateState(Enemy& enemy, EnemyMovement movement, Entity entity);
 	static bool updateHealerState(Enemy &enemy, Entity entity);
 	static void angryMode(Entity entity);

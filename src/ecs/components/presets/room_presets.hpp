@@ -1683,10 +1683,10 @@ const RoomPreset MedicalEnemyRoomHand {
                 {EnemyProstheticHand, {0.4f, 0.4f}},
                 {EnemyProstheticHand, {0.4f, 0.6f}},
                 {EnemySmallBoulder, {0.6f, 0.55f}},
-                {EnemySmallBoulder, {0.6f, 0.45f}},
+                // {EnemySmallBoulder, {0.6f, 0.45f}},
                     {EnemySmallBoulder, {0.6f, 0.5f}},
-{EnemySmallBoulder, {0.6f, 0.6f}},
-{EnemySmallBoulder, {0.6f, 0.4f}},
+// {EnemySmallBoulder, {0.6f, 0.6f}},
+                {EnemySmallBoulder, {0.6f, 0.4f}},
         },
 
     },
@@ -1698,6 +1698,24 @@ const RoomPreset MedicalEnemyRoomHand {
     "Bloody Dodgeball",
     false,
     {1200, 1200}
+};
+
+const RoomPreset EnemyRoomSingleMage {
+    {
+        {
+            {EnemyMage, {0.5f, 0.5f}},
+    {EnemySmallCShield, {0.5f, 0.5f}},
+        },
+
+    },
+    {},
+    {},
+    10.0f,
+    25,
+    5,
+    "ArchMage's Challenge",
+    false,
+    {1600, 1600}
 };
 
 const RoomPreset MedicalEnemyRoomMedicalSpineWorm {
