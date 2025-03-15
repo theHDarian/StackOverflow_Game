@@ -673,7 +673,7 @@ void RenderSystem::drawRoomBound(Entity entity,
 
 		// For changing wall textures per region
 		Map& map = registry.maps.components[0];
-		frame = (map.currRegion <= MapRegion::Biology) ? 0 : 1;
+		frame = max(0, map.currRegion - 1);
 	}
 	else if (registry.doorSymbols.has(entity))
 	{

@@ -835,8 +835,16 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		}
 	}
 	else if (registry.enemies.has(other)) {
-		// Boid touch enemy, it die
+		// Boid touch player, it die
 		if (registry.boids.has(other) && !registry.deleteds.has(other)) registry.deleteds.emplace(other);
+		// Handle case of boid worm
+		if (registry.wormHeads.has(other) && registry.wormBodies.entities.size() > 0)
+		{
+			for (int i = (int)registry.wormBodies.components.size() - 1; i >= 0; --i) {
+				if (!registry.deleteds.has(registry.wormBodies.entities[i]) && registry.deleteds.has(registry.wormBodies.components[i].head))
+					registry.deleteds.emplace(registry.wormBodies.entities[i]);
+			}
+		}
 		Enemy& e = registry.enemies.get(other);
 		effects.insert(effects.end(), e.collisionBullet.begin(), e.collisionBullet.end() );
 	}
@@ -891,6 +899,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 void WorldSystem::clearDeleteQueue() {
 	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
 		Entity e = registry.deleteds.entities[i];
+
 		// right now, all our entities that fade will also emit particles (enemies)
 		// but should be generalized for more things in the future
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {

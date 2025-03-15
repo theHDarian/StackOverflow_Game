@@ -395,10 +395,10 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					room = BossRoom;
 				}
 				else if (reaction.choice == 9) {
-					region = Final;
+					region = Military;
 				}
 				else if (reaction.choice == 10) {
-					region = Final;
+					region = Military;
 					room = BossRoom;
 				}
 			}

@@ -115,7 +115,7 @@ enum MapRegion {
     Mining = 2,
     Physics = 3,
     Medical = 4,
-    Final = 5
+    Military = 5
 };
 
 struct MapRequest {
