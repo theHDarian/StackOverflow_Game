@@ -67,6 +67,7 @@ class RenderSystem {
 		{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
 		{SpecialStates::UNDERGROUND, {1, 0.4, 1}}, // magenta
 			{SpecialStates::REGENERATING, {0, 1, 0}}, // green
+		{ SpecialStates::CLOAKED, {0.5, 0.5, 0.5} } // grey
 	};
 	const RenderRequest underGroundTexture = {
 		"underground.png",
