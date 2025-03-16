@@ -1285,7 +1285,7 @@ const RoomPreset HifiRoomCannonBoids{
     "HifiBoidCannons"
 };
 
-const RoomPreset EnemyRoomLaserFiesta {
+const RoomPreset HifiRoomLaserFiesta {
         {
             {
                 {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
@@ -1309,9 +1309,9 @@ const RoomPreset EnemyRoomLaserFiesta {
                         {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
                 },
 {
-                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemyLaserSniperHard, {Random::Float(),Random::Float()}},
 
-                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemyLaserSniperHard, {Random::Float(),Random::Float()}},
                 },
             {
             {EnemyEvilSkull , {0.5f, 0.5f}},
@@ -1501,10 +1501,51 @@ const RoomPreset HifiRoomLane {
         100.0f,
         5,
         2,
-        "Laneway Lasers",
+        "Laser Laneway",
         false,
         {650, 3000}
 };
+
+const RoomPreset HifiRoomShieldedMadness{
+            {
+                {
+                    {EnemyHifiWhip, {0.5f, 0.5f}},
+                    {EnemyHifiTackShooter, {0.8,0.2}},
+                    {EnemyHifiTackShooter, {0.2,0.8}},
+
+                        { EnemySmallCShield, {0.5f, 0.5f}},
+                    {EnemySmallCShield, {0.8,0.2}},
+                    { EnemySmallCShield, {0.2,0.8}},
+
+                },
+                {
+                        {EnemyHifiJellyFish, {0.6f, 0.4f}},
+                        {EnemyHifiJellyFish,{0.4,0.6}},
+                        {EnemyHifiJellyFish, {0.6f, 0.6f}},
+                        {EnemyHifiJellyFish, {0.4f, 0.4f}},
+
+                        { EnemySmallCShield, {0.6f, 0.4f}},
+                        { EnemySmallCShield, {0.2f, 0.2f}},
+                        { EnemySmallCShield, {0.4f, 0.6f}},
+                        { EnemySmallCShield, {0.6f, 0.6f}},
+                        { EnemySmallCShield, {0.4f, 0.4f}},
+
+                },
+
+            },
+
+        {},
+        {{{PopConsole,{numBulletsUp}}, {0.5f, 0.5f}},
+            {{PushConsole,{numBulletsUp}}, {0.25f, 0.5f}},
+            {{PushConsole,{bulletBurstUp}}, {0.75f, 0.5f}}},
+        15.0f,
+        45,
+    10,
+    "Shielded Madness",
+        false,
+        {2000, 2000}
+};
+
 
 const RoomPreset BossBigCRoom {
 
@@ -1819,6 +1860,10 @@ const RoomPreset MedicalEnemyRoomSyringes {
                 {EnemyMedicalSyringe, {0.5f, 0.5f}},
                 {EnemyScissors, {0.7f, 0.3f}},
                 {EnemyScissors, {0.3f, 0.7f}},
+// {EnemyScissors, {0.7f, 0.7f}},
+// {EnemyScissors, {0.3f, 0.3f}},
+
+
 {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
 {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
 {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
@@ -1903,9 +1948,9 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
             {
                 {
                     HifiRoomSniperBallLauncher, HifiRoomBasicEnemy, HifiRoomBoidSnipers, HifiRoomTwinLaserChargers,
-                    HifiRoomTwinLaserShurikens, HifiRoomBasicWave, HifiRoomAvenue, HifiRoomLane
+                    HifiRoomTwinLaserShurikens, HifiRoomBasicWave, HifiRoomAvenue, HifiRoomLane, EnemyRoomSingleMage
                 },
-                {HifiEnemyRoomSwarmLasers}
+                {HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness}
             }
         },
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
@@ -1918,9 +1963,9 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
             {
                 {
                     HifiRoomSniperBallLauncher, HifiRoomJellyFish, HifiRoomCannonLasers, HifiRoomCannonSnipers,
-                    HifiRoomSniperShurikens, HifiRoomCannonBoids, HifiRoomSmall, HifiRoomAvenue, HifiRoomLane
+                    HifiRoomSniperShurikens, HifiRoomCannonBoids, HifiRoomSmall, HifiRoomAvenue, HifiRoomLane,HifiRoomSmallTackShooter
                 },
-                {HifiEnemyRoomSwarmLasers, EnemyRoomLaserFiesta}
+                {HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta}
             }
         },
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
@@ -1928,7 +1973,16 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomSmallBallLauncher,HifiRoomSmall, },{EnemyRoomLaserFiesta}}},
+        {
+            RoomType::EnemyRoom,
+            {
+                {
+                    HifiRoomCannonLasers, HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,
+                    HifiRoomSmallBallLauncher, HifiRoomSmallTackShooter, HifiRoomSmall,
+                },
+                {HifiRoomLaserFiesta, HifiRoomShieldedMadness}
+            }
+        },
         {RoomType::RestRoom, {{RestingRoomPop},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
@@ -1947,9 +2001,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    HifiRoomSniperBallLauncher, HifiRoomJellyFish, HifiRoomCannonLasers, HifiRoomCannonSnipers,
-                    HifiRoomSniperShurikens, HifiRoomCannonBoids, HifiRoomSmall,
-                    Random::Float() < 0.5f ? HifiRoomAvenue : HifiRoomLane
+                    EnemyRoomSingleMage
                 },
                 {EnemyRoomMagic}
             }
@@ -1959,7 +2011,15 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomCannonLasers,HifiRoomJellyFish, HifiRoomCannonSnipers, HifiRoomSniperShurikens,HifiRoomSmallBallLauncher,HifiRoomSmall, },{EnemyRoomMagic}}},
+        {
+            RoomType::EnemyRoom,
+            {
+                {
+                    EnemyRoomSingleMage,
+                },
+                {EnemyRoomMagic}
+            }
+        },
         {RoomType::RestRoom, {{RestingRoomPop},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
@@ -1968,7 +2028,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand },{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
@@ -1977,7 +2037,10 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
         {
             RoomType::EnemyRoom,
             {
-                {MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes},
+                {
+                    MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes,EnemyRoomSingleMage
+
+                },
                 {}
             }
         },
@@ -1986,7 +2049,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{EnemyRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{HifiRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},

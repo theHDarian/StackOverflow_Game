@@ -330,6 +330,14 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	else if (registry.shield.has(entity)) {
 		alpha = 0.3;
 	}
+	else if (registry.cloaks.has(entity))
+	{
+		//enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
+		Cloaked& cloak = registry.cloaks.get(entity);
+		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+		alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, motion.position) - cloak.cloakingDistance) / cloak.cloakingDistance);
+	}
+
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, alpha);
 
@@ -2350,7 +2358,15 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	glUniform1f(charge_boundary_uloc, chargeBoundary);
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, 1);
+	float alpha = 1;
+	if (registry.cloaks.has(entity))
+	{
+		//enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
+		Cloaked& cloak = registry.cloaks.get(entity);
+		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+		alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, motion.position) - cloak.cloakingDistance) / cloak.cloakingDistance);
+	}
+	glUniform1f(alpha_uloc, alpha);
 	gl_has_errors();
 
 	GLint tile_uloc = glGetUniformLocation(program, "tile");

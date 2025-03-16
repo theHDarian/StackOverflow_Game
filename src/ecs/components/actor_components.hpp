@@ -430,6 +430,7 @@ enum class SpecialStates {
     PROTECTED,
     UNDERGROUND,
     REGENERATING,
+    CLOAKED,
 };
 
 enum class EnemyBehavior {
@@ -793,4 +794,10 @@ struct EnemyPart {
     Entity parent;
     vec2 offset;
     bool alwaysFollow = false;
+};
+
+struct Cloaked {
+    float max = 1000;
+    float countdown = max;
+    float cloakingDistance = 400;
 };

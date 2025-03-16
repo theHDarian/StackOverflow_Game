@@ -1295,32 +1295,14 @@ struct chimeraCrabSniper : Enemy
 
 struct SmallC : Enemy
 {
-
-	const AttackData FastLaser{
-		EnemyAttackPattern::LASER
-		,CIRCLE
-		,{dashUp, dashRechargeUp}
-		,bulletPierceDown
-		,1
-		,0
-		,{70, 70}
-		,0
-		, 5000
-		,{5000, 0}
-		,0
-		,0
-		,0
-		,EnemyBulletDeath::NONE
-		};
-
 	const AttackData shortFastLaser{
 		EnemyAttackPattern::LASER
 		,CIRCLE
 		,{dashUp, dashRechargeUp}
-		,bulletPierceDown
+		,bulletPierceUp
 		,1
 		,0
-		,{70, 70}
+		,{50, 50}
 		,0
 		, 2000
 		,{5000, 0}
@@ -1341,10 +1323,10 @@ struct SmallC : Enemy
 			1};
 
 		EnemyPattern idleState = {
-			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {duration}, 2, false, 2500, 7000.f, FastLaser};
+			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {duration}, 2, false, 2500, 7000.f, NoAttack};
 
 		EnemyPattern LaserSpin = {
-			"FOLLOW", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {duration}, 3, true, 0.f, 10000.f, FastLaser};
+			"FOLLOW", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {duration}, 3, true, 0.f, 10000.f, NoAttack};
 
 		EnemyPattern LineUp = {
 			"FOLLOW", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration}, 3, false, 0.f, 5000.f, NoAttack, };
@@ -1362,7 +1344,7 @@ struct SmallC : Enemy
 		rotatePower = 0.6f;
 		scale = vec2({300, 300 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
-		armour = 3;
+		armour = 5;
 	};
 };
 
@@ -1374,7 +1356,7 @@ struct BigC : Enemy
 		EnemyAttackPattern::LASER
 		,CIRCLE
 		,{dashUp, dashRechargeUp}
-		,bulletPierceDown
+		,bulletPierceUp
 		,1
 		,0
 		,{70, 70}
@@ -1391,7 +1373,7 @@ struct BigC : Enemy
 		EnemyAttackPattern::LASER
 		,CIRCLE
 		,{dashUp, dashRechargeUp}
-		,bulletPierceDown
+		,bulletPierceUp
 		,1
 		,0
 		,{70, 70}
@@ -3681,8 +3663,24 @@ struct HifiLaserSniper : Enemy
 
 struct HifiLaserSniperHard : Enemy
 {
+	const AttackData FastLaser{
+		EnemyAttackPattern::LASER
+		,CIRCLE
+		,{dashUp, playerSpeedUp, playerSpeedUp}
+		,dashRechargeUp
+		,1
+		,0
+		,{20, 20}
+		,0
+		, 2000
+		,{5000, 0}
+		,0
+		,0
+		,0
+		,EnemyBulletDeath::NONE
+		};
 	EnemyPattern randomState = {"Laser active", EnemyBehavior::IDLE, {}, 0, 0.f, 700.f, {{ReactionType::DURATION, 0}}, 1, true, 0.f, 700.f, FastLaser};
-	EnemyPattern Teleport = {"Charge", EnemyBehavior::TELEPORT, {}, 0, 300.f, 300.f, {{ReactionType::DURATION, 0}}, 2, true, 0.f, 350.f, twelveSpiralShot};
+	EnemyPattern Teleport = {"Charge", EnemyBehavior::TELEPORT, {}, 0, 300.f, 300.f, {{ReactionType::DURATION, 0}}, 2, false, 0.f, 350.f, twelveSpiralShot};
 	EnemyPattern CoolDown = {"CoolDown", EnemyBehavior::IDLE, {}, 0, 0.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 5000.f, NoAttack};
 
 	HifiLaserSniperHard()

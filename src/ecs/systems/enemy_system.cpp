@@ -732,6 +732,36 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
         }
         break;
     }
+    case SpecialStates::CLOAKED: {
+        for (Entity& e : registry.enemies.entities) {
+            if (e == entity) {
+                continue;
+            }
+            Motion& m = registry.motions.get(e);
+            if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
+                if (!registry.cloaks.has(e)) {
+                    auto& cloak = registry.cloaks.emplace(e);
+                    cloak.countdown = buffer.duration;
+                    if (registry.buffers.has(e)) {
+                        cloak.countdown = cloak.countdown / 2;
+                    } else {
+                        buffer.targetEntity = e;
+                    }
+                } else {
+                    registry.cloaks.get(e).countdown = buffer.duration;
+                }
+            }
+            if (behavior == EnemyBehavior::GRANTINGBUFFS) {
+                break;
+            }
+        }
+        if (behavior == EnemyBehavior::GRANTINGBUFFSAOE) {
+            createAOEIndicator( registry.motions.get(entity).position, buffer.range, SpecialStates::CLOAKED, buffer.duration);
+        }
+        break;
+
+    }
+
         
         default:
             break;

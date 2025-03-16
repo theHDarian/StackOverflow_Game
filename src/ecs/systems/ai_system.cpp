@@ -42,6 +42,9 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 				auto& inv = registry.invincibles.emplace(entity);
 
 					inv.countdown = currPattern.maxDuration;
+			} else {
+				auto& inv = registry.invincibles.get(entity);
+				inv.countdown = currPattern.maxDuration;
 			}
 		break;
 		case SpecialStates::INVISIBLE:
@@ -50,7 +53,9 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 
 				inv.countdown = currPattern.maxDuration;
 
-				std::cout << "invisible: " << inv.countdown << std::endl;
+			} else {
+				auto& inv = registry.invisibles.get(entity);
+				inv.countdown = currPattern.maxDuration;
 			}
 		break;
 		case SpecialStates::PROTECTED:
@@ -79,6 +84,9 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 			if (!registry.moles.has(entity)) {
 				auto& under = registry.moles.emplace(entity);
 				under.countdown = currPattern.maxDuration;
+			} else {
+				auto& under = registry.moles.get(entity);
+				under.countdown = currPattern.maxDuration;
 			}
 		break;
 		case SpecialStates::REGENERATING:
@@ -90,6 +98,15 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 				} else {
 					regen.healAmount = registry.enemies.get(entity).maxHealth * 0.015;
 				}
+			}
+		break;
+		case SpecialStates::CLOAKED:
+			if (!registry.cloaks.has(entity)) {
+				auto& cloak = registry.cloaks.emplace(entity);
+				cloak.countdown = currPattern.maxDuration;
+			} else {
+				auto& cloak = registry.cloaks.get(entity);
+				cloak.countdown = currPattern.maxDuration;
 			}
 		break;
 		default: break;
@@ -162,7 +179,16 @@ void handleSpecialStates (Reaction reaction, Entity entity)
 				auto& under = registry.regenerates.get(entity);
 				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 			}
-
+		break;
+		case SpecialStates::CLOAKED:
+			if (!registry.cloaks.has(entity)) {
+				auto& cloak = registry.cloaks.emplace(entity);
+				cloak.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			} else {
+				auto& cloak = registry.cloaks.get(entity);
+				cloak.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			}
+		break;
 		default: break;
 	}
 }

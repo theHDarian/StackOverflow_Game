@@ -317,6 +317,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	//check cloak countdown
+	if (registry.cloaks.entities.size() > 0) {
+		for (int i = (int)registry.cloaks.components.size()-1; i>=0; --i) {
+			Cloaked& entity = registry.cloaks.components[i];
+			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				registry.cloaks.remove(registry.cloaks.entities[i]);
+			}
+		}
+	}
+
 	// Critter management
 	if (registry.critters.entities.size() > 0) {
 		for (int i = (int)registry.critters.components.size() - 1; i >= 0; --i) {

@@ -25,5 +25,5 @@ void main() {
         texColor.b *= fcolor.b;
     }
 
-    color = texColor;
+    color = texColor * alpha;
 }
