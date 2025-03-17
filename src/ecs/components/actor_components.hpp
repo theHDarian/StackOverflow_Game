@@ -369,6 +369,15 @@ enum EnemyType {
 
     // Military
     EnemyEyeCube,
+
+    // event room enemies
+    InvincibleGranter,
+    InvisibleGranter,
+    VulnerableGranter,
+    ProtectedGranter,
+    UnderGroundGranter,
+    RegeneratingGranter,
+    CloakedGranter,
 };
 
 enum class EnemyAttackPattern {
@@ -586,13 +595,11 @@ struct Healer {
 };
 
 struct Buffer {
-    float cooldown;
+    float cooldown = 0;
     float maxCoolDown = 5000;
     float duration = 2000.f;
     float range = 200.f;
     Entity targetEntity;
-    // SpecialStates buffEffect = SpecialStates::NORMAL;
-
 };
 
 

@@ -325,6 +325,7 @@ void AISystem::step(float elapsed_ms)
 				Motion& motion = registry.motions.get(entity);
 				if (registry.motions.has(registry.enemyParts.get(entity).parent)) {
 					motion.position = registry.motions.get(registry.enemyParts.get(entity).parent).position + registry.enemyParts.get(entity).offset;
+					// std::cout << "follow: " <<  motion.position.x << ", "<< motion.position.y <<std::endl;
 				}
 			}
 		}
@@ -658,6 +659,10 @@ bool AISystem::updateHealerState(Enemy &enemy, Entity entity)
 
 vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 {
+	if (registry.enemyParts.has(entity) && registry.enemyParts.get(entity).alwaysFollow)
+	{
+		return getCurrentPos(entity);
+	}
 	// path finding hasnt been implemented
 	switch (behavior)
 	{

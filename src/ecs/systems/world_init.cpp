@@ -1731,6 +1731,81 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = EyeCube();
 		break;
 	}
+
+		case InvincibleGranter: {
+		enemy = InvincibleBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 6000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+
+		case InvisibleGranter : {
+		enemy = InvisibleBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 4000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+		case CloakedGranter : {
+		enemy = CloakedBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 5000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+		case ProtectedGranter : {
+		enemy = ProtectedBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+		case VulnerableGranter: {
+		enemy = VulnerableBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+		case UnderGroundGranter: {
+		enemy = UnderGroundBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+
 	default:
 		assert(false);
 	};

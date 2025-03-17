@@ -300,7 +300,7 @@ const RoomPreset EnemyRoomSwarm{
 
     {},
     {{{PopConsole,{bulletPierceUp, bulletPierceUp}}, {0.5f, 0.5f}}, {{PushConsole,{ bulletPierceUp}}, {0.25f, 0.5f}}, {{PushConsole,{bulletPierceUp}}, {0.75f, 0.5f}}},
-    15.0f,
+    7.5f,
     0,
 0,
 "Hallway full of Drones",
@@ -626,6 +626,107 @@ const RoomPreset EnemyRoomMagic{
     "Magical Trickeries",
     false,
     {3000, 3000}
+};
+
+const RoomPreset EnemyRoomInvisible{
+            {
+                {
+                    {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
+                    {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
+                    {EnemyMagnet, {0.3f, 0.4f}},
+                    {InvisibleGranter, {0.5f, 0.5f}},
+                    {InvisibleGranter, {0.8f, 0.2f}},
+                    {InvisibleGranter, {0.3f, 0.4f}},
+            },
+                {
+                                           {EnemyPufferfish, {0.3f, 0.7f}},
+                        {EnemyPufferfish, {0.4f, 0.6f}},
+                        {InvisibleGranter, {0.3f, 0.7f}},
+                        {InvisibleGranter, {0.4f, 0.6f}},
+
+                },
+                {
+                               {EnemyType::EnemyCrab, {0.8f, 0.8f}},
+            {EnemyType::EnemyEvilCrab, {0.8f, 0.2f}},
+            {EnemyType::EnemyCrab, {0.2f, 0.2f}},
+                {InvisibleGranter, {0.8f, 0.8f}},
+            {InvisibleGranter, {0.8f, 0.2f}},
+            {InvisibleGranter, {0.2f, 0.2f}},
+
+                    },
+                {
+                    {EnemyTwoBee, {0.5f, 0.5f}},
+            {EnemyHifiSniperHard , {0.1f, 0.9f}},
+            {EnemyHifiSniperHard , {0.9f, 0.1f}},
+                            {EnemyThreeBee, {0.4f, 0.6f}},
+{InvisibleGranter, {0.5f, 0.5f}},
+{InvisibleGranter , {0.1f, 0.9f}},
+{InvisibleGranter, {0.4f, 0.6f}},
+{InvisibleGranter , {0.9f, 0.1f}},
+                }
+            },
+        {},
+        {{{PushConsole,{bulletBounceUp,bulletBounceUp, bulletPierceUp,bulletPierceUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
+        },
+        20.0f,
+        35,
+        5,
+        "Phantom Menace",
+        false,
+        {1800, 2300}
+};
+
+const RoomPreset EnemyRoomCloaked{
+        {
+            {
+                {EnemySword, {0.5f, 0.5f}},
+                {EnemySword,{0.3f, 0.5f}},
+                {EnemySword,{0.7f, 0.5f}},
+                    {CloakedGranter, {0.5f, 0.5f}},
+                    {CloakedGranter,{0.3f, 0.5f}},
+                    {CloakedGranter,{0.7f, 0.5f}}
+            },
+            {
+                {EnemyScissors, {0.5f, 0.5f}},
+                {EnemyScissors,{0.5f, 0.3f}},
+                {EnemyScissors,{0.5f, 0.7f}},
+                    {CloakedGranter, {0.5f, 0.5f}},
+                    {CloakedGranter,{0.5f, 0.3f}},
+                    {CloakedGranter,{0.5f, 0.7f}}
+            },
+                {
+                    {EnemyHifiChargerHard, {0.5f, 0.5f}},
+                    {EnemyHifiCharger,{0.3f, 0.3f}},
+                    {EnemyHifiCharger,{0.7f, 0.7f}},
+                    {CloakedGranter, {0.5f, 0.5f}},
+                    {CloakedGranter,{0.3f, 0.3f}},
+                    {CloakedGranter,{0.7f, 0.7f}}
+                },
+            {
+                {EnemyMedicalRodA, {0.5f, 0.5f}},
+                {EnemyMedicalRodA,{0.3f, 0.7f}},
+                {EnemyMedicalRodA,{0.7f, 0.3f}},
+                    {CloakedGranter, {0.5f, 0.5f}},
+                    {CloakedGranter,{0.3f, 0.7f}},
+                    {CloakedGranter,{0.7f, 0.3f}}
+            },
+            {
+                    {EnemyMedicalSyringe,{0.3f, 0.7f}},
+                    {EnemyMedicalSyringe,{0.7f, 0.3f}},
+                        {EnemyMedicalBMP, {0.5f, 0.5f}},
+                        {CloakedGranter,{0.3f, 0.7f}},
+                        {CloakedGranter,{0.7f, 0.3f}},
+                        {CloakedGranter, {0.5f, 0.5f}},
+            },
+        },
+        {},
+        {},
+        10.0f,
+        10,
+        5,
+        "Cloak and Daggers",
+        false,
+        {1600, 1600}
 };
 
 
@@ -1718,7 +1819,7 @@ const RoomPreset MedicalEnemyRoomHand {
             {EnemyProstheticHand, {0.4f, 0.4f}},
             {EnemyProstheticHand, {0.4f, 0.6f}},
             {EnemySmallBoulder, {0.6f, 0.55f}},
-{EnemySmallCShield, {0.6f, 0.55f}},
+// {EnemySmallCShield, {0.6f, 0.55f}},
         },
         {
                 {EnemyProstheticHand, {0.4f, 0.5f}},
@@ -1927,13 +2028,13 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
         {RoomType::TreasureRoom, {{regularTreasureRooms},{EnemyRoomSwarm}}},
     }},
     {DifficultyRegion::Easy,{
-        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1,EnemyRoomCrabs,BioRoomSmall, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomSwarm}}},
+        {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1,EnemyRoomCrabs,BioRoomSmall, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomInvisible,EnemyRoomSwarm}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomMagic, EnemyRoomSwarm}}},
+        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomInvisible}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
@@ -1991,7 +2092,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
 
 std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{QuadShooterRoomSmall },{EnemyRoomMagic}}},
+        {RoomType::EnemyRoom, {{QuadShooterRoomSmall },{EnemyRoomMagic, EnemyRoomInvisible}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
@@ -2038,7 +2139,8 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
             RoomType::EnemyRoom,
             {
                 {
-                    MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes,EnemyRoomSingleMage
+                    MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes,EnemyRoomSingleMage,
+                    EnemyRoomCloaked
 
                 },
                 {}
