@@ -1637,8 +1637,8 @@ const RoomPreset HifiRoomShieldedMadness{
 
         {},
         {{{PopConsole,{numBulletsUp}}, {0.5f, 0.5f}},
-            {{PushConsole,{numBulletsUp}}, {0.25f, 0.5f}},
-            {{PushConsole,{bulletBurstUp}}, {0.75f, 0.5f}}},
+            {{PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.25f, 0.5f}},
+            {{PushConsole,{bulletBurstUp, bulletBurstUp}}, {0.75f, 0.5f}}},
         15.0f,
         45,
     10,
@@ -1807,7 +1807,7 @@ const RoomPreset MedicalEnemyRoomSmallRodC {
     10.0f,
     25,
     5,
-    "Forgotten Corner",
+    "Forgotten Halo",
     false,
     {1200, 1200}
 };
@@ -1986,6 +1986,45 @@ const RoomPreset MedicalEnemyRoomSyringes {
             "Surgical Swarm",
             false,
             {1600, 1600}
+};
+
+const RoomPreset MedicalRoomQuadShooter {
+    {
+        {
+            {EnemyType::EnemyQuadshooterElite, {0.2f, 0.2f}},
+           {EnemyType::EnemyQuadshooterElite, {0.4f, 0.2f}},
+           {EnemyType::EnemyQuadshooterElite, {0.6f, 0.2f}},
+           {EnemyType::EnemyQuadshooterElite, {0.8f, 0.2f}},
+           {EnemyType::EnemyQuadshooterElite, {0.2f, 0.8f}},
+           {EnemyType::EnemyQuadshooterElite, {0.4f, 0.8f}},
+           {EnemyType::EnemyQuadshooterElite, {0.6f, 0.8f}},
+           {EnemyType::EnemyQuadshooterElite, {0.8f, 0.8f}}
+        },
+
+            {{EnemyType::EnemyQuadshooterElite, {0.2f, 0.2f}},
+            {EnemyType::EnemyQuadshooterElite, {0.2f, 0.4f}},
+            {EnemyType::EnemyQuadshooterElite, {0.2f, 0.6f}},
+            {EnemyType::EnemyQuadshooterElite, {0.2f, 0.8f}},
+            {EnemyType::EnemyQuadshooterElite, {0.8f, 0.2f}},
+            {EnemyType::EnemyQuadshooterElite, {0.8f, 0.4f}},
+            {EnemyType::EnemyQuadshooterElite, {0.8f, 0.6f}},
+            {EnemyType::EnemyQuadshooterElite, {0.8f, 0.8f}}
+            },
+        {
+            {EnemyQuadshooterElite, {0.5f, 0.5f}},
+            {EnemySmallCShield, {0.5f, 0.5f}},
+
+        },
+
+    },
+    {},
+    {},
+    20.0f,
+    25,
+    5,
+    "Critical Mass",
+    false,
+    {1600, 1600}
 };
 
 

@@ -2805,7 +2805,7 @@ struct RodOfC : Enemy {
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
 		{dmgUp},
-		blunt,
+		bulletRangeDown,
 		8,
 		-M_PI / 4.f,
 		{15, 15},
