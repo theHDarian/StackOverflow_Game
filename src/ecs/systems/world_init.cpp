@@ -1653,10 +1653,21 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = Dynamite();
 		break;
 	}
+	case EnemyBulldozer:
+	{
+		enemy = Bulldozer();
+		break;
+	}
 	case EnemyChainDogHead:
 	{
 		enemy = ChainDogHead();
-		createProp(renderer, lerpToRoom(enemy.headData.anchorPoint), "Anchor.png", vec2(120 / 2), vec2(1), false);
+		createProp(renderer, pos, "Anchor.png", vec2(120 / 2), vec2(1), false);
+		break;
+	}
+	case EnemySpineChainedWormHead:
+	{
+		enemy = SpineChainedWormHead();
+		createProp(renderer, pos, "Anchor.png", vec2(120 / 2), vec2(1), false);
 		break;
 	}
 	case EnemyMedicalBMP:
@@ -1916,7 +1927,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		head.constrainDistance = enemy.headData.constrainDistance;
 		head.body = enemy.headData.body;
 		head.anchor = enemy.headData.anchor;
-		head.anchorPoint = enemy.headData.anchorPoint;
+		//head.anchorPoint = enemy.headData.anchorPoint;
+		head.anchorPoint = pos;
 
 		Map& map = registry.maps.components[0];
 		vec2 mid = map.currRoom.roomStart + 0.5f * (map.currRoom.roomEnd - map.currRoom.roomStart);
@@ -1952,6 +1964,9 @@ void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity hea
 		break;
 	case EnemyChainDogBody:
 		enemy = ChainDogBody();
+		break;
+	case EnemySpineChainedWormBody:
+		enemy = SpineChainedWormBody();
 		break;
 	case EnemySpinePatrolWormBody:
 		enemy = SpinePatrolWormBody();

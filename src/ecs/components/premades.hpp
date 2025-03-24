@@ -706,7 +706,6 @@ struct ChainDogHead : Enemy
 		headData.body = EnemyChainDogBody;
 		headData.constrainDistance = 30.f;
 		headData.anchor = true;
-		headData.anchorPoint = { 0.5f, 0.5f };
 	};
 };
 
@@ -3031,6 +3030,72 @@ struct ProstheticHand : Enemy
 	};
 };
 
+struct SpineChainedWormHead : Enemy
+{
+	const AttackData shotgun{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{},
+		blunt,
+		6,
+		M_PI / 16,
+		{30, 20},
+		400,
+		10000,
+		{0, 0},
+		0,
+		0,
+		0 };
+
+	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_FOLLOW, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 5000.f, shotgun };
+
+	SpineChainedWormHead()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { startState };
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_2.png",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+
+		headData.size = 12;
+		headData.body = EnemySpineChainedWormBody;
+		headData.constrainDistance = 48.f;
+		headData.anchor = true;
+	};
+};
+
+struct SpineChainedWormBody : Enemy
+{
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none };
+
+	SpineChainedWormBody()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { state };
+
+		patternIndex = 0;
+		sprite = {
+			"spine_variant_7.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0)
+		};
+		scale = vec2({ 72.0f, 120.f });
+		rotationBehaviour = EnemyRotationBehavior::WORM;
+	};
+};
+
 struct SpinePatrolWormHead : Enemy
 {
 	Reaction gotTo = {
@@ -3211,6 +3276,46 @@ struct SmallMole : Enemy
 		rotatePower = 1.0;
 		speedMultiplier = 5.0f;
 		rotationBehaviour = EnemyRotationBehavior::NONE;
+	};
+};
+
+struct Bulldozer : Enemy
+{
+
+	const AttackData dirtBlast{
+		EnemyAttackPattern::SPRAY,
+		TRIANGLE,
+		{dashRechargeUp},
+		dashRechargeUp,
+		16,
+		1.5f * M_PI,
+		{20, 20},
+		300,
+		1000,
+		{0, 0},
+		0,
+		10,
+		0
+	};
+
+	EnemyPattern rollingState = { "ROLLING", EnemyBehavior::PATROLLING, {{0.1, 0.1},{0.9, 0.9},{0.1, 0.9},{0.9,0.1}}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 2000.f, dirtBlast };
+
+	Bulldozer()
+	{
+		maxHealth = 300;
+		currHealth = maxHealth;
+
+		enemyPatterns = { rollingState };
+
+		patternIndex = 0;
+		sprite = {
+			"Bulldozer.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2({ 168.0f, 96.f });
+		speedMultiplier = 2.0f;
+		rotationBehaviour = EnemyRotationBehavior::FACE_UP;
 	};
 };
 

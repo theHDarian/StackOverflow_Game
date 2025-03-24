@@ -284,7 +284,7 @@ void AISystem::step(float elapsed_ms)
 					head.points[i] = constrainDistance(head.points[i], head.points[i - 1], head.constrainDistance);
 				}
 				if (head.anchor) {
-					head.points[head.size] = constrainDistance(head.points[head.size], lerpToRoom(head.anchorPoint), head.constrainDistance);
+					head.points[head.size] = constrainDistance(head.points[head.size], head.anchorPoint, head.constrainDistance);
 					for (int i = head.size - 1; i >= 0; i--) {
 						//Pull the next segment to the previous one
 						head.points[i] = constrainDistance(head.points[i], head.points[i+1], head.constrainDistance);
