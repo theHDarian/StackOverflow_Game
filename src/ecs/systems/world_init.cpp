@@ -1261,6 +1261,46 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	Enemy &enemy = registry.enemies.emplace(entity);
 	switch (type)
 	{
+	case EnemyType::EnemyTestLightningRotate:
+	{
+		enemy = TestLightningRotate();
+		break;
+	}
+	case EnemyType::EnemyTestLightningShuffle:
+	{
+		enemy = TestLightningShuffle();
+		break;
+	}
+	case EnemyType::EnemyTestEffectPlusOne:
+	{
+		enemy = TestEffectPlusOne();
+		break;
+	}
+	case EnemyType::EnemyTestEffectPlusTwo:
+	{
+		enemy = TestEffectPlusTwo();
+		break;
+	}
+	case EnemyType::EnemyTestEffectPlusThree:
+	{
+		enemy = TestEffectPlusThree();
+		break;
+	}
+	case EnemyType::EnemyTestEffectMinusOne:
+	{
+		enemy = TestEffectMinusOne();
+		break;
+	}
+	case EnemyType::EnemyTestEffectMinusTwo:
+	{
+		enemy = TestEffectMinusTwo();
+		break;
+	}
+	case EnemyType::EnemyTestEffectMinusThree:
+	{
+		enemy = TestEffectMinusThree();
+		break;
+	}
 	case EnemyType::EnemyPufferfish:
 	{
 		enemy = Pufferfish();

@@ -7,7 +7,44 @@
 #include "tiny_ecs_registry.hpp"
 #include "utils/random.hpp"
 
+//struct RoomPreset {
+//    std::list<std::vector<std::tuple<EnemyType, vec2>>>enemies;
+//    std::vector<std::tuple<RoomProp, vec2>> roomProps; //background props
+//    std::vector<std::tuple<RoomInteractable, vec2>> interactables; //for interactables
+//    float spawnDelay; //in seconds - for enemies and bosses
+//    int numSpecialBulletsToSpawn = 5;
+//    int numKeyBulletsToSpawn = 2;
+//    std::string ID;
+//    bool oneTime = false; //if true, room will not appear again
+//    vec2 roomSize = { 1600, 1600 };
+//    bool hasElite = false;
+//    bool operator==(const RoomPreset& other) const {
+//        return ID == other.ID;
+//    }
+//};
+
 //---------- PRESETS-------------------
+
+const RoomPreset TestRoom{
+    {{  {EnemyTestLightningRotate,  {0.1f, 0.1f}},
+        {EnemyTestLightningShuffle, {0.1f, 0.2f}},
+        {EnemyTestEffectPlusOne,    {0.1f, 0.3f}},
+        {EnemyTestEffectPlusTwo,    {0.1f, 0.4f}},
+        {EnemyTestEffectPlusThree,  {0.1f, 0.5f}},
+        {EnemyTestEffectMinusOne,    {0.1f, 0.6f}},
+        {EnemyTestEffectMinusTwo,    {0.1f, 0.7f}},
+        {EnemyTestEffectMinusThree,  {0.1f, 0.8f}}}},
+    {},
+    {},
+    0.0f,
+    0,
+    0,
+    "Testing Chamber",
+    false,
+    {1000, 2000}
+};
+
+
 const RoomPreset TutorialRoom1Preset{
     {},
     {},
@@ -1074,9 +1111,9 @@ const RoomPreset BossRoomCrab{
 };
 
 const RoomPreset BossRoomWorm{
-    {{{BossDrillWormHead, {1.5f, 1.5f}}}},
+    //{{{BossDrillWormHead, {1.5f, 1.5f}}}},
     //{{{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}}}},
-    //{{{EnemySpineChainedWormHead, {0.45f, 0.45f}}}},
+    {{{EnemyTestLightningRotate, {0.45f, 0.45f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,

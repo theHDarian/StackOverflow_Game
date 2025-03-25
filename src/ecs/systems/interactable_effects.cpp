@@ -363,41 +363,41 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			}
 			else{
 				iostate.tutorialOn = false;
-				if (reaction.choice == 1) { // bio region
+				if (reaction.choice == 1) {
 					region = Biology;
-				}
-				else if (reaction.choice == 2) {
-					region = Physics;
+					room = Testing;
+				} else if (reaction.choice == 2) { // bio region
+					region = Biology;
 				}
 				else if (reaction.choice == 3) {
-					region = Biology;
-					room = BossRoom;
+					region = Physics;
 				}
 				else if (reaction.choice == 4) {
-					region = Mining;
-				}
-				else if (reaction.choice == 5) {
-					region = Physics;
+					region = Biology;
 					room = BossRoom;
 				}
 				else if (reaction.choice == 5) {
 					region = Mining;
 				}
 				else if (reaction.choice == 6) {
-					region = Mining;
+					region = Physics;
 					room = BossRoom;
 				}
 				else if (reaction.choice == 7) {
-					region = Medical;
+					region = Mining;
+					room = BossRoom;
 				}
 				else if (reaction.choice == 8) {
 					region = Medical;
-					room = BossRoom;
 				}
 				else if (reaction.choice == 9) {
-					region = Military;
+					region = Medical;
+					room = BossRoom;
 				}
 				else if (reaction.choice == 10) {
+					region = Military;
+				}
+				else if (reaction.choice == 11) {
 					region = Military;
 					room = BossRoom;
 				}

@@ -43,11 +43,35 @@ const BulletStackEffect dmgDown = {
 	"Damage Down",
 	""};
 
+const BulletStackEffect dmgDown2 = {
+	BulletDamage,
+	-2,
+	"Damage Down",
+	"" };
+
+const BulletStackEffect dmgDown3 = {
+	BulletDamage,
+	-3,
+	"Damage Down",
+	"" };
+
 const BulletStackEffect dmgUp = {
 	BulletDamage,
 	1,
 	"Damage Up",
 	""};
+
+const BulletStackEffect dmgUp2 = {
+	BulletDamage,
+	2,
+	"Damage Up",
+	"" };
+
+const BulletStackEffect dmgUp3 = {
+	BulletDamage,
+	3,
+	"Damage Up",
+	"" };
 
 const BulletStackEffect numBulletsUp = {
 	BulletNum,
@@ -643,6 +667,303 @@ const AttackData FastLaser{
 //     AttackData atkData;
 // };
 /////////////////////////////////
+
+struct TestLightningRotate : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{},
+		lightningRotate,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0 
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestLightningRotate()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0) 
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
+struct TestLightningShuffle : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{},
+		lightningShuffle,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestLightningShuffle()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
+struct TestEffectPlusOne : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		CIRCLE,
+		{},
+		dmgUp,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestEffectPlusOne()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
+struct TestEffectPlusTwo : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		CIRCLE,
+		{},
+		dmgUp2,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestEffectPlusTwo()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
+struct TestEffectPlusThree : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		CIRCLE,
+		{},
+		dmgUp3,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestEffectPlusThree()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
+struct TestEffectMinusOne : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		dmgDown,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestEffectMinusOne()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
+struct TestEffectMinusTwo : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		dmgDown2,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestEffectMinusTwo()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
+struct TestEffectMinusThree : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		dmgDown3,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestEffectMinusThree()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
 
 struct Pufferfish : Enemy
 {

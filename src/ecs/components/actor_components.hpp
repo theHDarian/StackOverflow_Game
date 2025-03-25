@@ -142,31 +142,13 @@ struct StackCompile {
 	        if (currStack.size() < 1) return true;
 	        if (effect.value == -1) {
 		        std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
-                if ((currStack.size() > 1) && (currStack[0].type == currStack[1].type) && (abs(currStack[0].value + currStack[1].value) <= 3)) {
-                    currStack[1].value += currStack[0].value;
-                    currStack.erase(currStack.begin());
-                    if (currStack[0].value == 0) currStack.erase(currStack.begin());
-                }
 	        }
 	        else {
 		        std::random_device rd;
 		        std::mt19937 g(rd());
 		        std::shuffle(currStack.begin(), currStack.end(), g);
-
-                if (currStack.size() > 1) {
-                    int i = 0;
-                    while (i < currStack.size()-1) {
-                        if ((currStack[i].type == currStack[i+1].type) && (abs(currStack[i].value + currStack[i+1].value) <= 3)) {
-                            currStack[i].value += currStack[i+1].value;
-                            currStack.erase(currStack.begin() + i + 1);
-                            if (currStack[i].value == 0) currStack.erase(currStack.begin() + i);
-                        }
-                        else {
-                            i++;
-                        }
-                    }
-                }
 	        }
+            stackMerge();
     	    return true;
         }
         int maxStackSize = baseStackSize + Call(PlayerStackSize);
@@ -182,12 +164,45 @@ struct StackCompile {
         }
         values[effect.type] += effect.value;
         currStack.push_back(effect);
-        if ((currStack.size() > 1) && (currStack[currStack.size() - 1].type == currStack[currStack.size() - 2].type) && (abs(currStack[currStack.size() - 1].value + currStack[currStack.size() - 2].value) <= 3)) {
-            currStack[currStack.size() - 2].value += currStack[currStack.size() - 1].value;
-            currStack.pop_back();
-            if (currStack[currStack.size() - 1].value == 0) currStack.pop_back();
-        }
+        stackMerge();
         return true;
+    }
+
+    void stackMerge() {
+        if (currStack.size() > 1) {
+            int i = 0;
+            while (i < currStack.size() - 1) {
+                if (currStack[i].type != currStack[i + 1].type) {
+                    i++;
+                    continue;
+                }
+                if (abs(currStack[i].value + currStack[i + 1].value) <= 3) {
+                    currStack[i].value += currStack[i + 1].value;
+                    currStack.erase(currStack.begin() + i + 1);
+                    if (currStack[i].value == 0) currStack.erase(currStack.begin() + i);
+                    i--;
+                }
+                else if (currStack[i].value + currStack[i + 1].value == 4) {
+                    currStack[i].value = 3;
+                    currStack[i + 1].value = 1;
+                    i++;
+                }
+                else if (currStack[i].value + currStack[i + 1].value == -4) {
+                    currStack[i].value = -1;
+                    currStack[i + 1].value = -3;
+                    i--;
+                }
+                else if (abs(currStack[i].value + currStack[i + 1].value) > 4 && currStack[i].value < currStack[i + 1].value) {
+                    int swap = currStack[i].value;
+                    currStack[i].value = currStack[i + 1].value;
+                    currStack[i + 1].value = swap;
+                    i--;
+                }
+                else {
+                    i++;
+                }
+            }
+        }
     }
 
     BulletStackEffect remove(int index) {
@@ -268,6 +283,16 @@ struct PlayerBullet {
 };
 
 enum EnemyType {
+
+    // Testing
+    EnemyTestLightningRotate,
+    EnemyTestLightningShuffle,
+    EnemyTestEffectPlusOne,
+    EnemyTestEffectPlusTwo,
+    EnemyTestEffectPlusThree,
+    EnemyTestEffectMinusOne,
+    EnemyTestEffectMinusTwo,
+    EnemyTestEffectMinusThree,
 
     // Generic
     EnemyMage,

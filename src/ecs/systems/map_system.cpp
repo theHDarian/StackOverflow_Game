@@ -511,6 +511,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         if (roomType == RoomType::TutorialRoom) {
             map.currRoom.preset = StartingRoom;
         }
+        else if (roomType == RoomType::Testing) {
+            map.currRoom.preset = TestRoom;
+        }
         else {
             if (map.currRegion == Biology) {
                 std::vector<RoomPreset> bioBossRooms = {BossRoomCrab, BossRoomBee};
