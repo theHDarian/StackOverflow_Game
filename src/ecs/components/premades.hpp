@@ -2320,7 +2320,7 @@ struct BeehiveGun : Enemy
 
 		enemyPatterns = {rotateState};
 		speedMultiplier = 0.f;
-		rotatePower = 0.5;
+		rotatePower = 4.5f;
 
 		patternIndex = 0;
 		sprite = {
