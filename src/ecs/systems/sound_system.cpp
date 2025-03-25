@@ -209,7 +209,7 @@ void SoundSystem::loadMusic() {
         }
     }
 
-    this->titleScreenMusic = {SoundType::titleBGM, audio_path("title/title.wav"), 0.4f, -1};
+    this->titleScreenMusic = {SoundType::titleBGM, audio_path("title/title.wav"), 0.15f, -1};
     this->titleScreenMusic.music = Mix_LoadMUS(titleScreenMusic.path.c_str());
 }
 
