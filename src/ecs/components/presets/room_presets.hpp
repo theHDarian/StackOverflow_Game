@@ -703,12 +703,12 @@ const RoomPreset EnemyRoomInvisible{
                 }
             },
         {},
-        {{{PushConsole,{bulletBounceUp,bulletBounceUp, bulletPierceUp,bulletPierceUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
+        {{{PushConsole,{bulletBounceUp,bulletBounceUp,bulletBounceUp, bulletRangeUp,bulletRangeUp,bulletRangeUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
         },
         20.0f,
         35,
         5,
-        "Phantom Menace",
+        "Phantasmal Menace",
         false,
         {1800, 2300}
 };
@@ -1824,9 +1824,296 @@ const RoomPreset MedicalEnemyRoomHeartBeat2 {
     12.0f,
     10,
     5,
-    "Atrium",
+    "Know Your Enemy",
     false,
     {2500, 2500}
+};
+
+const RoomPreset MedicalEnemyRoomHeartBeat3 {
+
+    {
+
+        {
+//             {EnemyMedicalSyringe, {0.2f, 0.2f}},
+//                 {EnemyMedicalSyringe, {0.8f, 0.8f}},
+// {EnemyMedicalSyringe, {0.6f, 0.8f}},
+//             { EnemyMedicalSyringe, {0.4f, 0.2f}},
+//             { EnemyMedicalSyringe, {0.2f, 0.8f}},
+//             { EnemyMedicalSyringe, {0.8f, 0.2f}},
+//             { EnemyMedicalSyringe, {0.6f, 0.2f}},
+//             { EnemyMedicalSyringe, {0.4f, 0.8f}},
+            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+            {EnemyMedicalPillBoidSpawner, {0.2f, 0.5f}},
+                { EnemyMedicalPillBoidSpawner, {0.8f, 0.5f}},
+
+
+
+
+            {EnemyMedicalBMP , {0.75f, 0.75f}},
+                    {EnemyMedicalBMP , {0.25f, 0.25f}},
+
+        },
+        {
+                            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                        {EnemyMedicalBMP , {0.25f, 0.75f}},
+                        {EnemyMedicalBMP , {0.75f, 0.25f}},
+        },
+
+        {
+                            { EnemyMedicalSyringe, {0.2f, 0.8f}},
+                { EnemyMedicalSyringe, {0.8f, 0.2f}},
+                { EnemyMedicalSyringe, {0.6f, 0.2f}},
+                { EnemyMedicalSyringe, {0.4f, 0.8f}},
+                {EnemyQuadshooterElite, {0.5f, 0.5f}},
+        },
+
+        // {
+        //         {EnemyMedicalRodC, {0.5f, 0.5f}},
+        // },
+
+    },
+    {},
+{{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+    16.0f,
+    20,
+    5,
+    "Fatal Dose",
+    false,
+    {2000, 2000}
+};
+
+const RoomPreset MedicalEnemyRoomHeartBeat4 {
+
+{
+
+        {
+//             {EnemyMedicalSyringe, {0.2f, 0.2f}},
+//                 {EnemyMedicalSyringe, {0.8f, 0.8f}},
+// {EnemyMedicalSyringe, {0.6f, 0.8f}},
+//             { EnemyMedicalSyringe, {0.4f, 0.2f}},
+//             { EnemyMedicalSyringe, {0.2f, 0.8f}},
+//             { EnemyMedicalSyringe, {0.8f, 0.2f}},
+//             { EnemyMedicalSyringe, {0.6f, 0.2f}},
+//             { EnemyMedicalSyringe, {0.4f, 0.8f}},
+            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+               {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+
+            // {EnemyMedicalBMP , {0.75f, 0.75f}},
+            //         {EnemyMedicalBMP , {0.25f, 0.25f}},
+{EnemyMedicalBMP , {0.25f, 0.75f}},
+{EnemyMedicalBMP , {0.75f, 0.25f}},
+
+        },
+        {
+                            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                           {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBMP , {0.75f, 0.75f}},
+{EnemyMedicalBMP , {0.25f, 0.25f}},
+// {EnemyMedicalBMP , {0.25f, 0.75f}},
+// {EnemyMedicalBMP , {0.75f, 0.25f}},
+
+        },
+
+        {
+                //             { EnemyMedicalSyringe, {0.2f, 0.8f}},
+                // { EnemyMedicalSyringe, {0.8f, 0.2f}},
+                // { EnemyMedicalSyringe, {0.6f, 0.2f}},
+                // { EnemyMedicalSyringe, {0.4f, 0.8f}},
+                // {EnemyQuadshooterElite, {0.5f, 0.5f}},
+                {EnemyMedicalBMP , {0.5f, 0.5f}},
+                {EnemyProstheticHand , {0.75f, 0.75f}},
+                        {EnemyProstheticHand , {0.25f, 0.25f}},
+    {EnemyProstheticHand , {0.25f, 0.75f}},
+    {EnemyProstheticHand , {0.75f, 0.25f}},
+
+        },
+
+        // {
+        //         {EnemyMedicalRodC, {0.5f, 0.5f}},
+        // },
+
+    },
+    {},
+    {},
+    16.0f,
+    20,
+    5,
+    "Arrhythmia",
+    false,
+    {1600, 1600}
 };
 
 
@@ -2055,7 +2342,7 @@ const RoomPreset MedicalRoomQuadShooter {
 
     },
     {},
-    {},
+    {{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
     20.0f,
     25,
     5,
@@ -2064,6 +2351,45 @@ const RoomPreset MedicalRoomQuadShooter {
     {1600, 1600}
 };
 
+const RoomPreset MedicalEnemyRoomWorms {
+    {
+        {
+            {
+                {EnemySpinePatrolWormHead, {0.1f, 0.9f}},
+    {EnemySpinePatrolWormHead, {0.9f, 0.1f}},
+                {EnemySpineChainedWormHead, {0.25f, 0.75f}},
+    {EnemySpineChainedWormHead, {0.25f, 0.25f}},
+    {EnemySpineChainedWormHead, {0.75f, 0.25f}},
+    {EnemySpineChainedWormHead, {0.75f, 0.75f}},
+            },
+
+            {
+                    {EnemyMedicalBMP, {0.5f, 0.5f}},
+
+                {EnemySpinePatrolWormHead, {0.1f, 0.9f}},
+                // {EnemyQuadshooterElite, {0.9f, 0.1f}},
+            },
+            {
+
+                {EnemySpinePatrolWormHead, {0.9f, 0.1f}},
+
+    // {EnemySpineChainedWormHead, {0.9f, 0.9f}},
+    //
+    // {EnemySpineChainedWormHead, {0.1f, 0.1f}},
+            },
+
+            },
+
+    },
+{},
+    {{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+    20.0f,
+    25,
+    5,
+    "Critical Mass",
+    false,
+    {1500, 1500}
+};
 
 const RoomPreset allConsoles {
     { {
@@ -2205,7 +2531,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{HifiEnemyRoomSwarmLasers}}},
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{HifiEnemyRoomSwarmLasers}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
@@ -2216,10 +2542,10 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
             {
                 {
                     MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes,EnemyRoomSingleMage,
-                    EnemyRoomCloaked
+                    EnemyRoomCloaked, MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomWorms
 
                 },
-                {}
+                {MedicalEnemyRoomHeartBeat3}
             }
         },
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
@@ -2227,7 +2553,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{HifiRoomLaserFiesta}}},
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{HifiRoomLaserFiesta}}},
         {RoomType::RestRoom, {{RestingRoomPop},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},

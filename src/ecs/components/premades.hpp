@@ -2759,8 +2759,8 @@ struct MedBoid : Enemy
 		ReactionType::DURATION,
 		0 };
 
-	EnemyPattern boidState1 = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {boid1}, 1, false, 0.f, 0.f, NoAttack};
-	EnemyPattern boidState2 = { "BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {boid0}, 0, false, 0.f, 0.f, NoAttack };
+	EnemyPattern boidState1 = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {boid1}, 1, false, 0.f, 0.f, NoAttack, SpecialStates::CLOAKED};
+	EnemyPattern boidState2 = { "BOID", EnemyBehavior::BOIDSFISH, {}, 0, 5000.f, 5000.f, {boid0}, 0, false, 0.f, 0.f, NoAttack, SpecialStates::CLOAKED };
 
 	MedBoid()
 	{
@@ -2894,7 +2894,7 @@ struct PillBoidSpawner : Enemy
 	EnemyPattern random1 = {"MOVE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 1}, {ReactionType::PLAYER_CLOSE, 4}}, 1, false, 0.f, 0.f, NoAttack};
 	EnemyPattern chargingState = {"CHARGING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 2}}, 2, false, 0.f, 0.f, NoAttack, SpecialStates::PROTECTED};
 	EnemyPattern backUp = {"RECOIL", EnemyBehavior::RECOIL, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 3}}, 3, false, 0.f, 0.f, NoAttack, SpecialStates::VULNERABLE};
-	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, broadsideLasers};
+	EnemyPattern shootCannon = {"SHOOT1", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION, 0}}, 4, true, 0.f, 2000.f, broadsideLasers};
 	EnemyPattern spawn = {"SHOOT2", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 5}}, 5, true, 0.f, 200.f, spawning};
 	EnemyPattern rest = {"SHOOT1", EnemyBehavior::IDLE, {}, 0, 800.f, 800.f, {{ReactionType::DURATION, 0}}, 6, false, 0.f, 200.f, NoAttack};
 	EnemyPattern laser = {"LASER", EnemyBehavior::IDLE, {}, 0, 0.f, 2000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 2000.f, iceWall};
@@ -3372,7 +3372,7 @@ struct SpineChainedWormHead : Enemy
 
 	SpineChainedWormHead()
 	{
-		maxHealth = 300;
+		maxHealth = 700;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState };
@@ -3396,7 +3396,7 @@ struct SpineChainedWormHead : Enemy
 
 struct SpineChainedWormBody : Enemy
 {
-	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none };
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, false, 0.f, 2500.f, none, SpecialStates::PROTECTED };
 
 	SpineChainedWormBody()
 	{
@@ -3434,7 +3434,7 @@ struct SpinePatrolWormHead : Enemy
 
 	SpinePatrolWormHead()
 	{
-		maxHealth = 300;
+		maxHealth = 700;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState, loopState};
@@ -3472,7 +3472,7 @@ struct SpinePatrolWormBody : Enemy
 	0,
 	0 };
 
-	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 2500.f, dualShot };
+	EnemyPattern state = { "IDLE", EnemyBehavior::WORM_BODY, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 2500.f, dualShot, SpecialStates::PROTECTED };
 
 	SpinePatrolWormBody()
 	{
