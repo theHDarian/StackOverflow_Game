@@ -113,13 +113,118 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMedical 
 	{EnemyMedicalBMP, {0.2f, 0.8f}},
 {EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
 {EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
+{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
+{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
 	{EnemyMagnet, {0.2f, 0.4f}},
 	},
 {
 		{EnemyType::EnemyMedicalRodA, {0.8f, 0.8f}},
 {EnemyType::EnemyMedicalRodA, {0.2f, 0.2f}},
 	{EnemyType::EnemyMedicalRodC, {0.5f, 0.5f}},
+{EnemyType::EnemyMedicalRodA, {0.2f, 0.8f}},
+{EnemyType::EnemyMedicalRodA, {0.8f, 0.2f}},
 		},
+	{
+                            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                           {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBMP , {0.75f, 0.75f}},
+{EnemyMedicalBMP , {0.25f, 0.25f}},
+// {EnemyMedicalBMP , {0.25f, 0.75f}},
+// {EnemyMedicalBMP , {0.75f, 0.25f}},
+
+        },
+	{
+			{ EnemyMedicalSyringe, {0.2f, 0.8f}},
+                { EnemyMedicalSyringe, {0.8f, 0.2f}},
+                { EnemyMedicalSyringe, {0.6f, 0.2f}},
+                { EnemyMedicalSyringe, {0.4f, 0.8f}},
+	},
+	{
+			            {EnemyMedicalPillBoidSpawner, {0.2f, 0.5f}},
+					{ EnemyMedicalPillBoidSpawner, {0.8f, 0.5f}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+
+	},
+
+	{
+	            {EnemySpinePatrolWormHead, {0.1f, 0.9f}},
+	{EnemySpinePatrolWormHead, {0.9f, 0.1f}},
+{EnemySpineChainedWormHead, {0.25f, 0.75f}},
+// {EnemySpineChainedWormHead, {0.25f, 0.25f}},
+// {EnemySpineChainedWormHead, {0.75f, 0.25f}},
+{EnemySpineChainedWormHead, {0.75f, 0.75f}},
+	},
+
+
 
 		};
 
@@ -137,7 +242,6 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 	}
 	int numBullets = effects.size();
 	float angleStep = angleRange / numBullets;
-
 	for (int i = 0; i < numBullets; ++i) {
 		BulletStackEffect b = effects[i];
 		AttackData atkData = AttackData();
@@ -146,8 +250,8 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.rareBulletEffects = {b};
 		atkData.speed = 200;
 		atkData.size = vec2(20,50);
-		atkData.bulletRange = max(6000.f, numBullets * 500.f);
-		atkData.bulletBounce = max(2, numBullets / 4);
+		atkData.bulletRange = max(6000.f, numBullets * 1500.f);
+		atkData.bulletBounce = max(2, numBullets / 3);
 		float angle = (angleStep * i) + direction;
 		createPopBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);
 	}

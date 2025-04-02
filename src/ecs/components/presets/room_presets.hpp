@@ -766,6 +766,61 @@ const RoomPreset EnemyRoomCloaked{
         {1600, 1600}
 };
 
+const RoomPreset MedicalEnemyRoomInvincible{
+            {
+                {
+                    {EnemyProstheticHand, {0.5f, 0.5f}},
+                    {EnemyMedicalPillBoidSpawner,{0.3f, 0.5f}},
+                    {EnemyMedicalPillBoidSpawner,{0.7f, 0.5f}},
+                        {InvincibleGranter, {0.5f, 0.5f}},
+                        {InvincibleGranter,{0.3f, 0.5f}},
+                        {InvincibleGranter,{0.7f, 0.5f}}
+                },
+                {
+                    {EnemyScissors, {0.5f, 0.5f}},
+                    {EnemyScissors,{0.5f, 0.3f}},
+                    {EnemyScissors,{0.5f, 0.7f}},
+                        {InvincibleGranter, {0.5f, 0.5f}},
+                        {InvincibleGranter,{0.5f, 0.3f}},
+                        {InvincibleGranter,{0.5f, 0.7f}}
+                },
+                    {
+                        {EnemyQuadshooterElite, {0.5f, 0.5f}},
+                        {EnemySpineChainedWormHead,{0.3f, 0.3f}},
+                        {EnemySpineChainedWormHead,{0.7f, 0.7f}},
+                        {InvincibleGranter, {0.5f, 0.5f}},
+                        {InvincibleGranter,{0.3f, 0.3f}},
+                        {InvincibleGranter,{0.7f, 0.7f}}
+                    },
+
+                {
+                        {EnemyMedicalSyringe,{0.3f, 0.7f}},
+                        {EnemyMedicalSyringe,{0.7f, 0.3f}},
+                            {EnemySpinePatrolWormHead, {0.1f, 0.9f}},
+                            {InvincibleGranter,{0.3f, 0.7f}},
+                            {InvincibleGranter,{0.7f, 0.3f}},
+                            {InvincibleGranter, {0.1f, 0.9f}},
+                },
+            {
+                        {EnemyMedicalRodC, {0.5f, 0.5f}},
+                        {EnemyMedicalRodA,{0.3f, 0.7f}},
+                        {EnemyMedicalRodA,{0.7f, 0.3f}},
+                            {InvincibleGranter, {0.5f, 0.5f}},
+                            {InvincibleGranter,{0.3f, 0.7f}},
+                            {InvincibleGranter,{0.7f, 0.3f}}
+                },
+            },
+            {},
+{{{PushConsole,{bulletBounceUp,bulletBounceUp,bulletBounceUp, bulletRangeUp,bulletRangeUp,bulletRangeUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
+},
+            15.0f,
+            10,
+            5,
+            "Loyal to the beat",
+            false,
+            {2400, 2400}
+};
+
 
 const RoomPreset RestingRoomPop{
     {},
@@ -776,7 +831,67 @@ const RoomPreset RestingRoomPop{
     0,
     "Resting Room",
     false,
-    {1000,1000}
+    {1200,1200}
+};
+
+const RoomPreset RestingRoomPopLarge{
+        {},
+        {},
+        {{{PopConsole,{}}, {0.5f, 0.5f}}},
+        0.0f,
+        0,
+        0,
+        "Resting Room",
+        false,
+        {2500, 2500}
+};
+
+const RoomPreset RestingRoomPopLong{
+        {},
+        {},
+        {{{PopConsole,{}}, {0.5f, 0.5f}}},
+        0.0f,
+        0,
+        0,
+        "Resting Room",
+        false,
+        { 2500, 800}
+};
+
+const RoomPreset RestingRoomPopTall{
+            {},
+            {},
+            {{{PopConsole,{}}, {0.5f, 0.5f}}},
+            0.0f,
+            0,
+            0,
+            "Resting Room",
+            false,
+            { 800, 2500}
+};
+
+const RoomPreset RestingRoomPopSmall{
+        {},
+        {},
+        {{{PopConsole,{}}, {0.5f, 0.5f}}},
+        0.0f,
+        0,
+        0,
+        "Resting Room",
+        false,
+        {800, 800}
+};
+
+const RoomPreset RestingRoom3PopLarge{
+        {},
+        {},
+        {{{PopConsole,{}}, {0.5f, 0.5f}}, {{PopConsole,{}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},  {{PushConsole,{bulletPierceUp, bulletRangeUp}}, {0.5f, 0.25f}}, {{PopConsole,{dashUp, dashRechargeUp}}, {0.5f, 0.75f}}},
+        0.0f,
+        0,
+        0,
+        "Resting Room",
+        false,
+        {2500, 2500}
 };
 
 const RoomPreset RestingRoomGardener{
@@ -1022,7 +1137,7 @@ const RoomPreset TreasureRoomSniper{
 const RoomPreset TreasureRoomShotgun{
         {},
         {},
-        {{{PushConsole,{dmgDown,dmgDown,dmgDown,  accuracyDown, accuracyDown, accuracyDown, numBulletsUp, numBulletsUp, numBulletsUp,  }}, {0.5f, 0.5f}}},
+        {{{PushConsole,{bulletRangeDown,bulletRangeDown,bulletRangeDown,  accuracyDown, accuracyDown, accuracyDown, numBulletsUp, numBulletsUp, numBulletsUp,  }}, {0.5f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1034,7 +1149,7 @@ const RoomPreset TreasureRoomShotgun{
 const RoomPreset TreasureRoomOstrich{
         {},
         {},
-        {{{PushConsole,{dashDown, dashDown, dashRechargeDown, dashRechargeDown, dashRechargeDown, playerSpeedUp,playerSpeedUp, playerSpeedUp, }}, {0.5f, 0.5f}}},
+        {{{PushConsole,{dashDown, dashDown, dashDown, dashRechargeDown, dashRechargeDown, dashRechargeDown, playerSpeedUp,playerSpeedUp, playerSpeedUp, playerSpeedUp,playerSpeedUp, playerSpeedUp,}}, {0.5f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -2425,19 +2540,19 @@ const std::vector<RoomPreset> regularTreasureRooms = {
 std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3,BioRoomSmall },{}}},
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop},}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge},}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{EnemyRoomSwarm}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1,EnemyRoomCrabs,BioRoomSmall, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomInvisible,EnemyRoomSwarm}}},
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomInvisible}}},
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2456,7 +2571,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
                 {HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms,},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2471,7 +2586,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
                 {HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2486,7 +2601,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
                 {HifiRoomLaserFiesta, HifiRoomShieldedMadness}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2495,7 +2610,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
 std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{QuadShooterRoomSmall },{EnemyRoomMagic, EnemyRoomInvisible}}},
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2509,7 +2624,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
                 {EnemyRoomMagic}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2523,7 +2638,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
                 {EnemyRoomMagic}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop},{}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2531,8 +2646,8 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{HifiEnemyRoomSwarmLasers}}},
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{MedicalEnemyRoomInvincible}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2545,16 +2660,16 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
                     EnemyRoomCloaked, MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomWorms
 
                 },
-                {MedicalEnemyRoomHeartBeat3}
+                {MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{HifiRoomLaserFiesta}}},
-        {RoomType::RestRoom, {{RestingRoomPop},{}}},
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{MedicalEnemyRoomHeartBeat3,MedicalEnemyRoomInvincible}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
         {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
     }},
@@ -2827,6 +2942,13 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
                 {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
         {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
         },
+        {
+                                                {EnemyHifiJellyFish, {0.6f, 0.6f}},
+                            {EnemyHifiJellyFish, {0.4f, 0.4f}},
+{CloakedGranter, {0.6f, 0.6f}},
+               {CloakedGranter, {0.4f, 0.4f}},
+        },
+
 };
 
 std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
@@ -2836,6 +2958,12 @@ std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
                 {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
         {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
         },
+    {
+        {EnemyMedicalRodC, {0.5f, 0.5f}},
+        {InvisibleGranter, {0.5f, 0.5f}},
+    },
+    {
+    }
 };
 
 std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
