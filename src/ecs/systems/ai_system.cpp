@@ -247,7 +247,7 @@ void AISystem::step(float elapsed_ms)
 				// Move target location
 				switch (currPattern.type) {
 				case EnemyBehavior::WORM_FOLLOW:
-					head.points[0] = moveTowards(head.points[0], registry.motions.get(registry.players.entities[0]).position, 3.f * enemy.speedMultiplier);
+					head.points[0] = moveTowards(head.points[0], registry.motions.get(registry.players.entities[0]).position, 1.5f * enemy.speedMultiplier);
 					break;
 				case EnemyBehavior::WORM_PATROL:
 					// Worm will Teleport to first position in spline if not there

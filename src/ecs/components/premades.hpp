@@ -3797,25 +3797,117 @@ struct BigBoulder : Enemy
 
 struct DrillWormHead : Enemy
 {
-	Reaction gotTo = {
-		ReactionType::FINISH_PATROL,
+
+	const AttackData twoWalls{
+	EnemyAttackPattern::TWO_WALL,
+	CIRCLE,
+	{dashRechargeUp},
+	bulletBounceDown,
+	4,
+	M_PI / 4.f,
+	{40, 40},
+	150,
+	14000.f,
+	{0,0},
+	-100,
+	0,
+	0 };
+
+	const AttackData miningLasers{
+	EnemyAttackPattern::LASER,
+	RECTANGLE,
+	{},
+	dashRechargeUp,
+	2,
+	M_PI / 2.f,
+	{20, 20},
+	100,
+	8000,
+	{4, 0},
+	0,
+	0,
+	0 };
+
+	const AttackData spawning{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		2,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyMiningBoidWormHead };
+
+	Reaction seventyFiveHp = {
+		ReactionType::SEVENTYFIVE_HEALTH,
 		1 };
 
-	Reaction gotTo2 = {
+	Reaction gotTo = {
 		ReactionType::FINISH_PATROL,
 		2 };
 
+	Reaction gotTo2 = {
+		ReactionType::DURATION,
+		3 };
 
-	EnemyPattern startState = { "LOOP", EnemyBehavior::WORM_GOTO, { vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot };
-	EnemyPattern loopState = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(0.8,0.2), vec2(0.8,0.8), vec2(0.2, 0.8), vec2(0.2,0.2), vec2(0.8,0.2) }, 0, 1000000.f, 1000000.f, {gotTo2}, 0, false, 0.f, 5000.f, quadShot };
-	EnemyPattern followState = { "LOOP", EnemyBehavior::WORM_FOLLOW, {}, 0, 1000000.f, 1000000.f, {gotTo2}, 0, false, 0.f, 5000.f, quadShot };
+	Reaction halfHp = {
+		ReactionType::FIFTY_HEALTH,
+		4 };
+
+	Reaction gotTo3 = {
+		ReactionType::DURATION,
+		5 };
+
+	Reaction twentyFiveHp = {
+		ReactionType::TWENTYFIVE_HEALTH,
+		6 };
+
+	Reaction gotTo4 = {
+		ReactionType::FINISH_PATROL,
+		7 };
+
+	Reaction gotTo5 = {
+		ReactionType::DURATION,
+		8 };
+
+	EnemyPattern spikyState1 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {seventyFiveHp}, 0, false, 0.f, 5000.f, quadShot };
+
+	float length = 0.5f;
+	vec2 offset = vec2(0.5);
+	vec2 loopStart = offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f));
+	std::vector<vec2> loopPatrol = { offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f)), offset + length * vec2(cos(M_PI / 2.f), sin(M_PI / 2.f)), offset + length * vec2(cos(M_PI / 1.f), sin(M_PI / 1.f)), offset + length * vec2(cos(5.f * M_PI / 4.f), sin(5.f * M_PI / 4.f)), offset + length * vec2(cos(3.f * M_PI / 2.f), sin(3.f * M_PI / 2.f)), offset + length * vec2(cos(7.f * M_PI / 4.f), sin(7.f * M_PI / 4.f)), offset + length * vec2(cos(2.f * M_PI / 1.f), sin(2.f * M_PI / 1.f)), offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f)) };
+
+	// Lasers
+	EnemyPattern startState1 = { "LOOP", EnemyBehavior::WORM_GOTO, { loopStart }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern loopState1 = { "LOOP", EnemyBehavior::WORM_PATROL, loopPatrol, 0, 8000.f, 8000.f, {gotTo2}, 3, true, 0.f, 8000.f, miningLasers };
+	
+	// Boids
+	EnemyPattern spikyState2 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {halfHp}, 0, true, 0.f, 8000.f, spawning };
+
+	EnemyPattern followState = { "LOOP", EnemyBehavior::WORM_FOLLOW, {}, 0, 8000.f, 8000.f, {gotTo3}, 5, false, 0.f, 5000.f, quadShot };
+
+	// Boids
+	EnemyPattern spikyState3 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {twentyFiveHp}, 0, true, 0.f, 6000.f, spawning };
+
+	// 2 Wall
+	EnemyPattern startState2 = { "LOOP", EnemyBehavior::WORM_GOTO, { loopStart }, 0, 1000000.f, 1000000.f, {gotTo4}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern loopState2 = { "LOOP", EnemyBehavior::WORM_PATROL, loopPatrol, 0, 8000.f, 8000.f, {gotTo5}, 8, true, 0.f, 1000.f, twoWalls };
+
+	EnemyPattern spikyState4 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 4000.f, spawning };
 
 	DrillWormHead()
 	{
-		maxHealth = 5000;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 
-		enemyPatterns = { startState, loopState, followState };
+		enemyPatterns = { spikyState1, startState1, loopState1, spikyState2, followState, spikyState3, startState2, loopState2, spikyState4 };
 
 		patternIndex = 0;
 		sprite = {
@@ -3827,9 +3919,11 @@ struct DrillWormHead : Enemy
 			2,
 			60};
 		scale = vec2({ 288.0f / 2, 192.f / 2 });
-		rotationBehaviour = EnemyRotationBehavior::WORM;
+		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
+		speedMultiplier = 3.f;
+		collisionBullet = { bulletPierceDown };
 
-		headData.size = 10;
+		headData.size = 20;
 		headData.body = BossDrillWormBody;
 		headData.constrainDistance = 126.f;
 	};
