@@ -250,7 +250,7 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.rareBulletEffects = {b};
 		atkData.speed = 200;
 		atkData.size = vec2(20,50);
-		atkData.bulletRange = max(6000.f, numBullets * 1500.f);
+		atkData.bulletRange = max(6000.f, numBullets * 1000.f);
 		atkData.bulletBounce = max(2, numBullets / 3);
 		float angle = (angleStep * i) + direction;
 		createPopBullet(renderer, position + offset * vec2(cos(angle), sin(angle)), {cos(angle), sin(angle)}, vec2(0), atkData);

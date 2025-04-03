@@ -1122,6 +1122,102 @@ const RoomPreset TreasureRoomBlunt{
      {2000, 1500},
 };
 
+const RoomPreset TreasureRoomChoice1{
+        {},
+        {},
+        {{{FightConsole,{dmgUp}}, {0.25f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice1",
+        false,
+         {2000, 1500},
+    };
+
+const RoomPreset TreasureRoomChoice2{
+        {},
+        {},
+        {{{FightConsole,{numBulletsUp}}, {0.25f, 0.5f}}, {{FightConsole,{bulletBurstUp}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice2",
+        false,
+         {2000, 1500},
+    };
+
+const RoomPreset TreasureRoomChoice3{
+        {},
+        {},
+        {{{FightConsole,{bulletPierceUp, bulletPierceUp, }}, {0.25f, 0.5f}}, {{FightConsole,{bulletBounceUp, bulletBounceUp}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice3",
+        false,
+         {2000, 1500},
+    };
+
+const RoomPreset TreasureRoomChoice4{
+        {},
+        {},
+        {{{FightConsole,{bulletRangeUp, bulletRangeUp, }}, {0.25f, 0.5f}}, {{FightConsole,{accuracyUp, accuracyUp, accuracyUp,}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice4",
+        false,
+         {2000, 1500},
+    };
+
+const RoomPreset TreasureRoomChoice5{
+        {},
+        {},
+        {{{FightConsole,{dashRechargeUp, dashRechargeUp, }}, {0.25f, 0.5f}}, {{FightConsole,{dashUp, dashUp, dashUp}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice5",
+        false,
+         {2000, 1500},
+    };
+
+const RoomPreset TreasureRoomChoice6{
+        {},
+        {},
+        {{{FightConsole,{playerSpeedUp, playerSpeedUp, }}, {0.25f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp,}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice6",
+        false,
+         {2000, 1500},
+    };
+
+const RoomPreset TreasureRoomChoice7{
+        {},
+        {},
+        {{{FightConsole,{dashRechargeUp, dashRechargeUp, dashRechargeUp, dashDown }}, {0.25f, 0.5f}}, {{FightConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletSpeedDown}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice7",
+        false,
+         {2000, 1500},
+    };
+
+const RoomPreset TreasureRoomChoice8{
+        {},
+        {},
+        {{{FightConsole,{fireRateUp, fireRateUp, dmgDown, dmgDown, bulletRangeDown,  bulletRangeDown}}, {0.25f, 0.5f}}, {{FightConsole,{bulletBurstUp, bulletBurstUp, dmgDown, dmgDown, accuracyDown, accuracyDown}}, {0.75f, 0.5f}}},
+        0.0f,
+        5,
+        0,
+        "TreasureRoomChoice8",
+        false,
+         {2000, 1500},
+    };
+
 const RoomPreset TreasureRoomSniper{
     {},
     {},
@@ -1157,6 +1253,18 @@ const RoomPreset TreasureRoomOstrich{
         true,
          {1300, 1300},
     };
+
+const RoomPreset TreasureRoomMachineGun{
+            {},
+            {},
+            {{{PushConsole,{fireRateUp, fireRateUp, fireRateUp, dmgDown, dmgDown,dmgDown, numBulletsDown, numBulletsDown, numBulletsDown, bulletBurstUp,bulletBurstUp,bulletBurstUp,}}, {0.5f, 0.5f}}},
+            0.0f,
+            5,
+            0,
+        "Frenzied Fire",
+            true,
+             {1300, 1300},
+        };
 
 
 const RoomPreset TreasureRoomHoney{
@@ -1842,7 +1950,7 @@ const RoomPreset QuadShooterRoomSmall {
         4.0f,
         5,
         2,
-        "Wave in a bottle",
+        "Concentrated Fire",
         false,
         {1200, 1200}
 };
@@ -2440,14 +2548,15 @@ const RoomPreset MedicalRoomQuadShooter {
            {EnemyType::EnemyQuadshooterElite, {0.8f, 0.8f}}
         },
 
-            {{EnemyType::EnemyQuadshooterElite, {0.2f, 0.2f}},
+            {
+                // {EnemyType::EnemyQuadshooterElite, {0.2f, 0.2f}},
             {EnemyType::EnemyQuadshooterElite, {0.2f, 0.4f}},
             {EnemyType::EnemyQuadshooterElite, {0.2f, 0.6f}},
-            {EnemyType::EnemyQuadshooterElite, {0.2f, 0.8f}},
-            {EnemyType::EnemyQuadshooterElite, {0.8f, 0.2f}},
+            // {EnemyType::EnemyQuadshooterElite, {0.2f, 0.8f}},
+            // {EnemyType::EnemyQuadshooterElite, {0.8f, 0.2f}},
             {EnemyType::EnemyQuadshooterElite, {0.8f, 0.4f}},
             {EnemyType::EnemyQuadshooterElite, {0.8f, 0.6f}},
-            {EnemyType::EnemyQuadshooterElite, {0.8f, 0.8f}}
+            // {EnemyType::EnemyQuadshooterElite, {0.8f, 0.8f}}
             },
         {
             {EnemyQuadshooterElite, {0.5f, 0.5f}},
@@ -2537,24 +2646,33 @@ const std::vector<RoomPreset> regularTreasureRooms = {
     TreasureRoom8, TreasureRoom9, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt
 };
 
+const std::vector<RoomPreset> choiceTreasureRooms = {
+    TreasureRoomChoice1, TreasureRoomChoice2, TreasureRoomChoice3, TreasureRoomChoice4, TreasureRoomChoice5, TreasureRoomChoice6, TreasureRoomChoice7, TreasureRoomChoice8,
+};
+
+const std::vector<RoomPreset> bothTreasureRooms = {
+    TreasureRoom1, TreasureRoom2, TreasureRoom3, TreasureRoom4, TreasureRoom5, TreasureRoom6, TreasureRoom7,
+    TreasureRoom8, TreasureRoom9, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt,
+    TreasureRoomChoice1, TreasureRoomChoice2, TreasureRoomChoice3, TreasureRoomChoice4, TreasureRoomChoice5, TreasureRoomChoice6, TreasureRoomChoice7, TreasureRoomChoice8,};
+
 std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3,BioRoomSmall },{}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge},}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{EnemyRoomSwarm}}},
+        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1,EnemyRoomCrabs,BioRoomSmall, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomInvisible,EnemyRoomSwarm}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomInvisible}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{RestingRoomGardener, RestRoomBibleTree, RestRoomOracleCrab}, {EventRoomMouse}}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
 };
 
@@ -2573,7 +2691,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms,},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{bothTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Easy,{
         {
@@ -2588,7 +2706,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{bothTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Medium,{
         {
@@ -2603,7 +2721,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{bothTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
 };
 
@@ -2612,7 +2730,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
         {RoomType::EnemyRoom, {{QuadShooterRoomSmall },{EnemyRoomMagic, EnemyRoomInvisible}}},
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Easy,{
         {
@@ -2626,7 +2744,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Medium,{
         {
@@ -2640,7 +2758,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{bothTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
 };
 
@@ -2649,7 +2767,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
         {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{MedicalEnemyRoomInvincible}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, RestRoomOracleCrab, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{bothTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Easy,{
         {
@@ -2665,13 +2783,13 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
         {RoomType::EventRoom, {{TreasureRoomHoney, EventRoomSwarm, RestRoomOracleCrab, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{choiceTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{MedicalEnemyRoomHeartBeat3,MedicalEnemyRoomInvincible}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{}}},
         {RoomType::EventRoom, {{RestRoomBaru, TreasureRoomHoney, TreasureRoomWish, EventRoomSwarm, EventRoomOven}, {RestRoomBaru, TreasureRoomHoney, TreasureRoomWish }}  },
-        {RoomType::TreasureRoom, {{regularTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich}}},
+        {RoomType::TreasureRoom, {{choiceTreasureRooms},{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun}}},
     }},
 };
 
