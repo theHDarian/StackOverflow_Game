@@ -1660,6 +1660,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case BossDrillWormHead:
 	{
 		enemy = DrillWormHead();
+		auto& boss = registry.bosses.emplace(entity);
+		boss.name = "AUTUMN";
 		break;
 	}
 	case EnemySmallMiningWormHead:

@@ -382,7 +382,7 @@ void EnemySystem::step(float elapsed_ms)
             }
             if (registry.wormBodies.has(entity)) {
                Enemy& head = registry.enemies.get(registry.wormBodies.get(entity).head);
-               head.currHealth -= damage;
+               if (!registry.invincibles.has(registry.wormBodies.get(entity).head)) head.currHealth -= damage;
             }
             else {
                 enemyStat.currHealth -= damage;
