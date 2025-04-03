@@ -3864,7 +3864,7 @@ struct DrillWormHead : Enemy
 
 	EnemyPattern spikyState1 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {seventyFiveHp}, 0, false, 0.f, 5000.f, quadShot };
 
-	float length = 0.5f;
+	float length = 0.7f;
 	vec2 offset = vec2(0.5);
 	vec2 loopStart = offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f));
 	std::vector<vec2> loopPatrol = { offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f)), offset + length * vec2(cos(M_PI / 2.f), sin(M_PI / 2.f)), offset + length * vec2(cos(M_PI / 1.f), sin(M_PI / 1.f)), offset + length * vec2(cos(5.f * M_PI / 4.f), sin(5.f * M_PI / 4.f)), offset + length * vec2(cos(3.f * M_PI / 2.f), sin(3.f * M_PI / 2.f)), offset + length * vec2(cos(7.f * M_PI / 4.f), sin(7.f * M_PI / 4.f)), offset + length * vec2(cos(2.f * M_PI / 1.f), sin(2.f * M_PI / 1.f)), offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f)) };

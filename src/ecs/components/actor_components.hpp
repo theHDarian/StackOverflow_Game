@@ -187,7 +187,7 @@ struct StackCompile {
                     currStack[i + 1].value = 1;
                     i++;
                 }
-                else if (currStack[i].value + currStack[i + 1].value == -4) {
+                else if (currStack[i].value + currStack[i + 1].value == -4 && currStack[i].value != -1) {
                     currStack[i].value = -1;
                     currStack[i + 1].value = -3;
                     i--;
