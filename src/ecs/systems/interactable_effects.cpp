@@ -636,7 +636,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				case 2 : {
 					if (reaction.choice == 0) {
 						if (reaction.choice == 0) {
-							addEffect(player, {homingUp}, soundPlayer);
+							addEffect(player, {homingUp, fireRateUp,fireRateUp, fireRateUp }, soundPlayer);
 						}
 						object.dialogueCount = 4;
 					}
@@ -762,7 +762,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				}
 				case 1 : {
 					if (reaction.choice == 0) {
-						addEffect(player, {homingDown, playerSpeedUp}, soundPlayer);
+						addEffect(player, {bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp}, soundPlayer);
 						object.dialogueCount++;
 					}
 					break;
