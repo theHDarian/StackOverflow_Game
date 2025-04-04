@@ -2950,7 +2950,7 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
         return BossBigCRoom;
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Mining) {
-        return ScientistBossRoom; //TODO change to mining boss
+        return BossRoomWorm;
     }
 
     // Tutorial rooms
