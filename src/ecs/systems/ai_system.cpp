@@ -211,10 +211,12 @@ void AISystem::step(float elapsed_ms)
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING
 		updateState(enemy, movement, entity);
+		if (enemy.newPattern) {
+			currPattern = enemy.currEnemyPattern();
+		}
+		handleSpecialStates( currPattern, entity );
 		// std::cout << enemy.newPattern << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
-
-		handleSpecialStates( currPattern, entity );
 
 		if (registry.regenerates.has(entity)) {
 			auto& regen = registry.regenerates.get(entity);
@@ -235,8 +237,7 @@ void AISystem::step(float elapsed_ms)
 
 		if (currPattern.type == EnemyBehavior::ROLLING) {
 			movement.posB = getRollingPos(entity);
-		}
-		else if (registry.wormBodies.has(entity) || registry.wormHeads.has(entity)) {
+		} else if (registry.wormBodies.has(entity) || registry.wormHeads.has(entity)) {
 			auto& wormHead_registry = registry.wormHeads;
 			auto& wormBody_registry = registry.wormBodies;
 
@@ -315,7 +316,7 @@ void AISystem::step(float elapsed_ms)
 			// }
 			movement.posA = motion.position;
 			// ACTING
-			// std::cout << currPattern.name << "before getmove" << std::endl;
+			std::cout << currPattern.name << "before getmove" << std::endl;
 			movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
@@ -683,8 +684,6 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 	case EnemyBehavior::ROOK_FOLLOW:
 		// std::cout << "rook follow!" << std::endl;
 		return getRookPos(entity);
-	case EnemyBehavior::PATROLLING:
-		return getNextPatrolPos(entity);
 	case EnemyBehavior::EVADEBULLET:
 		// std::cout << "evade!" << std::endl;
 		return evadeBullet(entity);
@@ -710,8 +709,10 @@ vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 		return getParentPos(entity);
 	case EnemyBehavior::GRANTINGBUFFS:
 		return getTeamPos(entity);
-		case EnemyBehavior::GRANTINGBUFFSAOE:
+	case EnemyBehavior::GRANTINGBUFFSAOE:
     	return getTeamPos(entity);
+	case EnemyBehavior::PATROLLING:
+		return getNextPatrolPos(entity);
 	default:
 		return getCurrentPos(entity);
 	};
