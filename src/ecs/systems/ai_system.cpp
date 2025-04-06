@@ -41,27 +41,27 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 			if (!registry.invincibles.has(entity)) {
 				auto& inv = registry.invincibles.emplace(entity);
 
-					inv.countdown = currPattern.maxDuration;
+					inv.countdown = currPattern.curDuration;
 			} else {
 				auto& inv = registry.invincibles.get(entity);
-				inv.countdown = currPattern.maxDuration;
+				inv.countdown = currPattern.curDuration;
 			}
 		break;
 		case SpecialStates::INVISIBLE:
 			if (!registry.invisibles.has(entity)) {
 				auto& inv = registry.invisibles.emplace(entity);
 
-				inv.countdown = currPattern.maxDuration;
+				inv.countdown = currPattern.curDuration;
 
 			} else {
 				auto& inv = registry.invisibles.get(entity);
-				inv.countdown = currPattern.maxDuration;
+				inv.countdown = currPattern.curDuration;
 			}
 		break;
 		case SpecialStates::PROTECTED:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = currPattern.maxDuration;
+				vul.countdown = currPattern.curDuration;
 				vul.modifier = 0.5;
 			} else {
 				auto& vul = registry.vulnerabilities.emplace(entity);
@@ -72,7 +72,7 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 		case SpecialStates::VULNERABLE:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = currPattern.maxDuration;
+				vul.countdown = currPattern.curDuration;
 				vul.modifier = 2.f;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
@@ -83,16 +83,16 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 		case SpecialStates::UNDERGROUND:
 			if (!registry.moles.has(entity)) {
 				auto& under = registry.moles.emplace(entity);
-				under.countdown = currPattern.maxDuration;
+				under.countdown = currPattern.curDuration;
 			} else {
 				auto& under = registry.moles.get(entity);
-				under.countdown = currPattern.maxDuration;
+				under.countdown = currPattern.curDuration;
 			}
 		break;
 		case SpecialStates::REGENERATING:
 			if (!registry.regenerates.has(entity)) {
 				auto& regen = registry.regenerates.emplace(entity);
-				regen.countdown = currPattern.maxDuration;
+				regen.countdown = currPattern.curDuration;
 				if (registry.healers.has(entity)) {
 					regen.healAmount = registry.healers.get(entity).healPower;
 				} else {
@@ -103,10 +103,10 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 		case SpecialStates::CLOAKED:
 			if (!registry.cloaks.has(entity)) {
 				auto& cloak = registry.cloaks.emplace(entity);
-				cloak.countdown = currPattern.maxDuration;
+				cloak.countdown = currPattern.curDuration;
 			} else {
 				auto& cloak = registry.cloaks.get(entity);
-				cloak.countdown = currPattern.maxDuration;
+				cloak.countdown = currPattern.curDuration;
 			}
 		break;
 		default: break;
