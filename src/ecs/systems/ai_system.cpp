@@ -211,9 +211,9 @@ void AISystem::step(float elapsed_ms)
 		currPattern.curDuration -= elapsed_ms;
 		// SENSING
 		updateState(enemy, movement, entity);
-		if (enemy.newPattern) {
-			currPattern = enemy.currEnemyPattern();
-		}
+		// if (enemy.newPattern) {
+		// 	currPattern = enemy.currEnemyPattern();
+		// }
 		handleSpecialStates( currPattern, entity );
 		// std::cout << enemy.newPattern << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
@@ -316,8 +316,8 @@ void AISystem::step(float elapsed_ms)
 			// }
 			movement.posA = motion.position;
 			// ACTING
-			std::cout << currPattern.name << "before getmove" << std::endl;
-			movement.posB = boundPosition(getMove(currPattern.type, entity), entity);
+			// std::cout << currPattern.name << "before getmove" << std::endl;
+			movement.posB = boundPosition(getMove(enemy.currEnemyPattern().type, entity), entity);
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
 		}
