@@ -4099,6 +4099,361 @@ struct MiningBoidWormBody : Enemy
 
 
 //----------------------------------------- PHYSICS REGION ENEMIES ---------------------------------
+
+struct ConstructYELLOW : Enemy
+{
+	const AttackData spawning{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		3,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyHifiTemporaryBoid };
+
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 12000.f, 12000.f, {}, 0, true, 0.f, 6000.f, spawning };
+	
+	ConstructYELLOW()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState };
+		patternIndex = 0;
+		sprite = {
+			"HifiBoss2Yellow.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 135.f, 135.f });
+		rotatePower = 90.0f;
+	};
+};
+struct ConstructPURPLE : Enemy
+{
+	const AttackData bigBullet{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{100, 100},
+		400,
+		4000,
+		{50, 0},
+		10,
+		10,
+		0 
+	};
+
+	EnemyPattern startState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 8000.f, 8000.f, {{ReactionType::PLAYER_CLOSE, 1}}, 1, true, 0.f, 4000.f, bigBullet };
+	EnemyPattern teleState = { "PatrolSide", EnemyBehavior::TELEPORT, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 2}}, 2, false, 0.f, 1000.f, none };
+	EnemyPattern cooldownState = { "PatrolSide", EnemyBehavior::RANDOM_NEAR, {}, 0, 8000.f, 8000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 4000.f, bigBullet };
+
+	ConstructPURPLE()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = { startState, teleState, cooldownState };
+		patternIndex = 0;
+		sprite = {
+			"HifiBoss2Purple.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 135.f, 135.f });
+		rotatePower = 90.0f;
+		speedMultiplier = 1.3;
+	};
+};
+struct ConstructGREEN : Enemy
+{
+	const AttackData crabLaser{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{20, 20},
+		0,
+		10000000,
+		{4, 0},
+		0,
+		0,
+		0 };
+	EnemyPattern startState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.9, 0.1}}, 0, 3000.f, 3000.f, {{ReactionType::FINISH_PATROL, 1}}, 1, false, 0.f, 1000000000.f, none, SpecialStates::INVINCIBLE };
+	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 3000.f, 3000.f, {}, 1, true, 0.f, 1000000000.f, crabLaser };
+	
+	ConstructGREEN()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = { startState, randomState };
+		patternIndex = 0;
+		sprite = {
+			"HifiBoss2Green.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 135.f, 135.f });
+		rotatePower = 1.0f;
+		speedMultiplier = 4.F;
+		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
+	};
+};
+struct ConstructRED : Enemy
+{
+
+	const AttackData trail{
+		EnemyAttackPattern::TRAIL,
+		TRIANGLE,
+		{},
+		{blunt},
+		1,
+		0,
+		{20, 20},
+		0,
+		5000,
+		{0, 0},
+		0,
+		0,
+		0 
+	};
+
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {}, 0, true, 0.f, 1000.f, trail };
+
+	ConstructRED()
+	{
+		maxHealth = 500;
+		currHealth = maxHealth;
+		enemyPatterns = {
+			randomState };
+		patternIndex = 0;
+		sprite = {
+			"HifiBoss2Red.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE };
+		scale = vec2({ 135.f, 135.f });
+		rotatePower = 90.0f;
+		speedMultiplier = 1.9;
+	};
+};
+
+struct MultiCube : Enemy 
+{
+	// Spawn YELLOW
+	Reaction threeQuarterHP = {
+		ReactionType::SEVENTYFIVE_HEALTH,
+		2,
+		SpecialStates::INC_ANIM
+	};
+	const AttackData spawnYELLOW{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{0, 0},
+		0,
+		0,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::BossConstructYELLOW 
+	};
+
+	// Spawn PURPLE
+	Reaction halfHP = {
+		ReactionType::FIFTY_HEALTH,
+		5,
+		SpecialStates::INC_ANIM 
+	};
+	const AttackData spawnPURPLE{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{0, 0},
+		0,
+		0,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::BossConstructPURPLE
+	};
+
+	// Spawn GREEN and RED
+	Reaction quarterHP = {
+		ReactionType::TWENTYFIVE_HEALTH,
+		8,
+		SpecialStates::INC_ANIM
+	};
+	const AttackData spawnGREEN{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{0, 0},
+		0,
+		0,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::BossConstructGREEN
+	};
+	const AttackData spawnRED{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{0, 0},
+		0,
+		0,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::BossConstructRED
+	};
+
+	const AttackData oneLaser{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{20, 20},
+		0,
+		5000,
+		{5, 0.03},
+		0,
+		0,
+		0 };
+	const AttackData twoLaser{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{},
+		blunt,
+		2,
+		0,
+		{20, 20},
+		0,
+		5000,
+		{5, 0.02},
+		0,
+		0,
+		0 };
+	const AttackData threeLaser{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{},
+		blunt,
+		3,
+		0,
+		{20, 20},
+		0,
+		5000,
+		{5, 0.01},
+		0,
+		0,
+		0 };
+
+	const AttackData blowup{
+		EnemyAttackPattern::SPRAY,
+		TRIANGLE,
+		{},
+		blunt,
+		10,
+		2.f * M_PI,
+		{20, 20},
+		300,
+		200,
+		{0.0, 0.0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	const AttackData radialSquare{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	RECTANGLE,
+	{},
+	blunt,
+	4,
+	M_PI / 4.f,
+	{30, 30},
+	400,
+	2500,
+	{0, 0},
+	0,
+	0,
+	0
+	};
+
+	EnemyPattern zeroState1 = { "RookFollow", EnemyBehavior::ROOK_FOLLOW, {}, 0, 8000.f, 8000.f, {threeQuarterHP, {ReactionType::DURATION, 1}}, 1, false, 0.f, 1000.f, none };
+	EnemyPattern zeroState2 = { "IDLE1", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {threeQuarterHP, {ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, oneLaser };
+
+	EnemyPattern spawnYellow = { "spwnY", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 3}}, 3, true, 0.f, 1000.f, spawnYELLOW };
+
+	EnemyPattern oneState1 = { "center", EnemyBehavior::PATROLLING, {{0.5,0.5}}, 0, 8000.f, 8000.f, {halfHP, {ReactionType::DURATION, 4}}, 4, true, 0.f, 2000.f, radialSquare };
+	EnemyPattern oneState2 = { "IDLE2", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {halfHP, {ReactionType::DURATION, 3}}, 3, true, 0.f, 5000.f, twoLaser };
+
+	EnemyPattern spawnPurple = { "spwnP", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 6}}, 6, true, 0.f, 1000.f, spawnPURPLE };
+
+	EnemyPattern twoState1 = { "IDLE3", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {quarterHP, {ReactionType::DURATION, 7}}, 7, true, 0.f, 1000.f, radialSquare };
+	EnemyPattern twoState2 = { "IDLE4", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {quarterHP, {ReactionType::DURATION, 6}}, 6, true, 0.f, 5000.f, threeLaser };
+
+	EnemyPattern spawnGreen = { "spwnG", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 9, SpecialStates::INC_ANIM}}, 9, true, 0.f, 1000.f, spawnGREEN };
+	EnemyPattern spawnRed =   { "spwnR", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 10}}, 10, true, 0.f, 1000.f, spawnRED };
+
+	EnemyPattern finalState1 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 11}}, 11, true, 0.f, 500.f, blowup }; //blow up attack
+	EnemyPattern finalState2 = { "die", EnemyBehavior::DEATHSTATE, {}, 0, 3000.f, 3000.f, {}, 11, false, 0.f, 1000.f, none };
+	
+	MultiCube()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+		enemyPatterns = { zeroState1, zeroState2, spawnYellow, oneState1, oneState2, spawnPurple, twoState1, twoState2, spawnGreen, spawnRed, finalState1, finalState2 };
+		patternIndex = 0;
+		sprite = {
+			"hifi_boss_2_phases",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE, 
+			vec2(0),
+			AnimationTypes::NONE,
+			4,
+			-5
+		};
+		scale = vec2({ 240.f, 240.f });
+		rotatePower = 90.0f;
+		speedMultiplier = 2.5f;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+	};
+};
+
 struct TwinLaserVertical1 : Enemy
 {
 	const AttackData crabLaser{

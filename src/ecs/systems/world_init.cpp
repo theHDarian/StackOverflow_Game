@@ -1779,11 +1779,38 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
             buffer.maxCoolDown = 1000.f;
             break;
         }
-		case EnemyEyeCube:
+	case BossMultiCube:
 	{
-		enemy = EyeCube();
+		enemy = MultiCube();
+		auto& boss = registry.bosses.emplace(entity);
+		boss.name = "TBD";
 		break;
 	}
+	case BossConstructYELLOW:
+	{
+		enemy = ConstructYELLOW();
+		break;
+	}
+	case BossConstructPURPLE:
+	{
+		enemy = ConstructPURPLE();
+		break;
+	}
+	case BossConstructGREEN:
+	{
+		enemy = ConstructGREEN();
+		break;
+	}
+	case BossConstructRED:
+	{
+		enemy = ConstructRED();
+		break;
+	}
+	case EnemyEyeCube:
+		{
+			enemy = EyeCube();
+			break;
+		}
 
 		case InvincibleGranter: {
 		enemy = InvincibleBuffGranter();
@@ -1797,7 +1824,6 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		registry.invisibleEnemy.emplace(entity);
 		break;
 	}
-
 		case InvisibleGranter : {
 		enemy = InvisibleBuffGranter();
 		Buffer& buffer = registry.buffers.emplace(entity);

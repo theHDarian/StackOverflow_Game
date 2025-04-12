@@ -116,6 +116,15 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 void handleSpecialStates (Reaction reaction, Entity entity)
 {
 	switch (reaction.specialState) {
+		case SpecialStates::INC_ANIM:
+			std::cout << "INC" << std::endl;
+			if (registry.animations.has(entity)) {
+				auto& anim = registry.animations.get(entity);
+				std::cout << "b4:" << anim.frame << std::endl;
+				anim.frame = (anim.frame + 1) % anim.max_frames;
+				std::cout << "aft:" << anim.frame << std::endl;
+			}
+			break;
 		case SpecialStates::INVINCIBLE:
 			if (!registry.invincibles.has(entity)) {
 				auto& inv = registry.invincibles.emplace(entity);
@@ -488,10 +497,10 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 
 	if (hpPercent < 0.25f)
 	{
-		// std::cout << "current enemy hp" << hpPercent << std::endl;
 		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTYFIVE_HEALTH);
 		if (reaction)
 		{
+			std::cout << "25% HP" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
@@ -502,6 +511,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FIFTY_HEALTH);
 		if (reaction)
 		{
+			std::cout << "50% HP" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
@@ -513,6 +523,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		auto reaction = getReactions(currPattern.reactions, ReactionType::SEVENTYFIVE_HEALTH);
 		if (reaction)
 		{
+			std::cout << "75% HP" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
@@ -527,6 +538,7 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		vec2 patrolFactor = currPattern.path[currPattern.path.size() - 1];
 		vec2 endPoint = lerpToRoom(patrolFactor);
 
+		//std::cout << glm::to_string(EnemyPos) << ", " << glm::to_string(endPoint) << ", " << glm::distance(EnemyPos, endPoint) << std::endl;
 		if (glm::distance(EnemyPos, endPoint) < 0.001 || (registry.wormHeads.has(entity) && glm::distance(registry.wormHeads.get(entity).points[0], endPoint) < 0.05)) {
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
@@ -575,12 +587,14 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	if (!reaction_found && (currPattern.reactions.size() == 0 || getReactions(currPattern.reactions, ReactionType::DURATION)))
 	{
 		// std::cout << currPattern.name << " has " << currPattern.curDuration << " ms left" << std::endl;
+		auto reaction = getReactions(currPattern.reactions, ReactionType::DURATION);
 		if (currPattern.curDuration < 0.f)
 		{
 			enemy.patternIndex = currPattern.next;
 			enemy.newPattern = true;
 			// std::cout << currPattern.next << " index currPattern.next" << std::endl;
 			currPattern.curDuration = currPattern.maxDuration;
+			if (reaction) handleSpecialStates(*reaction, entity);
 			// std::cout << "change to " << enemy.currEnemyPattern().name << std::endl;
 		}
 	}
@@ -799,10 +813,7 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 	//}
 	// std::cout << "current state: " << pattern.name << std::endl;
 	pattern.pathIndex += 1;
-	if (pattern.pathIndex >= pattern.path.size())
-	{
-		pattern.pathIndex = 0;
-	}
+	pattern.pathIndex %= pattern.path.size();
 
 	vec2 patrolFactor = pattern.path[pattern.pathIndex];
 
@@ -812,7 +823,10 @@ vec2 AISystem::getNextPatrolPos(Entity entity)
 	vec2 min = {roomBounds.x, roomBounds.y};
 	vec2 max = {roomBounds.z, roomBounds.w};
 
-	return glm::lerp(min, max, patrolFactor);
+	//std::cout << glm::to_string(glm::lerp(min, max, patrolFactor)) << std::endl;
+
+	//return glm::lerp(min, max, patrolFactor);
+	return lerpToRoom(patrolFactor);
 }
 
 vec2 AISystem::generateRandomPos(Entity entity)

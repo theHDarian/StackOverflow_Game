@@ -259,7 +259,7 @@ void EnemySystem::step(float elapsed_ms)
 
                 if (pattern.type == EnemyBehavior::TELEPORT)
                 {
-                    std::cout << "teleporting in" << movement.posB[0] << ": " << movement.posB[1] << std::endl;
+                    //std::cout << "teleporting in" << movement.posB[0] << ": " << movement.posB[1] << std::endl;
                     motion.position = movement.posB;
                 }
                 else if (pattern.type == EnemyBehavior::ROLLING)
@@ -1003,8 +1003,7 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
     if (registry.enemies.components.size() > MAX_ENEMY_SPAWN)
         return;
 
-    if (registry.animations.has(entity))
-        registry.animations.get(entity).frame = 1;
+    if (registry.animations.has(entity) && registry.animations.get(entity).animation_countdown_base != -5) registry.animations.get(entity).frame = 1;
     Map &map = registry.maps.components[0];
     // vec2 roomStartPos = map.currRoom.roomStart;
     // vec2 roomEndPos = map.currRoom.roomEnd;

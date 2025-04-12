@@ -367,6 +367,12 @@ enum EnemyType {
     BossBigCShield,
     EnemyHifiBoid,
     EnemyFishBoid, // Unsure if this is hifi lol
+    BossMultiCube,
+    BossConstructYELLOW,
+    BossConstructPURPLE,
+    BossConstructGREEN,
+    BossConstructRED,
+
 
     // Medical
     EnemyProstheticHand,
@@ -468,6 +474,7 @@ enum class SpecialStates {
     UNDERGROUND,
     REGENERATING,
     CLOAKED,
+    INC_ANIM
 };
 
 enum class EnemyBehavior {

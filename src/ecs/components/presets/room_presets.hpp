@@ -1386,13 +1386,25 @@ const RoomPreset BossRoomCrab{
 const RoomPreset BossRoomWorm{
     {{{BossDrillWormHead, {1.5f, 0.f}}}},
     //{{{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}}}},
-    //{{{EnemyTestLightningRotate, {0.45f, 0.45f}}}},
+    //{{{BossMultiCube, {0.5f, 0.5f}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.5f}}},
     0.0f,
     20,
     5,
     "Tunnel Troubles",
+    false,
+    {1500, 1500}
+};
+
+const RoomPreset BossRoomMultiCube{
+    {{{BossMultiCube, {0.5f, 0.5f}}}},
+    {},
+    {{{Ram,{}}, {0.5f, 0.5f}}},
+    0.0f,
+    20,
+    5,
+    "Colour Collective",
     false,
     {1500, 1500}
 };
@@ -2998,7 +3010,8 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Medical) {
         return ScientistBossRoom;
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
-        return BossBigCRoom;
+        std::vector<RoomPreset> hifibosses = { BossBigCRoom, BossRoomMultiCube };
+        return Random::ListItem(hifibosses);
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Mining) {
         return BossRoomWorm;
     }
