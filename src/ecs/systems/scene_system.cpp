@@ -122,6 +122,17 @@ void SceneSystem::step(float elapsed_ms) {
 			if (req.type == DialogueRequestType::InteractableDialogue) {
 				InteractableObject& object = registry.interactables.get(entity);
 				InteractibleDialogue dialogueObject = { object.name, gameState.dialogueChoice, object.dialogueCount };
+				try {
+					if (object.dialogueCount == 0) {
+						// for objects that need to be constantly interacted with, we skip the first dialogue if it's not the first time they're interacted with
+						dialogueObject.dialogueCount += (int)hasInteracted.at(object.item);
+						hasInteracted.at(object.item) = 2;
+					}
+				}
+				catch (std::out_of_range& e) {
+					std::cout << "Error: " << e.what() << std::endl;
+				}
+
 				if (req.choice > -1) {
 					dialogueObject.choice = req.choice;
 				}
@@ -129,6 +140,9 @@ void SceneSystem::step(float elapsed_ms) {
 					DialogueLines& lines = registry.dialogueLines.components[0];
 					lines = DialogueLines();
 					lines.lines = interactibleDialogue[dialogueObject];
+					for (int i = 0; i < lines.lines.size(); i++) {
+                        std::cout << std::to_string(i)<< "th text: "<< lines.lines[i].text << std::endl;
+                    }
 					registry.interactableInDialogue.clear();
 					registry.interactableInDialogue.emplace(entity);
 					summonInteractibleDialogue(entity);

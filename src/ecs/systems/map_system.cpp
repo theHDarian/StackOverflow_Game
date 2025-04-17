@@ -291,9 +291,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         registry.gameReports.components[0].roomsCleared++;
     }
 
-
-    MapRegion region = map.currRegion;
-
     //update Map Region
     if (map.currRoom.type == TutorialRoom2) {
         map.currRegion = Biology; //Go to bio region at end of tutorial
@@ -303,6 +300,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     }
 
     int roomTraversed = map.roomsTraversed;
+    MapRegion region = map.currRegion;
 
     if (door.room == RoomType::BossRoom && map.currRegion != MapRegion::Military) {
         region = (MapRegion) (region + 1);
@@ -390,7 +388,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             lockedRooms++;
         }
 
-        d.preset = getRoomPreset(d.room,region, d.isLocked, roomTraversed);
+        d.preset = getRoomPreset(d.room, region, d.isLocked, roomTraversed);
 
         if ( d.room == RoomType::EnemyRoom && Random:: Float() < ELITE_SPAWN_CHANCE) {
             d.preset.hasElite = true;
@@ -518,7 +516,6 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             if (map.currRegion == Biology) {
                 std::vector<RoomPreset> bioBossRooms = {BossRoomCrab, BossRoomBee};
                 map.currRoom.preset = Random::ListItem( bioBossRooms);
-                // map.currRoom.preset = RestRoomOracleCrab;
             }
             else if (map.currRegion == Mining) {
                 map.currRoom.preset = BossRoomWorm;
@@ -527,15 +524,15 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                  map.currRoom.preset = ScientistBossRoom;
             }
             else if (map.currRegion == Physics) {
-                map.currRoom.preset = BossBigCRoom;
+                map.currRoom.preset = BossRoomMultiCube;
             } else {
                 map.currRoom.preset = ScientistBossRoom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
-            // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-            // req2.type = InteractableRequestType::AddEffect;
-            // req2.effects = {numBulletsUp, numBulletsUp};
+            InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+            req2.type = InteractableRequestType::AddEffect;
+            req2.effects = {numBulletsUp, numBulletsUp, dmgUp, dmgUp};
         }
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
@@ -721,7 +718,10 @@ void MapSystem::updateBgPositions() {
                         textRequest.y = ws.height - position.y;
                         if (door.isPrev) {
                             textRequest.text = "Previous Room";
-                        } else {
+                        } else if (door.room == TreasureRoom && !door.isLocked) {
+                            textRequest.text = "Treasure Room";
+                        }
+                        else {
                             textRequest.text = door.preset.ID;
                         }
                         if (!door.isPrev) {

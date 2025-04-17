@@ -33,7 +33,7 @@ vec2 boundPosition(vec2 position, Entity entity)
 	return glm::clamp(position, min, max);
 }
 
-void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
+void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 {
 
 	switch (currPattern.specialState) {
@@ -113,7 +113,7 @@ void handleSpecialStates (EnemyPattern &currPattern, Entity entity)
 	}
 }
 
-void handleSpecialStates (Reaction reaction, Entity entity)
+void handleSpecialStates (const Reaction &reaction, Entity entity)
 {
 	switch (reaction.specialState) {
 		case SpecialStates::INC_ANIM:

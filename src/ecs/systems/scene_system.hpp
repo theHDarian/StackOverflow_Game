@@ -39,6 +39,12 @@ public:
         { "fanfare", SoundType::FanFare }
     };
 
+    std::unordered_map<InteractableItem, int> hasInteracted = {
+        {InteractableItem::FightConsole, 0},
+        {InteractableItem::PushConsole, 0},
+        {InteractableItem::PopConsole, 0},
+    };
+
 private:
     SoundSystem* soundSystem;
     // fun fact: if you don't ask it to hash certain parts, it won't!

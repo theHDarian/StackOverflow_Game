@@ -580,7 +580,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			if (reaction.choice == 0) {
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
 				addEffect(player, stack.stack, soundPlayer);
-				object.dialogueCount++;
+				object.dialogueCount = 1;
 				RenderRequest& req = registry.renderRequests.get(reaction.object);
 				req.texture_name = "push_console_pushed.png";
 				req.used_effect = EFFECT_ASSET_ID::TEXTURED;
@@ -725,7 +725,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				EffectStack& stack = registry.effectStacks.get(reaction.object);
 				addEffect(player, stack.stack, soundPlayer);
 				registry.invincibles.emplace(player);
-				object.dialogueCount++;
+				object.dialogueCount = 1;
 				MapSystem::clearRoomInteractables();
 				Map &map = registry.maps.components[0];
 				switch (map.currRegion) {

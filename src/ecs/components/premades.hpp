@@ -3207,6 +3207,21 @@ struct RodOfC : Enemy {
 		EnemyBulletDeath::EXPLODE
 	};
 
+	const AttackData spiral{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{dmgUp},
+		playerSpeedDown,
+		10,
+		0.0,
+		{20, 20},
+		400,
+		3000,
+		{200, -2 * M_PI / 2.0},
+		0,
+		0,
+		0};
+
 	const AttackData HomingShot{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
@@ -3233,10 +3248,10 @@ struct RodOfC : Enemy {
 	EnemyPattern heal_state = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, lowHP}, 1, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::REGENERATING};
 	EnemyPattern random_pos = {"TELEPORT", EnemyBehavior::RANDOM, {}, 0, 1500.f, 1500.f, {duration, lowHP}, 2, true, 0.f, 700.f, magicMissile, };
 	EnemyPattern coolDown = {"IDLE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration, lowHP}, 6, false, 0.f, 0.f, NoAttack, SpecialStates::PROTECTED};
-	EnemyPattern whipState = {"WHIP", EnemyBehavior::IDLE, {}, 0, 2500.f, 2500.f, {duration, lowHP}, 7, true, 0.f, 100.f, whip};
+	EnemyPattern whipState = {"WHIP", EnemyBehavior::IDLE, {}, 0, 2500.f, 2500.f, {duration, lowHP}, 7, true, 0.f, 1000.f, halo};
 	EnemyPattern coolDown2 = {"IDLE", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration, lowHP}, 5, false, 0.f, 0.f, NoAttack, SpecialStates::VULNERABLE};
 	EnemyPattern protection_pulse = {"ATTACK LASER", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, lowHP}, 3, false, 0.f, 10000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::INVISIBLE};
-	EnemyPattern wall = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, lowHP}, 4, true, 0.f, 1000.f, halo, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
+	EnemyPattern wall = {"ATTACK LASER", EnemyBehavior::RANDOM_NEAR, {}, 0, 1000.f, 1000.f, {duration, lowHP}, 4, true, 0.f, 200.f, spiral, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	EnemyPattern coolDown3 = {"IDLE", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {duration, lowHP}, 0, false, 100.f, 750.f, HomingShot, SpecialStates::VULNERABLE};
 	EnemyPattern Spawning = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 2500.f, Spawn, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	RodOfC()
@@ -3894,7 +3909,7 @@ struct DrillWormHead : Enemy
 
 	DrillWormHead()
 	{
-		maxHealth = 2500;
+		maxHealth = 3500;
 		currHealth = maxHealth;
 
 		enemyPatterns = { spikyState1, startState1, loopState1, spikyState2, followState, spikyState3, startState2, loopState2, spikyState4 };
@@ -5603,7 +5618,8 @@ struct ScientistBossEnemy : Enemy
 
 	Reaction spawningBeeBoid{
 		ReactionType::PLAYER_CLOSE,
-		6};
+		6,
+		SpecialStates::REGENERATING};
 
 	Reaction shieldBreak{
 		ReactionType::SHIELDBREAK,
@@ -5616,7 +5632,8 @@ struct ScientistBossEnemy : Enemy
 
 	Reaction secondPhasePlayerClose{
 		ReactionType::PLAYER_CLOSE,
-		13};
+		13,
+		SpecialStates::REGENERATING};
 
 	const AttackData spawnLaserRotating{
 		EnemyAttackPattern::SPAWNING,
@@ -5860,8 +5877,8 @@ struct ScientistBossEnemy : Enemy
 
 	ScientistBossEnemy()
 	{
-		maxHealth = 2000;
-		currHealth = 2000;
+		maxHealth = 5000;
+		currHealth = 5000;
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
 						 spawnRadialState, spawnBeeBoidState,
@@ -6259,8 +6276,8 @@ struct ScientistHandEnemy : Enemy
 
 	ScientistHandEnemy()
 	{
-		maxHealth = 800;
-		currHealth = 800;
+		maxHealth = 5000;
+		currHealth = 5000;
 		enemyPatterns = {idling, chargePlayer, idling2,
 						 BombingState, idling3,teleportToScientist2,
 						 laserAttackPrepareState, patrolLaserState, teleportToScientist3,

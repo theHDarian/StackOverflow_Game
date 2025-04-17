@@ -1125,7 +1125,7 @@ const RoomPreset TreasureRoomBlunt{
 const RoomPreset TreasureRoomChoice1{
         {},
         {},
-        {{{FightConsole,{dmgUp}}, {0.25f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{dmgUp}}, {0.4f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1137,7 +1137,7 @@ const RoomPreset TreasureRoomChoice1{
 const RoomPreset TreasureRoomChoice2{
         {},
         {},
-        {{{FightConsole,{numBulletsUp}}, {0.25f, 0.5f}}, {{FightConsole,{bulletBurstUp}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{numBulletsUp}}, {0.4f, 0.5f}}, {{FightConsole,{bulletBurstUp}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1149,7 +1149,7 @@ const RoomPreset TreasureRoomChoice2{
 const RoomPreset TreasureRoomChoice3{
         {},
         {},
-        {{{FightConsole,{bulletPierceUp, bulletPierceUp, }}, {0.25f, 0.5f}}, {{FightConsole,{bulletBounceUp, bulletBounceUp}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{bulletPierceUp, bulletPierceUp, }}, {0.4f, 0.5f}}, {{FightConsole,{bulletBounceUp, bulletBounceUp}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1161,7 +1161,7 @@ const RoomPreset TreasureRoomChoice3{
 const RoomPreset TreasureRoomChoice4{
         {},
         {},
-        {{{FightConsole,{bulletRangeUp, bulletRangeUp, }}, {0.25f, 0.5f}}, {{FightConsole,{accuracyUp, accuracyUp, accuracyUp,}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{bulletRangeUp, bulletRangeUp, }}, {0.4f, 0.5f}}, {{FightConsole,{accuracyUp, accuracyUp, accuracyUp,}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1173,7 +1173,7 @@ const RoomPreset TreasureRoomChoice4{
 const RoomPreset TreasureRoomChoice5{
         {},
         {},
-        {{{FightConsole,{dashRechargeUp, dashRechargeUp, }}, {0.25f, 0.5f}}, {{FightConsole,{dashUp, dashUp, dashUp}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{dashRechargeUp, dashRechargeUp, }}, {0.4f, 0.5f}}, {{FightConsole,{dashUp, dashUp, dashUp}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1185,7 +1185,7 @@ const RoomPreset TreasureRoomChoice5{
 const RoomPreset TreasureRoomChoice6{
         {},
         {},
-        {{{FightConsole,{playerSpeedUp, playerSpeedUp, }}, {0.25f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp,}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{playerSpeedUp, playerSpeedUp, }}, {0.4f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp,}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1197,7 +1197,7 @@ const RoomPreset TreasureRoomChoice6{
 const RoomPreset TreasureRoomChoice7{
         {},
         {},
-        {{{FightConsole,{dashRechargeUp, dashRechargeUp, dashRechargeUp, dashDown }}, {0.25f, 0.5f}}, {{FightConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletSpeedDown}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{dashRechargeUp, dashRechargeUp, dashRechargeUp, dashDown }}, {0.4f, 0.5f}}, {{FightConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletSpeedDown}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1209,7 +1209,7 @@ const RoomPreset TreasureRoomChoice7{
 const RoomPreset TreasureRoomChoice8{
         {},
         {},
-        {{{FightConsole,{fireRateUp, fireRateUp, dmgDown, dmgDown, bulletRangeDown,  bulletRangeDown}}, {0.25f, 0.5f}}, {{FightConsole,{bulletBurstUp, bulletBurstUp, dmgDown, dmgDown, accuracyDown, accuracyDown}}, {0.75f, 0.5f}}},
+        {{{FightConsole,{fireRateUp, fireRateUp, dmgDown, dmgDown, bulletRangeDown,  bulletRangeDown}}, {0.4f, 0.5f}}, {{FightConsole,{bulletBurstUp, bulletBurstUp, dmgDown, dmgDown, accuracyDown, accuracyDown}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -2406,7 +2406,8 @@ const RoomPreset MedicalEnemyRoomSmallRodC {
     {
         {
             {EnemyMedicalRodC, {0.5f, 0.5f}},
-            {EnemySmallCShield, {0.5f, 0.5f}},
+            {ProtectedGranter, {0.5f, 0.5f}},
+
 
         },
 
@@ -2855,6 +2856,37 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
     }},
 };
 
+const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDirectory = {
+    {DifficultyRegion::Intro,{
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{MedicalEnemyRoomInvincible}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{EventRoomOven, EventRoomOracleCrab}, { }}  },
+        {RoomType::TreasureRoom, {bothTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
+    }},
+    {DifficultyRegion::Easy,{
+        {
+            RoomType::EnemyRoom,
+            {
+                {
+                    MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes,EnemyRoomSingleMage,
+                    EnemyRoomCloaked, MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomWorms
+
+                },
+                {MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible}
+            }
+        },
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::EventRoom, {{EventRoomOracleCrab, EventRoomOven}, { }}  },
+        {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
+    }},
+    {DifficultyRegion::Medium,{
+        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{MedicalEnemyRoomHeartBeat3,MedicalEnemyRoomInvincible}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{}}},
+        {RoomType::EventRoom, {{ EventRoomOracleCrab, EventRoomOven}, { }}  },
+        {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
+    }},
+};
+
 inline std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> getDirectory(MapRegion region) {
    switch ( region ) {
        case MapRegion::Tutorial:
@@ -2867,6 +2899,8 @@ inline std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> getDirectory(M
            return MiningRoomDirectory;
        case MapRegion::Medical:
            return MedicalRoomDirectory;
+       case MapRegion::Military:
+           return MilitaryRoomDirectory;
        default:
            return bioRoomDirectory;
    }

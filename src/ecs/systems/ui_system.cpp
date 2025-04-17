@@ -378,7 +378,7 @@ void UISystem::step(float elapsed_ms) {
 				text.formattedText = uiTexts["GameOver"];
 				text.formattedText.insert(text.formattedText.end(), reportTokenized.begin(), reportTokenized.end());
 				text.formattedText = getFormattedText(text.formattedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
-				registry.activeMenus.emplace(registry.menus.entities[MenuType::GameOverMenu]);
+				registry.activeMenus.emplace_with_duplicates(registry.menus.entities[MenuType::GameOverMenu]);
 				ioState.activeMenu++;
 			}
 
