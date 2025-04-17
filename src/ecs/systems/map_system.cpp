@@ -532,7 +532,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req.type = SoundType::bossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp, dmgUp, dmgUp};
+            req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp};
         }
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;

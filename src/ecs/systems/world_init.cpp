@@ -1601,6 +1601,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = ScientistBossEnemy();
 		registry.bosses.insert(entity, { "The Purple Cyborg" });
 		Scientist& scien = registry.scientist.emplace(entity);
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 1500.f;
+		buffer.maxCoolDown = 1000.f;
+		buffer.duration = 2500.f;
 
 		break;
 	}
