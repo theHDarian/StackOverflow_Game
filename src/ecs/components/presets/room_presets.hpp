@@ -2635,8 +2635,10 @@ const RoomPreset MedicalRoomQuadShooter {
     5,
     "Critical Mass",
     false,
-    {1600, 1600}
+    {3600, 1800}
 };
+
+
 
 const RoomPreset MedicalEnemyRoomWorms {
     {

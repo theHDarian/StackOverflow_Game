@@ -259,7 +259,7 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 
 
 
-void resetStack(Entity player, RenderSystem* renderer) {
+void resetStack(Entity player, RenderSystem* renderer, float offset) {
 
     //Invincible& inv =registry.invincibles.emplace(player);
     //inv.countdown = 1000.0f;
@@ -270,7 +270,7 @@ void resetStack(Entity player, RenderSystem* renderer) {
             return;
         }
         int size = reg.baseStackSize;
-        CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, 150.0f);
+        CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, offset);
     	std::vector<BulletStackEffect> temp = reg.currStack;
         // reg.currStack.clear();
         registry.stackCompile.remove(player);
@@ -412,7 +412,11 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 	for (InteractableRequest& request : registry.interactableRequests.components) {
 		switch (request.type) {
 			case InteractableRequestType::PopStack:
-			resetStack(player, renderer);
+				if (request.choice == -1) {
+					resetStack(player, renderer);
+				} else {
+					resetStack(player, renderer, request.choice);
+				}
 				break;
 			case InteractableRequestType::PopX:
 				CreateXPopBullets (renderer, registry.motions.get(player).position, M_PI / 2, request.effects, 2 * M_PI, 150);

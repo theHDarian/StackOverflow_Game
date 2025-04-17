@@ -14,7 +14,7 @@
 
 class SoundSystem;
 
-void resetStack(Entity player, RenderSystem* renderer);
+void resetStack(Entity player, RenderSystem* renderer, float offset = 150);
 void extendStack (Entity player, int extension);
 void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSystem* soundPlayer);
 void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer);
