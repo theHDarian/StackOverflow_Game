@@ -572,7 +572,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
 				extendStack( player, 8);
-				object.dialogueCount++;
+				object.dialogueCount = 1;
 				registry.deleteds.emplace(reaction.object);
 			}
 		}
