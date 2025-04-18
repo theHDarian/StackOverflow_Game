@@ -3183,9 +3183,21 @@ std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
     }
 };
 
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> militaryEliteEnemies = {
+    {{EnemyType::BossCrab, {0.5f,0.5f}}},
+{{EnemyType::BossBeehiveMain, {0.5f,0.5f}}},
+{{EnemyType::BossMultiCube, {0.5f,0.5f}}},
+    {{EnemyType::BossBigC, {0.5f,0.5f}},
+        {EnemyType::BossBigCShield, {0.5f,0.5f}}
+    },
+{{EnemyType::BossDrillWormHead, {1.5f,0.5f}}},
+};
+
 std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
+    {Tutorial, Random::ListItem(bioEliteEnemies)},
     {Biology, Random::ListItem(bioEliteEnemies)},
     {Physics, Random::ListItem(physicsEliteEnemies)},
     {Medical, Random::ListItem(medicalEliteEnemies)},
-    {Mining, Random::ListItem(miningEliteEnemies)}
+    {Mining, Random::ListItem(miningEliteEnemies)},
+    {Military, Random::ListItem(militaryEliteEnemies)},
 };

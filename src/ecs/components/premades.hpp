@@ -1575,7 +1575,7 @@ struct BossChimeraCrab : Enemy {
 
 	BossChimeraCrab()
 	{
-		maxHealth = 650;
+		maxHealth = 850;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState, idleState, walkingRage, shootMisile, HalfHPRepostion, HalfHPLaser, RetreatAndShoot, randomStateHalfHP, walkingRageHalfhp, randomlaserState, Phase2Laser};
@@ -2262,7 +2262,9 @@ struct BossBeeHive : Enemy
 		0};
 	Reaction halfHP{
 		ReactionType::FIFTY_HEALTH,
-		5};
+		5,
+		SpecialStates::INVINCIBLE
+	};
 	Reaction threeQuartersHP{
 		ReactionType::SEVENTYFIVE_HEALTH,
 		2};
@@ -2280,7 +2282,7 @@ struct BossBeeHive : Enemy
 	EnemyPattern endingState = {"25% HP HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {}, 8, true, 0.f, 5000.f, twelveBoidBees};
 	BossBeeHive()
 	{
-		maxHealth = 800;
+		maxHealth = 1200;
 		currHealth = maxHealth;
 		enemyPatterns = {startingState1, startingState2, halfHpState1, halfHpState2, halfHpState3, quarterHpState1, quarterHpState2, quarterHpState3, endingState};
 		sprite = {
