@@ -40,11 +40,12 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 		case SpecialStates::INVINCIBLE:
 			if (!registry.invincibles.has(entity)) {
 				auto& inv = registry.invincibles.emplace(entity);
-
 					inv.countdown = currPattern.curDuration;
 			} else {
 				auto& inv = registry.invincibles.get(entity);
-				inv.countdown = currPattern.curDuration;
+				if (inv.countdown < currPattern.curDuration) {
+					inv.countdown = currPattern.curDuration;
+				}
 			}
 		break;
 		case SpecialStates::INVISIBLE:
@@ -55,13 +56,17 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 
 			} else {
 				auto& inv = registry.invisibles.get(entity);
-				inv.countdown = currPattern.curDuration;
+				if (inv.countdown < currPattern.curDuration) {
+					inv.countdown = currPattern.curDuration;
+				}
 			}
 		break;
 		case SpecialStates::PROTECTED:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = currPattern.curDuration;
+				if (vul.countdown < currPattern.curDuration || vul.modifier != 0.5) {
+					vul.countdown = currPattern.curDuration;
+				}
 				vul.modifier = 0.5;
 			} else {
 				auto& vul = registry.vulnerabilities.emplace(entity);
@@ -72,7 +77,9 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 		case SpecialStates::VULNERABLE:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = currPattern.curDuration;
+				if (vul.countdown < currPattern.curDuration || vul.modifier != 2.f) {
+					vul.countdown = currPattern.curDuration;
+				}
 				vul.modifier = 2.f;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
@@ -86,7 +93,9 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				under.countdown = currPattern.curDuration;
 			} else {
 				auto& under = registry.moles.get(entity);
-				under.countdown = currPattern.curDuration;
+				if (under.countdown < currPattern.curDuration) {
+					under.countdown = currPattern.curDuration;
+				}
 			}
 		break;
 		case SpecialStates::REGENERATING:
@@ -106,7 +115,9 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				cloak.countdown = currPattern.curDuration;
 			} else {
 				auto& cloak = registry.cloaks.get(entity);
-				cloak.countdown = currPattern.curDuration;
+				if (cloak.countdown < currPattern.curDuration) {
+					cloak.countdown = currPattern.curDuration;
+				}
 			}
 		break;
 		default: break;
@@ -132,7 +143,10 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				inv.countdown = inv.max;
 			} else {
 				auto& inv = registry.invincibles.get(entity);
-				inv.countdown = inv.max;
+				float countdown = registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
+				if (countdown > inv.countdown) {
+					inv.countdown = countdown;
+				}
 			}
 		break;
 		case SpecialStates::INVISIBLE:
@@ -141,7 +155,10 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
 			} else {
 				auto& inv = registry.invisibles.get(entity);
-				inv.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 2500) + 2500.f) : Random::Float( 12000 ) + 3000;
+				if (countdown > inv.countdown) {
+					inv.countdown = countdown;
+				}
 			}
 		break;
 		case SpecialStates::PROTECTED:
@@ -151,7 +168,10 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				vul.modifier = 0.5;
 			} else {
 				auto& vul = registry.vulnerabilities.emplace(entity);
-				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > vul.countdown || vul.modifier != 0.5) {
+					vul.countdown = countdown;
+				}
 				vul.modifier = 0.5;
 			}
 		break;
@@ -162,7 +182,10 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				vul.modifier = 2.f;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
-                vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+                float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > vul.countdown || vul.modifier != 2.f) {
+					vul.countdown = countdown;
+				}
                 vul.modifier = 2.f;
             }
 		break;
@@ -172,7 +195,10 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 			} else {
 				auto& under = registry.moles.get(entity);
-				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > under.countdown) {
+					under.countdown = countdown;
+				}
 			}
 		break;
 		case SpecialStates::REGENERATING:
@@ -186,7 +212,10 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				}
 			} else {
 				auto& under = registry.regenerates.get(entity);
-				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > under.countdown) {
+					under.countdown = countdown;
+				}
 			}
 		break;
 		case SpecialStates::CLOAKED:
@@ -195,7 +224,10 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				cloak.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 			} else {
 				auto& cloak = registry.cloaks.get(entity);
-				cloak.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > cloak.countdown) {
+					cloak.countdown = countdown;
+				}
 			}
 		break;
 		default: break;

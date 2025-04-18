@@ -525,15 +525,21 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else if (map.currRegion == Physics) {
                 map.currRoom.preset = BossRoomMultiCube;
+                // map.currRoom.preset = BossBigCRoom;
             } else {
                 map.currRoom.preset = ScientistBossRoom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
-            InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-            req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp};
+            // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+            // req2.type = InteractableRequestType::AddEffect;
+            // req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
         }
+
+        InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+        req2.type = InteractableRequestType::AddEffect;
+        req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
+
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
         extendstack.choice = 8*max(0,((int)map.currRegion - 1));

@@ -1793,21 +1793,37 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case BossConstructYELLOW:
 	{
 		enemy = ConstructYELLOW();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10000.f;
+		buffer.maxCoolDown = 1000000000000.f;
+		buffer.duration = 15000.f;
 		break;
 	}
 	case BossConstructPURPLE:
 	{
 		enemy = ConstructPURPLE();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10000.f;
+		buffer.maxCoolDown = 1000000000000.f;
+		buffer.duration = 15000.f;
 		break;
 	}
 	case BossConstructGREEN:
 	{
 		enemy = ConstructGREEN();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10000.f;
+		buffer.maxCoolDown = 1000000000000.f;
+		buffer.duration = 15000.f;
 		break;
 	}
 	case BossConstructRED:
 	{
 		enemy = ConstructRED();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10000.f;
+		buffer.maxCoolDown = 1000000000000.f;
+		buffer.duration = 15000.f;
 		break;
 	}
 	case EnemyEyeCube:

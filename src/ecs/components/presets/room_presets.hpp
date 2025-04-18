@@ -1975,16 +1975,9 @@ const RoomPreset BossBigCRoom {
             {
                 {
                     {BossBigC, {0.5f, 0.5f}},
-                },
-                {
-                     {EnemyLaserSniper,{0.5, 0.63}},
+                    {EnemyLaserSniper,{0.5, 0.63}},
                         {EnemyLaserSniper,{0.38, 0.42}},
                     {EnemyLaserSniper,{1-0.38, 0.42}},
-                },
-                {
-                        {EnemyLaserSniper,{0.5, 1-0.63}},
-                            {EnemyLaserSniper,{0.38, 1-0.42}},
-                        {EnemyLaserSniper,{1-0.38, 1-0.42}},
                 },
             },
         {},
