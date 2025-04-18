@@ -77,7 +77,7 @@ const RoomPreset StartingRoom{
 };
 
 const RoomPreset ScientistBossRoom{
-    {{{EnemyType::ScientistBoss, {0.5, 0.1}}}},
+    {{{EnemyType::ScientistBoss, {0.5, 0.2}}}},
     {},
     {},
     0.0f,
