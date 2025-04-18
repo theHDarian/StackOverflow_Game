@@ -160,6 +160,14 @@ You decide not to install the ram module.
 ITEM Ram -1 1
 You've already installed the ram module. Sadly, downloading RAM isn't actually a thing.
 
+ITEM Ram -1 2
+Would you like to install the ram module?
+CHOICES Yes\No
+
+ITEM Ram 0 2
+[Stack capacity increased!]
+SOUND rareItemPickup
+
 ITEM BibleTree -1 0
 A tree with red fruit. Pick one?
 CHOICES Yes\No

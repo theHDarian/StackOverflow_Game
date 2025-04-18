@@ -43,6 +43,7 @@ public:
         {InteractableItem::FightConsole, 0},
         {InteractableItem::PushConsole, 0},
         {InteractableItem::PopConsole, 0},
+        {InteractableItem::Ram, 0},
     };
 
 private:
