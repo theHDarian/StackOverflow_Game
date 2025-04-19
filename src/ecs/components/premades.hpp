@@ -5828,6 +5828,11 @@ struct ScientistBossEnemy : Enemy
 		13,
 		};
 
+	Reaction playerFar {
+		ReactionType::PLAYER_FAR,
+		21,
+	};
+
 	const AttackData spawnLaserRotating{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
@@ -6073,38 +6078,38 @@ struct ScientistBossEnemy : Enemy
 
 	EnemyPattern spawnLaserHorizontalState = {
 		"SHOOT HORIZONTAL", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f,
-		{duration, shieldBreak, secondPhase}, 1, true, 0.f, 1000.f, spawnLaserHorizontal
+		{duration, shieldBreak, secondPhase, twentyFivePercent}, 1, true, 0.f, 1000.f, spawnLaserHorizontal
 	};
 	EnemyPattern spawnLaserVerticalState = {
 		"SHOOT VERTICAL", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f,
-		{duration, shieldBreak, secondPhase}, 2, true, 0.f, 4000.f, spawnLaserVertical
+		{duration, shieldBreak, secondPhase, twentyFivePercent}, 2, true, 0.f, 4000.f, spawnLaserVertical
 	};
 	EnemyPattern spawnHomingState = {
 		"SHOOT HOMING", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f,
-		{duration, shieldBreak, secondPhase}, 3, true, 0.f, 500.f, ScientistHomingShot
+		{duration, shieldBreak, secondPhase, twentyFivePercent}, 3, true, 0.f, 500.f, ScientistHomingShot
 	};
 	EnemyPattern spawnBoidState = {
-		"SHOOT BOID", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase},
+		"SHOOT BOID", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration, spawningBeeBoid, shieldBreak, secondPhase, twentyFivePercent},
 		4, true, 0.f, 2500.f, spawnBoids
 	};
 	EnemyPattern spawnLaserRotateState = {
 		"SHOOT LASER", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f,
-		{duration, spawningBeeBoid, shieldBreak, secondPhase}, 5, true, 0.f, 7000.f, spawnLaserRotating
+		{duration, spawningBeeBoid, shieldBreak, secondPhase, twentyFivePercent}, 5, true, 0.f, 7000.f, spawnLaserRotating
 	};
 	EnemyPattern spawnRadialState = {
 		"SHOOT RADIAL", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f,
-		{duration, spawningBeeBoid, shieldBreak, secondPhase}, 0, true, 0.f, 4000.f, spawnTurret
+		{duration, spawningBeeBoid, shieldBreak, secondPhase, twentyFivePercent}, 0, true, 0.f, 4000.f, spawnTurret
 	};
 	EnemyPattern spawnBeeBoidState = {
-		"YOU ARE CLOSE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, shieldBreak, secondPhase}, 0, true, 0.f,
+		"YOU ARE CLOSE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, shieldBreak, secondPhase, twentyFivePercent}, 0, true, 0.f,
 		1000.f, spawnMedicalBoids, SpecialStates::PROTECTED
 	};
 	EnemyPattern vunerableState = {
-		"VURNERABLE", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, spawningBeeBoid, secondPhase}, 8, false, 0.f, 0.f,
+		"VURNERABLE", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, spawningBeeBoid, secondPhase, twentyFivePercent}, 8, false, 0.f, 0.f,
 		NoAttack, SpecialStates::VULNERABLE
 	};
 	EnemyPattern spawnShieldState = {
-		"Shield", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, shieldBreak, secondPhase}, 0, true, 0.f, 100.f,
+		"Shield", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, shieldBreak, secondPhase, twentyFivePercent}, 0, true, 0.f, 100.f,
 		spawnShield
 	};
 	EnemyPattern secondPhaseState = {
@@ -6121,43 +6126,43 @@ struct ScientistBossEnemy : Enemy
 	};
 
 	EnemyPattern patrollingState2 = {
-		"RANDOM", EnemyBehavior::GRANTINGBUFFSAOE, {{0.2, 0.8}, {0.2, 0.2}}, 0, 2000.f, 2000.f, {duration}, 13, true, 0.f,
+		"RANDOM", EnemyBehavior::GRANTINGBUFFSAOE, {{0.2, 0.8}, {0.2, 0.2}}, 0, 2000.f, 2000.f, {duration, playerFar}, 13, true, 0.f,
 		2000.f, spawnLaserHorizontal, SpecialStates::PROTECTED, SpecialStates::INVINCIBLE
 	};
 
 	EnemyPattern patrollingState3 = {
-		"RANDOM", EnemyBehavior::RANDOM, {{0.5, 0.5}, {0.7, 0.7}}, 0, 5000.f, 5000.f, {duration}, 14, true, 0.f, 5000.f,
+		"RANDOM", EnemyBehavior::RANDOM, {{0.5, 0.5}, {0.7, 0.7}}, 0, 5000.f, 5000.f, {duration, playerFar}, 14, true, 0.f, 5000.f,
 		spawnExplosive, SpecialStates::PROTECTED
 	};
 	EnemyPattern teleportState = {
-		"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 0, 3000.f, 3000.f, {duration}, 15, true, 0.f, 3000.f,
+		"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 0, 3000.f, 3000.f, {duration, playerFar}, 15, true, 0.f, 3000.f,
 		boidFishSummon, SpecialStates::VULNERABLE
 	};
 	EnemyPattern spawnLaserRotateState2 = {
 		"SHOOT LASER", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f,
-		{duration}, 16, true, 0.f, 7000.f, spawnLaserRotating
+		{duration, playerFar}, 16, true, 0.f, 7000.f, spawnLaserRotating
 	};
 	EnemyPattern spawnTurretState = {
-		"SHOOT RADIAL", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f,
-		{duration}, 17, true, 0.f, 4000.f, spawnTurret
+		"SHOOT RADIAL", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f,
+		{duration, playerFar}, 18, true, 0.f, 4000.f, spawnTurret
 	};
 
 	EnemyPattern grantInvisibleState = {
 		"GRANT INVISIBLE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f,
-		{duration}, 18, true, 0.f, 4000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::INVISIBLE
+		{duration, playerFar}, 18, true, 0.f, 4000.f, NoAttack, SpecialStates::VULNERABLE, SpecialStates::INVISIBLE
 	};
 
 	EnemyPattern spawnLaserHorizontalStatePhase2 = {
-		"SHOOT HORIZONTAL", EnemyBehavior::RANDOM_FAR, {}, 0, 100.f, 100.f,
-		{duration }, 19, true, 0.f, 1000.f, spawnLaserHorizontal, SpecialStates::VULNERABLE
+		"SHOOT HORIZONTAL", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f,
+		{duration, playerFar }, 19, true, 0.f, 1000.f, spawnLaserHorizontal, SpecialStates::VULNERABLE
 	};
 	EnemyPattern spawnLaserVerticalStatePhase2 = {
-		"SHOOT VERTICAL", EnemyBehavior::RANDOM_FAR, {}, 0, 100.f, 100.f,
-		{duration}, 21, true, 0.f, 4000.f, spawnLaserVertical, SpecialStates::VULNERABLE
+		"SHOOT VERTICAL", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f,
+		{duration, playerFar}, 21, true, 0.f, 4000.f, spawnLaserVertical, SpecialStates::VULNERABLE
 	};
 
 	EnemyPattern spawnShieldStatePhase2 = {
-		"Shield", EnemyBehavior::IDLE, {}, 0, 100.f, 100.f, {duration}, 11, true, 0.f, 1000.f,
+		"Shield", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 12, true, 0.f, 1000.f,
 		spawnShield
 	};
 
@@ -6173,9 +6178,7 @@ struct ScientistBossEnemy : Enemy
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
 						 spawnRadialState, spawnBeeBoidState,
-						 vunerableState, spawnShieldState, secondPhaseState,
-						 spawnHandState,
-						 patrollingState1,
+						 vunerableState, spawnShieldState, secondPhaseState,spawnHandState, patrollingState1,
 						 patrollingState2, patrollingState3, teleportState, spawnLaserRotateState, spawnTurretState,
 		grantInvisibleState, spawnLaserHorizontalStatePhase2, spawnLaserVerticalStatePhase2, spawnRodC, spawnShieldStatePhase2,
 		};
@@ -6188,6 +6191,8 @@ struct ScientistBossEnemy : Enemy
 		scale = vec2(250, 250);
 		rotatePower = 0.f;
 		armour = 10;
+		speedMultiplier = 1.5f;
+		collisionBullet = {blunt, blunt, blunt, blunt};
 	}
 };
 
@@ -6646,8 +6651,8 @@ struct ScientistHandEnemy : Enemy
 
 	ScientistHandEnemy()
 	{
-		maxHealth = 2500;
-		currHealth = 2500;
+		maxHealth = 1500;
+		currHealth = maxHealth;
 		enemyPatterns = {idling, chargePlayer, idling2,
 						 BombingState, idling3,teleportToScientist2,
 						 laserAttackPrepareState, patrolLaserState, teleportToScientist3,
