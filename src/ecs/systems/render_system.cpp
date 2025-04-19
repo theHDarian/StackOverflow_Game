@@ -390,23 +390,29 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
 	bool isProtected = false;
-	if (registry.vulnerabilities.has(entity)) {
-		if (registry.vulnerabilities.get(entity).modifier < 1.0f) {
+	Entity target;
+	if (registry.wormBodies.has(entity)) {
+		target = registry.wormBodies.get(entity).head;
+	} else {
+		target = entity;
+	}
+	if (registry.vulnerabilities.has(target)) {
+		if (registry.vulnerabilities.get(target).modifier < 1.0f) {
 			isProtected = true;
 		}
 	}
 
 	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
-	glUniform1i(shielded_uloc, (registry.invincibles.has(entity) || isProtected));
+	glUniform1i(shielded_uloc, (registry.invincibles.has(target) || isProtected));
 
 	GLuint shield_color_uloc = glGetUniformLocation(program, "shieldColor");
-	if (registry.invincibles.has(entity))
+	if (registry.invincibles.has(target))
 	{
 		vec3 shieldColor = vec3(233.f / 255.f, 173.f / 255.f, 48.f / 255.f);
 		glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
-	} else if (registry.vulnerabilities.has(entity))
+	} else if (registry.vulnerabilities.has(target))
 	{
-		if (registry.vulnerabilities.get(entity).modifier < 0.9f) {
+		if (registry.vulnerabilities.get(target).modifier < 0.9f) {
 			vec3 shieldColor = vec3(0.5f, 0.5f, 1.2f);
 			glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
 		}
@@ -421,16 +427,16 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	if (registry.damageds.has(entity))
 	{
-    Damaged &damaged = registry.damageds.get(entity);
+		Damaged &damaged = registry.damageds.get(entity);
 		vec3 color = {1.2, 0.5, 0.5}; // red
-		if (registry.invincibles.has(entity)) {
+		if (registry.invincibles.has(target)) {
 			color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
 		}
-		else if (registry.vulnerabilities.has(entity)) {
-			if (registry.vulnerabilities.get(entity).modifier < 0.9) {
+		else if (registry.vulnerabilities.has(target)) {
+			if (registry.vulnerabilities.get(target).modifier < 0.9) {
 				color = {107.f/255.f, 143.f/255.f, 242/255.f}; // blue, to show that the damage is being reduced
 			}
-			else if (registry.vulnerabilities.get(entity).modifier > 1.1) {
+			else if (registry.vulnerabilities.get(target).modifier > 1.1) {
 				color = {199/255.f, 39/255.f, 145/255.f}; // purple, to show that the damage is being boosted
 			}
 		}
