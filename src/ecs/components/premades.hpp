@@ -6106,7 +6106,7 @@ struct ScientistBossEnemy : Enemy
 	};
 	EnemyPattern vunerableState = {
 		"VURNERABLE", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, spawningBeeBoid, secondPhase, twentyFivePercent}, 8, false, 0.f, 0.f,
-		NoAttack, SpecialStates::VULNERABLE
+		NoAttack,
 	};
 	EnemyPattern spawnShieldState = {
 		"Shield", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, shieldBreak, secondPhase, twentyFivePercent}, 0, true, 0.f, 100.f,
