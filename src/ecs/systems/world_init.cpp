@@ -1839,7 +1839,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = InvincibleBuffGranter();
 		Buffer& buffer = registry.buffers.emplace(entity);
 		buffer.range = 10.f;
-		buffer.duration = 6000.f;
+		buffer.duration = 3000.f;
 		buffer.maxCoolDown = 5000.f;
 		EnemyPart& ep = registry.enemyParts.emplace(entity);
 		ep.offset = {0,0};
@@ -1875,8 +1875,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = ProtectedBuffGranter();
 		Buffer& buffer = registry.buffers.emplace(entity);
 		buffer.range = 10.f;
-		buffer.duration = 3000.f;
-		buffer.maxCoolDown = 5000.f;
+		buffer.duration = 2000.f;
+		buffer.maxCoolDown = 1500.f;
 		EnemyPart& ep = registry.enemyParts.emplace(entity);
 		ep.offset = {0,0};
 		ep.alwaysFollow = true;
@@ -1887,8 +1887,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = VulnerableBuffGranter();
 		Buffer& buffer = registry.buffers.emplace(entity);
 		buffer.range = 10.f;
-		buffer.duration = 3000.f;
-		buffer.maxCoolDown = 5000.f;
+		buffer.duration = 2000.f;
+		buffer.maxCoolDown = 1500.f;
 		EnemyPart& ep = registry.enemyParts.emplace(entity);
 		ep.offset = {0,0};
 		ep.alwaysFollow = true;
