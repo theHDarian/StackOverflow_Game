@@ -1365,7 +1365,7 @@ const RoomPreset BossRoomBee{
     0.0f,
     20,
     5,
-    "\"Apiarist\"",
+    "Hivemind",
 
 };
 

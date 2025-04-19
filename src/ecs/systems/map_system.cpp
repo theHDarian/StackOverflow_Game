@@ -531,14 +531,14 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;
-            // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-            // req2.type = InteractableRequestType::AddEffect;
-            // req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
+            InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+            req2.type = InteractableRequestType::AddEffect;
+            req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
         }
 
-        InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-        req2.type = InteractableRequestType::AddEffect;
-        req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
+        // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+        // req2.type = InteractableRequestType::AddEffect;
+        // req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
 
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;

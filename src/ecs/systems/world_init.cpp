@@ -1324,7 +1324,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = BossBigCCore();
 		auto &boss = registry.bosses.emplace(entity);
-		boss.name = "BigC";
+		boss.name = "Doubling Cube";
 		break;
 	}
 		case EnemyType::BossBigCShield:
@@ -1668,7 +1668,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = DrillWormHead();
 		auto& boss = registry.bosses.emplace(entity);
-		boss.name = "AUTUMN";
+		boss.name = "\"Autumn Willow\"";
 		break;
 	}
 	case EnemySmallMiningWormHead:
@@ -1790,7 +1790,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = MultiCube();
 		auto& boss = registry.bosses.emplace(entity);
-		boss.name = "TBD";
+		boss.name = "Prismatic Construct";
 		break;
 	}
 	case BossConstructYELLOW:
@@ -2036,6 +2036,13 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
     {
         createEnemy(renderer, pos + vec2(0, 0), EnemyType::BossBigCShield);
     }
+
+	//HP and damage scaling
+	Map& map = registry.maps.components[0];
+	if (!registry.bosses.has(entity) && !registry.enemyParts.has(entity)) {
+		enemy.maxHealth = enemy.maxHealth * pow(1.15, (max((int) map.currRegion - 1 , 0)));
+		enemy.currHealth = enemy.maxHealth;
+	}
 
 	return entity;
 };
