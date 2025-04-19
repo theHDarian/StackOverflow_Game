@@ -16,6 +16,7 @@ uniform vec2 tiling = vec2(1.0, 1.0);
 
 uniform bool shielded = false;
 uniform sampler2DArray shieldMask;
+uniform vec3 shieldColor = vec3(233.f / 255.f, 173.f / 255.f, 48.f / 255.f);
 uniform vec2 scale;
 
 uniform bool glitchToggle = false;
@@ -56,7 +57,7 @@ void main()
 		vec2 diff = texcoord - vec2(0.5);
 		float dist = diff.x * diff.x + diff.y * diff.y;
 		if (dist < 0.3 && texture(shieldMask, vec3(texcoord.xy * vec2(0.15) * scale, 0)).a > 0.5) {
-			color = vec4(233.f / 255.f, 173.f / 255.f, 48.f / 255.f, (0.2 * sin(0.5 * time) + 0.8) - dist * 1.5);
+			color = vec4(shieldColor.x, shieldColor.y, shieldColor.z, (0.2 * sin(0.5 * time) + 0.8) - dist * 1.5);
 		}
 	}
 	// note: branches are expensive, consider using another shader instead?
