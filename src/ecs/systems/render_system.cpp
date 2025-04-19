@@ -402,7 +402,17 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	{
     Damaged &damaged = registry.damageds.get(entity);
 		vec3 color = {1.2, 0.5, 0.5}; // red
-		if (registry.invincibles.has(entity)) color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
+		if (registry.invincibles.has(entity)) {
+			color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
+		}
+		else if (registry.vulnerabilities.has(entity)) {
+			if (registry.vulnerabilities.get(entity).modifier < 0.9) {
+				color = {0.5, 0.5, 1}; // blue, to show that the damage is being reduced
+			}
+			else if (registry.vulnerabilities.get(entity).modifier > 1.1) {
+				color = {0.8, 0.25, 0.7}; // purple, to show that the damage is being boosted
+			}
+		}
 		glUniform3fv(color_uloc, 1, (float *)&color);
 		glUniform1i(change_color_uloc, 1);
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);

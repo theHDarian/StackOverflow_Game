@@ -524,7 +524,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                  map.currRoom.preset = ScientistBossRoom;
             }
             else if (map.currRegion == Physics) {
-                map.currRoom.preset = BossRoomMultiCube;
+                // map.currRoom.preset = BossRoomMultiCube;
+                map.currRoom.preset = BossBigCRoom;
             } else {
                 map.currRoom.preset = ScientistBossRoom;
             }
