@@ -1314,9 +1314,6 @@ const RoomPreset TreasureRoomRisky{
          {1300, 1300},
 };
 
-
-
-
 const RoomPreset EventRoomHoney{
     {},
     {},
@@ -1464,9 +1461,9 @@ const RoomPreset BossRoomMole {
         10.f,
         35,
         5,
-        "Mole's Lair",
+        "Minesweeper",
         false,
-        {1700, 1700}
+        {2300, 1700}
 };
 
 const RoomPreset BossRoomMultiCube{

@@ -3780,13 +3780,14 @@ struct MoleBoss : Enemy
 		dashRechargeUp,
 		6,
 		M_PI / 12.f,
-		{30, 30},
+		{50, 50},
 		400,
-		4000,
+		3000,
 		{0, 0},
 		0,
-		1,
-		0
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER
 	};
 
 	const AttackData weakDirtBlast{
@@ -3796,7 +3797,7 @@ struct MoleBoss : Enemy
 		dashRechargeUp,
 		5,
 		M_PI / 12.f,
-		{30, 30},
+		{50, 50},
 		250,
 		1000,
 		{0, 0},
@@ -3861,7 +3862,6 @@ struct MoleBoss : Enemy
 			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
 			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
 			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
-
 			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
 
 		}
@@ -3936,10 +3936,10 @@ struct MoleBoss : Enemy
 	};
 
 	EnemyPattern chasePlayer = { "CHASE", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration}, 8, true, 0.f, 700.f, weakDirtBlast, SpecialStates::UNDERGROUND };
-	EnemyPattern spawnMoles = { "Spawn Moles", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 500.f, summonMoles, SpecialStates::UNDERGROUND };
+	EnemyPattern spawnMoles = { "Spawn Moles", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 500.f, summonMoles, SpecialStates::UNDERGROUND };
 
 	EnemyPattern phase2Reposition = { "RANDOM POSITION", EnemyBehavior::PATROLLING, {{0.5, 0.5}, {0.5, 0.5}}, 0, 1000.f, 1000.f, {repositioned}, 10, true, 0.f, 200.f, plantMine, SpecialStates::UNDERGROUND };
-	EnemyPattern spawnBoulders = { "Summon Boulders", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 3, true, 500.f, 5000.f, summonBoulders, SpecialStates::UNDERGROUND };
+	EnemyPattern spawnBoulders = { "Summon Boulders", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 3, true, 500.f, 5000.f, summonBoulders, SpecialStates::UNDERGROUND };
 
 	MoleBoss()
 	{
