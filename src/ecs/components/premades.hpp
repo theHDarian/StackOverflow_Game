@@ -1918,7 +1918,7 @@ struct BossBigCCore : Enemy{
 		CIRCLE,
 		{},
 		blunt,
-		150,
+		1,
 		0,
 		{60, 60},
 		600,
@@ -1928,7 +1928,7 @@ struct BossBigCCore : Enemy{
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyFishBoid};
+		EnemyType::EnemyHifiCharger};
 
 
 	Reaction duration = {

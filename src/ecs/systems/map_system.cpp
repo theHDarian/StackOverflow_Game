@@ -525,7 +525,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else if (map.currRegion == Physics) {
                 std::vector<RoomPreset> physicsBossRooms = {BossBigCRoom, BossRoomMultiCube};
-                map.currRoom.preset = Random::ListItem( physicsBossRooms);
+                // map.currRoom.preset = Random::ListItem( physicsBossRooms)
+                map.currRoom.preset = physicsBossRooms[0];
             } else {
                 map.currRoom.preset = ScientistBossRoom;
             }

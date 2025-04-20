@@ -1261,7 +1261,7 @@ const RoomPreset TreasureRoomMachineGun{
             0.0f,
             5,
             0,
-        "Frenzied Fire",
+        "Frenzied Fiend",
             true,
              {1300, 1300},
         };
