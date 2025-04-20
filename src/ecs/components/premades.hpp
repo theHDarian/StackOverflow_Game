@@ -3771,6 +3771,201 @@ struct SmallMole : Enemy
 	};
 };
 
+struct MoleBoss : Enemy
+{
+	const AttackData dirtBlast{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{dashRechargeUp},
+		dashRechargeUp,
+		6,
+		M_PI / 12.f,
+		{30, 30},
+		400,
+		4000,
+		{0, 0},
+		0,
+		1,
+		0
+	};
+
+	const AttackData weakDirtBlast{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{dashRechargeUp},
+		dashRechargeUp,
+		5,
+		M_PI / 12.f,
+		{30, 30},
+		250,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0
+	};
+
+	const AttackData plantMine{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyDynamite };
+
+	const AttackData halo{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{bulletRangeUp, bulletRangeUp },
+		dashRechargeDown,
+		12,
+		M_PI / 6.f,
+		{30, 30},
+		120,
+		1000,
+		{125, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER
+
+	};
+
+	const AttackData summonMineField{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		25,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyDynamite,
+		{
+			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+
+			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+
+		}
+
+	};
+	const AttackData summonMoles {
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemySmallMole };
+
+	const AttackData summonBoulders {
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		8,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemySmallBoulder,
+		{{0.25, 0.25}, {0.5, 0.25}, {0.75, 0.25}, {0.25, 0.5}, {0.75, 0.5}, {0.25, 0.75}, {0.5, 0.75}, {0.75, 0.75}}
+	};
+
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	Reaction halfHP = {
+		ReactionType::FIFTY_HEALTH,
+		9 };
+
+	Reaction repositioned = {
+		ReactionType::FINISH_PATROL,
+		10 };
+
+	Reaction playerClose = {
+		ReactionType::PLAYER_CLOSE,
+		5 };
+
+
+	EnemyPattern diggingState = { "Digging", EnemyBehavior::RANDOM_FAR, {}, 0, 1500.f, 1500.f, {duration, halfHP}, 1, true, 0.f, 300.f, plantMine, SpecialStates::UNDERGROUND };
+	EnemyPattern emergeState = { "Emerge", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, halfHP}, 2, true, 200.f, 700.f, halo, SpecialStates::VULNERABLE };
+
+	EnemyPattern shootingState = {
+		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration, halfHP}, 0, true, 0.f, 1000.f, dirtBlast
+	};
+	EnemyPattern mineFieldState = { "MineField", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 1000.f, summonMineField, SpecialStates::UNDERGROUND };
+	EnemyPattern diggingStatePhase2 = { "Digging", EnemyBehavior::RANDOM, {}, 0, 3600.f, 3600.f, {duration, playerClose}, 5, true, 0.f, 200.f, plantMine, SpecialStates::UNDERGROUND };
+
+	EnemyPattern emergeStatePhase2 = { "Emerge", EnemyBehavior::IDLE, {}, 0, 3500.f, 3500.f, {duration}, 6, true, 1500.f, 1000.f, halo, SpecialStates::VULNERABLE };
+	EnemyPattern shootingStatePhas2 = {
+		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 700.f, dirtBlast, SpecialStates::VULNERABLE
+	};
+
+	EnemyPattern chasePlayer = { "CHASE", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration}, 8, true, 0.f, 700.f, weakDirtBlast, SpecialStates::UNDERGROUND };
+	EnemyPattern spawnMoles = { "Spawn Moles", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 500.f, summonMoles, SpecialStates::UNDERGROUND };
+
+	EnemyPattern phase2Reposition = { "RANDOM POSITION", EnemyBehavior::PATROLLING, {{0.5, 0.5}, {0.5, 0.5}}, 0, 1000.f, 1000.f, {repositioned}, 10, true, 0.f, 200.f, plantMine, SpecialStates::UNDERGROUND };
+	EnemyPattern spawnBoulders = { "Summon Boulders", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 3, true, 500.f, 5000.f, summonBoulders, SpecialStates::UNDERGROUND };
+
+	MoleBoss()
+	{
+		maxHealth = 2000;
+		currHealth = maxHealth;
+
+		enemyPatterns = {  diggingState, emergeState,  shootingState, mineFieldState, diggingStatePhase2, emergeStatePhase2, shootingStatePhas2, chasePlayer, spawnMoles, phase2Reposition, spawnBoulders };
+
+		patternIndex = 0;
+		sprite = {
+			"mole_boss",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			1,
+			2,
+			50
+		};
+		scale = vec2({ 336.f / 1.75, 408.f / 1.75 });
+		rotatePower = 1.0;
+		speedMultiplier = 5.0f;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+		collisionBullet = {playerSpeedDown, playerSpeedDown, playerSpeedDown, blunt, blunt};
+	};
+};
+
 struct Bulldozer : Enemy
 {
 
@@ -3893,23 +4088,48 @@ struct Dynamite : Enemy
 		EnemyBulletDeath::EXPLODE
 	};
 
+	const AttackData bomberManExplosion{
+		EnemyAttackPattern::LASER,
+		TRIANGLE,
+		{},
+		bulletRangeUp,
+		4,
+		0.0,
+		{30, 30},
+		300,
+		400,
+		{20, 0.0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
 	Reaction playerClose = {
 		ReactionType::PLAYER_REALLY_CLOSE,
-		1 };
+		1,
+		SpecialStates::INVINCIBLE
+	};
 
 	Reaction bulletClose = {
 		ReactionType::PLAYER_BULLET_CLOSE,
-		1 };
+		2,
+		SpecialStates::INVINCIBLE
+	};
 
-	EnemyPattern waitingState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 1000000.f, 1000000.f, {playerClose, bulletClose}, 0, false, 0.f, 5000.f, quadShot };
-	EnemyPattern explodingState = { "ROLLING", EnemyBehavior::DEATHSTATE, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 5000.f, blowup };
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
 
+	EnemyPattern waitingState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 1000000.f, 1000000.f, {playerClose, bulletClose}, 0, false, 0.f, 5000.f, quadShot, SpecialStates::CLOAKED };
+	EnemyPattern explodingState = { "ROLLING", EnemyBehavior::DEATHSTATE, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 5000.f, blowup,  };
+	EnemyPattern laserExplode = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 400.f, 400.f, {duration}, 1, true, 0.f, 5000.f, bomberManExplosion };
 	Dynamite()
 	{
 		maxHealth = 40;
 		currHealth = maxHealth;
 
-		enemyPatterns = { waitingState, explodingState };
+		enemyPatterns = { waitingState, explodingState, laserExplode };
 
 		patternIndex = 0;
 		sprite = {
@@ -4003,19 +4223,26 @@ struct DrillWormHead : Enemy
 
 	Reaction seventyFiveHp = {
 		ReactionType::SEVENTYFIVE_HEALTH,
-		1 };
+		1,
+		SpecialStates::INVINCIBLE
+	};
 
 	Reaction gotTo = {
 		ReactionType::FINISH_PATROL,
-		2 };
+		2,
+		SpecialStates::PROTECTED
+	};
 
 	Reaction gotTo2 = {
 		ReactionType::DURATION,
-		3 };
+		3,
+	};
 
 	Reaction halfHp = {
 		ReactionType::FIFTY_HEALTH,
-		4 };
+		4,
+		SpecialStates::INVINCIBLE
+	};
 
 	Reaction gotTo3 = {
 		ReactionType::DURATION,
@@ -4023,11 +4250,15 @@ struct DrillWormHead : Enemy
 
 	Reaction twentyFiveHp = {
 		ReactionType::TWENTYFIVE_HEALTH,
-		6 };
+		6,
+		SpecialStates::INVINCIBLE
+	};
 
 	Reaction gotTo4 = {
 		ReactionType::FINISH_PATROL,
-		7 };
+		7,
+		SpecialStates::PROTECTED
+	};
 
 	Reaction gotTo5 = {
 		ReactionType::DURATION,
@@ -4041,7 +4272,7 @@ struct DrillWormHead : Enemy
 	std::vector<vec2> loopPatrol = { offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f)), offset + length * vec2(cos(M_PI / 2.f), sin(M_PI / 2.f)), offset + length * vec2(cos(M_PI / 1.f), sin(M_PI / 1.f)), offset + length * vec2(cos(5.f * M_PI / 4.f), sin(5.f * M_PI / 4.f)), offset + length * vec2(cos(3.f * M_PI / 2.f), sin(3.f * M_PI / 2.f)), offset + length * vec2(cos(7.f * M_PI / 4.f), sin(7.f * M_PI / 4.f)), offset + length * vec2(cos(2.f * M_PI / 1.f), sin(2.f * M_PI / 1.f)), offset + length * vec2(cos(M_PI / 4.f), sin(M_PI / 4.f)) };
 
 	// Lasers
-	EnemyPattern startState1 = { "LOOP", EnemyBehavior::WORM_GOTO, { loopStart }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot, SpecialStates::INVINCIBLE };
+	EnemyPattern startState1 = { "LOOP", EnemyBehavior::WORM_GOTO, { loopStart }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot,  };
 	EnemyPattern loopState1 = { "LOOP", EnemyBehavior::WORM_PATROL, loopPatrol, 0, 8000.f, 8000.f, {gotTo2}, 3, true, 0.f, 1000.f, twoWalls,  };
 	
 	// Boids
@@ -4053,7 +4284,7 @@ struct DrillWormHead : Enemy
 	EnemyPattern spikyState3 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {twentyFiveHp}, 0, true, 0.f, 10000.f, spawning };
 
 	// 2 Wall
-	EnemyPattern startState2 = { "LOOP", EnemyBehavior::WORM_GOTO, { loopStart }, 0, 1000000.f, 1000000.f, {gotTo4}, 0, false, 0.f, 5000.f, quadShot, SpecialStates::INVINCIBLE };
+	EnemyPattern startState2 = { "LOOP", EnemyBehavior::WORM_GOTO, { loopStart }, 0, 1000000.f, 1000000.f, {gotTo4}, 0, false, 0.f, 5000.f, quadShot,  };
 	EnemyPattern loopState2 = { "LOOP", EnemyBehavior::WORM_PATROL, loopPatrol, 0, 8000.f, 8000.f, {gotTo5}, 8, true, 0.f, 1000.f, twoWalls,  };
 
 	EnemyPattern spikyState4 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 8000.f, spawning };

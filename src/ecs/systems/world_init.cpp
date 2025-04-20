@@ -1664,6 +1664,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = PileDriverTurret();
 		break;
 	}
+	case BossMole: {
+		enemy = MoleBoss();
+		auto &boss = registry.bosses.emplace(entity);
+		boss.name = "Bomber Mole";
+		break;
+	}
 	case BossDrillWormHead:
 	{
 		enemy = DrillWormHead();

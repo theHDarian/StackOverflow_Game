@@ -341,6 +341,7 @@ enum EnemyType {
     EnemyPileDriverTurret,
     EnemySmallMiningWormHead,
     EnemySmallMiningWormBody,
+    BossMole,
 
     // Hifi
     EnemyHifiBoidFish,

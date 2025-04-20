@@ -1397,6 +1397,80 @@ const RoomPreset BossRoomWorm{
     {1500, 1500}
 };
 
+const RoomPreset BossRoomMole {
+        {
+
+                {
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},
+
+            {EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {BossMole, {0.5f, 0.5f}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+                {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                },
+
+        },
+    {},
+        {{ {Ram,{}}, {0.5f, 0.5f}}},
+        10.f,
+        35,
+        5,
+        "Mole's Lair",
+        false,
+        {1700, 1700}
+};
+
 const RoomPreset BossRoomMultiCube{
     {{{BossMultiCube, {0.5f, 0.5f}}}},
     {},
@@ -2673,6 +2747,45 @@ const RoomPreset MedicalEnemyRoomWorms {
     {1500, 1500}
 };
 
+
+
+const RoomPreset MiningEnemyRoomMines {
+        {
+
+                {
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},
+
+            {EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {EnemyDynamite, {Random::Float(), Random::Float()}},
+                    {BossMole, {0.5f, 0.5f}},
+
+                },
+
+        },
+    {},
+        {{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+        20.0f,
+        25,
+        5,
+        "Critical Mass",
+        false,
+        {1500, 1500}
+};
+
+
+
 const RoomPreset allConsoles {
     { {
         {EnemyMedicalBMP, {Random::Float(), Random::Float()}},
@@ -3042,7 +3155,8 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
         std::vector<RoomPreset> hifibosses = { BossBigCRoom, BossRoomMultiCube };
         return Random::ListItem(hifibosses);
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Mining) {
-        return BossRoomWorm;
+        std::vector<RoomPreset> miningbosses = { BossRoomMole, BossRoomWorm };
+        return Random::ListItem(miningbosses);
     }
 
     // Tutorial rooms
