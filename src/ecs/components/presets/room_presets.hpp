@@ -3295,6 +3295,25 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> militaryEliteEnemies = {
         {EnemyLaserSniper,{1-0.38, 0.42}},
     },
 {{EnemyType::BossDrillWormHead, {1.5f,0.5f}}},
+    {
+        {EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},
+
+          {EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
+        {EnemyDynamite, {Random::Float(), Random::Float()}},
+        {BossMole, {0.5f, 0.5f}},
+},
 };
 
 std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
