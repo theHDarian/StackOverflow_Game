@@ -1361,7 +1361,7 @@ const RoomPreset EventRoomWish{
 const RoomPreset BossRoomBee{
     {{{BossBeehiveMain, {0.5f, 0.5f}}, {EnemyThreeBee,{0.5f, 0.75f}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
@@ -1373,7 +1373,7 @@ const RoomPreset BossRoomBee{
 const RoomPreset BossRoomCrab{
     {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
@@ -1388,7 +1388,7 @@ const RoomPreset BossRoomWorm{
     //{{{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}}}},
     //{{{BossMultiCube, {0.5f, 0.5f}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
@@ -1462,7 +1462,7 @@ const RoomPreset BossRoomMole {
 
         },
     {},
-        {{ {Ram,{}}, {0.5f, 0.5f}}},
+        {{ {Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
         10.f,
         35,
         5,
@@ -1474,7 +1474,7 @@ const RoomPreset BossRoomMole {
 const RoomPreset BossRoomMultiCube{
     {{{BossMultiCube, {0.5f, 0.5f}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
@@ -2055,7 +2055,7 @@ const RoomPreset BossBigCRoom {
                 },
             },
         {},
-        {{{Ram,{}}, {0.5f, 0.5f}}},
+        {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
         24.0f,
         20,
         5,
