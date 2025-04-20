@@ -357,7 +357,7 @@ const RoomPreset EnemyRoomDashIntro1{
        0.0f,
        3,
     1,
-    "EnemyRoomDashIntro1",
+    "Uneven Quadrants",
 };
 
 const RoomPreset EnemyRoomDashIntro2{
@@ -372,7 +372,7 @@ const RoomPreset EnemyRoomDashIntro2{
        0.0f,
        3,
     1,
-    "EnemyRoomDashIntro2",
+    "A date with snails",
 };
 
 const RoomPreset EnemyRoomDashIntro3{
@@ -391,7 +391,7 @@ const RoomPreset EnemyRoomDashIntro3{
        0.0f,
        3,
          1,
-            "EnemyRoomDashIntro3",
+            "Duck and Ducklings",
 };
 
 const RoomPreset EnemyRoomDash1{
@@ -419,7 +419,7 @@ const RoomPreset EnemyRoomDash1{
     10.0f,
     5,
     2,
-    "EnemyRoomDash1",
+    "Pointed Troubles",
 };
 
 const RoomPreset EnemyRoomDash2{
@@ -436,7 +436,7 @@ const RoomPreset EnemyRoomDash2{
     0.0f,
     5,
     2,
-    "EnemyRoomDash2",
+    "Tacit Understanding",
 };
 
 
@@ -463,7 +463,7 @@ const RoomPreset EnemyRoomDashHard{
     20.0f,
     5,
     2,
-    "EnemyRoomDashHard",
+    "Brains in Jars",
 };
 
 const RoomPreset EnemyRoomSnails {
@@ -606,7 +606,7 @@ const RoomPreset EnemyRoomBees3{
     0.0f,
     5,
     2,
-    "Bee Blitz",
+    "Order of Importance",
 };
 
 const RoomPreset EnemyRoomAngelTank{
@@ -1324,7 +1324,7 @@ const RoomPreset EventRoomHoney{
     0.0f,
     5,
     0,
-    "EventRoomHoney",
+    "A Sweet Scent",
     true,
      {1300, 1300},
 };
@@ -1349,12 +1349,10 @@ const RoomPreset EventRoomWish{
     0.0f,
     5,
     0,
-    "EventRoomWish",
+    "Unremembered Monument",
     true,
      {1800, 2000},
 };
-
-
 
 
 
@@ -1498,7 +1496,7 @@ const RoomPreset HifiRoomTwinLaserShurikens {
     0.0f,
     5,
     2,
-    "HifiLaserShurikens"
+    "Prickly Situation"
 };
 const RoomPreset HifiRoomTwinLaserChargers {
         {
@@ -1518,7 +1516,7 @@ const RoomPreset HifiRoomTwinLaserChargers {
     0.0f,
     5,
     2,
-    "HifiLaserChargersHard"
+    "Laser Tag"
 };
 
 
@@ -1542,7 +1540,7 @@ const RoomPreset HifiRoomBasicEnemy {
     0.0f,
     5,
     2,
-    "HifiBasic"
+    "Keep Your Distance"
 };
 
 const RoomPreset HifiRoomBasicWave {
@@ -1570,7 +1568,7 @@ const RoomPreset HifiRoomBasicWave {
         20.0f,
         5,
         2,
-        "HifiWave"
+        "Cold Reception"
     };
 
 const RoomPreset HifiRoomBoidSnipers{
@@ -1618,7 +1616,7 @@ const RoomPreset HifiRoomBoidSnipers{
     10.0f,
     5,
     2,
-    "HifiBoidSnipers"
+    "Arial Assault",
 };
 
 const RoomPreset HifiEnemyRoomSwarmLasers {
@@ -1673,7 +1671,7 @@ const RoomPreset HifiEnemyRoomSwarmLasers {
     15.0f,
     0,
 0,
-"HifiEnemyRoomSwarmLasers",
+"Drone and Swarm",
     false,
     {2000, 2000}
 };
@@ -1698,7 +1696,7 @@ const RoomPreset HifiRoomCannonLasers{
     0.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Cannon Fodder"
 };
 
 const RoomPreset HifiRoomCannonSnipers{
@@ -1725,7 +1723,7 @@ const RoomPreset HifiRoomCannonSnipers{
     12.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Ranged Assault",
 };
 
 const RoomPreset HifiRoomSniperShurikens{
@@ -1752,7 +1750,7 @@ const RoomPreset HifiRoomSniperShurikens{
     10.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Hot and Cold",
 };
 
 const RoomPreset HifiRoomCannonBoids{
@@ -1779,7 +1777,7 @@ const RoomPreset HifiRoomCannonBoids{
     15.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Mind the Gap",
 };
 
 const RoomPreset HifiRoomLaserFiesta {
@@ -1848,7 +1846,7 @@ const RoomPreset HifiRoomJellyFish { //Test room for new enemies
     0.0f,
     5,
     2,
-    "HifiRoomJellyFish",
+    "Biomimicry",
     false,
     {2500, 2000}
 };
@@ -1868,7 +1866,7 @@ const RoomPreset HifiRoomSniperBallLauncher {
     0.0f,
     5,
     2,
-    "HifiRoomJellyFish",
+    "Sniper's Nest",
     false,
     {2500, 2000}
 };
