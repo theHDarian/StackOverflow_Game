@@ -3289,8 +3289,10 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> militaryEliteEnemies = {
     {{EnemyType::BossCrab, {0.5f,0.5f}}},
 {{EnemyType::BossBeehiveMain, {0.5f,0.5f}}},
 {{EnemyType::BossMultiCube, {0.5f,0.5f}}},
-    {{EnemyType::BossBigC, {0.5f,0.5f}},
-        {EnemyType::BossBigCShield, {0.5f,0.5f}}
+    {{BossBigC, {0.5f, 0.5f}},
+        {EnemyLaserSniper,{0.5, 0.63}},
+            {EnemyLaserSniper,{0.38, 0.42}},
+        {EnemyLaserSniper,{1-0.38, 0.42}},
     },
 {{EnemyType::BossDrillWormHead, {1.5f,0.5f}}},
 };

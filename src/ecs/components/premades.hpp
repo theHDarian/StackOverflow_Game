@@ -6404,8 +6404,8 @@ struct ScientistBossEnemy : Enemy
 
 	ScientistBossEnemy()
 	{
-		maxHealth = 5000;
-		currHealth = 5000;
+		maxHealth = 3500;
+		currHealth = maxHealth;
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
 						 spawnRadialState, spawnBeeBoidState,
