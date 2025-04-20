@@ -2225,7 +2225,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 		ParticleProps props = enemyBullet;
 		props.colorEffects.push_back({enemyBulletParticleColors.at(Key),0});
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, atkData.bulletRange, Random::Int(3) + 5);
 
 		return entity;
 	}
@@ -2271,7 +2271,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 	if (!props.colorEffects.empty())
 	{
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, atkData.bulletRange, Random::Int(3) + 5);
 	}
 
 	return entity;
