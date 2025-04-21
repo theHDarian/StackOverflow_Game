@@ -1983,8 +1983,8 @@ struct BossBigCCore : Enemy{
 		"RANDOM POSITION", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, playerCloseHalfHP, halfhp, twenty_five_HP}, 5, true,
 		100.f, 1500.f, spawning, SpecialStates::PROTECTED
 	};
-	EnemyPattern laserState1 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP, twenty_five_HP }, 6, true, 0.f, 2000.f, laser1, SpecialStates::VULNERABLE};
-	EnemyPattern laserState2 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP, twenty_five_HP}, 4, true, 0.f, 2000.f, laser2, SpecialStates::VULNERABLE};
+	EnemyPattern laserState1 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP, twenty_five_HP }, 6, true, 0.f, 2000.f, laser1,};
+	EnemyPattern laserState2 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP, twenty_five_HP}, 4, true, 0.f, 2000.f, laser2,};
 
 	EnemyPattern spawningLaserSniper = {"SPAWNING", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 2000.f, spawningLaserSniper1, };
 
@@ -2009,8 +2009,8 @@ struct BossBigCCore : Enemy{
 		0.f, 1500.f, spawningState4, SpecialStates::PROTECTED
 	};
 
-	EnemyPattern laserState1TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 14, true, 0.f, 2000.f, laser1, };
-	EnemyPattern laserState2TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 15, true, 0.f, 2000.f, laser2, };
+	EnemyPattern laserState1TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 14, true, 0.f, 2000.f, laser3, };
+	EnemyPattern laserState2TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 15, true, 0.f, 2000.f, laser4, };
 	EnemyPattern laserState3TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 16, true, 0.f, 2000.f, laser3, };
 	EnemyPattern laserState4TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 12, true, 0.f, 2000.f, laser4, };
 
@@ -3776,7 +3776,7 @@ struct MoleBoss : Enemy
 	const AttackData dirtBlast{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{dashRechargeUp},
+		{bulletRangeUp},
 		dashRechargeUp,
 		6,
 		M_PI / 12.f,
@@ -3790,10 +3790,27 @@ struct MoleBoss : Enemy
 		EnemyBulletDeath::CLUSTER
 	};
 
+	const AttackData fastDirtBlast{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{bulletRangeUp},
+		dashRechargeUp,
+		6,
+		M_PI / 12.f,
+		{50, 50},
+		700,
+		2500,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER
+	};
+
 	const AttackData weakDirtBlast{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{dashRechargeUp},
+		{bulletRangeUp},
 		dashRechargeUp,
 		5,
 		M_PI / 12.f,
@@ -3932,7 +3949,7 @@ struct MoleBoss : Enemy
 
 	EnemyPattern emergeStatePhase2 = { "Emerge", EnemyBehavior::IDLE, {}, 0, 3500.f, 3500.f, {duration}, 6, true, 1500.f, 1000.f, halo, SpecialStates::VULNERABLE };
 	EnemyPattern shootingStatePhas2 = {
-		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 700.f, dirtBlast, SpecialStates::VULNERABLE
+		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 700.f, fastDirtBlast, SpecialStates::VULNERABLE
 	};
 
 	EnemyPattern chasePlayer = { "CHASE", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration}, 8, true, 0.f, 700.f, weakDirtBlast, SpecialStates::UNDERGROUND };

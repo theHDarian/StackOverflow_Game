@@ -99,7 +99,7 @@ void MapSystem::step(float elapsed_ms)
     if (map.currRoom.preset.hasElite) {
         if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.empty()) ) {
             Entity bossEnemy;
-            SpawnEnemiesInList( eliteEnemies.at(map.currRegion), bossEnemy, renderer, true);
+            SpawnEnemiesInList( Random::ListItem(eliteEnemies.at(map.currRegion)), bossEnemy, renderer, true);
             map.currRoom.preset.hasElite = false;
             map.currRoom.spawnedElite = true;
             soundPlayer->playAlarmSound(3);
@@ -525,9 +525,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else if (map.currRegion == Physics) {
                 std::vector<RoomPreset> physicsBossRooms = {BossBigCRoom, BossRoomMultiCube};
-                // map.currRoom.preset = Random::ListItem( physicsBossRooms)
+                map.currRoom.preset = Random::ListItem( physicsBossRooms);
                 // map.currRoom.preset = physicsBossRooms[0];
-                map.currRoom.preset = TreasureRoomRisky;
+                // map.currRoom.preset = TreasureRoomChoice5;
             } else {
                 map.currRoom.preset = ScientistBossRoom;
             }
@@ -544,7 +544,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
 
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
-        extendstack.choice = 8*max(0,((int)map.currRegion - 1));
+        extendstack.choice = 4*max(0,((int)map.currRegion - 1));
 
         map.directory = getDirectory(map.currRegion);
         std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);

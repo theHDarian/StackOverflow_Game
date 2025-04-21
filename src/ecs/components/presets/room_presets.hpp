@@ -2807,6 +2807,10 @@ const RoomPreset allConsoles {
     {2500, 2000}
 };
 
+const std::vector<RoomPreset> bossRooms = {
+    BossRoomBee, BossRoomCrab, BossRoomMole, BossRoomWorm, BossBigCRoom, BossRoomMultiCube
+};
+
 const std::vector<RoomPreset> regularTreasureRooms = {
     TreasureRoom1, TreasureRoom2, TreasureRoom3, TreasureRoom4, TreasureRoom5, TreasureRoom6, TreasureRoom7,
     TreasureRoom8, TreasureRoom9, TreasureRoomKey, TreasureRoomKeys, TreasureRoomBlunt
@@ -2931,7 +2935,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDirectory = {
     {DifficultyRegion::Intro,{
         {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{MedicalEnemyRoomInvincible}}},
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOven, EventRoomOracleCrab}, { }}  },
         {RoomType::TreasureRoom, {bothTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -2947,7 +2951,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
                 {MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOracleCrab, EventRoomOven}, { }}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -2961,8 +2965,8 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{MedicalEnemyRoomInvincible}}},
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::EnemyRoom, {{EnemyRoomInvisible, EnemyRoomMagic,},bossRooms}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOven, EventRoomOracleCrab}, { }}  },
         {RoomType::TreasureRoom, {bothTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -2971,20 +2975,19 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDir
             RoomType::EnemyRoom,
             {
                 {
-                    MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes,EnemyRoomSingleMage,
-                    EnemyRoomCloaked, MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomWorms
+                    EnemyRoomMagic,HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible
 
                 },
-                {MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible}
+                bossRooms
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOracleCrab, EventRoomOven}, { }}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{MedicalEnemyRoomHeartBeat3,MedicalEnemyRoomInvincible}}},
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible },bossRooms}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{ EventRoomOracleCrab, EventRoomOven}, { }}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -3316,11 +3319,11 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> militaryEliteEnemies = {
 },
 };
 
-std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
-    {Tutorial, Random::ListItem(bioEliteEnemies)},
-    {Biology, Random::ListItem(bioEliteEnemies)},
-    {Physics, Random::ListItem(physicsEliteEnemies)},
-    {Medical, Random::ListItem(medicalEliteEnemies)},
-    {Mining, Random::ListItem(miningEliteEnemies)},
-    {Military, Random::ListItem(militaryEliteEnemies)},
+std::map<MapRegion,std::vector<std::vector<std::tuple<EnemyType,vec2>>> > eliteEnemies = {
+    {Tutorial, bioEliteEnemies},
+    {Biology, bioEliteEnemies},
+    {Physics, physicsEliteEnemies},
+    {Medical, medicalEliteEnemies},
+    {Mining, miningEliteEnemies},
+    {Military, militaryEliteEnemies},
 };
