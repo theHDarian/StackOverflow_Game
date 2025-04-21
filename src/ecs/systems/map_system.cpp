@@ -595,7 +595,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
         // createEnemy(renderer, vec2(1000, 300), EnemyType::EnemyPufferfish);
         // createRamStick(renderer, vec2(500, 500));
-        // createPushConsole(renderer, vec2(500, 500), {dashUp, dashCDRDownA, dmgUpM});
+         //createPushConsole(renderer, vec2(500, 500), {dashUp, dashUp, dashUp, dmgDown, dmgDown, dashUp, dmgDown2, dmgDown2, dashUp, dmgDown, dashUp, dmgDown});
         //createWishGranter(renderer, vec2(500,500));
         //createEnemy(renderer, vec2(500, 500), ScientistBoss);
     }

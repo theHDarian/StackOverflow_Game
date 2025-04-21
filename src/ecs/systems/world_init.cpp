@@ -369,38 +369,116 @@ Entity createWhiteBoard(RenderSystem *renderer, vec2 pos)
 	return entity;
 }
 
-void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects) {
-	// add names of effects
-	size_t next = 0;
-	std::vector<std::tuple<std::string, vec3>> effectStringList;
-	int effectCount = 1;
-	std::string effectsString = "";
-	for (int i = 1; i < effects.size(); i++) {
-		if (effects[i - 1].type == Key || effects[i - 1].type == Inert || effects[i - 1 ].type == None || effects[i - 1].type == Lightning) {
-			effectStringList.emplace_back(effects[i-1].name, effects[i-1].type == Key ? COLOR_YELLOW : bulletEffectColors.at (effects[i-1].type));
-		} else {
-			if ((effects[i-1].name == effects[i].name && effectCount < 3)) {
-				effectCount++;
-			} else {
-				std::string direction = effects[i-1].name.find("Down") != std::string::npos ? " -" : " +";
-				effectStringList.emplace_back(effects[i-1].name + direction +  std::to_string(effectCount), bulletEffectColors.at (effects[i-1].type));
-				effectCount = 1;
+// merges effects as if they were on the stack
+std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects) {
+	std::vector<BulletStackEffect> mergeEffects;
+	BulletStackEffect prev = blunt;
+	const int maxPosVal = 3;
+	const int maxNegVal = -3;
+
+	// first check size is more than 1 effect, i.e there's something to actually merge
+	if (effects.size() <= 1) {
+		return effects;
+	}
+	
+	for (int i = 0; i < effects.size(); i++) {
+		if (effects[i].type == Key || effects[i].type == Inert || effects[i].type == Lightning) {
+			mergeEffects.push_back(effects[i]);
+		} else { // need to count normal bullets
+			if (effects[i].type == prev.type) {
+				prev.value += effects[i].value;
+
+				// make sure doesn't overflow
+				if (prev.value > maxPosVal) {
+					BulletStackEffect prevCopy = prev;
+					prevCopy.value = maxPosVal;
+					prev.value -= maxPosVal;
+					mergeEffects.push_back(prevCopy);
+				}
+
+				if (prev.value < maxNegVal) {
+					BulletStackEffect prevCopy = prev;
+					prevCopy.value = maxNegVal;
+					prev.value -= maxNegVal;
+					mergeEffects.push_back(prevCopy);
+				}
+			}
+			else {
+				if (prev.type != BulletEffectType::Inert && prev.value != 0) {
+					mergeEffects.push_back(prev);
+				}
+				prev = effects[i];
 			}
 		}
 	}
-	for (int index = 0; index < effectStringList.size(); ++index) {
-		// std::cout << std::get<0>(effectStringList[index]) << std::endl;
-		vec3 color = std::get<1>(effectStringList[index]);
-		if (index == effectStringList.size() - 1) {
-			effectsString += std::get<0>(effectStringList[index]);
+	if (prev.type != BulletEffectType::Inert && prev.value != 0) {
+		mergeEffects.push_back(prev);
+	}
+
+	return mergeEffects;
+}
+
+// add names of effects
+void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects) {
+	vec3 color;
+	size_t next = 0;
+	std::string effectsString = "";
+
+	// first merge effects
+	effects = mergeEffects(effects);
+
+	for (int i = 0; i < effects.size(); i++) {
+		effectsString += getFormattedBulletEffectString(effects[i]);
+		color = bulletEffectColors.at(effects[i].type);
+
+		// Remove later when change key to 1 colour
+		if (effects[i].type == Key) {
+			color = COLOR_YELLOW;
+		}
+		
+		if (i == effects.size() - 1) {
 			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
-		} else {
-			effectsString += std::get<0>(effectStringList[index]) + ", ";
+		}
+		else {
+			effectsString += ", ";
 			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
 		}
+		
 		next = effectsString.length();
 	}
+
 	object.scriptVariables.push_back(effectsString);
+
+
+	//std::vector<std::tuple<std::string, vec3>> effectStringList;
+	//int effectCount = 1;
+	//std::string effectsString = "";
+	//for (int i = 1; i < effects.size(); i++) {
+	//	if (effects[i - 1].type == Key || effects[i - 1].type == Inert || effects[i - 1 ].type == None || effects[i - 1].type == Lightning) {
+	//		effectStringList.emplace_back(effects[i-1].name, effects[i-1].type == Key ? COLOR_YELLOW : bulletEffectColors.at (effects[i-1].type));
+	//	} else {
+	//		if ((effects[i-1].name == effects[i].name && effectCount < 3)) {
+	//			effectCount++;
+	//		} else {
+	//			std::string direction = effects[i-1].name.find("Down") != std::string::npos ? " -" : " +";
+	//			effectStringList.emplace_back(effects[i-1].name + direction +  std::to_string(effectCount), bulletEffectColors.at (effects[i-1].type));
+	//			effectCount = 1;
+	//		}
+	//	}
+	//}
+	//for (int index = 0; index < effectStringList.size(); ++index) {
+	//	// std::cout << std::get<0>(effectStringList[index]) << std::endl;
+	//	vec3 color = std::get<1>(effectStringList[index]);
+	//	if (index == effectStringList.size() - 1) {
+	//		effectsString += std::get<0>(effectStringList[index]);
+	//		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
+	//	} else {
+	//		effectsString += std::get<0>(effectStringList[index]) + ", ";
+	//		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
+	//	}
+	//	next = effectsString.length();
+	//}
+	//object.scriptVariables.push_back(effectsString);
 }
 
 Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects)
