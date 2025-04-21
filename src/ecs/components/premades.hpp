@@ -509,7 +509,7 @@ const AttackData twoPincerShot{
 const AttackData twelveSpiralShot{
 	EnemyAttackPattern::RADIAL,
 	TRIANGLE,
-	{numBulletsUp, accuracyUp},
+	{bulletRangeUp, accuracyUp},
 	blunt,
 	12,
 	0.0,
