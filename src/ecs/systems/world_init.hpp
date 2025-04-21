@@ -57,6 +57,8 @@ Entity createHoneyCanister(RenderSystem *renderer, vec2 pos);
 
 Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);
 
+void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects);
+
 Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects);
 
 Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects);

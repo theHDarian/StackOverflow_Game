@@ -683,7 +683,7 @@ struct TestLightningRotate : Enemy
 		{0.0, 0.0},
 		0,
 		0,
-		0 
+		0
 	};
 
 	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
@@ -698,7 +698,7 @@ struct TestLightningRotate : Enemy
 			"enemy_QuadShooter.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
-			vec2(0) 
+			vec2(0)
 		};
 		scale = vec2({ 192.0f / 2, 192.f / 2 });
 		rotatePower = 0.f;
@@ -1001,7 +1001,7 @@ struct Pufferfish : Enemy
 
 struct ChainDogHead : Enemy
 {
-	
+
 	EnemyPattern followState = { "Follow", EnemyBehavior::WORM_FOLLOW, {}, 0, 3000.f, 3000.f, {}, 0, false, 0.f, 5000.f, quadShot };
 
 	ChainDogHead()
@@ -2724,7 +2724,7 @@ struct Mage : Enemy
 		0,
 		0,
 		0.07,
-		EnemyBulletDeath::EXPLODE 
+		EnemyBulletDeath::EXPLODE
 	};
 
 	const AttackData radialSquare{
@@ -2740,7 +2740,7 @@ struct Mage : Enemy
 	{0, 0},
 	0,
 	0,
-	0 
+	0
 	};
 
 	const AttackData radialTriangle{
@@ -2756,7 +2756,7 @@ struct Mage : Enemy
 	{0, 0},
 	0,
 	0,
-	0 
+	0
 	};
 
 	const Reaction PlayerBullet = {
@@ -2783,7 +2783,7 @@ struct Mage : Enemy
 	EnemyPattern IdleState = { "Follow Player", EnemyBehavior::RANDOM_NEAR, {}, 0, 4000.f, 4000.f, {{ReactionType::DURATION,  2}, PlayerBullet}, 2, true, 0.f, 2500.f, magicMissile };
 
 	EnemyPattern teleport = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {{ReactionType::DURATION, 0}, HalfHP}, 0, true, 0.f, 500.f, radialTriangle};
-	
+
 	EnemyPattern shootingState = { "ROTATE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 0}, PlayerClose, PlayerBullet}, 0, true, 0.f, 1000.f, iceWall};
 
 	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 4}, PlayerClose2}, 4, true, 0.f, 3000.f,  fireball};
@@ -3487,13 +3487,13 @@ struct ProstheticHand : Enemy
 
 	Reaction duration0 = {
 		ReactionType::DURATION,
-		0 
+		0
 	};
 
 
 	Reaction duration1 = {
 		ReactionType::DURATION,
-		1 
+		1
 	};
 
 	EnemyPattern restingState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 400.f, 400.f, {duration1}, 1, false, 0.f, 5000.f, quadShot };
@@ -4274,7 +4274,7 @@ struct DrillWormHead : Enemy
 	// Lasers
 	EnemyPattern startState1 = { "LOOP", EnemyBehavior::WORM_GOTO, { loopStart }, 0, 1000000.f, 1000000.f, {gotTo}, 0, false, 0.f, 5000.f, quadShot,  };
 	EnemyPattern loopState1 = { "LOOP", EnemyBehavior::WORM_PATROL, loopPatrol, 0, 8000.f, 8000.f, {gotTo2}, 3, true, 0.f, 1000.f, twoWalls,  };
-	
+
 	// Boids
 	EnemyPattern spikyState2 = { "LOOP", EnemyBehavior::WORM_PATROL, { vec2(2,0.0), vec2(-1,0.5), vec2(2,1), vec2(1,2), vec2(0.5,-1), vec2(0.0,2), vec2(-1,1), vec2(2,0.5), vec2(-1,0), vec2(0,-1), vec2(0.5,2), vec2(2,-1) }, 0, 1000000.f, 1000000.f, {halfHp}, 0, true, 0.f, 12000.f, spawning };
 
@@ -4523,7 +4523,7 @@ struct ConstructYELLOW : Enemy
 
 	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, false, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 12000.f, 12000.f, {}, 1, true, 0.f, 6000.f, spawning };
-	
+
 	ConstructYELLOW()
 	{
 		maxHealth = 500;
@@ -4554,7 +4554,7 @@ struct ConstructPURPLE : Enemy
 		{50, 0},
 		10,
 		10,
-		0 
+		0
 	};
 	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
 	EnemyPattern startState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 8000.f, 8000.f, {{ReactionType::PLAYER_CLOSE, 1}}, 2, true, 0.f, 4000.f, bigBullet };
@@ -4595,7 +4595,7 @@ struct ConstructGREEN : Enemy
 	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
 	EnemyPattern startState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.9, 0.1}}, 0, 3000.f, 3000.f, {{ReactionType::FINISH_PATROL, 2}}, 2, false, 0.f, 1000000000.f, none };
 	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 3000.f, 3000.f, {}, 2, true, 0.f, 1000000000.f, crabLaser };
-	
+
 	ConstructGREEN()
 	{
 		maxHealth = 500;
@@ -4628,7 +4628,7 @@ struct ConstructRED : Enemy
 		{0, 0},
 		0,
 		0,
-		0 
+		0
 	};
 
 	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
@@ -4651,7 +4651,7 @@ struct ConstructRED : Enemy
 	};
 };
 
-struct MultiCube : Enemy 
+struct MultiCube : Enemy
 {
 	// Spawn YELLOW
 	Reaction threeQuarterHP = {
@@ -4674,14 +4674,14 @@ struct MultiCube : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::BossConstructYELLOW 
+		EnemyType::BossConstructYELLOW
 	};
 
 	// Spawn PURPLE
 	Reaction halfHP = {
 		ReactionType::FIFTY_HEALTH,
 		5,
-		SpecialStates::INC_ANIM 
+		SpecialStates::INC_ANIM
 	};
 	const AttackData spawnPURPLE{
 		EnemyAttackPattern::SPAWNING,
@@ -4870,7 +4870,7 @@ struct MultiCube : Enemy
 
 	EnemyPattern finalState1 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 11}}, 13, true, 0.f, 500.f, blowup }; //blow up attack
 	EnemyPattern finalState2 = { "die", EnemyBehavior::DEATHSTATE, {}, 0, 3000.f, 3000.f, {}, 11, false, 0.f, 1000.f, none };
-	
+
 	MultiCube()
 	{
 		maxHealth = 3000;
@@ -4880,7 +4880,7 @@ struct MultiCube : Enemy
 		sprite = {
 			"hifi_boss_2_phases",
 			EFFECT_ASSET_ID::ANIMATE,
-			GEOMETRY_BUFFER_ID::SPRITE, 
+			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0),
 			AnimationTypes::NONE,
 			4,

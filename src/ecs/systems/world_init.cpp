@@ -369,6 +369,40 @@ Entity createWhiteBoard(RenderSystem *renderer, vec2 pos)
 	return entity;
 }
 
+void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects) {
+	// add names of effects
+	size_t next = 0;
+	std::vector<std::tuple<std::string, vec3>> effectStringList;
+	int effectCount = 1;
+	std::string effectsString = "";
+	for (int i = 1; i < effects.size(); i++) {
+		if (effects[i - 1].type == Key || effects[i - 1].type == Inert || effects[i - 1 ].type == None || effects[i - 1].type == Lightning) {
+			effectStringList.emplace_back(effects[i-1].name, effects[i-1].type == Key ? COLOR_YELLOW : bulletEffectColors.at (effects[i-1].type));
+		} else {
+			if ((effects[i-1].name == effects[i].name && effectCount < 3)) {
+				effectCount++;
+			} else {
+				std::string direction = effects[i-1].name.find("Down") != std::string::npos ? " -" : " +";
+				effectStringList.emplace_back(effects[i-1].name + direction +  std::to_string(effectCount), bulletEffectColors.at (effects[i-1].type));
+				effectCount = 1;
+			}
+		}
+	}
+	for (int index = 0; index < effectStringList.size(); ++index) {
+		// std::cout << std::get<0>(effectStringList[index]) << std::endl;
+		vec3 color = std::get<1>(effectStringList[index]);
+		if (index == effectStringList.size() - 1) {
+			effectsString += std::get<0>(effectStringList[index]);
+			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
+		} else {
+			effectsString += std::get<0>(effectStringList[index]) + ", ";
+			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
+		}
+		next = effectsString.length();
+	}
+	object.scriptVariables.push_back(effectsString);
+}
+
 Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects)
 {
 	Entity console = Entity();
@@ -391,28 +425,8 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 	object.name = "PushStack";
 	object.item = InteractableItem::PushConsole;
 	object.decorations.push_back({});
-	
-	vec3 color;
-	size_t next = 0;
-	// add names of effects
-	std::string effectsString = "";
-	for (int i = 0; i < effects.size() - 1; i++) {
-		effectsString += effects[i].name + ", ";
-		color = bulletEffectColors.at(effects[i].type);
-		if (effects[i].type == Key) {
-			color = COLOR_YELLOW;
-		}
-		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
-		next = effectsString.length();
-	}
-	effectsString += effects[effects.size() - 1].name;
-	color = bulletEffectColors.at(effects[effects.size() - 1].type);
-	if (effects[effects.size() - 1].type == Key) {
-		color = COLOR_YELLOW;
-	}
-	object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
 
-	object.scriptVariables.push_back(effectsString);
+	createEffectString(object, effects);
 
 	Animation &a = registry.animations.emplace(console);
 	a.max_frames = 8;
@@ -461,27 +475,8 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	 object.item = InteractableItem::FightConsole;
 	 object.decorations.push_back({});
 
-	 vec3 color;
-	 size_t next = 0;
-	 // add names of effects
-	 std::string effectsString = "";
-	 for (int i = 0; i < effects.size() - 1; i++) {
-		 effectsString += effects[i].name + ", ";
-		 color = bulletEffectColors.at(effects[i].type);
-		 if (effects[i].type == Key) {
-			 color = COLOR_YELLOW;
-		 }
-		 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
-		 next = effectsString.length();
-	 }
-	 effectsString += effects[effects.size() - 1].name;
-	 color = bulletEffectColors.at(effects[effects.size() - 1].type);
-	 if (effects[effects.size() - 1].type == Key) {
-		 color = COLOR_YELLOW;
-	 }
-	 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
+	createEffectString(object, effects);
 
-	 object.scriptVariables.push_back(effectsString);
 
 	Animation &a = registry.animations.emplace(console);
 	a.max_frames = 1;
