@@ -3126,7 +3126,7 @@ struct Scissors : Enemy
 
 	Scissors()
 	{
-		maxHealth = 120;
+		maxHealth = 320;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3};
 		sprite = {
@@ -3168,7 +3168,7 @@ struct BMP : Enemy {
 	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 0, true, 0.f, 700.f, spiral, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	BMP()
 	{
-		maxHealth = 300;
+		maxHealth = 1000;
 		currHealth = maxHealth;
 		enemyPatterns = {heal_state, telePortState};
 		sprite = {
@@ -3258,7 +3258,7 @@ struct Syringe : Enemy
 
 	Syringe()
 	{
-		maxHealth = 150;
+		maxHealth = 350;
 		currHealth = maxHealth;
 		enemyPatterns = {random, random2, random3, random4, healing, spawn,  charge, recoil, farRandom};
 		patternIndex = 0;
@@ -3407,7 +3407,7 @@ struct RodOfC : Enemy {
 	EnemyPattern Spawning = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 2500.f, Spawn, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	RodOfC()
 	{
-		maxHealth = 800;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 		enemyPatterns = {heal_state, random_pos, coolDown, whipState, coolDown2, protection_pulse, wall, coolDown3, Spawning};
 		sprite = {
@@ -3448,7 +3448,7 @@ struct RodOfA : Enemy {
 
 	RodOfA()
 	{
-		maxHealth = 200;
+		maxHealth = 300;
 		currHealth = maxHealth;
 		enemyPatterns = {heal_state, telePortState, chargingState};
 		sprite = {
@@ -3501,7 +3501,7 @@ struct ProstheticHand : Enemy
 
 	ProstheticHand()
 	{
-		maxHealth = 300;
+		maxHealth = 500;
 		currHealth = maxHealth;
 
 		enemyPatterns = { restingState, movingState };
@@ -3543,7 +3543,7 @@ struct SpineChainedWormHead : Enemy
 
 	SpineChainedWormHead()
 	{
-		maxHealth = 700;
+		maxHealth = 2000;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState };
@@ -3605,7 +3605,7 @@ struct SpinePatrolWormHead : Enemy
 
 	SpinePatrolWormHead()
 	{
-		maxHealth = 700;
+		maxHealth = 2000;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState, loopState};

@@ -1348,15 +1348,15 @@ void RenderSystem::drawGameUI()
 			drawHPbar(entity, projection, view);
 			drawEnemyIndicator(entity, projection, view);
 			BossEnemy &boss = registry.bosses.get(entity);
-			if (!registry.textRenderRequests.has(entity))
+			if (!registry.textRenderRequests.has(entity) && registry.bosses.entities[0] == entity)
 			{
 				GameUIText &text = registry.gameUITexts.emplace(entity);
 				TextRenderRequest &textRequest = registry.textRenderRequests.emplace(entity);
 				textRequest.text = boss.name;
 				textRequest.x = windowState.width / 2,
 				textRequest.y = windowState.height * 0.03f;
-				textRequest.alignment = TextAlignment::CenteredAlign;
 				textRequest.scale = 0.4f;
+				textRequest.alignment = TextAlignment::CenteredAlign;
 				textRequest.color = vec3(1, 1, 1);
 				textRequest.bottomLeftBound = vec2(0);
 				textRequest.topRightBound = vec2(windowState.width, windowState.height);
@@ -2333,6 +2333,9 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	{
 		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
 		HPBarMotion.scale = {100, 10};
+	} else if (registry.bosses.entities[0] != entity) {
+		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10 * 2.5);
+		HPBarMotion.scale = {100*2.5, 10*2.5};
 	}
 
 	if (registry.damageds.has(entity) && !registry.invincibles.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
@@ -2433,7 +2436,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
 
 	mat4 transform = createFollowCameraModel(HPBarMotion, vec2(0));
-	if (registry.bosses.has(entity))
+	if (registry.bosses.has(entity) && registry.bosses.entities[0] == entity)
 	{
 		transform = createNormalModel(HPBarMotion, vec2(0));
 	}
