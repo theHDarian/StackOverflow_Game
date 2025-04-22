@@ -1353,10 +1353,17 @@ void RenderSystem::drawGameUI()
 				GameUIText &text = registry.gameUITexts.emplace(entity);
 				TextRenderRequest &textRequest = registry.textRenderRequests.emplace(entity);
 				textRequest.text = boss.name;
-				textRequest.x = windowState.width / 2,
-				textRequest.y = windowState.height * 0.03f;
+				// if (registry.bosses.entities.size() > 1) {
+				// 	Motion &motion = registry.motions.get(entity);
+				// 	textRequest.x = motion.position.x;
+				// 	textRequest.y = motion.position.y - 250;
+				// } else {
+					textRequest.x = windowState.width / 2,
+					textRequest.y = windowState.height * 0.03f;
+					textRequest.scale = 0.4f;
+				// }
+
 				textRequest.alignment = TextAlignment::CenteredAlign;
-				textRequest.scale = 0.4f;
 				textRequest.color = vec3(1, 1, 1);
 				textRequest.bottomLeftBound = vec2(0);
 				textRequest.topRightBound = vec2(windowState.width, windowState.height);
@@ -2331,6 +2338,9 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 
 	if (!registry.bosses.has(entity))
 	{
+		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
+		HPBarMotion.scale = {100, 10};
+	} else if ((find(registry.bosses.entities.begin(), registry.bosses.entities.end, entity) - registry.bosses.entities.begin()) > 0) {
 		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
 		HPBarMotion.scale = {100, 10};
 	}

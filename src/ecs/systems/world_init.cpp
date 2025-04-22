@@ -2278,7 +2278,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 		motion.veer = vec2(0);
 		bullet.bulletBounce = 10;
 		bullet.bulletPierce = 0;
-		bullet.bulletRange = 5000;
+		bullet.bulletRange = atkData.bulletRange * 0.66f;
 
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
@@ -2298,7 +2298,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 		ParticleProps props = enemyBullet;
 		props.colorEffects.push_back({enemyBulletParticleColors.at(Key),0});
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, atkData.bulletRange, Random::Int(3) + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, bullet.bulletRange, Random::Int(3) + 5);
 
 		return entity;
 	}
