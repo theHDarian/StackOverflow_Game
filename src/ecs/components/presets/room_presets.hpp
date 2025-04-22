@@ -1413,7 +1413,6 @@ const RoomPreset BossRoomMole {
                     {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
                     {EnemyDynamite, {Random::Float(), Random::Float()}},
                     {BossMole, {0.5f, 0.5f}},
-                    {BossDrillWormHead, {1.15f, 0.15f}},
                 },
                 {{EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
                         {EnemyDynamite, {Random::Float(), Random::Float()}},{EnemyDynamite, {Random::Float(), Random::Float()}},
