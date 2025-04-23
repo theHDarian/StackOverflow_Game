@@ -4834,8 +4834,56 @@ struct MultiCube : Enemy
 	const AttackData haloGreen{
 		EnemyAttackPattern::SHOTGUN,
 		RECTANGLE,
-		{bulletPierceUp, bulletPierceUp },
-		bulletPierceDown,
+		{numBulletsUp, numBulletsUp },
+		numBulletsDown,
+		12,
+		M_PI / 6.f,
+		{500, 15},
+		250,
+		10000,
+		{125, 0},
+		0,
+		0,
+		0
+	};
+
+	const AttackData haloRed{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
+		{dmgUp, dmgUp },
+		dmgDown,
+		12,
+		M_PI / 6.f,
+		{500, 15},
+		250,
+		10000,
+		{125, 0},
+		0,
+		0,
+		0
+	};
+
+	const AttackData haloPurple{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
+		{fireRateDown, fireRateDown },
+		fireRateDown,
+		12,
+		M_PI / 6.f,
+		{500, 15},
+		250,
+		10000,
+		{125, 0},
+		0,
+		0,
+		0
+	};
+
+	const AttackData haloYellow{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
+		{bulletRangeUp, bulletRangeUp },
+		bulletRangeDown,
 		12,
 		M_PI / 6.f,
 		{500, 15},
@@ -4964,7 +5012,7 @@ struct MultiCube : Enemy
 	{30, 30},
 	0,
 	4500,
-	{10, 0.5},
+	{10, 0.05},
 	0,
 	0,
 	0 };
@@ -5020,17 +5068,20 @@ struct MultiCube : Enemy
 	EnemyPattern soloState1 = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 4500.f, 4500.f, {explode, {ReactionType::DURATION, 13}}, 13, true, 0.f, 100.f, whip, SpecialStates::PROTECTED};
 	EnemyPattern soloState2 = {"ROTATE IN PLACE", EnemyBehavior::RANDOM, {}, 0, 5000.f, 6000.f, {explode, {ReactionType::DURATION, 12}}, 12, true, 0.f, 7000.f, broadsideLasers, };
 
-	EnemyPattern PredeathSuper = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {{ReactionType::DURATION, 15}}, 15, true, 0.f, 500.f, spiral, SpecialStates::INVINCIBLE };
-	EnemyPattern PredeathSuper2 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {{ReactionType::DURATION, 16}}, 16, true, 0.f, 1000.f, haloBlue, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 15}}, 15, true, 0.f, 1000.f, haloYellow, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper2 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 16}}, 16, true, 1000.f, 1000.f, haloPurple, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper3 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 17}}, 17, true, 1000.f, 1000.f, haloGreen, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper4 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 18}}, 18, true, 1000.f, 1000.f, haloRed, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper5 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 19}}, 19, true, 1000.f, 1000.f, haloBlue, SpecialStates::INVINCIBLE };
 
-	EnemyPattern finalState1 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 17}}, 17, true, 0.f, 500.f, blowup }; //blow up attack
+	EnemyPattern finalState1 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 20}}, 20, true, 0.f, 500.f, blowup }; //blow up attack
 	EnemyPattern finalState2 = { "die", EnemyBehavior::DEATHSTATE, {}, 0, 3000.f, 3000.f, {}, 11, false, 0.f, 1000.f, none };
 
 	MultiCube()
 	{
 		maxHealth = 3000;
 		currHealth = maxHealth;
-		enemyPatterns = { zeroState1, zeroState2, spawnYellow, oneState1, oneState2, spawnPurple, twoState1, twoState2, spawnGreen, threeState1, threeState2, spawnRed, soloState1, soloState2, PredeathSuper, PredeathSuper2, finalState1, finalState2 };
+		enemyPatterns = { zeroState1, zeroState2, spawnYellow, oneState1, oneState2, spawnPurple, twoState1, twoState2, spawnGreen, threeState1, threeState2, spawnRed, soloState1, soloState2, PredeathSuper, PredeathSuper2, PredeathSuper3, PredeathSuper4, PredeathSuper5, finalState1, finalState2 };
 		patternIndex = 0;
 		sprite = {
 			"hifi_boss_2_phases",

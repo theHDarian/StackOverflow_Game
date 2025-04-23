@@ -526,9 +526,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                  map.currRoom.preset = ScientistBossRoom;
             }
             else if (map.currRegion == Physics) {
-                std::vector<RoomPreset> physicsBossRooms = {BossBigCRoom, BossRoomMultiCube};
-                map.currRoom.preset = Random::ListItem( physicsBossRooms);
-                // map.currRoom.preset = physicsBossRooms[0];
+                // std::vector<RoomPreset> physicsBossRooms = {BossBigCRoom, BossRoomMultiCube};
+                // map.currRoom.preset = Random::ListItem( physicsBossRooms);
+                map.currRoom.preset = BossRoomMultiCube;
                 // map.currRoom.preset = TreasureRoomChoice5;
             } else {
                 map.currRoom.preset = ScientistBossRoom;
