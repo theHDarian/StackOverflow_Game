@@ -4948,7 +4948,7 @@ struct MultiCube : Enemy
 	{30, 30},
 	0,
 	4500,
-	{10, 0},
+	{10, 0.5},
 	0,
 	0,
 	0 };
@@ -5028,7 +5028,7 @@ struct MultiCube : Enemy
 		scale = vec2({ 240.f, 240.f });
 		rotatePower = 90.0f;
 		speedMultiplier = 2.5f;
-		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
 	};
 };
 
