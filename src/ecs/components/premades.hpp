@@ -4584,7 +4584,7 @@ struct ConstructYELLOW : Enemy
 		CIRCLE,
 		{},
 		blunt,
-		6,
+		9,
 		0,
 		{60, 60},
 		600,
@@ -4610,7 +4610,7 @@ struct ConstructYELLOW : Enemy
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 12000.f, 12000.f, {duration, halfHp}, 1, true, 0.f, 6000.f, spawning };
 
 	EnemyPattern initPhase2 = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 1000.f, 1000.f, {duration}, 3, false, 0.f, 10.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
-	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 4000.f, 4000.f, {duration}, 2, true, 0.f, 1500.f, spawningPhase2 };
+	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 2000.f, 2000.f, {duration}, 2, true, 0.f, 1500.f, spawningPhase2 };
 
 
 	ConstructYELLOW()
@@ -4685,7 +4685,7 @@ struct ConstructPURPLE : Enemy
 
 	Reaction halfHp = {
 		ReactionType::FIFTY_HEALTH,
-		2,
+		4,
 		SpecialStates::INVINCIBLE
 	};
 

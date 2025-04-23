@@ -1877,8 +1877,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = ConstructYELLOW();
 		Buffer& buffer = registry.buffers.emplace(entity);
 		buffer.range = 750.f;
-		buffer.maxCoolDown = 5000.f;
-		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 2500.f;
+		buffer.duration = 2000.f;
 		break;
 	}
 	case BossConstructPURPLE:
