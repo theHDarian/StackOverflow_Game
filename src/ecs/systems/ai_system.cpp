@@ -527,7 +527,31 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 		reaction_found = updateHealerState(enemy, entity);
 	}
 
-	if (hpPercent < 0.25f)
+	if (hpPercent < 0.1f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::TEN_HEALTH);
+		if (reaction)
+		{
+			std::cout << "10% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+	else if (hpPercent < 0.2f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTY_HEALTH);
+		if (reaction)
+		{
+			std::cout << "20% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+	else if (hpPercent < 0.25f)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::TWENTYFIVE_HEALTH);
 		if (reaction)
@@ -536,14 +560,65 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
 		}
 	}
+	else if (hpPercent < 0.3f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::THIRTY_HEALTH);
+		if (reaction)
+		{
+			std::cout << "30% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+	else if (hpPercent < 0.4f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::FORTY_HEALTH);
+		if (reaction)
+		{
+			std::cout << "40% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+
 	else if (hpPercent < 0.5f)
 	{
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FIFTY_HEALTH);
 		if (reaction)
 		{
 			std::cout << "50% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+
+	else if (hpPercent < 0.6f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::SIXTY_HEALTH);
+		if (reaction)
+		{
+			std::cout << "60% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+	else if (hpPercent < 0.7f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::SEVENTY_HEALTH);
+		if (reaction)
+		{
+			std::cout << "70% HP" << std::endl;
 			enemy.patternIndex = reaction->index;
 			enemy.newPattern = true;
 			reaction_found = true;
@@ -561,9 +636,32 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 			reaction_found = true;
 			handleSpecialStates(*reaction, entity);
 		}
-		// PLAYER BULLET CLOSE TO BE IMPELMENTED..
-		// DEFAULT STATE (CHANGE BY DURATION)
 	}
+	else if (hpPercent < 0.8f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::EIGHTY_HEALTH);
+		if (reaction)
+		{
+			std::cout << "80% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+	else if (hpPercent < 0.9f)
+	{
+		auto reaction = getReactions(currPattern.reactions, ReactionType::NINETY_HEALTH);
+		if (reaction)
+		{
+			std::cout << "90% HP" << std::endl;
+			enemy.patternIndex = reaction->index;
+			enemy.newPattern = true;
+			reaction_found = true;
+			handleSpecialStates(*reaction, entity);
+		}
+	}
+
 	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::FINISH_PATROL) && currPattern.pathIndex == currPattern.path.size() - 1) {
 		auto reaction = getReactions(currPattern.reactions, ReactionType::FINISH_PATROL);
 

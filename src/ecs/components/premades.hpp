@@ -4181,15 +4181,56 @@ struct BigBoulder : Enemy
 		10,
 		0
 	};
+	const AttackData boulderSpawn{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		2,
+		M_PI / 12.f,
+		{30, 30},
+		400,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemySmallBoulder };
+	const AttackData blowup{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		blunt,
+		10,
+		0.0,
+		{20, 20},
+		300,
+		200,
+		{0.0, 0.0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
 
-	EnemyPattern rollingState = { "ROLLING", EnemyBehavior::ROLLING, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 1.f, boulderTrail };
+	Reaction tenHP = {
+		ReactionType::TEN_HEALTH,
+		2,
+		SpecialStates::INVINCIBLE
+	};
 
+	Reaction duration = {ReactionType::DURATION, 1};
+
+	EnemyPattern rollingState = { "ROLLING", EnemyBehavior::ROLLING, {}, 0, 1000000.f, 1000000.f, {duration, tenHP}, 0, true, 0.f, 1.f, boulderTrail };
+	EnemyPattern DeathState = { "ROLLING", EnemyBehavior::DEATHSTATE, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 1000.f, boulderSpawn };
+	EnemyPattern blowUp = { "ROLLING", EnemyBehavior::ROLLING, {}, 0, 200.f, 200.f, {duration}, 1, true, 0.f, 1000.f, blowup };
 	BigBoulder()
 	{
-		maxHealth = 100;
+		maxHealth = 700;
 		currHealth = maxHealth;
 
-		enemyPatterns = { rollingState };
+		enemyPatterns = { rollingState, DeathState, blowUp };
 
 		patternIndex = 0;
 		sprite = {
@@ -4672,7 +4713,7 @@ struct MultiCube : Enemy
 {
 	// Spawn YELLOW
 	Reaction threeQuarterHP = {
-		ReactionType::SEVENTYFIVE_HEALTH,
+		ReactionType::NINETY_HEALTH,
 		2,
 		SpecialStates::INC_ANIM
 	};
@@ -4696,7 +4737,7 @@ struct MultiCube : Enemy
 
 	// Spawn PURPLE
 	Reaction halfHP = {
-		ReactionType::FIFTY_HEALTH,
+		ReactionType::SEVENTYFIVE_HEALTH,
 		5,
 		SpecialStates::INC_ANIM
 	};
@@ -4720,7 +4761,7 @@ struct MultiCube : Enemy
 
 	// Spawn GREEN and RED
 	Reaction quarterHP = {
-		ReactionType::TWENTYFIVE_HEALTH,
+		ReactionType::SIXTY_HEALTH,
 		8,
 		SpecialStates::INC_ANIM
 	};
@@ -4833,6 +4874,22 @@ struct MultiCube : Enemy
 		0,
 		0 };
 
+	const AttackData fourLaser{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{},
+		blunt,
+		3,
+		0,
+		{20, 20},
+		0,
+		5000,
+		{5, 0.01},
+		0,
+		0,
+		0 };
+
+
 	const AttackData blowup{
 		EnemyAttackPattern::SPRAY,
 		TRIANGLE,
@@ -4866,6 +4923,49 @@ struct MultiCube : Enemy
 	0
 	};
 
+	const AttackData tacks{
+		EnemyAttackPattern::RADIAL,
+		RECTANGLE,
+		{bulletPierceUp},
+		blunt,
+		10,
+		0.0,
+		{20, 20},
+		400,
+		2000,
+		{200, -2 * M_PI / 2.0},
+		0,
+		0,
+		0};
+
+	const AttackData broadsideLasers{
+	EnemyAttackPattern::LASER,
+	CIRCLE,
+	{bulletPierceUp},
+	dashRechargeUp,
+	4,
+	0,
+	{30, 30},
+	0,
+	4500,
+	{10, 0},
+	0,
+	0,
+	0 };
+
+
+	Reaction finalSpawn = {
+		ReactionType::FORTY_HEALTH,
+		9,
+		SpecialStates::INC_ANIM
+	};
+
+	Reaction explode = {
+		ReactionType::TEN_HEALTH,
+		10,
+		SpecialStates::INVINCIBLE
+	};
+
 	EnemyPattern zeroState1 = { "RookFollow", EnemyBehavior::ROOK_FOLLOW, {}, 0, 8000.f, 8000.f, {threeQuarterHP, {ReactionType::DURATION, 1}}, 1, false, 0.f, 1000.f, none };
 	EnemyPattern zeroState2 = { "IDLE1", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {threeQuarterHP, {ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, oneLaser };
 
@@ -4880,6 +4980,9 @@ struct MultiCube : Enemy
 	EnemyPattern twoState2 = { "IDLE4", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {quarterHP, {ReactionType::DURATION, 6}}, 6, true, 0.f, 5000.f, threeLaser };
 
 	EnemyPattern spawnGreen = { "spwnG", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 9, SpecialStates::INC_ANIM}}, 9, true, 0.f, 1000.f, spawnGREEN , SpecialStates::INVINCIBLE};
+
+	EnemyPattern threeState1 = { "IDLE5", EnemyBehavior::PATROLLING, {}, 0, 3000.f, 3000.f, {quarterHP, {ReactionType::DURATION, 8}}, 8, true, 0.f, 1000.f, radialSquare };
+
 	EnemyPattern spawnRed =   { "spwnR", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 10}}, 10, true, 0.f, 1000.f, spawnRED };
 
 	EnemyPattern PredeathSuper = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {{ReactionType::DURATION, 10}}, 11, true, 0.f, 500.f, spiral, SpecialStates::INVINCIBLE };
@@ -4906,7 +5009,7 @@ struct MultiCube : Enemy
 		scale = vec2({ 240.f, 240.f });
 		rotatePower = 90.0f;
 		speedMultiplier = 2.5f;
-		rotationBehaviour = EnemyRotationBehavior::NONE;
+		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
 	};
 };
 
