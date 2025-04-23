@@ -4579,22 +4579,53 @@ struct ConstructYELLOW : Enemy
 		EnemyBulletDeath::NONE,
 		EnemyType::EnemyHifiTemporaryBoid };
 
-	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, false, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
-	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 12000.f, 12000.f, {}, 1, true, 0.f, 6000.f, spawning };
+	const AttackData spawningPhase2{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		6,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyHifiTemporaryBoid };
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	Reaction halfHp = {
+		ReactionType::FIFTY_HEALTH,
+		2,
+		SpecialStates::INVINCIBLE
+	};
+
+	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {duration, halfHp}, 1, false, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 12000.f, 12000.f, {duration, halfHp}, 1, true, 0.f, 6000.f, spawning };
+
+	EnemyPattern initPhase2 = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 1000.f, 1000.f, {duration}, 3, false, 0.f, 10.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
+	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 4000.f, 4000.f, {duration}, 2, true, 0.f, 1500.f, spawningPhase2 };
+
 
 	ConstructYELLOW()
 	{
-		maxHealth = 500;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 		enemyPatterns = { init,
-			randomState };
+			randomState, initPhase2, randomStatePhase2 };
 		patternIndex = 0;
 		sprite = {
 			"HifiBoss2Yellow.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 135.f, 135.f });
-		rotatePower = 90.0f;
+		rotatePower = 1.0f;
 	};
 };
 struct ConstructPURPLE : Enemy
@@ -4614,23 +4645,72 @@ struct ConstructPURPLE : Enemy
 		10,
 		0
 	};
-	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
-	EnemyPattern startState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 8000.f, 8000.f, {{ReactionType::PLAYER_CLOSE, 1}}, 2, true, 0.f, 4000.f, bigBullet };
-	EnemyPattern teleState = { "PatrolSide", EnemyBehavior::TELEPORT, {}, 0, 100.f, 100.f, {{ReactionType::DURATION, 2}}, 3, false, 0.f, 1000.f, none };
-	EnemyPattern cooldownState = { "PatrolSide", EnemyBehavior::RANDOM_NEAR, {}, 0, 8000.f, 8000.f, {{ReactionType::DURATION, 0}}, 1, true, 0.f, 4000.f, bigBullet };
+
+	const AttackData bigBulletPhase2{
+		EnemyAttackPattern::BURST,
+		CIRCLE,
+		{fireRateUp},
+		fireRateDown,
+		3,
+		0,
+		{100, 100},
+		500,
+		3000,
+		{50, 0},
+		10,
+		3,
+		0.01,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	const AttackData radialSquare{
+		EnemyAttackPattern::RADIAL_POLYGON,
+		RECTANGLE,
+		{fireRateUp},
+		fireRateDown,
+		4,
+		0,
+		{30, 30},
+		250,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0
+		};
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	Reaction halfHp = {
+		ReactionType::FIFTY_HEALTH,
+		2,
+		SpecialStates::INVINCIBLE
+	};
+
+	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {duration}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
+	EnemyPattern startState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 8000.f, 8000.f, {{ReactionType::PLAYER_CLOSE, 2}, halfHp, duration}, 2, true, 0.f, 4000.f, bigBullet };
+	EnemyPattern teleState = { "PatrolSide", EnemyBehavior::TELEPORT, {}, 0, 100.f, 100.f, {duration}, 3, false, 0.f, 1000.f, none };
+	EnemyPattern cooldownState = { "PatrolSide", EnemyBehavior::RANDOM_NEAR, {}, 0, 8000.f, 8000.f, {duration,halfHp}, 1, true, 0.f, 4000.f, bigBullet };
+
+	EnemyPattern startStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 9000.f, 9000.f, {duration}, 5, true, 0.f, 3000.f, bigBulletPhase2 };
+	EnemyPattern teleStatePhase2 = { "PatrolSide", EnemyBehavior::TELEPORT, {}, 0, 100.f, 100.f, {duration}, 6, true, 0.f, 1000.f, radialSquare };
+	EnemyPattern cooldownStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_NEAR, {}, 0, 4000.f, 4000.f, {duration}, 4, true, 0.f, 2000.f, bigBulletPhase2 };
 
 	ConstructPURPLE()
 	{
-		maxHealth = 500;
+		maxHealth = 1500;
 		currHealth = maxHealth;
-		enemyPatterns = { init, startState, teleState, cooldownState };
+		enemyPatterns = { init, startState, teleState, cooldownState,
+			startStatePhase2, teleStatePhase2, cooldownStatePhase2 };
 		patternIndex = 0;
 		sprite = {
 			"HifiBoss2Purple.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 135.f, 135.f });
-		rotatePower = 90.0f;
+		rotatePower = 1.0f;
 		speedMultiplier = 1.3;
 	};
 };
@@ -4650,15 +4730,58 @@ struct ConstructGREEN : Enemy
 		0,
 		0,
 		0 };
+
+	const AttackData LaserPhase2{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{},
+		numBulletsDown,
+		1,
+		0,
+		{50, 50},
+		0,
+		10000000,
+		{6, 0},
+		0,
+		0,
+		0 };
+
+	const AttackData snailTrail{
+		EnemyAttackPattern::TRAIL,
+		CIRCLE,
+		{playerSpeedUp},
+		playerSpeedDown,
+		1,
+		0,
+		{20, 20},
+		0,
+		4000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER};
+
+	Reaction halfHp = {
+		ReactionType::FIFTY_HEALTH,
+		3,
+		SpecialStates::INVINCIBLE
+	};
+
 	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
-	EnemyPattern startState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.9, 0.1}}, 0, 3000.f, 3000.f, {{ReactionType::FINISH_PATROL, 2}}, 2, false, 0.f, 1000000000.f, none };
-	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 3000.f, 3000.f, {}, 2, true, 0.f, 1000000000.f, crabLaser };
+	EnemyPattern startState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.9, 0.1}}, 0, 3000.f, 3000.f, {{ReactionType::FINISH_PATROL, 2}, halfHp}, 2, false, 0.f, 1000000000.f, none };
+	EnemyPattern randomState = { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,2}, halfHp}, 2, true, 0.f, 1000000000.f, crabLaser };
+
+	EnemyPattern rePosition { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.9, 0.1}}, 0, 3000.f, 3000.f, {{ReactionType::FINISH_PATROL, 4}}, 4, true, 0.f, 250.f, snailTrail };
+	EnemyPattern randomStatePhase2 = { "PatrolBoundary", EnemyBehavior::PATROLLING, {
+		{0.99, 0.01}, {0.01, 0.01}, {0.01, 0.99}, {0.99, 0.99}, {0.99, 0.01}
+	}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,4}}, 4, true, 0.f, 1000000000.f, LaserPhase2 };
 
 	ConstructGREEN()
 	{
-		maxHealth = 500;
+		maxHealth = 1500;
 		currHealth = maxHealth;
-		enemyPatterns = { init, startState, randomState };
+		enemyPatterns = { init, startState, randomState, rePosition, randomStatePhase2 };
 		patternIndex = 0;
 		sprite = {
 			"HifiBoss2Green.png",
@@ -4689,12 +4812,41 @@ struct ConstructRED : Enemy
 		0
 	};
 
-	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {{ReactionType::DURATION,1}}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
-	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {}, 1, true, 0.f, 1000.f, trail };
+	const AttackData Blast{
+		EnemyAttackPattern::SHOTGUN,
+		TRIANGLE,
+		{dmgUp},
+		dmgDown,
+		5,
+		M_PI / 12.f,
+		{30, 30},
+		700,
+		1500,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER
+	};
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	Reaction halfHp = {
+	ReactionType::FIFTY_HEALTH,
+		2,
+		SpecialStates::INVINCIBLE
+	};
+
+	EnemyPattern init = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 100.f, 100.f, {duration}, 1, true, 0.f, 10.f, NoAttack, SpecialStates::INVINCIBLE, SpecialStates::INVINCIBLE};
+	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration, halfHp}, 1, true, 0.f, 1000.f, trail };
+
+	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration}, 2, true, 0.f, 1000.f, Blast };
 
 	ConstructRED()
 	{
-		maxHealth = 500;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 		enemyPatterns = { init,
 			randomState };
@@ -4704,8 +4856,8 @@ struct ConstructRED : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 135.f, 135.f });
-		rotatePower = 90.0f;
 		speedMultiplier = 1.9;
+		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	};
 };
 
