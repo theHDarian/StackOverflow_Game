@@ -4943,7 +4943,7 @@ struct MultiCube : Enemy
 		CIRCLE,
 		{},
 		blunt,
-		3,
+		4,
 		0,
 		{20, 20},
 		0,
@@ -4987,6 +4987,22 @@ struct MultiCube : Enemy
 	0
 	};
 
+	const AttackData radialSquareBlue{
+		EnemyAttackPattern::RADIAL_POLYGON,
+		RECTANGLE,
+		{blunt},
+		bulletPierceDown,
+		4,
+		M_PI / 4.f,
+		{30, 30},
+		400,
+		2500,
+		{0, 0},
+		0,
+		0,
+		0
+		};
+
 	const AttackData tacks{
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
@@ -5006,13 +5022,13 @@ struct MultiCube : Enemy
 	EnemyAttackPattern::LASER,
 	CIRCLE,
 	{bulletPierceUp},
-	dashRechargeUp,
+	bulletPierceDown,
 	4,
 	0,
 	{30, 30},
 	0,
 	4500,
-	{10, 0.05},
+	{10, 0.0125},
 	0,
 	0,
 	0 };
@@ -5021,7 +5037,7 @@ struct MultiCube : Enemy
 		EnemyAttackPattern::RADIAL,
 		RECTANGLE,
 		{dmgUp},
-		 blunt,
+		 bulletPierceDown,
 		4,
 		M_PI/16,
 		{15, 15},
@@ -5029,8 +5045,8 @@ struct MultiCube : Enemy
 		2500,
 		{200, M_PI / 1.5},
 		0,
-		0,
-		1};
+		1,
+		0};
 
 
 	Reaction finalSpawn = {
@@ -5055,26 +5071,26 @@ struct MultiCube : Enemy
 
 	EnemyPattern spawnPurple = { "spwnP", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 6}}, 6, true, 0.f, 1000.f, spawnPURPLE , SpecialStates::INVINCIBLE};
 
-	EnemyPattern twoState1 = { "IDLE3", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {quarterHP, {ReactionType::DURATION, 7}}, 7, true, 0.f, 1000.f, radialSquare };
+	EnemyPattern twoState1 = { "IDLE3", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {quarterHP, {ReactionType::DURATION, 7}}, 7, true, 0.f, 1000.f, radialSquareBlue };
 	EnemyPattern twoState2 = { "IDLE4", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {quarterHP, {ReactionType::DURATION, 6}}, 6, true, 0.f, 5000.f, threeLaser };
 
-	EnemyPattern spawnGreen = { "spwnG", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 9, SpecialStates::INC_ANIM}}, 9, true, 0.f, 1000.f, spawnGREEN , SpecialStates::INVINCIBLE};
+	EnemyPattern spawnGreen = { "spwnG", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 9}}, 9, true, 0.f, 1000.f, spawnGREEN , SpecialStates::INVINCIBLE};
 
-	EnemyPattern threeState1 = { "IDLE5", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {finalSpawn, {ReactionType::DURATION, 10}}, 10, true, 0.f, 1000.f, radialSquare };
+	EnemyPattern threeState1 = { "IDLE5", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {finalSpawn, {ReactionType::DURATION, 10}}, 10, true, 0.f, 500.f, radialSquareBlue };
 	EnemyPattern threeState2 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {finalSpawn, {ReactionType::DURATION, 9}}, 9, true, 0.f, 5000.f, fourLaser };
 
 	EnemyPattern spawnRed =   { "spwnR", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {{ReactionType::DURATION, 12}}, 12, true, 0.f, 1000.f, spawnRED };
 
 	EnemyPattern soloState1 = {"ROTATE IN PLACE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 4500.f, 4500.f, {explode, {ReactionType::DURATION, 13}}, 13, true, 0.f, 100.f, whip, SpecialStates::PROTECTED};
-	EnemyPattern soloState2 = {"ROTATE IN PLACE", EnemyBehavior::RANDOM, {}, 0, 5000.f, 6000.f, {explode, {ReactionType::DURATION, 12}}, 12, true, 0.f, 7000.f, broadsideLasers, };
+	EnemyPattern soloState2 = {"ROTATE IN PLACE", EnemyBehavior::RANDOM, {}, 0, 5000.f, 6000.f, {explode, {ReactionType::DURATION, 12}}, 12, true, 0.f, 7000.f, broadsideLasers, SpecialStates::PROTECTED};
 
-	EnemyPattern PredeathSuper = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {{ReactionType::DURATION, 15}}, 15, true, 0.f, 1000.f, haloYellow, SpecialStates::INVINCIBLE };
-	EnemyPattern PredeathSuper2 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 16}}, 16, true, 1000.f, 1000.f, haloPurple, SpecialStates::INVINCIBLE };
-	EnemyPattern PredeathSuper3 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 17}}, 17, true, 1000.f, 1000.f, haloGreen, SpecialStates::INVINCIBLE };
-	EnemyPattern PredeathSuper4 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 18}}, 18, true, 1000.f, 1000.f, haloRed, SpecialStates::INVINCIBLE };
-	EnemyPattern PredeathSuper5 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 19}}, 19, true, 1000.f, 1000.f, haloBlue, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper = { "IDLE5", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 15}}, 15, true, 500.f, 1000.f, haloYellow, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper2 = { "ROTATE_IN_PLACE5", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 16}}, 16, true, 500.f, 1000.f, haloPurple, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper3 = { "ROTATE_IN_PLACE5", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 17}}, 17, true, 500.f, 1000.f, haloGreen, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper4 = { "ROTATE_IN_PLACE5", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 18}}, 18, true, 500.f, 1000.f, haloRed, SpecialStates::INVINCIBLE };
+	EnemyPattern PredeathSuper5 = { "ROTATE_IN_PLACE5", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 19}}, 19, true, 500.f, 1000.f, haloBlue, SpecialStates::INVINCIBLE };
 
-	EnemyPattern finalState1 = { "IDLE5", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 20}}, 20, true, 0.f, 500.f, blowup }; //blow up attack
+	EnemyPattern finalState1 = { "ROTATE_IN_PLACE5", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 3000.f, 3000.f, {{ReactionType::DURATION, 20}}, 20, true, 0.f, 500.f, blowup }; //blow up attack
 	EnemyPattern finalState2 = { "die", EnemyBehavior::DEATHSTATE, {}, 0, 3000.f, 3000.f, {}, 11, false, 0.f, 1000.f, none };
 
 	MultiCube()
@@ -5089,7 +5105,7 @@ struct MultiCube : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0),
 			AnimationTypes::NONE,
-			4,
+			5,
 			-5
 		};
 		scale = vec2({ 240.f, 240.f });
@@ -5123,7 +5139,7 @@ struct TwinLaserVertical1 : Enemy
 	EnemyPattern randomState = {"PatrolSide", EnemyBehavior::PATROLLING, {{0.01, 0.01}, {0.01, 0.99}, {0.01, 0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
 	TwinLaserVertical1()
 	{
-		maxHealth = 100;
+		maxHealth = 300;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
