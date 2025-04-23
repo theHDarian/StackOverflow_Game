@@ -2779,6 +2779,25 @@ const RoomPreset MiningEnemyRoomMines {
         {1500, 1500}
 };
 
+const RoomPreset MiningEnemyRoomBoulders {
+        {
+
+                {
+                    {EnemyBigBoulder, {Random::Float(), Random::Float()}},
+
+                },
+
+        },
+    {},
+        {{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+        20.0f,
+        25,
+        5,
+        "Critical Mass",
+        false,
+        {1500, 1500}
+};
+
 
 
 const RoomPreset allConsoles {
