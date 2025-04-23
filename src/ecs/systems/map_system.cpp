@@ -526,9 +526,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                  map.currRoom.preset = ScientistBossRoom;
             }
             else if (map.currRegion == Physics) {
-                // std::vector<RoomPreset> physicsBossRooms = {BossBigCRoom, BossRoomMultiCube};
-                // map.currRoom.preset = Random::ListItem( physicsBossRooms);
-                map.currRoom.preset = BossRoomMultiCube;
+                std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};
+                map.currRoom.preset = Random::ListItem( physicsBossRooms);
+                // map.currRoom.preset = BossRoomMultiCube;
                 // map.currRoom.preset = TreasureRoomChoice5;
             } else {
                 map.currRoom.preset = ScientistBossRoom;
@@ -537,7 +537,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req.type = SoundType::bossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
+            req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
         }
 
         // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());

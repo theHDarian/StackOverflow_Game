@@ -2039,7 +2039,7 @@ const RoomPreset HifiRoomShieldedMadness{
 };
 
 
-const RoomPreset BossBigCRoom {
+const RoomPreset BossRoomBigC {
 
             {
                 {
@@ -2827,7 +2827,7 @@ const RoomPreset allConsoles {
 };
 
 const std::vector<RoomPreset> bossRooms = {
-    BossRoomBee, BossRoomCrab, BossRoomMole, BossRoomWorm, BossBigCRoom, BossRoomMultiCube
+    BossRoomBee, BossRoomCrab, BossRoomMole, BossRoomWorm, BossRoomBigC, BossRoomMultiCube
 };
 
 const std::vector<RoomPreset> regularTreasureRooms = {
@@ -3169,7 +3169,7 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Medical) {
         return ScientistBossRoom;
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
-        std::vector<RoomPreset> hifibosses = { BossBigCRoom, BossRoomMultiCube };
+        std::vector<RoomPreset> hifibosses = { BossRoomBigC, BossRoomMultiCube };
         return Random::ListItem(hifibosses);
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Mining) {
         std::vector<RoomPreset> miningbosses = { BossRoomMole, BossRoomWorm };

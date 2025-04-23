@@ -4584,7 +4584,7 @@ struct ConstructYELLOW : Enemy
 		CIRCLE,
 		{},
 		blunt,
-		9,
+		6,
 		0,
 		{60, 60},
 		600,
@@ -4610,7 +4610,7 @@ struct ConstructYELLOW : Enemy
 	EnemyPattern randomState = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 12000.f, 12000.f, {duration, halfHp}, 1, true, 0.f, 6000.f, spawning };
 
 	EnemyPattern initPhase2 = {"GiveInvincibility", EnemyBehavior::GRANTINGBUFFSAOE, {{0.5, 0.5}}, 0, 1000.f, 1000.f, {duration}, 3, false, 0.f, 10.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
-	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 2000.f, 2000.f, {duration}, 2, true, 0.f, 1500.f, spawningPhase2 };
+	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {duration}, 2, true, 0.f, 1500.f, spawningPhase2 };
 
 
 	ConstructYELLOW()
@@ -4625,7 +4625,7 @@ struct ConstructYELLOW : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 135.f, 135.f });
-		rotatePower = 1.0f;
+		rotatePower = 1.50f;
 	};
 };
 struct ConstructPURPLE : Enemy
@@ -4700,7 +4700,7 @@ struct ConstructPURPLE : Enemy
 
 	ConstructPURPLE()
 	{
-		maxHealth = 1500;
+		maxHealth = 1000;
 		currHealth = maxHealth;
 		enemyPatterns = { init, startState, teleState, cooldownState,
 			startStatePhase2, teleStatePhase2, cooldownStatePhase2 };
@@ -4710,7 +4710,7 @@ struct ConstructPURPLE : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 135.f, 135.f });
-		rotatePower = 1.0f;
+		rotatePower = 1.50f;
 		speedMultiplier = 1.3;
 	};
 };
@@ -4774,7 +4774,7 @@ struct ConstructGREEN : Enemy
 
 	EnemyPattern rePosition { "PatrolBoundary", EnemyBehavior::PATROLLING, {{0.9, 0.1}}, 0, 3000.f, 3000.f, {{ReactionType::FINISH_PATROL, 4}}, 4, true, 0.f, 250.f, snailTrail };
 	EnemyPattern randomStatePhase2 = { "PatrolBoundary", EnemyBehavior::PATROLLING, {
-		{0.99, 0.01}, {0.01, 0.01}, {0.01, 0.99}, {0.99, 0.99}, {0.99, 0.01}
+			{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}
 	}, 0, 3000.f, 3000.f, {{ReactionType::DURATION,4}}, 4, true, 0.f, 1000000000.f, LaserPhase2 };
 
 	ConstructGREEN()
@@ -4788,7 +4788,7 @@ struct ConstructGREEN : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 135.f, 135.f });
-		rotatePower = 1.0f;
+		rotatePower = 1.50f;
 		speedMultiplier = 4.F;
 		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
 	};
@@ -4817,10 +4817,10 @@ struct ConstructRED : Enemy
 		TRIANGLE,
 		{dmgUp},
 		dmgDown,
-		5,
-		M_PI / 12.f,
+		4,
+		M_PI / 6.f,
 		{30, 30},
-		700,
+		600,
 		1500,
 		{0, 0},
 		0,
@@ -4846,10 +4846,10 @@ struct ConstructRED : Enemy
 
 	ConstructRED()
 	{
-		maxHealth = 1500;
+		maxHealth = 1000;
 		currHealth = maxHealth;
 		enemyPatterns = { init,
-			randomState };
+			randomState, randomStatePhase2 };
 		patternIndex = 0;
 		sprite = {
 			"HifiBoss2Red.png",

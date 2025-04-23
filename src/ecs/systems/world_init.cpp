@@ -1877,7 +1877,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = ConstructYELLOW();
 		Buffer& buffer = registry.buffers.emplace(entity);
 		buffer.range = 750.f;
-		buffer.maxCoolDown = 2500.f;
+		buffer.maxCoolDown = 1200.f;
 		buffer.duration = 2000.f;
 		break;
 	}
