@@ -2784,7 +2784,7 @@ const RoomPreset MiningEnemyRoomBoulders {
 
                 {
                     {EnemyBigBoulder, {Random::Float(), Random::Float()}},
-
+                        {EnemySurfaceMole, {Random::Float(), Random::Float()}},
                 },
 
         },

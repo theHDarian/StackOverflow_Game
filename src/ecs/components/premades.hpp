@@ -3983,6 +3983,154 @@ struct MoleBoss : Enemy
 	};
 };
 
+struct SurfaceMole : Enemy
+{
+	const AttackData dirtBlast{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{bulletRangeUp},
+		dashRechargeUp,
+		6,
+		M_PI / 12.f,
+		{50, 50},
+		400,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::CLUSTER
+	};
+
+	const AttackData fastDirtBlast{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{bulletRangeUp},
+		dashRechargeUp,
+		6,
+		M_PI / 12.f,
+		{50, 50},
+		700,
+		2500,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	const AttackData weakDirtBlast{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{bulletRangeUp},
+		dashRechargeUp,
+		5,
+		M_PI / 12.f,
+		{50, 50},
+		250,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0
+	};
+
+	const AttackData plantMine{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyDynamite };
+
+
+	const AttackData summonMoles {
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemySmallMole };
+
+	const AttackData summonBoulders {
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemySmallBoulder,
+	};
+
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	Reaction halfHP = {
+		ReactionType::FIFTY_HEALTH,
+		2,
+		SpecialStates::INVINCIBLE
+	};
+
+
+	EnemyPattern diggingState = { "Digging", EnemyBehavior::RANDOM, {}, 0, 7500.f, 7500.f, {duration, halfHP}, 1, true, 0.f, 1000.f,  fastDirtBlast,  };
+	EnemyPattern emergeState = { "Emerge", EnemyBehavior::RANDOM, {}, 0, 500.f, 500.f, {duration, halfHP}, 1, true, 0.f, 200.f, plantMine };
+
+	EnemyPattern emergeStatePhase2 = { "Emerge", EnemyBehavior::RANDOM_NEAR, {}, 0, 1500.f, 1500.f, {duration}, 3, true, 0.f, 700.f, summonBoulders };
+	EnemyPattern shootingStatePhas2 = {
+		"Shooting", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {duration}, 4, true, 0.f, 700.f, fastDirtBlast
+	};
+	EnemyPattern chasePlayer = { "CHASE", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration}, 2, true, 0.f, 700.f, plantMine };
+
+	SurfaceMole()
+	{
+		maxHealth = 1500;
+		currHealth = maxHealth;
+
+		enemyPatterns = {  diggingState, emergeState, emergeStatePhase2, shootingStatePhas2, chasePlayer };
+		sprite = {
+			"surface_mole",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			1,
+			2,
+			150
+		};
+		scale = vec2({ 336.f / 1.75, 192.f / 1.75 });
+		rotatePower = 1.2f;
+		speedMultiplier = 2.5f;
+		collisionBullet = {dashRechargeUp};
+	};
+};
+
 struct Bulldozer : Enemy
 {
 
@@ -4952,21 +5100,6 @@ struct MultiCube : Enemy
 		EnemyType::BossConstructRED
 	};
 
-	const AttackData spiral{
-		EnemyAttackPattern::RADIAL,
-		TRIANGLE,
-		{numBulletsUp, dmgDown},
-		bulletPierceDown,
-		12,
-		0.0,
-		{40, 40},
-		800,
-		6000,
-		{400, -2 * M_PI / 3.0},
-		0,
-		1,
-		0};
-
 	const AttackData haloBlue{
 		EnemyAttackPattern::SHOTGUN,
 		RECTANGLE,
@@ -5018,7 +5151,7 @@ struct MultiCube : Enemy
 	const AttackData haloPurple{
 		EnemyAttackPattern::SHOTGUN,
 		RECTANGLE,
-		{fireRateDown, fireRateDown },
+		{fireRateUp, fireRateUp },
 		fireRateDown,
 		12,
 		M_PI / 6.f,
@@ -5154,21 +5287,6 @@ struct MultiCube : Enemy
 		0,
 		0
 		};
-
-	const AttackData tacks{
-		EnemyAttackPattern::RADIAL,
-		RECTANGLE,
-		{bulletPierceUp},
-		blunt,
-		10,
-		0.0,
-		{20, 20},
-		400,
-		2000,
-		{200, -2 * M_PI / 2.0},
-		0,
-		0,
-		0};
 
 	const AttackData broadsideLasers{
 	EnemyAttackPattern::LASER,

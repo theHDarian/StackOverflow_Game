@@ -328,6 +328,7 @@ enum EnemyType {
     EnemyMiningBoulderSmall,
     EnemyMiningBoulderBig,
     EnemySmallMole,
+    EnemySurfaceMole,
     EnemyDynamite,
     EnemyBulldozer,
     EnemySmallBoulder,
