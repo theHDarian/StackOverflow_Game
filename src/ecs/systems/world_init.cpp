@@ -1397,7 +1397,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = BossBigCCore();
 		auto &boss = registry.bosses.emplace(entity);
-		boss.name = "Doubling Cube";
+		boss.name = "\"Centurion\"";
 		break;
 	}
 		case EnemyType::BossBigCShield:
@@ -1489,6 +1489,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::EnemySmallMole:
 	{
 		enemy = SmallMole();
+		break;
+	}
+	case EnemyType::EnemySurfaceMole: {
+		enemy = SurfaceMole();
 		break;
 	}
 	case EnemyType::EnemySmallBoulder:

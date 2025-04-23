@@ -34,7 +34,10 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
     Map& map = registry.maps.components[0];
     for (auto &e : enemies)
     {
-        vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
+        vec2 location = std::get<vec2>(e);
+        location.x = location.x == random_pos ? Random::Float() : location.x;
+        location.y = location.y == random_pos ? Random::Float() : location.y;
+        vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
         if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
             createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
         } else {

@@ -1805,7 +1805,7 @@ struct BossBigCCore : Enemy{
 		dashRechargeUp,
 		8,
 		0,
-		{20, 20},
+		{30, 30},
 		0,
 		1500,
 		{500, 0},
@@ -1820,7 +1820,7 @@ struct BossBigCCore : Enemy{
 		dashRechargeUp,
 		8,
 		M_PI / 8.f,
-		{20, 20},
+		{30, 30},
 		0,
 		1500,
 		{500, 0},
@@ -1837,7 +1837,7 @@ struct BossBigCCore : Enemy{
 		0,
 		{60, 60},
 		0,
-		1500,
+		3000,
 		{500, 0},
 		0,
 		0,
@@ -1852,7 +1852,7 @@ struct BossBigCCore : Enemy{
 		M_PI / 8.f,
 		{60, 60},
 		0,
-		1500,
+		3000,
 		{500,0},
 		0,
 		0,
@@ -1874,7 +1874,7 @@ struct BossBigCCore : Enemy{
 		0,
 		EnemyBulletDeath::NONE,
 		EnemyType::EnemyLaserSniper,
-			{{0.5f, 1-0.63f}, {0.38, 1-0.42}, {1-0.38, 1-0.42} }
+			{{0.5f, 1-0.651f}, {0.368, 1-0.4}, {1-0.368, 1-0.4} }
 		};
 
 	const AttackData spawningState2{
@@ -1935,7 +1935,7 @@ struct BossBigCCore : Enemy{
 		ReactionType::DURATION,
 		1};
 	Reaction seven_five_hp = {
-		ReactionType::SEVENTYFIVE_HEALTH,
+		ReactionType::EIGHTY_HEALTH,
 		7,
 		SpecialStates::INVINCIBLE};
 
@@ -1993,7 +1993,7 @@ struct BossBigCCore : Enemy{
 		0.f, 1500.f, spawningState2, SpecialStates::PROTECTED
 	};
 
-	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 11, true, 0.f, 1000.f, spawningState3, SpecialStates::PROTECTED};
+	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 11, true, 0.f, 1000.f, spawningState3, };
 
 	EnemyPattern PlayerCloseTwentyFiveHP = {
 		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 11, false, 0.f, 100.f, laserRotate,
@@ -2009,19 +2009,17 @@ struct BossBigCCore : Enemy{
 		0.f, 1500.f, spawningState4, SpecialStates::PROTECTED
 	};
 
-	EnemyPattern laserState1TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 14, true, 0.f, 2000.f, laser3, };
-	EnemyPattern laserState2TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 15, true, 0.f, 2000.f, laser4, };
-	EnemyPattern laserState3TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 16, true, 0.f, 2000.f, laser3, };
-	EnemyPattern laserState4TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, playerCloseTwentyFiveHP}, 12, true, 0.f, 2000.f, laser4, };
+	EnemyPattern laserState1TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 14, true, 0.f, 2000.f, laser3, };
+	EnemyPattern laserState2TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 13, true, 0.f, 2000.f, laser4, };
 
 	BossBigCCore()
 	{
-		maxHealth = 4000;
+		maxHealth = 7500;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			idleState, PlayerClose, PlayerCloseHalfHP, PlayerCloseHalfHPLaser, randomStateSevenFiveHP, laserState1,
 			laserState2, spawningLaserSniper, randomStateHalfHP, spawningState,
-			PlayerCloseTwentyFiveHP, PlayerCloseTwentyFiveHPLaser, randomStateTwentyFiveHP, laserState1TwentyFiveHP, laserState2TwentyFiveHP, laserState3TwentyFiveHP, laserState4TwentyFiveHP,
+			PlayerCloseTwentyFiveHP, PlayerCloseTwentyFiveHPLaser, randomStateTwentyFiveHP, laserState1TwentyFiveHP, laserState2TwentyFiveHP,
 		};
 		patternIndex = 0;
 		sprite = {
@@ -3875,11 +3873,11 @@ struct MoleBoss : Enemy
 		EnemyBulletDeath::NONE,
 		EnemyType::EnemyDynamite,
 		{
-			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
-			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
-			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
-			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
-			Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
+			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
+			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
+			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
+			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
 
 		}
 
@@ -3980,6 +3978,109 @@ struct MoleBoss : Enemy
 		speedMultiplier = 5.0f;
 		rotationBehaviour = EnemyRotationBehavior::NONE;
 		collisionBullet = {playerSpeedDown, playerSpeedDown, playerSpeedDown, blunt, blunt};
+	};
+};
+
+struct SurfaceMole : Enemy
+{
+	const AttackData dirtBlast{
+		EnemyAttackPattern::BURST,
+		CIRCLE,
+		{accuracyUp},
+		dashRechargeUp,
+		4,
+		0,
+		{50, 50},
+		500,
+		3000,
+		{0, 0},
+		0,
+		0,
+		0.01,
+		EnemyBulletDeath::EXPLODE
+	};
+
+
+	const AttackData fastDirtBlast{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{accuracyUp},
+		dashRechargeUp,
+		3,
+		M_PI / 8.f,
+		{50, 50},
+		400,
+		2000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	const AttackData summonBoulders {
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyBigBoulder,
+	};
+
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	Reaction halfHP = {
+		ReactionType::FIFTY_HEALTH,
+		2, SpecialStates::INVINCIBLE
+	};
+
+	Reaction playerClose = {
+		ReactionType::PLAYER_CLOSE,
+		3 };
+
+
+	EnemyPattern diggingState = { "Digging", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {duration, halfHP}, 1, true, 0.f, 1500.f, fastDirtBlast };
+	EnemyPattern emergeState = { "Emerge", EnemyBehavior::RANDOM_FAR, {}, 0, 4000.f, 4000.f, {duration, halfHP}, 0, true, 0.f, 1500.f, dirtBlast };
+
+	EnemyPattern spawnBoulders = { "Summon Boulders", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration}, 3, true, 900.f, 500.f, summonBoulders, SpecialStates::UNDERGROUND };
+
+	EnemyPattern diggingStatePhase2 = { "Digging", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration}, 4, true, 0.f, 1000.f, fastDirtBlast };
+	EnemyPattern emergeStatePhase2 = { "Emerge", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration, playerClose}, 3, true, 0.f, 1000.f, dirtBlast };
+
+
+	SurfaceMole()
+	{
+		maxHealth = 1250;
+		currHealth = maxHealth;
+
+		enemyPatterns = {  diggingState, emergeState,  spawnBoulders, diggingStatePhase2, emergeStatePhase2,  };
+
+		patternIndex = 0;
+		sprite = {
+			"surface_mole",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			1,
+			2,
+			150
+		};
+		scale = vec2({ 336.f / 1.75, 192.f / 1.75 });
+		rotatePower = 0.75f;
+		speedMultiplier = 2.f;
+		collisionBullet = {playerSpeedDown};
 	};
 };
 

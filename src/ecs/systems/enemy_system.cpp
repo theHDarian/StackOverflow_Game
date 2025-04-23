@@ -693,7 +693,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                 if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
                     if (!registry.vulnerabilities.has(e)) {
                         auto& vul = registry.vulnerabilities.emplace(e);
-                        vul.modifier = 2.f;
+                        vul.modifier = 1.5f;
                         vul.countdown = buffer.duration;
                         if (registry.buffers.has(e)) {
                             vul.countdown = vul.countdown / 2;
@@ -706,7 +706,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                         if (countDown > inv.countdown) {
                             inv.countdown = countDown;
                         }
-                        inv.modifier = 2.f;
+                        inv.modifier = 1.5f;
                     }
                 }
                 if (behavior == EnemyBehavior::GRANTINGBUFFS) {
