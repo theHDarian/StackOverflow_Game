@@ -11,7 +11,7 @@ const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{BulletDamage,      {173.f/255.f, 49.f/255.f, 75.f/255.f}},
 			{ProjectileSpeed,   COLOR_PINK},
 			{ProjectileSize,    COLOR_MAGENTA_LIGHT},
-			{FireRate,          COLOR_MAGENTA_MED},
+			{FireRate,          COLOR_PURPLE_DARK},
 			{BulletRange,       COLOR_YELLOW},
 			{BulletAccuracy,      COLOR_ORANGE},
 			{BulletNum,         COLOR_TEAL_LIGHT},
