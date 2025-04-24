@@ -5440,7 +5440,7 @@ struct HifiLaserSniper : Enemy
 
 	HifiLaserSniper()
 	{
-		maxHealth = 100;
+		maxHealth = 150;
 		currHealth = maxHealth;
 		enemyPatterns = {randomState};
 		patternIndex = 0;
@@ -5457,29 +5457,14 @@ struct HifiLaserSniper : Enemy
 
 struct HifiLaserSniperHard : Enemy
 {
-	const AttackData FastLaser{
-		EnemyAttackPattern::LASER
-		,CIRCLE
-		,{dashUp, playerSpeedUp, playerSpeedUp}
-		,dashRechargeUp
-		,1
-		,0
-		,{20, 20}
-		,0
-		, 2000
-		,{5000, 0}
-		,0
-		,0
-		,0
-		,EnemyBulletDeath::NONE
-		};
-	EnemyPattern laser = {"Laser active", EnemyBehavior::IDLE, {}, 0, 0.f, 700.f, {{ReactionType::DURATION, 0}}, 2, true, 0.f, 700.f, FastLaser};
-	EnemyPattern Teleport = {"Charge", EnemyBehavior::IDLE, {}, 0, 300.f, 300.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 350.f, twelveSpiralShot};
-	EnemyPattern CoolDown = {"CoolDown", EnemyBehavior::IDLE, {}, 0, 0.f, 4000.f, {{ReactionType::DURATION, 0}}, 1, false, 0.f, 5000.f, NoAttack};
+
+	EnemyPattern laser = {"Laser active", EnemyBehavior::IDLE, {}, 0, 0.f, 1200.f, {{ReactionType::DURATION, 0}}, 2, true, 0.f, 1000.f, FastLaser};
+	EnemyPattern Teleport = {"Charge", EnemyBehavior::IDLE, {}, 0, 300.f, 300.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 350.f, NoAttack};
+	EnemyPattern CoolDown = {"CoolDown", EnemyBehavior::IDLE, {}, 0, 0.f, 4000.f, {{ReactionType::DURATION, 0}}, 1, false, 0.f, 2000.f, NoAttack};
 
 	HifiLaserSniperHard()
 	{
-		maxHealth = 150;
+		maxHealth = 300;
 		currHealth = maxHealth;
 		enemyPatterns = {CoolDown, laser, Teleport};
 		patternIndex = 0;

@@ -522,8 +522,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else if (map.currRegion == Mining) {
                 std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
-                // map.currRoom.preset = Random::ListItem( miningBossRooms);
-                map.currRoom.preset = MiningEnemyRoomIntro;
+                map.currRoom.preset = Random::ListItem( miningBossRooms);
+                // map.currRoom.preset = MiningEnemyRoomAvenue;
             }
             else if (map.currRegion == Medical) {
                  map.currRoom.preset = ScientistBossRoom;

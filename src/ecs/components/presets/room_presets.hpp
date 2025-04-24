@@ -1948,21 +1948,36 @@ const RoomPreset HifiRoomAvenue {
                     {EnemyLaserSniper,{0.9,0.2}},
                     {EnemyLaserSniper,{0.9,0.8}},
                     {EnemyHifiCannon,{0.9,0.5}},
-
+                     {EnemyHifiBallLauncher, {0.5,0.5}},
+                    {EnemyHifiBallLauncher, {0.5,random_float}},
+                    {EnemyHifiBallLauncher, {0.5,random_float}},
                 },
 
                 {
                     {EnemyLaserSniper,{0.1,0.2}},
                     {EnemyLaserSniper,{0.1,0.8}},
                     {EnemyHifiCannonHard,{0.1,0.5}},
-
+                    {EnemyHifiTrailHard, {0.5, random_float}},
+                    {EnemyHifiTrailHard, {0.5, random_float}},
 
                 },
+                    {
+                        {EnemyLaserSniper,{0.9,0.2}},
+                        {EnemyLaserSniper,{0.9,0.8}},
+                        {EnemyHifiCannon,{0.9,0.5}},
+                            {EnemyLaserSniper,{0.85,0.5}},
+                         {EnemyHifiBallLauncher, {0.5,0.5}},
+                        {EnemyHifiBallLauncher, {0.5,random_float}},
+                        {EnemyHifiBallLauncher, {0.5,random_float}},
+                            {EnemyHifiJellyFish, random_vec2},
+                            {EnemyHifiJellyFish, random_vec2},
+                            {EnemyHifiJellyFish, random_vec2},
+                    },
 
             },
         {},
         {},
-        30.0f,
+        20.0f,
         5,
         2,
         "Avenue Ambush",
@@ -1976,21 +1991,38 @@ const RoomPreset HifiRoomLane {
                     {EnemyLaserSniper,{0.2,0.9}},
                     {EnemyLaserSniper,{0.8,0.9}},
                     {EnemyHifiCannon,{0.5,0.9}},
-
+                        {EnemyHifiTackShooter, {0.5,0.5}},
+                            {EnemyHifiTackShooter, {0.5,random_float}},
+                            {EnemyHifiTackShooter, {0.5,random_float}},
                 },
 
                 {
                     {EnemyLaserSniper,{0.2,0.1}},
                     {EnemyLaserSniper,{0.8,0.1}},
                     {EnemyHifiCannonHard,{0.5,0.1}},
-
+                        {EnemyHifiTackShooter, {0.5,0.5}},
+                    {EnemyHifiSniperHard, {0.5, random_float}},
+                        {EnemyHifiSniperHard, {0.5, random_float}},
 
                 },
 
+                    {
+                        {EnemyLaserSniper,{0.2,0.9}},
+                        {EnemyLaserSniper,{0.8,0.9}},
+                        {EnemyHifiCannon,{0.5,0.9}},
+                            {EnemyLaserSniper,{0.5,0.85}},
+                            {EnemyHifiTackShooter, {0.5,0.5}},
+                                {EnemyHifiTackShooter, {0.5,random_float}},
+                                {EnemyHifiTackShooter, {0.5,random_float}},
+                            {EnemyHifiChargerHard, random_vec2},
+                                    {EnemyHifiChargerHard, random_vec2},
+                                    {EnemyHifiChargerHard, random_vec2},
+
+                    },
             },
         {},
         {},
-        100.0f,
+        20.0f,
         5,
         2,
         "Laser Laneway",
@@ -2986,6 +3018,68 @@ const RoomPreset MiningEnemyRoomIntro {
         {1200, 1000}
 };
 
+const RoomPreset MiningEnemyRoomLane {
+                {
+                    {
+                        {EnemyPileDriverTurret,{0.2,0.9}},
+                    {EnemyPileDriverTurret,{0.8,0.9}},
+                    {EnemyPileDriverTurret,{0.5,0.9}},
+                            {EnemyBulldozer, random_vec2},
+                                {EnemyBulldozer, random_vec2},
+
+                    },
+
+                    {
+                        {EnemyPileDriverTurret,{0.2,0.1}},
+                        {EnemyPileDriverTurret,{0.8,0.1}},
+                        {EnemyPileDriverTurret,{0.5,0.1}},
+                        {EnemySmallMole, random_vec2},
+                        {EnemySmallMole, random_vec2},
+
+                    },
+
+                },
+                        {},
+                        {},
+                    20.f,
+            10,
+            5,
+            "Laneway Excavation",
+            false,
+{650, 3000}
+};
+
+const RoomPreset MiningEnemyRoomAvenue {
+                {
+                    {
+                        {EnemyPileDriverTurret,{0.9,0.2}},
+                        {EnemyPileDriverTurret,{0.9,0.8}},
+                        {EnemyPileDriverTurret,{0.9,0.5}},
+                                {EnemyBigBoulder, random_vec2},
+                    },
+
+                    {
+                        {EnemyPileDriverTurret,{0.1,0.2}},
+                        {EnemyPileDriverTurret,{0.1,0.8}},
+                        {EnemyPileDriverTurret,{0.1,0.5}},
+                            { EnemySmallBoulder, {0.5, random_float}},
+                            { EnemySmallBoulder, {0.5, random_float}},
+                            { EnemySmallBoulder, {0.5, random_float}},
+                                { EnemySmallBoulder, {0.5, random_float}},
+                                    { EnemySmallBoulder, {0.5, random_float}},
+
+                    },
+
+                },
+            {},
+            {},
+            20.0f,
+            10,
+            5,
+            "Boulder Avenue",
+            false,
+            {3000, 650}
+};
 
 const RoomPreset allConsoles {
     { {
@@ -3103,7 +3197,10 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
 
 std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{QuadShooterRoomSmall, MiningEnemyRoomMoles },{EnemyRoomMagic, MiningEnemyRoomMineField}}},
+        {
+            RoomType::EnemyRoom,
+            {{QuadShooterRoomSmall, MiningEnemyRoomMoles}, {EnemyRoomMagic, MiningEnemyRoomMineField}}
+        },
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall}}},
         {RoomType::EventRoom, {{EventRoomBibleTree, EventRoomOracleCrab, }, {EventRoomBaru, EventRoomHoney }}  },
         {RoomType::TreasureRoom, {regularTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare}}},
@@ -3113,7 +3210,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    MiningEnemyRoomIntro, QuadShooterRoomSmall, MiningEnemyRoomBoulders, MiningEnemyRoomMoles
+                    MiningEnemyRoomIntro, QuadShooterRoomSmall, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue
                 },
                 {EnemyRoomMagic, MiningEnemyRoomMineField}
             }
@@ -3127,7 +3224,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    EnemyRoomSingleMage, MiningEnemyRoomBoulders, MiningEnemyRoomMoles
+                    EnemyRoomSingleMage, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue
                 },
                 {EnemyRoomMagic, MiningEnemyRoomMineField}
             }
@@ -3144,7 +3241,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
             RoomType::EnemyRoom,
             {
                 {
-                    MedicalEnemyRoomSpineWormQuadShooters, EnemyRoomSingleMage, MedicalEnemyRoomWares,
+                    MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomWares,
                     MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand
                 },
                 {MedicalEnemyRoomInvincible}
