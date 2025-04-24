@@ -7,8 +7,8 @@
 #include "components.hpp"
 #include <random>
 
-constexpr float random_pos = -9999;
-constexpr vec2 random_vec2 = {random_pos, random_pos};
+constexpr float random_float = -9999;
+constexpr vec2 random_vec2 = {random_float, random_float};
 
 enum BulletEffectType {
     BulletDamage,

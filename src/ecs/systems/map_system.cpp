@@ -35,8 +35,8 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
     for (auto &e : enemies)
     {
         vec2 location = std::get<vec2>(e);
-        location.x = location.x == random_pos ? Random::Float() : location.x;
-        location.y = location.y == random_pos ? Random::Float() : location.y;
+        location.x = location.x == random_float ? Random::Float() : location.x;
+        location.y = location.y == random_float ? Random::Float() : location.y;
         vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
         if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
             createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
@@ -523,7 +523,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             else if (map.currRegion == Mining) {
                 std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
                 // map.currRoom.preset = Random::ListItem( miningBossRooms);
-                map.currRoom.preset = MiningEnemyRoomBoulders;
+                map.currRoom.preset = MiningEnemyRoomIntro;
             }
             else if (map.currRegion == Medical) {
                  map.currRoom.preset = ScientistBossRoom;

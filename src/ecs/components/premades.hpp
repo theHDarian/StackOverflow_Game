@@ -3873,11 +3873,11 @@ struct MoleBoss : Enemy
 		EnemyBulletDeath::NONE,
 		EnemyType::EnemyDynamite,
 		{
-			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
-			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
-			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
-			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
-			{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},{random_pos, random_pos},
+			{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},
+			{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},
+			{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},
+			{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},
+			{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},{random_float, random_float},
 
 		}
 
