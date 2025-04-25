@@ -7,7 +7,8 @@
 #include "components.hpp"
 #include <random>
 
-
+constexpr float random_float = -9999;
+constexpr vec2 random_vec2 = {random_float, random_float};
 
 enum BulletEffectType {
     BulletDamage,
@@ -71,7 +72,7 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize = 16;
+    int baseStackSize = 20;
     std::vector<BulletStackEffect> currStack;
     std::vector<BulletStackEffect> recentRemoved;
 
@@ -346,6 +347,7 @@ enum EnemyType {
     EnemyMiningBoulderSmall,
     EnemyMiningBoulderBig,
     EnemySmallMole,
+    EnemySurfaceMole,
     EnemyDynamite,
     EnemyBulldozer,
     EnemySmallBoulder,
@@ -359,6 +361,7 @@ enum EnemyType {
     EnemyPileDriverTurret,
     EnemySmallMiningWormHead,
     EnemySmallMiningWormBody,
+    BossMole,
 
     // Hifi
     EnemyHifiBoidFish,
@@ -558,6 +561,14 @@ enum class ReactionType {
     SEVENTYFIVE_HEALTH,
     FIFTY_HEALTH,
     TWENTYFIVE_HEALTH,
+    TEN_HEALTH,
+    TWENTY_HEALTH,
+    THIRTY_HEALTH,
+    FORTY_HEALTH,
+    SIXTY_HEALTH,
+    SEVENTY_HEALTH,
+    EIGHTY_HEALTH,
+    NINETY_HEALTH,
     BEE_CLOSE,
     TEAM_HURT,
     NO_BEES,

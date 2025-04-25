@@ -92,16 +92,16 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMining =
 	{
 	{
 		{EnemyType::EnemyBigBoulder, {0.5f, 0.5f}},
-{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
-{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
-{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
+{EnemyType::EnemySmallBoulder, random_vec2},
+{EnemyType::EnemySmallBoulder, random_vec2},
+{EnemyType::EnemySmallBoulder, random_vec2},
 	},
 {
-		{EnemyType::EnemySmallBoulder, {Random::Float(), Random::Float()}},
-	{EnemyType::EnemyBigBoulder, {Random::Float(), Random::Float()}},
-	{EnemyType::EnemySmallMole, {Random::Float(), Random::Float()}},
-{EnemyType::EnemySmallMole, {Random::Float(), Random::Float()}},
-{EnemyType::EnemySmallMole, {Random::Float(), Random::Float()}},
+		{EnemyType::EnemySmallBoulder, random_vec2},
+	{EnemyType::EnemyBigBoulder, random_vec2},
+	{EnemyType::EnemySmallMole, random_vec2},
+{EnemyType::EnemySmallMole, random_vec2},
+{EnemyType::EnemySmallMole, random_vec2},
 		},
 
 		};
@@ -111,10 +111,10 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMedical 
 	{
 		{EnemyType::EnemyScissors, {0.5f, 0.5f}},
 	{EnemyMedicalBMP, {0.2f, 0.8f}},
-{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
-{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
-{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
-{EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
+{EnemyType::EnemyScissors, random_vec2},
+{EnemyType::EnemyScissors, random_vec2},
+{EnemyType::EnemyScissors, random_vec2},
+{EnemyType::EnemyScissors, random_vec2},
 	{EnemyMagnet, {0.2f, 0.4f}},
 	},
 {
@@ -125,65 +125,65 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMedical 
 {EnemyType::EnemyMedicalRodA, {0.8f, 0.2f}},
 		},
 	{
-                            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                            {EnemyMedicalBoid, random_vec2},
+                    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
 
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                           {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, random_vec2},
+                           {EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+    {EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, random_vec2},
 {EnemyMedicalBMP , {0.75f, 0.75f}},
 {EnemyMedicalBMP , {0.25f, 0.25f}},
 // {EnemyMedicalBMP , {0.25f, 0.75f}},
@@ -199,19 +199,19 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMedical 
 	{
 			            {EnemyMedicalPillBoidSpawner, {0.2f, 0.5f}},
 					{ EnemyMedicalPillBoidSpawner, {0.8f, 0.5f}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
+{EnemyMedicalBoid, random_vec2},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, random_vec2},
 
 	},
 
@@ -259,7 +259,7 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 
 
 
-void resetStack(Entity player, RenderSystem* renderer) {
+void resetStack(Entity player, RenderSystem* renderer, float offset) {
 
     //Invincible& inv =registry.invincibles.emplace(player);
     //inv.countdown = 1000.0f;
@@ -270,7 +270,7 @@ void resetStack(Entity player, RenderSystem* renderer) {
             return;
         }
         int size = reg.baseStackSize;
-        CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, 150.0f);
+        CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, offset);
     	std::vector<BulletStackEffect> temp = reg.currStack;
         // reg.currStack.clear();
         registry.stackCompile.remove(player);
@@ -412,7 +412,11 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 	for (InteractableRequest& request : registry.interactableRequests.components) {
 		switch (request.type) {
 			case InteractableRequestType::PopStack:
-			resetStack(player, renderer);
+				if (request.choice == -1) {
+					resetStack(player, renderer);
+				} else {
+					resetStack(player, renderer, request.choice);
+				}
 				break;
 			case InteractableRequestType::PopX:
 				CreateXPopBullets (renderer, registry.motions.get(player).position, M_PI / 2, request.effects, 2 * M_PI, 150);
@@ -571,7 +575,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 		if (object.item == InteractableItem::Ram) {
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
-				extendStack( player, 8);
+				extendStack( player, 4);
 				object.dialogueCount = 1;
 				registry.deleteds.emplace(reaction.object);
 			}

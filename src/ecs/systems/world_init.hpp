@@ -4,6 +4,7 @@
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
 #include "map_components.hpp"
+#include "ui_system.hpp"
 
 // These are hardcoded to the dimensions of the entity texture
 // BB = bounding box
@@ -56,6 +57,10 @@ Entity createOracleCrab(RenderSystem *renderer, vec2 pos);
 Entity createHoneyCanister(RenderSystem *renderer, vec2 pos);
 
 Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);
+
+void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects);
+
+std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects);
 
 Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects);
 

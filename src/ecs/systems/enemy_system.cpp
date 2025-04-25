@@ -598,6 +598,12 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                         } else {
                             buffer.targetEntity = e;
                         }
+                    } else {
+                        auto& inv = registry.invincibles.get(e);
+                        float countDown = registry.buffers.has(e) ? inv.countdown / 2 : buffer.duration;
+                        if (countDown > inv.countdown) {
+                            inv.countdown = countDown;
+                        }
                     }
                 }
                 if (behavior == EnemyBehavior::GRANTINGBUFFS) {
@@ -623,6 +629,12 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                             inv.countdown = inv.countdown / 2;
                         } else {
                             buffer.targetEntity = e;
+                        }
+                    } else {
+                        auto& inv = registry.invisibles.get(e);
+                        float countDown = registry.buffers.has(e) ? inv.countdown / 2 : buffer.duration;
+                        if (countDown > inv.countdown) {
+                            inv.countdown = countDown;
                         }
                     }
                 }
@@ -653,8 +665,12 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                         buffer.targetEntity = e;
                     }
                 } else {
-                    registry.vulnerabilities.get(e).countdown = buffer.duration;
-                    registry.vulnerabilities.get(e).modifier = 0.5;
+                    auto& inv = registry.vulnerabilities.get(e);
+                    float countDown = registry.buffers.has(e) ? inv.countdown / 2 : buffer.duration;
+                    if (countDown > inv.countdown) {
+                        inv.countdown = countDown;
+                    }
+                    inv.modifier = 0.5;
                 }
             }
             if (behavior == EnemyBehavior::GRANTINGBUFFS) {
@@ -677,7 +693,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                 if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
                     if (!registry.vulnerabilities.has(e)) {
                         auto& vul = registry.vulnerabilities.emplace(e);
-                        vul.modifier = 2.f;
+                        vul.modifier = 1.5f;
                         vul.countdown = buffer.duration;
                         if (registry.buffers.has(e)) {
                             vul.countdown = vul.countdown / 2;
@@ -685,8 +701,12 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                             buffer.targetEntity = e;
                         }
                     } else {
-                        registry.vulnerabilities.get(e).countdown = buffer.duration;
-                        registry.vulnerabilities.get(e).modifier = 2.f;
+                        auto& inv = registry.vulnerabilities.get(e);
+                        float countDown = registry.buffers.has(e) ? inv.countdown / 2 : buffer.duration;
+                        if (countDown > inv.countdown) {
+                            inv.countdown = countDown;
+                        }
+                        inv.modifier = 1.5f;
                     }
                 }
                 if (behavior == EnemyBehavior::GRANTINGBUFFS) {
@@ -720,7 +740,11 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                         buffer.targetEntity = e;
                     }
                 } else {
-                    registry.regenerates.get(e).countdown = buffer.duration;
+                    auto& regen = registry.regenerates.get(e);
+                    float countDown = registry.buffers.has(e) ? regen.countdown / 2 : buffer.duration;
+                    if (countDown > regen.countdown) {
+                        regen.countdown = countDown;
+                    }
                 }
             }
             if (behavior == EnemyBehavior::GRANTINGBUFFS) {
@@ -748,7 +772,11 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                         buffer.targetEntity = e;
                     }
                 } else {
-                    registry.cloaks.get(e).countdown = buffer.duration;
+                    auto& cloak = registry.cloaks.get(e);
+                    float countDown = registry.buffers.has(e) ? cloak.countdown / 2 : buffer.duration;
+                    if (countDown > cloak.countdown) {
+                        cloak.countdown = countDown;
+                    }
                 }
             }
             if (behavior == EnemyBehavior::GRANTINGBUFFS) {

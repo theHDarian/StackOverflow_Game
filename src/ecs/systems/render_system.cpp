@@ -184,9 +184,22 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	RenderRequest render_request;
 	Motion motion = registry.motions.get(entity);
 
+	Entity target;
+	if (registry.wormBodies.has(entity)) {
+		target = registry.wormBodies.get(entity).head;
+	} else {
+		target = entity;
+	}
+
 	if (registry.moles.has(entity)) {
 		render_request = underGroundTexture;
-		motion.scale = vec2(264, 288) / 2.f;
+		if (registry.bosses.has (entity)) {
+			render_request = bossUnderGroundTexture;
+			motion.scale = { 336.f / 1.75, 408.f / 1.75 };
+		} else {
+			render_request = underGroundTexture;
+			motion.scale = vec2(264, 288) / 2.f;
+		}
 		motion.angle = 0.f;
 	} else {
         render_request = registry.renderRequests.get(entity);
@@ -287,7 +300,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		}
 	}
 
-	glUniform1i(glitchToggle_uloc, (registry.elites.has(entity) || should_glitch));
+	glUniform1i(glitchToggle_uloc, (registry.elites.has(target) || should_glitch));
 	gl_has_errors();
 
 	GLint currProgram;
@@ -390,12 +403,6 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
 	bool isProtected = false;
-	Entity target;
-	if (registry.wormBodies.has(entity)) {
-		target = registry.wormBodies.get(entity).head;
-	} else {
-		target = entity;
-	}
 	if (registry.vulnerabilities.has(target)) {
 		if (registry.vulnerabilities.get(target).modifier < 1.0f) {
 			isProtected = true;
@@ -1341,15 +1348,15 @@ void RenderSystem::drawGameUI()
 			drawHPbar(entity, projection, view);
 			drawEnemyIndicator(entity, projection, view);
 			BossEnemy &boss = registry.bosses.get(entity);
-			if (!registry.textRenderRequests.has(entity))
+			if (!registry.textRenderRequests.has(entity) && registry.bosses.entities[0] == entity)
 			{
 				GameUIText &text = registry.gameUITexts.emplace(entity);
 				TextRenderRequest &textRequest = registry.textRenderRequests.emplace(entity);
 				textRequest.text = boss.name;
 				textRequest.x = windowState.width / 2,
 				textRequest.y = windowState.height * 0.03f;
-				textRequest.alignment = TextAlignment::CenteredAlign;
 				textRequest.scale = 0.4f;
+				textRequest.alignment = TextAlignment::CenteredAlign;
 				textRequest.color = vec3(1, 1, 1);
 				textRequest.bottomLeftBound = vec2(0);
 				textRequest.topRightBound = vec2(windowState.width, windowState.height);
@@ -2326,6 +2333,9 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	{
 		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
 		HPBarMotion.scale = {100, 10};
+	} else if (registry.bosses.entities[0] != entity) {
+		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10 * 2.5);
+		HPBarMotion.scale = {100*2.5, 10*2.5};
 	}
 
 	if (registry.damageds.has(entity) && !registry.invincibles.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
@@ -2426,7 +2436,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
 
 	mat4 transform = createFollowCameraModel(HPBarMotion, vec2(0));
-	if (registry.bosses.has(entity))
+	if (registry.bosses.has(entity) && registry.bosses.entities[0] == entity)
 	{
 		transform = createNormalModel(HPBarMotion, vec2(0));
 	}

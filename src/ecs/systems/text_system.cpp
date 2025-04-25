@@ -183,7 +183,7 @@ float TextSystem::getTextLength(std::string text, float scale) {
 }
 
 // returns the line index of the given character index
-int TextSystem::getIndexLine(std::vector<std::string> lines, int charIndex) {
+int getIndexLine(std::vector<std::string> lines, int charIndex) {
     int lineCount = 0;
     for (std::string line : lines) {
         charIndex -= line.length();

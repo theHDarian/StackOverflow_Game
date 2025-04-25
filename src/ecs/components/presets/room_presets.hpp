@@ -78,7 +78,7 @@ const RoomPreset StartingRoom{
 };
 
 const RoomPreset ScientistBossRoom{
-    {{{EnemyType::ScientistBoss, {0.5, 0.1}}}},
+    {{{EnemyType::ScientistBoss, {0.5, 0.2}}}},
     {},
     {},
     0.0f,
@@ -358,7 +358,7 @@ const RoomPreset EnemyRoomDashIntro1{
        0.0f,
        3,
     1,
-    "EnemyRoomDashIntro1",
+    "Uneven Quadrants",
 };
 
 const RoomPreset EnemyRoomDashIntro2{
@@ -373,7 +373,7 @@ const RoomPreset EnemyRoomDashIntro2{
        0.0f,
        3,
     1,
-    "EnemyRoomDashIntro2",
+    "A date with snails",
 };
 
 const RoomPreset EnemyRoomDashIntro3{
@@ -392,7 +392,7 @@ const RoomPreset EnemyRoomDashIntro3{
        0.0f,
        3,
          1,
-            "EnemyRoomDashIntro3",
+            "Duck and Ducklings",
 };
 
 const RoomPreset EnemyRoomDash1{
@@ -420,7 +420,7 @@ const RoomPreset EnemyRoomDash1{
     10.0f,
     5,
     2,
-    "EnemyRoomDash1",
+    "Pointed Troubles",
 };
 
 const RoomPreset EnemyRoomDash2{
@@ -437,7 +437,7 @@ const RoomPreset EnemyRoomDash2{
     0.0f,
     5,
     2,
-    "EnemyRoomDash2",
+    "Tacit Understanding",
 };
 
 
@@ -464,7 +464,7 @@ const RoomPreset EnemyRoomDashHard{
     20.0f,
     5,
     2,
-    "EnemyRoomDashHard",
+    "Brains in Jars",
 };
 
 const RoomPreset EnemyRoomSnails {
@@ -496,8 +496,8 @@ const RoomPreset EnemyRoomSnailsHard {
                     {EnemyMagnet, {0.8f, 0.4f}},
             },
                 {
-                        {EnemyType::EnemyEvilSnail, {Random::Float(), Random::Float()}},
-{EnemySnail, {Random::Float(), Random::Float()}},
+                    {EnemyType::EnemyEvilSnail, {random_float, random_float}},
+                    {EnemySnail, {random_float, random_float}},
                     {EnemySkull, {0.5f, 0.5f}},
 
                 }
@@ -577,10 +577,10 @@ const RoomPreset EnemyRoomBees2{
             {EnemyType::EnemyBeeHive, {0.2f, 0.4f}},
             {EnemyType::EnemyBeeHive, {0.8f, 0.4f}}},
             {
-                {EnemyType::EnemyTwoBee, {Random::Float(), Random::Float()}},
-                   {EnemyEvilSnail, {Random::Float(), Random::Float()}},
-                 {EnemyType::EnemyTwoBee, {Random::Float(), Random::Float()}},
-        {EnemyType::EnemyTwoBee, {Random::Float(), Random::Float()}},
+                {EnemyType::EnemyTwoBee, {random_float, random_float}},
+                   {EnemyEvilSnail, {random_float, random_float}},
+                 {EnemyType::EnemyTwoBee, {random_float, random_float}},
+        {EnemyType::EnemyTwoBee, {random_float, random_float}},
 
             },
         },
@@ -607,7 +607,7 @@ const RoomPreset EnemyRoomBees3{
     0.0f,
     5,
     2,
-    "Bee Blitz",
+    "Order of Importance",
 };
 
 const RoomPreset EnemyRoomAngelTank{
@@ -623,7 +623,7 @@ const RoomPreset EnemyRoomAngelTank{
 {EnemyType::EnemyHealer, {0.8, 0.8}},
 {EnemyType::EnemyHealer, {0.2, 0.2}}}
         },
-     
+
     {},
     {},
     12.25f,
@@ -645,10 +645,10 @@ const RoomPreset EnemyRoomMagic{
 
 
             {
-                {EnemyType::EnemyScissors, {Random::Float(), Random::Float()}},
-                {EnemyType::EnemySword, {Random::Float(), Random::Float()}},
-                    {EnemyType::EnemyHealer, {Random::Float(), Random::Float()}},
-                {EnemyType::EnemyHealer, {Random::Float(), Random::Float()}},
+                {EnemyType::EnemyScissors, {random_float, random_float}},
+                {EnemyType::EnemySword, {random_float, random_float}},
+                    {EnemyType::EnemyHealer, {random_float, random_float}},
+                {EnemyType::EnemyHealer, {random_float, random_float}},
             },
 
             {
@@ -1262,7 +1262,7 @@ const RoomPreset TreasureRoomMachineGun{
             0.0f,
             5,
             0,
-        "Frenzied Fire",
+        "Frenzied Fiend",
             true,
              {1300, 1300},
         };
@@ -1315,9 +1315,6 @@ const RoomPreset TreasureRoomRisky{
          {1300, 1300},
 };
 
-
-
-
 const RoomPreset EventRoomHoney{
     {},
     {},
@@ -1325,7 +1322,7 @@ const RoomPreset EventRoomHoney{
     0.0f,
     5,
     0,
-    "EventRoomHoney",
+    "A Sweet Scent",
     true,
      {1300, 1300},
 };
@@ -1350,23 +1347,21 @@ const RoomPreset EventRoomWish{
     0.0f,
     5,
     0,
-    "EventRoomWish",
+    "Unremembered Monument",
     true,
      {1800, 2000},
 };
 
 
 
-
-
 const RoomPreset BossRoomBee{
     {{{BossBeehiveMain, {0.5f, 0.5f}}, {EnemyThreeBee,{0.5f, 0.75f}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
-    "\"Apiarist\"",
+    "Hivemind",
 
 };
 
@@ -1374,7 +1369,7 @@ const RoomPreset BossRoomBee{
 const RoomPreset BossRoomCrab{
     {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
@@ -1389,7 +1384,7 @@ const RoomPreset BossRoomWorm{
     //{{{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}},{EnemyMiningBoidWormHead, {0.45f, 0.45f}}}},
     //{{{BossMultiCube, {0.5f, 0.5f}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
@@ -1398,10 +1393,84 @@ const RoomPreset BossRoomWorm{
     {1500, 1500}
 };
 
+const RoomPreset BossRoomMole {
+        {
+
+                {
+                    {EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},
+
+            {EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},
+                    {BossMole, {0.5f, 0.5f}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {{EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+
+        },
+    {},
+        {{ {Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
+        10.f,
+        35,
+        5,
+        "Minesweeper",
+        false,
+        {2300, 1700}
+};
+
 const RoomPreset BossRoomMultiCube{
     {{{BossMultiCube, {0.5f, 0.5f}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.5f}}},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,
@@ -1425,7 +1494,7 @@ const RoomPreset HifiRoomTwinLaserShurikens {
     0.0f,
     5,
     2,
-    "HifiLaserShurikens"
+    "Prickly Situation"
 };
 const RoomPreset HifiRoomTwinLaserChargers {
         {
@@ -1445,7 +1514,7 @@ const RoomPreset HifiRoomTwinLaserChargers {
     0.0f,
     5,
     2,
-    "HifiLaserChargersHard"
+    "Laser Tag"
 };
 
 
@@ -1469,7 +1538,7 @@ const RoomPreset HifiRoomBasicEnemy {
     0.0f,
     5,
     2,
-    "HifiBasic"
+    "Keep Your Distance"
 };
 
 const RoomPreset HifiRoomBasicWave {
@@ -1497,7 +1566,7 @@ const RoomPreset HifiRoomBasicWave {
         20.0f,
         5,
         2,
-        "HifiWave"
+        "Cold Reception"
     };
 
 const RoomPreset HifiRoomBoidSnipers{
@@ -1545,7 +1614,7 @@ const RoomPreset HifiRoomBoidSnipers{
     10.0f,
     5,
     2,
-    "HifiBoidSnipers"
+    "Arial Assault",
 };
 
 const RoomPreset HifiEnemyRoomSwarmLasers {
@@ -1600,7 +1669,7 @@ const RoomPreset HifiEnemyRoomSwarmLasers {
     15.0f,
     0,
 0,
-"HifiEnemyRoomSwarmLasers",
+"Drone and Swarm",
     false,
     {2000, 2000}
 };
@@ -1625,7 +1694,7 @@ const RoomPreset HifiRoomCannonLasers{
     0.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Cannon Fodder"
 };
 
 const RoomPreset HifiRoomCannonSnipers{
@@ -1652,7 +1721,7 @@ const RoomPreset HifiRoomCannonSnipers{
     12.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Ranged Assault",
 };
 
 const RoomPreset HifiRoomSniperShurikens{
@@ -1679,7 +1748,7 @@ const RoomPreset HifiRoomSniperShurikens{
     10.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Hot and Cold",
 };
 
 const RoomPreset HifiRoomCannonBoids{
@@ -1706,7 +1775,7 @@ const RoomPreset HifiRoomCannonBoids{
     15.0f,
     5,
     2,
-    "HifiBoidCannons"
+    "Mind the Gap",
 };
 
 const RoomPreset HifiRoomLaserFiesta {
@@ -1775,7 +1844,7 @@ const RoomPreset HifiRoomJellyFish { //Test room for new enemies
     0.0f,
     5,
     2,
-    "HifiRoomJellyFish",
+    "Biomimicry",
     false,
     {2500, 2000}
 };
@@ -1795,7 +1864,7 @@ const RoomPreset HifiRoomSniperBallLauncher {
     0.0f,
     5,
     2,
-    "HifiRoomJellyFish",
+    "Sniper's Nest",
     false,
     {2500, 2000}
 };
@@ -1880,21 +1949,36 @@ const RoomPreset HifiRoomAvenue {
                     {EnemyLaserSniper,{0.9,0.2}},
                     {EnemyLaserSniper,{0.9,0.8}},
                     {EnemyHifiCannon,{0.9,0.5}},
-
+                     {EnemyHifiBallLauncher, {0.5,0.5}},
+                    {EnemyHifiBallLauncher, {0.5,random_float}},
+                    {EnemyHifiBallLauncher, {0.5,random_float}},
                 },
 
                 {
                     {EnemyLaserSniper,{0.1,0.2}},
                     {EnemyLaserSniper,{0.1,0.8}},
                     {EnemyHifiCannonHard,{0.1,0.5}},
-
+                    {EnemyHifiTrailHard, {0.5, random_float}},
+                    {EnemyHifiTrailHard, {0.5, random_float}},
 
                 },
+                    {
+                        {EnemyLaserSniper,{0.9,0.2}},
+                        {EnemyLaserSniper,{0.9,0.8}},
+                        {EnemyHifiCannon,{0.9,0.5}},
+                            {EnemyLaserSniper,{0.85,0.5}},
+                         {EnemyHifiBallLauncher, {0.5,0.5}},
+                        {EnemyHifiBallLauncher, {0.5,random_float}},
+                        {EnemyHifiBallLauncher, {0.5,random_float}},
+                            {EnemyHifiJellyFish, random_vec2},
+                            {EnemyHifiJellyFish, random_vec2},
+                            {EnemyHifiJellyFish, random_vec2},
+                    },
 
             },
         {},
         {},
-        30.0f,
+        20.0f,
         5,
         2,
         "Avenue Ambush",
@@ -1908,21 +1992,38 @@ const RoomPreset HifiRoomLane {
                     {EnemyLaserSniper,{0.2,0.9}},
                     {EnemyLaserSniper,{0.8,0.9}},
                     {EnemyHifiCannon,{0.5,0.9}},
-
+                        {EnemyHifiTackShooter, {0.5,0.5}},
+                            {EnemyHifiTackShooter, {0.5,random_float}},
+                            {EnemyHifiTackShooter, {0.5,random_float}},
                 },
 
                 {
                     {EnemyLaserSniper,{0.2,0.1}},
                     {EnemyLaserSniper,{0.8,0.1}},
                     {EnemyHifiCannonHard,{0.5,0.1}},
-
+                        {EnemyHifiTackShooter, {0.5,0.5}},
+                    {EnemyHifiSniperHard, {0.5, random_float}},
+                        {EnemyHifiSniperHard, {0.5, random_float}},
 
                 },
 
+                    {
+                        {EnemyLaserSniper,{0.2,0.9}},
+                        {EnemyLaserSniper,{0.8,0.9}},
+                        {EnemyHifiCannon,{0.5,0.9}},
+                            {EnemyLaserSniper,{0.5,0.85}},
+                            {EnemyHifiTackShooter, {0.5,0.5}},
+                                {EnemyHifiTackShooter, {0.5,random_float}},
+                                {EnemyHifiTackShooter, {0.5,random_float}},
+                            {EnemyHifiChargerHard, random_vec2},
+                                    {EnemyHifiChargerHard, random_vec2},
+                                    {EnemyHifiChargerHard, random_vec2},
+
+                    },
             },
         {},
         {},
-        100.0f,
+        20.0f,
         5,
         2,
         "Laser Laneway",
@@ -1971,29 +2072,22 @@ const RoomPreset HifiRoomShieldedMadness{
 };
 
 
-const RoomPreset BossBigCRoom {
+const RoomPreset BossRoomBigC {
 
             {
                 {
                     {BossBigC, {0.5f, 0.5f}},
-                },
-                {
-                     {EnemyLaserSniper,{0.5, 0.63}},
+                    {EnemyLaserSniper,{0.5, 0.63}},
                         {EnemyLaserSniper,{0.38, 0.42}},
                     {EnemyLaserSniper,{1-0.38, 0.42}},
                 },
-                {
-                        {EnemyLaserSniper,{0.5, 1-0.63}},
-                            {EnemyLaserSniper,{0.38, 1-0.42}},
-                        {EnemyLaserSniper,{1-0.38, 1-0.42}},
-                },
             },
         {},
-        {{{Ram,{}}, {0.5f, 0.5f}}},
+        {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
         24.0f,
         20,
         5,
-        "Big C",
+        "Solemn Sentry",
     false,
     {2200, 2500}
 
@@ -2022,23 +2116,23 @@ const RoomPreset MedicalEnemyRoomWares{
     {
         {
             {EnemyMagnet, {0.5f, 0.5f}},
-            {EnemyMagnet,{Random::Float(), Random::Float()}},
-            {EnemyMagnet,{Random::Float(), Random::Float()}}
+            {EnemyMagnet,{random_float, random_float}},
+            {EnemyMagnet,{random_float, random_float}}
         },
         {
             {EnemyScissors, {0.5f, 0.5f}},
-            {EnemyScissors,{Random::Float(), Random::Float()}},
-            {EnemyScissors,{Random::Float(), Random::Float()}}
+            {EnemyScissors,{random_float, random_float}},
+            {EnemyScissors,{random_float, random_float}}
         },
             {
                 {EnemySword, {0.5f, 0.5f}},
-                {EnemySword,{Random::Float(), Random::Float()}},
-                {EnemySword,{Random::Float(), Random::Float()}}
+                {EnemySword,{random_float, random_float}},
+                {EnemySword,{random_float, random_float}}
             },
         {
             {EnemyMedicalRodA, {0.5f, 0.5f}},
-            {EnemyMedicalRodA,{Random::Float(), Random::Float()}},
-            {EnemyMedicalRodA,{Random::Float(), Random::Float()}}
+            {EnemyMedicalRodA,{random_float, random_float}},
+            {EnemyMedicalRodA,{random_float, random_float}}
         },
     },
     {},
@@ -2057,15 +2151,15 @@ const RoomPreset MedicalEnemyRoomHeartBeat{
 
         {
                 {EnemyMedicalRodA, {0.5f, 0.5f}},
-                    {EnemyMedicalRodA, {Random::Float(), Random::Float()}},
+                    {EnemyMedicalRodA, {random_float, random_float}},
             {EnemyMedicalBMP , {0.75f, 0.75f}},
                     {EnemyMedicalBMP , {0.25f, 0.25f}},
 
         },
         {
-                    {EnemyScissors,{Random::Float(), Random::Float()}},
-                    {EnemyScissors,{Random::Float(), Random::Float()}},
-                        {EnemyScissors,{Random::Float(), Random::Float()}},
+                    {EnemyScissors,{random_float, random_float}},
+                    {EnemyScissors,{random_float, random_float}},
+                        {EnemyScissors,{random_float, random_float}},
                         {EnemyMedicalRodA, {0.5f, 0.5f}},
         }
 
@@ -2088,15 +2182,15 @@ const RoomPreset MedicalEnemyRoomHeartBeat2 {
 
         {
                 {EnemyMedicalRodA, {0.5f, 0.5f}},
-                    {EnemyMedicalRodA, {Random::Float(), Random::Float()}},
+                    {EnemyMedicalRodA, {random_float, random_float}},
             {EnemyMedicalBMP , {0.75f, 0.75f}},
                     {EnemyMedicalBMP , {0.25f, 0.25f}},
 
         },
         {
-                    {EnemyScissors,{Random::Float(), Random::Float()}},
-                    {EnemyScissors,{Random::Float(), Random::Float()}},
-                        {EnemyScissors,{Random::Float(), Random::Float()}},
+                    {EnemyScissors,{random_float, random_float}},
+                    {EnemyScissors,{random_float, random_float}},
+                        {EnemyScissors,{random_float, random_float}},
                         {EnemyMedicalRodA, {0.5f, 0.5f}},
         },
 
@@ -2128,21 +2222,21 @@ const RoomPreset MedicalEnemyRoomHeartBeat3 {
 //             { EnemyMedicalSyringe, {0.8f, 0.2f}},
 //             { EnemyMedicalSyringe, {0.6f, 0.2f}},
 //             { EnemyMedicalSyringe, {0.4f, 0.8f}},
-            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+            {EnemyMedicalBoid, {random_float, random_float}},
+                {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
             {EnemyMedicalPillBoidSpawner, {0.2f, 0.5f}},
                 { EnemyMedicalPillBoidSpawner, {0.8f, 0.5f}},
 
@@ -2154,21 +2248,21 @@ const RoomPreset MedicalEnemyRoomHeartBeat3 {
 
         },
         {
-                            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                            {EnemyMedicalBoid, {random_float, random_float}},
+                    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
 
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {random_float, random_float}},
                         {EnemyMedicalBMP , {0.25f, 0.75f}},
                         {EnemyMedicalBMP , {0.75f, 0.25f}},
         },
@@ -2209,95 +2303,95 @@ const RoomPreset MedicalEnemyRoomHeartBeat4 {
 //             { EnemyMedicalSyringe, {0.8f, 0.2f}},
 //             { EnemyMedicalSyringe, {0.6f, 0.2f}},
 //             { EnemyMedicalSyringe, {0.4f, 0.8f}},
-            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+            {EnemyMedicalBoid, {random_float, random_float}},
+                {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-               {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+               {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
 
             // {EnemyMedicalBMP , {0.75f, 0.75f}},
@@ -2307,65 +2401,65 @@ const RoomPreset MedicalEnemyRoomHeartBeat4 {
 
         },
         {
-                            {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                            {EnemyMedicalBoid, {random_float, random_float}},
+                    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
 
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                           {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+                           {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
 {EnemyMedicalBMP , {0.75f, 0.75f}},
 {EnemyMedicalBMP , {0.25f, 0.25f}},
 // {EnemyMedicalBMP , {0.25f, 0.75f}},
@@ -2516,53 +2610,53 @@ const RoomPreset MedicalEnemyRoomSyringes {
             {
                 {EnemyMedicalSyringe, {0.2f, 0.2f}},
                 {EnemyMedicalSyringe, {0.8f, 0.8f}},
-                {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                {EnemyMedicalBoid, {random_float, random_float}},
+                    {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
             },
                 {
                         {EnemyMedicalSyringe, {0.2f, 0.8f}},
                     {EnemyMedicalSyringe, {0.8f, 0.2f}},
-                        {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                        {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-                    {EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+                        {EnemyMedicalBoid, {random_float, random_float}},
+                        {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+    {EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+                    {EnemyMedicalBoid, {random_float, random_float}},
 
 
                 },
@@ -2576,13 +2670,13 @@ const RoomPreset MedicalEnemyRoomSyringes {
 // {EnemyScissors, {0.3f, 0.3f}},
 
 
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalBoid, {Random::Float(), Random::Float()}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
+{EnemyMedicalBoid, {random_float, random_float}},
 
 
 
@@ -2636,8 +2730,10 @@ const RoomPreset MedicalRoomQuadShooter {
     5,
     "Critical Mass",
     false,
-    {1600, 1600}
+    {3600, 1800}
 };
+
+
 
 const RoomPreset MedicalEnemyRoomWorms {
     {
@@ -2679,17 +2775,324 @@ const RoomPreset MedicalEnemyRoomWorms {
     {1500, 1500}
 };
 
+
+
+const RoomPreset MiningEnemyRoomMineField {
+        {
+                {
+                { EnemySurfaceMole, {random_float, random_float}},
+                    {EnemyBigBoulder, {0.1,0.9}},
+                {EnemyBigBoulder, {0.9,0.9}},
+                {EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},
+
+                {EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                },
+                {
+                    {EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},
+
+            {EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                                    {EnemyDynamite, {random_float, random_float}},
+                { EnemySmallMole, {random_float, random_float}},
+                { EnemySmallMole, {random_float, random_float}},
+                },
+
+                {
+                        {EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},
+
+                {EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                                        {EnemyDynamite, {random_float, random_float}},
+                    { EnemySmallBoulder, {random_float, random_float}},
+                    { EnemySmallBoulder, {random_float, random_float}},
+                        { EnemySmallBoulder, {random_float, random_float}},
+                                        { EnemySmallBoulder, {random_float, random_float}},
+                        { EnemySmallBoulder, {random_float, random_float}},
+                                        { EnemySmallBoulder, {random_float, random_float}},
+                        {EnemyBigBoulder, {0.9,0.1}},
+                        {EnemyBigBoulder, {0.1,0.1}},
+                    },
+{
+                        {EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},
+
+                {EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                    {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+                                        {EnemyDynamite, {random_float, random_float}},
+                    { EnemySurfaceMole, {random_float, random_float}},
+                    },
+        },
+    {},
+        {{ {PushConsole,{bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, bulletBounceUp, bulletBounceUp, bulletBounceUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+        10.0f,
+        25,
+        5,
+        "Minefield Disco",
+        false,
+        {2100, 1600}
+};
+
+const RoomPreset MiningEnemyRoomBoulders {
+        {
+
+                {
+                    {EnemyBigBoulder, {0.1, 0.1}},
+                    {EnemyBigBoulder, {0.1, 0.3}},
+                    {EnemyBigBoulder, {0.1, 0.5}},
+                    {EnemyBigBoulder, {0.1, 0.7}},
+                    {EnemyBigBoulder, {0.1, 0.9}},
+                    {EnemyBigBoulder, {0.9, 0.2}},
+                    {EnemyBigBoulder, {0.9, 0.4}},
+                    {EnemyBigBoulder, {0.9, 0.6}},
+                    {EnemyBigBoulder, {0.9, 0.8}},
+
+                },
+                {
+                    { EnemySmallBoulder, {random_float, random_float}},
+                        { EnemySmallBoulder, {random_float, random_float}},
+                            { EnemySmallBoulder, {random_float, random_float}},
+                                            { EnemySmallBoulder, {random_float, random_float}},
+                            { EnemySmallBoulder, {random_float, random_float}},
+                                            { EnemySmallBoulder, {random_float, random_float}},
+                },
+            {
+                { EnemyBigBoulder, {0.2, 0.1}},
+                {EnemyBigBoulder, {0.4, 0.1}},
+                {EnemyBigBoulder, {0.6, 0.1}},
+                {EnemyBigBoulder, {0.8, 0.1}},
+            },
+            {
+                { EnemySmallBoulder, {random_float, random_float}},
+            { EnemySmallBoulder, {random_float, random_float}},
+                { EnemySmallBoulder, {random_float, random_float}},
+                    { EnemySmallBoulder, {random_float, random_float}},
+                { EnemySmallBoulder, {random_float, random_float}},
+                        { EnemySmallBoulder, {random_float, random_float}},
+                    },
+            {
+                { EnemyBigBoulder, {0.1, 0.9}},
+                {EnemyBigBoulder, {0.3, 0.9}},
+                    { EnemyBigBoulder, {0.5, 0.9}},
+                { EnemyBigBoulder, {0.7, 0.9}},
+                { EnemyBigBoulder, {0.9, 0.9}},
+            },
+
+        },
+    {},
+                    {},
+                12.5f,
+        25,
+        5,
+        "Boulder Dash",
+        false,
+        {1500, 1500}
+};
+
+const RoomPreset MiningEnemyRoomMolesIntro {
+        {
+            {
+                {EnemySmallMole, random_vec2},
+                    {EnemySmallMole, random_vec2},
+                    {EnemySmallMole, random_vec2},
+            },
+            {
+                    {EnemySmallBoulder, random_vec2},
+            }
+        },
+                {},
+                {},
+            7.5f,
+    10,
+    5,
+    "Mole's Welcome",
+    false,
+    {1500, 1500}
+};
+
+const RoomPreset MiningEnemyRoomMoles {
+    {
+        {
+            {EnemySmallMole, {0.4, random_float}},
+    {EnemySmallMole, {0.4, random_float}},
+    {EnemySmallMole, {0.4, random_float}},
+        { EnemySmallBoulder, {0.6, random_float}},
+        { EnemySmallBoulder, {0.6, random_float}},
+        { EnemySmallBoulder, {0.6, random_float}},
+        { EnemySmallBoulder, {0.6, random_float}},
+
+        },
+
+        {
+            {EnemySurfaceMole, {0.4, random_float}},
+            {EnemySurfaceMole, {0.4, random_float}},
+            { EnemyBigBoulder, {0.6, random_float}},
+            { EnemyBigBoulder, {0.6, random_float}},
+            { EnemyBigBoulder, {0.6, random_float}},
+
+        },
+    },
+            {},
+            {},
+        18.5f,
+10,
+5,
+"Mole Party",
+false,
+{1500, 1500}
+};
+
+const RoomPreset MiningEnemyRoomIntro {
+            {
+                {
+                    {EnemyPileDriverTurret, {0.5, 0.5}},
+                        {EnemyBulldozer, random_vec2},
+                            {EnemyBulldozer, random_vec2},
+                            {EnemyBulldozer, random_vec2},
+                        {EnemySmallMole, random_vec2},
+                        {EnemySmallMole, random_vec2},
+                },
+
+            },
+                    {},
+                    {},
+                7.5f,
+        10,
+        5,
+        "Construction Site",
+        false,
+        {1200, 1000}
+};
+
+const RoomPreset MiningEnemyRoomLane {
+                {
+                    {
+                        {EnemyPileDriverTurret,{0.2,0.9}},
+                    {EnemyPileDriverTurret,{0.8,0.9}},
+                    {EnemyPileDriverTurret,{0.5,0.9}},
+                            {EnemyBulldozer, random_vec2},
+                                {EnemyBulldozer, random_vec2},
+
+                    },
+
+                    {
+                        {EnemyPileDriverTurret,{0.2,0.1}},
+                        {EnemyPileDriverTurret,{0.8,0.1}},
+                        {EnemyPileDriverTurret,{0.5,0.1}},
+                        {EnemySmallMole, random_vec2},
+                        {EnemySmallMole, random_vec2},
+
+                    },
+
+                },
+                        {},
+                        {},
+                    20.f,
+            10,
+            5,
+            "Laneway Excavation",
+            false,
+{650, 3000}
+};
+
+const RoomPreset MiningEnemyRoomAvenue {
+                {
+                    {
+                        {EnemyPileDriverTurret,{0.9,0.2}},
+                        {EnemyPileDriverTurret,{0.9,0.8}},
+                        {EnemyPileDriverTurret,{0.9,0.5}},
+                                {EnemyBigBoulder, random_vec2},
+                    },
+
+                    {
+                        {EnemyPileDriverTurret,{0.1,0.2}},
+                        {EnemyPileDriverTurret,{0.1,0.8}},
+                        {EnemyPileDriverTurret,{0.1,0.5}},
+                            { EnemySmallBoulder, {0.5, random_float}},
+                            { EnemySmallBoulder, {0.5, random_float}},
+                            { EnemySmallBoulder, {0.5, random_float}},
+                                { EnemySmallBoulder, {0.5, random_float}},
+                                    { EnemySmallBoulder, {0.5, random_float}},
+
+                    },
+
+                },
+            {},
+            {},
+            20.0f,
+            10,
+            5,
+            "Boulder Avenue",
+            false,
+            {3000, 650}
+};
+
 const RoomPreset allConsoles {
     { {
-        {EnemyMedicalBMP, {Random::Float(), Random::Float()}},
-// {EnemyScissors, {Random::Float(), Random::Float()}},
-{EnemyScissors, {Random::Float(), Random::Float()}},
-{EnemyMedicalRodC, {Random::Float(), Random::Float()}},
-// {EnemyMedicalPillBoid, {Random::Float(), Random::Float()}},
-// {EnemyMedicalPillBoid, {Random::Float(), Random::Float()}},
-// {EnemyMedicalPillBoid, {Random::Float(), Random::Float()}},
-// {EnemyMedicalPillBoid, {Random::Float(), Random::Float()}},
-{EnemyMedicalPillBoidSpawner, {Random::Float(), Random::Float()}},
+        {EnemyMedicalBMP, {random_float, random_float}},
+// {EnemyScissors, {random_float, random_float}},
+{EnemyScissors, {random_float, random_float}},
+{EnemyMedicalRodC, {random_float, random_float}},
+// {EnemyMedicalPillBoid, {random_float, random_float}},
+// {EnemyMedicalPillBoid, {random_float, random_float}},
+// {EnemyMedicalPillBoid, {random_float, random_float}},
+// {EnemyMedicalPillBoid, {random_float, random_float}},
+{EnemyMedicalPillBoidSpawner, {random_float, random_float}},
 
     }},
     {},
@@ -2703,6 +3106,10 @@ const RoomPreset allConsoles {
     "AllConsoles",
     false,
     {2500, 2000}
+};
+
+const std::vector<RoomPreset> bossRooms = {
+    BossRoomBee, BossRoomCrab, BossRoomMole, BossRoomWorm, BossRoomBigC, BossRoomMultiCube
 };
 
 const std::vector<RoomPreset> regularTreasureRooms = {
@@ -2791,7 +3198,10 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> physicsRoomDirectory 
 
 std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{QuadShooterRoomSmall },{EnemyRoomMagic, EnemyRoomInvisible}}},
+        {
+            RoomType::EnemyRoom,
+            {{QuadShooterRoomSmall, MiningEnemyRoomMoles}, {EnemyRoomMagic, MiningEnemyRoomMineField}}
+        },
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall}}},
         {RoomType::EventRoom, {{EventRoomBibleTree, EventRoomOracleCrab, }, {EventRoomBaru, EventRoomHoney }}  },
         {RoomType::TreasureRoom, {regularTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare}}},
@@ -2801,9 +3211,9 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    EnemyRoomSingleMage
+                    MiningEnemyRoomIntro, QuadShooterRoomSmall, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue
                 },
-                {EnemyRoomMagic}
+                {EnemyRoomMagic, MiningEnemyRoomMineField}
             }
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
@@ -2815,9 +3225,9 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    EnemyRoomSingleMage,
+                    EnemyRoomSingleMage, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue
                 },
-                {EnemyRoomMagic}
+                {EnemyRoomMagic, MiningEnemyRoomMineField}
             }
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
@@ -2828,8 +3238,17 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{MedicalEnemyRoomInvincible}}},
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {
+            RoomType::EnemyRoom,
+            {
+                {
+                    MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomWares,
+                    MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand
+                },
+                {MedicalEnemyRoomInvincible}
+            }
+        },
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOven, EventRoomOracleCrab}, { }}  },
         {RoomType::TreasureRoom, {bothTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -2845,7 +3264,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
                 {MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible}
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOracleCrab, EventRoomOven}, { }}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -2859,8 +3278,8 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomSpineWormQuadShooters,EnemyRoomSingleMage, MedicalEnemyRoomWares, MedicalEnemyRoomHeartBeat, MedicalEnemyRoomSmallRodC, MedicalEnemyRoomHand},{MedicalEnemyRoomInvincible}}},
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::EnemyRoom, {{EnemyRoomInvisible, EnemyRoomMagic,},bossRooms}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOven, EventRoomOracleCrab}, { }}  },
         {RoomType::TreasureRoom, {bothTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -2869,20 +3288,19 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDir
             RoomType::EnemyRoom,
             {
                 {
-                    MedicalEnemyRoomHeartBeat, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes,EnemyRoomSingleMage,
-                    EnemyRoomCloaked, MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomWorms
+                    EnemyRoomMagic,HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible
 
                 },
-                {MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible}
+                bossRooms
             }
         },
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOracleCrab, EventRoomOven}, { }}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{MedicalEnemyRoomHeartBeat3,MedicalEnemyRoomInvincible}}},
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{}}},
+        {RoomType::EnemyRoom, {{HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible },bossRooms}},
+        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{ EventRoomOracleCrab, EventRoomOven}, { }}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
@@ -2911,12 +3329,12 @@ inline bool hasLocked(RoomType type, int roomsTraversed) {
     Map& map = registry.maps.components[0];
     std::map<DifficultyRegion, std::map<RoomType, RoomPresets>> directory = map.directory;
 
-    // magic number: means room after boss room 
+    // magic number: means room after boss room
     // if (roomsTraversed == 13) {
     //     directory = getDirectory((MapRegion)(map.currRegion + 1));
     //     std::cout << "using next dir: " << map.currRegion + 1 << std::endl;
     // }
-    
+
     if (type >= RoomType::None) {
         return false;
     }
@@ -2944,7 +3362,7 @@ inline bool hasUnlocked(RoomType type, int roomsTraversed) {
     Map& map = registry.maps.components[0];
     std::map<DifficultyRegion, std::map<RoomType, RoomPresets>> directory = map.directory;
 
-    // magic number: means room after boss room 
+    // magic number: means room after boss room
     // if (roomsTraversed == 13) {
     //     directory = getDirectory((MapRegion)(map.currRegion + 1));
     //     std::cout << "using next dir: " << map.currRegion + 1 << std::endl;
@@ -3024,9 +3442,9 @@ inline std::vector<RoomType> getRandomRoomTypes(bool excludeNone, int roomsTrave
         else if (r < 0.850f && !treasure && !(rest && event)) {
             out[i] = RoomType::TreasureRoom;
             treasure = true;
-        } 
+        }
         else if (r < 1.000f && !event && !(treasure && rest)) {
-            out[i] = RoomType::EventRoom; 
+            out[i] = RoomType::EventRoom;
             event = true;
         }
     }
@@ -3045,10 +3463,11 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Medical) {
         return ScientistBossRoom;
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Physics) {
-        std::vector<RoomPreset> hifibosses = { BossBigCRoom, BossRoomMultiCube };
+        std::vector<RoomPreset> hifibosses = { BossRoomBigC, BossRoomMultiCube };
         return Random::ListItem(hifibosses);
     } else if (type == RoomType::BossRoom && currRegion == MapRegion::Mining) {
-        return BossRoomWorm;
+        std::vector<RoomPreset> miningbosses = { BossRoomMole, BossRoomWorm };
+        return Random::ListItem(miningbosses);
     }
 
     // Tutorial rooms
@@ -3182,9 +3601,42 @@ std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
     }
 };
 
-std::map<MapRegion,std::vector<std::tuple<EnemyType,vec2>> > eliteEnemies = {
-    {Biology, Random::ListItem(bioEliteEnemies)},
-    {Physics, Random::ListItem(physicsEliteEnemies)},
-    {Medical, Random::ListItem(medicalEliteEnemies)},
-    {Mining, Random::ListItem(miningEliteEnemies)}
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> militaryEliteEnemies = {
+    {{EnemyType::BossCrab, {0.5f,0.5f}}},
+{{EnemyType::BossBeehiveMain, {0.5f,0.5f}}},
+{{EnemyType::BossMultiCube, {0.5f,0.5f}}},
+    {{BossBigC, {0.5f, 0.5f}},
+        {EnemyLaserSniper,{0.5, 0.63}},
+            {EnemyLaserSniper,{0.38, 0.42}},
+        {EnemyLaserSniper,{1-0.38, 0.42}},
+    },
+{{EnemyType::BossDrillWormHead, {1.5f,0.5f}}},
+    {
+        {EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},
+
+          {EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},
+        {BossMole, {0.5f, 0.5f}},
+},
+};
+
+std::map<MapRegion,std::vector<std::vector<std::tuple<EnemyType,vec2>>> > eliteEnemies = {
+    {Tutorial, bioEliteEnemies},
+    {Biology, bioEliteEnemies},
+    {Physics, physicsEliteEnemies},
+    {Medical, medicalEliteEnemies},
+    {Mining, miningEliteEnemies},
+    {Military, militaryEliteEnemies},
 };

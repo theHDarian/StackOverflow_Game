@@ -369,6 +369,118 @@ Entity createWhiteBoard(RenderSystem *renderer, vec2 pos)
 	return entity;
 }
 
+// merges effects as if they were on the stack
+std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects) {
+	std::vector<BulletStackEffect> mergeEffects;
+	BulletStackEffect prev = blunt;
+	const int maxPosVal = 3;
+	const int maxNegVal = -3;
+
+	// first check size is more than 1 effect, i.e there's something to actually merge
+	if (effects.size() <= 1) {
+		return effects;
+	}
+	
+	for (int i = 0; i < effects.size(); i++) {
+		if (effects[i].type == Key || effects[i].type == Inert || effects[i].type == Lightning) {
+			mergeEffects.push_back(effects[i]);
+		} else { // need to count normal bullets
+			if (effects[i].type == prev.type) {
+				prev.value += effects[i].value;
+
+				// make sure doesn't overflow
+				if (prev.value > maxPosVal) {
+					BulletStackEffect prevCopy = prev;
+					prevCopy.value = maxPosVal;
+					prev.value -= maxPosVal;
+					mergeEffects.push_back(prevCopy);
+				}
+
+				if (prev.value < maxNegVal) {
+					BulletStackEffect prevCopy = prev;
+					prevCopy.value = maxNegVal;
+					prev.value -= maxNegVal;
+					mergeEffects.push_back(prevCopy);
+				}
+			}
+			else {
+				if (prev.type != BulletEffectType::Inert && prev.value != 0) {
+					mergeEffects.push_back(prev);
+				}
+				prev = effects[i];
+			}
+		}
+	}
+	if (prev.type != BulletEffectType::Inert && prev.value != 0) {
+		mergeEffects.push_back(prev);
+	}
+
+	return mergeEffects;
+}
+
+// add names of effects
+void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects) {
+	vec3 color;
+	size_t next = 0;
+	std::string effectsString = "";
+
+	// first merge effects
+	effects = mergeEffects(effects);
+
+	for (int i = 0; i < effects.size(); i++) {
+		effectsString += getFormattedBulletEffectString(effects[i]);
+		color = bulletEffectColors.at(effects[i].type);
+
+		// Remove later when change key to 1 colour
+		if (effects[i].type == Key) {
+			color = COLOR_YELLOW;
+		}
+		
+		if (i == effects.size() - 1) {
+			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
+		}
+		else {
+			effectsString += ", ";
+			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
+		}
+		
+		next = effectsString.length();
+	}
+
+	object.scriptVariables.push_back(effectsString);
+
+
+	//std::vector<std::tuple<std::string, vec3>> effectStringList;
+	//int effectCount = 1;
+	//std::string effectsString = "";
+	//for (int i = 1; i < effects.size(); i++) {
+	//	if (effects[i - 1].type == Key || effects[i - 1].type == Inert || effects[i - 1 ].type == None || effects[i - 1].type == Lightning) {
+	//		effectStringList.emplace_back(effects[i-1].name, effects[i-1].type == Key ? COLOR_YELLOW : bulletEffectColors.at (effects[i-1].type));
+	//	} else {
+	//		if ((effects[i-1].name == effects[i].name && effectCount < 3)) {
+	//			effectCount++;
+	//		} else {
+	//			std::string direction = effects[i-1].name.find("Down") != std::string::npos ? " -" : " +";
+	//			effectStringList.emplace_back(effects[i-1].name + direction +  std::to_string(effectCount), bulletEffectColors.at (effects[i-1].type));
+	//			effectCount = 1;
+	//		}
+	//	}
+	//}
+	//for (int index = 0; index < effectStringList.size(); ++index) {
+	//	// std::cout << std::get<0>(effectStringList[index]) << std::endl;
+	//	vec3 color = std::get<1>(effectStringList[index]);
+	//	if (index == effectStringList.size() - 1) {
+	//		effectsString += std::get<0>(effectStringList[index]);
+	//		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
+	//	} else {
+	//		effectsString += std::get<0>(effectStringList[index]) + ", ";
+	//		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
+	//	}
+	//	next = effectsString.length();
+	//}
+	//object.scriptVariables.push_back(effectsString);
+}
+
 Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects)
 {
 	Entity console = Entity();
@@ -391,28 +503,8 @@ Entity createPushConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSta
 	object.name = "PushStack";
 	object.item = InteractableItem::PushConsole;
 	object.decorations.push_back({});
-	
-	vec3 color;
-	size_t next = 0;
-	// add names of effects
-	std::string effectsString = "";
-	for (int i = 0; i < effects.size() - 1; i++) {
-		effectsString += effects[i].name + ", ";
-		color = bulletEffectColors.at(effects[i].type);
-		if (effects[i].type == Key) {
-			color = COLOR_YELLOW;
-		}
-		object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
-		next = effectsString.length();
-	}
-	effectsString += effects[effects.size() - 1].name;
-	color = bulletEffectColors.at(effects[effects.size() - 1].type);
-	if (effects[effects.size() - 1].type == Key) {
-		color = COLOR_YELLOW;
-	}
-	object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
 
-	object.scriptVariables.push_back(effectsString);
+	createEffectString(object, effects);
 
 	Animation &a = registry.animations.emplace(console);
 	a.max_frames = 8;
@@ -461,27 +553,8 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	 object.item = InteractableItem::FightConsole;
 	 object.decorations.push_back({});
 
-	 vec3 color;
-	 size_t next = 0;
-	 // add names of effects
-	 std::string effectsString = "";
-	 for (int i = 0; i < effects.size() - 1; i++) {
-		 effectsString += effects[i].name + ", ";
-		 color = bulletEffectColors.at(effects[i].type);
-		 if (effects[i].type == Key) {
-			 color = COLOR_YELLOW;
-		 }
-		 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
-		 next = effectsString.length();
-	 }
-	 effectsString += effects[effects.size() - 1].name;
-	 color = bulletEffectColors.at(effects[effects.size() - 1].type);
-	 if (effects[effects.size() - 1].type == Key) {
-		 color = COLOR_YELLOW;
-	 }
-	 object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
+	createEffectString(object, effects);
 
-	 object.scriptVariables.push_back(effectsString);
 
 	Animation &a = registry.animations.emplace(console);
 	a.max_frames = 1;
@@ -1329,7 +1402,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = BossBigCCore();
 		auto &boss = registry.bosses.emplace(entity);
-		boss.name = "BigC";
+		boss.name = "\"Centurion\"";
 		break;
 	}
 		case EnemyType::BossBigCShield:
@@ -1421,6 +1494,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::EnemySmallMole:
 	{
 		enemy = SmallMole();
+		break;
+	}
+	case EnemyType::EnemySurfaceMole: {
+		enemy = SurfaceMole();
 		break;
 	}
 	case EnemyType::EnemySmallBoulder:
@@ -1527,7 +1604,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		break;
 	case EnemyType::EnemyLaserSniperHard:
 		enemy = HifiLaserSniperHard();
-		registry.specialRotators.emplace(entity);
+		// registry.specialRotators.emplace(entity);
 		break;
 	case EnemyType::EnemyHifiCharger:
 		enemy = HifiCharger();
@@ -1606,6 +1683,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = ScientistBossEnemy();
 		registry.bosses.insert(entity, { "The Purple Cyborg" });
 		Scientist& scien = registry.scientist.emplace(entity);
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 1500.f;
+		buffer.maxCoolDown = 1000.f;
+		buffer.duration = 2500.f;
 
 		break;
 	}
@@ -1613,6 +1694,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = ScientistSheildEnemy();
 		registry.shield.emplace(entity);
+		auto& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
 		break;
 	}
 	case EnemyType::ScientistHand:
@@ -1662,11 +1746,17 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = PileDriverTurret();
 		break;
 	}
+	case BossMole: {
+		enemy = MoleBoss();
+		auto &boss = registry.bosses.emplace(entity);
+		boss.name = "Bomber Mole";
+		break;
+	}
 	case BossDrillWormHead:
 	{
 		enemy = DrillWormHead();
 		auto& boss = registry.bosses.emplace(entity);
-		boss.name = "AUTUMN";
+		boss.name = "\"Autumn Willow\"";
 		break;
 	}
 	case EnemySmallMiningWormHead:
@@ -1788,27 +1878,43 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	{
 		enemy = MultiCube();
 		auto& boss = registry.bosses.emplace(entity);
-		boss.name = "TBD";
+		boss.name = "Prismatic Construct";
 		break;
 	}
 	case BossConstructYELLOW:
 	{
 		enemy = ConstructYELLOW();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 750.f;
+		buffer.maxCoolDown = 1200.f;
+		buffer.duration = 2000.f;
 		break;
 	}
 	case BossConstructPURPLE:
 	{
 		enemy = ConstructPURPLE();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10000.f;
+		buffer.maxCoolDown = 1000000000000.f;
+		buffer.duration = 15000.f;
 		break;
 	}
 	case BossConstructGREEN:
 	{
 		enemy = ConstructGREEN();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10000.f;
+		buffer.maxCoolDown = 1000000000000.f;
+		buffer.duration = 15000.f;
 		break;
 	}
 	case BossConstructRED:
 	{
 		enemy = ConstructRED();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10000.f;
+		buffer.maxCoolDown = 1000000000000.f;
+		buffer.duration = 15000.f;
 		break;
 	}
 	case EnemyEyeCube:
@@ -2019,6 +2125,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
         createEnemy(renderer, pos + vec2(0, 0), EnemyType::BossBigCShield);
     }
 
+	//HP and damage scaling
+	Map& map = registry.maps.components[0];
+	enemy.maxHealth = enemy.maxHealth * pow(1.25, (max((int) map.currRegion - 1 , 0)));
+	enemy.currHealth = enemy.maxHealth;
 	return entity;
 };
 
@@ -2177,7 +2287,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 		motion.veer = vec2(0);
 		bullet.bulletBounce = 10;
 		bullet.bulletPierce = 0;
-		bullet.bulletRange = 5000;
+		bullet.bulletRange = atkData.bulletRange * 0.66f;
 
 		PolyCollider& pc = registry.polyColliders.emplace(entity);
 		pc.offsetVertices = {
@@ -2197,7 +2307,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 		ParticleProps props = enemyBullet;
 		props.colorEffects.push_back({enemyBulletParticleColors.at(Key),0});
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 100000, Random::Int(3) + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, bullet.bulletRange, Random::Int(3) + 5);
 
 		return entity;
 	}
@@ -2243,7 +2353,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 	if (!props.colorEffects.empty())
 	{
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, atkData.bulletRange, Random::Int(3) + 5);
 	}
 
 	return entity;

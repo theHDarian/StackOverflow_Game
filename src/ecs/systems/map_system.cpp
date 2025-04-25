@@ -34,7 +34,10 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
     Map& map = registry.maps.components[0];
     for (auto &e : enemies)
     {
-        vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd,std::get<vec2>(e));
+        vec2 location = std::get<vec2>(e);
+        location.x = location.x == random_float ? Random::Float() : location.x;
+        location.y = location.y == random_float ? Random::Float() : location.y;
+        vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
         if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
             createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
         } else {
@@ -99,7 +102,7 @@ void MapSystem::step(float elapsed_ms)
     if (map.currRoom.preset.hasElite) {
         if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.empty()) ) {
             Entity bossEnemy;
-            SpawnEnemiesInList( eliteEnemies.at(map.currRegion), bossEnemy, renderer, true);
+            SpawnEnemiesInList( Random::ListItem(eliteEnemies.at(map.currRegion)), bossEnemy, renderer, true);
             map.currRoom.preset.hasElite = false;
             map.currRoom.spawnedElite = true;
             soundPlayer->playAlarmSound(3);
@@ -518,14 +521,18 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 map.currRoom.preset = Random::ListItem( bioBossRooms);
             }
             else if (map.currRegion == Mining) {
-                map.currRoom.preset = BossRoomWorm;
+                std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
+                map.currRoom.preset = Random::ListItem( miningBossRooms);
+                // map.currRoom.preset = MiningEnemyRoomAvenue;
             }
             else if (map.currRegion == Medical) {
                  map.currRoom.preset = ScientistBossRoom;
             }
             else if (map.currRegion == Physics) {
+                std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};
+                map.currRoom.preset = Random::ListItem( physicsBossRooms);
                 // map.currRoom.preset = BossRoomMultiCube;
-                map.currRoom.preset = BossBigCRoom;
+                // map.currRoom.preset = TreasureRoomChoice5;
             } else {
                 map.currRoom.preset = ScientistBossRoom;
             }
@@ -533,11 +540,16 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req.type = SoundType::bossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp, dmgUp, dmgUp};
+            req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
         }
+
+        // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+        // req2.type = InteractableRequestType::AddEffect;
+        // req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
+
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
-        extendstack.choice = 8*max(0,((int)map.currRegion - 1));
+        extendstack.choice = 4*max(0,((int)map.currRegion - 1));
 
         map.directory = getDirectory(map.currRegion);
         std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
@@ -588,7 +600,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
         // createEnemy(renderer, vec2(1000, 300), EnemyType::EnemyPufferfish);
         // createRamStick(renderer, vec2(500, 500));
-        // createPushConsole(renderer, vec2(500, 500), {dashUp, dashCDRDownA, dmgUpM});
+         //createPushConsole(renderer, vec2(500, 500), {dashUp, dashUp, dashUp, dmgDown, dmgDown, dashUp, dmgDown2, dmgDown2, dashUp, dmgDown, dashUp, dmgDown});
         //createWishGranter(renderer, vec2(500,500));
         //createEnemy(renderer, vec2(500, 500), ScientistBoss);
     }

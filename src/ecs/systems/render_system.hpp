@@ -76,6 +76,13 @@ class RenderSystem {
 		true,
 		vec2(0, 0),
 	};
+	const RenderRequest bossUnderGroundTexture = {
+		"bossUnderGround.png",
+		EFFECT_ASSET_ID::TEXTURED,
+		GEOMETRY_BUFFER_ID::SPRITE,
+		true,
+		vec2(0, 0),
+	};
 public:
 	// Initialize the window
 	bool init(GLFWwindow* window);

@@ -886,6 +886,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		if (effects[i].type == BulletEffectType::Pop) {
 			InteractableRequest& req = registry.interactableRequests.emplace(Entity());
 			req.type = InteractableRequestType::PopStack;
+			req.choice = effects[i].value;
 		}
 		else {
 			bool success = registry.stackCompile.get(player).add(effects[i]);

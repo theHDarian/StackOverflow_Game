@@ -285,17 +285,9 @@ void UISystem::step(float elapsed_ms) {
 						bulletEffectShapes.at(uiRequest.effects[index].type),
 						bulletEffectColors.at(uiRequest.effects[index].type),
 						uiRequest.effects[index]);
-					// build the effect value string, reporting values that aren't 0
-					std::string valueString = "";
-					if (uiRequest.effects[index].value != 0) {
-						valueString += " ";
-						if (uiRequest.effects[index].value > 0) {
-							valueString += "+";
-						}
-						valueString += std::to_string(uiRequest.effects[index].value);
-					}
 
-					std::string message = uiRequest.effects[index].name + valueString + " added onto the stack";
+					std::string effectStr = getFormattedBulletEffectString(uiRequest.effects[index]);
+					std::string message = effectStr + " added onto the stack";
 					Entity notif = createNotifMessage(message);
 
 					// highlight bullet effect name
@@ -306,7 +298,7 @@ void UISystem::step(float elapsed_ms) {
 					}
 					else {
 						registry.textRenderRequests.get(notif).decorations.push_back(
-							TextDecorationSpan{ 0, uiRequest.effects[index].name.length() + valueString.length(), bulletEffectColors.at(uiRequest.effects[index].type) });
+							TextDecorationSpan{ 0, effectStr.length(), bulletEffectColors.at(uiRequest.effects[index].type) });
 					}
 				}
 			}
@@ -630,7 +622,7 @@ void UISystem::playDialogue() {
 			}
 
 			text.formattedText = getFormattedText(getTokenizedText(text.text), text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
-			
+
 			// play a sound if there is one
 			if (nextLine.sfx == IncomingDialogue) {
 				soundSystem->playIncomingDialogueSound();
@@ -1814,6 +1806,23 @@ void UISystem::loadText() {
 	}
 }
 
+// returns a string that contains:
+// "<bullet name>" if the bullet doesn't have a value (key, inert, etc)
+// "<bullet name> (+/-<value>)" otherwise
+std::string getFormattedBulletEffectString(BulletStackEffect bullet) {
+	std::string str = bullet.name;
+
+	if (bullet.value != 0) {
+		str += " (";
+		if (bullet.value > 0) {
+			str += "+";
+		}
+		str += std::to_string(bullet.value) + ")";
+	}
+	
+	return str;
+}
+
 std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 	std::string tooltip = /*"bullet.name + "\n\n"*/"";
 	std::string modify = "";
@@ -2002,4 +2011,16 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 	}
 
 	request.text = text;
+
+	// PROBLEM: if script variable is long, decoration spans will be short by # of lines - 1
+	// but only know after text is properly formatted, so retroactively correct this for now
+	std::vector<std::string> formattedText = getFormattedText(getTokenizedText(request.text), request.scale, request.alignment, { request.x, request.y }, request.topRightBound, request.bottomLeftBound);
+
+	for (int i = 0; i < request.decorations.size(); i++) {
+		int startLineCount = getIndexLine(formattedText, request.decorations[i].startIndex);
+		int endLineCount = getIndexLine(formattedText, request.decorations[i].endIndex);
+		if (startLineCount > 0) {
+			request.decorations[i].endIndex += endLineCount - startLineCount;
+		}
+	}
 }
