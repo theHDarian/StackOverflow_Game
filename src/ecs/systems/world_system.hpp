@@ -48,6 +48,8 @@ public:
 
 
 static float getModifiedValue(BulletEffectType bf, float value);
+static bool checkTierThreshold(BulletEffectType bf);
+
 private:
 	// restart level
 	void restartGame();

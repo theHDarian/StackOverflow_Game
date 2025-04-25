@@ -79,8 +79,7 @@ struct StackCompile {
     // x<0 does nothing (except waste space on stack)
     float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
     float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * 80.f, 1400.f); };
-    // x=5 is tier limit reached
-    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < 5) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
+    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
     float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? -500.f + 1000.f / ((float)x + 2.f) : -50.f * (float)x, 1000.f); };
     float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
     float bulletSpreadFunc(int x)       { return clamp(-15.f, (x > 0) ? -2.f * (float)x : -20.f * (float)x, 330.f); };
@@ -100,7 +99,7 @@ struct StackCompile {
         {ProjectileSize,    &StackCompile::projectileSizeFunc},
         {FireRate,          &StackCompile::fireRateFunc},
         {BulletRange,       &StackCompile::bulletRangeFunc},
-        {BulletAccuracy,      &StackCompile::bulletSpreadFunc},
+        {BulletAccuracy,    &StackCompile::bulletSpreadFunc},
         {BulletNum,         &StackCompile::bulletNumFunc},
         {BulletBurst,       &StackCompile::bulletBurstFunc},
         {Bounce,            &StackCompile::bounceFunc},
@@ -109,7 +108,7 @@ struct StackCompile {
         {PlayerSpeed,       &StackCompile::playerSpeedFunc},
         {PlayerNumDash,     &StackCompile::playerNumDashFunc},
         {PlayerStackSize,   &StackCompile::playerStackSizeFunc},
-        {PlayerDashRecharge,     &StackCompile::playerDashCDRFunc}
+        {PlayerDashRecharge,&StackCompile::playerDashCDRFunc}
     };
 
     // Use extra when you want to find what a higher/lower value would yield
@@ -125,7 +124,7 @@ struct StackCompile {
         {ProjectileSize,    0},
         {FireRate,          0},
         {BulletRange,       0},
-        {BulletAccuracy,      0},
+        {BulletAccuracy,    0},
         {BulletNum,         0},
         {BulletBurst,       0},
         {Bounce,            0},
@@ -134,7 +133,25 @@ struct StackCompile {
         {PlayerSpeed,       0},
         {PlayerNumDash,     0},
         {PlayerStackSize,   0},
-        {PlayerDashRecharge,     0}
+        {PlayerDashRecharge,0}
+    };
+
+    std::map<BulletEffectType, float> tierThresholds = {
+        {BulletDamage,      5},
+        {ProjectileSpeed,   5},
+        {ProjectileSize,    5},
+        {FireRate,          5},
+        {BulletRange,       5},
+        {BulletAccuracy,    5},
+        {BulletNum,         5},
+        {BulletBurst,       5},
+        {Bounce,            5},
+        {Pierce,            5},
+        {Homing,            5},
+        {PlayerSpeed,       5},
+        {PlayerNumDash,     5},
+        {PlayerStackSize,   5},
+        {PlayerDashRecharge,5}
     };
 
     bool add(BulletStackEffect effect) {
@@ -172,7 +189,7 @@ struct StackCompile {
         if (currStack.size() > 1) {
             int i = 0;
             while (i < currStack.size() - 1) {
-                if (currStack[i].type != currStack[i + 1].type) {
+                if (currStack[i].type != currStack[i + 1].type || currStack[i].value == 0 || values.find(currStack[i].type) == values.end()) {
                     i++;
                     continue;
                 }
@@ -287,6 +304,7 @@ enum EnemyType {
     // Testing
     EnemyTestLightningRotate,
     EnemyTestLightningShuffle,
+    EnemyTestEffectBlunt,
     EnemyTestEffectPlusOne,
     EnemyTestEffectPlusTwo,
     EnemyTestEffectPlusThree,

@@ -551,20 +551,31 @@ void WorldSystem::handleCollisions() {
 				Motion& motion = registry.motions.get(entity);
 				WallCollider& wall = registry.walls.get(entity_other);
 				if (bullet.bulletBounce > 0) {
-					// Bounce / reflect the enemy bullet against the wall
-					vec2 a = motion.position - wall.startPosition;
-					vec2 b = wall.endPosition - wall.startPosition;
-					vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
-					vec2 n = glm::normalize(a - c);
+					if (checkTierThreshold(Bounce) && registry.enemies.entities.size() > 0) {
+						motion.position -= normalize(motion.velocity) * max(motion.scale.x, motion.scale.y) / 2.f;
+						Entity& randomEnemy = Random::ListItem(registry.enemies.entities);
+						Motion& rem = registry.motions.get(randomEnemy);
 
-					motion.position -= normalize(motion.velocity) * max(motion.scale.x,motion.scale.y)/2.f;
-					motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
-					motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
-					// Assumes bullet flies towards facing direction
-					motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+						vec2 goTo = glm::normalize(rem.position - motion.position);
+						motion.velocity = goTo * glm::length(motion.velocity);
+						motion.veer = vec2(0);
+						motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+					}
+					else {
+						// Bounce / reflect the enemy bullet against the wall
+						vec2 a = motion.position - wall.startPosition;
+						vec2 b = wall.endPosition - wall.startPosition;
+						vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
+						vec2 n = glm::normalize(a - c);
 
+						motion.position -= normalize(motion.velocity) * max(motion.scale.x, motion.scale.y) / 2.f;
+						motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
+						motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
+						// Assumes bullet flies towards facing direction
+						motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+					}
 					bullet.bulletBounce -= 1;
-					bullet.bulletRange = getModifiedValue(BulletRange, PlayerBullet().bulletRange); //refresh range
+					bullet.bulletRange = getModifiedValue(BulletRange, PlayerBullet().bulletRange) / 1.5f; //refresh range
 					registry.ignores.get(entity).clear();
 				}
 				else {
@@ -804,7 +815,41 @@ float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 	return registry.stackCompile.get(pl).Call(bf) + value;
 }
 
+bool WorldSystem::checkTierThreshold(BulletEffectType bf)
+{
+	Entity& pl = registry.players.entities[0];
+	return registry.stackCompile.get(pl).values[bf] >= registry.stackCompile.get(pl).tierThresholds[bf];
+}
+
 void WorldSystem::handlePlayerHit(Entity& other) {
+	std::vector<BulletStackEffect> effects;
+	if (registry.enemyBullets.has(other)) {
+		EnemyBullet& eBullet = registry.enemyBullets.get(other);
+		effects = eBullet.bulletEffects;
+		if (eBullet.isSpecial) { // kept effect same as original code
+			registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn -= effects.size();
+		}
+	}
+	else if (registry.enemies.has(other)) {
+		// Boid touch player, it die
+		if (registry.boids.has(other) && !registry.deleteds.has(other)) registry.deleteds.emplace(other);
+		// Handle case of boid worm
+		if (registry.wormHeads.has(other) && registry.wormBodies.entities.size() > 0)
+		{
+			for (int i = (int)registry.wormBodies.components.size() - 1; i >= 0; --i) {
+				if (!registry.deleteds.has(registry.wormBodies.entities[i]) && registry.deleteds.has(registry.wormBodies.components[i].head))
+					registry.deleteds.emplace(registry.wormBodies.entities[i]);
+			}
+		}
+		Enemy& e = registry.enemies.get(other);
+		effects.insert(effects.end(), e.collisionBullet.begin(), e.collisionBullet.end());
+	}
+
+	if (checkTierThreshold(PlayerDashRecharge) && effects.size() == 1 && effects[0].type == Inert) {
+		// TODO Play dodge sound
+		return;
+	}
+
 	//change sprite
 	auto& spriteMap = registry.sprites.get(player).sprites;
 	if (spriteMap.count(SPRITE_STATE::DAMAGED) && !registry.invincibles.has(player)) {
@@ -834,29 +879,6 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 		DialogueRequest& req = registry.dialogueRequests.emplace(registry.players.entities[0]);
 		req.type = DialogueRequestType::StoryDialogue;
 		registry.ioStates.components[0].lockControls = false;
-	}
-
-	std::vector<BulletStackEffect> effects;
-	if (registry.enemyBullets.has(other)) {
-		EnemyBullet& eBullet = registry.enemyBullets.get(other);
-		effects = eBullet.bulletEffects;
-		if (eBullet.isSpecial) { // kept effect same as original code
-			registry.maps.components[0].currRoom.preset.numSpecialBulletsToSpawn -= effects.size();
-		}
-	}
-	else if (registry.enemies.has(other)) {
-		// Boid touch player, it die
-		if (registry.boids.has(other) && !registry.deleteds.has(other)) registry.deleteds.emplace(other);
-		// Handle case of boid worm
-		if (registry.wormHeads.has(other) && registry.wormBodies.entities.size() > 0)
-		{
-			for (int i = (int)registry.wormBodies.components.size() - 1; i >= 0; --i) {
-				if (!registry.deleteds.has(registry.wormBodies.entities[i]) && registry.deleteds.has(registry.wormBodies.components[i].head))
-					registry.deleteds.emplace(registry.wormBodies.entities[i]);
-			}
-		}
-		Enemy& e = registry.enemies.get(other);
-		effects.insert(effects.end(), e.collisionBullet.begin(), e.collisionBullet.end() );
 	}
 
 	//add to stack for enemy bullets

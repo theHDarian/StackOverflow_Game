@@ -742,6 +742,43 @@ struct TestLightningShuffle : Enemy
 	};
 };
 
+struct TestEffectBlunt : Enemy
+{
+	const AttackData testShot{
+		EnemyAttackPattern::RADIAL,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{0.0, 0.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+
+	TestEffectBlunt()
+	{
+		maxHealth = 500000;
+		currHealth = maxHealth;
+		enemyPatterns = { idleState };
+		patternIndex = 0;
+		sprite = {
+			"enemy_QuadShooter.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0)
+		};
+		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		rotatePower = 0.f;
+	};
+};
+
 struct TestEffectPlusOne : Enemy
 {
 	const AttackData testShot{

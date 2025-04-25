@@ -1271,6 +1271,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		enemy = TestLightningShuffle();
 		break;
 	}
+	case EnemyType::EnemyTestEffectBlunt:
+	{
+		enemy = TestEffectBlunt();
+		break;
+	}
 	case EnemyType::EnemyTestEffectPlusOne:
 	{
 		enemy = TestEffectPlusOne();
@@ -2633,7 +2638,7 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 
 	// Setting initial values
 	PlayerBullet &bullet = registry.playerBullets.emplace(entity);
-	bullet.damage = getModifiedValue(BulletDamage, bullet.damage);
+	bullet.damage = getModifiedValue(BulletDamage, bullet.damage) / min(1.f, getModifiedValue(BulletNum, 1) - 0.5f);
 	bullet.bulletSpeed = getModifiedValue(ProjectileSpeed, bullet.bulletSpeed);
 	bullet.bulletRange = getModifiedValue(BulletRange, bullet.bulletRange);
 	bullet.bulletSize = getModifiedValue(ProjectileSize, bullet.bulletSize);
