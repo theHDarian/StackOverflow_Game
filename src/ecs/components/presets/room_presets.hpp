@@ -405,14 +405,14 @@ const RoomPreset EnemyRoomDash1{
             {EnemyType::EnemySkull, {0.5f, 0.5f}},
             },
             {
-                {EnemyType::EnemySword, {Random::Float(),Random::Float()}},
-                {EnemyType::EnemySword, {Random::Float(),Random::Float()}}
+                {EnemyType::EnemySword, random_vec2},
+                {EnemyType::EnemySword, random_vec2}
             },
             {
-                {EnemyType::EnemySword, {Random::Float(),Random::Float()}},
-                {EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}},
-{EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}},
-{EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}}
+                {EnemyType::EnemySword, random_vec2},
+                {EnemyType::EnemyPufferfish, random_vec2},
+{EnemyType::EnemyPufferfish, random_vec2},
+{EnemyType::EnemyPufferfish, random_vec2}
             },
         },
     {},
@@ -448,8 +448,8 @@ const RoomPreset EnemyRoomDashHard{
                 {EnemyType::EnemyPufferfish, {0.3, 0.2}},
             },
             {
-                    {EnemyType::EnemyPufferfish, {Random::Float(),Random::Float()}},
-                {EnemyType::EnemyEvilSnail, {Random::Float(),Random::Float()}}
+                    {EnemyType::EnemyPufferfish, random_vec2},
+                {EnemyType::EnemyEvilSnail, random_vec2}
             },
             {
                 {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
@@ -1706,14 +1706,14 @@ const RoomPreset HifiRoomCannonSnipers{
 
             },
             {
-                    {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
-                    {EnemyType::EnemySniper, {Random::Float(),Random::Float()}},
-                        {EnemyType::EnemySniper, {Random::Float(),Random::Float()}},
-                    {EnemyType::EnemySniper, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemyLaserSniper, random_vec2},
+                    {EnemyType::EnemySniper, random_vec2},
+                        {EnemyType::EnemySniper, random_vec2},
+                    {EnemyType::EnemySniper, random_vec2},
             },
             {
-                    {EnemyType::EnemyHifiCannon, {Random::Float(),Random::Float()}},
-                    {EnemyType::EnemyHifiCannon, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemyHifiCannon, random_vec2},
+                    {EnemyType::EnemyHifiCannon, random_vec2},
             },
         },
     {},
@@ -1733,8 +1733,8 @@ const RoomPreset HifiRoomSniperShurikens{
             {EnemyType::EnemyHealer, {0.2f,0.2f}},
             },
             {
-                    {EnemyType::EnemyHifiTrailHard, {Random::Float(),Random::Float()}},
-                        {EnemyType::EnemyHifiTrailHard, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemyHifiTrailHard, random_vec2},
+                        {EnemyType::EnemyHifiTrailHard, random_vec2},
             },
             {
                 {EnemyType::EnemyHifiSniperHard, {0.8f,0.8f}},
@@ -1762,11 +1762,11 @@ const RoomPreset HifiRoomCannonBoids{
 {{EnemyHifiTackShooter, {0.2,0.2}},
         {EnemyHifiTackShooter, {0.2,0.8}},},
             {
-                    {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
-            {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
-        {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemyHealer, random_vec2},
+            {EnemyType::EnemyHealer, random_vec2},
+        {EnemyType::EnemyHealer, random_vec2},
             {EnemyType::EnemyHifiCannonHard, {0.5f,0.5f}},
-            {EnemyType::EnemyHealer, {Random::Float(),Random::Float()}},
+            {EnemyType::EnemyHealer, random_vec2},
             },
 
         },
@@ -1786,25 +1786,25 @@ const RoomPreset HifiRoomLaserFiesta {
                 {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
                 {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
             },
-{{EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+{{EnemyType::EnemyLaserSniper, random_vec2},
 
-        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+        {EnemyType::EnemyLaserSniper, random_vec2},
 
             },
             {
-                    {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemyLaserSniper, random_vec2},
 
-                    {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                    {EnemyType::EnemyLaserSniper, random_vec2},
             },
                 {
-                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemyLaserSniper, random_vec2},
 
-                        {EnemyType::EnemyLaserSniper, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemyLaserSniper, random_vec2},
                 },
 {
-                        {EnemyType::EnemyLaserSniperHard, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemyLaserSniperHard, random_vec2},
 
-                        {EnemyType::EnemyLaserSniperHard, {Random::Float(),Random::Float()}},
+                        {EnemyType::EnemyLaserSniperHard, random_vec2},
                 },
             {
             {EnemyEvilSkull , {0.5f, 0.5f}},
@@ -1893,16 +1893,16 @@ const RoomPreset HifiRoomSmallBallLauncher {
                 {
                     {EnemyHifiBallLauncher,{0.5,0.5}},
                     {EnemySmallCShield,{0.5,0.5}},
-                    {EnemyHifiCharger,{Random::Float(),Random::Float()}},
-                {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+                    {EnemyHifiCharger,random_vec2},
+                {EnemyHifiCharger,random_vec2},
 
 
                 },
 
                 {
                     // {EnemyHifiTackShooter,{0.5,0.5}},
-                        {EnemyHifiCharger,{Random::Float(),Random::Float()}},
-                    {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+                        {EnemyHifiCharger,random_vec2},
+                    {EnemyHifiCharger,random_vec2},
                 },
 
             },
@@ -1921,15 +1921,15 @@ const RoomPreset HifiRoomSmallTackShooter {
                     {
                         {EnemyHifiTackShooter,{0.5,0.5}},
                          {EnemySmallCShield,{0.5,0.5}},
-        {EnemyHifiCharger,{Random::Float(),Random::Float()}},
-            // {EnemyHifiCharger,{Random::Float(),Random::Float()}},
-                        // {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+        {EnemyHifiCharger,random_vec2},
+            // {EnemyHifiCharger,random_vec2},
+                        // {EnemyHifiCharger,random_vec2},
 
                     },
 
                     {
-                        {EnemyHifiCharger,{Random::Float(),Random::Float()}},
-                            {EnemyHifiCharger,{Random::Float(),Random::Float()}},
+                        {EnemyHifiCharger,random_vec2},
+                            {EnemyHifiCharger,random_vec2},
                     },
 
                 },
@@ -3581,43 +3581,71 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
     {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+        {
+         {EnemyType::EnemyBeeHive, {0.5f,0.5f}},
+            {EnemyTwoBee, random_vec2},
+{EnemyTwoBee, random_vec2},
+{EnemyThreeBee, random_vec2},
+{EnemyTwoBee, random_vec2}
+        },
 };
 
 std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
     {{EnemyType::EnemyMage, {0.5f,0.5f}}},
     {
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemySurfaceMole, {0.5f,0.5f}},
+                {EnemyType::EnemySmallMole, random_vec2},
+                    {EnemyType::EnemySmallMole, random_vec2},
+                {EnemyType::EnemySmallMole, random_vec2},
+                {EnemyType::EnemySmallMole, random_vec2},
+                {EnemyType::EnemySmallMole, random_vec2},
+                {EnemyType::EnemySmallMole, random_vec2},
         },
+        {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
+        {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
-    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
+            {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
+{{EnemyType::EnemyMage, {0.5f,0.5f}}},
     {
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, random_vec2},
+                {EnemyType::EnemyMage, random_vec2},
+        {EnemyType::EnemyMage, random_vec2},
         },
         {
-                                                {EnemyHifiJellyFish, {0.6f, 0.6f}},
-                            {EnemyHifiJellyFish, {0.4f, 0.4f}},
+                            {EnemyHifiJellyFish, {0.6f, 0.6f}},
+        {EnemyHifiJellyFish, {0.4f, 0.4f}},
 {CloakedGranter, {0.6f, 0.6f}},
+{EnemySmallCShield, {0.6f, 0.6f}},
+    {EnemySmallCShield, {0.4f, 0.4f}},
                {CloakedGranter, {0.4f, 0.4f}},
+            { EnemyHifiJellyFish, {0.4f, 0.6f}},
+                            {EnemyHifiJellyFish, {0.6f, 0.4f}},
+                { CloakedGranter, {0.4f, 0.6f}},
+                {CloakedGranter, {0.6f, 0.4f}},
+                {EnemySmallCShield, {0.4f, 0.6f}},
+                {EnemySmallCShield, {0.6f, 0.4f}},
         },
 
 };
 
 std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
     {{EnemyType::EnemyMage, {0.5f,0.5f}}},
+{{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
+    {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
     {
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-                {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
-        {EnemyType::EnemyMage, {Random::Float(),Random::Float()}},
+                {EnemyType::EnemyMage, random_vec2},
+                {EnemyType::EnemyMage, random_vec2},
+        {EnemyType::EnemyMage, random_vec2},
         },
     {
         {EnemyMedicalRodC, {0.5f, 0.5f}},
         {InvisibleGranter, {0.5f, 0.5f}},
+{EnemyType::EnemyMedicalBMP, random_vec2},
+{EnemyType::EnemyMedicalPillBoidSpawner, random_vec2},
+        { EnemyType::EnemyMedicalSyringe, random_vec2},
     },
     {
     }
