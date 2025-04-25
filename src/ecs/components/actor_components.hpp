@@ -424,6 +424,7 @@ enum EnemyType {
 
     // Military
     EnemyEyeCube,
+    EnemyPhantom,
 
     // event room enemies
     InvincibleGranter,

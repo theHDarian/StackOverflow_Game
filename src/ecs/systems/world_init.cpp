@@ -1922,6 +1922,14 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			enemy = EyeCube();
 			break;
 		}
+	case EnemyPhantom: {
+		enemy = Phantom();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 2000.f;
+		buffer.maxCoolDown = 500.f;
+		buffer.duration = 5000.f;
+		break;
+	}
 
 		case InvincibleGranter: {
 		enemy = InvincibleBuffGranter();

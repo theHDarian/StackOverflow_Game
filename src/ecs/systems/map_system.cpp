@@ -534,7 +534,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 // map.currRoom.preset = BossRoomMultiCube;
                 // map.currRoom.preset = TreasureRoomChoice5;
             } else {
-                map.currRoom.preset = ScientistBossRoom;
+                map.currRoom.preset = EnemyRoomPhantom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;

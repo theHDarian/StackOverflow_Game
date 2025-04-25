@@ -7455,7 +7455,7 @@ struct EyeCube : Enemy {
 
 	EyeCube()
 	{
-		maxHealth = 1500;
+		maxHealth = 2000;
 		currHealth = maxHealth;
 
 		enemyPatterns = { followState, attackState };
@@ -7480,14 +7480,14 @@ struct Phantom : Enemy
 		EnemyAttackPattern::SHOTGUN,
 		RECTANGLE,
 		{},
-		bulletPierceUp,
-		4,
-		M_PI / 2.f,
-		{20, 400},
-		200,
+		dmgDown,
+		8,
+		M_PI / 4.f,
+		{20, 300},
+		300,
 		10000,
 		{0, 0},
-		0,
+		2,
 		-100,
 		0
 	};
@@ -7495,8 +7495,8 @@ struct Phantom : Enemy
 	const AttackData magicMissile{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
-		{dmgUp, bulletRangeDown},
-		bulletPierceUp,
+		{dmgUp, dmgUp},
+		bulletRangeDown,
 		10,
 		0,
 		{20, 40},
@@ -7505,14 +7505,30 @@ struct Phantom : Enemy
 		{100, 0},
 		0,
 		0,
-		0.02
+		0.02,
+		EnemyBulletDeath::EXPLODE
 	};
+
+	const AttackData beeSpray{
+		EnemyAttackPattern::SPRAY,
+		CIRCLE,
+		{fireRateUp, bulletRangeUp,bulletRangeUp},
+		dmgDown,
+		15,
+		M_PI,
+		{30, 30},
+		600,
+		5000,
+		{0, 0},
+		0,
+		2,
+		0};
 
 	const AttackData fireball{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{accuracyUp},
-		accuracyDown,
+		{bulletRangeUp, bulletRangeUp},
+		bulletRangeDown,
 		1,
 		0,
 		{80, 80},
@@ -7528,8 +7544,8 @@ struct Phantom : Enemy
 	const AttackData radialSquare{
 	EnemyAttackPattern::RADIAL_POLYGON,
 	RECTANGLE,
-	{fireRateUp},
-	bulletSpeedUp,
+	{fireRateUp, dmgUp},
+	bulletRangeDown,
 	4,
 	0,
 	{30, 30},
@@ -7538,14 +7554,15 @@ struct Phantom : Enemy
 	{0, 0},
 	0,
 	0,
-	0
+	0,
+		EnemyBulletDeath::EXPLODE
 	};
 
 	const AttackData radialTriangle{
 	EnemyAttackPattern::RADIAL_POLYGON,
 	TRIANGLE,
-	{fireRateUp},
-	bulletSpeedUp,
+	{fireRateUp, dmgUp},
+	bulletRangeDown,
 	3,
 	0,
 	{30, 30},
@@ -7554,18 +7571,14 @@ struct Phantom : Enemy
 	{0, 0},
 	0,
 	0,
-	0
-	};
-
-	const Reaction PlayerBullet = {
-		ReactionType::PLAYER_BULLET_CLOSE,
-		3,
+	0,
+		EnemyBulletDeath::CLUSTER
 	};
 
 	const Reaction HalfHP = {
 		ReactionType::FIFTY_HEALTH,
-		3,
-		SpecialStates::INVINCIBLE
+		1,
+		SpecialStates::INVISIBLE
 	};
 
 	const Reaction PlayerClose = {
@@ -7580,32 +7593,38 @@ struct Phantom : Enemy
 		SpecialStates::VULNERABLE
 	};
 
-	Reaction duration = {
-		ReactionType::DURATION,
-		0,
+	const Reaction	PlayerClose3 = {
+		ReactionType::PLAYER_CLOSE,
+		6,
 		SpecialStates::VULNERABLE
 	};
 
+	const Reaction duration = {
+		ReactionType::DURATION,
+		0,
+	};
 
-	EnemyPattern IdleState = { "Follow Player", EnemyBehavior::RANDOM_NEAR, {}, 0, 4000.f, 4000.f, {duration, PlayerClose, PlayerBullet}, 2, true, 0.f, 2500.f, magicMissile, SpecialStates::CLOAKED };
 
-	EnemyPattern teleport = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration, HalfHP}, 0, true, 0.f, 500.f, radialTriangle, SpecialStates::INVISIBLE};
 
-	EnemyPattern shootingState = { "ROTATE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {duration, PlayerClose, PlayerBullet}, 0, true, 0.f, 1000.f, iceWall, SpecialStates::CLOAKED };
+	EnemyPattern IdleState = { "Follow Player", EnemyBehavior::RANDOM_NEAR, {}, 0, 3000.f, 3000.f, {duration, PlayerClose, HalfHP}, 1, true, 0.f, 1000.f, beeSpray, SpecialStates::CLOAKED };
 
-	EnemyPattern grantCloaked = { "GRANT CLOAKED", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, PlayerClose2}, 4, true, 0.f, 3000.f, NoAttack, SpecialStates::CLOAKED, SpecialStates::CLOAKED };
+	EnemyPattern teleport = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration}, 2, true, 0.f, 500.f, radialTriangle, SpecialStates::CLOAKED};
 
-	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration, PlayerClose2}, 4, true, 0.f, 3000.f,  fireball, SpecialStates::CLOAKED};
+	EnemyPattern grantInvisible = { "GRANT INVISIBLE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, PlayerClose2,}, 3, true, 0.f, 3000.f, NoAttack, SpecialStates::CLOAKED, SpecialStates::INVISIBLE };
 
-	EnemyPattern teleport2 = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration, HalfHP}, 0, true, 0.f, 500.f, radialSquare, SpecialStates::INVISIBLE};
+	EnemyPattern shootingState = { "ROTATE", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {duration, PlayerClose2,}, 4, true, 0.f, 2000.f, magicMissile, SpecialStates::CLOAKED };
 
-	EnemyPattern grantInvisible = { "GRANT INVISIBLE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, PlayerClose2}, 4, true, 0.f, 3000.f, NoAttack, SpecialStates::INVISIBLE, SpecialStates::INVISIBLE };
+	EnemyPattern teleport2 = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration}, 5, true, 0.f, 500.f, radialSquare, SpecialStates::CLOAKED};
+
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration, PlayerClose3,}, 6, true, 0.f, 1500.f,  fireball, SpecialStates::CLOAKED};
+
+	EnemyPattern teleport3 = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration}, 0, true, 0.f, 500.f, iceWall, SpecialStates::CLOAKED};
 
 	Phantom()
 	{
-		maxHealth = 750;
+		maxHealth = 1250;
 		currHealth = maxHealth;
-		enemyPatterns = {IdleState, teleport, shootingState,  RetreatAndShoot, teleport2};
+		enemyPatterns = {IdleState, teleport,grantInvisible, shootingState,  teleport2, RetreatAndShoot, teleport3};
 		sprite = {
 			"military_triangle",
 			EFFECT_ASSET_ID::ANIMATE,
@@ -7615,10 +7634,10 @@ struct Phantom : Enemy
 			12,
 			100};
 		patternIndex = 0;
-		scale = vec2(216.f, 264.f) * 0.4f;
+		scale = vec2(192.f, 240.f) * 0.66f;
 		rotatePower = 0.f;
-		speedMultiplier = 3.f;
-
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+		speedMultiplier = 7.5f;
 	};
 };
 

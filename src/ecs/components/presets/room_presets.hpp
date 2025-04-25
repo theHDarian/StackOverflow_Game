@@ -3108,6 +3108,28 @@ const RoomPreset allConsoles {
     {2500, 2000}
 };
 
+const RoomPreset EnemyRoomPhantom {
+        { {
+
+            {EnemyPhantom, {0.5, 0.5}},
+                {EnemyEyeCube, random_vec2}
+                },
+
+        },
+        {},
+        {{{PushConsole,{numBulletsUp}}, {0.5f, 0.5f}},
+        {{PopConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
+        {{WishGranter,{bulletBurstUp, bulletSpeedUp}}, {0.75f, 0.5f}},
+    },
+        0.0f,
+        5,
+        2,
+        "\"The Phantom\"",
+        false,
+        {2500, 2000}
+};
+
+
 const std::vector<RoomPreset> bossRooms = {
     BossRoomBee, BossRoomCrab, BossRoomMole, BossRoomWorm, BossRoomBigC, BossRoomMultiCube
 };
