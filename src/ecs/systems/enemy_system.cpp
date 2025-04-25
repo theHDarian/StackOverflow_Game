@@ -657,7 +657,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
             if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
                 if (!registry.vulnerabilities.has(e)) {
                     auto& vul = registry.vulnerabilities.emplace(e);
-                    vul.modifier = 0.5;
+                    vul.modifier = checkTierThreshold(Pierce) ? 0.75 : 0.5;
                     vul.countdown = buffer.duration;
                     if (registry.buffers.has(e)) {
                         vul.countdown = vul.countdown / 2;
@@ -670,7 +670,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                     if (countDown > inv.countdown) {
                         inv.countdown = countDown;
                     }
-                    inv.modifier = 0.5;
+                    inv.modifier = checkTierThreshold(Pierce) ? 0.75 : 0.5;
                 }
             }
             if (behavior == EnemyBehavior::GRANTINGBUFFS) {
@@ -693,7 +693,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                 if (glm::distance(m.position, registry.motions.get(entity).position) < buffer.range) {
                     if (!registry.vulnerabilities.has(e)) {
                         auto& vul = registry.vulnerabilities.emplace(e);
-                        vul.modifier = 1.5f;
+                        vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
                         vul.countdown = buffer.duration;
                         if (registry.buffers.has(e)) {
                             vul.countdown = vul.countdown / 2;
@@ -706,7 +706,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
                         if (countDown > inv.countdown) {
                             inv.countdown = countDown;
                         }
-                        inv.modifier = 1.5f;
+                        inv.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
                     }
                 }
                 if (behavior == EnemyBehavior::GRANTINGBUFFS) {

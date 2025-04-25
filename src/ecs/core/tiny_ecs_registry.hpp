@@ -7,6 +7,8 @@
 #include "map_components.hpp"
 #include "particle_components.hpp"
 
+bool checkTierThreshold(BulletEffectType bf);
+
 class ECSRegistry
 {
 	// Callbacks to remove a particular or all entities in the system

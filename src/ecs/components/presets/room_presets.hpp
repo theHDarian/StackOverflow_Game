@@ -2939,7 +2939,7 @@ const RoomPreset MiningEnemyRoomBoulders {
                 12.5f,
         25,
         5,
-        "Boulder Dash",
+        "Rolling in the Deep",
         false,
         {1500, 1500}
 };

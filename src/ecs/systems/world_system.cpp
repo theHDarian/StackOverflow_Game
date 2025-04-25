@@ -553,7 +553,7 @@ void WorldSystem::handleCollisions() {
 				if (bullet.bulletBounce > 0) {
 					if (checkTierThreshold(Bounce) && registry.enemies.entities.size() > 0) {
 						motion.position -= normalize(motion.velocity) * max(motion.scale.x, motion.scale.y) / 2.f;
-						Entity& randomEnemy = Random::ListItem(registry.enemies.entities);
+						Entity randomEnemy = Random::ListItem(registry.enemies.entities);
 						Motion& rem = registry.motions.get(randomEnemy);
 
 						vec2 goTo = glm::normalize(rem.position - motion.position);
@@ -815,12 +815,6 @@ float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
 	return registry.stackCompile.get(pl).Call(bf) + value;
 }
 
-bool WorldSystem::checkTierThreshold(BulletEffectType bf)
-{
-	Entity& pl = registry.players.entities[0];
-	return registry.stackCompile.get(pl).values[bf] >= registry.stackCompile.get(pl).tierThresholds[bf];
-}
-
 void WorldSystem::handlePlayerHit(Entity& other) {
 	std::vector<BulletStackEffect> effects;
 	if (registry.enemyBullets.has(other)) {
@@ -846,7 +840,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 	}
 
 	if (checkTierThreshold(PlayerDashRecharge) && effects.size() == 1 && effects[0].type == Inert) {
-		// TODO Play dodge sound
+		soundPlayer->playPlayerDashSound();
 		return;
 	}
 

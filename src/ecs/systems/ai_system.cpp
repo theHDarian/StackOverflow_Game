@@ -67,11 +67,11 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				if (vul.countdown < currPattern.curDuration || vul.modifier != 0.5) {
 					vul.countdown = currPattern.curDuration;
 				}
-				vul.modifier = 0.5;
+				vul.modifier = checkTierThreshold(Pierce) ? 0.75 : 0.5;
 			} else {
 				auto& vul = registry.vulnerabilities.emplace(entity);
 				vul.countdown = currPattern.curDuration;
-				vul.modifier = 0.5;
+				vul.modifier = checkTierThreshold(Pierce) ? 0.75 : 0.5;
 			}
 		break;
 		case SpecialStates::VULNERABLE:
@@ -80,11 +80,11 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				if (vul.countdown < currPattern.curDuration || vul.modifier != 2.f) {
 					vul.countdown = currPattern.curDuration;
 				}
-				vul.modifier = 1.5f;
+				vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
                 vul.countdown = currPattern.curDuration;
-                vul.modifier = 1.5f;
+                vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
             }
 		break;
 		case SpecialStates::UNDERGROUND:
@@ -165,28 +165,28 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
 				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
-				vul.modifier = 0.5;
+				vul.modifier = checkTierThreshold(Pierce) ? 0.75 : 0.5;
 			} else {
 				auto& vul = registry.vulnerabilities.emplace(entity);
 				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 				if (countdown > vul.countdown || vul.modifier != 0.5) {
 					vul.countdown = countdown;
 				}
-				vul.modifier = 0.5;
+				vul.modifier = checkTierThreshold(Pierce) ? 0.75 : 0.5;
 			}
 		break;
 		case SpecialStates::VULNERABLE:
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
 				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
-				vul.modifier = 1.5f;
+				vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
                 float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 				if (countdown > vul.countdown || vul.modifier != 2.f) {
 					vul.countdown = countdown;
 				}
-                vul.modifier = 1.5f;
+                vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
             }
 		break;
 		case SpecialStates::UNDERGROUND:
@@ -731,9 +731,11 @@ void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
 	if (!reaction_found && getReactions(currPattern.reactions, ReactionType::PLAYER_BULLET_CLOSE))
 	{
 		float closestPBullet = 100000.f;
-		for (Entity e : registry.playerBullets.entities) {
-			Motion& m = registry.motions.get(e);
-			closestPBullet = min(closestPBullet, glm::distance(m.position, EnemyPos));
+		if (!registry.spawnings.has(entity)) {
+			for (Entity e : registry.playerBullets.entities) {
+				Motion& m = registry.motions.get(e);
+				closestPBullet = min(closestPBullet, glm::distance(m.position, EnemyPos));
+			}
 		}
 
 		auto reaction = getReactions(currPattern.reactions, ReactionType::PLAYER_BULLET_CLOSE);

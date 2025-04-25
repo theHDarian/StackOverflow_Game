@@ -3941,7 +3941,7 @@ struct MoleBoss : Enemy
 		CIRCLE,
 		{},
 		blunt,
-		8,
+		4,
 		0,
 		{60, 60},
 		600,
@@ -3951,8 +3951,8 @@ struct MoleBoss : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemySmallBoulder,
-		{{0.25, 0.25}, {0.5, 0.25}, {0.75, 0.25}, {0.25, 0.5}, {0.75, 0.5}, {0.25, 0.75}, {0.5, 0.75}, {0.75, 0.75}}
+		EnemyType::EnemyBigBoulder,
+		{{0.5, 0.25},  {0.25, 0.5}, {0.75, 0.5},  {0.5, 0.75}, }
 	};
 
 
@@ -3984,7 +3984,7 @@ struct MoleBoss : Enemy
 
 	EnemyPattern emergeStatePhase2 = { "Emerge", EnemyBehavior::IDLE, {}, 0, 3500.f, 3500.f, {duration}, 6, true, 1500.f, 1000.f, halo, SpecialStates::VULNERABLE };
 	EnemyPattern shootingStatePhas2 = {
-		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 700.f, fastDirtBlast, SpecialStates::VULNERABLE
+		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 700.f, fastDirtBlast,
 	};
 
 	EnemyPattern chasePlayer = { "CHASE", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration}, 8, true, 0.f, 700.f, weakDirtBlast, SpecialStates::UNDERGROUND };
@@ -7470,6 +7470,155 @@ struct EyeCube : Enemy {
 		rotatePower = 1.0;
 		speedMultiplier = 4.0f;
 		rotationBehaviour = EnemyRotationBehavior::NONE;
+	};
+};
+
+struct Phantom : Enemy
+{
+
+	const AttackData iceWall{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
+		{},
+		bulletPierceUp,
+		4,
+		M_PI / 2.f,
+		{20, 400},
+		200,
+		10000,
+		{0, 0},
+		0,
+		-100,
+		0
+	};
+
+	const AttackData magicMissile{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{dmgUp, bulletRangeDown},
+		bulletPierceUp,
+		10,
+		0,
+		{20, 40},
+		600,
+		1500,
+		{100, 0},
+		0,
+		0,
+		0.02
+	};
+
+	const AttackData fireball{
+		EnemyAttackPattern::SHOTGUN,
+		CIRCLE,
+		{accuracyUp},
+		accuracyDown,
+		1,
+		0,
+		{80, 80},
+		300,
+		4000,
+		{0, 0},
+		0,
+		0,
+		0.07,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	const AttackData radialSquare{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	RECTANGLE,
+	{fireRateUp},
+	bulletSpeedUp,
+	4,
+	0,
+	{30, 30},
+	400,
+	2000,
+	{0, 0},
+	0,
+	0,
+	0
+	};
+
+	const AttackData radialTriangle{
+	EnemyAttackPattern::RADIAL_POLYGON,
+	TRIANGLE,
+	{fireRateUp},
+	bulletSpeedUp,
+	3,
+	0,
+	{30, 30},
+	400,
+	2000,
+	{0, 0},
+	0,
+	0,
+	0
+	};
+
+	const Reaction PlayerBullet = {
+		ReactionType::PLAYER_BULLET_CLOSE,
+		3,
+	};
+
+	const Reaction HalfHP = {
+		ReactionType::FIFTY_HEALTH,
+		3,
+		SpecialStates::INVINCIBLE
+	};
+
+	const Reaction PlayerClose = {
+		ReactionType::PLAYER_CLOSE,
+		1,
+		SpecialStates::VULNERABLE
+	};
+
+	const Reaction PlayerClose2 = {
+		ReactionType::PLAYER_CLOSE,
+		4,
+		SpecialStates::VULNERABLE
+	};
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0,
+		SpecialStates::VULNERABLE
+	};
+
+
+	EnemyPattern IdleState = { "Follow Player", EnemyBehavior::RANDOM_NEAR, {}, 0, 4000.f, 4000.f, {duration, PlayerClose, PlayerBullet}, 2, true, 0.f, 2500.f, magicMissile, SpecialStates::CLOAKED };
+
+	EnemyPattern teleport = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration, HalfHP}, 0, true, 0.f, 500.f, radialTriangle, SpecialStates::INVISIBLE};
+
+	EnemyPattern shootingState = { "ROTATE", EnemyBehavior::RANDOM, {}, 0, 2000.f, 2000.f, {duration, PlayerClose, PlayerBullet}, 0, true, 0.f, 1000.f, iceWall, SpecialStates::CLOAKED };
+
+	EnemyPattern grantCloaked = { "GRANT CLOAKED", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, PlayerClose2}, 4, true, 0.f, 3000.f, NoAttack, SpecialStates::CLOAKED, SpecialStates::CLOAKED };
+
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration, PlayerClose2}, 4, true, 0.f, 3000.f,  fireball, SpecialStates::CLOAKED};
+
+	EnemyPattern teleport2 = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration, HalfHP}, 0, true, 0.f, 500.f, radialSquare, SpecialStates::INVISIBLE};
+
+	EnemyPattern grantInvisible = { "GRANT INVISIBLE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 1000.f, 1000.f, {duration, PlayerClose2}, 4, true, 0.f, 3000.f, NoAttack, SpecialStates::INVISIBLE, SpecialStates::INVISIBLE };
+
+	Phantom()
+	{
+		maxHealth = 750;
+		currHealth = maxHealth;
+		enemyPatterns = {IdleState, teleport, shootingState,  RetreatAndShoot, teleport2};
+		sprite = {
+			"military_triangle",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::RANDOM,
+			12,
+			100};
+		patternIndex = 0;
+		scale = vec2(216.f, 264.f) * 0.4f;
+		rotatePower = 0.f;
+		speedMultiplier = 3.f;
+
 	};
 };
 
