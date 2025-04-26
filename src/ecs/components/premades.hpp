@@ -1529,7 +1529,7 @@ struct BossChimeraCrab : Enemy {
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		Random::ListItem(crabs),
+		EnemyType::EnemyEvilCrab,
 		{}};
 	const AttackData laserSummon{
 		EnemyAttackPattern::SPAWNING,
@@ -1612,7 +1612,7 @@ struct BossChimeraCrab : Enemy {
 
 	BossChimeraCrab()
 	{
-		maxHealth = 850;
+		maxHealth = 1000;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState, idleState, walkingRage, shootMisile, HalfHPRepostion, HalfHPLaser, RetreatAndShoot, randomStateHalfHP, walkingRageHalfhp, randomlaserState, Phase2Laser};
@@ -2466,7 +2466,7 @@ struct BossBeeHive : Enemy
 	EnemyPattern endingState = {"25% HP HIVE", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {}, 8, true, 0.f, 5000.f, twelveBoidBees};
 	BossBeeHive()
 	{
-		maxHealth = 1200;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 		enemyPatterns = {startingState1, startingState2, halfHpState1, halfHpState2, halfHpState3, quarterHpState1, quarterHpState2, quarterHpState3, endingState};
 		sprite = {
@@ -5554,7 +5554,7 @@ struct HifiSniper : Enemy
 
 	HifiSniper()
 	{
-		maxHealth = 90;
+		maxHealth = 120;
 		currHealth = maxHealth;
 		enemyPatterns = {random, random2, random3, random4};
 		patternIndex = 0;
@@ -5611,7 +5611,7 @@ struct HifiSniperHard : Enemy
 
 	HifiSniperHard()
 	{
-		maxHealth = 60;
+		maxHealth = 100;
 		currHealth = maxHealth;
 		enemyPatterns = {random, random2, random3, random4};
 		patternIndex = 0;
@@ -5640,7 +5640,7 @@ struct HifiCharger : Enemy
 
 	HifiCharger()
 	{
-		maxHealth = 70;
+		maxHealth = 150;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, randomPosNoCharge};
 		sprite = {
@@ -5687,7 +5687,7 @@ struct HifiChargerHard : Enemy
 
 	HifiChargerHard()
 	{
-		maxHealth = 90;
+		maxHealth = 200;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3, randomPosNoCharge};
 		sprite = {
@@ -5796,7 +5796,7 @@ struct HifiTrail : Enemy
 
 	HifiTrail()
 	{
-		maxHealth = 250;
+		maxHealth = 300;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState};
@@ -6050,7 +6050,7 @@ struct HifiJellyFish : Enemy
 
 	HifiJellyFish()
 	{
-		maxHealth = 150;
+		maxHealth = 250;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState, chargingState3, shootingState2};
@@ -6206,7 +6206,7 @@ struct HifiBallLauncher : Enemy
 
 	HifiBallLauncher()
 	{
-		maxHealth = 90;
+		maxHealth = 150;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, shootingState};
@@ -6336,7 +6336,7 @@ struct HifiCannon : Enemy
 
 	HifiCannon()
 	{
-		maxHealth = 150;
+		maxHealth = 350;
 		currHealth = maxHealth;
 		enemyPatterns = {random1, chargingState, backUp, shootCannon, shootCluster};
 		patternIndex = 0;
@@ -6400,7 +6400,7 @@ struct HifiCannonHard : Enemy
 
 	HifiCannonHard()
 	{
-		maxHealth = 400;
+		maxHealth = 500;
 		currHealth = maxHealth;
 		enemyPatterns = {random1, chargingState, backUp, shootCannon, spawn, rest, laser};
 		patternIndex = 0;
@@ -7492,6 +7492,23 @@ struct Phantom : Enemy
 		0
 	};
 
+	const AttackData plantMine{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyDynamite };
+
 	const AttackData magicMissile{
 		EnemyAttackPattern::RADIAL,
 		TRIANGLE,
@@ -7616,13 +7633,13 @@ struct Phantom : Enemy
 
 	EnemyPattern teleport2 = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration}, 5, true, 0.f, 500.f, radialSquare, SpecialStates::CLOAKED};
 
-	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration, PlayerClose3,}, 6, true, 0.f, 1500.f,  fireball, SpecialStates::CLOAKED};
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration, PlayerClose3,}, 6, true, 0.f, 500.f,  plantMine, SpecialStates::CLOAKED};
 
 	EnemyPattern teleport3 = { "Follow Player", EnemyBehavior::TELEPORT, {}, 0, 500.f, 500.f, {duration}, 0, true, 0.f, 500.f, iceWall, SpecialStates::CLOAKED};
 
 	Phantom()
 	{
-		maxHealth = 1250;
+		maxHealth = 750;
 		currHealth = maxHealth;
 		enemyPatterns = {IdleState, teleport,grantInvisible, shootingState,  teleport2, RetreatAndShoot, teleport3};
 		sprite = {
@@ -7797,6 +7814,174 @@ struct UnderGroundBuffGranter : Enemy
 	EnemyPattern buff = {"UNDERGROUND", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 5000.f, 5000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::UNDERGROUND};
 
 	UnderGroundBuffGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct WholeRoomInvincibleGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM INVINCIBLE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVINCIBLE};
+
+	WholeRoomInvincibleGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct WholeRoomCloakedGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM CLOAKED", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::CLOAKED};
+
+	WholeRoomCloakedGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct WholeRoomRegenerateGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM REGENERATE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::REGENERATING};
+
+	WholeRoomRegenerateGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct WholeRoomProtectedGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM PROTECTED", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::PROTECTED};
+
+	WholeRoomProtectedGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct WholeRoomVulnerableGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM VULNERABLE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::VULNERABLE};
+
+	WholeRoomVulnerableGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct WholeRoomUnderGroundGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM UNDERGROUND", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::UNDERGROUND};
+
+	WholeRoomUnderGroundGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+	};
+};
+
+struct WholeRoomInvisibleGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM INVISIBLE", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::INVISIBLE};
+
+	WholeRoomInvisibleGranter()
 	{
 		maxHealth = 1;
 		currHealth = maxHealth;

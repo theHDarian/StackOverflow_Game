@@ -440,7 +440,7 @@ void WorldSystem::handleCollisions() {
 		// Player centric collision handling
 		if (registry.players.has(entity)) {
 			// Checking Player - Deadly collisions
-			if (!registry.invincibles.has(entity) && !registry.spawnings.has(entity_other) && !registry.moles.has(entity_other)
+			if (!registry.invincibles.has(entity) && !registry.spawnings.has(entity_other) && !registry.moles.has(entity_other) && !registry.roomWideBuffers.has(entity_other)
 				&& (registry.enemies.has(entity_other) || registry.enemyBullets.has(entity_other))) {
 				handlePlayerHit(entity_other);
 				if (registry.enemyBullets.has(entity_other) 

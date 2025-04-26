@@ -672,35 +672,35 @@ const RoomPreset EnemyRoomInvisible{
                     {EnemyType::EnemyEvilSnail, {0.5f, 0.5f}},
                     {EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
                     {EnemyMagnet, {0.3f, 0.4f}},
-                    {InvisibleGranter, {0.5f, 0.5f}},
-                    {InvisibleGranter, {0.8f, 0.2f}},
-                    {InvisibleGranter, {0.3f, 0.4f}},
+                    {InvisibleGranterRoomWide, {0.5f, 0.5f}},
+                    // {InvisibleGranter, {0.8f, 0.2f}},
+                    // {InvisibleGranter, {0.3f, 0.4f}},
             },
                 {
                                            {EnemyPufferfish, {0.3f, 0.7f}},
                         {EnemyPufferfish, {0.4f, 0.6f}},
-                        {InvisibleGranter, {0.3f, 0.7f}},
-                        {InvisibleGranter, {0.4f, 0.6f}},
+                        // {InvisibleGranter, {0.3f, 0.7f}},
+                        // {InvisibleGranter, {0.4f, 0.6f}},
 
                 },
                 {
                                {EnemyType::EnemyCrab, {0.8f, 0.8f}},
             {EnemyType::EnemyEvilCrab, {0.8f, 0.2f}},
             {EnemyType::EnemyCrab, {0.2f, 0.2f}},
-                {InvisibleGranter, {0.8f, 0.8f}},
-            {InvisibleGranter, {0.8f, 0.2f}},
-            {InvisibleGranter, {0.2f, 0.2f}},
+            //     {InvisibleGranter, {0.8f, 0.8f}},
+            // {InvisibleGranter, {0.8f, 0.2f}},
+            // {InvisibleGranter, {0.2f, 0.2f}},
 
                     },
                 {
                     {EnemyTwoBee, {0.5f, 0.5f}},
-            {EnemyHifiSniperHard , {0.1f, 0.9f}},
-            {EnemyHifiSniperHard , {0.9f, 0.1f}},
+            {EnemyTwoBee , {0.1f, 0.9f}},
+            {EnemyThreeBee , {0.9f, 0.1f}},
                             {EnemyThreeBee, {0.4f, 0.6f}},
-{InvisibleGranter, {0.5f, 0.5f}},
-{InvisibleGranter , {0.1f, 0.9f}},
-{InvisibleGranter, {0.4f, 0.6f}},
-{InvisibleGranter , {0.9f, 0.1f}},
+// {InvisibleGranter, {0.5f, 0.5f}},
+// {InvisibleGranter , {0.1f, 0.9f}},
+// {InvisibleGranter, {0.4f, 0.6f}},
+// {InvisibleGranter , {0.9f, 0.1f}},
                 }
             },
         {},
@@ -720,41 +720,41 @@ const RoomPreset EnemyRoomCloaked{
                 {EnemySword, {0.5f, 0.5f}},
                 {EnemySword,{0.3f, 0.5f}},
                 {EnemySword,{0.7f, 0.5f}},
-                    {CloakedGranter, {0.5f, 0.5f}},
-                    {CloakedGranter,{0.3f, 0.5f}},
-                    {CloakedGranter,{0.7f, 0.5f}}
+                    {CloakedGranterRoomWide, {0.5f, 0.5f}},
+                    // {CloakedGranter,{0.3f, 0.5f}},
+                    // {CloakedGranter,{0.7f, 0.5f}}
             },
             {
                 {EnemyScissors, {0.5f, 0.5f}},
                 {EnemyScissors,{0.5f, 0.3f}},
                 {EnemyScissors,{0.5f, 0.7f}},
-                    {CloakedGranter, {0.5f, 0.5f}},
-                    {CloakedGranter,{0.5f, 0.3f}},
-                    {CloakedGranter,{0.5f, 0.7f}}
+                    // {CloakedGranter, {0.5f, 0.5f}},
+                    // {CloakedGranter,{0.5f, 0.3f}},
+                    // {CloakedGranter,{0.5f, 0.7f}}
             },
                 {
                     {EnemyHifiChargerHard, {0.5f, 0.5f}},
                     {EnemyHifiCharger,{0.3f, 0.3f}},
                     {EnemyHifiCharger,{0.7f, 0.7f}},
-                    {CloakedGranter, {0.5f, 0.5f}},
-                    {CloakedGranter,{0.3f, 0.3f}},
-                    {CloakedGranter,{0.7f, 0.7f}}
+                    // {CloakedGranter, {0.5f, 0.5f}},
+                    // {CloakedGranter,{0.3f, 0.3f}},
+                    // {CloakedGranter,{0.7f, 0.7f}}
                 },
             {
                 {EnemyMedicalRodA, {0.5f, 0.5f}},
                 {EnemyMedicalRodA,{0.3f, 0.7f}},
                 {EnemyMedicalRodA,{0.7f, 0.3f}},
-                    {CloakedGranter, {0.5f, 0.5f}},
-                    {CloakedGranter,{0.3f, 0.7f}},
-                    {CloakedGranter,{0.7f, 0.3f}}
+                    // {CloakedGranter, {0.5f, 0.5f}},
+                    // {CloakedGranter,{0.3f, 0.7f}},
+                    // {CloakedGranter,{0.7f, 0.3f}}
             },
             {
                     {EnemyMedicalSyringe,{0.3f, 0.7f}},
                     {EnemyMedicalSyringe,{0.7f, 0.3f}},
                         {EnemyMedicalBMP, {0.5f, 0.5f}},
-                        {CloakedGranter,{0.3f, 0.7f}},
-                        {CloakedGranter,{0.7f, 0.3f}},
-                        {CloakedGranter, {0.5f, 0.5f}},
+                        // {CloakedGranter,{0.3f, 0.7f}},
+                        // {CloakedGranter,{0.7f, 0.3f}},
+                        // {CloakedGranter, {0.5f, 0.5f}},
             },
         },
         {},
@@ -773,42 +773,42 @@ const RoomPreset MedicalEnemyRoomInvincible{
                     {EnemyProstheticHand, {0.5f, 0.5f}},
                     {EnemyMedicalPillBoidSpawner,{0.3f, 0.5f}},
                     {EnemyMedicalPillBoidSpawner,{0.7f, 0.5f}},
-                        {InvincibleGranter, {0.5f, 0.5f}},
-                        {InvincibleGranter,{0.3f, 0.5f}},
-                        {InvincibleGranter,{0.7f, 0.5f}}
+                        {InvincibleGranterRoomWide, {0.5f, 0.5f}},
+                        // {InvincibleGranter,{0.3f, 0.5f}},
+                        // {InvincibleGranter,{0.7f, 0.5f}}
                 },
                 {
                     {EnemyScissors, {0.5f, 0.5f}},
                     {EnemyScissors,{0.5f, 0.3f}},
                     {EnemyScissors,{0.5f, 0.7f}},
-                        {InvincibleGranter, {0.5f, 0.5f}},
-                        {InvincibleGranter,{0.5f, 0.3f}},
-                        {InvincibleGranter,{0.5f, 0.7f}}
+                        // {InvincibleGranter, {0.5f, 0.5f}},
+                        // {InvincibleGranter,{0.5f, 0.3f}},
+                        // {InvincibleGranter,{0.5f, 0.7f}}
                 },
                     {
                         {EnemyQuadshooterElite, {0.5f, 0.5f}},
                         {EnemySpineChainedWormHead,{0.3f, 0.3f}},
                         {EnemySpineChainedWormHead,{0.7f, 0.7f}},
-                        {InvincibleGranter, {0.5f, 0.5f}},
-                        {InvincibleGranter,{0.3f, 0.3f}},
-                        {InvincibleGranter,{0.7f, 0.7f}}
+                        // {InvincibleGranter, {0.5f, 0.5f}},
+                        // {InvincibleGranter,{0.3f, 0.3f}},
+                        // {InvincibleGranter,{0.7f, 0.7f}}
                     },
 
                 {
                         {EnemyMedicalSyringe,{0.3f, 0.7f}},
                         {EnemyMedicalSyringe,{0.7f, 0.3f}},
                             {EnemySpinePatrolWormHead, {0.1f, 0.9f}},
-                            {InvincibleGranter,{0.3f, 0.7f}},
-                            {InvincibleGranter,{0.7f, 0.3f}},
-                            {InvincibleGranter, {0.1f, 0.9f}},
+                            // {InvincibleGranter,{0.3f, 0.7f}},
+                            // {InvincibleGranter,{0.7f, 0.3f}},
+                            // {InvincibleGranter, {0.1f, 0.9f}},
                 },
             {
                         {EnemyMedicalRodC, {0.5f, 0.5f}},
                         {EnemyMedicalRodA,{0.3f, 0.7f}},
                         {EnemyMedicalRodA,{0.7f, 0.3f}},
-                            {InvincibleGranter, {0.5f, 0.5f}},
-                            {InvincibleGranter,{0.3f, 0.7f}},
-                            {InvincibleGranter,{0.7f, 0.3f}}
+                            // {InvincibleGranter, {0.5f, 0.5f}},
+                            // {InvincibleGranter,{0.3f, 0.7f}},
+                            // {InvincibleGranter,{0.7f, 0.3f}}
                 },
             },
             {},
@@ -1375,7 +1375,7 @@ const RoomPreset BossRoomCrab{
     5,
     "Carcinisation",
     false,
-    {1500, 1500}
+    {1800, 1800}
 
 };
 
@@ -2997,6 +2997,51 @@ false,
 {1500, 1500}
 };
 
+const RoomPreset MiningEnemyRoomCloakedMoles {
+        {
+            {
+                {EnemySmallMole, {0.4, 0.4}},
+        {EnemySmallMole, {0.4, 0.5}},
+        {EnemySmallMole, {0.4, 0.6}},
+            { EnemySmallBoulder, {0.6, 0.3}},
+            { EnemySmallBoulder, {0.6, 0.5}},
+            { EnemySmallBoulder, {0.6, 0.7}},
+            { EnemySmallBoulder, {0.6, 0.9}},
+                // {CloakedGranter, {0.4, 0.4}},
+                // {CloakedGranter, {0.4, 0.5}},
+                // {CloakedGranter, {0.4, 0.6}},
+                // { CloakedGranter, {0.6, 0.3}},
+                // { CloakedGranter, {0.6, 0.5}},
+                // { CloakedGranter, {0.6, 0.7}},
+                // { CloakedGranter, {0.6, 0.9}},
+                { CloakedGranterRoomWide, {0.6, 0.5}},
+
+            },
+
+            {
+                {EnemySurfaceMole, {0.4, 0.4}},
+                {EnemySurfaceMole, {0.4, 0.6}},
+                { EnemyBigBoulder, {0.6, 0.3}},
+                { EnemyBigBoulder, {0.6, 0.5}},
+                { EnemyBigBoulder, {0.6, 0.7}},
+                        // {CloakedGranter, {0.4, 0.4}},
+                        // {CloakedGranter, {0.4, 0.6}},
+                        // { CloakedGranter, {0.6, 0.3}},
+                        // { CloakedGranter, {0.6, 0.5}},
+                        // { CloakedGranter, {0.6, 0.7}},
+
+            },
+        },
+                {},
+                {},
+            18.5f,
+    10,
+    5,
+    "Shrouded in Darkness",
+    false,
+    {2100, 1700}
+};
+
 const RoomPreset MiningEnemyRoomIntro {
             {
                 {
@@ -3109,10 +3154,51 @@ const RoomPreset allConsoles {
 };
 
 const RoomPreset EnemyRoomPhantom {
-        { {
-
+        {
+            {
             {EnemyPhantom, {0.5, 0.5}},
-                {EnemyEyeCube, random_vec2}
+                {EnemyMage, random_vec2},
+                    {EnemyMage, random_vec2}
+                },
+                    {
+                {EnemyMage, {0.5, 0.5}},
+                    {EnemyPhantom, random_vec2},
+                        {EnemyPhantom, random_vec2}
+                    },
+
+        },
+        {},
+        {{{PushConsole,{numBulletsUp}}, {0.5f, 0.5f}},
+        {{PopConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
+        {{WishGranter,{bulletBurstUp, bulletSpeedUp}}, {0.75f, 0.5f}},
+    },
+        65.0f,
+        35,
+        12,
+        "The Phantom",
+        false,
+        {2500, 2000}
+};
+
+const RoomPreset EnemyRoomEyes {
+            {
+                {
+                    {EnemyEyeCube, {0.5f, 0.5f}},
+                        {EnemyQuadshooterElite, {0.2f, 0.8f}},
+                            {EnemyQuadshooterElite, {0.8f, 0.2f}},
+                            {EnemyQuadshooter, {0.8f, 0.8f}},
+                                { EnemyQuadshooter, {0.2f, 0.2f}},
+                },
+                    {
+                        {EnemyEyeCube, random_vec2},
+                            {EnemyQuadshooterElite, {0.25f, 0.25f}},
+                                {EnemyQuadshooterElite, {0.75f, 0.75f}},
+                                {EnemyQuadshooter, {0.25f, 0.75f}},
+                                    { EnemyQuadshooter, {0.75f, 0.25f}},
+                    },
+                {
+                        {EnemyEyeCube, random_vec2},
+                                {EnemyEyeCube, random_vec2},
                 },
 
         },
@@ -3121,10 +3207,10 @@ const RoomPreset EnemyRoomPhantom {
         {{PopConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
         {{WishGranter,{bulletBurstUp, bulletSpeedUp}}, {0.75f, 0.5f}},
     },
-        0.0f,
-        5,
-        2,
-        "\"The Phantom\"",
+        25.0f,
+        35,
+        12,
+        "Penetrating Gaze",
         false,
         {2500, 2000}
 };

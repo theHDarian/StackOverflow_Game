@@ -83,6 +83,12 @@ void EnemySystem::step(float elapsed_ms)
             }
         }
 
+        if (registry.roomWideBuffers.has(entity)) {
+            Map& map = registry.maps.components[0];
+            if (registry.enemies.entities.size() < 2 && map.currRoom.enemiesToSpawn.empty() && map.currRoom.preset.enemies.empty())
+                destruct(enemy);
+        }
+
         // merge bee logic
         EnemyPattern &pattern = enemy.currEnemyPattern();
         if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
@@ -353,7 +359,7 @@ void EnemySystem::step(float elapsed_ms)
         }
         const Collision &collision = registry.collisions.get(entity);
         Entity other_entity = collision.other;
-        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity) && !registry.deleteds.has(other_entity) && !registry.spawnings.has(entity) && !registry.moles.has(entity))
+        if (registry.enemies.has(entity) && registry.playerBullets.has(other_entity) && !registry.deleteds.has(other_entity) && !registry.spawnings.has(entity) && !registry.moles.has(entity) && !registry.roomWideBuffers.has(entity))
         {
             Enemy &enemyStat = registry.enemies.get(entity);
             PlayerBullet &bulletStat = registry.playerBullets.get(other_entity);

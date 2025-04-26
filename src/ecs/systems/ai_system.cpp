@@ -806,7 +806,7 @@ bool AISystem::updateHealerState(Enemy &enemy, Entity entity)
 
 vec2 AISystem::getMove(EnemyBehavior behavior, Entity entity)
 {
-	if (registry.enemyParts.has(entity) && registry.enemyParts.get(entity).alwaysFollow)
+	if ((registry.enemyParts.has(entity) && registry.enemyParts.get(entity).alwaysFollow) || registry.roomWideBuffers.has(entity))
 	{
 		return getCurrentPos(entity);
 	}

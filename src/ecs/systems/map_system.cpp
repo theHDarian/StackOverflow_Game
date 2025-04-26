@@ -148,7 +148,7 @@ void MapSystem::step(float elapsed_ms)
             }
         }
             
-    } else if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.type != TutorialRoom1) {
+    } else if (!map.currRoom.cleared && (registry.enemies.entities.size() <= registry.roomWideBuffers.entities.size()) && map.currRoom.type != TutorialRoom1) {
         //spawn next wave by setting timeElapsed to spawnDelay
         map.currRoom.timeElapsed += map.currRoom.preset.spawnDelay;
     }
@@ -523,10 +523,11 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             else if (map.currRegion == Mining) {
                 std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
                 map.currRoom.preset = Random::ListItem( miningBossRooms);
-                // map.currRoom.preset = MiningEnemyRoomAvenue;
+                // map.currRoom.preset = MiningEnemyRoomCloakedMoles;
             }
             else if (map.currRegion == Medical) {
                  map.currRoom.preset = ScientistBossRoom;
+                // map.currRoom.preset = EnemyRoomInvisible;
             }
             else if (map.currRegion == Physics) {
                 std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};
@@ -534,7 +535,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 // map.currRoom.preset = BossRoomMultiCube;
                 // map.currRoom.preset = TreasureRoomChoice5;
             } else {
-                map.currRoom.preset = EnemyRoomPhantom;
+                map.currRoom.preset =  EnemyRoomPhantom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
             req.type = SoundType::bossBGM;

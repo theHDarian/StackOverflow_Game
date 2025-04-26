@@ -427,6 +427,7 @@ enum EnemyType {
     EnemyPhantom,
 
     // event room enemies
+    // single target buffs, place at the same position as target
     InvincibleGranter,
     InvisibleGranter,
     VulnerableGranter,
@@ -434,6 +435,14 @@ enum EnemyType {
     UnderGroundGranter,
     RegeneratingGranter,
     CloakedGranter,
+    // room wide buffs, place at the center of the room
+    InvincibleGranterRoomWide,
+    InvisibleGranterRoomWide,
+    VulnerableGranterRoomWide,
+    ProtectedGranterRoomWide,
+    UnderGroundGranterRoomWide,
+    RegenerateGranterRoomWide,
+    CloakedGranterRoomWide,
 };
 
 enum class EnemyAttackPattern {
@@ -842,6 +851,10 @@ struct UIRequest {
 };
 
 struct specialRotators {
+
+};
+
+struct RoomWideBuffers {
 
 };
 

@@ -62,12 +62,12 @@ class RenderSystem {
 	const std::map<SpecialStates, vec3> specialStatesToColor = {
 		{SpecialStates::NORMAL, {1, 1, 1}},
 		{SpecialStates::INVINCIBLE, {1, 1, 0.3}}, // yellow
-		{SpecialStates::PROTECTED,  { 0, 1, 1}}, // cyan
-		{SpecialStates::VULNERABLE, {0, 0, 1}}, // blue
+		{SpecialStates::PROTECTED,  COLOR_TEAL_MED}, // cyan
+		{SpecialStates::VULNERABLE, COLOR_BLUE_BLACK}, // blue
 		{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
-		{SpecialStates::UNDERGROUND, {1, 0.4, 1}}, // magenta
+		{SpecialStates::UNDERGROUND, COLOR_BROWN},
 			{SpecialStates::REGENERATING, {0, 1, 0}}, // green
-		{ SpecialStates::CLOAKED, {0.5, 0.5, 0.5} } // grey
+		{ SpecialStates::CLOAKED, COLOR_MAGENTA_MED }
 	};
 	const RenderRequest underGroundTexture = {
 		"underground.png",
