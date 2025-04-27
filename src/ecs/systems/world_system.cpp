@@ -298,7 +298,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 	//check damage countdown
-	if (registry.damageds.entities.size() > 0) {
+	if (!registry.damageds.entities.empty()) {
 		for (int i = (int)registry.damageds.components.size()-1; i>=0; --i) {
 			Damaged& entity = registry.damageds.components[i];
 			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
@@ -308,7 +308,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	//check spawn countdown
-	if (registry.spawnings.entities.size() > 0) {
+	if (!registry.spawnings.entities.empty()) {
 		for (int i = (int)registry.spawnings.components.size()-1; i>=0; --i) {
 			Spawning& entity = registry.spawnings.components[i];
 			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
@@ -318,7 +318,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	//check cloak countdown
-	if (registry.cloaks.entities.size() > 0) {
+	if (!registry.cloaks.entities.empty()) {
 		for (int i = (int)registry.cloaks.components.size()-1; i>=0; --i) {
 			Cloaked& entity = registry.cloaks.components[i];
 			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
@@ -328,7 +328,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// Critter management
-	if (registry.critters.entities.size() > 0) {
+	if (!registry.critters.entities.empty()) {
 		for (int i = (int)registry.critters.components.size() - 1; i >= 0; --i) {
 			if (registry.deleteds.has(registry.critters.entities[i])) continue;
 			auto& critter = registry.critters.components[i];
@@ -348,7 +348,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// Boss parts
-	if (!registry.bosses.entities.size() > 0) 
+	if (!registry.bosses.entities.size() > 0)
 	{
 		for (int i = (int)registry.bossParts.components.size() - 1; i >= 0; --i) {
 			if (!registry.deleteds.has(registry.bossParts.entities[i]))

@@ -5495,9 +5495,9 @@ struct HifiLaserSniper : Enemy
 struct HifiLaserSniperHard : Enemy
 {
 
-	EnemyPattern laser = {"Laser active", EnemyBehavior::IDLE, {}, 0, 0.f, 1200.f, {{ReactionType::DURATION, 0}}, 2, true, 0.f, 1000.f, FastLaser};
-	EnemyPattern Teleport = {"Charge", EnemyBehavior::IDLE, {}, 0, 300.f, 300.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 350.f, NoAttack};
-	EnemyPattern CoolDown = {"CoolDown", EnemyBehavior::IDLE, {}, 0, 0.f, 4000.f, {{ReactionType::DURATION, 0}}, 1, false, 0.f, 2000.f, NoAttack};
+	EnemyPattern laser = {"Laser active", EnemyBehavior::RANDOM_FAR, {}, 0, 0.f, 1200.f, {{ReactionType::DURATION, 0}}, 2, true, 0.f, 1000.f, FastLaser};
+	EnemyPattern Teleport = {"Charge", EnemyBehavior::RANDOM_FAR, {}, 0, 300.f, 300.f, {{ReactionType::DURATION, 0}}, 0, false, 0.f, 350.f, NoAttack};
+	EnemyPattern CoolDown = {"CoolDown", EnemyBehavior::RANDOM_FAR, {}, 0, 0.f, 4000.f, {{ReactionType::DURATION, 0}}, 1, false, 0.f, 2000.f, NoAttack};
 
 	HifiLaserSniperHard()
 	{
@@ -5511,7 +5511,7 @@ struct HifiLaserSniperHard : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE};
 		scale = vec2({160.0f / 2, 160.f / 2});
 		rotatePower = 0.7f;
-		speedMultiplier = 1.3;
+		speedMultiplier = 1.5f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	};
 };

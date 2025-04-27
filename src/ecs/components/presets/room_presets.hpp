@@ -392,7 +392,7 @@ const RoomPreset EnemyRoomDashIntro3{
        0.0f,
        3,
          1,
-            "Duck and Ducklings",
+            "Pupal Training",
 };
 
 const RoomPreset EnemyRoomDash1{
@@ -420,7 +420,7 @@ const RoomPreset EnemyRoomDash1{
     10.0f,
     5,
     2,
-    "Pointed Troubles",
+    "Spiny Troubles",
 };
 
 const RoomPreset EnemyRoomDash2{
@@ -1486,7 +1486,13 @@ const RoomPreset HifiRoomTwinLaserShurikens {
                 {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.99f,0.1f}},
                 {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
                 {EnemyType::EnemyHifiTrail, {0.6f,0.6f}},
-                {EnemyType::EnemyHifiTrail, {0.4f,0.4f}}
+                {EnemyType::EnemyHifiTrail, {0.4f,0.4f}},
+{EnemyType::EnemyHifiTrail, random_vec2},
+{EnemyType::EnemyHifiTrail, random_vec2},
+{EnemyType::EnemyHifiTrail, random_vec2},
+{EnemyType::EnemyHifiTrail, random_vec2},
+{EnemyType::EnemyHifiTrailHard, random_vec2},
+{EnemyType::EnemyHifiTrailHard, random_vec2},
             }
         },
     {},
@@ -1507,6 +1513,11 @@ const RoomPreset HifiRoomTwinLaserChargers {
                 {EnemyType::EnemyHifiChargerHard, {0.2f,0.8f}},
                 {EnemyType::EnemyHifiChargerHard, {0.4f,0.6f}},
                 {EnemyType::EnemyHifiChargerHard, {0.6f,0.4f}},
+{EnemyType::EnemyHifiChargerHard, random_vec2},
+{EnemyType::EnemyHifiChargerHard, random_vec2},
+{EnemyType::EnemyHifiChargerHard, random_vec2},
+{EnemyType::EnemyHifiChargerHard, random_vec2},
+{EnemyType::EnemyHifiChargerHard, random_vec2},
             }
         },
     {},
@@ -1531,6 +1542,12 @@ const RoomPreset HifiRoomBasicEnemy {
                 {EnemyType::EnemySniper, {0.2f,0.8f}},
                 {EnemyType::EnemyHealer, {0.5f,0.5f}},
                 {EnemyType::EnemyHealer, {0.2f,0.2f}},
+                    {EnemyType::EnemyHifiSniperHard, random_vec2},
+                    {EnemyType::EnemyHifiSniperHard, random_vec2},
+                    {EnemyType::EnemyHifiSniperHard, random_vec2},
+                    {EnemyType::EnemyHifiSniperHard, random_vec2},
+                    {EnemyType::EnemyHifiSniperHard, random_vec2},
+                    {EnemyType::EnemyHifiSniperHard, random_vec2},
             }
         },
     {},
@@ -1554,16 +1571,20 @@ const RoomPreset HifiRoomBasicWave {
                         {EnemyType::EnemySniper, {0.8f,0.2f}},
                         {EnemyType::EnemySniper, {0.8f,0.8f}},
                         {EnemyType::EnemySniper, {0.2f,0.8f}},
+                            {EnemyType::EnemyHifiSniperHard, random_vec2},
+                            {EnemyType::EnemyHifiSniperHard, random_vec2},
                 },
                 {
-                            {EnemyType::EnemyHifiCharger, {0.4f,0.5f}},
+                            {EnemyType::EnemyHifiChargerHard, {0.4f,0.5f}},
+                            {EnemyType::EnemyHifiSniperHard, random_vec2},
+                            {EnemyType::EnemyHifiSniperHard, random_vec2},
                         {EnemyType::EnemyHealer, {0.5f,0.5f}},
                         {EnemyType::EnemyHealer, {0.2f,0.2f}},
                 }
             },
         {},
         {},
-        20.0f,
+        10.0f,
         5,
         2,
         "Cold Reception"
@@ -1579,13 +1600,43 @@ const RoomPreset HifiRoomBoidSnipers{
                 {EnemyType::EnemySniper, {0.5f,0.4f}},
             },
 {
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
-    {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+    {EnemyType::EnemyHifiBoid, random_vec2},
+    {EnemyType::EnemyHifiBoid, random_vec2},
+    {EnemyType::EnemyHifiBoid, random_vec2},
+    {EnemyType::EnemyHifiBoid, random_vec2},
+    {EnemyType::EnemyHifiBoid, random_vec2},
+    {EnemyType::EnemyHifiBoid, random_vec2},
+    {EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+        {EnemyType::EnemySniper, random_vec2},
+        {EnemyType::EnemySniper, random_vec2},
 
             },
     {
@@ -1596,6 +1647,43 @@ const RoomPreset HifiRoomBoidSnipers{
         {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
         {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
         {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+            {EnemyType::EnemySniper, random_vec2},
+            {EnemyType::EnemySniper, random_vec2},
 
                 },
 {
@@ -1606,6 +1694,51 @@ const RoomPreset HifiRoomBoidSnipers{
         {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
         {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
         {EnemyType::EnemyHifiBoid, {0.5f, 0.5f}},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+{EnemyType::EnemyHifiBoid, random_vec2},
+        {EnemyType::EnemySniper, random_vec2},
+        {EnemyType::EnemySniper, random_vec2},
 
                 },
         },
@@ -1681,6 +1814,8 @@ const RoomPreset HifiRoomCannonLasers{
                 {EnemyType::EnemyHifiCannon, {0.9f,0.8f}},
                 {EnemyType::EnemyHifiCannon, {0.1f,0.2f}},
                 {EnemyType::EnemyHifiCannon, {0.1f,0.8f}},
+                    {EnemyType::EnemyHifiCannonHard, random_vec2},
+                    {EnemyType::EnemyHifiCannonHard, random_vec2},
         {EnemyType::EnemyHealer, {0.5f,0.5f}},
         {EnemyType::EnemyHealer, {0.2f,0.2f}},
                 {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
@@ -1694,7 +1829,7 @@ const RoomPreset HifiRoomCannonLasers{
     0.0f,
     5,
     2,
-    "Cannon Fodder"
+    "Cannon Carnival"
 };
 
 const RoomPreset HifiRoomCannonSnipers{
@@ -1786,30 +1921,44 @@ const RoomPreset HifiRoomLaserFiesta {
                 {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
                 {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
             },
-{{EnemyType::EnemyLaserSniper, random_vec2},
+            {
 
+    {EnemyType::EnemyLaserSniper, random_vec2},
         {EnemyType::EnemyLaserSniper, random_vec2},
 
             },
             {
+                {EnemyType::EnemyLaserSniper, random_vec2},
+        {EnemyType::EnemyLaserSniper, random_vec2},
+            },
+            {
                     {EnemyType::EnemyLaserSniper, random_vec2},
-
                     {EnemyType::EnemyLaserSniper, random_vec2},
+                        {EnemyType::EnemyLaserSniper, random_vec2},
+            },
+            {
+                                                {EnemyType::EnemyLaserSniper, random_vec2},
+                            {EnemyType::EnemyLaserSniper, random_vec2},
+                                {EnemyType::EnemyLaserSniper, random_vec2},
             },
                 {
-                        {EnemyType::EnemyLaserSniper, random_vec2},
-
-                        {EnemyType::EnemyLaserSniper, random_vec2},
-                },
-{
                         {EnemyType::EnemyLaserSniperHard, random_vec2},
 
                         {EnemyType::EnemyLaserSniperHard, random_vec2},
                 },
             {
+                                             {EnemyType::EnemyLaserSniperHard, random_vec2},
+                                {EnemyType::EnemyLaserSniperHard, random_vec2},
+            },
+{
+                        {EnemyType::EnemyLaserSniperHard, {0.7, 0.3}},
+                            {EnemyType::EnemySmallCShield, {0.7, 0.3}},
+                        {EnemyType::EnemyLaserSniperHard, { 0.3, 0.7}},
+                            {EnemyType::EnemySmallCShield, { 0.3, 0.7}},
+                },
+            {
             {EnemyEvilSkull , {0.5f, 0.5f}},
-                {EnemySkull, {0.25f, 0.25f}},
-                {EnemySkull, {0.75f, 0.75f}},
+            {EnemySmallCShield , {0.5f, 0.5f}},
                 },
         },
     {},
@@ -1817,7 +1966,7 @@ const RoomPreset HifiRoomLaserFiesta {
     {{PushConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
     {{PushConsole,{bulletBurstUp, bulletSpeedUp}}, {0.75f, 0.5f}},
 },
-    12.0f,
+    6.5f,
     5,
     2,
     "Laser Fiesta",
@@ -1829,11 +1978,17 @@ const RoomPreset HifiRoomJellyFish { //Test room for new enemies
         {
             {
                 {EnemyHifiWhip, {0.5f, 0.5f}},
-                {EnemyHifiJellyFish, {0.5f, 0.5f}},
+                {EnemyHifiJellyFish, random_vec2},
+                    {EnemyHifiJellyFish, random_vec2},
+                    {EnemyHifiJellyFish, random_vec2},
                 {EnemyHifiTackShooter, {0.8,0.2}},
             },
             {
-                    {EnemyHifiJellyFish, {0.5f, 0.5f}},
+                        {EnemyHifiJellyFish, random_vec2},
+                        {EnemyHifiJellyFish, random_vec2},
+                        {EnemyHifiJellyFish, random_vec2},
+                        {EnemyHifiJellyFish, random_vec2},
+                        {EnemyHifiJellyFish, random_vec2},
                     {EnemyHifiTackShooter, {0.2,0.2}},
                     {EnemyHifiTackShooter, {0.2,0.8}},
                     {EnemyHifiBallLauncher,{0.4,0.6}},
@@ -1853,20 +2008,34 @@ const RoomPreset HifiRoomSniperBallLauncher {
         {
             {
                 {EnemyHifiBallLauncher,{0.5,0.5}},
-                {EnemySniper,{0.7,0.5}},
-                {EnemySniper,{0.3,0.5}},
-                {EnemySniper,{0.5,0.3}},
-                {EnemySniper,{0.5,0.7}},
-            }
+                {ProtectedGranter, {0.5,0.5}},
+                {EnemySniper, {0.7, 0.5}},
+                {EnemySniper, {0.3, 0.5}},
+                {EnemySniper, {0.5, 0.3}},
+                {EnemySniper, {0.5, 0.7}},
+            },
+
+            {
+                {EnemyHifiBallLauncher,{0.5,0.5}},
+
+                    {EnemyHifiSniperHard,{0.7,0.5}},
+                    {EnemyHifiSniperHard,{0.3,0.5}},
+                    {EnemyHifiSniperHard,{0.5,0.3}},
+                    {EnemyHifiSniperHard,{0.5,0.7}},
+                    {EnemyHifiBallLauncher,random_vec2},
+                    {EnemyHifiBallLauncher,random_vec2},
+                    {EnemyHifiBallLauncher,random_vec2},
+                    {EnemyHifiBallLauncher,random_vec2},
+            },
         },
     {},
     {},
-    0.0f,
+    15.0f,
     5,
     2,
     "Sniper's Nest",
     false,
-    {2500, 2000}
+    {2000, 1500}
 };
 
 const RoomPreset HifiRoomSmall {
@@ -2944,6 +3113,35 @@ const RoomPreset MiningEnemyRoomBoulders {
         {1500, 1500}
 };
 
+const RoomPreset MiningEnemyRoomQuadShooterBoulders {
+                {
+                    {
+                        {EnemyQuadshooterElite,{0.5,0.5}},
+                        {EnemySmallBoulder, random_vec2},
+                            {EnemySmallBoulder, random_vec2},
+                            {EnemySmallBoulder, random_vec2},
+                    },
+                    {
+                            {EnemySmallBoulder, random_vec2},
+                        {EnemySmallBoulder, random_vec2},
+                    },
+                    {
+                        {EnemyBigBoulder, random_vec2}
+                    },
+
+
+                },
+            {},
+            {},
+            5.0f,
+            5,
+            2,
+            "Deliberate with Care",
+            false,
+            {1600, 1600}
+};
+
+
 const RoomPreset MiningEnemyRoomMolesIntro {
         {
             {
@@ -2953,11 +3151,32 @@ const RoomPreset MiningEnemyRoomMolesIntro {
             },
             {
                     {EnemySmallBoulder, random_vec2},
-            }
+{EnemySmallBoulder, random_vec2},
+            },
+{
+                        {EnemySmallBoulder, random_vec2},
+    {EnemySmallBoulder, random_vec2},
+                },
+{
+                        {EnemySmallBoulder, random_vec2},
+    {EnemySmallBoulder, random_vec2},
+                },
+{
+                        {EnemySmallBoulder, random_vec2},
+    {EnemySmallBoulder, random_vec2},
+                },
+{
+                        {EnemySmallBoulder, random_vec2},
+    {EnemySmallBoulder, random_vec2},
+                },
+{
+                        {EnemySmallBoulder, random_vec2},
+    {EnemySmallBoulder, random_vec2},
+                },
         },
                 {},
                 {},
-            7.5f,
+            6.5f,
     10,
     5,
     "Mole's Welcome",
@@ -2995,6 +3214,26 @@ const RoomPreset MiningEnemyRoomMoles {
 "Mole Party",
 false,
 {1500, 1500}
+};
+
+const RoomPreset MiningEnemyRoomMoles2 {
+        {
+            {
+                {EnemySurfaceMole, {0.5f, 0.5f}},
+            },
+            {
+                        {EnemySmallMole, random_vec2},
+                        {EnemySmallMole, random_vec2},
+            },
+        },
+                {},
+                {},
+            12.5f,
+    10,
+    5,
+    "Homeward Bound",
+    false,
+    {2000, 1500}
 };
 
 const RoomPreset MiningEnemyRoomCloakedMoles {
@@ -3125,6 +3364,101 @@ const RoomPreset MiningEnemyRoomAvenue {
             "Boulder Avenue",
             false,
             {3000, 650}
+};
+
+const RoomPreset MiningEnemyRoomPileDrivers {
+                    {
+                        {
+                            {EnemyPileDriverTurret,{0.8,0.2}},
+                            {EnemyPileDriverTurret,{0.8,0.8}},
+                            {EnemyPileDriverTurret,{0.2,0.8}},
+                                {EnemyPileDriverTurret,{0.2,0.2}},
+                                    {EnemyBigBoulder, random_vec2},
+                        },
+
+                        {
+
+                            {EnemyPileDriverTurret,{0.5,0.5}},
+                            {EnemySmallCShield,{0.5,0.5}},
+                                { EnemyBulldozer, random_vec2},
+                                { EnemyBulldozer, random_vec2},
+                                { EnemyBulldozer, random_vec2},
+                                {EnemySmallBoulder, random_vec2},
+                                {EnemyBigBoulder, random_vec2},
+                                    { EnemySmallMole, random_vec2},
+                                        { EnemySmallMole, random_vec2},
+
+                        },
+
+                    },
+                {},
+                {},
+                16.0f,
+                5,
+                2,
+                "Mineshaft Excavation",
+                false,
+                {1500, 1500}
+};
+
+const RoomPreset MiningEnemyRoomPileDriversIntro {
+                        {
+                            {
+                                {EnemyPileDriverTurret,{0.8,0.2}},
+                                {EnemyPileDriverTurret,{0.8,0.8}},
+                                {EnemyPileDriverTurret,{0.2,0.8}},
+                                    {EnemyPileDriverTurret,{0.2,0.2}},
+                                        {EnemyBigBoulder, random_vec2},
+                                    {EnemyBigBoulder, random_vec2},
+                                {EnemySmallBoulder, random_vec2},
+                                {EnemySmallBoulder, random_vec2},
+                                {EnemySmallBoulder, random_vec2},
+                                {EnemySmallBoulder, random_vec2},
+                            { EnemySmallMole, random_vec2},
+                                { EnemySmallMole, random_vec2},
+                            },
+
+
+                        },
+                    {},
+                    {},
+                    16.0f,
+                    5,
+                    2,
+                    "Spelunking",
+                    false,
+                    {1600, 1600}
+};
+
+const RoomPreset MiningEnemyRoomBulldozers {
+                    {
+                        {
+                            {EnemyBulldozer,{0.2,0.9}},
+                            {EnemyBulldozer,{0.8,0.9}},
+                            {EnemyBulldozer,{0.5,0.9}},
+                                {EnemyBigBoulder,{random_float, 0.5} },
+                                {EnemySmallBoulder,{random_float, 0.5} },
+                                {EnemySmallBoulder,{random_float, 0.5} },
+                        },
+
+                        {
+                            {EnemyBulldozer,{0.2,0.1}},
+                            {EnemyBulldozer,{0.8,0.1}},
+                            {EnemyBulldozer,{0.5,0.1}},
+                                    {EnemyBigBoulder,{random_float, 0.5f} },
+                                    {EnemyBigBoulder,{random_float, 0.5f} },
+                                    {EnemyBigBoulder,{random_float, 0.5f} },
+                        },
+
+                    },
+                {},
+                {},
+                15.f,
+            10,
+            5,
+            "Bulldozing Competition",
+            false,
+            {2100, 1500}
 };
 
 const RoomPreset allConsoles {
@@ -3308,7 +3642,13 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
     {DifficultyRegion::Intro,{
         {
             RoomType::EnemyRoom,
-            {{QuadShooterRoomSmall, MiningEnemyRoomMoles}, {EnemyRoomMagic, MiningEnemyRoomMineField}}
+            {
+                {
+                    QuadShooterRoomSmall, MiningEnemyRoomIntro, MiningEnemyRoomMoles, MiningEnemyRoomPileDrivers,
+                    MiningEnemyRoomBulldozers, MiningEnemyRoomPileDriversIntro, MiningEnemyRoomMoles2,
+                },
+                {EnemyRoomMagic, MiningEnemyRoomCloakedMoles,}
+            }
         },
         {RoomType::RestRoom, {{RestingRoomPop},{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall}}},
         {RoomType::EventRoom, {{EventRoomBibleTree, EventRoomOracleCrab, }, {EventRoomBaru, EventRoomHoney }}  },
@@ -3319,9 +3659,10 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    MiningEnemyRoomIntro, QuadShooterRoomSmall, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue
+                     QuadShooterRoomSmall, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue,MiningEnemyRoomPileDrivers, MiningEnemyRoomBulldozers, MiningEnemyRoomMoles2,
+                    MiningEnemyRoomPileDriversIntro, MiningEnemyRoomQuadShooterBoulders,
                 },
-                {EnemyRoomMagic, MiningEnemyRoomMineField}
+                {EnemyRoomMagic, MiningEnemyRoomMineField, MiningEnemyRoomCloakedMoles,}
             }
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
@@ -3333,9 +3674,9 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    EnemyRoomSingleMage, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue
+                    EnemyRoomSingleMage, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue,MiningEnemyRoomPileDrivers ,MiningEnemyRoomMoles2,MiningEnemyRoomQuadShooterBoulders,MiningEnemyRoomBulldozers,
                 },
-                {EnemyRoomMagic, MiningEnemyRoomMineField}
+                {EnemyRoomMagic, MiningEnemyRoomMineField, MiningEnemyRoomCloakedMoles,}
             }
         },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},

@@ -85,7 +85,7 @@ void EnemySystem::step(float elapsed_ms)
 
         if (registry.roomWideBuffers.has(entity)) {
             Map& map = registry.maps.components[0];
-            if (registry.enemies.entities.size() < 2 && map.currRoom.enemiesToSpawn.empty() && map.currRoom.preset.enemies.empty())
+            if (registry.enemies.entities.size() <= registry.roomWideBuffers.entities.size() && map.currRoom.enemiesToSpawn.empty() && map.currRoom.preset.enemies.empty())
                 destruct(enemy);
         }
 

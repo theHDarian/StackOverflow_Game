@@ -533,7 +533,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};
                 map.currRoom.preset = Random::ListItem( physicsBossRooms);
                 // map.currRoom.preset = BossRoomMultiCube;
-                // map.currRoom.preset = TreasureRoomChoice5;
+                // map.currRoom.preset = HifiRoomLaserFiesta;
             } else {
                 map.currRoom.preset =  EnemyRoomPhantom;
             }
@@ -543,6 +543,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req2.type = InteractableRequestType::AddEffect;
             req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
         }
+        InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+        req2.type = InteractableRequestType::AddEffect;
+        req2.effects = { numBulletsUp, dmgUp,dmgUp,fireRateUp,};
 
         // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
         // req2.type = InteractableRequestType::AddEffect;
