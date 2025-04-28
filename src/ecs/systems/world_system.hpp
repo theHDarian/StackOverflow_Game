@@ -46,9 +46,6 @@ public:
 
 	void enemyBulletDeath(Entity e);
 
-
-static float getModifiedValue(BulletEffectType bf, float value);
-
 private:
 	// restart level
 	void restartGame();

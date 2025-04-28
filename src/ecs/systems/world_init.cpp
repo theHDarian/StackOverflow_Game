@@ -2869,6 +2869,64 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	return entity;
 }
 
+void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction) {
+	float offset = atan2(direction.y, direction.x);
+	for (uint i = 0; i < number; i++)
+	{
+		float a = offset + i * (2 * M_PI / number);
+		createGenericPlayerBullet(renderer, position, vec2(cos(a), sin(a)));
+	}
+}
+
+Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial values
+	PlayerBullet& bullet = registry.playerBullets.emplace(entity);
+	bullet.damage = 0.5f * getModifiedValue(BulletDamage, bullet.damage) / min(1.f, getModifiedValue(BulletNum, 1) - 0.5f);
+	bullet.bulletSpeed = 600;
+	bullet.bulletRange = 1000;
+	bullet.bulletSize = 12;
+	bullet.bulletPierce = 0;
+	bullet.bulletBounce = 0;
+	bullet.generic = true;
+
+	// Invisible &inv = registry.invisibles.emplace(entity);
+	// inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = atan2(direction.y, direction.x);
+	motion.velocity = direction * bullet.bulletSpeed;
+	motion.position = position;
+	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x / 2;
+
+	registry.ignores.emplace(entity);
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
+
+	registry.renderRequests.insert(
+		entity,
+		{ "player_bullet.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	// add bullet trail
+	ParticleProps props = playerBulletTrail;
+	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(2) + 1);
+	return entity;
+}
+
 Entity createSkipDialogue()
 {
 	Entity entity = Entity();
@@ -2876,12 +2934,6 @@ Entity createSkipDialogue()
 	object.name = "SkipTutorial";
 	registry.menuUIs.emplace(entity);
 	return entity;
-}
-
-float getModifiedValue(BulletEffectType bf, float value)
-{
-	Entity &player = registry.players.entities[0];
-	return registry.stackCompile.get(player).Call(bf) + value;
 }
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpecial)

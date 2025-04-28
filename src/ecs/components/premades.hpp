@@ -5943,7 +5943,7 @@ struct HifiJellyFish : Enemy
 		0.0,
 		{20, 20},
 		400,
-		5000,
+		2000,
 		{200, -2 * M_PI / 2.0},
 		0,
 		0,
@@ -5957,7 +5957,7 @@ struct HifiJellyFish : Enemy
 		0.0,
 		{20, 20},
 		300,
-		2000,
+		1000,
 		{200, 0},
 		0,
 		0,
@@ -6168,7 +6168,7 @@ struct HifiBallLauncher : Enemy
 		M_PI / 4.f,
 		{30, 30},
 		600,
-		10000,
+		2000,
 		{0, 0},
 		0,
 		2,
@@ -6201,7 +6201,7 @@ struct HifiBallLauncher : Enemy
 		0,
 		true,
 		0.f,
-		500.f,
+		1000.f,
 		launch};
 
 	HifiBallLauncher()

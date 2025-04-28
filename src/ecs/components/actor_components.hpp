@@ -79,7 +79,7 @@ struct StackCompile {
     typedef float (StackCompile ::* FP)(int);
     // x<0 does nothing (except waste space on stack)
     float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
-    float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * 80.f, 1400.f); };
+    float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f); };
     float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
     float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? -500.f + 1000.f / ((float)x + 2.f) : -50.f * (float)x, 1000.f); };
     float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
@@ -138,21 +138,21 @@ struct StackCompile {
     };
 
     std::map<BulletEffectType, float> tierThresholds = {
-        {BulletDamage,      5},
+        {BulletDamage,      5},     // Inflict burning on hit. 15% default, +15% per additional point over threshold
         {ProjectileSpeed,   5},
-        {ProjectileSize,    5},
+        {ProjectileSize,    5},     // Bullet explodes into smaller bullets on deletion
         {FireRate,          5},
-        {BulletRange,       5},
-        {BulletAccuracy,    5},
+        {BulletRange,       5},     // Deal more damage the further away from the player the enemy is (up to 2x)
+        {BulletAccuracy,    5},     // Inflict vulnerable for 4000
         {BulletNum,         5},
         {BulletBurst,       5},
-        {Bounce,            5},
-        {Pierce,            5},
+        {Bounce,            5},     // Bouncing towards random enemy
+        {Pierce,            5},     // Deal more dmg to protected enemies, and vulnerable effect stronger
         {Homing,            5},
         {PlayerSpeed,       5},
         {PlayerNumDash,     5},
         {PlayerStackSize,   5},
-        {PlayerDashRecharge,5}
+        {PlayerDashRecharge,5}      // 50% Chance to dodge inert effect from bullets or enemies
     };
 
     bool add(BulletStackEffect effect) {
@@ -277,7 +277,16 @@ struct Invisible {
 
 struct Vulnerability {
     float countdown = 1000;
-    float modifier = 1.f;
+    float modifier = 1.5f;
+};
+
+struct Burning {
+    // When countdown reaches 0, deal damage * stack dmg to the enemy and decrement stack
+    // reset countdown if stack > 0
+    float countdown = 3000;
+    float maxCountdown = 3000;
+    float damage = 10.f;
+    int stack = 0;
 };
 
 struct PlayerAttackData {
@@ -298,6 +307,9 @@ struct PlayerBullet {
     float bulletSize = 20;
     int bulletPierce = 0;
     int bulletBounce = 0;
+
+    // Generic bullets can't create more bullets
+    bool generic = false;
 };
 
 enum EnemyType {

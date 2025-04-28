@@ -112,9 +112,11 @@ Entity createKeyBullet(RenderSystem* renderer, vec2 pos);
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
-Entity createSkipDialogue();
+void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction);
 
-float getModifiedValue(BulletEffectType bf, float value);
+Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
+
+Entity createSkipDialogue();
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial);
 

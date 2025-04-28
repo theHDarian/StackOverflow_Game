@@ -40,6 +40,28 @@ void EnemySystem::step(float elapsed_ms)
     // std::cout << "current bee enemy: " << registry.bees.entities.size() << std::endl;
     std::vector<Entity> pendingDeletion;
     std::vector<vec3> createBees;
+
+    //burning ticks
+    if (registry.onFires.entities.size() > 0) {
+        for (int i = (int)registry.onFires.components.size() - 1; i >= 0; --i) {
+            Burning& fire = registry.onFires.components[i];
+            if (fire.stack == 0) continue;
+            fire.countdown = max(fire.countdown - elapsed_ms, 0.f);
+            if (fire.countdown <= 0.f && fire.stack > 0) {
+                Entity e = registry.onFires.entities[i];
+                if (registry.wormBodies.has(e)) {
+                    Entity wh = registry.wormBodies.get(e).head;
+                    if (!registry.invincibles.has(wh)) registry.enemies.get(wh).currHealth -= fire.damage * fire.stack;
+                }
+                else {
+                    registry.enemies.get(e).currHealth -= fire.damage * fire.stack;
+                }
+                fire.stack--;
+                fire.countdown = fire.maxCountdown;
+            }
+        }
+    }
+
     // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities)
     {
@@ -381,10 +403,16 @@ void EnemySystem::step(float elapsed_ms)
                 continue;
             }
 
+            // Deal damage
             float damage = registry.elites.has(entity) ? max((float)((1.f - registry.elites.get(entity).eliteLevel * 0.03) * bulletStat.damage), 1.f) : bulletStat.damage;
             if (registry.vulnerabilities.has(entity))
             {
-                damage = max((float)(damage * registry.vulnerabilities.get(entity).modifier), 1.f);
+                damage = max((float)(damage * registry.vulnerabilities.get(entity).modifier), damage);
+            }
+            if (checkTierThreshold(BulletRange)) {
+                float dist = glm::length(registry.motions.get(entity).position - registry.motions.get(player).position);
+                float snipeMultiplier = clamp(1.f, dist / 500.f, 2.f);
+                damage *= snipeMultiplier;
             }
             if (registry.wormBodies.has(entity)) {
                Enemy& head = registry.enemies.get(registry.wormBodies.get(entity).head);
@@ -406,6 +434,20 @@ void EnemySystem::step(float elapsed_ms)
             else if (registry.damageds.has(entity))
             {
                 registry.damageds.get(entity).countdown = registry.damageds.get(entity).max;
+            }
+
+            // Inflict Vulnerable on enemy if spread tier
+            if (checkTierThreshold(BulletAccuracy)) {
+                auto& vul = registry.vulnerabilities.has(entity) ? registry.vulnerabilities.get(entity) : registry.vulnerabilities.emplace(entity);
+                vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+                vul.countdown = 4000;
+            }
+
+            // Inflict burning or build burning stack if damage tier
+            if (checkTierThreshold(BulletDamage) && (rand() % 100) < (getEffectValueTierThresholdDifference(BulletDamage) + 1) * 15) {
+                if (!registry.onFires.has(entity)) registry.onFires.emplace(entity);
+                Burning& fire = registry.onFires.get(entity);
+                fire.stack++;
             }
         }
     }

@@ -809,12 +809,6 @@ void WorldSystem::movePlayer() {
 	aimMotion.position = player_motion.position + glm::normalize(diff) * range;
 }
 
-float WorldSystem::getModifiedValue(BulletEffectType bf, float value)
-{
-	Entity& pl = registry.players.entities[0];
-	return registry.stackCompile.get(pl).Call(bf) + value;
-}
-
 void WorldSystem::handlePlayerHit(Entity& other) {
 	std::vector<BulletStackEffect> effects;
 	if (registry.enemyBullets.has(other)) {
@@ -932,6 +926,12 @@ void WorldSystem::clearDeleteQueue() {
 		if (!registry.fades.has(e) || registry.fades.get(e).time <= 0) {
 			if (registry.enemyBullets.has(e) && !registry.gameStates.components[0].resetRoom) {
 				enemyBulletDeath(e);
+			}
+
+			// Player bullet explodes if ProjectileSize threshold
+			if (registry.playerBullets.has(e) && !registry.playerBullets.get(e).generic && checkTierThreshold(ProjectileSize) && !registry.gameStates.components[0].resetRoom) {
+				Motion& pBM = registry.motions.get(e);
+				createNGenericPlayerBullet(renderer, 3 + (rand() % (2 + getEffectValueTierThresholdDifference(ProjectileSize))), pBM.position, pBM.velocity);
 			}
 			registry.deleteEntityAndRelatedEntities(e);
 		}
