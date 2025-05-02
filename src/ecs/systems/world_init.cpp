@@ -2204,7 +2204,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 
 	//HP and damage scaling
 	Map& map = registry.maps.components[0];
-	enemy.maxHealth = enemy.maxHealth * pow(1.25, (max((int) map.currRegion - 1 , 0)));
+	int dmgScale = registry.elites.has(entity) ? (int) map.currRegion - 1 + registry.elites.get(entity).eliteLevel : (int) map.currRegion - 1;
+	enemy.maxHealth = enemy.maxHealth * pow(1.25, (max(dmgScale , 0)));
 	enemy.currHealth = enemy.maxHealth;
 	return entity;
 };
