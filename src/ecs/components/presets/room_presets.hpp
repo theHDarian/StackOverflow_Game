@@ -1963,7 +1963,7 @@ const RoomPreset HifiRoomLaserFiesta {
         },
     {},
 {{{PopConsole,{numBulletsUp}}, {0.5f, 0.5f}},
-    {{PushConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
+    {{PushConsole,{fireRateUp, bulletRangeUp}}, {0.25f, 0.5f}},
     {{PushConsole,{bulletBurstUp, bulletSpeedUp}}, {0.75f, 0.5f}},
 },
     6.5f,
@@ -3272,7 +3272,14 @@ const RoomPreset MiningEnemyRoomCloakedMoles {
             },
         },
                 {},
-                {},
+                {
+
+            // {{PushConsole,{numBulletsUp}}, {0.5f, 0.5f}},
+        {{PopConsole}, {0.25f, 0.5f}},
+        {{PushConsole,{dashUp, dashUp,dashUp,sizeUp,sizeUp}}, {0.75f, 0.5f}},
+
+
+                },
             18.5f,
     10,
     5,
@@ -3288,13 +3295,15 @@ const RoomPreset MiningEnemyRoomIntro {
                         {EnemyBulldozer, random_vec2},
                             {EnemyBulldozer, random_vec2},
                             {EnemyBulldozer, random_vec2},
-                        {EnemySmallMole, random_vec2},
-                        {EnemySmallMole, random_vec2},
+                        {EnemyMagnet, random_vec2},
+                        {EnemyMagnet, random_vec2},
                 },
 
             },
                     {},
-                    {},
+                    {
+
+                    },
                 7.5f,
         10,
         5,
@@ -3385,8 +3394,8 @@ const RoomPreset MiningEnemyRoomPileDrivers {
                                 { EnemyBulldozer, random_vec2},
                                 {EnemySmallBoulder, random_vec2},
                                 {EnemyBigBoulder, random_vec2},
-                                    { EnemySmallMole, random_vec2},
-                                        { EnemySmallMole, random_vec2},
+                                    { EnemyMagnet, random_vec2},
+                                        { EnemySword, random_vec2},
 
                         },
 
@@ -3415,7 +3424,7 @@ const RoomPreset MiningEnemyRoomPileDriversIntro {
                                 {EnemySmallBoulder, random_vec2},
                                 {EnemySmallBoulder, random_vec2},
                             { EnemySmallMole, random_vec2},
-                                { EnemySmallMole, random_vec2},
+                                { EnemyMagnet, random_vec2},
                             },
 
 
@@ -3475,7 +3484,9 @@ const RoomPreset allConsoles {
 
     }},
     {},
-    {{{PushConsole,{numBulletsUp}}, {0.5f, 0.5f}},
+    {
+
+        {{PushConsole,{numBulletsUp}}, {0.5f, 0.5f}},
     {{PopConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
     {{WishGranter,{bulletBurstUp, bulletSpeedUp}}, {0.75f, 0.5f}},
 },
@@ -3727,7 +3738,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{EnemyRoomInvisible, EnemyRoomMagic,},bossRooms}},
+        {RoomType::EnemyRoom, {{EnemyRoomInvisible, MiningEnemyRoomMineField, MiningEnemyRoomCloakedMoles, EnemyRoomMagic,EnemyRoomPhantom, EnemyRoomEyes,},bossRooms}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomOven, EventRoomOracleCrab}, { }}  },
         {RoomType::TreasureRoom, {bothTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
@@ -3737,7 +3748,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDir
             RoomType::EnemyRoom,
             {
                 {
-                    EnemyRoomMagic,HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible
+                    EnemyRoomMagic,HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible, EnemyRoomPhantom, EnemyRoomEyes,
 
                 },
                 bossRooms
@@ -3748,7 +3759,13 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDir
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible },bossRooms}},
+        {
+            RoomType::EnemyRoom,
+            {
+                {HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible, EnemyRoomPhantom, EnemyRoomEyes,},
+                bossRooms,
+            }
+        },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{ EventRoomOracleCrab, EventRoomOven}, { }}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},

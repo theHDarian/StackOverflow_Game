@@ -282,6 +282,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     std::vector<Door> &doors = registry.doors.components;
     Map &map = registry.maps.components[0];
     Door &door = doors[doorIndex];
+    std::cout << "Entered Door: " << door.preset.ID << std::endl;
 
     if (door.room == RoomType::None || (!map.currRoom.cleared && registry.interactables.get(registry.doors.entities[doorIndex]).name.compare("OpenDoor") != 0))
         return;
@@ -323,6 +324,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom = Room();
     assert(door.room != RoomType::None);
     map.currRoom.preset = door.preset;
+    std::cout << "Changing room to: " << map.currRoom.preset.ID << std::endl;
     map.currRoom.type = door.room;
 
     // randomize the doors other than the one you came from
@@ -466,6 +468,7 @@ void MapSystem::decorateRoom() {
  
 void MapSystem::resetMap() {
     registry.maps.components[0].currRoom = Room();
+    std:: cout << "Resetting map" << std::endl;
     clearRoomActors();
 }
 
@@ -494,6 +497,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         map.currRegion = MapRegion::Tutorial;
 
         map.currRoom = Room();
+        std::cout << "New Map" << std::endl;
         map.currRoom.preset = TutorialRoom1Preset;
         updateBgPositions();
         map.currRoom.type = TutorialRoom1;
@@ -507,6 +511,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         int lockedRooms = 0;
         bool excludeNone = false;
         map.currRoom = Room();
+        std::cout << "New Map" << std::endl;
         map.currRegion = region;
         map.currRoom.type = roomType;
         if (roomType == RoomType::TutorialRoom) {

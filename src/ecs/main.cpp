@@ -50,6 +50,7 @@ int main() {
 	UISystem uiSystem(&soundSystem);
 	SceneSystem sceneSystem(&soundSystem);
 	CameraSystem cameraSystem;
+	Map map;
 
     // Initialize window
     GLFWwindow* window = world.createWindow();
@@ -115,6 +116,7 @@ int main() {
 		}
 		else {
 			mapSystem.step(elapsed_ms);
+			map = registry.maps.components[0];
 			world.step(elapsed_ms);
 			physics.step(elapsed_ms);
 			aiSystem.step(elapsed_ms);

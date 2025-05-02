@@ -89,7 +89,7 @@ struct DoorSymbol {
 
 struct Room {
     RoomPreset preset;
-    RoomType type = RoomType::TutorialRoom;
+    RoomType type = RoomType::None;
     std::vector<std::tuple<EnemyType, vec2>> enemiesToSpawn = {};
     bool cleared = false;
     float timeElapsed = 0; //time passed since enter room in seconds

@@ -228,6 +228,18 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMedical 
 
 		};
 
+std::vector<std::vector<std::tuple<EnemyType,vec2>>> fightConsolePresetsMilitary =
+{
+	{
+		{EnemyType::EnemyEyeCube, random_vec2},
+{EnemyType::EnemyEyeCube, random_vec2},
+	},
+{
+			{EnemyType::EnemyPhantom, random_vec2},
+			},
+
+			};
+
 
 std::map<char, float> doorSideToAngle = {
 	{'T', M_PI},
@@ -445,6 +457,15 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 							break;
 						case MapRegion::Physics:
 							spawnEnemies(soundPlayer, fightConsolePresetsPhysics[request.choice > -1 ? request.choice : Random::Int(fightConsolePresetsPhysics.size())]);
+							break;
+						case MapRegion::Mining:
+							spawnEnemies( soundPlayer, fightConsolePresetsMining[request.choice > -1 ? request.choice : Random::Int(fightConsolePresetsMining.size())]);
+							break;
+						case MapRegion::Medical:
+							spawnEnemies( soundPlayer, fightConsolePresetsMedical[request.choice > -1 ? request.choice : Random::Int(fightConsolePresetsMedical.size())]);
+							break;
+						case MapRegion::Military:
+							spawnEnemies( soundPlayer, fightConsolePresetsMilitary[request.choice > -1 ? request.choice : Random::Int(fightConsolePresetsMilitary.size())]);
 							break;
 					}
 				}  else
@@ -751,6 +772,9 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					}
 					case Tutorial: {
 						// spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsTutorial));
+						break;
+					} case Military: {
+						spawnEnemies( soundPlayer, Random::ListItem( fightConsolePresetsMilitary));
 						break;
 					}
 					default:
