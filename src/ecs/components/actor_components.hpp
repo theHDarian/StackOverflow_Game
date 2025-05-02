@@ -91,7 +91,7 @@ struct StackCompile {
     float homingFunc(int x)             { return clamp(0.f, (float)x / 20.f, 1.f); };
     float playerSpeedFunc(int x)        { return clamp(-150.f, (float)x * 20.f, 300.f); };
     float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 20.f); };
-    float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 4.f, 64.f); };
+    float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 2.f, 64.f); };
     float playerDashCDRFunc(int x)      { return clamp(-1500.f, (x > 0) ? (float)x * -150.f : (float)x * -200.f, 8000.f); };
 
     std::map<BulletEffectType, FP> functions = {

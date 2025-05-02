@@ -255,6 +255,7 @@ const BulletStackEffect popCurrentStack = {
 	""
 };
 
+
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
 const std::vector<BulletStackEffect> premadeBullets = {
@@ -282,7 +283,8 @@ const std::vector<BulletStackEffect> premadeBullets = {
 	playerSpeedUp,
 	playerSpeedDown,
 	key,
-	homingUp
+	homingUp,
+	popCurrentStack,
 };
 
 //////////////////////////////////////////

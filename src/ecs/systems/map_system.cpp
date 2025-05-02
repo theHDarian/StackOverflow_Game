@@ -100,7 +100,7 @@ void MapSystem::step(float elapsed_ms)
     }
 
     if (map.currRoom.preset.hasElite) {
-        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.empty()) ) {
+        if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.size() <= registry.roomWideBuffers.size()) ) {
             Entity bossEnemy;
             SpawnEnemiesInList( Random::ListItem(eliteEnemies.at(map.currRegion)), bossEnemy, renderer, true);
             map.currRoom.preset.hasElite = false;
@@ -112,6 +112,13 @@ void MapSystem::step(float elapsed_ms)
     if (!map.currRoom.enemiesToSpawn.empty()) {
         SpawnEnemiesInList(map.currRoom.enemiesToSpawn, renderer);
         map.currRoom.enemiesToSpawn.clear();
+    }
+
+    if (map.currRoom.spawnedElite && registry.elites.entities.empty()) {
+        InteractableRequest & req = registry.interactableRequests.emplace_with_duplicates(registry.players.entities[0]);
+        req.type = InteractableRequestType::AddEffect;
+        req.effects = { stackSizeUp };
+        map.currRoom.spawnedElite = false;
     }
 
     if (map.currRoom.cleared || map.currRoom.type == TutorialRoom1) {
@@ -128,6 +135,7 @@ void MapSystem::step(float elapsed_ms)
     if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !map.currRoom.preset.hasElite)
     {
         map.currRoom.cleared = true;
+
         if (map.currRoom.type == BossRoom) {
             CameraRequest& cameraReq2 = registry.cameraRequests.emplace_with_duplicates(registry.maps.entities[0]);
             cameraReq2.type = CameraRequestType::ChangeTargetAndZoom;

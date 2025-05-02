@@ -523,6 +523,8 @@ void UISystem::step(float elapsed_ms) {
 				}
 				else {
 					roomNameText += ", Wave " + std::to_string(map.currRoom.currentWave);
+					if (!roomNameTextComponent.decorations.empty())
+						roomNameTextComponent.decorations.clear();
 				}
 			}
 

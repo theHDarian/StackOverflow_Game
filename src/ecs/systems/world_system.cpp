@@ -942,12 +942,13 @@ void WorldSystem::clearDeleteQueue() {
 		if (registry.enemyBullets.entities.size() == 0) {
 			registry.gameStates.components[0].resetRoom = false;
 		}
-		else {
-			if (!registry.mapRequests.has(player)) {
-				std::cout << "clearing enemy bullets" << std::endl;
-				MapRequest& mapReq = registry.mapRequests.emplace(player, MapRequestType::RestartGame);
-			}
-		}
+		//causes empty room error, check if this is needed
+		// else {
+		// 	if (!registry.mapRequests.has(player)) {
+		// 		std::cout << "clearing enemy bullets" << std::endl;
+		// 		MapRequest& mapReq = registry.mapRequests.emplace(player, MapRequestType::RestartGame);
+		// 	}
+		// }
 		
 	}
 }
