@@ -48,7 +48,7 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             registry.spawnings.emplace(enemy);
             if (isElite) {
                 auto& elt = registry.elites.emplace(enemy);
-                elt.eliteLevel = Random::Int((registry.maps.components[0].currRegion));
+                elt.eliteLevel = Random::Int((registry.maps.components[0].currRegion) + 1);
             }
         }
     }
