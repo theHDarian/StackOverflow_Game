@@ -38,7 +38,7 @@ struct IOState {
 	bool confirmedOption = false;
 	bool pressedEsc = false;
 	bool lockControls = false;
-	bool isFullscreen = false;
+	bool isFullscreen = true;
 	bool isBorderless = false;
 
 	ExtendedStack<int> pressedHorizontal;
