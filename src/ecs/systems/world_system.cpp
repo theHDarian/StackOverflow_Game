@@ -388,6 +388,7 @@ void WorldSystem::restartGame() {
 	soundPlayer->stopGameOverSound();
 
 	if (!registry.mapRequests.has(player)) {
+		std ::cout << "Restarting game" << std::endl;
 		MapRequest& mapReq = registry.mapRequests.emplace(player, MapRequestType::RestartGame);
 	}
 	
@@ -943,6 +944,7 @@ void WorldSystem::clearDeleteQueue() {
 		}
 		else {
 			if (!registry.mapRequests.has(player)) {
+				std::cout << "clearing enemy bullets" << std::endl;
 				MapRequest& mapReq = registry.mapRequests.emplace(player, MapRequestType::RestartGame);
 			}
 		}
