@@ -27,6 +27,10 @@ public:
     SoundSystem();
     ~SoundSystem();
 
+    void playEnemyDeathSound(int sfxNumber);
+
+    void playLaserSound(float time);
+
     bool setMusicVolume(float volume);
 
     bool setSFXVolume(float volume);
@@ -34,6 +38,8 @@ public:
     void playGameOverSound();
 
     void stopGameOverSound();
+
+    void playPlayerDodgeSound(int sfxNumber);
 
     void playNextMusic();
 
@@ -105,7 +111,8 @@ private:
     Mix_Chunk *itemGetSound;
     Mix_Chunk *rareItemGetSound;
     Mix_Chunk *gameOversound;
-
+    Mix_Chunk *laserSound;
+    Mix_Chunk *laserLoopSound;
     Mix_Chunk *fanFareSound;
 
     // Mix_Chunk* playerDeathSound;
@@ -113,7 +120,9 @@ private:
     // Mix_Chunk* enemyDeathSound;
     std::vector<Mix_Chunk *> enemyShootSounds;
     std::vector<Mix_Chunk *> explosionSounds;
+    std::vector<Mix_Chunk *> playerDodgeSounds;
     std::vector<Mix_Chunk *> alarmSounds;
+    std::vector<Mix_Chunk *> enemyDeathSounds;
 
     Mix_Chunk *doorOpenSound;
     Mix_Chunk *doorCloseSound;

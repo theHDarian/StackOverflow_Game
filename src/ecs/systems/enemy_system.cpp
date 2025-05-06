@@ -482,6 +482,9 @@ void EnemySystem::step(float elapsed_ms)
                     }
                 }
             }
+            if (!registry.boids.has(entity)) {
+                sound-> playEnemyDeathSound(Random::Int(1));
+            }
         }
     }
 
@@ -965,6 +968,7 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
         }
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
+    sound->playLaserSound(atkData.bulletRange);
 }
 void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
 {

@@ -124,6 +124,9 @@ enum SoundType {
 	explosion,
 	AlarmSound,
 	FanFare,
+	EnemyDeathSound,
+	PlayerDodgeSound,
+	LaserSound,
 };
 struct SoundRequest {
 	SoundType type;

@@ -2389,6 +2389,10 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 
 		return entity;
 	}
+	if (bullet.bulletEffects[0].type == PlayerStackSize) {
+		bullet.bulletRange *= 0.33f;
+		bullet.bulletSpeed *= 2.f;
+ 	}
 
 	motion.angleOffset = M_PI / 2.f;
 	motion.angle += M_PI / 2.f;
@@ -2431,7 +2435,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 	if (!props.colorEffects.empty())
 	{
 		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, atkData.bulletRange, Random::Int(3) + 5);
+		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, bullet.bulletRange, Random::Int(3) + 5);
 	}
 
 	return entity;

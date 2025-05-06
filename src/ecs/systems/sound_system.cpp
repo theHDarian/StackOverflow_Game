@@ -71,22 +71,34 @@ void SoundSystem::step(float elapsed_ms)
 
             case SoundType::explosion:
                 playExplosionSound(soundRequest.songIndex);
+            break;
 
             case SoundType::DoorClose:
                 playDoorCloseSound();
+            break;
 
             case SoundType::titleBGM:
                 playTitleMusic();
+            break;
 
             case SoundType::PlayerZapped:
                 playPlayerZappedSound();
+            break;
             case SoundType::AlarmSound:
                 if (soundRequest.songIndex == -1)
                     playAlarmSound();
                 else
                 playAlarmSound(soundRequest.songIndex);
+            break;
             case SoundType::FanFare:
                 playFanFareSound();
+            break;
+                case SoundType::EnemyDeathSound:
+                playEnemyDeathSound(soundRequest.songIndex);
+            break;
+                case SoundType::PlayerDodgeSound:
+                playPlayerDodgeSound(soundRequest.songIndex);
+            break;
 
             default:
                 std::cerr << "Unknown sound type: " << soundRequest.type << std::endl;
@@ -328,6 +340,23 @@ void SoundSystem::loadSoundEffects()
         fprintf(stderr, "Failed to load fanfare sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load fanfare sound");
     }
+    fanFareSound->volume = 0.8f * MIX_MAX_VOLUME;
+
+    laserLoopSound = Mix_LoadWAV(audio_path("sfx/laser_loop.wav").c_str());
+    if (!laserLoopSound)
+    {
+        fprintf(stderr, "Failed to load laser loop sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load laser loop sound");
+    }
+    laserLoopSound->volume = 0.3f * MIX_MAX_VOLUME;
+
+    laserSound = Mix_LoadWAV(audio_path("sfx/laser.wav").c_str());
+    if (!laserSound)
+    {
+        fprintf(stderr, "Failed to load laser sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load laser sound");
+    }
+    laserSound->volume = 0.7f * MIX_MAX_VOLUME;
 
     for (int i = 0; i < 5; i++)
     {
@@ -349,6 +378,26 @@ void SoundSystem::loadSoundEffects()
             throw std::runtime_error("Failed to load alarm sound");
         }
         alarmSounds[i]->volume = 0.4f * MIX_MAX_VOLUME;
+    }
+    for (int i = 0; i < 1; i++)
+    {
+        playerDodgeSounds.push_back(Mix_LoadWAV(audio_path("sfx/player_dodge_" + std::to_string(i) + ".wav").c_str()));
+        if (!playerDodgeSounds[i])
+        {
+            fprintf(stderr, "Failed to load dodge sound: %s\n", Mix_GetError());
+            throw std::runtime_error("Failed to load dodge sound");
+        }
+        playerDodgeSounds[i]->volume = 0.6f * MIX_MAX_VOLUME;
+    }
+    for (int i = 1; i <= 4; i++)
+    {
+        enemyDeathSounds.push_back(Mix_LoadWAV(audio_path("sfx/sfx_deathscream_robot" + std::to_string(i) + ".wav").c_str()));
+        if (!enemyDeathSounds[i-1])
+        {
+            fprintf(stderr, "Failed to load enemy death sound: %s\n", Mix_GetError());
+            throw std::runtime_error("Failed to load enemy death sound");
+        }
+        enemyDeathSounds[i-1]->volume = 0.8f * MIX_MAX_VOLUME;
     }
 }
 
@@ -502,7 +551,7 @@ void SoundSystem::playDoorCloseSound()
 
 void SoundSystem::playIncomingDialogueSound()
 {
-    if (!Mix_Playing(6))
+    if (true)
     {
         Mix_PlayChannel(6, incomingDialogueSound, 0);
         Mix_Volume(6, incomingDialogueSound->volume * sfxVolume);
@@ -599,6 +648,42 @@ void SoundSystem::stopGameOverSound()
     if (Mix_Playing(10))
         Mix_HaltChannel(10);
 }
+
+
+void SoundSystem::playPlayerDodgeSound(int sfxNumber)
+{
+    int i = sfxNumber % 1;
+        Mix_PlayChannel(13, playerDodgeSounds[i], 0);
+        Mix_Volume(13, playerDodgeSounds[i]->volume * sfxVolume);
+}
+
+void SoundSystem::playEnemyDeathSound(int sfxNumber)
+{
+    int i = sfxNumber % 4;
+    if (!Mix_Playing(14))
+    {
+        Mix_PlayChannel(14, enemyDeathSounds[i], 0);
+        Mix_Volume(14, enemyDeathSounds[i]->volume * sfxVolume);
+    }
+}
+
+void SoundSystem::playLaserSound(float time)
+{
+    if (!Mix_Playing(15))
+    {
+        Mix_PlayChannel(15, laserSound, 0);
+        Mix_Volume(15, laserSound->volume * sfxVolume);
+    }
+    Mix_Volume(15, laserSound->volume * sfxVolume);
+    if (time > 3000 && !Mix_Playing(16)) {
+        int loops = (time / 8000);
+        Mix_FadeInChannelTimed(16, laserLoopSound, loops, 3000, 0);
+        Mix_Volume(16, laserLoopSound->volume * sfxVolume);
+    }
+}
+
+
+
 
 bool SoundSystem::setMusicVolume(float volume)
 {
