@@ -483,7 +483,7 @@ void EnemySystem::step(float elapsed_ms)
                 }
             }
             if (!registry.boids.has(entity)) {
-                sound-> playEnemyDeathSound(Random::Int(1));
+                sound-> playEnemyDeathSound(Random::Int(4));
             }
         }
     }
@@ -968,7 +968,14 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
         }
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
-    sound->playLaserSound(atkData.bulletRange);
+    if (atkData.veer.x >= 1000) {
+        auto& laserSound = registry.soundRequests.emplace_with_duplicates(enemy);
+        laserSound.type = SoundType::LaserSound;
+        laserSound.delay = 1000.f;
+        laserSound.ticks = atkData.bulletRange;
+    } else {
+        sound->playLaserSound(atkData.bulletRange);
+    }
 }
 void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
 {

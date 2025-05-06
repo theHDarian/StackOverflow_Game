@@ -11,8 +11,16 @@
 
 void SoundSystem::step(float elapsed_ms)
 {
-    for (SoundRequest &soundRequest : registry.soundRequests.components)
+    std::vector<SoundRequest> soundRequests;
+    for (int i = (int)registry.soundRequests.components.size()-1; i>=0; --i)
     {
+        SoundRequest &soundRequest = registry.soundRequests.components[i];
+
+        if (soundRequest.delay > 0)
+        {
+            soundRequest.delay -= elapsed_ms;
+            continue;
+        }
 
         switch (soundRequest.type) {
             case SoundType::normalBGM:
@@ -84,36 +92,43 @@ void SoundSystem::step(float elapsed_ms)
             case SoundType::PlayerZapped:
                 playPlayerZappedSound();
             break;
+
             case SoundType::AlarmSound:
                 if (soundRequest.songIndex == -1)
                     playAlarmSound();
                 else
-                playAlarmSound(soundRequest.songIndex);
+                    playAlarmSound(soundRequest.songIndex);
             break;
+
             case SoundType::FanFare:
                 playFanFareSound();
             break;
-                case SoundType::EnemyDeathSound:
+
+            case SoundType::EnemyDeathSound:
                 playEnemyDeathSound(soundRequest.songIndex);
             break;
-                case SoundType::PlayerDodgeSound:
+
+            case SoundType::PlayerDodgeSound:
                 playPlayerDodgeSound(soundRequest.songIndex);
+            break;
+
+            case SoundType::LaserSound:
+                playLaserSound(soundRequest.ticks);
             break;
 
             default:
                 std::cerr << "Unknown sound type: " << soundRequest.type << std::endl;
             break;
         }
-
+        registry.soundRequests.remove(registry.soundRequests.entities[i]);
     }
-    registry.soundRequests.clear();
 }
 
 SoundSystem::SoundSystem()
 {
     loadMusic();
     loadSoundEffects();
-    Mix_AllocateChannels(16);
+    Mix_AllocateChannels(24);
 }
 
 SoundSystem::~SoundSystem()
@@ -170,6 +185,19 @@ SoundSystem::~SoundSystem()
         if (track.music != nullptr)
             Mix_FreeMusic(track.music);
     }
+    if (titleScreenMusic.music != nullptr)
+        Mix_FreeMusic(titleScreenMusic.music);
+    for (auto& track : playerDodgeSounds)
+    {
+        if (track != nullptr)
+            Mix_FreeChunk(track);
+    }
+    for (auto& track : enemyDeathSounds)
+    {
+        if (track != nullptr)
+            Mix_FreeChunk(track);
+    }
+
 
     Mix_CloseAudio();
 }
@@ -397,7 +425,7 @@ void SoundSystem::loadSoundEffects()
             fprintf(stderr, "Failed to load enemy death sound: %s\n", Mix_GetError());
             throw std::runtime_error("Failed to load enemy death sound");
         }
-        enemyDeathSounds[i-1]->volume = 0.8f * MIX_MAX_VOLUME;
+        enemyDeathSounds[i-1]->volume = 0.5f * MIX_MAX_VOLUME;
     }
 }
 
@@ -677,8 +705,10 @@ void SoundSystem::playLaserSound(float time)
     Mix_Volume(15, laserSound->volume * sfxVolume);
     if (time > 3000 && !Mix_Playing(16)) {
         int loops = (time / 8000);
-        Mix_FadeInChannelTimed(16, laserLoopSound, loops, 3000, 0);
+        // Mix_FadeInChannelTimed(16, laserLoopSound, loops, 3000, 0);
+        Mix_FadeInChannelTimed(16, laserLoopSound, loops, 2000, time);
         Mix_Volume(16, laserLoopSound->volume * sfxVolume);
+
     }
 }
 

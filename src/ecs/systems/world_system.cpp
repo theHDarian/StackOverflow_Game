@@ -836,7 +836,11 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 
 	if (checkTierThreshold(PlayerDashRecharge) && effects.size() == 1 && effects[0].type == Inert) {
 		soundPlayer->playPlayerDodgeSound(Random::Int(2));
-		registry.invincibles.emplace(player);
+		ParticleProps props = playerTrail;
+		registry.emitParticles.replace(player, PExplode, props, 100, 1);
+		if (!registry.invincibles.has(player)) {
+			registry.invincibles.emplace(player);
+		}
 		return;
 	}
 

@@ -136,6 +136,7 @@ struct SoundRequest {
 	float ticks;
 	int songIndex = -1;
 	Mix_Music* music= nullptr;
+	float delay = 0;
 };
 
 
