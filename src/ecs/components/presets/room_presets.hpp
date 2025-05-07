@@ -4555,16 +4555,16 @@ const std::map<RoomType,int> roomTypeToSymbols = {
 };
 
 const std::map<RoomType, SoundType> roomTypeToMusic = {
-    {RoomType::EnemyRoom, SoundType::normalBGM},
-    {RoomType::RestRoom, SoundType::specialBGM},
-    {RoomType::BossRoom, SoundType::bossBGM},
-    {RoomType::TreasureRoom, SoundType::specialBGM},
-    {RoomType::None, normalBGM},
-    {RoomType::TutorialRoom, SoundType::titleBGM},
-    {RoomType::TutorialRoom1, SoundType::titleBGM},
-    {RoomType::TutorialRoom2, SoundType::normalBGM},
-{ RoomType::EventRoom, SoundType::specialBGM },
-{ RoomType::None, SoundType::specialBGM }
+    {RoomType::EnemyRoom, SoundType::CombatBGM},
+    {RoomType::RestRoom, SoundType::ClearedBGM},
+    {RoomType::BossRoom, SoundType::BossBGM},
+    {RoomType::TreasureRoom, SoundType::ClearedBGM},
+    {RoomType::None, SoundType::ClearedBGM},
+    {RoomType::TutorialRoom, SoundType::TitleBGM},
+    {RoomType::TutorialRoom1, SoundType::TitleBGM},
+    {RoomType::TutorialRoom2, SoundType::CombatBGM},
+{ RoomType::EventRoom, SoundType::ClearedBGM },
+{ RoomType::None, SoundType::ClearedBGM }
 
 };
 

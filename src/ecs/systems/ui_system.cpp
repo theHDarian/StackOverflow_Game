@@ -626,25 +626,61 @@ void UISystem::playDialogue() {
 			text.formattedText = getFormattedText(getTokenizedText(text.text), text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
 
 			// play a sound if there is one
-			if (nextLine.sfx == IncomingDialogue) {
-				soundSystem->playIncomingDialogueSound();
-			} else if (nextLine.sfx == DoorOpen) {
-				soundSystem->playDoorOpenSound();
-			} else if (nextLine.sfx == DoorClose) {
-				soundSystem->playDoorCloseSound();
-			} else if (nextLine.sfx == itemPickup) {
-				soundSystem->playItemPickupSound();
-			} else if (nextLine.sfx == rareItemPickup) {
-				soundSystem->playRareItemPickupSound();
-			} else if (nextLine.sfx == explosion) {
-				soundSystem->playExplosionSound(2);
-			} else if (nextLine.sfx == AlarmSound) {
-				soundSystem->playAlarmSound();
-			} else if (nextLine.sfx == FanFare) {
-				 soundSystem->playFanFareSound();
-			} else {
-				soundSystem->stopIncomingDialogueSound();
-				soundSystem->playNextDialogueSound();
+			switch (nextLine.sfx) {
+				case SoundType::IncomingDialogue:
+					soundSystem->playIncomingDialogueSound();
+					break;
+				case SoundType::DoorOpen:
+					soundSystem->playDoorOpenSound();
+					break;
+				case SoundType::DoorClose:
+					soundSystem->playDoorCloseSound();
+					break;
+				case SoundType::itemPickup:
+					soundSystem->playItemPickupSound();
+					break;
+				case SoundType::rareItemPickup:
+					soundSystem->playRareItemPickupSound();
+					break;
+				case SoundType::explosion:
+					soundSystem->playExplosionSound(2);
+					break;
+				case SoundType::AlarmSound:
+					soundSystem->playAlarmSound();
+					break;
+				case SoundType::FanFare:
+					soundSystem->playFanFareSound();
+					break;
+				case SoundType::EnemyShoot:
+					soundSystem->playEnemyShootSound(0, 0);
+					break;
+				case SoundType::EnemyDeathSound:
+					soundSystem->playEnemyDeathSound(Random::Int(4));
+					break;
+				case SoundType::PlayerShoot:
+					soundSystem->playPlayerShootSound(200);
+					break;
+				case SoundType::PlayerDodgeSound:
+					soundSystem->playPlayerDodgeSound(Random::Int(2));
+					break;
+				case SoundType::PlayerHurt:
+					soundSystem->playPlayerHurtSound();
+					break;
+				case SoundType::PlayerZapped:
+					soundSystem->playPlayerZappedSound();
+					break;
+				case SoundType::LaserSound:
+					soundSystem->playLaserSound(1000);
+					break;
+				case SoundType::DiggingSound:
+					soundSystem-> playDiggingSound(2000);
+					break;
+				case SoundType::DashSound:
+					soundSystem->playPlayerDashSound();
+					break;
+				default:
+					soundSystem->playNextDialogueSound();
+					break;
 			}
 
 			// change speaker avatar and name to current

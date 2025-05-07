@@ -91,6 +91,9 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 			if (!registry.moles.has(entity)) {
 				auto& under = registry.moles.emplace(entity);
 				under.countdown = currPattern.curDuration;
+				auto& req = registry.soundRequests.emplace(entity);
+				req.type = SoundType::DiggingSound;
+				req.ticks = currPattern.curDuration;
 			} else {
 				auto& under = registry.moles.get(entity);
 				if (under.countdown < currPattern.curDuration) {
@@ -120,7 +123,7 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				}
 			}
 		break;
-		case SpecialStates::CLEAR_STATES:
+		case SpecialStates::CLEAR_ALL:
 			if (registry.invincibles.has(entity)) {
 				auto& inv = registry.invincibles.get(entity);
 				inv.countdown = -1;
@@ -136,6 +139,9 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 			if (registry.moles.has(entity)) {
 				auto& under = registry.moles.get(entity);
 				under.countdown = -1;
+				auto& req = registry.soundRequests.emplace(entity);
+				req.type = SoundType::DiggingSound;
+				req.songIndex = 1;
 			}
 			if (registry.regenerates.has(entity)) {
 				auto& under = registry.regenerates.get(entity);
@@ -144,6 +150,46 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 			if (registry.cloaks.has(entity)) {
 				auto& cloak = registry.cloaks.get(entity);
 				cloak.countdown = -1;
+			}
+			break;
+		case SpecialStates::CLEAR_INVINCIBLE:
+			if (registry.invincibles.has(entity)) {
+				auto& inv = registry.invincibles.get(entity);
+				inv.countdown = -1;
+			}
+			break;
+		case SpecialStates::CLEAR_INVISIBLE:
+			if (registry.invisibles.has(entity)) {
+				auto& inv = registry.invisibles.get(entity);
+				inv.countdown = -1;
+			}
+			break;
+		case SpecialStates::CLEAR_PROTECTED:
+		case SpecialStates::CLEAR_VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = -1;
+			}
+			break;
+		case SpecialStates::CLEAR_CLOAKED:
+			if (registry.cloaks.has(entity)) {
+				auto& cloak = registry.cloaks.get(entity);
+				cloak.countdown = -1;
+			}
+			break;
+		case SpecialStates::CLEAR_REGENERATING:
+			if (registry.regenerates.has(entity)) {
+				auto& under = registry.regenerates.get(entity);
+				under.countdown = -1;
+			}
+			break;
+		case SpecialStates::CLEAR_UNDERGROUND:
+			if (registry.moles.has(entity)) {
+				auto& under = registry.moles.get(entity);
+				under.countdown = -1;
+				auto& req = registry.soundRequests.emplace(entity);
+				req.type = SoundType::DiggingSound;
+				req.songIndex = 1;
 			}
 			break;
 		default: break;
@@ -219,6 +265,9 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (!registry.moles.has(entity)) {
 				auto& under = registry.moles.emplace(entity);
 				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				auto& req = registry.soundRequests.emplace(entity);
+				req.type = SoundType::DiggingSound;
+				req.ticks = under.countdown;
 			} else {
 				auto& under = registry.moles.get(entity);
 				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
@@ -257,7 +306,7 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			}
 		break;
 
-		case SpecialStates::CLEAR_STATES:
+		case SpecialStates::CLEAR_ALL:
 			if (registry.invincibles.has(entity)) {
 				auto& inv = registry.invincibles.get(entity);
 				inv.countdown = -1;
@@ -273,6 +322,9 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (registry.moles.has(entity)) {
 				auto& under = registry.moles.get(entity);
 				under.countdown = -1;
+				auto& req = registry.soundRequests.emplace(entity);
+				req.type = SoundType::DiggingSound;
+				req.songIndex = 1;
 			}
 			if (registry.regenerates.has(entity)) {
 				auto& under = registry.regenerates.get(entity);
@@ -281,6 +333,46 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (registry.cloaks.has(entity)) {
 				auto& cloak = registry.cloaks.get(entity);
 				cloak.countdown = -1;
+			}
+		break;
+		case SpecialStates::CLEAR_INVINCIBLE:
+			if (registry.invincibles.has(entity)) {
+				auto& inv = registry.invincibles.get(entity);
+				inv.countdown = -1;
+			}
+		break;
+		case SpecialStates::CLEAR_INVISIBLE:
+			if (registry.invisibles.has(entity)) {
+				auto& inv = registry.invisibles.get(entity);
+				inv.countdown = -1;
+			}
+		break;
+		case SpecialStates::CLEAR_PROTECTED:
+		case SpecialStates::CLEAR_VULNERABLE:
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = -1;
+			}
+		break;
+		case SpecialStates::CLEAR_CLOAKED:
+			if (registry.cloaks.has(entity)) {
+				auto& cloak = registry.cloaks.get(entity);
+				cloak.countdown = -1;
+			}
+		break;
+		case SpecialStates::CLEAR_REGENERATING:
+			if (registry.regenerates.has(entity)) {
+				auto& under = registry.regenerates.get(entity);
+				under.countdown = -1;
+			}
+		break;
+			case SpecialStates::CLEAR_UNDERGROUND:
+			if (registry.moles.has(entity)) {
+				auto& under = registry.moles.get(entity);
+				under.countdown = -1;
+				auto& req = registry.soundRequests.emplace(entity);
+				req.type = SoundType::DiggingSound;
+				req.songIndex = 1;
 			}
 		break;
 		default: break;

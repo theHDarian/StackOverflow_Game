@@ -518,7 +518,14 @@ enum class SpecialStates {
     REGENERATING,
     CLOAKED,
     INC_ANIM,
-    CLEAR_STATES
+    CLEAR_ALL,
+    CLEAR_INVISIBLE,
+    CLEAR_INVINCIBLE,
+    CLEAR_VULNERABLE,
+    CLEAR_PROTECTED,
+    CLEAR_UNDERGROUND,
+    CLEAR_REGENERATING,
+    CLEAR_CLOAKED,
 };
 
 enum class EnemyBehavior {

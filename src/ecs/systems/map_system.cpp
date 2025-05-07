@@ -419,21 +419,21 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     clearRoomActors();
 
     SoundType song = roomTypeToMusic.at(type);
-        if (song == SoundType::normalBGM && soundPlayer->currentMusicState != MusicState::PlayingNormal) {
+        if (song == SoundType::CombatBGM && soundPlayer->currentMusicState != MusicState::PlayingNormal) {
             std::cout << "Playing normal music" << std::endl;
             // soundPlayer->playNextMusic();
             auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::normalBGM;
-        } else if (song == SoundType::bossBGM && soundPlayer->currentMusicState != MusicState::PlayingBoss) {
+            req.type = SoundType::CombatBGM;
+        } else if (song == SoundType::BossBGM && soundPlayer->currentMusicState != MusicState::PlayingBoss) {
             std::cout << "Playing boss music" << std::endl;
             // soundPlayer->playBossMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::bossBGM;
-        } else if (song == SoundType::specialBGM && soundPlayer->currentMusicState != MusicState::PlayingSpecial) {
+            req.type = SoundType::BossBGM;
+        } else if (song == SoundType::ClearedBGM && soundPlayer->currentMusicState != MusicState::PlayingSpecial) {
             std::cout << "Playing special music" << std::endl;
             // soundPlayer->playSpecialMusic(0);
             auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::specialBGM;
+            req.type = SoundType::ClearedBGM;
         }
 
     decorateRoom();
@@ -550,7 +550,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 map.currRoom.preset =  EnemyRoomPhantom;
             }
             SoundRequest& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::bossBGM;
+            req.type = SoundType::BossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
             req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};

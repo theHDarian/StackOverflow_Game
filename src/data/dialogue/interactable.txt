@@ -113,7 +113,6 @@ You've already used this! Thinking back, why does a run-down lab have a machine 
 
 ITEM PopStack -1 2
 Would you like to pop your stack?
-Speaker Pop Console pop_console.png
 CHOICES Yes\No
 
 ITEM PushStack -1 0

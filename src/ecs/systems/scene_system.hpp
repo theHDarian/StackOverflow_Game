@@ -22,9 +22,9 @@ public:
     void playCutscene();
 
     std::unordered_map<std::string, SoundType> soundEffectNames = {
-        {"normalBGM", SoundType::normalBGM},
-        {"bossBGM", SoundType::bossBGM},
-        {"specialBGM", SoundType::specialBGM},
+        {"CombatBGM", SoundType::CombatBGM},
+        {"BossBGM", SoundType::BossBGM},
+        {"ClearedBGM", SoundType::ClearedBGM},
         {"PlayerHurt", SoundType::PlayerHurt},
         {"DashSound", SoundType::DashSound},
         {"PlayerShoot", SoundType::PlayerShoot},
@@ -36,7 +36,13 @@ public:
         {"rareItemPickup", SoundType::rareItemPickup},
         {"explosion", SoundType::explosion},
         { "alarm", SoundType::AlarmSound },
-        { "fanfare", SoundType::FanFare }
+        { "fanfare", SoundType::FanFare },
+        { "DoorClose", SoundType::DoorClose },
+        { "PlayerZapped", SoundType::PlayerZapped },
+        { "EnemyDeathSound", SoundType::EnemyDeathSound },
+        { "PlayerDodgeSound", SoundType::PlayerDodgeSound },
+        { "LaserSound", SoundType::LaserSound },
+        { "DiggingSound", SoundType::DiggingSound }
     };
 
     std::unordered_map<InteractableItem, int> hasInteracted = {

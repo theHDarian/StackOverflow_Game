@@ -23,18 +23,18 @@ void SoundSystem::step(float elapsed_ms)
         }
 
         switch (soundRequest.type) {
-            case SoundType::normalBGM:
+            case SoundType::CombatBGM:
                 playNextMusic();
             break;
 
-            case SoundType::bossBGM:
+            case SoundType::BossBGM:
                 if (soundRequest.songIndex == -1)
                     playBossMusic(Random::Int(bossRoomMusic.size()));
                 else
                     playBossMusic(soundRequest.songIndex);
             break;
 
-            case SoundType::specialBGM:
+            case SoundType::ClearedBGM:
                 if (soundRequest.songIndex == -1)
                     playSpecialMusic();
                 else
@@ -85,7 +85,7 @@ void SoundSystem::step(float elapsed_ms)
                 playDoorCloseSound();
             break;
 
-            case SoundType::titleBGM:
+            case SoundType::TitleBGM:
                 playTitleMusic();
             break;
 
@@ -116,8 +116,15 @@ void SoundSystem::step(float elapsed_ms)
                 playLaserSound(soundRequest.ticks);
             break;
 
+            case SoundType::DiggingSound:
+                if (soundRequest.songIndex == -1)
+                    playDiggingSound(soundRequest.ticks);
+                else
+                    stopDiggingSound();
+            break;
+
             default:
-                std::cerr << "Unknown sound type: " << soundRequest.type << std::endl;
+                std::cerr << "Unknown sound type."  << std::endl;
             break;
         }
         registry.soundRequests.remove(registry.soundRequests.entities[i]);
@@ -209,10 +216,10 @@ void SoundSystem::loadMusic() {
 
     // Preload normal room music
     normalRoomMusic = {
-                {SoundType::normalBGM, audio_path("room/game-music-loop-1.wav"), 0.25f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-2.wav"), 0.25f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-3.wav"), 0.25f, -1},
-        {SoundType::normalBGM, audio_path("room/game-music-loop-4.wav"), 0.3f, -1},
+                {SoundType::CombatBGM, audio_path("room/game-music-loop-1.wav"), 0.25f, -1},
+        {SoundType::CombatBGM, audio_path("room/game-music-loop-2.wav"), 0.25f, -1},
+        {SoundType::CombatBGM, audio_path("room/game-music-loop-3.wav"), 0.25f, -1},
+        {SoundType::CombatBGM, audio_path("room/game-music-loop-4.wav"), 0.3f, -1},
     };
 
     for (auto& track : normalRoomMusic) {
@@ -224,8 +231,8 @@ void SoundSystem::loadMusic() {
 
     // Preload boss room music
     bossRoomMusic = {
-        {SoundType::bossBGM, audio_path("boss/boss-music-1.wav"), 0.5f, -1},
-        // {SoundType::bossBGM, audio_path("boss/boss-music-2.wav"), 0.5f, -1},
+        {SoundType::BossBGM, audio_path("boss/boss-music-1.wav"), 0.5f, -1},
+        // {SoundType::BossBGM, audio_path("boss/boss-music-2.wav"), 0.5f, -1},
     };
 
     for (auto& track : bossRoomMusic) {
@@ -237,9 +244,9 @@ void SoundSystem::loadMusic() {
 
     // Preload special room music
     specialRoomMusic = {
-        {SoundType::specialBGM, audio_path("event/event-room-1.wav"), 0.4f, -1},
-        {SoundType::specialBGM, audio_path("event/event-room-2.wav"), 0.6f, -1},
-        {SoundType::specialBGM, audio_path("event/event-room-3.wav"), 0.3f, -1},
+        {SoundType::ClearedBGM, audio_path("event/event-room-1.wav"), 0.4f, -1},
+        {SoundType::ClearedBGM, audio_path("event/event-room-2.wav"), 0.6f, -1},
+        {SoundType::ClearedBGM, audio_path("event/event-room-3.wav"), 0.3f, -1},
     };
 
     for (auto& track : specialRoomMusic) {
@@ -249,7 +256,7 @@ void SoundSystem::loadMusic() {
         }
     }
 
-    this->titleScreenMusic = {SoundType::titleBGM, audio_path("title/title.wav"), 0.15f, -1};
+    this->titleScreenMusic = {SoundType::TitleBGM, audio_path("title/title.wav"), 0.15f, -1};
     this->titleScreenMusic.music = Mix_LoadMUS(titleScreenMusic.path.c_str());
 }
 
@@ -322,14 +329,14 @@ void SoundSystem::loadSoundEffects()
         fprintf(stderr, "Failed to load incoming dialogue sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load incoming dialogue sound");
     }
-    incomingDialogueSound->volume = 0.4f * MIX_MAX_VOLUME;
+    incomingDialogueSound->volume = 0.7f * MIX_MAX_VOLUME;
     nextDialogueSound = Mix_LoadWAV(audio_path("sfx/next_dialogue_short.wav").c_str());
     if (!nextDialogueSound)
     {
         fprintf(stderr, "Failed to load next dialogue sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load next dialogue sound");
     }
-    nextDialogueSound->volume = 0.2f * MIX_MAX_VOLUME;
+    nextDialogueSound->volume = 0.6f * MIX_MAX_VOLUME;
     doorCloseSound = Mix_LoadWAV(audio_path("sfx/door_close.wav").c_str());
     if (!doorCloseSound)
     {
@@ -385,6 +392,14 @@ void SoundSystem::loadSoundEffects()
         throw std::runtime_error("Failed to load laser sound");
     }
     laserSound->volume = 0.7f * MIX_MAX_VOLUME;
+
+    diggingSound = Mix_LoadWAV(audio_path("sfx/digging.wav").c_str());
+    if (!diggingSound)
+    {
+        fprintf(stderr, "Failed to load digging sound: %s\n", Mix_GetError());
+        throw std::runtime_error("Failed to load digging sound");
+    }
+    diggingSound->volume = 0.8f * MIX_MAX_VOLUME;
 
     for (int i = 0; i < 5; i++)
     {
@@ -579,11 +594,8 @@ void SoundSystem::playDoorCloseSound()
 
 void SoundSystem::playIncomingDialogueSound()
 {
-    if (true)
-    {
-        Mix_PlayChannel(6, incomingDialogueSound, 0);
-        Mix_Volume(6, incomingDialogueSound->volume * sfxVolume);
-    }
+    Mix_PlayChannel(6, incomingDialogueSound, 0);
+    Mix_Volume(6, incomingDialogueSound->volume * sfxVolume);
 }
 
 bool SoundSystem::isPlayingIncomingDialogueSound()
@@ -629,11 +641,8 @@ void SoundSystem::playItemPickupSound()
 
 void SoundSystem::playRareItemPickupSound()
 {
-    if (!Mix_Playing(8))
-    {
-        Mix_PlayChannel(8, rareItemGetSound, 0);
-        Mix_Volume(8, rareItemGetSound->volume * sfxVolume);
-    }
+    Mix_PlayChannel(8, rareItemGetSound, 0);
+    Mix_Volume(8, rareItemGetSound->volume * sfxVolume);
 }
 
 void SoundSystem::playExplosionSound(int sfxNumber)
@@ -704,14 +713,26 @@ void SoundSystem::playLaserSound(float time)
     }
     Mix_Volume(15, laserSound->volume * sfxVolume);
     if (time > 3000 && !Mix_Playing(16)) {
-        int loops = (time / 8000);
         // Mix_FadeInChannelTimed(16, laserLoopSound, loops, 3000, 0);
-        Mix_FadeInChannelTimed(16, laserLoopSound, loops, 1000, time);
+        Mix_FadeInChannelTimed(16, laserLoopSound, -1, 1000, time);
         Mix_Volume(16, laserLoopSound->volume * sfxVolume);
 
     }
 }
 
+void SoundSystem::playDiggingSound(float time)
+{
+    if (!Mix_Playing(17)) {
+        Mix_PlayChannelTimed(17, diggingSound, -1,  time);
+        Mix_Volume(17, diggingSound->volume * sfxVolume);
+    }
+}
+
+void SoundSystem::stopDiggingSound()
+{
+    if (Mix_Playing(17))
+        Mix_HaltChannel(17);
+}
 
 
 

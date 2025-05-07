@@ -31,6 +31,10 @@ public:
 
     void playLaserSound(float time);
 
+    void playDiggingSound(float time);
+
+    void stopDiggingSound();
+
     bool setMusicVolume(float volume);
 
     bool setSFXVolume(float volume);
@@ -114,6 +118,7 @@ private:
     Mix_Chunk *laserSound;
     Mix_Chunk *laserLoopSound;
     Mix_Chunk *fanFareSound;
+    Mix_Chunk *diggingSound;
 
     // Mix_Chunk* playerDeathSound;
     // Mix_Chunk* enemyHurtSound;

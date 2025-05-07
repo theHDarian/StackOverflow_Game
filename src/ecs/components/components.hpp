@@ -105,11 +105,11 @@ struct Frame {
 	GLuint prevFrameBuffer;
 };
 
-enum SoundType {
-	normalBGM,
-	bossBGM,
-	specialBGM,
-	titleBGM,
+enum class SoundType {
+	CombatBGM,
+	BossBGM,
+	ClearedBGM,
+	TitleBGM,
 	PlayerHurt,
 	PlayerZapped,
 	DashSound,
@@ -127,6 +127,7 @@ enum SoundType {
 	EnemyDeathSound,
 	PlayerDodgeSound,
 	LaserSound,
+	DiggingSound,
 };
 struct SoundRequest {
 	SoundType type;
