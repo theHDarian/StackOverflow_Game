@@ -706,7 +706,7 @@ void SoundSystem::playLaserSound(float time)
     if (time > 3000 && !Mix_Playing(16)) {
         int loops = (time / 8000);
         // Mix_FadeInChannelTimed(16, laserLoopSound, loops, 3000, 0);
-        Mix_FadeInChannelTimed(16, laserLoopSound, loops, 2000, time);
+        Mix_FadeInChannelTimed(16, laserLoopSound, loops, 1000, time);
         Mix_Volume(16, laserLoopSound->volume * sfxVolume);
 
     }
@@ -729,9 +729,6 @@ bool SoundSystem::setMusicVolume(float volume)
         {
             Mix_VolumeMusic(volume * MIX_MAX_VOLUME * 0.3f);
         }
-        Mix_Volume(1, playerShootSound->volume * volume);
-        Mix_Volume(2, playerDashSound->volume * volume);
-        Mix_Volume(3, playerHurtSound->volume * volume);
         return true;
     }
     return false;

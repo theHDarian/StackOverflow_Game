@@ -56,6 +56,14 @@ void IOSystem::onKey(int key, int _, int action, int mod) {
 		gameState.currentVolume = std::min(1.0f, gameState.currentVolume + 0.0125f);
 		gameState.previousVolume = gameState.currentVolume;
 	}
+	if (key == GLFW_KEY_COMMA && action != GLFW_RELEASE && !gameState.gamePaused) {
+		gameState.currentSfxVolume = std::max(0.0f, gameState.currentSfxVolume - 0.0125f);
+		gameState.previousSfxVolume = gameState.currentSfxVolume;
+	}
+	if (key == GLFW_KEY_PERIOD && action != GLFW_RELEASE && !gameState.gamePaused) {
+		gameState.currentSfxVolume = std::min(1.0f, gameState.currentSfxVolume + 0.0125f);
+		gameState.previousSfxVolume = gameState.currentSfxVolume;
+	}
 
 	//toggle fullscreen
 	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {

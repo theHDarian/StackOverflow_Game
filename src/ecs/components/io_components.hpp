@@ -53,6 +53,8 @@ struct GameState {
 	int dialogueChoice = -1;
 	float currentVolume = 0.4f;
 	float previousVolume = 0.4f;
+	float currentSfxVolume = 0.3f;
+	float previousSfxVolume = 0.3f;
 	bool seenLockedDoor = false;
 	bool titleScreen = false;
 	bool resetRoom = false;

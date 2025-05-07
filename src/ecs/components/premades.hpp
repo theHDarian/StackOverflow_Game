@@ -1463,7 +1463,7 @@ struct BossChimeraCrab : Enemy {
 		0,
 		{60, 60},
 		0,
-		10000,
+		15000,
 		{500, 0},
 		0,
 		0,
@@ -1533,37 +1533,6 @@ struct BossChimeraCrab : Enemy {
 		EnemyBulletDeath::NONE,
 		EnemyType::EnemyEvilCrab,
 		{}};
-	const AttackData laserSummon{
-		EnemyAttackPattern::SPAWNING,
-		TRIANGLE,
-		{numBulletsUp},
-		playerSpeedDown,
-		1,
-		M_PI,
-		{20, 20},
-		600,
-		3000,
-		{0, 0},
-		0,
-		0,
-		0,
-		EnemyBulletDeath::NONE,
-		BossCrabLaser,
-		{}};
-	const AttackData laserRotate{
-		EnemyAttackPattern::LASER,
-		CIRCLE,
-		{bulletPierceUp},
-		dashRechargeUp,
-		3,
-		0,
-		{0, 20},
-		0,
-		8000,
-		{1.2, M_PI / 300},
-		0,
-		0,
-		0};
 
 	const AttackData missile{
 		EnemyAttackPattern::SHOTGUN,
@@ -1604,11 +1573,11 @@ struct BossChimeraCrab : Enemy {
 	EnemyPattern shootMisile = {"MISSILE", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, halfhp}, 0, true, 0.f, 500.f, missile};
 
 	EnemyPattern HalfHPRepostion = { "RANDOM POSITION", EnemyBehavior::PATROLLING, {{0.5, 0.5},{0.5, 0.5}}, 0, 1000.f, 1000.f, {repositioned}, 5, true, 0.f, 500.f, radialSquare, SpecialStates::INVINCIBLE };
-	EnemyPattern HalfHPLaser = { "Laser Spin", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 25000.f, 25000.f, {duration}, 6, true, 0.f, 5000.f, broadsideLasers, SpecialStates::INVINCIBLE };
+	EnemyPattern HalfHPLaser = { "Laser Spin", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 25000.f, 25000.f, {duration}, 6, true, 0.f, 12500.f, broadsideLasers, SpecialStates::INVINCIBLE };
 
-	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RETREAT, {}, 0, 2000.f, 2000.f, {duration,PlayerFar}, 7, true, 0.f, 75.f,  wave};
+	EnemyPattern RetreatAndShoot = {"RetreatAndShoot", EnemyBehavior::RETREAT, {}, 0, 2000.f, 2000.f, {duration,PlayerFar}, 7, true, 0.f, 75.f,  wave, };
 	EnemyPattern randomStateHalfHP = {"RANDOM POSITION", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration}, 8, true, 0.f, 15000.f, crabSummon};
-	EnemyPattern walkingRageHalfhp = {"WALKING RAGE", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 9, true, 0.f, 100.f, twoPincerShot};
+	EnemyPattern walkingRageHalfhp = {"WALKING RAGE", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 9, true, 0.f, 100.f, twoPincerShot, SpecialStates::CLEAR_STATES};
 	EnemyPattern randomlaserState = {"PatrolBoundary", EnemyBehavior::PATROLLING, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 2000.f, 2000.f, {duration}, 6, true, 0.f, 120.f, radialSquarephase2, SpecialStates::INVINCIBLE};
 	EnemyPattern Phase2Laser = { "Laser Spin", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 5000.f, broadsideLasers, };
 
@@ -3785,7 +3754,7 @@ struct SmallMole : Enemy
 		ReactionType::DURATION,
 		1 };
 
-	EnemyPattern shootingState = { "Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration1}, 1, true, 0.f, 1000.f, dirtBlast };
+	EnemyPattern shootingState = { "Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration1}, 1, true, 0.f, 1000.f, dirtBlast, SpecialStates::CLEAR_STATES };
 	EnemyPattern diggingState = { "Digging", EnemyBehavior::RANDOM_FAR, {}, 0, 1500.f, 1500.f, {duration0}, 0, false, 0.f, 5000.f, quadShot, SpecialStates::UNDERGROUND };
 
 	SmallMole()
@@ -3979,14 +3948,14 @@ struct MoleBoss : Enemy
 	EnemyPattern emergeState = { "Emerge", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration, halfHP}, 2, true, 200.f, 700.f, halo, SpecialStates::VULNERABLE };
 
 	EnemyPattern shootingState = {
-		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration, halfHP}, 0, true, 0.f, 1000.f, dirtBlast
+		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration, halfHP}, 0, true, 0.f, 1000.f, dirtBlast, SpecialStates::CLEAR_STATES
 	};
 	EnemyPattern mineFieldState = { "MineField", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 1000.f, summonMineField, SpecialStates::UNDERGROUND };
 	EnemyPattern diggingStatePhase2 = { "Digging", EnemyBehavior::RANDOM, {}, 0, 3600.f, 3600.f, {duration, playerClose}, 5, true, 0.f, 200.f, plantMine, SpecialStates::UNDERGROUND };
 
 	EnemyPattern emergeStatePhase2 = { "Emerge", EnemyBehavior::IDLE, {}, 0, 3500.f, 3500.f, {duration}, 6, true, 1500.f, 1000.f, halo, SpecialStates::VULNERABLE };
 	EnemyPattern shootingStatePhas2 = {
-		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 700.f, fastDirtBlast,
+		"Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration}, 7, true, 0.f, 700.f, fastDirtBlast, SpecialStates::CLEAR_STATES
 	};
 
 	EnemyPattern chasePlayer = { "CHASE", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 3000.f, 3000.f, {duration}, 8, true, 0.f, 700.f, weakDirtBlast, SpecialStates::UNDERGROUND };

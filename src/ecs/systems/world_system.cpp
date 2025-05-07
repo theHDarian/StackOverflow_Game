@@ -622,6 +622,7 @@ void WorldSystem::handleInput() {
 	//change musicVolume
 	GameState& gameState = registry.gameStates.components[0];
 	soundPlayer->setMusicVolume(gameState.currentVolume);
+	soundPlayer->setSFXVolume(gameState.currentSfxVolume);
 
 	registry.nearbyInteractables.clear();
 }

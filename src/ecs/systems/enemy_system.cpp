@@ -968,7 +968,7 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
         }
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
-    if (atkData.veer.x >= 1000) {
+    if (atkData.veer.x >= 400) {
         auto& laserSound = registry.soundRequests.emplace_with_duplicates(enemy);
         laserSound.type = SoundType::LaserSound;
         laserSound.delay = 1000.f;

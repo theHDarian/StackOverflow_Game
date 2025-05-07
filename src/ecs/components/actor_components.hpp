@@ -517,7 +517,8 @@ enum class SpecialStates {
     UNDERGROUND,
     REGENERATING,
     CLOAKED,
-    INC_ANIM
+    INC_ANIM,
+    CLEAR_STATES
 };
 
 enum class EnemyBehavior {

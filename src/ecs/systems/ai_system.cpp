@@ -120,6 +120,32 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				}
 			}
 		break;
+		case SpecialStates::CLEAR_STATES:
+			if (registry.invincibles.has(entity)) {
+				auto& inv = registry.invincibles.get(entity);
+				inv.countdown = -1;
+			}
+			if (registry.invisibles.has(entity)) {
+				auto& inv = registry.invisibles.get(entity);
+				inv.countdown = -1;
+			}
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = -1;
+			}
+			if (registry.moles.has(entity)) {
+				auto& under = registry.moles.get(entity);
+				under.countdown = -1;
+			}
+			if (registry.regenerates.has(entity)) {
+				auto& under = registry.regenerates.get(entity);
+				under.countdown = -1;
+			}
+			if (registry.cloaks.has(entity)) {
+				auto& cloak = registry.cloaks.get(entity);
+				cloak.countdown = -1;
+			}
+			break;
 		default: break;
 	}
 }
@@ -228,6 +254,33 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				if (countdown > cloak.countdown) {
 					cloak.countdown = countdown;
 				}
+			}
+		break;
+
+		case SpecialStates::CLEAR_STATES:
+			if (registry.invincibles.has(entity)) {
+				auto& inv = registry.invincibles.get(entity);
+				inv.countdown = -1;
+			}
+			if (registry.invisibles.has(entity)) {
+				auto& inv = registry.invisibles.get(entity);
+				inv.countdown = -1;
+			}
+			if (registry.vulnerabilities.has(entity)) {
+				auto& vul = registry.vulnerabilities.get(entity);
+				vul.countdown = -1;
+			}
+			if (registry.moles.has(entity)) {
+				auto& under = registry.moles.get(entity);
+				under.countdown = -1;
+			}
+			if (registry.regenerates.has(entity)) {
+				auto& under = registry.regenerates.get(entity);
+				under.countdown = -1;
+			}
+			if (registry.cloaks.has(entity)) {
+				auto& cloak = registry.cloaks.get(entity);
+				cloak.countdown = -1;
 			}
 		break;
 		default: break;
