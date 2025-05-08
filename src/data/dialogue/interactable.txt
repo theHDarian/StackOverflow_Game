@@ -765,6 +765,35 @@ You can't bake anything without the ingredients.
 ITEM Oven 1 0
 You decide to leave the oven alone.
 
+ITEM Optimizer -1 0
+This seems to be some very advanced piece of technology, capable of optimizing your stack.
+Trusting an unknown machine with your stack seems risky, but it might be worth it.
+Would you like to optimize your stack?
+CHOICES Yes\No
+
+ITEM Optimizer 0 0
+Your stack has changed.
+SOUND rareItemPickup
+
+ITEM Optimizer 1 0
+You decide against using the machine.
+
+ITEM Optimizer -1 1
+You silently feel a great sense of relief. It seems the machine worked as intended. However, you can't shake the feeling that trusting a machine with your stack was a bad idea.
+
+ITEM Optimizer -1 2
+Would you like to optimize your stack?
+CHOICES Yes\No
+
+ITEM Optimizer 0 2
+Your stack has changed.
+SOUND rareItemPickup
+
+ITEM Optimizer 1 2
+You decide against using the machine.
+
+ITEM Optimizer -1 3
+Well, it seems trusting an unknown machine with your stack has backfired on you. Perhaps you should have been more careful.
 
 
 

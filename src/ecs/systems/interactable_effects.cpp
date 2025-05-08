@@ -935,7 +935,84 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 
 			}
 		}
+		if (object.item == InteractableItem::Optimizer) {
+			switch ( object.dialogueCount) {
+				case 2 :
+				case 0 : {
+					if (reaction.choice == 0) {
+						auto& currStack = registry.stackCompile.get(player).currStack;
+						std::vector<BulletStackEffect> effectToKeep = { };
+						std::vector<BulletStackEffect> effectToPop = { };
+						for (BulletStackEffect b : currStack) {
+							if (b.type == BulletEffectType::Inert || b.value < 0) {
+								effectToPop.push_back(b);
+							} else {
+								if (effectToKeep.empty()) {
+									effectToKeep.push_back(b);
+								} else {
+									for (int i = 0; i < effectToKeep.size(); i++) {
+										auto& b2 = effectToKeep[i];
+										if (b.type == BulletEffectType::Key) {
+											effectToKeep.push_back(b);
+											break;
+										}
+										if (b.type == b2.type && b2.value + b.value < 4) {
+											b2.value = b2.value + b.value;
+											break;
+										} else if (b.type == b2.type && b2.value + b.value == 4) {
+											b2.value = 3;
+											b.value = 1;
+											effectToKeep.push_back(b);
+											break;
+										}
+										if (b.type == b2.type && b2.value + b.value == 5) {
+											b2.value = 3;
+											b.value = 2;
+											effectToKeep.push_back(b);
+											break;
+										}
+										if (i == effectToKeep.size() - 1) {
+											effectToKeep.push_back(b);
+											break;
+										}
+									}
+								}
+							}
+						}
+						clearStack(player);
+						if (Random::Float() < 0.8f) {
+							addEffect(player, effectToKeep, soundPlayer);
+							CreateXPopBullets (renderer, registry.motions.get(player).position, M_PI / 2, effectToPop);
+							object.dialogueCount = 1;
+						} else {
+							//Backfire
+							addEffect(player, effectToPop, soundPlayer);
+							CreateXPopBullets (renderer, registry.motions.get(player).position, M_PI / 2, effectToKeep);
+							object.dialogueCount = 3;
+						}
+					}
+					break;
+				}
 
+			}
+		}
+		if (object.item == InteractableItem::Inverter) {
+			switch ( object.dialogueCount) {
+				case 0 : {
+					if (reaction.choice == 0) {
+						auto& currStack = registry.stackCompile.get(player).currStack;
+						bool backfire = Random::Float() < 0.05f;
+						for (BulletStackEffect b : currStack) {
+							if ((b.value < 0 && !backfire) || (b.value > 0 && backfire)) {
+								b.value = -b.value;
+							}
+						}
+						object.dialogueCount = backfire ? 3 : 1;
+					}
+					break;
+				}
+			}
+		}
 		registry.interactableReactions.clear();
 	}
 	handleRequests( elapsed_ms, player, renderer, soundPlayer);

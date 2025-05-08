@@ -191,10 +191,12 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createSwarm(renderer, pos);
 	case InteractableItem::Mouse:
 		return createDeskWithMouse(renderer, pos);
-		case InteractableItem::OracleTurret:
-			return  createOracleTurret(renderer, pos);
-		case InteractableItem::Oven:
-			return CreateOven(renderer, pos);
+	case InteractableItem::OracleTurret:
+		return  createOracleTurret(renderer, pos);
+	case InteractableItem::Oven:
+		return CreateOven(renderer, pos);
+	case InteractableItem::Optimizer:
+		return createOptimizer(renderer, pos);
 	default:
 		return Entity();
 	}
@@ -599,6 +601,48 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 	InteractableObject &object = registry.interactables.emplace(console);
 	object.name = "PopStack";
 	object.item = PopConsole;
+	// or maybe object type enum? This is not a unique id, just an object type identifier
+
+	Animation &a = registry.animations.emplace(console);
+	a.max_frames = 8;
+	a.animation_countdown_base = 100;
+
+	registry.renderRequests.insert(
+		console,
+		{"pop_console",
+		 EFFECT_ASSET_ID::ANIMATE,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	return console;
+}
+
+Entity createOptimizer(RenderSystem *renderer, vec2 pos)
+{
+	const Entity console = Entity();
+
+	Motion &m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = 200.f * vec2(1, 1.4166666);
+
+	auto &o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	CircleCollider &c = registry.circleColliders.get(registry.players.entities[0]);
+	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	registry.backgrounds.emplace(console);
+
+	// can use aabb as near player range for now for pseudo-offsetting
+	//AABBCollider &aabb = registry.aabbs.emplace(console);
+	//aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	//aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
+
+	CircleCollider &cc = registry.circleColliders.emplace(console);
+	cc.radius = m.scale.y / 4;
+
+	InteractableObject &object = registry.interactables.emplace(console);
+	object.name = "Optimizer";
+	object.item = Optimizer;
 	// or maybe object type enum? This is not a unique id, just an object type identifier
 
 	Animation &a = registry.animations.emplace(console);

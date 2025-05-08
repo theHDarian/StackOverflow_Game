@@ -1742,7 +1742,7 @@ const RoomPreset BossRoomBee{
 const RoomPreset BossRoomCrab{
     {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
     {},
-    {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
+    {{{Ram,{}}, {0.5f, 0.55f}}, { {Optimizer,{}}, {0.5f, 0.45f}},},
     0.0f,
     20,
     5,

@@ -56,6 +56,8 @@ Entity createOracleCrab(RenderSystem *renderer, vec2 pos);
 
 Entity createHoneyCanister(RenderSystem *renderer, vec2 pos);
 
+Entity createOptimizer(RenderSystem *renderer, vec2 pos);
+
 Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem item, std::vector<BulletStackEffect> effects);
 
 void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects);

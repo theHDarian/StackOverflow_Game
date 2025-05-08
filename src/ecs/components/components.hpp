@@ -518,6 +518,8 @@ enum InteractableItem {
 	Mouse,
 	OracleTurret,
 	Oven,
+	Optimizer,
+	Inverter,
 	NA
 };
 
