@@ -26,7 +26,7 @@ const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{Inert,             COLOR_GREY_LIGHT},
 			{Lightning,			{1.f,1.f,1.f}},
 			{Key,				{1.0, 1.0, 1.0}},
-				{ Pop,				{1.0, 1.0, 1.0} }
+			{ Pop,				{1.0, 1.0, 1.0} }
 	};
 
 const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {

@@ -4465,7 +4465,277 @@ inline std::vector<RoomType> getRandomRoomTypes(bool excludeNone, int roomsTrave
     return out;
 }
 
-inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked, int roomsTraversed = -1) {
+// Datatype for what BulletEffects each region can choose
+// The weight is relative to total weight, so doesn't need to sum to any specific value
+// To balance:
+// Increase a weight to increase odds of that effect, 
+// Decrease a weight to decrease odss of that effect
+struct weightedRegionEffects {
+    std::vector<std::pair<std::vector<BulletStackEffect>, float>> weightedEffects;
+
+    bool cumulated = false;
+
+    void getCumulativeWeights() {
+        for (int i = 1; i < weightedEffects.size(); i++) {
+            weightedEffects[i].second += weightedEffects[i - 1].second;
+        }
+        cumulated = true;
+    }
+
+    std::vector<BulletStackEffect> getWeightedEffect() {
+        if (!cumulated) getCumulativeWeights();
+
+        float random = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / weightedEffects.back().second));
+        for (int i = 0; i < weightedEffects.size(); i++) {
+            if (weightedEffects[i].second > random) {
+                return weightedEffects[i].first;
+            }
+        }
+        return weightedEffects[0].first;
+    }
+
+    // Return N vectors of BulletStackEffect, ignoring any effects of type found in the ignoreList
+    std::vector<std::vector<BulletStackEffect>> getNWeightedEffects(int N, std::vector<std::vector<BulletStackEffect>> ignoreList = {}) {
+        std::vector<std::vector<BulletStackEffect>> output;
+        if (!cumulated) getCumulativeWeights();
+
+        std::vector<std::pair<std::vector<BulletStackEffect>, float>> tempWeightedEffects = weightedEffects;
+
+        for (int j = 0; j < N; j++) {
+            float random = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / tempWeightedEffects.back().second));
+            for (int i = 0; i < tempWeightedEffects.size(); i++) {
+                if (tempWeightedEffects[i].second > random) {
+                    if (!checkIgnoreList(tempWeightedEffects[i].first[0].type, ignoreList)) {
+                        output.push_back(tempWeightedEffects[i].first);
+                    } else {
+                        j--;
+                    }
+                    float weightToRemove = (tempWeightedEffects[i].second - ((i > 0) ? tempWeightedEffects[i - 1].second : 0));
+                    for (int k = i + 1; k < tempWeightedEffects.size(); k++) {
+                        tempWeightedEffects[k].second -= weightToRemove;
+                    }
+                    tempWeightedEffects.erase(tempWeightedEffects.begin() + i);
+                    break;
+                }
+            }
+        }
+        //std::cout << N << ", " << output.size() << std::endl;
+        return output;
+    }
+
+    // Returns true if the BulletEffectType is present in the ignoreList
+    bool checkIgnoreList(BulletEffectType bet, std::vector<std::vector<BulletStackEffect>> ignoreList) {
+        if (ignoreList.size() == 0) return false;
+        for (auto& e : ignoreList) {
+            for (BulletStackEffect& bst : e) {
+                if (bst.type == bet) return true;
+            }
+        }
+        return false;
+    }
+};
+
+// BIOLOGY ----------------------------------------------
+
+weightedRegionEffects biologyPositiveEffects = {
+    {
+        {{dmgUp},               10.f},
+        {{bulletSpeedUp},       15.f},
+        {{sizeUp},              30.f},
+        {{fireRateUp},          15.f},
+        {{bulletRangeUp},       20.f},
+        {{accuracyUp},          25.f},
+        {{numBulletsUp},        5.f},
+        {{bulletBurstUp},       5.f},
+        {{bulletBounceUp},      15.f},
+        {{bulletPierceUp},      10.f},
+        {{homingUp},            0.f},
+        {{playerSpeedUp},       20.f},
+        {{dashUp},              5.f},
+        {{dashRechargeUp},      20.f},
+    }
+};
+
+weightedRegionEffects biologyNegativeEffects = {
+    {
+        {{dmgDown},             5.f},
+        {{bulletSpeedDown},     5.f},
+        {{sizeDown},            5.f},
+        {{fireRateDown},        5.f},
+        {{bulletRangeDown},     5.f},
+        {{accuracyDown},        5.f},
+        {{numBulletsDown},      0.f},
+        {{bulletBurstDown},     0.f},
+        {{bulletBounceDown},    5.f},
+        {{bulletPierceDown},    5.f},
+        {{homingDown},          0.f},
+        {{playerSpeedDown},     5.f},
+        {{dashDown},            5.f},
+        {{dashRechargeDown},    5.f},
+    }
+};
+
+// MINING ----------------------------------------------
+
+weightedRegionEffects miningPositiveEffects = {
+    {
+        {{dmgUp},               15.f},
+        {{bulletSpeedUp},       15.f},
+        {{sizeUp},              10.f},
+        {{fireRateUp},          15.f},
+        {{bulletRangeUp},       25.f},
+        {{accuracyUp},          25.f},
+        {{numBulletsUp},        5.f},
+        {{bulletBurstUp},       5.f},
+        {{bulletBounceUp},      10.f},
+        {{bulletPierceUp},      15.f},
+        {{homingUp},            0.f},
+        {{playerSpeedUp},       10.f},
+        {{dashUp},              5.f},
+        {{dashRechargeUp},      10.f},
+    }
+};
+
+weightedRegionEffects miningNegativeEffects = {
+    {
+        {{dmgDown},             5.f},
+        {{bulletSpeedDown},     5.f},
+        {{sizeDown},            5.f},
+        {{fireRateDown},        5.f},
+        {{bulletRangeDown},     5.f},
+        {{accuracyDown},        5.f},
+        {{numBulletsDown},      5.f},
+        {{bulletBurstDown},     5.f},
+        {{bulletBounceDown},    5.f},
+        {{bulletPierceDown},    5.f},
+        {{homingDown},          0.f},
+        {{playerSpeedDown},     5.f},
+        {{dashDown},            5.f},
+        {{dashRechargeDown},    5.f},
+    }
+};
+
+// HIFI ----------------------------------------------
+
+weightedRegionEffects hifiPositiveEffects = {
+    {
+        {{dmgUp},               15.f},
+        {{bulletSpeedUp},       30.f},
+        {{sizeUp},              25.f},
+        {{fireRateUp},          15.f},
+        {{bulletRangeUp},       30.f},
+        {{accuracyUp},          30.f},
+        {{numBulletsUp},        15.f},
+        {{bulletBurstUp},       5.f},
+        {{bulletBounceUp},      30.f},
+        {{bulletPierceUp},      5.f},
+        {{homingUp},            10.f},
+        {{playerSpeedUp},       30.f},
+        {{dashUp},              15.f},
+        {{dashRechargeUp},      30.f},
+    }
+};
+
+weightedRegionEffects hifiNegativeEffects = {
+    {
+        {{dmgDown},             5.f},
+        {{bulletSpeedDown},     5.f},
+        {{sizeDown},            5.f},
+        {{fireRateDown},        5.f},
+        {{bulletRangeDown},     5.f},
+        {{accuracyDown},        5.f},
+        {{numBulletsDown},      5.f},
+        {{bulletBurstDown},     5.f},
+        {{bulletBounceDown},    5.f},
+        {{bulletPierceDown},    5.f},
+        {{homingDown},          5.f},
+        {{playerSpeedDown},     5.f},
+        {{dashDown},            5.f},
+        {{dashRechargeDown},    5.f},
+    }
+};
+
+// MEDICAL ----------------------------------------------
+
+weightedRegionEffects medicalPositiveEffects = {
+    {
+        {{dmgUp},               20.f},
+        {{bulletSpeedUp},       15.f},
+        {{sizeUp},              15.f},
+        {{fireRateUp},          30.f},
+        {{bulletRangeUp},       20.f},
+        {{accuracyUp},          30.f},
+        {{numBulletsUp},        5.f},
+        {{bulletBurstUp},       5.f},
+        {{bulletBounceUp},      5.f},
+        {{bulletPierceUp},      15.f},
+        {{homingUp},            10.f},
+        {{playerSpeedUp},       45.f},
+        {{dashUp},              30.f},
+        {{dashRechargeUp},      45.f},
+    }
+};
+
+weightedRegionEffects medicalNegativeEffects = {
+    {
+        {{dmgDown},             5.f},
+        {{bulletSpeedDown},     5.f},
+        {{sizeDown},            5.f},
+        {{fireRateDown},        5.f},
+        {{bulletRangeDown},     5.f},
+        {{accuracyDown},        5.f},
+        {{numBulletsDown},      5.f},
+        {{bulletBurstDown},     5.f},
+        {{bulletBounceDown},    5.f},
+        {{bulletPierceDown},    5.f},
+        {{homingDown},          5.f},
+        {{playerSpeedDown},     5.f},
+        {{dashDown},            5.f},
+        {{dashRechargeDown},    5.f},
+    }
+};
+
+// MILITARY ----------------------------------------------
+
+weightedRegionEffects militaryPositiveEffects = {
+    {
+        {{dmgUp},               50.f},
+        {{bulletSpeedUp},       5.f},
+        {{sizeUp},              5.f},
+        {{fireRateUp},          5.f},
+        {{bulletRangeUp},       50.f},
+        {{accuracyUp},          5.f},
+        {{numBulletsUp},        5.f},
+        {{bulletBurstUp},       5.f},
+        {{bulletBounceUp},      5.f},
+        {{bulletPierceUp},      5.f},
+        {{homingUp},            15.f},
+        {{playerSpeedUp},       50.f},
+        {{dashUp},              5.f},
+        {{dashRechargeUp},      50.f},
+    }
+};
+
+weightedRegionEffects militaryNegativeEffects = {
+    {
+        {{dmgDown},             5.f},
+        {{bulletSpeedDown},     5.f},
+        {{sizeDown},            5.f},
+        {{fireRateDown},        5.f},
+        {{bulletRangeDown},     5.f},
+        {{accuracyDown},        5.f},
+        {{numBulletsDown},      5.f},
+        {{bulletBurstDown},     5.f},
+        {{bulletBounceDown},    5.f},
+        {{bulletPierceDown},    5.f},
+        {{homingDown},          5.f},
+        {{playerSpeedDown},     5.f},
+        {{dashDown},            5.f},
+        {{dashRechargeDown},    5.f},
+    }
+};
+
+inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked, int roomsTraversed = -1, float eliteSpawnChance = 0.2f) {
     Map& map = registry.maps.components[0];
     //boss rooms
     if (type == RoomType::BossRoom && currRegion == MapRegion::Biology) {
@@ -4492,38 +4762,38 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     if (!hasLocked(type,map.roomsTraversed) && locked) {
         assert(false);
     }
-    DifficultyRegion currentRegion;
+    DifficultyRegion currentRegionDifficulty;
     if (roomsTraversed == -1) {
 
         if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
-            currentRegion = DifficultyRegion::Intro;
+            currentRegionDifficulty = DifficultyRegion::Intro;
         } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
-            currentRegion = DifficultyRegion::Easy;
+            currentRegionDifficulty = DifficultyRegion::Easy;
         } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
-            currentRegion = DifficultyRegion::Medium;
+            currentRegionDifficulty = DifficultyRegion::Medium;
         } else {
-            currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+            currentRegionDifficulty = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
         }
     } else {
         if (roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
-            currentRegion = DifficultyRegion::Intro;
+            currentRegionDifficulty = DifficultyRegion::Intro;
         } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
-            currentRegion = DifficultyRegion::Easy;
+            currentRegionDifficulty = DifficultyRegion::Easy;
         } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
-            currentRegion = DifficultyRegion::Medium;
+            currentRegionDifficulty = DifficultyRegion::Medium;
         } else {
-            currentRegion = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+            currentRegionDifficulty = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
         }
     }
     if (type == RoomType::None) {
         return nextRoom;
     }
-    nextRoom = Random::ListItem(locked ? getDirectory(currRegion).at(currentRegion).at(type).locked : getDirectory(currRegion).at(currentRegion).at(type).unlocked);
+    nextRoom = Random::ListItem(locked ? getDirectory(currRegion).at(currentRegionDifficulty).at(type).locked : getDirectory(currRegion).at(currentRegionDifficulty).at(type).unlocked);
 
     // Remove the one-time room from all relevant regions
     if (nextRoom.oneTime) {
         for (auto it = map.directory.begin(); it != map.directory.end(); ++it) {
-            if (it->first >= currentRegion) { // Remove from current and future regions
+            if (it->first >= currentRegionDifficulty) { // Remove from current and future regions
                 std::map<RoomType, RoomPresets>& roomMap = it->second;
                 std::vector<RoomPreset>& roomList = roomMap.at(type).locked;
                 roomList.erase(std::remove(roomList.begin(), roomList.end(), nextRoom), roomList.end());
@@ -4531,6 +4801,63 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
                 // Repeat the process for unlocked rooms if applicable
                 std::vector<RoomPreset>& unlockedRoomList = roomMap.at(type).unlocked;
                 unlockedRoomList.erase(std::remove(unlockedRoomList.begin(), unlockedRoomList.end(), nextRoom), unlockedRoomList.end());
+            }
+        }
+    }
+
+    // Elite
+    if (type == RoomType::EnemyRoom && roomsTraversed > 6 && Random::Float() < eliteSpawnChance) {
+        nextRoom.hasElite = true;
+    }
+
+    // Effect controls
+    // Biology  2pos 1neg
+    // Mining   2pos 2neg
+    // Hifi     3pos 2neg
+    // Medical  3pos 3neg
+    // Military 1pos 3neg
+
+    if (type == RoomType::EnemyRoom) {
+        switch (currRegion) {
+        case MapRegion::Biology:
+            nextRoom.positiveEffects = biologyPositiveEffects.getNWeightedEffects(2);
+            nextRoom.negativeEffects = biologyNegativeEffects.getNWeightedEffects(1, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Mining:
+            nextRoom.positiveEffects = miningPositiveEffects.getNWeightedEffects(2);
+            nextRoom.negativeEffects = miningNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Physics:
+            nextRoom.positiveEffects = hifiPositiveEffects.getNWeightedEffects(3);
+            nextRoom.negativeEffects = hifiNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Medical:
+            nextRoom.positiveEffects = medicalPositiveEffects.getNWeightedEffects(3);
+            nextRoom.negativeEffects = medicalNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Military:
+            nextRoom.positiveEffects = militaryPositiveEffects.getNWeightedEffects(1);
+            nextRoom.negativeEffects = militaryNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+            break;
+        default:
+            std::cout << "WARNING: Enemy room in unexpected region!" << std::endl;
+            nextRoom.positiveEffects = { biologyPositiveEffects.getWeightedEffect() };
+            nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
+            break;
+        }
+
+        // Effect printing for testing
+        std::cout << "--== Positive Effects ==--" << std::endl;
+        for (auto& e : nextRoom.positiveEffects) {
+            for (auto& ee : e) {
+                std::cout << ee.name << std::endl;
+            }
+        }
+
+        std::cout << "--== Negative Effects ==--" << std::endl;
+        for (auto& e : nextRoom.negativeEffects) {
+            for (auto& ee : e) {
+                std::cout << ee.name << std::endl;
             }
         }
     }

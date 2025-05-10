@@ -1647,7 +1647,7 @@ struct SmallC : Enemy
 
 	SmallC()
 	{
-		maxHealth = 5000;
+		maxHealth = 500;
 
 		currHealth = maxHealth;
 
@@ -1677,7 +1677,7 @@ struct SmallC : Enemy
 		rotatePower = 0.6f;
 		scale = vec2({300, 300 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
-		armour = 5;
+		armour = 2;
 	};
 };
 

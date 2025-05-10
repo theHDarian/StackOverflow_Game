@@ -400,11 +400,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             lockedRooms++;
         }
 
-        d.preset = getRoomPreset(d.room, region, d.isLocked, roomTraversed);
-
-        if ( d.room == RoomType::EnemyRoom && Random:: Float() < ELITE_SPAWN_CHANCE) {
-            d.preset.hasElite = true;
-        }
+        d.preset = getRoomPreset(d.room, region, d.isLocked, roomTraversed, ELITE_SPAWN_CHANCE);
 
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
     }

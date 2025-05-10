@@ -19,9 +19,10 @@ vec4 getRoomBounds(Entity entity)
 	vec2 roomEndPos = map.currRoom.roomEnd;
 
 	vec2 scale = abs(registry.motions.get(entity).scale);
+	scale = vec2(0); // TEST IF THIS IS OKAY
 	vec2 min = roomStartPos + scale / 2.f;
 	vec2 max = roomEndPos - scale / 2.f;
-
+	
 	return vec4(min, max);
 }
 
@@ -507,7 +508,7 @@ void AISystem::step(float elapsed_ms)
 			// std::cout << "x " << movement.posB[0] << " y " << movement.posB[1] <<std::endl;
 			movement.distanceTraveled = 0.f;
 		}
-		if (registry.enemyParts.has(entity) ) {
+		if (registry.enemyParts.has(entity)) {
 			if (registry.enemyParts.get(entity).alwaysFollow) {
 				Motion& motion = registry.motions.get(entity);
 				if (registry.motions.has(registry.enemyParts.get(entity).parent)) {

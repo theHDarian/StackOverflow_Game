@@ -2987,11 +2987,29 @@ Entity createSkipDialogue()
 
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpecial)
 {
-	// Fixed chance of special bullet
-	float prob = 0.2f;
-	Map &map = registry.maps.components[0];
+	Map& map = registry.maps.components[0];
 
-	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < prob && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
+	// Fixed chance of special bullet
+	float positiveProb = 0.2f;
+
+	if (map.currRoom.type == RoomType::EnemyRoom && map.currRoom.spawnedElite == false) {
+		if (Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0) {
+			isSpecial = true;
+			return map.currRoom.preset.positiveEffects[rand() % map.currRoom.preset.positiveEffects.size()];
+		}
+		else {
+			isSpecial = false;
+			// Base 20% for negative, else inert 
+			// Increase by 20% per region
+			if (Random::Float() < 0.2f * (float)map.currRegion) {
+				return map.currRoom.preset.negativeEffects[rand() % map.currRoom.preset.negativeEffects.size()];
+			}
+			return { blunt };
+		}
+	}
+
+	// Non-room related effects
+	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
 		isSpecial = true;
 		return atkData.rareBulletEffects;

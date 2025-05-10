@@ -42,17 +42,25 @@ struct RoomInteractable {
     InteractableItem item;
     std::vector<BulletStackEffect> pushConsoleEffects;
 };
+
 struct RoomPreset {
     std::list<std::vector<std::tuple<EnemyType,vec2>>>enemies;
     std::vector<std::tuple<RoomProp,vec2>> roomProps; //background props
     std::vector<std::tuple<RoomInteractable, vec2>> interactables; //for interactables
     float spawnDelay; //in seconds - for enemies and bosses
+
     int numSpecialBulletsToSpawn = 5;
+    
     int numKeyBulletsToSpawn = 2;
     std::string ID;
     bool oneTime = false; //if true, room will not appear again
     vec2 roomSize = { 1600, 1600 };
     bool hasElite = false;
+
+    // Effect and chance tuple
+    std::vector<std::vector<BulletStackEffect>> positiveEffects;
+    std::vector<std::vector<BulletStackEffect>> negativeEffects;
+
     bool operator==(const RoomPreset& other) const {
         return ID == other.ID;
     }
