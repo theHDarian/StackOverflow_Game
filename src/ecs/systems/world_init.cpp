@@ -197,7 +197,10 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return CreateOven(renderer, pos);
 	case InteractableItem::Optimizer:
 		return createOptimizer(renderer, pos);
+	case InteractableItem::Inverter:
+		return createInverter(renderer, pos);
 	default:
+		assert(false && "Invalid InteractableItem");
 		return Entity();
 	}
 }
@@ -623,13 +626,13 @@ Entity createOptimizer(RenderSystem *renderer, vec2 pos)
 	Motion &m = registry.motions.emplace(console);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = 200.f * vec2(1, 1.4166666);
+	m.scale = {784,456} / 1.4f;
 
 	auto &o = registry.objects.emplace(console);
 	o.baseOffset = 20;
 
 	CircleCollider &c = registry.circleColliders.get(registry.players.entities[0]);
-	createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	// createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
 	registry.backgrounds.emplace(console);
 
 	// can use aabb as near player range for now for pseudo-offsetting
@@ -645,18 +648,53 @@ Entity createOptimizer(RenderSystem *renderer, vec2 pos)
 	object.item = Optimizer;
 	// or maybe object type enum? This is not a unique id, just an object type identifier
 
-	Animation &a = registry.animations.emplace(console);
-	a.max_frames = 8;
-	a.animation_countdown_base = 100;
-
 	registry.renderRequests.insert(
 		console,
-		{"pop_console",
-		 EFFECT_ASSET_ID::ANIMATE,
+		{"robot_surgeon",
+		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
 	return console;
 }
+
+Entity createInverter(RenderSystem *renderer, vec2 pos)
+{
+	const Entity console = Entity();
+
+	Motion &m = registry.motions.emplace(console);
+	m.position = pos;
+	m.velocity = vec2(0);
+	m.scale = {784,456} / 1.4f;
+
+	auto &o = registry.objects.emplace(console);
+	o.baseOffset = 20;
+
+	CircleCollider &c = registry.circleColliders.get(registry.players.entities[0]);
+	// createWall(renderer, vec2(pos.x - 100 + c.radius * 2, pos.y + 20 - c.radius * 2), vec2(pos.x + 100 - c.radius * 2, pos.y + 20 - c.radius * 2));
+	registry.backgrounds.emplace(console);
+
+	// can use aabb as near player range for now for pseudo-offsetting
+	//AABBCollider &aabb = registry.aabbs.emplace(console);
+	//aabb.topLeft = vec2(-m.scale.x / 8, -m.scale.y / 15);
+	//aabb.bottomRight = vec2(m.scale.x / 8, m.scale.y / 3);
+
+	CircleCollider &cc = registry.circleColliders.emplace(console);
+	cc.radius = m.scale.y / 4;
+
+	InteractableObject &object = registry.interactables.emplace(console);
+	object.name = "Inverter";
+	object.item = Inverter;
+	// or maybe object type enum? This is not a unique id, just an object type identifier
+
+	registry.renderRequests.insert(
+		console,
+		{"robot_surgeon",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+
+	return console;
+}
+
 
 Entity createHoneyCanister(RenderSystem *renderer, vec2 pos)
 {

@@ -32,6 +32,8 @@ Entity createOracleTurret ( RenderSystem *renderer, vec2 pos );
 
 Entity CreateOven ( RenderSystem *renderer, vec2 pos );
 
+Entity createInverter(RenderSystem *renderer, vec2 pos);
+
 Entity createWhiteBoard(RenderSystem* renderer, vec2 pos);
 
 Entity createPopConsole(RenderSystem* renderer, vec2 pos);

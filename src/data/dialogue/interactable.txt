@@ -795,5 +795,39 @@ You decide against using the machine.
 ITEM Optimizer -1 3
 Well, it seems trusting an unknown machine with your stack has backfired on you. Perhaps you should have been more careful.
 
+ITEM Inverter -1 0
+A bizarre machine. It seems to be some kind of... tunnel attached to a bed like structure?
+It seems it expects you to lie down on it.
+Do you trust this machine?
+CHOICES Yes\No
+
+ITEM Inverter 0 0
+You lie down on the machine.
+The machine hums to life, and the bed-like structure begins to move.
+A bright light envelops you as you move into the tunnel, and the world around you fades away.
+Something has changed.
+SOUND rareItemPickup
+
+ITEM Inverter 1 0
+You decide against using the machine.
+
+ITEM Inverter -1 1
+You silently thank the machine. It seems it has made your negative effects into positive ones. However, you can't shake the feeling that trusting it blindly could end badly one day.
+
+ITEM Inverter -1 2
+Would you like to use the machine?
+CHOICES Yes\No
+
+ITEM Inverter 0 2
+You lie down on the machine.
+The machine hums to life, and the world around you fades away.
+SOUND rareItemPickup
+
+ITEM Inverter 1 2
+You decide against using the machine.
+
+ITEM Inverter -1 3
+Well, it seems trusting an unknown machine with your stack has backfired on you. Perhaps you should have been more careful.
+
 
 
