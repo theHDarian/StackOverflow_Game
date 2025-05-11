@@ -650,7 +650,7 @@ Entity createOptimizer(RenderSystem *renderer, vec2 pos)
 
 	registry.renderRequests.insert(
 		console,
-		{"robot_surgeon",
+		{"robot_surgeon.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
@@ -688,7 +688,7 @@ Entity createInverter(RenderSystem *renderer, vec2 pos)
 
 	registry.renderRequests.insert(
 		console,
-		{"robot_surgeon",
+		{"robot_surgeon.png",
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE});
 
@@ -3030,16 +3030,16 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 	// Fixed chance of special bullet
 	float positiveProb = 0.2f;
 
-	if (map.currRoom.type == RoomType::EnemyRoom && map.currRoom.spawnedElite == false) {
+	if (map.currRoom.type == RoomType::EnemyRoom && map.currRoom.spawnedElite == false && !map.currRoom.preset.negativeEffects.empty()) {
 		if (Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0) {
 			isSpecial = true;
 			return map.currRoom.preset.positiveEffects[rand() % map.currRoom.preset.positiveEffects.size()];
 		}
 		else {
 			isSpecial = false;
-			// Base 20% for negative, else inert 
+			// Base 20% for negative, else inert
 			// Increase by 20% per region
-			if (Random::Float() < 0.2f * (float)map.currRegion) {
+			if (Random::Float() < 0.2f * log((float)map.currRegion)) {
 				return map.currRoom.preset.negativeEffects[rand() % map.currRoom.preset.negativeEffects.size()];
 			}
 			return { blunt };

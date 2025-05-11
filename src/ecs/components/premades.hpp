@@ -5073,7 +5073,7 @@ struct MultiCube : Enemy
 		6000,
 		{400, -2 * M_PI / 3.0},
 		0,
-		1,
+		0,
 		0};
 
 	const AttackData haloBlue{
