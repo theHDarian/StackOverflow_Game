@@ -278,6 +278,16 @@ void ParticleSystem::handleEmitRequests(float elapsed_ms) {
             }
             
         }
+        else if (request.requestType == ParticleRequestType::FloatUpwards) {
+            const Motion& motion = registry.motions.get(ent);
+            //should be attached to entity already, set the velocity to upwards
+            request.props.position.variation.y *= 0.4f;
+            request.props.position.variation.x = motion.scale.x/2.5f;
+            request.props.velocity.base.x = 0;
+            request.props.velocity.variation.x = 0;
+            floatUp(request.props, emitCount, request.props.velocity.base);
+            //trail(request.props, emitCount); // not sure if this is any different honestly
+        }
     }
     if (shouldClear) {
         clearParticles();
@@ -379,6 +389,15 @@ void ParticleSystem::explode(const ParticleProps& props, int emitCount, bool isI
 void ParticleSystem::trail(const ParticleProps& props, int emitCount) {
     for (int j = 0; j < emitCount; j++) {
         Particle& particle = particlePool[activateParticle(props)];
+    }
+}
+
+void ParticleSystem::floatUp(const ParticleProps& props, int emitCount, vec2 speed) {
+    for (int j = 0; j < emitCount; j++) {
+        Particle& particle = particlePool[activateParticle(props)];
+
+        // override velocity
+        particle.velocity = speed;
     }
 }
 

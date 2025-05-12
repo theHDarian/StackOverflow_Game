@@ -29,6 +29,7 @@ enum ParticleRequestType {
     PWallCollision,
     PLaser,
     PImplosion, //explosion played backwards
+    FloatUpwards, // emit particles upwards
 
 	ClearParticles // special request to clear all current particles
 };

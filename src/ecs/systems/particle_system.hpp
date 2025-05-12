@@ -20,6 +20,7 @@ public:
     void explode(const ParticleProps& props, int emitCount,bool isImplosion);
     void impact(const ParticleProps& props, int emitCount, vec2 direction);
     void trail(const ParticleProps& props, int emitCount);
+    void floatUp(const ParticleProps& props, int emitCount, vec2 speed);
 
     void render();
     bool initScreenTexture();
