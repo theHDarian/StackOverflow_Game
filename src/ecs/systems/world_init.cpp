@@ -1921,7 +1921,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 750.f;
 		buffer.maxCoolDown = 1200.f;
 		buffer.duration = 2000.f;
-		registry.bossParts.emplace(entity);
+		auto& bp = registry.bossParts.emplace(entity);
+		bp.diesWithBoss = false;
 		break;
 	}
 	case BossConstructPURPLE:
@@ -1931,7 +1932,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 10000.f;
 		buffer.maxCoolDown = 1000000000000.f;
 		buffer.duration = 15000.f;
-		registry.bossParts.emplace(entity);
+		auto& bp = registry.bossParts.emplace(entity);
+		bp.diesWithBoss = false;
 		break;
 	}
 	case BossConstructGREEN:
@@ -1941,7 +1943,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 10000.f;
 		buffer.maxCoolDown = 1000000000000.f;
 		buffer.duration = 15000.f;
-		registry.bossParts.emplace(entity);
+		auto& bp = registry.bossParts.emplace(entity);
+		bp.diesWithBoss = false;
 		break;
 	}
 	case BossConstructRED:
@@ -1951,7 +1954,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 10000.f;
 		buffer.maxCoolDown = 1000000000000.f;
 		buffer.duration = 15000.f;
-		registry.bossParts.emplace(entity);
+		auto& bp = registry.bossParts.emplace(entity);
+		bp.diesWithBoss = false;
 		break;
 	}
 	case EnemyEyeCube:

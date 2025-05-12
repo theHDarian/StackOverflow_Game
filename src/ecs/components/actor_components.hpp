@@ -765,6 +765,7 @@ struct BossEnemy {
 };
 
 struct BossParts {
+    bool diesWithBoss = true;
 };
 
 struct EnemyBullet {

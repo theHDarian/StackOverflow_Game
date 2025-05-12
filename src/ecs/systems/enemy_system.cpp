@@ -111,6 +111,12 @@ void EnemySystem::step(float elapsed_ms)
                 destruct(enemy);
         }
 
+        if (registry.bossParts.has(entity) && registry.bosses.entities.empty())
+        {
+            if (registry.bossParts.get(entity).diesWithBoss)
+                destruct(enemy);
+        }
+
         // merge bee logic
         EnemyPattern &pattern = enemy.currEnemyPattern();
         if (registry.bees.has(entity) && pattern.type == EnemyBehavior::MERGE_BEE && registry.bees.get(entity).nearbyBees.size() > 0)
