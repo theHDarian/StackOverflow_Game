@@ -350,6 +350,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
     doors[spawnIndex].isPrev = true;
+    registry.doorSymbols.components[spawnIndex].doorType = RoomType::None;
     doors[spawnIndex].isLocked = false;
     registry.interactables.get(registry.doors.entities[spawnIndex]).name = "PrevDoor";
     registry.animations.get(registry.doorSymbols.entities[spawnIndex]).frame = 5;
@@ -372,14 +373,13 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     {
         // reset counters
         registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
-
         // reset previous room type
         if (i == spawnIndex)
             continue;
         registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
         registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         Door &d = registry.doors.components[i];
-        DoorSymbol &ds = registry.doorSymbols.components[i];
+        DoorSymbol& ds = registry.doorSymbols.components[i];
         d.reset();
 
         d.room = newRooms[i];
@@ -416,6 +416,7 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         d.preset = getRoomPreset(d.room, region, d.isLocked, roomTraversed, ELITE_SPAWN_CHANCE);
 
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
+        ds.doorType = d.room;
     }
 
     updateBgPositions();
@@ -498,12 +499,15 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         for (int i = 0; i < 4; i++)
         {
             Door& d = registry.doors.components[i];
+            DoorSymbol& ds = registry.doorSymbols.components[i];
+            ds.doorType = RoomType::None;
             d.preset.ID = "";
             d.reset();
             registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
             registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
             registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
         }
+        registry.doorSymbols.components[2].doorType = RoomType::TutorialRoom2;
         registry.doors.components[2].room = RoomType::TutorialRoom2; // bottom door
         registry.doors.components[2].preset = TutorialRoom2Preset;
         registry.animations.get(registry.doorSymbols.entities[2]).frame = roomTypeToSymbols.at(registry.doors.components[2].room);
