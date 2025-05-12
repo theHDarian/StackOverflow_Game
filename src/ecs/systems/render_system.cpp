@@ -376,6 +376,16 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, motion.position) - cloak.cloakingDistance) / cloak.cloakingDistance);
 	}
 
+	if (registry.spawnings.has(entity))
+	{
+		Spawning& spawning = registry.spawnings.get(entity);
+		//change color to blue
+		vec3 Color = vec3(1.0, 1.0, 2.0);
+		glUniform3fv(color_uloc, 1, (float*)&Color);
+		glUniform1i(change_color_uloc, 0);
+		alpha = glm::lerp(0.f, 1.f, (spawning.max - spawning.countdown) / spawning.max);
+	}
+
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, alpha);
 
@@ -478,14 +488,6 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		glUniform1f(effectAlpha, alpha);
 	}
 
-	if (registry.spawnings.has(entity))
-	{
-		Spawning& spawning = registry.spawnings.get(entity);
-		//change color to blue
-		vec3 Color = vec3(1.0, 1.0, 2.0);
-		glUniform3fv(color_uloc, 1, (float*)&Color);
-		glUniform1i(change_color_uloc, 0);
-	}
 	// GLsizei num_triangles = num_indices / 3;
 
 	// Drawing of num_indices/3 triangles specified in the index buffer

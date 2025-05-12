@@ -15,6 +15,7 @@ uniform vec3 fcolor;
 uniform int changeColor = 0;
 uniform float effectAlpha = 1.0;
 uniform int frame = 1;
+uniform float alpha = 1.0;
 
 uniform bool glitchToggle = false;
 uniform float time;
@@ -55,7 +56,7 @@ vec4 gaugeEffect(vec4 color)
 void main()
 {
 
-	color = vec4(fcolor, 1.0) * texture(sampler0, vec3(texcoord.x, texcoord.y, frame));
+	color = vec4(fcolor, alpha) * texture(sampler0, vec3(texcoord.x, texcoord.y, frame));
 	if (glitchToggle) {
 		float a = texture(glitchMask, vec3(texcoord.x, texcoord.y, floor(64.0 * mod(0.01 * time, 1)))).a;
 		if (a > 0.5 && (
