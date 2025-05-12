@@ -339,9 +339,6 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float*)&color);
-
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
 	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
@@ -2322,6 +2319,8 @@ void RenderSystem::resetProgramToggle(GLint program) {
 	gl_has_errors();
 }
 
+// position is relative to window size
+// suitable for things like ui
 mat4 createNormalModel(Motion &motion, vec2 offset = vec2(0))
 {
 	mat4 transform = glm::mat4(1.0);
@@ -2333,6 +2332,8 @@ mat4 createNormalModel(Motion &motion, vec2 offset = vec2(0))
 	return transform;
 }
 
+// position is relative to world size
+// suitable for things in game world
 mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 {
 	WindowState &windowState = registry.windowStates.components[0];
@@ -2352,6 +2353,8 @@ mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 	return transform;
 }
 
+// position is relative to world size
+// need a separate one for text because text system's y = 0 is at bottom of screen as opposed to top
 mat4 createFollowCameraModelText(Motion &motion, vec2 offset)
 {
 	WindowState &windowState = registry.windowStates.components[0];
