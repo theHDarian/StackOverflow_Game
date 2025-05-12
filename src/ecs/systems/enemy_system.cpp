@@ -363,6 +363,7 @@ void EnemySystem::step(float elapsed_ms)
             pattern.currAtkCD -= elapsed_ms;
             if (pattern.currAtkCD < 0)
             {
+                if (!pattern.atkData.gottenRoomEffects) fetchRoomEffects(entity, pattern.atkData);
                 AttackData atkData = pattern.atkData;
                 if (atkData.attackType != EnemyAttackPattern::SPAWNING)
                     attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
@@ -990,8 +991,7 @@ void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
 
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
 {
-    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1
-                                                                                                              : 2;
+    int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
 
     Enemy &enemy = registry.enemies.get(entity);
     Motion &em = registry.motions.get(entity);
@@ -1209,4 +1209,25 @@ void EnemySystem::heal(Entity entity, EnemyPattern &currPattern)
 void EnemySystem::destruct(Enemy &enemy)
 {
     enemy.currHealth = -1;
+}
+
+void EnemySystem::fetchRoomEffects(Entity entity, AttackData& atkData)
+{
+    atkData.gottenRoomEffects = true;
+
+    // Add checks here to exclude certain enemies from adopting room effects
+    if (registry.bosses.has(entity) || registry.bossParts.has(entity) || registry.elites.has(entity)) {
+        atkData.positiveBulletEffects = atkData.rareBulletEffects;
+        atkData.negativeBulletEffects.push_back(atkData.defaultEffect);
+        return;
+    }
+
+    Map& map = registry.maps.components[0];
+
+    assert(!map.currRoom.preset.negativeEffects.empty() && !map.currRoom.preset.positiveEffects.empty());
+
+    BulletStackEffect blunt = { Inert, 0, "Inert", "" };
+
+    atkData.positiveBulletEffects = map.currRoom.preset.positiveEffects[rand() % map.currRoom.preset.positiveEffects.size()];
+    atkData.negativeBulletEffects = map.currRoom.preset.negativeEffects[rand() % map.currRoom.preset.negativeEffects.size()];
 }

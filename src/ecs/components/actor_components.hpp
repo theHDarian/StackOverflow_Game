@@ -492,6 +492,9 @@ enum EnemyBulletShape {
 struct AttackData {
     EnemyAttackPattern attackType;
     EnemyBulletShape shape = EnemyBulletShape::CIRCLE;
+    
+    // Pre Effect Rework effect system
+    // Used for bosses, elites
     std::vector<BulletStackEffect> rareBulletEffects;
     BulletStackEffect defaultEffect;
     int numBullets = 1;
@@ -506,6 +509,11 @@ struct AttackData {
     EnemyBulletDeath onDeath = EnemyBulletDeath::NONE;
     EnemyType spawn;
     std::vector<vec2> spawnPosition = {};
+    
+    // Post Effect Rework effect system
+    bool gottenRoomEffects = false;
+    std::vector<BulletStackEffect> positiveBulletEffects;
+    std::vector<BulletStackEffect> negativeBulletEffects;
 };
 
 enum class SpecialStates {

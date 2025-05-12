@@ -3030,30 +3030,19 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 	// Fixed chance of special bullet
 	float positiveProb = 0.2f;
 
-	if (map.currRoom.type == RoomType::EnemyRoom && map.currRoom.spawnedElite == false && !map.currRoom.preset.negativeEffects.empty()) {
-		if (Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0) {
-			isSpecial = true;
-			return map.currRoom.preset.positiveEffects[rand() % map.currRoom.preset.positiveEffects.size()];
-		}
-		else {
-			isSpecial = false;
-			// Base 20% for negative, else inert
-			// Increase by 20% per region
-			if (Random::Float() < 0.2f * log((float)map.currRegion)) {
-				return map.currRoom.preset.negativeEffects[rand() % map.currRoom.preset.negativeEffects.size()];
-			}
-			return { blunt };
-		}
-	}
+	assert(!map.currRoom.preset.negativeEffects.empty());
 
 	// Non-room related effects
-	if (atkData.rareBulletEffects.size() > 0 && Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
+	if (atkData.positiveBulletEffects.size() > 0 && Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
 	{
 		isSpecial = true;
-		return atkData.rareBulletEffects;
+		return atkData.positiveBulletEffects;
 	}
 	isSpecial = false;
-	return {atkData.defaultEffect};
+	if (Random::Float() < 0.2f * log((float)map.currRegion)) {
+		return atkData.negativeBulletEffects;
+	}
+	return { blunt };
 
 }
 

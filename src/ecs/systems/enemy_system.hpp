@@ -39,6 +39,8 @@ private:
     void destruct(Enemy& enemy);
     void heal(Entity entoty, EnemyPattern &currPattern);
     void createAOEIndicator(vec2 pos, float radius, SpecialStates buff, float timer);
+
+    void fetchRoomEffects(Entity entity, AttackData& atkData);
     RenderSystem *render;
     SoundSystem *sound;
 };
