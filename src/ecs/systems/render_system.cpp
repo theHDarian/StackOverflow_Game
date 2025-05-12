@@ -633,6 +633,15 @@ void RenderSystem::drawBullet(Entity entity,
 	GLint scale_uloc = glGetUniformLocation(program, "scale");
 	glUniform2fv(scale_uloc, 1, (float*)&registry.motions.get(entity).scale);
 
+	float alpha = 1.0;
+	if (registry.fades.has(entity))
+	{
+		Fade& fade = registry.fades.get(entity);
+		alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
+	}
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, alpha);
+
 	vec3 c1, c2, c3, c4, c5;
 	c1 = (size > 0) ? bulletEffectColors.at(bse[0].type) : vec3(-1.0);
 	c2 = (size > 1) ? bulletEffectColors.at(bse[1].type) : vec3(-1.0);

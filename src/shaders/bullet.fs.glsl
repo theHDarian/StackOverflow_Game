@@ -18,6 +18,7 @@ uniform vec3 bcolor2;
 uniform vec3 bcolor3;
 uniform vec3 bcolor4;
 uniform vec3 bcolor5;
+uniform float alpha = 1.0;
 
 #define PI 3.14159
 
@@ -121,18 +122,18 @@ float laserColoring() {
 
 void main()
 {
-	color = vec4(vec3(0.0), 1.0);
+	color = vec4(vec3(0.0), alpha);
 	switch (shape) {
 	case 0:
-		color = vec4(rectangle(), 1.0);
+		color.rgb = rectangle();
 		if (onDeath && distance(texcoord * scale, vec2(0.5) * scale) < 0.1 * scale.x) color.rgb = vec3(sin(time), 0.0, 0.0);
 		break;
 	case 1:
-		color = vec4(tri(), 1.0);
+		color.rgb = tri();
 		if (onDeath && distance(texcoord * scale, vec2(0.5 * (scale.y / scale.x), 0.5) * scale) < 0.1 * scale.x) color.rgb = vec3(sin(time), 0.0, 0.0);
 		break;
 	case 2:
-		color = vec4(circle(), 1.0);
+		color.rgb = circle();
 		if (onDeath && distance(texcoord * scale, vec2(0.5) * scale) < 0.1 * scale.x) color.rgb = vec3(sin(time), 0.0, 0.0);
 		break;
 	}
