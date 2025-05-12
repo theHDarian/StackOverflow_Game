@@ -339,9 +339,6 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	// Getting uniform locations for glUniform* calls
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float*)&color);
-
 	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
 	glUniform1i(change_color_uloc, 0);
 	GLint effectAlpha = glGetUniformLocation(program, "effectAlpha");
@@ -1677,80 +1674,8 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 		vec2(ws.width / 2.f, ws.height / 2.f) - indicatorMotion.scale) + vec2(ws.width / 2.f, ws.height / 2.f);
 	indicatorMotion.angle = atan(posDiff.y, posDiff.x);
 
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
-	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
-	const GLuint program = (GLuint)effects[used_effect_enum];
-
-	// Setting shaders
-	glUseProgram(program);
-	resetProgramToggle(program);
-	gl_has_errors();
-
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
-
-	GLint in_position_loc = glGetAttribLocation(program, "in_position");
-	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-		sizeof(TexturedVertex), (void*)0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(
-		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		(void*)sizeof(
-			vec3)); // note the stride to skip the preceeding vertex position
-
-	// Enabling and binding texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-
-	GLuint texture_id =
-		texture_gl_handles[(GLuint)name_to_texture[indicatorName]];
-	
-	//glBindTexture(GL_TEXTURE_2D, texture_id);
-	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-	glUniform1i(texture_uloc, 0);
-	gl_has_errors();
-
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
-	// GLsizei num_triangles = num_indices / 3;
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color_uloc, 1, (float*)&color);
-
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
-
-	mat4 transform = createNormalModel(indicatorMotion, vec2(0));
-
-	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
-	gl_has_errors();
-
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-	gl_has_errors();
+	setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, indicatorName, color, projection, indicatorMotion, false);
+	drawBasicAnimateTextured();
 }
 
 void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, const mat4& view) {
@@ -1766,10 +1691,6 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 		return;
 	}
 
-	// first draw the indicator
-	std::string indicatorName = "enemy_indicator.png";
-	vec3 color = COLOR_WHITE;
-
 	// draw indicator in screen coordinates
 	Motion indicatorMotion = Motion();
 	indicatorMotion.scale = { 30, 30 };
@@ -1778,83 +1699,10 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 		vec2(ws.width / 2.f, ws.height / 2.f) - indicatorMotion.scale) + vec2(ws.width / 2.f, ws.height / 2.f);
 	indicatorMotion.angle = atan(posDiff.y, posDiff.x);
 
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
-	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
-	const GLuint program = (GLuint)effects[used_effect_enum];
-
-	// Setting shaders
-	glUseProgram(program);
-	resetProgramToggle(program);
-	gl_has_errors();
-
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
-
-	GLint in_position_loc = glGetAttribLocation(program, "in_position");
-	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-		sizeof(TexturedVertex), (void*)0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(
-		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		(void*)sizeof(
-			vec3)); // note the stride to skip the preceeding vertex position
-
-	// Enabling and binding texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-
-	GLuint texture_id =
-		texture_gl_handles[(GLuint)name_to_texture[indicatorName]];
-
-	//glBindTexture(GL_TEXTURE_2D, texture_id);
-	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-	glUniform1i(texture_uloc, 0);
-	gl_has_errors();
-
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
-	// GLsizei num_triangles = num_indices / 3;
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color_uloc, 1, (float*)&color);
-
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
-
-	mat4 transform = createNormalModel(indicatorMotion, vec2(0));
-
-	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
-	gl_has_errors();
-
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-	gl_has_errors();
+	setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, "enemy_indicator.png", COLOR_WHITE, projection, indicatorMotion, false);
+	drawBasicAnimateTextured();
 	
-	// draw symbol underneath
-	// adjust motion to put under indicator
+	// draw symbol underneath; adjust motion to put under indicator
 	Motion adjustedMotion = motion;
 	adjustedMotion.position = glm::clamp(posDiff * camera.zoom, -vec2(ws.width / 2.f, ws.height / 2.f) + adjustedMotion.scale,
 		vec2(ws.width / 2.f, ws.height / 2.f) - adjustedMotion.scale) + vec2(ws.width / 2.f, ws.height / 2.f);
@@ -1865,74 +1713,26 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 	}
 
 	// the rest of the code is just copied from drawAnimateTextured
-
 	assert(registry.renderRequests.has(entity));
 	RenderRequest render_request = registry.renderRequests.get(entity);
+	GLint program = setupBasicAnimateTextured(render_request.used_effect, render_request.texture_name, 
+		vec3(1), projection, adjustedMotion, false, registry.animations.get(entity).frame);
 
-	const GLuint used_effect_enum2 = (GLuint)EFFECT_ASSET_ID::ANIMATE;
-	const GLuint program2 = (GLuint)effects[used_effect_enum2];
-
-	const GLuint vbo2 = vertex_buffers[(GLuint)SPRITE];
-	const GLuint ibo2 = index_buffers[(GLuint)SPRITE];
-
-	// Setting shaders
-	glUseProgram(program2);
-	gl_has_errors();
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo2);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo2);
-	gl_has_errors();
-
-	// Input data location as in the vertex buffer
-	in_position_loc = glGetAttribLocation(program2, "in_position");
-	in_texcoord_loc = glGetAttribLocation(program2, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
-	gl_has_errors();
-
-	vec2 scale = motion.scale / min(motion.scale.x, motion.scale.y);
-	GLint scale_uloc = glGetUniformLocation(program2, "scale");
-	glUniform2fv(scale_uloc, 1, (float*)&scale);
-
-	GLint frame_uloc = glGetUniformLocation(program2, "frame");
-	glUniform1i(frame_uloc, (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) ? 0 : registry.animations.get(entity).frame);
-	GLuint time_uloc = glGetUniformLocation(program2, "time");
-	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-	gl_has_errors();
-
-	// Enable and bind the texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-	assert(registry.renderRequests.has(entity));
-	texture_id = texture_gl_handles.at((GLuint)name_to_texture.at(render_request.texture_name));
-
-	texture_uloc = glGetUniformLocation(program2, "sampler0");
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-	glUniform1i(texture_uloc, 0);
-	gl_has_errors();
-
+	// make symbol glitch if there's an elite
 	GLuint glitch_mask_id = texture_gl_handles[(GLuint)name_to_texture["glitch_mask"]];
-	GLuint glitch_mask_uloc = glGetUniformLocation(program2, "glitchMask");
+	GLuint glitch_mask_uloc = glGetUniformLocation(program, "glitchMask");
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_mask_id);
 	glUniform1i(glitch_mask_uloc, 1);
 
 	GLuint glitch_id = texture_gl_handles[(GLuint)name_to_texture["glitch"]];
-	GLuint glitch_uloc = glGetUniformLocation(program2, "glitch");
+	GLuint glitch_uloc = glGetUniformLocation(program, "glitch");
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, glitch_id);
 	glUniform1i(glitch_uloc, 2);
 	gl_has_errors();
 
-	GLuint glitchToggle_uloc = glGetUniformLocation(program2, "glitchToggle");
+	GLuint glitchToggle_uloc = glGetUniformLocation(program, "glitchToggle");
 	bool should_glitch = false;
 	if (registry.doorSymbols.has(entity))
 	{
@@ -1947,44 +1747,7 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 	glUniform1i(glitchToggle_uloc, should_glitch);
 	gl_has_errors();
 
-	currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Get number of indices from index buffer, which has elements uint16_t
-	size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	num_indices = size / sizeof(uint16_t);
-
-	// Getting uniform locations for glUniform* calls
-	color_uloc = glGetUniformLocation(program2, "fcolor");
-	color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float*)&color);
-
-	GLint change_color_uloc = glGetUniformLocation(program2, "changeColor");
-	glUniform1i(change_color_uloc, 0);
-
-	// Setting uniform values to the currently bound program
-	WindowState& windowState = registry.windowStates.components[0];
-	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-	float wallThickness = 100 + 50;
-	float zoom = 1;
-	projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
-
-	const vec3 coloring = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
-	glUniform3fv(color_uloc, 1, (float*)&coloring);
-
-	transform = glm::mat4(1.0);
-	transform = createNormalModel(adjustedMotion, vec2(0));
-
-	transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
-	glUniformMatrix4fv(glGetUniformLocation(program2, "view"), 1, GL_FALSE, (float*)&view);
-
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-	gl_has_errors();
+	drawBasicAnimateTextured();
 }
 
 // should really consider making a draw textured mesh function without relying on an entity/for UI
@@ -2004,64 +1767,18 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 	motionOutline.scale = motion.scale + vec2(10);
 	motionOutline.position = motion.position;
 	vec3 outlineColor = vec3(1.0);
-
 	vec3 color = vec3(0);
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
-	const GLuint program = (GLuint)effects[used_effect_enum];
 
-	// Setting shaders
-	glUseProgram(program);
-	resetProgramToggle(program);
-	gl_has_errors();
+	// we're drawing outline first, so set that up first
+	GLint program = setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, "enemy_bullet_square.png", outlineColor, projection, motionOutline, false);
 
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
-
-	GLint in_position_loc = glGetAttribLocation(program, "in_position");
-	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-						  sizeof(TexturedVertex), (void *)0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(
-		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		(void *)sizeof(
-			vec3)); // note the stride to skip the preceeding vertex position
-
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-
-	GLuint texture_id =
-		texture_gl_handles[(GLuint)name_to_texture["enemy_bullet_square.png"]];
-
-	//glBindTexture(GL_TEXTURE_2D, texture_id);
-	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-	glUniform1i(texture_uloc, 0);
-	gl_has_errors();
-
-	// Getting uniform locations for glUniform* calls
-	// want to overwrite the colour with given; could also use a separate shader program
-	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-	glUniform1i(change_color_uloc, 1);
+	// make stack flash red when player is hit
 	float alpha = 1;
 	float effect_alpha = 1;
-
 	GameState& gameState = registry.gameStates.components[0];
 	if (registry.invincibles.has(registry.players.entities[0]) && !registry.dashes.has(registry.players.entities[0])
 		&& !gameState.gameOver && !gameState.gamePaused && !gameState.dialogueScene)
 	{
-
 		Invincible& invincible = registry.invincibles.get(registry.players.entities[0]);
 		//float effect_alpha = abs(sin(invincible.countdown / invincible.max * 10) * 0.3);
 		//glUniform1f(effect_alpha_uloc, effect_alpha);
@@ -2069,7 +1786,6 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 		alpha = 1 - abs(sin(invincible.countdown / invincible.max * 10) * 0.5);
 		// effect_alpha = lerp( 0.5f, 0.f, (invincible.max-invincible.countdown) / invincible.max);
 	}
-
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, alpha);
 	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
@@ -2077,44 +1793,40 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 
 	gl_has_errors();
 
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
-	// GLsizei num_triangles = num_indices / 3;
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float *)&view);
-
-	gl_has_errors();
-
 	mat4 transform = createNormalModel(motion, vec2(0));
-	mat4 transformOutline = createNormalModel(motionOutline, vec2(0));
 
 	// draw outline here
-	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float *)&transformOutline);
-	GLint color2_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color2_uloc, 1, (float *)&outlineColor);
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	drawBasicAnimateTextured();
 
 	// draw actual stack here
-	GLuint transform2_loc = glGetUniformLocation(currProgram, "model");
+	GLuint transform2_loc = glGetUniformLocation(program, "model");
 	glUniformMatrix4fv(transform2_loc, 1, GL_FALSE, (float *)&transform);
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color_uloc, 1, (float *)&color);
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	drawBasicAnimateTextured();
 
 	gl_has_errors();
+
+	// set these up for bullets once
+	GLint shape_uloc = glGetUniformLocation(program, "shape");
+	glUniform1i(shape_uloc, EnemyBulletShape::RECTANGLE);
+
+	GLint scale_uloc = glGetUniformLocation(program, "scale");
+	glUniform2fv(scale_uloc, 1, (float*)&stackui.bulletSize);
+
+	vec3 c1, c2, c3, c4, c5;
+	c1 = c2 = c3 = c4 = c5 = vec3(-1.0);
+
+	GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
+	glUniform3fv(bcolor1_uloc, 1, (float*)&c1);
+	GLint bcolor2_uloc = glGetUniformLocation(program, "bcolor2");
+	glUniform3fv(bcolor2_uloc, 1, (float*)&c2);
+	GLint bcolor3_uloc = glGetUniformLocation(program, "bcolor3");
+	glUniform3fv(bcolor3_uloc, 1, (float*)&c3);
+	GLint bcolor4_uloc = glGetUniformLocation(program, "bcolor4");
+	glUniform3fv(bcolor4_uloc, 1, (float*)&c4);
+	GLint bcolor5_uloc = glGetUniformLocation(program, "bcolor5");
+	glUniform3fv(bcolor5_uloc, 1, (float*)&c5);
 
 	// draw bullet stack here for now, based on bullet effects
 	for (int i = 0; i < stack.currStack.size(); i++)
@@ -2145,124 +1857,16 @@ void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std
 	motion.scale = bullet_size;
 	motion.position = position;
 
-	GLuint used_effect_enum = static_cast<GLuint>(EFFECT_ASSET_ID::BULLET);
+	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::BULLET;
 	if (shape.compare(bulletEffectShapes.at(BulletEffectType::Key)) == 0) {
-		used_effect_enum = static_cast<GLuint>(EFFECT_ASSET_ID::TEXTURED);
+		used_effect = EFFECT_ASSET_ID::TEXTURED;
 	}
-	const GLuint program = (GLuint)effects[used_effect_enum];
-
-	// Setting shaders
-	glUseProgram(program);
-	//gl_has_errors();
-
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	//gl_has_errors();
-
-	GLint in_position_loc = glGetAttribLocation(program, "in_position");
-	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	//gl_has_errors();
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
-	//gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
-	//gl_has_errors();
-
-	GLuint time_uloc = glGetUniformLocation(program, "time");
-	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
-
-	GLint frame_uloc = glGetUniformLocation(program, "frame");
-	glUniform1i(frame_uloc, bullet_value + 3);
-
-	GLint laser_uloc = glGetUniformLocation(program, "laser");
-	glUniform1i(laser_uloc, 0);
-  
-  GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
-	glUniform1i(onDeath_uloc, 0);
-
-	int size = 1;
-	GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
-	glUniform1i(effect_size_uloc, size);
-
-	GLint shape_uloc = glGetUniformLocation(program, "shape");
-	glUniform1i(shape_uloc, EnemyBulletShape::RECTANGLE);
-
-	GLint scale_uloc = glGetUniformLocation(program, "scale");
-	glUniform2fv(scale_uloc, 1, (float*)&bullet_size);
-
-	vec3 c2, c3, c4, c5;
-	c2 = c3 = c4 = c5 = vec3(-1.0);
-	vec3 c1 = color;
+	const GLuint program = setupBasicAnimateTextured(used_effect, shape, color, projection, motion, false, bullet_value + 3);
 
 	GLint bcolor1_uloc = glGetUniformLocation(program, "bcolor1");
-	glUniform3fv(bcolor1_uloc, 1, (float*)&c1);
-	GLint bcolor2_uloc = glGetUniformLocation(program, "bcolor2");
-	glUniform3fv(bcolor2_uloc, 1, (float*)&c2);
-	GLint bcolor3_uloc = glGetUniformLocation(program, "bcolor3");
-	glUniform3fv(bcolor3_uloc, 1, (float*)&c3);
-	GLint bcolor4_uloc = glGetUniformLocation(program, "bcolor4");
-	glUniform3fv(bcolor4_uloc, 1, (float*)&c4);
-	GLint bcolor5_uloc = glGetUniformLocation(program, "bcolor5");
-	glUniform3fv(bcolor5_uloc, 1, (float*)&c5);
+	glUniform3fv(bcolor1_uloc, 1, (float*)&color);
 
-	// textured gluniforms
-	GLint color_uloc = glGetUniformLocation(program, "fcolor");
-	glUniform3fv(color_uloc, 1, (float*)&color);
-	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
-	glUniform1i(change_color_uloc, 0);
-	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, 1);
-
-	//gl_has_errors();
-
-	// Enable and bind the texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture[shape]];
-	//glBindTexture(GL_TEXTURE_2D, texture_id);
-	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-	glUniform1i(texture_uloc, 0);
-	gl_has_errors();
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size_i = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size_i);
-
-	//gl_has_errors();
-
-	GLsizei num_indices = size_i / sizeof(uint16_t);
-
-	//gl_has_errors();
-
-	WindowState& windowState = registry.windowStates.components[0];
-	Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-	float wallThickness = 100 + 50;
-	float zoom = 1;
-	// note: perspective seems to make no difference?
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
-
-	mat4 transform = glm::mat4(1.0);
-	transform = createNormalModel(motion, vec2(0));
-	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
-
-	//gl_has_errors();
-
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-
-	gl_has_errors();
+	drawBasicAnimateTextured();
 }
 
 void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, const mat4 &view)
@@ -2278,33 +1882,7 @@ void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, con
 	motion.scale = vec2(laser.maxLength, motion.scale.y * 2.f);
 	vec2 offset = render_request.offset;
 
-	const GLuint program = (GLuint)effects[EFFECT_ASSET_ID::TEXTURED];
-
-	// Setting shaders
-	glUseProgram(program);
-	resetProgramToggle(program);
-	gl_has_errors();
-
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
-
-	GLint in_position_loc = glGetAttribLocation(program, "in_position");
-	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void *)0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void *)sizeof(vec3));
-	gl_has_errors();
+	const GLuint program = setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, "LaserIndicator.png", vec3(1), projection, motion, true);
 
 	GLint tile_uloc = glGetUniformLocation(program, "tile");
 	glUniform1i(tile_uloc, true);
@@ -2314,46 +1892,7 @@ void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, con
 	GLint tiling_uloc = glGetUniformLocation(program, "tiling");
 	glUniform2fv(tiling_uloc, 1, (float *)&tiling);
 
-	// Enable and bind the texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-	GLuint texture_id = texture_gl_handles[(GLuint)name_to_texture["LaserIndicator.png"]];
-
-	//glBindTexture(GL_TEXTURE_2D, texture_id);
-	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-	glUniform1i(texture_uloc, 0);
-	gl_has_errors();
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
-
-	// Setting uniform values to the currently bound program
-	WindowState &windowState = registry.windowStates.components[0];
-	Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
-	float wallThickness = 100 + 50;
-	float zoom = 1;
-	// note: perspective seems to make no difference?
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
-
-	mat4 transform = glm::mat4(1.0);
-	transform = createFollowCameraModel(motion, offset);
-	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float *)&transform);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float *)&view);
-
-	gl_has_errors();
-
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-
-	gl_has_errors();
+	drawBasicAnimateTextured();
 }
 
 // draw collider shape based on shape texture passed
@@ -2366,15 +1905,11 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	colliderMotion.position = motion.position;
 	colliderMotion.angle = motion.angle;
 
-	// note: because of repeat, circles display wierdly rn
 	if (shape == "circle.png")
 	{
 		auto &circle = registry.circleColliders.get(entity);
 		colliderMotion.scale = { circle.radius * 2, circle.radius * 2};
-		//std::cout << "pos: " << colliderMotion.position.x << ", " << colliderMotion.position.y << std::endl;
-		//std::cout << colliderMotion.scale.x << ", " << colliderMotion.scale.y << std::endl;
 	}
-	// note: this isn't working for offset aabbs
 	else if (shape == "rectangle.png")
 	{
 		auto &aabb = registry.aabbs.get(entity);
@@ -2384,83 +1919,8 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	else {
 		assert(false);
 	}
-
-	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::TEXTURED;
-	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
-	const GLuint program = (GLuint)effects[used_effect_enum];
-
-	// Setting shaders
-	glUseProgram(program);
-	resetProgramToggle(program);
-	gl_has_errors();
-
-	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
-
-	// Setting vertex and index buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	gl_has_errors();
-
-	GLint in_position_loc = glGetAttribLocation(program, "in_position");
-	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-	gl_has_errors();
-	assert(in_texcoord_loc >= 0);
-
-	GLint tile_uloc = glGetUniformLocation(program, "tile");
-	glUniform1i(tile_uloc, 0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_position_loc);
-	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-						  sizeof(TexturedVertex), (void *)0);
-	gl_has_errors();
-
-	glEnableVertexAttribArray(in_texcoord_loc);
-	glVertexAttribPointer(
-		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-		(void *)sizeof(
-			vec3)); // note the stride to skip the preceeding vertex position
-
-	// Enabling and binding texture to slot 0
-	glActiveTexture(GL_TEXTURE0);
-	gl_has_errors();
-
-	assert(registry.renderRequests.has(entity));
-	GLuint texture_id =
-		texture_gl_handles[(GLuint)name_to_texture[shape]];
-
-	//glBindTexture(GL_TEXTURE_2D, texture_id);
-	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
-	glUniform1i(texture_uloc, 0);
-	gl_has_errors();
-
-	// Get number of indices from index buffer, which has elements uint16_t
-	GLint size = 0;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	gl_has_errors();
-
-	GLsizei num_indices = size / sizeof(uint16_t);
-	// GLsizei num_triangles = num_indices / 3;
-
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-
-	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
-
-	mat4 transform = createFollowCameraModel(colliderMotion, vec2(0));
-
-	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
-	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float *)&transform);
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float *)&view);
-	gl_has_errors();
-
-	// Drawing of num_indices/3 triangles specified in the index buffer
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
-	gl_has_errors();
+	setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, shape, vec3(1), projection, colliderMotion, true);
+	drawBasicAnimateTextured();
 }
 
 void RenderSystem::drawDashes(const mat4 &projection, const mat4 &view)
@@ -2735,6 +2195,94 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	gl_has_errors();
 }
 
+// a simple draw for things that aren't in the ECS (like ui)
+// could consider moving ui into ECS as well
+void RenderSystem::drawBasicAnimateTextured() {
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+	GLsizei num_indices = size / sizeof(uint16_t);
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
+// sets up basic uniforms for things that aren't in ECS
+// returns the program
+GLint RenderSystem::setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, mat4 projection, Motion motion, bool followCamera, int frame) {
+	const GLuint used_effect_enum = (GLuint)used_effect;
+	const GLuint program = (GLuint)effects[static_cast<GLuint>(EFFECT_ASSET_ID::TEXTURED)];
+
+	// Setting shaders
+	glUseProgram(program);
+	resetProgramToggle(program);
+	gl_has_errors();
+
+	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+	const GLuint ibo = index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles.at((GLuint)name_to_texture.at(spriteName));
+
+	//glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
+	gl_has_errors();
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	glUniform3fv(color_uloc, 1, (float*)&color);
+
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	mat4 transform;
+
+	if (followCamera) {
+		transform = createFollowCameraModel(motion, vec2(0));
+	}
+	else {
+		transform = createNormalModel(motion, vec2(0));
+	}
+	 
+	GLuint transform_loc = glGetUniformLocation(currProgram, "model");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
+
+	GLint frame_uloc = glGetUniformLocation(program, "frame");
+	glUniform1i(frame_uloc, frame);
+	GLuint time_uloc = glGetUniformLocation(program, "time");
+	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
+	return program;
+}
+
 // turns off all possible toggles in program
 // should be called at start to avoid manually resetting things
 void RenderSystem::resetProgramToggle(GLint program) {
@@ -2759,9 +2307,20 @@ void RenderSystem::resetProgramToggle(GLint program) {
 	GLint tile_uloc = glGetUniformLocation(program, "tile");
 	glUniform1i(tile_uloc, 0);
 
+	GLint laser_uloc = glGetUniformLocation(program, "laser");
+	glUniform1i(laser_uloc, 0);
+
+	GLint onDeath_uloc = glGetUniformLocation(program, "onDeath");
+	glUniform1i(onDeath_uloc, 0);
+
+	GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
+	glUniform1i(effect_size_uloc, 1);
+
 	gl_has_errors();
 }
 
+// position is relative to window size
+// suitable for things like ui
 mat4 createNormalModel(Motion &motion, vec2 offset = vec2(0))
 {
 	mat4 transform = glm::mat4(1.0);
@@ -2773,6 +2332,8 @@ mat4 createNormalModel(Motion &motion, vec2 offset = vec2(0))
 	return transform;
 }
 
+// position is relative to world size
+// suitable for things in game world
 mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 {
 	WindowState &windowState = registry.windowStates.components[0];
@@ -2792,6 +2353,8 @@ mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 	return transform;
 }
 
+// position is relative to world size
+// need a separate one for text because text system's y = 0 is at bottom of screen as opposed to top
 mat4 createFollowCameraModelText(Motion &motion, vec2 offset)
 {
 	WindowState &windowState = registry.windowStates.components[0];
