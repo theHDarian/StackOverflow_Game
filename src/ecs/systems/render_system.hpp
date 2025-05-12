@@ -120,6 +120,7 @@ public:
 	void drawToScreenExtra(EFFECT_ASSET_ID effect);
 	void drawToScreenFinal();
 	void step(float elapsed_ms);
+	void resetProgramToggle(GLint program);
 
 	void drawCursor();
 

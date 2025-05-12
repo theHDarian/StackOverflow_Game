@@ -945,6 +945,7 @@ void RenderSystem::drawDash(Entity entity,
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -1706,14 +1707,10 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 
+	resetProgramToggle(currProgram);
+
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color_uloc, 1, (float*)&color);
-
-	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, 1);
-
-	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
-	glUniform1f(effect_alpha_uloc, 0);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
@@ -1830,6 +1827,7 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2069,6 +2067,7 @@ void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, con
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -2187,6 +2186,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2332,6 +2332,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
 
@@ -2442,10 +2443,6 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	glUniform1f(alpha_uloc, alpha);
 	gl_has_errors();
 
-	GLint tile_uloc = glGetUniformLocation(program, "tile");
-	glUniform1i(tile_uloc, 0);
-	gl_has_errors();
-
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -2457,6 +2454,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
+	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2475,6 +2473,33 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
+// turns off all possible toggles in program
+// should be called at start to avoid manually resetting things
+void RenderSystem::resetProgramToggle(GLint program) {
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 0);
+
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
+
+	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
+	glUniform1f(effect_alpha_uloc, 0);
+
+	GLuint glitchToggle_uloc = glGetUniformLocation(program, "glitchToggle");
+	glUniform1i(glitchToggle_uloc, false);
+
+	GLuint gaugeToggle_uloc = glGetUniformLocation(program, "gaugeToggle");
+	glUniform1i(gaugeToggle_uloc, false);
+
+	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
+	glUniform1i(shielded_uloc, false);
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, 0);
+
 	gl_has_errors();
 }
 

@@ -19,9 +19,14 @@ vec4 getRoomBounds(Entity entity)
 	vec2 roomEndPos = map.currRoom.roomEnd;
 
 	vec2 scale = abs(registry.motions.get(entity).scale);
-	scale = vec2(0); // TEST IF THIS IS OKAY
-	vec2 min = roomStartPos + scale / 2.f;
-	vec2 max = roomEndPos - scale / 2.f;
+	//scale = vec2(0); // TEST IF THIS IS OKAY Edit: this is not okay, enemies clip into walls
+	float offset = 0.f;
+
+	// can manually offset by 40 to avoid top wall clipping, because walls are off by 40 to let player walk up to wall
+	offset = 40.f;
+
+	vec2 min = vec2(roomStartPos.x + scale.x / 2.f, roomStartPos.y + scale.y/2.f + offset); 
+	vec2 max = vec2(roomEndPos.x - scale.x / 2.f, roomEndPos.y - scale.y/2.f);
 	
 	return vec4(min, max);
 }

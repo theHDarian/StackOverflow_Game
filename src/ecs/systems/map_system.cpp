@@ -51,9 +51,13 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             gauge.unchargedColor = vec4(1.0, 1.0, 1.0, 0.0);
             gauge.isVertical = true;
             // with particles
-            ParticleProps props = enemySpawnParticles;
-            props.velocity.base = vec2(0, -200) * (registry.motions.get(enemy).scale.y / 150);
-            registry.emitParticles.emplace(enemy, ParticleRequestType::FloatUpwards, props, spawning.max, Random::Int(10) + 20);
+            if (!registry.boids.has(enemy)) {
+                ParticleProps props = enemySpawnParticles;
+                props.velocity.base = vec2(0, -200) * (registry.motions.get(enemy).scale.y / 150);
+                props.velocity.base.y = min(-100.0f, props.velocity.base.y);
+                int count = max(1, int(3 * registry.motions.get(enemy).scale.x / 50));
+                registry.emitParticles.emplace(enemy, ParticleRequestType::FloatUpwards, props, spawning.max, Random::Int(count) + 2 * count);
+            }
 
             if (isElite) {
                 auto& elt = registry.elites.emplace(enemy);
