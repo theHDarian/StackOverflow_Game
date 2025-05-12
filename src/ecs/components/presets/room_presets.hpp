@@ -4631,56 +4631,6 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     
     Map& map = registry.maps.components[0];
 
-    // Effect controls
-    // Biology  2pos 1neg
-    // Mining   2pos 2neg
-    // Hifi     3pos 2neg
-    // Medical  3pos 3neg
-    // Military 1pos 3neg
-
-    switch (currRegion) {
-    case MapRegion::Biology:
-        nextRoom.positiveEffects = biologyPositiveEffects.getNWeightedEffects(2);
-        nextRoom.negativeEffects = biologyNegativeEffects.getNWeightedEffects(1, nextRoom.positiveEffects);
-        break;
-    case MapRegion::Mining:
-        nextRoom.positiveEffects = miningPositiveEffects.getNWeightedEffects(2);
-        nextRoom.negativeEffects = miningNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
-        break;
-    case MapRegion::Physics:
-        nextRoom.positiveEffects = hifiPositiveEffects.getNWeightedEffects(3);
-        nextRoom.negativeEffects = hifiNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
-        break;
-    case MapRegion::Medical:
-        nextRoom.positiveEffects = medicalPositiveEffects.getNWeightedEffects(3);
-        nextRoom.negativeEffects = medicalNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
-        break;
-    case MapRegion::Military:
-        nextRoom.positiveEffects = militaryPositiveEffects.getNWeightedEffects(1);
-        nextRoom.negativeEffects = militaryNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
-        break;
-    default:
-        std::cout << "WARNING: Enemy room in unexpected region!" << std::endl;
-        nextRoom.positiveEffects = { biologyPositiveEffects.getWeightedEffect() };
-        nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
-        break;
-    }
-
-    // Effect printing for testing
-    std::cout << "--== Positive Effects ==--" << std::endl;
-    for (auto& e : nextRoom.positiveEffects) {
-        for (auto& ee : e) {
-            std::cout << ee.name << std::endl;
-        }
-    }
-
-    std::cout << "--== Negative Effects ==--" << std::endl;
-    for (auto& e : nextRoom.negativeEffects) {
-        for (auto& ee : e) {
-            std::cout << ee.name << std::endl;
-        }
-    }
-
     //boss rooms
     if (type == RoomType::BossRoom && currRegion == MapRegion::Biology) {
         std::vector<RoomPreset> biobosses = {BossRoomBee, BossRoomCrab};
@@ -4731,6 +4681,56 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
         return nextRoom;
     }
     nextRoom = Random::ListItem(locked ? getDirectory(currRegion).at(currentRegionDifficulty).at(type).locked : getDirectory(currRegion).at(currentRegionDifficulty).at(type).unlocked);
+
+    // Effect controls
+    // Biology  2pos 1neg
+    // Mining   2pos 2neg
+    // Hifi     3pos 2neg
+    // Medical  3pos 3neg
+    // Military 1pos 3neg
+
+    switch (currRegion) {
+    case MapRegion::Biology:
+        nextRoom.positiveEffects = biologyPositiveEffects.getNWeightedEffects(2);
+        nextRoom.negativeEffects = biologyNegativeEffects.getNWeightedEffects(1, nextRoom.positiveEffects);
+        break;
+    case MapRegion::Mining:
+        nextRoom.positiveEffects = miningPositiveEffects.getNWeightedEffects(2);
+        nextRoom.negativeEffects = miningNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+        break;
+    case MapRegion::Physics:
+        nextRoom.positiveEffects = hifiPositiveEffects.getNWeightedEffects(3);
+        nextRoom.negativeEffects = hifiNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+        break;
+    case MapRegion::Medical:
+        nextRoom.positiveEffects = medicalPositiveEffects.getNWeightedEffects(3);
+        nextRoom.negativeEffects = medicalNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+        break;
+    case MapRegion::Military:
+        nextRoom.positiveEffects = militaryPositiveEffects.getNWeightedEffects(1);
+        nextRoom.negativeEffects = militaryNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+        break;
+    default:
+        std::cout << "WARNING: Enemy room in unexpected region!" << std::endl;
+        nextRoom.positiveEffects = { biologyPositiveEffects.getWeightedEffect() };
+        nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
+        break;
+    }
+
+    // Effect printing for testing
+    std::cout << "--== Positive Effects ==--" << std::endl;
+    for (auto& e : nextRoom.positiveEffects) {
+        for (auto& ee : e) {
+            std::cout << ee.name << std::endl;
+        }
+    }
+
+    std::cout << "--== Negative Effects ==--" << std::endl;
+    for (auto& e : nextRoom.negativeEffects) {
+        for (auto& ee : e) {
+            std::cout << ee.name << std::endl;
+        }
+    }
 
     // Remove the one-time room from all relevant regions
     if (nextRoom.oneTime) {

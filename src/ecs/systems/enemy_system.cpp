@@ -1223,8 +1223,8 @@ void EnemySystem::fetchRoomEffects(Entity entity, AttackData& atkData)
     }
 
     Map& map = registry.maps.components[0];
-
-    assert(!map.currRoom.preset.negativeEffects.empty() && !map.currRoom.preset.positiveEffects.empty());
+    assert(!map.currRoom.preset.positiveEffects.empty());
+    assert(!map.currRoom.preset.negativeEffects.empty());
 
     BulletStackEffect blunt = { Inert, 0, "Inert", "" };
 
