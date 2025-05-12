@@ -476,6 +476,12 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 	registry.interactableRequests.clear();
 }
 
+void resetDashes () {
+	auto& player = registry.players.components[0];
+	player.currDashCharges = getModifiedValue( PlayerNumDash, player.maxDashCharges);
+	player.currDashCooldown = getModifiedValue( PlayerDashRecharge, player.baseDashCDR);
+}
+
 
 void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
 	// interactible object management placed here and hard coded for now
@@ -549,6 +555,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					object.name = "OpenDoor";
 					object.interactType = InteractableType::ActionInteractable;
 					reaction.choice = -1;
+					resetDashes();
 				} else { // does not have key, but attempted opening
 					DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
 					req.choice = 2; // use this as temporary way to get back to dialogue system
@@ -573,6 +580,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			if (reaction.choice == 0) { // yes
 				object.dialogueCount++;
 				resetStack(player, renderer);
+				resetDashes();
 			}
 			else if (reaction.choice == 1) { // no
 				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
@@ -609,6 +617,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				RenderRequest& req = registry.renderRequests.get(reaction.object);
 				req.texture_name = "push_console_pushed.png";
 				req.used_effect = EFFECT_ASSET_ID::TEXTURED;
+				resetDashes();
 			}
 		}
 
@@ -630,6 +639,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					{EnemyType::EnemyTwoBee, {0.8f, 0.2f}},
 				{EnemyType::EnemyThreeBee, {0.2f, 0.2f}},
 			});
+				resetDashes();
 			}
 		}
 		if (object.item == WishGranter) {
@@ -780,6 +790,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 					default:
 						break;
 				}
+				resetDashes();
 			}
 		}
 		if (object.item == InteractableItem::Swarm) {

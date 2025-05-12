@@ -1921,6 +1921,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 750.f;
 		buffer.maxCoolDown = 1200.f;
 		buffer.duration = 2000.f;
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case BossConstructPURPLE:
@@ -1930,6 +1931,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 10000.f;
 		buffer.maxCoolDown = 1000000000000.f;
 		buffer.duration = 15000.f;
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case BossConstructGREEN:
@@ -1939,6 +1941,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 10000.f;
 		buffer.maxCoolDown = 1000000000000.f;
 		buffer.duration = 15000.f;
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case BossConstructRED:
@@ -1948,6 +1951,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		buffer.range = 10000.f;
 		buffer.maxCoolDown = 1000000000000.f;
 		buffer.duration = 15000.f;
+		registry.bossParts.emplace(entity);
 		break;
 	}
 	case EnemyEyeCube:
@@ -2379,7 +2383,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 	bullet.bulletRange = atkData.bulletRange;
 	bullet.bulletBounce = atkData.bulletBounce;
 	bullet.bulletPierce = atkData.bulletPierce;
-	bullet.bulletEffects = getBulletEffects(atkData, bullet.isSpecial);
+	bullet.bulletEffects = atkData.rareBulletEffects;
 	bullet.shape = atkData.shape;
 	if (atkData.onDeath != EnemyBulletDeath::NONE)
 		bullet.onDeath = atkData.onDeath;

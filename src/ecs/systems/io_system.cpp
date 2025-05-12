@@ -168,6 +168,8 @@ void IOSystem::handleMenuChoice(int key, int action, IOState& state, GameState& 
 			
 			state.hoveringMenuChoice = min(state.hoveringMenuChoice + 1, (int)registry.menuChoices.components.size() - 1);
 		}
+		auto& req = registry.soundRequests.emplace(Entity());
+		req.type = SoundType::NormalDialogue;
 	}
 }
 

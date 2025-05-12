@@ -370,9 +370,14 @@ void PhysicsSystem::step(float elapsed_ms)
 					registry.nearbyInteractables.emplace(registry.doors.entities[i]);
 				}
 				else {
-					registry.interactables.get(registry.doors.entities[i]).timer -= elapsed_ms;
-					if (registry.interactables.get(registry.doors.entities[i]).timer <= 0) {
-						MapRequest& mapReq = registry.mapRequests.emplace(doors.entities[i], MapRequestType::ChangeRoom, doors.components[i].room, i);
+					if (!registry.invincibles.has(player)) {
+						registry.interactables.get(registry.doors.entities[i]).timer -= elapsed_ms;
+						if (registry.interactables.get(registry.doors.entities[i]).timer <= 0) {
+							MapRequest& mapReq = registry.mapRequests.emplace(doors.entities[i], MapRequestType::ChangeRoom, doors.components[i].room, i);
+							registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
+						}
+					}
+					else {
 						registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
 					}
 				}
