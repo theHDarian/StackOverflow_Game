@@ -374,55 +374,6 @@ Entity createWhiteBoard(RenderSystem *renderer, vec2 pos)
 	return entity;
 }
 
-// merges effects as if they were on the stack
-std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects) {
-	std::vector<BulletStackEffect> mergeEffects;
-	BulletStackEffect prev = blunt;
-	const int maxPosVal = 3;
-	const int maxNegVal = -3;
-
-	// first check size is more than 1 effect, i.e there's something to actually merge
-	if (effects.size() <= 1) {
-		return effects;
-	}
-	
-	for (int i = 0; i < effects.size(); i++) {
-		if (effects[i].type == Key || effects[i].type == Inert || effects[i].type == Lightning) {
-			mergeEffects.push_back(effects[i]);
-		} else { // need to count normal bullets
-			if (effects[i].type == prev.type) {
-				prev.value += effects[i].value;
-
-				// make sure doesn't overflow
-				if (prev.value > maxPosVal) {
-					BulletStackEffect prevCopy = prev;
-					prevCopy.value = maxPosVal;
-					prev.value -= maxPosVal;
-					mergeEffects.push_back(prevCopy);
-				}
-
-				if (prev.value < maxNegVal) {
-					BulletStackEffect prevCopy = prev;
-					prevCopy.value = maxNegVal;
-					prev.value -= maxNegVal;
-					mergeEffects.push_back(prevCopy);
-				}
-			}
-			else {
-				if (prev.type != BulletEffectType::Inert && prev.value != 0) {
-					mergeEffects.push_back(prev);
-				}
-				prev = effects[i];
-			}
-		}
-	}
-	if (prev.type != BulletEffectType::Inert && prev.value != 0) {
-		mergeEffects.push_back(prev);
-	}
-
-	return mergeEffects;
-}
-
 // add names of effects
 void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects) {
 	vec3 color;

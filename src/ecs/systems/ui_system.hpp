@@ -14,6 +14,7 @@ class SoundSystem;
 const float STACK_NOTIF_SCALE = 1.0f;
 
 std::string getFormattedBulletEffectString(BulletStackEffect bullet);
+std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects);
 
 // System responsible for handling user input
 class UISystem {

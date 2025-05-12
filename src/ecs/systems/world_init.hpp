@@ -64,8 +64,6 @@ Entity createInteractable(RenderSystem* renderer, vec2 pos, InteractableItem ite
 
 void createEffectString (InteractableObject &object, std::vector<BulletStackEffect> effects);
 
-std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects);
-
 Entity createPushConsole(RenderSystem* renderer, vec2 pos, std::vector<BulletStackEffect> effects);
 
 Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletStackEffect> effects);

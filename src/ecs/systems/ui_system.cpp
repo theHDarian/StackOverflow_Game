@@ -276,6 +276,9 @@ void UISystem::step(float elapsed_ms) {
 
 			vec2 bulletStartPos = playerPos;
 
+			// first merge effects
+			uiRequest.effects = mergeEffects(uiRequest.effects);
+
 			// note: shuffles will end up here too, so need to catch them beforehand
 			if (uiRequest.effects.size() > 0 && uiRequest.type == UIRequestType::StackNotifBullet) {
 				for (int index = 0; index < uiRequest.effects.size(); index++) {
@@ -2064,4 +2067,54 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 			request.decorations[i].endIndex += endLineCount - startLineCount;
 		}
 	}
+}
+
+// merges effects as if they were on the stack
+std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects) {
+	std::vector<BulletStackEffect> mergeEffects;
+	BulletStackEffect prev = blunt;
+	const int maxPosVal = 3;
+	const int maxNegVal = -3;
+
+	// first check size is more than 1 effect, i.e there's something to actually merge
+	if (effects.size() <= 1) {
+		return effects;
+	}
+
+	for (int i = 0; i < effects.size(); i++) {
+		if (effects[i].type == Key || effects[i].type == Inert || effects[i].type == Lightning) {
+			mergeEffects.push_back(effects[i]);
+		}
+		else { // need to count normal bullets
+			if (effects[i].type == prev.type) {
+				prev.value += effects[i].value;
+
+				// make sure doesn't overflow
+				if (prev.value > maxPosVal) {
+					BulletStackEffect prevCopy = prev;
+					prevCopy.value = maxPosVal;
+					prev.value -= maxPosVal;
+					mergeEffects.push_back(prevCopy);
+				}
+
+				if (prev.value < maxNegVal) {
+					BulletStackEffect prevCopy = prev;
+					prevCopy.value = maxNegVal;
+					prev.value -= maxNegVal;
+					mergeEffects.push_back(prevCopy);
+				}
+			}
+			else {
+				if (prev.type != BulletEffectType::Inert && prev.value != 0) {
+					mergeEffects.push_back(prev);
+				}
+				prev = effects[i];
+			}
+		}
+	}
+	if (prev.type != BulletEffectType::Inert && prev.value != 0) {
+		mergeEffects.push_back(prev);
+	}
+
+	return mergeEffects;
 }
