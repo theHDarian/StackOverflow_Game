@@ -146,9 +146,11 @@ private:
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, int bullet_value, const mat4& projection, const mat4& view);
 	void drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view);
 	void drawBulletStack(const mat4& projection, const mat4& view);
-
 	void drawDoorIndicator(Entity& enemy, const mat4& projection, const mat4& view);
+
 	void resetProgramToggle(GLint program);
+	void drawBasicAnimateTextured();
+	GLint setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, mat4 projection, Motion motion, bool followCamera, int frame = 0);
 
 	// Window handle
 	GLFWwindow* window;
