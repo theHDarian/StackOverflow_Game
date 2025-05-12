@@ -105,8 +105,6 @@ struct StackAddNotif {
 };
 
 enum UIRequestType {
-	StackNotifReqShift,
-	StackNotifReqShuffle,
 	ResetUI,
 	GameOverReport,
 	CallNotif,

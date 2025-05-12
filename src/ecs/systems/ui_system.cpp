@@ -245,9 +245,7 @@ void UISystem::step(float elapsed_ms) {
 
 	// handle ui requests
 	for (UIRequest& uiRequest : registry.uiRequests.components) {
-		if (uiRequest.type == UIRequestType::StackNotifReqShift
-			|| uiRequest.type == UIRequestType::StackNotifReqShuffle
-			|| uiRequest.type == UIRequestType::CallNotif
+		if (uiRequest.type == UIRequestType::CallNotif
 			|| uiRequest.type == UIRequestType::StackNotifBullet) {
 
 			// clean up previous stack add notifs
@@ -278,17 +276,43 @@ void UISystem::step(float elapsed_ms) {
 
 			vec2 bulletStartPos = playerPos;
 
+			// note: shuffles will end up here too, so need to catch them beforehand
 			if (uiRequest.effects.size() > 0 && uiRequest.type == UIRequestType::StackNotifBullet) {
 				for (int index = 0; index < uiRequest.effects.size(); index++) {
-					createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y),
-						registry.stackUI.components[0].bulletSize * STACK_NOTIF_SCALE,
-						bulletEffectShapes.at(uiRequest.effects[index].type),
-						bulletEffectColors.at(uiRequest.effects[index].type),
-						uiRequest.effects[index]);
+					std::string bulletSprite = "";
+					vec3 bulletColor = vec3(1);
+					std::string bulletMsg = "";
+					std::string effectStr = "";
 
-					std::string effectStr = getFormattedBulletEffectString(uiRequest.effects[index]);
-					std::string message = effectStr + " added onto the stack";
-					Entity notif = createNotifMessage(message);
+					if (uiRequest.effects[index].type == BulletEffectType::Lightning) {
+						if (uiRequest.effects[index].value == lightningShuffle.value) { // shuffle
+							bulletSprite = "stackNotifShuffle.png";
+							bulletMsg = "Shuffled stack";
+							bulletColor = COLOR_YELLOW;
+							effectStr = "shuffled";
+						}
+						else {
+							bulletSprite = "stackNotifShift.png";
+							bulletMsg = "Shifted stack by 1";
+							bulletColor = COLOR_TURQUOISE;
+							effectStr = "shifted";
+						}
+
+						createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, bulletSprite, vec3(1), BulletStackEffect());
+					} else {
+						bulletSprite = bulletEffectShapes.at(uiRequest.effects[index].type);
+						bulletColor = bulletEffectColors.at(uiRequest.effects[index].type);
+						effectStr = getFormattedBulletEffectString(uiRequest.effects[index]);
+						bulletMsg = effectStr + " added onto the stack";
+
+						createStackAddNotif(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y),
+							registry.stackUI.components[0].bulletSize* STACK_NOTIF_SCALE,
+							bulletSprite,
+							bulletColor,
+							uiRequest.effects[index]);
+					}
+
+					Entity notif = createNotifMessage(bulletMsg);
 
 					// highlight bullet effect name
 					// do a special check for keys, but can alternatively make all non-bullet items share a colour (teal?)
@@ -298,38 +322,17 @@ void UISystem::step(float elapsed_ms) {
 					}
 					else {
 						registry.textRenderRequests.get(notif).decorations.push_back(
-							TextDecorationSpan{ 0, effectStr.length(), bulletEffectColors.at(uiRequest.effects[index].type) });
+							TextDecorationSpan{ 0, effectStr.length(), bulletColor });
 					}
 				}
 			}
 			else {
 				std::string sprite = "stackNotifShift.png";
-				std::string message = "Shifted stack by 1";
-				if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
-					sprite = "stackNotifShuffle.png";
-					message = "Shuffled stack";
-				}
-				else if (uiRequest.type == UIRequestType::CallNotif) {
+				if (uiRequest.type == UIRequestType::CallNotif) {
 					sprite = "callNotif.png";
 				}
 
 				createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, sprite, vec3(1), BulletStackEffect());
-
-				if (uiRequest.type == UIRequestType::StackNotifReqShuffle ||
-					uiRequest.type == UIRequestType::StackNotifReqShift) {
-					Entity notif = createNotifMessage(message);
-					std::string shifted = "shifted";
-					std::string shuffled = "shuffled";
-
-					if (uiRequest.type == UIRequestType::StackNotifReqShuffle) {
-						registry.textRenderRequests.get(notif).decorations.push_back(
-							TextDecorationSpan{ 0, shuffled.length(), COLOR_YELLOW });
-					}
-					else {
-						registry.textRenderRequests.get(notif).decorations.push_back(
-							TextDecorationSpan{ 0, shifted.length(), COLOR_TURQUOISE });
-					}
-				}
 			}
 		}
 
