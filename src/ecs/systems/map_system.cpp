@@ -551,6 +551,34 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req2.type = InteractableRequestType::AddEffect;
             req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
         }
+        auto& nextRoom = map.currRoom.preset;
+        switch (map.currRegion) {
+            case MapRegion::Biology:
+                nextRoom.positiveEffects = biologyPositiveEffects.getNWeightedEffects(2);
+                nextRoom.negativeEffects = biologyNegativeEffects.getNWeightedEffects(1, nextRoom.positiveEffects);
+                break;
+            case MapRegion::Mining:
+                nextRoom.positiveEffects = miningPositiveEffects.getNWeightedEffects(2);
+                nextRoom.negativeEffects = miningNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+                break;
+            case MapRegion::Physics:
+                nextRoom.positiveEffects = hifiPositiveEffects.getNWeightedEffects(3);
+                nextRoom.negativeEffects = hifiNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+                break;
+            case MapRegion::Medical:
+                nextRoom.positiveEffects = medicalPositiveEffects.getNWeightedEffects(3);
+                nextRoom.negativeEffects = medicalNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+                break;
+            case MapRegion::Military:
+                nextRoom.positiveEffects = militaryPositiveEffects.getNWeightedEffects(1);
+                nextRoom.negativeEffects = militaryNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+                break;
+            default:
+                std::cout << "WARNING: Enemy room in unexpected region!" << std::endl;
+                nextRoom.positiveEffects = { biologyPositiveEffects.getWeightedEffect() };
+                nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
+                break;
+        }
         InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
         req2.type = InteractableRequestType::AddEffect;
         req2.effects = { numBulletsUp, dmgUp,dmgUp,fireRateUp,};
