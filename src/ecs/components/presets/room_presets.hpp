@@ -4631,6 +4631,39 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     
     Map& map = registry.maps.components[0];
 
+    if (!hasLocked(type, map.roomsTraversed) && locked) {
+        assert(false);
+    }
+    DifficultyRegion currentRegionDifficulty;
+    if (roomsTraversed == -1) {
+        if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
+            currentRegionDifficulty = DifficultyRegion::Intro;
+        }
+        else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
+            currentRegionDifficulty = DifficultyRegion::Easy;
+        }
+        else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
+            currentRegionDifficulty = DifficultyRegion::Medium;
+        }
+        else {
+            currentRegionDifficulty = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+        }
+    }
+    else {
+        if (roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
+            currentRegionDifficulty = DifficultyRegion::Intro;
+        }
+        else if (roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
+            currentRegionDifficulty = DifficultyRegion::Easy;
+        }
+        else if (roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
+            currentRegionDifficulty = DifficultyRegion::Medium;
+        }
+        else {
+            currentRegionDifficulty = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+        }
+    }
+
     //boss rooms
     if (type == RoomType::BossRoom && currRegion == MapRegion::Biology) {
         std::vector<RoomPreset> biobosses = {BossRoomBee, BossRoomCrab};
@@ -4646,42 +4679,19 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     }
 
     // Tutorial rooms
-    if (type == RoomType::TutorialRoom2) {
+    else if (type == RoomType::TutorialRoom2) {
         nextRoom = TutorialRoom2Preset;
     }
-
+    
     // Regular rooms
-    if (!hasLocked(type,map.roomsTraversed) && locked) {
-        assert(false);
-    }
-    DifficultyRegion currentRegionDifficulty;
-    if (roomsTraversed == -1) {
-
-        if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
-            currentRegionDifficulty = DifficultyRegion::Intro;
-        } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
-            currentRegionDifficulty = DifficultyRegion::Easy;
-        } else if (map.roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
-            currentRegionDifficulty = DifficultyRegion::Medium;
-        } else {
-            currentRegionDifficulty = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
+    else {
+        if (type == RoomType::None) {
+            return nextRoom;
         }
-    } else {
-        if (roomsTraversed < static_cast<int>(DifficultyRegion::Intro)) {
-            currentRegionDifficulty = DifficultyRegion::Intro;
-        } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Easy)) {
-            currentRegionDifficulty = DifficultyRegion::Easy;
-        } else if (roomsTraversed < static_cast<int>(DifficultyRegion::Medium)) {
-            currentRegionDifficulty = DifficultyRegion::Medium;
-        } else {
-            currentRegionDifficulty = DifficultyRegion::Medium; // Assuming Medium for higher roomsTraversed
-        }
+        nextRoom = Random::ListItem(locked ? getDirectory(currRegion).at(currentRegionDifficulty).at(type).locked : getDirectory(currRegion).at(currentRegionDifficulty).at(type).unlocked);
+    
     }
-    if (type == RoomType::None) {
-        return nextRoom;
-    }
-    nextRoom = Random::ListItem(locked ? getDirectory(currRegion).at(currentRegionDifficulty).at(type).locked : getDirectory(currRegion).at(currentRegionDifficulty).at(type).unlocked);
-
+    
     // Effect controls
     // Biology  2pos 1neg
     // Mining   2pos 2neg
