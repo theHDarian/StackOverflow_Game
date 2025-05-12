@@ -898,6 +898,7 @@ void RenderSystem::drawDash(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
@@ -945,7 +946,6 @@ void RenderSystem::drawDash(Entity entity,
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	resetProgramToggle(currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -1653,6 +1653,7 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -1707,8 +1708,6 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 
-	resetProgramToggle(currProgram);
-
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color_uloc, 1, (float*)&color);
 
@@ -1752,6 +1751,7 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -1827,7 +1827,6 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2023,6 +2022,7 @@ void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, con
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -2067,7 +2067,6 @@ void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, con
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	resetProgramToggle(currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -2132,6 +2131,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -2186,7 +2186,6 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2244,6 +2243,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -2332,7 +2332,6 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	resetProgramToggle(currProgram);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
 
@@ -2380,6 +2379,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -2454,7 +2454,6 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
-	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
