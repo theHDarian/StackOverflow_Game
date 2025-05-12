@@ -1068,7 +1068,7 @@ Entity createDoorSymbol(RenderSystem *renderer, char side, float angle, vec2 sca
 	symbol.offset = vec3(0);
 	symbol.side = side;
 
-	registry.backgrounds.emplace(entity);
+	registry.gameOverlayUIs.emplace(entity);
 
 	RenderRequest &rr = registry.renderRequests.insert(entity,
 													   {"door_symbols",

@@ -120,7 +120,6 @@ public:
 	void drawToScreenExtra(EFFECT_ASSET_ID effect);
 	void drawToScreenFinal();
 	void step(float elapsed_ms);
-	void resetProgramToggle(GLint program);
 
 	void drawCursor();
 
@@ -147,6 +146,9 @@ private:
 	void drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, int bullet_value, const mat4& projection, const mat4& view);
 	void drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view);
 	void drawBulletStack(const mat4& projection, const mat4& view);
+
+	void drawDoorIndicator(Entity& enemy, const mat4& projection, const mat4& view);
+	void resetProgramToggle(GLint program);
 
 	// Window handle
 	GLFWwindow* window;
