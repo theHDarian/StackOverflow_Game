@@ -467,8 +467,10 @@ void UISystem::step(float elapsed_ms) {
 				registry.renderRequests.get(bulletUIArrow).show = false;
 			}
 
+			// Temp fix: because door gauges are deleted everyframe
+			// but enemies are gauges when spawning, so must persist
 			for (Entity gaugeEntity : registry.gaugeVisuals.entities) {
-				if (!registry.deleteds.has(gaugeEntity)) {
+				if (!registry.deleteds.has(gaugeEntity) && !registry.spawnings.has(gaugeEntity)) {
 					registry.deleteds.emplace(gaugeEntity);
 				}
 			}

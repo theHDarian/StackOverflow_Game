@@ -45,7 +45,16 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
             if (registry.bosses.has(enemy)) {
                 bossEnemy = enemy;
             }
-            registry.spawnings.emplace(enemy);
+            Spawning& spawning = registry.spawnings.emplace(enemy);
+            // make it a gauge for spawning "animation"
+            GaugeVisual& gauge = registry.gaugeVisuals.emplace(enemy);
+            gauge.unchargedColor = vec4(1.0, 1.0, 1.0, 0.0);
+            gauge.isVertical = true;
+            // with particles
+            ParticleProps props = enemySpawnParticles;
+            props.velocity.base = vec2(0, -200) * (registry.motions.get(enemy).scale.y / 150);
+            registry.emitParticles.emplace(enemy, ParticleRequestType::FloatUpwards, props, spawning.max, Random::Int(10) + 20);
+
             if (isElite) {
                 auto& elt = registry.elites.emplace(enemy);
                 elt.eliteLevel = Random::Int((registry.maps.components[0].currRegion) + 1);

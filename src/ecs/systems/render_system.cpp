@@ -126,6 +126,14 @@ void RenderSystem::step(float elapsed_ms)
 			}
 		}
 	}
+
+	for (Entity entity : registry.gaugeVisuals.entities) {
+		GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+		if (registry.spawnings.has(entity)) {
+			Spawning& spawning = registry.spawnings.get(entity);
+			gauge.chargeBoundary = glm::lerp(0.0f, 1.f, (spawning.max - spawning.countdown) / spawning.max);
+		}
+	}
 }
 
 void RenderSystem::drawCursor()
@@ -303,6 +311,23 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniform1i(glitchToggle_uloc, (registry.elites.has(target) || should_glitch));
 	gl_has_errors();
 
+	GLuint gaugeToggle_uloc = glGetUniformLocation(program, "gaugeToggle");
+	if (registry.gaugeVisuals.has(entity))
+	{
+		GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+		glUniform1i(gaugeToggle_uloc, true);
+		GLint chargeBoundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+		glUniform1f(chargeBoundary_uloc, gauge.chargeBoundary);
+		GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
+		glUniform4fv(uncharged_uloc, 1, (float*)&gauge.unchargedColor);
+		GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
+		glUniform1i(chargeDir_uloc, gauge.isVertical ? 1 : 0);
+	}
+	else {
+		glUniform1i(gaugeToggle_uloc, false);
+	}
+	gl_has_errors();
+
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -456,11 +481,10 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	if (registry.spawnings.has(entity))
 	{
 		Spawning& spawning = registry.spawnings.get(entity);
-		//change color to grey
-		vec3 Color = COLOR_GREY_LIGHT;
+		//change color to blue
+		vec3 Color = vec3(1.0, 1.0, 2.0);
 		glUniform3fv(color_uloc, 1, (float*)&Color);
 		glUniform1i(change_color_uloc, 0);
-		alpha = glm::lerp(0.f, 2.f, (spawning.max - spawning.countdown) / spawning.max);
 	}
 	// GLsizei num_triangles = num_indices / 3;
 
