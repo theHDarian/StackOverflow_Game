@@ -15,12 +15,19 @@ uniform vec3 fcolor;
 uniform int changeColor = 0;
 uniform float effectAlpha = 1.0;
 uniform int frame = 1;
+uniform float alpha = 1.0;
 
 uniform bool glitchToggle = false;
 uniform float time;
 uniform sampler2DArray glitchMask;
 uniform sampler2DArray glitch;
 float glitchOffset = 0.05;
+
+// for drawing gauges
+uniform bool gaugeToggle = false;
+uniform float chargeBoundary = 1.0;
+uniform vec4 unchargedColor;
+uniform int isVertical = 1;
 
 // Output color
 layout(location = 0) out  vec4 color;
@@ -29,10 +36,27 @@ vec2 clampedGlitchOffset(vec2 offset) {
 	return clamp(texcoord + offset, vec2(0.0), vec2(1.0));
 }
 
+vec4 gaugeEffect(vec4 color)
+{
+	if (texcoord.y < 1.0 - chargeBoundary && isVertical == 1) {
+		color.r *= fcolor.r;
+		color.g *= fcolor.g;
+		color.b *= fcolor.b;
+		color *= unchargedColor;
+	}
+	if (texcoord.x > chargeBoundary && isVertical == 0) {
+		color.r *= fcolor.r;
+		color.g *= fcolor.g;
+		color.b *= fcolor.b;
+		color *= unchargedColor;
+	}
+	return color;
+}
+
 void main()
 {
 
-	color = vec4(fcolor, 1.0) * texture(sampler0, vec3(texcoord.x, texcoord.y, frame));
+	color = vec4(fcolor, alpha) * texture(sampler0, vec3(texcoord.x, texcoord.y, frame));
 	if (glitchToggle) {
 		float a = texture(glitchMask, vec3(texcoord.x, texcoord.y, floor(64.0 * mod(0.01 * time, 1)))).a;
 		if (a > 0.5 && (
@@ -48,6 +72,9 @@ void main()
 					   )) {
 			color = texture(glitch, vec3(texcoord.x, texcoord.y, floor(39.0 * mod(0.02 * time, 1))));
 		}
+	}
+	if (gaugeToggle) {
+		color = gaugeEffect(color);
 	}
 	// note: branches are expensive, consider using another shader instead?
 	if (changeColor == 1){

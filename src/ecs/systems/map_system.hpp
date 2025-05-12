@@ -2,6 +2,7 @@
 #include "components/map_components.hpp"
 #include "render_system.hpp"
 #include "SDL_mixer.h"
+#include "presets/particle_presets.hpp"
 
 
 class SoundSystem;

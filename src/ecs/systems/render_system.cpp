@@ -126,6 +126,14 @@ void RenderSystem::step(float elapsed_ms)
 			}
 		}
 	}
+
+	for (Entity entity : registry.gaugeVisuals.entities) {
+		GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+		if (registry.spawnings.has(entity)) {
+			Spawning& spawning = registry.spawnings.get(entity);
+			gauge.chargeBoundary = glm::lerp(0.0f, 1.f, (spawning.max - spawning.countdown) / spawning.max);
+		}
+	}
 }
 
 void RenderSystem::drawCursor()
@@ -303,6 +311,23 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniform1i(glitchToggle_uloc, (registry.elites.has(target) || should_glitch));
 	gl_has_errors();
 
+	GLuint gaugeToggle_uloc = glGetUniformLocation(program, "gaugeToggle");
+	if (registry.gaugeVisuals.has(entity))
+	{
+		GaugeVisual& gauge = registry.gaugeVisuals.get(entity);
+		glUniform1i(gaugeToggle_uloc, true);
+		GLint chargeBoundary_uloc = glGetUniformLocation(program, "chargeBoundary");
+		glUniform1f(chargeBoundary_uloc, gauge.chargeBoundary);
+		GLint uncharged_uloc = glGetUniformLocation(program, "unchargedColor");
+		glUniform4fv(uncharged_uloc, 1, (float*)&gauge.unchargedColor);
+		GLint chargeDir_uloc = glGetUniformLocation(program, "isVertical");
+		glUniform1i(chargeDir_uloc, gauge.isVertical ? 1 : 0);
+	}
+	else {
+		glUniform1i(gaugeToggle_uloc, false);
+	}
+	gl_has_errors();
+
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -349,6 +374,16 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		Cloaked& cloak = registry.cloaks.get(entity);
 		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
 		alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, motion.position) - cloak.cloakingDistance) / cloak.cloakingDistance);
+	}
+
+	if (registry.spawnings.has(entity))
+	{
+		Spawning& spawning = registry.spawnings.get(entity);
+		//change color to blue
+		vec3 Color = vec3(1.0, 1.0, 2.0);
+		glUniform3fv(color_uloc, 1, (float*)&Color);
+		glUniform1i(change_color_uloc, 0);
+		alpha = glm::lerp(0.f, 1.f, (spawning.max - spawning.countdown) / spawning.max);
 	}
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
@@ -453,15 +488,6 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		glUniform1f(effectAlpha, alpha);
 	}
 
-	if (registry.spawnings.has(entity))
-	{
-		Spawning& spawning = registry.spawnings.get(entity);
-		//change color to grey
-		vec3 Color = COLOR_GREY_LIGHT;
-		glUniform3fv(color_uloc, 1, (float*)&Color);
-		glUniform1i(change_color_uloc, 0);
-		alpha = glm::lerp(0.f, 2.f, (spawning.max - spawning.countdown) / spawning.max);
-	}
 	// GLsizei num_triangles = num_indices / 3;
 
 	// Drawing of num_indices/3 triangles specified in the index buffer
@@ -919,6 +945,7 @@ void RenderSystem::drawDash(Entity entity,
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -1680,14 +1707,10 @@ void RenderSystem::drawEnemyIndicator(Entity& enemy, const mat4& projection, con
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 
+	resetProgramToggle(currProgram);
+
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color_uloc, 1, (float*)&color);
-
-	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, 1);
-
-	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
-	glUniform1f(effect_alpha_uloc, 0);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
@@ -1804,6 +1827,7 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2043,6 +2067,7 @@ void RenderSystem::drawLaserIndicator(Entity entity, const mat4 &projection, con
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -2161,6 +2186,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2306,6 +2332,7 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	resetProgramToggle(currProgram);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
 
@@ -2416,10 +2443,6 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	glUniform1f(alpha_uloc, alpha);
 	gl_has_errors();
 
-	GLint tile_uloc = glGetUniformLocation(program, "tile");
-	glUniform1i(tile_uloc, 0);
-	gl_has_errors();
-
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -2431,6 +2454,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
+	resetProgramToggle(currProgram);
 
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
 	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection);
@@ -2449,6 +2473,33 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
+// turns off all possible toggles in program
+// should be called at start to avoid manually resetting things
+void RenderSystem::resetProgramToggle(GLint program) {
+	GLint change_color_uloc = glGetUniformLocation(program, "changeColor");
+	glUniform1i(change_color_uloc, 0);
+
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, 1);
+
+	GLint effect_alpha_uloc = glGetUniformLocation(program, "effectAlpha");
+	glUniform1f(effect_alpha_uloc, 0);
+
+	GLuint glitchToggle_uloc = glGetUniformLocation(program, "glitchToggle");
+	glUniform1i(glitchToggle_uloc, false);
+
+	GLuint gaugeToggle_uloc = glGetUniformLocation(program, "gaugeToggle");
+	glUniform1i(gaugeToggle_uloc, false);
+
+	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
+	glUniform1i(shielded_uloc, false);
+
+	GLint tile_uloc = glGetUniformLocation(program, "tile");
+	glUniform1i(tile_uloc, 0);
+
 	gl_has_errors();
 }
 

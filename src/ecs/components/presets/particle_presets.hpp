@@ -117,3 +117,12 @@ const ParticleProps enemyBulletDeathParticle {
     800.f
 };
 
+const ParticleProps enemySpawnParticles{
+    {{0,0},{0,0}},
+    {{0,0},{100,100}},
+    {{{{ COLOR_TURQUOISE, 1.0f },{ COLOR_TURQUOISE.r+0.5,COLOR_TURQUOISE.g + 0.5,COLOR_TURQUOISE.b + 0.5, 0.5f }},0}},
+    {8.f,0.f,2.f},
+    -1,
+    800.f
+};
+
