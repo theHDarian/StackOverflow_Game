@@ -714,6 +714,17 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		return;
 	}
 
+	vec2 bulletPos = playerPos + bulletDir;
+	float angle = atan2(bulletDir.y, bulletDir.x);
+	float angleOffset = radians(getModifiedValue(BulletAccuracy, 20));
+
+	//// Tom's thingy
+	//if (checkTierThreshold(FireRate) && Random::Float() < 0.15f && registry.enemies.entities.size() - registry.boids.entities.size() > 0) {
+	//	float randomDirection = 2.f * M_PI * Random::Float();
+	//	vec2 randomOffset = vec2(cos(randomDirection), sin(randomDirection)) * (float)(rand() % 200);
+	//	createNTentaclePlayerBullet(renderer, 1, bulletPos, bulletDir, 400);
+	//}
+
 	if (pl.currFiringInterval <= 0) {
 		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
 		pl.currFiringInterval = getModifiedValue(FireRate, pl.maxFiringInterval);
@@ -728,10 +739,10 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				BulletBurst, pl.maxBulletBurst)
 		);
 		// create bullet
-		vec2 bulletPos = playerPos + bulletDir;
 
-		float angle = atan2(bulletDir.y, bulletDir.x);
-		float angleOffset = radians(getModifiedValue(BulletAccuracy, 20));
+		if (checkTierThreshold(BulletNum)) {
+			createNGenericPlayerBullet(renderer, 4 * (1 + getEffectValueTierThresholdDifference(BulletNum)), bulletPos, { cos(angle), sin(angle) }, 500);
+		}
 
 		if (cluster % 2 == 0) {
 			for (int i = 0; i < cluster / 2; i++) {

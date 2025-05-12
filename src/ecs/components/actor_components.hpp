@@ -144,7 +144,7 @@ struct StackCompile {
         {FireRate,          5},
         {BulletRange,       5},     // Deal more damage the further away from the player the enemy is (up to 2x)
         {BulletAccuracy,    5},     // Inflict vulnerable for 4000
-        {BulletNum,         5},
+        {BulletNum,         5},     // Fires 4 * (1 + value-threshold) mini bullets
         {BulletBurst,       5},
         {Bounce,            5},     // Bouncing towards random enemy
         {Pierce,            5},     // Deal more dmg to protected enemies, and vulnerable effect stronger

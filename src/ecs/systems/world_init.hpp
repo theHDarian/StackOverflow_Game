@@ -114,9 +114,13 @@ Entity createKeyBullet(RenderSystem* renderer, vec2 pos);
 // a player-fired bullet
 Entity createPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
 
-void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction);
+void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction, float range = 1000);
 
-Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction);
+Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range = 1000);
+
+void createNTentaclePlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction, float range = 1000);
+
+Entity createTentaclePlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range = 1000);
 
 Entity createSkipDialogue();
 

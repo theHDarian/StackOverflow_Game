@@ -1214,19 +1214,17 @@ void EnemySystem::destruct(Enemy &enemy)
 void EnemySystem::fetchRoomEffects(Entity entity, AttackData& atkData)
 {
     atkData.gottenRoomEffects = true;
+    Map& map = registry.maps.components[0];
 
     // Add checks here to exclude certain enemies from adopting room effects
-    if (registry.bosses.has(entity) || registry.bossParts.has(entity) || registry.elites.has(entity)) {
+    if (registry.bosses.has(entity) || registry.bossParts.has(entity) || registry.elites.has(entity) || map.currRoom.type == Testing) {
         atkData.positiveBulletEffects = atkData.rareBulletEffects;
         atkData.negativeBulletEffects.push_back(atkData.defaultEffect);
         return;
     }
 
-    Map& map = registry.maps.components[0];
     assert(!map.currRoom.preset.positiveEffects.empty());
     assert(!map.currRoom.preset.negativeEffects.empty());
-
-    BulletStackEffect blunt = { Inert, 0, "Inert", "" };
 
     atkData.positiveBulletEffects = map.currRoom.preset.positiveEffects[rand() % map.currRoom.preset.positiveEffects.size()];
     atkData.negativeBulletEffects = map.currRoom.preset.negativeEffects[rand() % map.currRoom.preset.negativeEffects.size()];

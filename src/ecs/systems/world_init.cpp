@@ -2907,16 +2907,16 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	return entity;
 }
 
-void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction) {
+void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction, float range) {
 	float offset = atan2(direction.y, direction.x);
 	for (uint i = 0; i < number; i++)
 	{
 		float a = offset + i * (2 * M_PI / number);
-		createGenericPlayerBullet(renderer, position, vec2(cos(a), sin(a)));
+		createGenericPlayerBullet(renderer, position, vec2(cos(a), sin(a)), range);
 	}
 }
 
-Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction)
+Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range)
 {
 	auto entity = Entity();
 
@@ -2926,11 +2926,11 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 
 	// Setting initial values
 	PlayerBullet& bullet = registry.playerBullets.emplace(entity);
-	bullet.damage = 0.5f * getModifiedValue(BulletDamage, bullet.damage) / min(1.f, getModifiedValue(BulletNum, 1) - 0.5f);
+	bullet.damage = 0.2f * getModifiedValue(BulletDamage, bullet.damage) / min(1.f, getModifiedValue(BulletNum, 1) - 0.5f);
 	bullet.bulletSpeed = 600;
-	bullet.bulletRange = 1000;
+	bullet.bulletRange = range;
 	bullet.bulletSize = 12;
-	bullet.bulletPierce = 0;
+	bullet.bulletPierce = 5;
 	bullet.bulletBounce = 0;
 	bullet.generic = true;
 
@@ -2965,6 +2965,60 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 	return entity;
 }
 
+void createNTentaclePlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction, float range) {
+	float offset = atan2(direction.y, direction.x);
+	for (uint i = 0; i < number; i++)
+	{
+		float a = offset + i * (2 * M_PI / number);
+		createGenericPlayerBullet(renderer, position, vec2(cos(a), sin(a)), range);
+	}
+}
+
+Entity createTentaclePlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial values
+	PlayerBullet& bullet = registry.playerBullets.emplace(entity);
+	bullet.damage = 0.1f;
+	bullet.bulletSpeed = 400;
+	bullet.bulletRange = range;
+	bullet.bulletSize = 10;
+	bullet.bulletPierce = 0;
+	bullet.bulletBounce = 0;
+	bullet.generic = true;
+
+	// Invisible &inv = registry.invisibles.emplace(entity);
+	// inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = atan2(direction.y, direction.x);
+	motion.velocity = direction * bullet.bulletSpeed;
+	motion.position = position;
+	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = motion.scale.x / 2;
+
+	registry.ignores.emplace(entity);
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = "player_bullet.png";
+
+	registry.renderRequests.insert(
+		entity,
+		{ "player_bullet.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 Entity createSkipDialogue()
 {
 	Entity entity = Entity();
@@ -2990,7 +3044,7 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 		return atkData.positiveBulletEffects;
 	}
 	isSpecial = false;
-	if (Random::Float() < 0.2f * log((float)map.currRegion)) {
+	if (Random::Float() < 0.2f * log((float)map.currRegion) || map.currRoom.type == Testing) {
 		return atkData.negativeBulletEffects;
 	}
 	return { blunt };

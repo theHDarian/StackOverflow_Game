@@ -787,7 +787,7 @@ struct TestEffectPlusOne : Enemy
 		EnemyAttackPattern::RADIAL,
 		CIRCLE,
 		{},
-		dmgUp,
+		fireRateUp,
 		1,
 		0.0,
 		{20, 20},
