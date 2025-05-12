@@ -1323,7 +1323,8 @@ void RenderSystem::drawGameOverlayUI()
 
 		// draw symbols for any off screen doors that aren't none type AND if room is cleared
 		if (registry.roomSizeScaleds.has(entity) && registry.roomSizeScaleds.get(entity).name.compare("DoorSymbol") == 0 &&
-			registry.doorSymbols.get(entity).doorType != RoomType::None && registry.maps.components[0].currRoom.cleared) {
+			registry.doorSymbols.get(entity).doorType != RoomType::None &&
+			registry.maps.components[0].currRoom.cleared) {
 			Motion& motion = registry.motions.get(entity);
 			Camera& camera = registry.cameras.components[0]; // set as camera target instead of just player; may regret later
 			vec2 posDiff = motion.position - camera.lookAtPos;
@@ -1775,6 +1776,7 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SPRITE];
@@ -1825,8 +1827,6 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 
-	resetProgramToggle(currProgram);
-
 	GLint color_uloc = glGetUniformLocation(program, "fcolor");
 	glUniform3fv(color_uloc, 1, (float*)&color);
 
@@ -1850,6 +1850,11 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 	Motion adjustedMotion = motion;
 	adjustedMotion.position = glm::clamp(posDiff * camera.zoom, -vec2(ws.width / 2.f, ws.height / 2.f) + adjustedMotion.scale,
 		vec2(ws.width / 2.f, ws.height / 2.f) - adjustedMotion.scale) + vec2(ws.width / 2.f, ws.height / 2.f);
+
+	// if it's a tutorial room symbol, rotate icon
+	if (registry.doorSymbols.get(entity).doorType == RoomType::TutorialRoom2) {
+		adjustedMotion.scale *= -1;
+	}
 
 	// the rest of the code is just copied from drawAnimateTextured
 
@@ -1925,7 +1930,6 @@ void RenderSystem::drawDoorIndicator(Entity& entity, const mat4& projection, con
 	{
 		for (Entity& d : registry.doors.entities) {
 			if ((registry.doors.get(d).side == registry.doorSymbols.get(entity).side) && registry.doors.get(d).preset.hasElite) {
-				// std::cout << "symbol: " << registry.doorSymbols.get(entity).side << " door: " << registry.doors.get(d).side << ", preset "<< registry.doors.get(d).preset.ID << std::endl;
 				should_glitch = true;
 				break;
 			}
