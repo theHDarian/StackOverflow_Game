@@ -1647,7 +1647,7 @@ struct SmallC : Enemy
 
 	SmallC()
 	{
-		maxHealth = 500;
+		maxHealth = 1500;
 
 		currHealth = maxHealth;
 

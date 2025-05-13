@@ -321,6 +321,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)registry.spawnings.components.size()-1; i>=0; --i) {
 			Spawning& entity = registry.spawnings.components[i];
 			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if (registry.gaugeVisuals.has(registry.spawnings.entities[i])) {
+					registry.gaugeVisuals.remove(registry.spawnings.entities[i]); // remove "spawn effect" after done spawning
+				}
 				registry.spawnings.remove(registry.spawnings.entities[i]);
 			}
 		}

@@ -155,6 +155,10 @@ struct DrawingText {
 	bool blink = false; // blink the cursor
 };
 
+struct UIGauge {
+
+};
+
 // simplest way for text system to know where hp bar is drawn in render system
 // so that text can "wobble" along with hp bar
 struct HPBarUI {
