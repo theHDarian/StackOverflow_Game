@@ -202,6 +202,26 @@ void ParticleSystem::step(float elapsed_ms) {
 
     //check emit requests
     handleEmitRequests(elapsed_ms);
+
+    // burning enemies will emit fire while burnt; i.e. a) have burning status b) stack > 0
+    // intensity (# of particles) based on num stacks? (not working rn)
+    for (Entity& burningEntity: registry.onFires.entities) {
+        if (registry.onFires.get(burningEntity).stack <= 0) {
+            continue;
+        }
+        ParticleProps props = playerTrail;
+        const Motion& motion = registry.motions.get(burningEntity);
+        props.position.base = motion.position;
+        props.velocity.base = vec2(0, -200) * (registry.motions.get(burningEntity).scale.y / 150);
+        props.velocity.base.y = min(-100.0f, props.velocity.base.y);
+        int count = max(1, int((registry.motions.get(burningEntity).scale.x / 50) * (registry.onFires.get(burningEntity).stack / 10.f)));
+        int emitCount = (int)ceil(count * elapsed_ms / 1000.f);
+        props.position.variation.y *= 0.4f;
+        props.position.variation.x = motion.scale.x / 2.5f;
+        props.velocity.base.x = 0;
+        props.velocity.variation.x = 0;
+        floatUp(props, emitCount, props.velocity.base);
+    }
 }
 
 void ParticleSystem::handleEmitRequests(float elapsed_ms) {

@@ -258,6 +258,13 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
         Fade& fade = registry.fades.get(entity);
         alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
     }
+    if (registry.cloaks.has(entity))
+    {
+        //enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
+        Cloaked& cloak = registry.cloaks.get(entity);
+        Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+        alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, registry.motions.get(entity).position) - cloak.cloakingDistance) / cloak.cloakingDistance);
+    }
 
     // which num char are we on now?
     // remember we don't count newlines and spaces, since avoiding drawing them!
@@ -568,11 +575,62 @@ void TextSystem::renderGameOverlayUIText() {
         }
     }
 
+    // draw status texts
+    WindowState& windowState = registry.windowStates.components[0];
+
+    for (Entity entity : registry.hpBarHavers.entities) {
+        vec2 iconSize = STATUS_ICON_SCALE;
+        vec2 startingPos;
+        HPBarUI& hpBar = registry.hpBarHavers.get(entity);
+        TextRenderRequest textReq = TextRenderRequest();
+        textReq.scale = STATUS_TEXT_SCALE;
+        textReq.color = COLOR_WHITE;
+        vec2 offset = STATUS_ICON_OFFSET;
+        float followCameraMultiplier = -1;
+
+        if (!hpBar.followCamera) {
+            followCameraMultiplier = 1;
+            iconSize *= STATUS_ICON_BOSS_MULTIPLIER;
+            offset *= STATUS_ICON_BOSS_MULTIPLIER;
+            textReq.scale *= STATUS_TEXT_BOSS_MULTIPLIER;
+        }
+
+        // position config is copied from drawing statuses in render system
+        startingPos = hpBar.position - vec2(hpBar.scale.x / 2.f, -hpBar.scale.y - iconSize.y / 2.f);
+
+        startingPos = hpBar.position - vec2(hpBar.scale.x / 2.f, followCameraMultiplier * (hpBar.scale.y + iconSize.y / 2.f));
+        startingPos.x += iconSize.x / 2.f; // account for icon size
+        startingPos.y -= iconSize.y / 2.f * followCameraMultiplier;
+
+        offset.x += iconSize.x;
+
+        // adjust for text system using diff projection matrix
+        startingPos.y = windowState.height - startingPos.y;
+
+        // this draws text in middle of icon
+        //textReq.x = startingPos.x - textReq.scale * textReq.text.size() * DEFAULT_FONT_SIZE / 2.f;
+        //textReq.y = startingPos.y - textReq.scale * DEFAULT_FONT_SIZE / 2.f;
+
+        // this draws text to bottom right of icon
+        textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
+        textReq.y = startingPos.y - textReq.scale * DEFAULT_FONT_SIZE / 2.f - iconSize.y / 2;
+
+        if (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) {
+            // start icons on new row if overflow
+            if ((textReq.x - iconSize.x) > (hpBar.position.x + hpBar.scale.x / 2)) {
+                textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
+                textReq.y += (iconSize.y + offset.y) * followCameraMultiplier;
+            }
+            textReq.text = std::to_string(registry.onFires.get(entity).stack);
+            renderText(textReq, entity, !hpBar.followCamera);
+            textReq.x += offset.x;
+        }
+    }
+
     glBindVertexArray(0);
     gl_has_errors();
 
 }
-
 
 void TextSystem::renderGameUIText() {
     glBindVertexArray(VAO);

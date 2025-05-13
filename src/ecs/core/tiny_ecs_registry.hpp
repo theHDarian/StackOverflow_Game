@@ -132,6 +132,8 @@ public:
 	ComponentContainer<Cloaked> cloaks;
 	ComponentContainer<RoomWideBuffers> roomWideBuffers;
 	ComponentContainer<Burning> onFires;
+	ComponentContainer<HPBarUI> hpBarHavers;
+	ComponentContainer<BurnTick> burnTicked;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -249,6 +251,8 @@ public:
 		registry_list.push_back(&cloaks);
 		registry_list.push_back(&roomWideBuffers);
 		registry_list.push_back(&onFires);
+		registry_list.push_back(&hpBarHavers);
+		registry_list.push_back(&burnTicked);
 	}
 
 	void clear_all_components()

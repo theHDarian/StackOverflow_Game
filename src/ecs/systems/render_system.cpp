@@ -483,6 +483,27 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		glUniform1i(change_color_uloc, 1);
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);
 		glUniform1f(effectAlpha, alpha);
+	} 
+	else if (registry.burnTicked.has(entity))
+	{
+		BurnTick& burnTicked = registry.burnTicked.get(entity);
+		vec3 color = COLOR_ORANGE;
+
+		if (registry.invincibles.has(target)) {
+			color = { 1, 1, 0.3 }; // yellow, to show that the damage is being absorbed
+		}
+		else if (registry.vulnerabilities.has(target)) {
+			if (registry.vulnerabilities.get(target).modifier < 0.9) {
+				color = { 107.f / 255.f, 143.f / 255.f, 242 / 255.f }; // blue, to show that the damage is being reduced
+			}
+			else if (registry.vulnerabilities.get(target).modifier > 1.1) {
+				color = { 199 / 255.f, 39 / 255.f, 145 / 255.f }; // purple, to show that the damage is being boosted
+			}
+		}
+		glUniform3fv(color_uloc, 1, (float*)&color);
+		glUniform1i(change_color_uloc, 1);
+		alpha = glm::lerp(0.5f, 0.f, (burnTicked.max - burnTicked.countdown) / burnTicked.max);
+		glUniform1f(effectAlpha, alpha);
 	}
 
 	// GLsizei num_triangles = num_indices / 3;
@@ -1387,7 +1408,6 @@ void RenderSystem::drawGameUI()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		if (!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
-			drawHPbar(entity, projection, view);
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);
 		}
@@ -1399,7 +1419,6 @@ void RenderSystem::drawGameUI()
 			continue;
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity))
 		{
-			drawHPbar(entity, projection, view);
 			drawEnemyIndicator(entity, projection, view);
 			BossEnemy &boss = registry.bosses.get(entity);
 			if (!registry.textRenderRequests.has(entity) && registry.bosses.entities[0] == entity)
@@ -1416,6 +1435,14 @@ void RenderSystem::drawGameUI()
 				textRequest.topRightBound = vec2(windowState.width, windowState.height);
 			}
 		}
+	}
+
+	for (Entity& entity : registry.hpBarHavers.entities) {
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.deleteds.has(entity))
+			continue;
+		drawHPbar(entity, projection, view);
+		// draw any statuses below hp bar
+		drawStatuses(entity, projection, view);
 	}
 
 	for (Entity &entity : registry.gameUIs.entities)
@@ -1923,6 +1950,48 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	drawBasicAnimateTextured();
 }
 
+// pass hp bar as parameter, so that icons "shake" with hp bar
+void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const mat4& view) {
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion motion = registry.motions.get(entity);
+	HPBarUI& hpBar = registry.hpBarHavers.get(entity);
+	Motion statusMotion = Motion();
+	statusMotion.scale = STATUS_ICON_SCALE;
+	vec2 offset = STATUS_ICON_OFFSET;
+	float followCameraMultiplier = -1;
+
+	if (!hpBar.followCamera) {
+		followCameraMultiplier = 1;
+		statusMotion.scale *= STATUS_ICON_BOSS_MULTIPLIER;
+		offset *= STATUS_ICON_BOSS_MULTIPLIER;
+	}
+
+	statusMotion.position = hpBar.position - vec2(hpBar.scale.x / 2.f, followCameraMultiplier * (hpBar.scale.y + statusMotion.scale.y / 2.f));
+	statusMotion.position.x += statusMotion.scale.x / 2.f; // account for icon size
+	statusMotion.position.y -= statusMotion.scale.y / 2.f * followCameraMultiplier;
+
+	offset.x += statusMotion.scale.x;
+	vec2 startingPos = statusMotion.position;
+
+	if (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) {
+		drawAStatus("icon_01.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
+	}
+}
+
+void RenderSystem::drawAStatus(std::string icon, vec3 color, float boundPosition, Motion& statusMotion, vec2 startingPos, vec2 offset, HPBarUI& hpBar, const mat4& projection) {
+	// start icons on new row if overflow
+	if ((statusMotion.position.x - statusMotion.scale.x) > boundPosition) {
+		statusMotion.position.x = startingPos.x;
+		statusMotion.position.y -= (statusMotion.scale.y + offset.y) * (hpBar.followCamera? -1 : 1);
+	}
+
+	GLint const program = setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, icon, COLOR_WHITE, projection, statusMotion, hpBar.followCamera);
+	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+	glUniform1f(alpha_uloc, hpBar.alpha);
+	drawBasicAnimateTextured();
+	statusMotion.position.x += offset.x;
+}
+
 void RenderSystem::drawDashes(const mat4 &projection, const mat4 &view)
 {
 	vec2 pos = {77, 220};
@@ -2193,6 +2262,12 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
+
+	// set hp bar ui stats to make drawing statuses easier
+	HPBarUI& hpbar = registry.hpBarHavers.get(entity);
+	hpbar.position = HPBarMotion.position;
+	hpbar.scale = HPBarMotion.scale;
+	hpbar.alpha = alpha;
 }
 
 // a simple draw for things that aren't in the ECS (like ui)
@@ -2208,7 +2283,7 @@ void RenderSystem::drawBasicAnimateTextured() {
 
 // sets up basic uniforms for things that aren't in ECS
 // returns the program
-GLint RenderSystem::setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, mat4 projection, Motion motion, bool followCamera, int frame) {
+GLint RenderSystem::setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, const mat4& projection, Motion motion, bool followCamera, int frame) {
 	const GLuint used_effect_enum = (GLuint)used_effect;
 	const GLuint program = (GLuint)effects[static_cast<GLuint>(EFFECT_ASSET_ID::TEXTURED)];
 

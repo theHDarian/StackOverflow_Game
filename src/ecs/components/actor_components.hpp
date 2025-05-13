@@ -828,6 +828,12 @@ struct Damaged {
     float countdown = max;
 };
 
+// should be separate from damaged so that damage from player takes precedence
+struct BurnTick {
+    float max = 200;
+    float countdown = max;
+};
+
 struct BeeEnemy {
     std::set<Entity> nearbyBees;
     int mergeCount = 1;

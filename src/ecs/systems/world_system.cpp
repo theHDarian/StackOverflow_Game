@@ -94,12 +94,12 @@ GLFWwindow* WorldSystem::createWindow() {
 	// window_height_px = 720;
 	window_width_px = 1920;
 	window_height_px = 1080;
-	window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
+	//window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", monitor, nullptr);
 
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
+	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -303,6 +303,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			Damaged& entity = registry.damageds.components[i];
 			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
 				registry.damageds.remove(registry.damageds.entities[i]);
+			}
+		}
+	}
+
+	if (!registry.burnTicked.entities.empty()) {
+		for (int i = (int)registry.burnTicked.components.size() - 1; i >= 0; --i) {
+			BurnTick& entity = registry.burnTicked.components[i];
+			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				registry.burnTicked.remove(registry.burnTicked.entities[i]);
 			}
 		}
 	}

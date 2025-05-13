@@ -596,9 +596,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
                 break;
         }
-        //InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-        //req2.type = InteractableRequestType::AddEffect;
-        //req2.effects = { fireRateUp,fireRateUp, fireRateUp, fireRateUp, fireRateUp, };
+        InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+        req2.type = InteractableRequestType::AddEffect;
+        req2.effects = { dmgUp,dmgUp,dmgUp,dmgUp,dmgUp, fireRateUp, fireRateUp, fireRateUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, key };
         //req2.effects = { homingUp, };
 
         // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());

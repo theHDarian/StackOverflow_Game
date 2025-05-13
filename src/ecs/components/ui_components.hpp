@@ -154,3 +154,12 @@ struct DrawingText {
 	bool doneDrawing = false; // set by text system when done drawing (no outside char counter implemented yet)
 	bool blink = false; // blink the cursor
 };
+
+// simplest way for text system to know where hp bar is drawn in render system
+// so that text can "wobble" along with hp bar
+struct HPBarUI {
+	vec2 position;
+	vec2 scale;
+	float alpha = 1.0;
+	bool followCamera = true;
+};

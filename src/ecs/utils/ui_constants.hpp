@@ -69,3 +69,9 @@ const std::unordered_map<std::string, TextAnimationType> textAnimationNames = {
 	{"wavy", TextAnimationType::WavyText},
 	{"wobbly", TextAnimationType::WobblyText}
 };
+
+const vec2 STATUS_ICON_SCALE = { 30, 30 };
+const vec2 STATUS_ICON_OFFSET = { 15, 5 };
+const float STATUS_ICON_BOSS_MULTIPLIER = 1.5;
+const float STATUS_TEXT_BOSS_MULTIPLIER = 1.3;
+const float STATUS_TEXT_SCALE = 0.3;

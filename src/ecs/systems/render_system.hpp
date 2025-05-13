@@ -147,10 +147,12 @@ private:
 	void drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view);
 	void drawBulletStack(const mat4& projection, const mat4& view);
 	void drawDoorIndicator(Entity& enemy, const mat4& projection, const mat4& view);
+	void drawStatuses(Entity& entity, const mat4& projection, const mat4& view);
+	void drawAStatus(std::string icon, vec3 color, float boundPosition, Motion& statusMotion, vec2 startingPos, vec2 offset, HPBarUI& hpBar, const mat4& projection);
 
 	void resetProgramToggle(GLint program);
 	void drawBasicAnimateTextured();
-	GLint setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, mat4 projection, Motion motion, bool followCamera, int frame = 0);
+	GLint setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, const mat4& projection, Motion motion, bool followCamera, int frame = 0);
 
 	// Window handle
 	GLFWwindow* window;
