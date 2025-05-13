@@ -468,11 +468,8 @@ void UISystem::step(float elapsed_ms) {
 			}
 
 			// Temp fix: because door gauges are deleted everyframe
-			// but enemies are gauges when spawning, so must persist
-			for (Entity gaugeEntity : registry.gaugeVisuals.entities) {
-				if (!registry.deleteds.has(gaugeEntity) && !registry.spawnings.has(gaugeEntity)) {
-					registry.deleteds.emplace(gaugeEntity);
-				}
+			for (Entity gaugeEntity : registry.uiGauges.entities) {
+				registry.deleteds.emplace(gaugeEntity);
 			}
 
 			// update guages of all interactables whose timers have gone off
@@ -1205,6 +1202,8 @@ Entity UISystem::createInteractGauge(vec2 position, float timer, float baseTimer
 	else if (position.x >= registry.motions.get(registry.doors.entities[1]).position.x) { // right door
 		motion.position.x += 50;
 	}
+
+	registry.uiGauges.emplace(entity);
 
 	return entity;
 }

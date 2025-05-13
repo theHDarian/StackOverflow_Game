@@ -154,3 +154,7 @@ struct DrawingText {
 	bool doneDrawing = false; // set by text system when done drawing (no outside char counter implemented yet)
 	bool blink = false; // blink the cursor
 };
+
+struct UIGauge {
+
+};
