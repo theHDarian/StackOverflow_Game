@@ -517,13 +517,17 @@ struct AttackData {
 };
 
 enum class SpecialStates {
-    NORMAL,
-    INVISIBLE,
+    // order corresponds to order drawn in ui
     INVINCIBLE,
+    UNDERGROUND,
     VULNERABLE,
     PROTECTED,
-    UNDERGROUND,
     REGENERATING,
+    ONFIRE,
+
+    // these won't be shown in ui
+    NORMAL,
+    INVISIBLE,
     CLOAKED,
     INC_ANIM,
     CLEAR_ALL,
@@ -920,4 +924,14 @@ struct Cloaked {
     float max = 1000;
     float countdown = max;
     float cloakingDistance = 400;
+};
+
+// simplest way for text system to know where hp bar is drawn in render system
+// so that text can "wobble" along with hp bar
+struct HPBarUI {
+    vec2 position;
+    vec2 scale;
+    float alpha = 1.0;
+    bool followCamera = true;
+    std::vector<int> activeStatuses = std::vector<int>(static_cast<int>(SpecialStates::NORMAL));
 };

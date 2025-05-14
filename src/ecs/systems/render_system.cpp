@@ -1960,6 +1960,7 @@ void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const ma
 	vec2 offset = STATUS_ICON_OFFSET;
 	float followCameraMultiplier = -1;
 
+	// Boss hp bars on fixed on screen and are bigger
 	if (!hpBar.followCamera) {
 		followCameraMultiplier = 1;
 		statusMotion.scale *= STATUS_ICON_BOSS_MULTIPLIER;
@@ -1967,37 +1968,28 @@ void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const ma
 	}
 
 	statusMotion.position = hpBar.position - vec2(hpBar.scale.x / 2.f, followCameraMultiplier * (hpBar.scale.y + statusMotion.scale.y / 2.f));
-	statusMotion.position.x += statusMotion.scale.x / 2.f; // account for icon size
+	// account for icon size
+	statusMotion.position.x += statusMotion.scale.x / 2.f; 
 	statusMotion.position.y -= statusMotion.scale.y / 2.f * followCameraMultiplier;
 
 	offset.x += statusMotion.scale.x;
 	vec2 startingPos = statusMotion.position;
 
-	if (registry.invincibles.has(entity)) {
-		drawAStatus("invulnerable_v3.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
-	}
-
-	if (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 1) {
-		drawAStatus("protected_v2.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
-	}
-
-	if (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier > 1) {
-		drawAStatus("icon_00.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
-	}
-
-	if (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) {
-		drawAStatus("icon_01.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
+	for (int i = 0; i < hpBar.activeStatuses.size(); i++) {
+		if (hpBar.activeStatuses[i] >= 0) {
+			drawAStatus(i, COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
+		}
 	}
 }
 
-void RenderSystem::drawAStatus(std::string icon, vec3 color, float boundPosition, Motion& statusMotion, vec2 startingPos, vec2 offset, HPBarUI& hpBar, const mat4& projection) {
+void RenderSystem::drawAStatus(int frame, vec3 color, float boundPosition, Motion& statusMotion, vec2 startingPos, vec2 offset, HPBarUI& hpBar, const mat4& projection) {
 	// start icons on new row if overflow
 	if ((statusMotion.position.x - statusMotion.scale.x) > boundPosition) {
 		statusMotion.position.x = startingPos.x;
 		statusMotion.position.y -= (statusMotion.scale.y + offset.y) * (hpBar.followCamera? -1 : 1);
 	}
 
-	GLint const program = setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, icon, COLOR_WHITE, projection, statusMotion, hpBar.followCamera);
+	GLint const program = setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "status_icons", COLOR_WHITE, projection, statusMotion, hpBar.followCamera, frame);
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
 	glUniform1f(alpha_uloc, hpBar.alpha);
 	drawBasicAnimateTextured();

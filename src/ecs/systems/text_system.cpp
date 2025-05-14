@@ -588,6 +588,7 @@ void TextSystem::renderGameOverlayUIText() {
         vec2 offset = STATUS_ICON_OFFSET;
         float followCameraMultiplier = -1;
 
+        // Boss hp bars on fixed on screen and are bigger
         if (!hpBar.followCamera) {
             followCameraMultiplier = 1;
             iconSize *= STATUS_ICON_BOSS_MULTIPLIER;
@@ -607,25 +608,18 @@ void TextSystem::renderGameOverlayUIText() {
         // adjust for text system using diff projection matrix
         startingPos.y = windowState.height - startingPos.y;
 
-        // this draws text in middle of icon
-        //textReq.x = startingPos.x - textReq.scale * textReq.text.size() * DEFAULT_FONT_SIZE / 2.f;
-        //textReq.y = startingPos.y - textReq.scale * DEFAULT_FONT_SIZE / 2.f;
-
         // this draws text to bottom right of icon
         textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
         textReq.y = startingPos.y - textReq.scale * DEFAULT_FONT_SIZE / 2.f - iconSize.y / 2;
 
-        // don't actually write anything, skip over for now
-        if (registry.invincibles.has(entity)) {
-            drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, "");
-        }
-
-        if (registry.vulnerabilities.has(entity) && (registry.vulnerabilities.get(entity).modifier < 1 || registry.vulnerabilities.get(entity).modifier > 1)) {
-            drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, "");
-        }
-
-        if (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) {
-            drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, std::to_string(registry.onFires.get(entity).stack));
+        for (int i = 0; i < hpBar.activeStatuses.size(); i++) {
+            if (hpBar.activeStatuses[i] >= 0) {
+                std::string count = "";
+                if (hpBar.activeStatuses[i] > 0) {
+                    count = std::to_string(hpBar.activeStatuses[i]);
+                }
+                drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, count);
+            }
         }
     }
 
