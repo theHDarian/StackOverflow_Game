@@ -13,6 +13,7 @@ const vec3 COLOR_GREEN_LIGHT =	{ 152 / 255.f, 174 / 255.f, 60/ 255.f };
 const vec3 COLOR_TURQUOISE =	{ 87 / 255.f, 186 / 255.f, 184/ 255.f };
 const vec3 COLOR_BLUE =			{ 20 / 255.f, 60 / 255.f, 212 / 255.f };
 const vec3 COLOR_BLUE_SKY =		{ 93 / 255.f, 135 / 255.f, 212/ 255.f };
+const vec3 COLOR_PURPLE_LIGHT = { 168 / 255.f, 139 / 255.f, 224 / 255.f };
 const vec3 COLOR_PURPLE_MED =	{ 100 / 255.f, 85 / 255.f, 188/ 255.f };
 const vec3 COLOR_PURPLE_DARK =	{ 74 / 255.f, 39 / 255.f, 109 / 255.f };
 const vec3 COLOR_PINK =			{ 194 / 255.f, 101 / 255.f, 142/ 255.f };
@@ -75,3 +76,15 @@ const vec2 STATUS_ICON_OFFSET = { 15, 5 };
 const float STATUS_ICON_BOSS_MULTIPLIER = 1.5;
 const float STATUS_TEXT_BOSS_MULTIPLIER = 1.3;
 const float STATUS_TEXT_SCALE = 0.3;
+
+const std::map<SpecialStates, vec3> specialStatesToColor = {
+	{SpecialStates::NORMAL, COLOR_WHITE},
+	{SpecialStates::INVINCIBLE, COLOR_YELLOW}, // old yellow was: {1, 1, 0.3}
+	{SpecialStates::PROTECTED,  COLOR_TURQUOISE},
+	{SpecialStates::VULNERABLE, COLOR_PURPLE_LIGHT},
+	{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
+	{SpecialStates::UNDERGROUND, COLOR_BROWN},
+	{SpecialStates::REGENERATING, COLOR_TEAL_LIGHT}, // green
+	{SpecialStates::CLOAKED, COLOR_MAGENTA_MED },
+	{SpecialStates::ONFIRE, COLOR_ORANGE},
+};

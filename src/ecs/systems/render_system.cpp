@@ -434,77 +434,53 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
-	bool isProtected = false;
-	if (registry.vulnerabilities.has(target)) {
-		if (registry.vulnerabilities.get(target).modifier < 1.0f) {
-			isProtected = true;
-		}
-	}
+	bool isInvincible = registry.invincibles.has(target);
+	bool isVulnerable = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier > 1.0f);
+	bool isProtected = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier < 1.0f);
 
 	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
 	glUniform1i(shielded_uloc, (registry.invincibles.has(target) || isProtected));
 
-	GLuint shield_color_uloc = glGetUniformLocation(program, "shieldColor");
-	if (registry.invincibles.has(target))
-	{
-		vec3 shieldColor = vec3(233.f / 255.f, 173.f / 255.f, 48.f / 255.f);
-		glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
-	} else if (registry.vulnerabilities.has(target))
-	{
-		if (registry.vulnerabilities.get(target).modifier < 0.9f) {
-			vec3 shieldColor = vec3(0.5f, 0.5f, 1.2f);
-			glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
-		}
+	vec3 damagedColor = vec3(1);
+	vec3 shieldColor = vec3(1);
+	Damaged damaged;
+
+	if (isInvincible) {
+		shieldColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
+		damagedColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
+	}
+	else if (isProtected) {
+		shieldColor = specialStatesToColor.at(SpecialStates::PROTECTED);
+		damagedColor = specialStatesToColor.at(SpecialStates::PROTECTED);
+	}
+	else if (isVulnerable) {
+		damagedColor = specialStatesToColor.at(SpecialStates::VULNERABLE);
+	}
+	else if (registry.damageds.has(entity)) {
+		damagedColor = { 1.2, 0.5, 0.5 }; // red;
+		damaged = registry.damageds.get(entity);
+	}
+	else if (registry.burnTicked.has(entity)) {
+		damagedColor = specialStatesToColor.at(SpecialStates::ONFIRE);
+		damaged = registry.burnTicked.get(entity);
 	}
 
+	GLuint shield_color_uloc = glGetUniformLocation(program, "shieldColor");
+	glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
 
 	if (registry.aoeIndicators.has(entity)) {
 		auto& aoe = registry.aoeIndicators.get(entity);
-		vec3 color = specialStatesToColor.at( aoe.type);
+		vec3 color = specialStatesToColor.at(aoe.type);
 		glUniform3fv(color_uloc, 1, (float*)&color);
 	}
 
-	if (registry.damageds.has(entity))
+	if (registry.damageds.has(entity) || registry.burnTicked.has(entity))
 	{
-		Damaged &damaged = registry.damageds.get(entity);
-		vec3 color = {1.2, 0.5, 0.5}; // red
-		if (registry.invincibles.has(target)) {
-			color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
-		}
-		else if (registry.vulnerabilities.has(target)) {
-			if (registry.vulnerabilities.get(target).modifier < 0.9) {
-				color = {107.f/255.f, 143.f/255.f, 242/255.f}; // blue, to show that the damage is being reduced
-			}
-			else if (registry.vulnerabilities.get(target).modifier > 1.1) {
-				color = {199/255.f, 39/255.f, 145/255.f}; // purple, to show that the damage is being boosted
-			}
-		}
-		glUniform3fv(color_uloc, 1, (float *)&color);
+		glUniform3fv(color_uloc, 1, (float *)&damagedColor);
 		glUniform1i(change_color_uloc, 1);
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);
 		glUniform1f(effectAlpha, alpha);
 	} 
-	else if (registry.burnTicked.has(entity))
-	{
-		BurnTick& burnTicked = registry.burnTicked.get(entity);
-		vec3 color = COLOR_ORANGE;
-
-		if (registry.invincibles.has(target)) {
-			color = { 1, 1, 0.3 }; // yellow, to show that the damage is being absorbed
-		}
-		else if (registry.vulnerabilities.has(target)) {
-			if (registry.vulnerabilities.get(target).modifier < 0.9) {
-				color = { 107.f / 255.f, 143.f / 255.f, 242 / 255.f }; // blue, to show that the damage is being reduced
-			}
-			else if (registry.vulnerabilities.get(target).modifier > 1.1) {
-				color = { 199 / 255.f, 39 / 255.f, 145 / 255.f }; // purple, to show that the damage is being boosted
-			}
-		}
-		glUniform3fv(color_uloc, 1, (float*)&color);
-		glUniform1i(change_color_uloc, 1);
-		alpha = glm::lerp(0.5f, 0.f, (burnTicked.max - burnTicked.countdown) / burnTicked.max);
-		glUniform1f(effectAlpha, alpha);
-	}
 
 	// GLsizei num_triangles = num_indices / 3;
 

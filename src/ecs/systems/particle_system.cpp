@@ -200,12 +200,9 @@ void ParticleSystem::step(float elapsed_ms) {
         particle.rotation += 0.01f * ts;
     }
 
-    //check emit requests
-    handleEmitRequests(elapsed_ms);
-
     // burning enemies will emit fire while burnt; i.e. a) have burning status b) stack > 0
     // intensity (# of particles) based on num stacks? (not working rn)
-    for (Entity& burningEntity: registry.onFires.entities) {
+    for (Entity& burningEntity : registry.onFires.entities) {
         if (registry.onFires.get(burningEntity).stack <= 0) {
             continue;
         }
@@ -222,6 +219,9 @@ void ParticleSystem::step(float elapsed_ms) {
         props.velocity.variation.x = 0;
         floatUp(props, emitCount, props.velocity.base);
     }
+
+    //check emit requests
+    handleEmitRequests(elapsed_ms);
 }
 
 void ParticleSystem::handleEmitRequests(float elapsed_ms) {

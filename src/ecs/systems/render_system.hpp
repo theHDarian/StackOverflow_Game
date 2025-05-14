@@ -59,16 +59,6 @@ class RenderSystem {
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
 
-	const std::map<SpecialStates, vec3> specialStatesToColor = {
-		{SpecialStates::NORMAL, {1, 1, 1}},
-		{SpecialStates::INVINCIBLE, {1, 1, 0.3}}, // yellow
-		{SpecialStates::PROTECTED,  COLOR_TEAL_MED}, // cyan
-		{SpecialStates::VULNERABLE, COLOR_BLUE_BLACK}, // blue
-		{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
-		{SpecialStates::UNDERGROUND, COLOR_BROWN},
-			{SpecialStates::REGENERATING, {0, 1, 0}}, // green
-		{ SpecialStates::CLOAKED, COLOR_MAGENTA_MED }
-	};
 	const RenderRequest underGroundTexture = {
 		"underground.png",
 		EFFECT_ASSET_ID::TEXTURED,

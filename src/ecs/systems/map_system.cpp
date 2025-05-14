@@ -598,8 +598,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         }
         InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
         req2.type = InteractableRequestType::AddEffect;
-        req2.effects = { dmgUp,dmgUp,dmgUp,dmgUp,dmgUp, fireRateUp, fireRateUp, fireRateUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, key, 
-            accuracyUp, accuracyUp, accuracyUp, accuracyUp, accuracyUp, };
+        req2.effects = { dmgUp,dmgUp,dmgUp,dmgUp,dmgUp, fireRateUp, fireRateUp, fireRateUp, stackSizeUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, key, 
+            accuracyUp, accuracyUp, accuracyUp, accuracyUp, accuracyUp, bulletSpeedUp, sizeUp};
         //req2.effects = { homingUp, };
 
         // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());

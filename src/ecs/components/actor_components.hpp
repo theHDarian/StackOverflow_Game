@@ -833,9 +833,8 @@ struct Damaged {
 };
 
 // should be separate from damaged so that damage from player takes precedence
-struct BurnTick {
-    float max = 200;
-    float countdown = max;
+struct BurnTick : Damaged {
+
 };
 
 struct BeeEnemy {
