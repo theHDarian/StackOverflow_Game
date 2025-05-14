@@ -252,7 +252,7 @@ void UISystem::step(float elapsed_ms) {
 		hp.activeStatuses[static_cast<int>(SpecialStates::VULNERABLE)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier > 1) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::PROTECTED)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 1) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::REGENERATING)] = registry.regenerates.has(entity) - 1;
-		hp.activeStatuses[static_cast<int>(SpecialStates::ONFIRE)] = registry.onFires.has(entity) ? registry.onFires.get(entity).stack : -1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::ONFIRE)] = (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) ? registry.onFires.get(entity).stack : -1;
 	}
 
 	// handle ui requests
