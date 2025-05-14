@@ -1233,7 +1233,8 @@ void EnemySystem::fetchRoomEffects(Entity entity, AttackData& atkData)
     Map& map = registry.maps.components[0];
 
     // Add checks here to exclude certain enemies from adopting room effects
-    if (registry.bosses.has(entity) || registry.bossParts.has(entity) || registry.elites.has(entity) || map.currRoom.type == Testing) {
+    if (registry.bosses.has(entity) || registry.bossParts.has(entity) 
+        || registry.elites.has(entity) || map.currRoom.type == Testing || map.currRoom.type == TutorialRoom2) {
         atkData.positiveBulletEffects = atkData.rareBulletEffects;
         atkData.negativeBulletEffects.push_back(atkData.defaultEffect);
         return;

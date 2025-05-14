@@ -94,7 +94,7 @@ const RoomPreset TutorialRoom2Preset{
     {},
     {},
     0.0f,
-    3 ,
+    0,
     0,
     "TutorialRoom2",
     false,

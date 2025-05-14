@@ -3052,7 +3052,8 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 	// Fixed chance of special bullet
 	float positiveProb = 0.2f;
 
-	assert(!map.currRoom.preset.negativeEffects.empty());
+	// TODO: is this needed?
+	assert(!map.currRoom.preset.negativeEffects.empty() || map.currRoom.type == TutorialRoom2);
 
 	// Non-room related effects
 	if (atkData.positiveBulletEffects.size() > 0 && Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
@@ -3061,7 +3062,7 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 		return atkData.positiveBulletEffects;
 	}
 	isSpecial = false;
-	if (Random::Float() < 0.2f * log((float)map.currRegion) || map.currRoom.type == Testing) {
+	if (Random::Float() < 0.2f * log((float)map.currRegion) || map.currRoom.type == Testing || map.currRoom.type == TutorialRoom2) {
 		return atkData.negativeBulletEffects;
 	}
 	return { blunt };
