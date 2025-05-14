@@ -615,21 +615,34 @@ void TextSystem::renderGameOverlayUIText() {
         textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
         textReq.y = startingPos.y - textReq.scale * DEFAULT_FONT_SIZE / 2.f - iconSize.y / 2;
 
+        // don't actually write anything, skip over for now
+        if (registry.invincibles.has(entity)) {
+            drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, "");
+        }
+
+        if (registry.vulnerabilities.has(entity) && (registry.vulnerabilities.get(entity).modifier < 1 || registry.vulnerabilities.get(entity).modifier > 1)) {
+            drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, "");
+        }
+
         if (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) {
-            // start icons on new row if overflow
-            if ((textReq.x - iconSize.x) > (hpBar.position.x + hpBar.scale.x / 2)) {
-                textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
-                textReq.y += (iconSize.y + offset.y) * followCameraMultiplier;
-            }
-            textReq.text = std::to_string(registry.onFires.get(entity).stack);
-            renderText(textReq, entity, !hpBar.followCamera);
-            textReq.x += offset.x;
+            drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, std::to_string(registry.onFires.get(entity).stack));
         }
     }
 
     glBindVertexArray(0);
     gl_has_errors();
 
+}
+
+void TextSystem::drawAStatusText(Entity& entity, HPBarUI& hpBar, TextRenderRequest& textReq, vec2 startingPos, vec2 offset, vec2 iconSize, std::string count) {
+    // start icons on new row if overflow
+    if ((textReq.x - iconSize.x) > (hpBar.position.x + hpBar.scale.x / 2)) {
+        textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
+        textReq.y += (iconSize.y + offset.y) * (hpBar.followCamera ? -1 : 1);
+    }
+    textReq.text = count;
+    renderText(textReq, entity, !hpBar.followCamera);
+    textReq.x += offset.x;
 }
 
 void TextSystem::renderGameUIText() {

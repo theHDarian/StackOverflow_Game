@@ -62,4 +62,5 @@ private:
     void renderText(TextRenderRequest& request, Entity entity, bool isUI = true);
     void drawInstancedText(int length);
     float getTextLength(std::string text, float scale);
+    void drawAStatusText(Entity& entity, HPBarUI& hpBar, TextRenderRequest& textReq, vec2 startingPos, vec2 offset, vec2 iconSize, std::string count);
 };

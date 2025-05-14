@@ -1973,6 +1973,18 @@ void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const ma
 	offset.x += statusMotion.scale.x;
 	vec2 startingPos = statusMotion.position;
 
+	if (registry.invincibles.has(entity)) {
+		drawAStatus("invulnerable_v3.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
+	}
+
+	if (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 1) {
+		drawAStatus("protected_v2.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
+	}
+
+	if (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier > 1) {
+		drawAStatus("icon_00.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
+	}
+
 	if (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) {
 		drawAStatus("icon_01.png", COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
 	}
