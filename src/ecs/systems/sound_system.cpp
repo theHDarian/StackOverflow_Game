@@ -180,6 +180,14 @@ SoundSystem::~SoundSystem()
         Mix_FreeChunk(nextDialogueSound);
     if (itemGetSound != nullptr)
         Mix_FreeChunk(itemGetSound);
+    if (rareItemGetSound != nullptr)
+        Mix_FreeChunk(rareItemGetSound);
+    if (laserSound != nullptr)
+        Mix_FreeChunk(laserSound);
+    if (laserLoopSound != nullptr)
+        Mix_FreeChunk(laserLoopSound);
+    if (diggingSound != nullptr)
+        Mix_FreeChunk(diggingSound);
 
     for (int i = 0; i < 4; i++)
     {

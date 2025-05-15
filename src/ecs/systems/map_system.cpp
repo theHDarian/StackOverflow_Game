@@ -238,6 +238,8 @@ void MapSystem::clearRoomActors()
     {
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
+        if (registry.persistentSounds.has(ent))
+            registry.persistentSounds.get(ent).stop();
     }
     for (Entity ent : registry.walls.entities)
     {

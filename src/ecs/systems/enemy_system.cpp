@@ -973,7 +973,7 @@ void EnemySystem::shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_m
     burst.burstCooldown = atkData.veer.y;
 }
 
-void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, float attackCoolDown)
+void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, bool shouldPlayFiringSound)
 {
     for (uint i = 0; i < atkData.numBullets; i++)
     {
@@ -983,21 +983,15 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, float a
         }
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
-    bool shouldPlayFiringsound = true;
-    if (registry.persistentSounds.has(enemy)) {
-        auto& sound = registry.persistentSounds.get(enemy);
-        if (sound.channels.at(SoundType::LaserSound).x != -1) {
-            shouldPlayFiringsound = false;
-        }
-    }
+
     if (atkData.veer.x >= 400) {
         auto& laserSound = registry.soundRequests.emplace_with_duplicates(enemy);
         laserSound.type = SoundType::LaserSound;
         laserSound.delay = 1000.f;
         laserSound.ticks = atkData.bulletRange;
-        laserSound.songIndex = shouldPlayFiringsound;
+        laserSound.songIndex = shouldPlayFiringSound;
     } else {
-        sound->playLaserSound(atkData.bulletRange, shouldPlayFiringsound, &enemy);
+        sound->playLaserSound(atkData.bulletRange, shouldPlayFiringSound, &enemy);
     }
 }
 void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
@@ -1041,7 +1035,15 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::LASER)
     {
-        shootLaser(pos, entity, atkData, currPattern.maxAtkCD);
+        if (registry.persistentSounds.has(entity)) {
+            bool shouldPlayFiringSound = registry.persistentSounds.get(entity).channels.at(SoundType::LaserSound).x != -1;
+            shootLaser( pos, entity, atkData, shouldPlayFiringSound);
+        } else if (currPattern.maxAtkCD < atkData.bulletRange) {
+            shootLaser(pos, entity, atkData, false);
+        }
+        else {
+            shootLaser(pos, entity, atkData, true);
+        }
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::TWIN_LASER)
