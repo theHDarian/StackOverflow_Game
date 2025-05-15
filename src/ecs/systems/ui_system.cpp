@@ -247,13 +247,29 @@ void UISystem::step(float elapsed_ms) {
 	// would be nice to use something like observer pattern, but do this for now
 	for (Entity entity : registry.hpBarHavers.entities) {
 		HPBarUI& hp = registry.hpBarHavers.get(entity);
+
+		// configure what hpBar will look like (in terms of alpha)
+		if (registry.invisibles.has(entity) || registry.deleteds.has(entity)) {
+			hp.alpha = 0;
+		}
+		else if (registry.cloaks.has(entity))
+		{
+			//enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
+			Cloaked& cloak = registry.cloaks.get(entity);
+			Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+			hp.alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, registry.motions.get(entity).position) - cloak.cloakingDistance) / cloak.cloakingDistance);
+		}
+		else {
+			hp.alpha = 1;
+		}
+
 		hp.activeStatuses[static_cast<int>(SpecialStates::INVINCIBLE)] = registry.invincibles.has(entity) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::UNDERGROUND)] = registry.moles.has(entity) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::VULNERABLE)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier > 1.01) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::PROTECTED)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 0.99) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::REGENERATING)] = registry.regenerates.has(entity) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::ONFIRE)] = (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) ? registry.onFires.get(entity).stack : -1;
-	}
+		}
 
 	// handle ui requests
 	for (UIRequest& uiRequest : registry.uiRequests.components) {

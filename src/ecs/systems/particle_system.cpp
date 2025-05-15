@@ -206,7 +206,14 @@ void ParticleSystem::step(float elapsed_ms) {
         if (registry.onFires.get(burningEntity).stack <= 0) {
             continue;
         }
+
         ParticleProps props = playerTrail;
+        if (registry.hpBarHavers.has(burningEntity)) {
+            HPBarUI& hp = registry.hpBarHavers.get(burningEntity);
+            props.colorEffects[0].color.start.a *= hp.alpha;
+            props.colorEffects[0].color.end.a *= hp.alpha;
+        }
+        
         const Motion& motion = registry.motions.get(burningEntity);
         props.position.base = motion.position;
         props.velocity.base = vec2(0, -200) * (registry.motions.get(burningEntity).scale.y / 150);
@@ -223,6 +230,13 @@ void ParticleSystem::step(float elapsed_ms) {
     // particles for enemies being healed
     for (Entity& e : registry.regenerates.entities) {
         ParticleProps props = regenParticles;
+
+        if (registry.hpBarHavers.has(e)) {
+            HPBarUI& hp = registry.hpBarHavers.get(e);
+            props.colorEffects[0].color.start.a *= hp.alpha;
+            props.colorEffects[0].color.end.a *= hp.alpha;
+        }
+
         const Motion& motion = registry.motions.get(e);
         props.position.base = motion.position;
         props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);

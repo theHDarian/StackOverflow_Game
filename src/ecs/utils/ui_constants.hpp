@@ -84,7 +84,7 @@ const std::map<SpecialStates, vec3> specialStatesToColor = {
 	{SpecialStates::VULNERABLE, COLOR_PURPLE_LIGHT},
 	{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
 	{SpecialStates::UNDERGROUND, COLOR_BROWN},
-	{SpecialStates::REGENERATING, COLOR_TEAL_LIGHT}, // green
+	{SpecialStates::REGENERATING, {0, 1, 0}}, // green
 	{SpecialStates::CLOAKED, COLOR_MAGENTA_MED },
 	{SpecialStates::ONFIRE, COLOR_ORANGE},
 };

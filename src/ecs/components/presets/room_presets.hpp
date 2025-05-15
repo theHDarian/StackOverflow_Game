@@ -45,6 +45,29 @@ const RoomPreset TestRoom{
     {1000, 2000}
 };
 
+const RoomPreset TestRoom2{
+    {{  {EnemyTestLightningRotate,  {0.1f, 0.1f}},
+    {EnemyMedicalRodA, {0.5f, 0.5f}},
+    {EnemyMedicalRodA, {0.5f, 0.5f}},
+    {EnemyMedicalRodA, {0.5f, 0.5f}},
+    {EnemyMedicalRodA, {0.5f, 0.5f}},
+    {EnemyMedicalRodA, {0.5f, 0.5f}},
+    {EnemyMedicalRodC, {0.5f, 0.5f}},
+    {EnemySword, {0.5f, 0.5f}},
+    {CloakedGranterRoomWide, {0.5f, 0.5f}},
+    {EnemyBeeHive, {0.5f, 0.5f}},
+    {EnemyBioBoid, {0.5f, 0.5f}},
+    }},
+{},
+{},
+0.0f,
+0,
+0,
+"Testing Chamber2",
+false,
+{1000, 1000}
+};
+
 
 const RoomPreset TutorialRoom1Preset{
     {},

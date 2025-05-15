@@ -463,7 +463,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	else if (registry.burnTicked.has(entity)) {
 		damagedColor = specialStatesToColor.at(SpecialStates::ONFIRE);
 		damaged = registry.burnTicked.get(entity);
-	}
+	} 
 
 	GLuint shield_color_uloc = glGetUniformLocation(program, "shieldColor");
 	glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
@@ -481,6 +481,52 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);
 		glUniform1f(effectAlpha, alpha);
 	} 
+
+	GLint aura_uloc = glGetUniformLocation(program, "auraToggle");
+	glUniform1i(aura_uloc, false);
+	
+	if (registry.regenerates.has(entity)) {
+		Regenerate& regenerates = registry.regenerates.get(entity);
+		damagedColor = specialStatesToColor.at(SpecialStates::REGENERATING) * 0.7f;
+
+		drawBasicAnimateTextured();
+
+		float angle = glm::clamp(motion.angle, M_PI / 4, -M_PI / 4);
+		float rotHeight = motion.scale.y;
+		float rotWidth = motion.scale.x;
+
+		Motion auraMotion = Motion();
+		auraMotion.scale = motion.scale;
+		auraMotion.position = motion.position;
+
+		// don't bother resizing squares
+		if (auraMotion.scale.x != auraMotion.scale.y && motion.angle != 0) {
+			vec2 v = { auraMotion.scale.x, auraMotion.scale.y };
+			vec2 u = { auraMotion.scale.x, -auraMotion.scale.y };
+
+			// ref for vector rotation: https://matthew-brett.github.io/teaching/rotation_2d.html
+			vec2 rotated_v = { cos(angle) * v.x - sin(angle) * v.y, sin(angle) * v.x + cos(angle) * v.y };
+			vec2 rotated_u = { cos(angle) * u.x - sin(angle) * u.y, sin(angle) * u.x + cos(angle) * u.y };
+
+			rotHeight = max(abs(rotated_v.y), abs(rotated_u.y));
+			rotWidth = max(abs(rotated_v.x), abs(rotated_u.x));
+
+			auraMotion.scale = vec2(rotHeight, rotWidth);
+			auraMotion.position = { motion.position.x, motion.position.y /* - (auraMotion.scale.y - motion.scale.y) / 2*/}; // offset so aura starts from right underneath
+		}
+
+		// draw a square ontop to create "aura" effect
+		setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, "enemy_bullet_square.png", COLOR_WHITE, projection, auraMotion, !isUI);
+
+		glUniform1i(aura_uloc, true);
+		GLuint aura_color_uloc = glGetUniformLocation(program, "auraColor");
+		glUniform3fv(aura_color_uloc, 1, (float*)&damagedColor);
+
+		glUniform3fv(color_uloc, 1, (float*)&COLOR_GREEN_LIGHT);
+		glUniform1i(change_color_uloc, 1);
+		float auraAlpha = 1 - abs(cos(regenerates.countdown / (regenerates.max / 10)) * (0.5));
+		glUniform1f(alpha_uloc, glm::clamp(alpha*(auraAlpha - 0.3f), 0.f, 1.f));
+	}
 
 	// GLsizei num_triangles = num_indices / 3;
 
