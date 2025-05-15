@@ -435,8 +435,8 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
 	bool isInvincible = registry.invincibles.has(target);
-	bool isVulnerable = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier > 1.0f);
-	bool isProtected = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier < 1.0f);
+	bool isVulnerable = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier > 1.01f);
+	bool isProtected = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier < 0.99f);
 
 	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
 	glUniform1i(shielded_uloc, (registry.invincibles.has(target) || isProtected));

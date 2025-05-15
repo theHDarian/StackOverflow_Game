@@ -126,3 +126,12 @@ const ParticleProps enemySpawnParticles{
     800.f
 };
 
+const ParticleProps regenParticles{
+    {{0,0},{0,0}},
+    {{0,0},{0,0}},
+    {{{{ COLOR_TEAL_LIGHT, 1.0f },{ COLOR_TEAL_LIGHT, 0.5f }},1}}, // hijack bullet trail system by assign positive effect val = + particle
+    {8.f,1.f,2.f},
+    -1,
+    800.f
+};
+

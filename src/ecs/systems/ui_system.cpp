@@ -249,8 +249,8 @@ void UISystem::step(float elapsed_ms) {
 		HPBarUI& hp = registry.hpBarHavers.get(entity);
 		hp.activeStatuses[static_cast<int>(SpecialStates::INVINCIBLE)] = registry.invincibles.has(entity) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::UNDERGROUND)] = registry.moles.has(entity) - 1;
-		hp.activeStatuses[static_cast<int>(SpecialStates::VULNERABLE)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier > 1) - 1;
-		hp.activeStatuses[static_cast<int>(SpecialStates::PROTECTED)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 1) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::VULNERABLE)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier > 1.01) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::PROTECTED)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 0.99) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::REGENERATING)] = registry.regenerates.has(entity) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::ONFIRE)] = (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) ? registry.onFires.get(entity).stack : -1;
 	}

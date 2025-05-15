@@ -645,6 +645,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
 
             d.preset = getRoomPreset(d.room, map.currRegion, d.isLocked);
 
+            // change door symbol type for offscreen ui
+            DoorSymbol& ds = registry.doorSymbols.components[i];
+            ds.doorType = d.room;
         }
         //map.currRoom.preset = TreasureRoom1;
         updateBgPositions();
