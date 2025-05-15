@@ -11,6 +11,30 @@
 
 void SoundSystem::step(float elapsed_ms)
 {
+    for (int i = (int) registry.persistentSounds.components.size()-1; i>=0; --i) {
+        PersistentSounds &persistentSounds = registry.persistentSounds.components[i];
+        int notPlaying = 0;
+        for (auto& channel : persistentSounds.channels) {
+            if (channel.second.x != -1) {
+                channel.second.y -= elapsed_ms;
+                if (channel.second.y <= 0) {
+                    Mix_HaltChannel(channel.second.x);
+                    channel.second.x = -1;
+                } else if (!Mix_Playing(channel.second.x)) {
+                    auto& soundRequest = registry.soundRequests.emplace_with_duplicates(registry.persistentSounds.entities[i]);
+                    soundRequest.type = channel.first;
+                    soundRequest.ticks = channel.second.y;
+                    soundRequest.songIndex = 0;
+                }
+            } else {
+                notPlaying++;
+            }
+        }
+        if (notPlaying == persistentSounds.channels.size()) {
+            registry.persistentSounds.remove(registry.persistentSounds.entities[i]);
+        }
+    }
+
     std::vector<SoundRequest> soundRequests;
     for (int i = (int)registry.soundRequests.components.size()-1; i>=0; --i)
     {
@@ -113,12 +137,12 @@ void SoundSystem::step(float elapsed_ms)
             break;
 
             case SoundType::LaserSound:
-                playLaserSound(soundRequest.ticks);
+                playLaserSound(soundRequest.ticks, soundRequest.songIndex, &registry.soundRequests.entities[i]);
             break;
 
             case SoundType::DiggingSound:
                 if (soundRequest.songIndex == -1)
-                    playDiggingSound(soundRequest.ticks);
+                    playDiggingSound(soundRequest.ticks, &registry.soundRequests.entities[i]);
                 else
                     stopDiggingSound();
             break;
@@ -704,27 +728,63 @@ void SoundSystem::playEnemyDeathSound(int sfxNumber)
     }
 }
 
-void SoundSystem::playLaserSound(float time)
+void SoundSystem::playLaserSound(float time, bool shouldPlayFiringSound, const Entity* entity)
 {
-    if (!Mix_Playing(15))
+    if (shouldPlayFiringSound)
     {
         Mix_PlayChannel(15, laserSound, 0);
         Mix_Volume(15, laserSound->volume * sfxVolume);
     }
-    Mix_Volume(15, laserSound->volume * sfxVolume);
-    if (time > 3000 && !Mix_Playing(16)) {
-        // Mix_FadeInChannelTimed(16, laserLoopSound, loops, 3000, 0);
-        Mix_FadeInChannelTimed(16, laserLoopSound, -1, 1000, time);
-        Mix_Volume(16, laserLoopSound->volume * sfxVolume);
+
+    if (time > 2000) {
+        if (entity == nullptr) {
+            Mix_FadeInChannelTimed( 16, laserLoopSound, -1, 1000, time);
+            Mix_Volume(16, laserLoopSound->volume * sfxVolume);
+            return;
+        }
+        if (!registry.persistentSounds.has(*entity)) {
+            registry.persistentSounds.emplace(*entity);
+        }
+        auto& persistentSounds = registry.persistentSounds.get(*entity);
+        auto& channel = persistentSounds.channels[SoundType::LaserSound];
+        if (time > channel.y) {
+            channel.y = time;
+        }
+        if (channel.x == -1) {
+            channel.x = Mix_FadeInChannelTimed(-1, laserLoopSound, -1, 1000, time);
+            Mix_Volume(channel.x, laserLoopSound->volume * sfxVolume);
+            channel.y = time;
+        } else if (!Mix_Playing(channel.x) && channel.y > 0) {
+            Mix_FadeInChannelTimed(channel.x, laserLoopSound, -1, 1000, channel.y);
+            Mix_Volume(channel.x, laserLoopSound->volume * sfxVolume);
+        }
 
     }
 }
 
-void SoundSystem::playDiggingSound(float time)
+void SoundSystem::playDiggingSound(float time, const Entity* entity)
 {
-    if (!Mix_Playing(17)) {
-        Mix_PlayChannelTimed(17, diggingSound, -1,  time);
+    if (entity == nullptr) {
+        Mix_FadeInChannelTimed(17, diggingSound, -1, 1000, time);
         Mix_Volume(17, diggingSound->volume * sfxVolume);
+        return;
+    }
+
+   if (!registry.persistentSounds.has(*entity)) {
+        registry.persistentSounds.emplace(*entity);
+    }
+    auto& persistentSounds = registry.persistentSounds.get(*entity);
+    auto& channel = persistentSounds.channels[SoundType::DiggingSound];
+    if (time > channel.y) {
+        channel.y = time;
+    }
+    if (channel.x == -1) {
+        channel.x = Mix_FadeInChannelTimed(-1, diggingSound, -1, 1000, time);
+        Mix_Volume(channel.x, diggingSound->volume * sfxVolume);
+        channel.y = time;
+    } else if (!Mix_Playing(channel.x) && channel.y > 0) {
+        Mix_FadeInChannelTimed(channel.x, diggingSound, -1, 1000, channel.y);
+        Mix_Volume(channel.x, diggingSound->volume * sfxVolume);
     }
 }
 

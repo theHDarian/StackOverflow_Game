@@ -1778,8 +1778,8 @@ struct BossBigCCore : Enemy{
 		CIRCLE,
 		{bulletPierceUp},
 		dashRechargeUp,
-		6,
-		M_PI / 6,
+		36,
+		M_PI / 5,
 		{0, 20},
 		0,
 		2000,
@@ -1983,7 +1983,7 @@ struct BossBigCCore : Enemy{
 	};
 
 	EnemyPattern PlayerCloseHalfHPLaser = {
-		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration, twenty_five_HP}, 5, true, 0.f, 100.f, laserRotate,
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration, twenty_five_HP}, 5, true, 0.f, 1000.f, laserRotate,
 		SpecialStates::INVINCIBLE
 	};
 
@@ -2008,7 +2008,7 @@ struct BossBigCCore : Enemy{
 	};
 
 	EnemyPattern PlayerCloseTwentyFiveHPLaser = {
-		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 100.f, laserRotate,
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 1000.f, laserRotate,
 		SpecialStates::INVINCIBLE
 	};
 

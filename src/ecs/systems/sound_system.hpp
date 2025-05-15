@@ -29,9 +29,9 @@ public:
 
     void playEnemyDeathSound(int sfxNumber);
 
-    void playLaserSound(float time);
+    void playLaserSound(float time, bool shouldPlayFiringSound = true, const Entity *entity = nullptr);
 
-    void playDiggingSound(float time);
+    void playDiggingSound(float time, const Entity *entity = nullptr);
 
     void stopDiggingSound();
 

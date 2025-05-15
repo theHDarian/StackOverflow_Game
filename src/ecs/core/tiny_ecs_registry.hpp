@@ -133,6 +133,7 @@ public:
 	ComponentContainer<RoomWideBuffers> roomWideBuffers;
 	ComponentContainer<Burning> onFires;
 	ComponentContainer<UIGauge> uiGauges;
+	ComponentContainer<PersistentSounds> persistentSounds;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -251,6 +252,7 @@ public:
 		registry_list.push_back(&roomWideBuffers);
 		registry_list.push_back(&onFires);
 		registry_list.push_back(&uiGauges);
+		registry_list.push_back(&persistentSounds);
 	}
 
 	void clear_all_components()

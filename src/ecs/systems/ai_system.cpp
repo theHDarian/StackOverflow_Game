@@ -145,9 +145,8 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 			if (registry.moles.has(entity)) {
 				auto& under = registry.moles.get(entity);
 				under.countdown = -1;
-				auto& req = registry.soundRequests.emplace(entity);
-				req.type = SoundType::DiggingSound;
-				req.songIndex = 1;
+				if (registry.persistentSounds.has(entity))
+					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
 			}
 			if (registry.regenerates.has(entity)) {
 				auto& under = registry.regenerates.get(entity);
@@ -193,9 +192,8 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 			if (registry.moles.has(entity)) {
 				auto& under = registry.moles.get(entity);
 				under.countdown = -1;
-				auto& req = registry.soundRequests.emplace(entity);
-				req.type = SoundType::DiggingSound;
-				req.songIndex = 1;
+				if (registry.persistentSounds.has(entity))
+					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
 			}
 			break;
 		default: break;
@@ -271,7 +269,7 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (!registry.moles.has(entity)) {
 				auto& under = registry.moles.emplace(entity);
 				under.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
-				auto& req = registry.soundRequests.emplace(entity);
+				auto& req = registry.soundRequests.emplace_with_duplicates(entity);
 				req.type = SoundType::DiggingSound;
 				req.ticks = under.countdown;
 			} else {
@@ -328,9 +326,8 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (registry.moles.has(entity)) {
 				auto& under = registry.moles.get(entity);
 				under.countdown = -1;
-				auto& req = registry.soundRequests.emplace(entity);
-				req.type = SoundType::DiggingSound;
-				req.songIndex = 1;
+				if (registry.persistentSounds.has(entity))
+					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
 			}
 			if (registry.regenerates.has(entity)) {
 				auto& under = registry.regenerates.get(entity);
@@ -376,9 +373,8 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (registry.moles.has(entity)) {
 				auto& under = registry.moles.get(entity);
 				under.countdown = -1;
-				auto& req = registry.soundRequests.emplace(entity);
-				req.type = SoundType::DiggingSound;
-				req.songIndex = 1;
+				if (registry.persistentSounds.has(entity))
+					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
 			}
 		break;
 		default: break;

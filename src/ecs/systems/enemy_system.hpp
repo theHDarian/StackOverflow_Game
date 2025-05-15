@@ -30,7 +30,7 @@ private:
     void shootOneWall(AttackData atkData, float angle, float elapsed_ms);
     void shootTwoWall(AttackData atkData, float angle, float elapsed_ms);
     void shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst);
-    void shootLaser(vec2 pos, Entity enemy, AttackData atkData);
+    void shootLaser(vec2 pos, Entity enemy, AttackData atkData, float attackCoolDown);
     void shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData);
     void attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms);
     void spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData);

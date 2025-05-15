@@ -678,7 +678,7 @@ void UISystem::playDialogue() {
 					soundSystem->playLaserSound(1000);
 					break;
 				case SoundType::DiggingSound:
-					soundSystem-> playDiggingSound(2000);
+					soundSystem-> playDiggingSound(2000, nullptr);
 					break;
 				case SoundType::DashSound:
 					soundSystem->playPlayerDashSound();
