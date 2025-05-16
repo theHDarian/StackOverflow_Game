@@ -19,5 +19,30 @@ Controls:
 UI GameOver
 ERROR: StackOverflow \nPress R to reboot
 
+UI Tier_BulletDamage
+Bullets have a 15% chance to inflict 1 stack of <color=red>Burn</color> on hit, with an additional 15% chance per <color=red>Bullet Damage Up</color> above 5. Each tick of <color=red>Burn</color> reduces the stack by 1, dealing 10 damage plus an additional 10 per stack.
+\n\nCurrent burn chance: {0}
+
+UI Tier_ProjectileSize
+Bullets split into mini bullets on deletion (how many? random?). Reset bullet size upon reaching 5 <color=purple_light>Bullet Size up</color>.
+
+UI Tier_BulletRange
+Deal more damage the further you are from the enemy, up to a multiplier of 2x.
+
+UI Tier_BulletAccuracy
+Bullets inflict <color=purple_med>Vulnerable</color> on hit, increasing damage dealt by 1.5x for 4s.
+
+UI Tier_BulletNum
+Fire 4 extra mini bullets around you, with an additional 4 per <color=teal_light>Bullet Count Up</color> above 5. \n\nCurrent number of mini bullets: {0} 
+
+UI Tier_Bounce
+Bullets now bounce towards a random enemy.
+
+UI Tier_Pierce
+Deal 1.5x more damage to <color=turquoise>Protected</color> enemies. <color=purple_med>Vulnerable</color> multiplier increased to 1.75x.
+# note: protected goes from 0.5x -> 0.75x
+
+UI Tier_PlayerDashRecharge
+50% chance to not have <color=grey_light>Inert</color> added onto stack upon being hit by bullets or enemies. 
 
 

@@ -437,6 +437,12 @@ struct TextRenderRequest {
 	std::vector<TextDecorationSpan> decorations;
 };
 
+struct UIText {
+	std::string text;
+	std::vector<std::string> tokenizedText;
+	std::vector<TextDecorationSpan> decorations;
+};
+
 struct Dialogue {
 	std::string text;
 	std::vector<TextDecorationSpan> decorations;

@@ -44,6 +44,7 @@ const std::unordered_map<std::string, vec3> colorNames = {
 	{"turquoise", COLOR_TURQUOISE},
 	{"blue", COLOR_BLUE},
 	{"blue_sky", COLOR_BLUE_SKY},
+	{"purple_light",COLOR_PURPLE_LIGHT},
 	{"purple_med", COLOR_PURPLE_MED},
 	{"purple_dark", COLOR_PURPLE_DARK},
 	{"pink", COLOR_PINK},
@@ -88,3 +89,6 @@ const std::map<SpecialStates, vec3> specialStatesToColor = {
 	{SpecialStates::CLOAKED, COLOR_MAGENTA_MED },
 	{SpecialStates::ONFIRE, COLOR_ORANGE},
 };
+
+const vec2 TIER_ICON_SCALE = { 45, 45 };
+const vec2 TIER_ICON_OFFSET = { 15, 0 };

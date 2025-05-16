@@ -159,7 +159,7 @@ void RenderSystem::drawCursor()
 
 void RenderSystem::effectToDrawCall(Entity entity,
 	const mat4& projection, const mat4& view, bool isUI = false) {
-	
+	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
 	switch (render_request.used_effect) {
 		case ROOM_BOUND:
@@ -188,7 +188,6 @@ void RenderSystem::effectToDrawCall(Entity entity,
 void RenderSystem::drawAnimateTextured(Entity entity,
 	const mat4& projection, const mat4& view, bool isUI = false)
 {
-	assert(registry.renderRequests.has(entity));
 	RenderRequest render_request;
 	Motion motion = registry.motions.get(entity);
 
@@ -220,6 +219,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
@@ -555,6 +555,7 @@ void RenderSystem::drawMesh(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
@@ -628,6 +629,7 @@ void RenderSystem::drawBullet(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	//gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
@@ -755,6 +757,7 @@ void RenderSystem::drawRoomBound(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	//gl_has_errors();
 
 	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
@@ -1898,6 +1901,17 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
 					 bulletColor, bulletShape, stack.currStack[i].value, projection, view);
 	}
+
+	// draw tiers under
+	for (auto& tier : stackui.activeTiers) {
+		Motion motion = Motion();
+		motion.position = tier.second;
+		motion.scale = TIER_ICON_SCALE;
+		setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, "enemy_bullet_square.png", bulletEffectColors.at(tier.first), projection, motion, false, (int)tier.first);
+		GLint greyscale_toggle = glGetUniformLocation(program, "greyscale");
+		glUniform1i(greyscale_toggle, getEffectValue(tier.first) < getEffectTierThreshold(tier.first));
+		drawBasicAnimateTextured();
+	}
 }
 
 void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, int bullet_value, const mat4 &projection, const mat4 &view)
@@ -2416,6 +2430,9 @@ void RenderSystem::resetProgramToggle(GLint program) {
 
 	GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
 	glUniform1i(effect_size_uloc, 1);
+
+	GLint greyscale = glGetUniformLocation(program, "greyscale");
+	glUniform1i(greyscale, false);
 
 	gl_has_errors();
 }

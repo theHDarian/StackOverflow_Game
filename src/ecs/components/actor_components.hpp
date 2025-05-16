@@ -934,3 +934,21 @@ struct HPBarUI {
     bool followCamera = true;
     std::vector<int> activeStatuses = std::vector<int>(static_cast<int>(SpecialStates::NORMAL));
 };
+
+// not sure how I feel about struct just for this
+// but is easiest way for text and render system to talk
+struct StackUI {
+    vec2 bulletStartPos;
+    vec2 bulletSize;
+    float bulletOffset; // space between bullets
+    vec2 stackSize;
+    vec2 stackPos;
+
+    std::vector<vec2> bulletPositions;
+    std::map<BulletEffectType, vec2> activeTiers; // map of active tiers and their icon position
+
+        void updateStackUISize(int bulletCapacity) {
+        stackSize = vec2(bulletCapacity * bulletSize.x + bulletCapacity * bulletOffset + 2 * bulletOffset, bulletSize.y + 2 * bulletOffset);
+        stackPos = vec2(bulletStartPos.x + stackSize.x / 2 - bulletSize.x - bulletOffset / 2, bulletStartPos.y);
+    }
+};

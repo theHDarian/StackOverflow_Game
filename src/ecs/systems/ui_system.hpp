@@ -15,6 +15,7 @@ const float STACK_NOTIF_SCALE = 1.0f;
 
 std::string getFormattedBulletEffectString(BulletStackEffect bullet);
 std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effects);
+std::string getTruncatedDecimal(float num);
 
 // System responsible for handling user input
 class UISystem {
@@ -48,7 +49,7 @@ private:
 
     int lastHoveredBullet = -1;
 
-    std::unordered_map<std::string, std::vector<std::string>> uiTexts;
+    std::unordered_map<std::string, UIText> uiTexts;
     Entity fpsCounter;
     Entity roomCounter;
     Entity roomName;
@@ -103,6 +104,7 @@ private:
     std::string makeBulletTooltip(BulletStackEffect bullet);
 
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
+    void updateTierUI(vec2 position, BulletEffectType tier);
 
     void updateFlashMessageDisplay(std::string text);
 
