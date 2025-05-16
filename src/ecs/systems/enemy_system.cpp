@@ -985,11 +985,12 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, bool sh
     }
 
     if (atkData.veer.x >= 400) {
-        auto& laserSound = registry.soundRequests.emplace_with_duplicates(enemy);
+        SoundRequest& laserSound = registry.soundRequests.emplace(Entity());
         laserSound.type = SoundType::LaserSound;
         laserSound.delay = 1000.f;
         laserSound.ticks = atkData.bulletRange;
         laserSound.songIndex = shouldPlayFiringSound;
+        laserSound.sourceEntity = &enemy;
     } else {
         sound->playLaserSound(atkData.bulletRange, shouldPlayFiringSound, &enemy);
     }
@@ -1038,7 +1039,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         if (registry.persistentSounds.has(entity)) {
             bool shouldPlayFiringSound = registry.persistentSounds.get(entity).channels.at(SoundType::LaserSound).x != -1;
             shootLaser( pos, entity, atkData, shouldPlayFiringSound);
-        } else if (currPattern.maxAtkCD < atkData.bulletRange) {
+        } else if (currPattern.maxAtkCD <= 750.f) {
             shootLaser(pos, entity, atkData, false);
         }
         else {

@@ -21,10 +21,11 @@ void SoundSystem::step(float elapsed_ms)
                     Mix_HaltChannel(channel.second.x);
                     channel.second.x = -1;
                 } else if (!Mix_Playing(channel.second.x)) {
-                    auto& soundRequest = registry.soundRequests.emplace_with_duplicates(registry.persistentSounds.entities[i]);
+                    auto& soundRequest = registry.soundRequests.emplace(Entity());
                     soundRequest.type = channel.first;
                     soundRequest.ticks = channel.second.y;
                     soundRequest.songIndex = 0;
+                    soundRequest.sourceEntity = &registry.persistentSounds.entities[i];
                 }
             } else {
                 notPlaying++;
@@ -35,7 +36,6 @@ void SoundSystem::step(float elapsed_ms)
         }
     }
 
-    std::vector<SoundRequest> soundRequests;
     for (int i = (int)registry.soundRequests.components.size()-1; i>=0; --i)
     {
         SoundRequest &soundRequest = registry.soundRequests.components[i];
@@ -137,12 +137,12 @@ void SoundSystem::step(float elapsed_ms)
             break;
 
             case SoundType::LaserSound:
-                playLaserSound(soundRequest.ticks, soundRequest.songIndex, &registry.soundRequests.entities[i]);
+                playLaserSound(soundRequest.ticks, soundRequest.songIndex, soundRequest.sourceEntity);
             break;
 
             case SoundType::DiggingSound:
                 if (soundRequest.songIndex == -1)
-                    playDiggingSound(soundRequest.ticks, &registry.soundRequests.entities[i]);
+                    playDiggingSound(soundRequest.ticks, soundRequest.sourceEntity);
                 else
                     stopDiggingSound();
             break;

@@ -138,6 +138,7 @@ struct SoundRequest {
 	int songIndex = -1;
 	Mix_Music* music= nullptr;
 	float delay = 0;
+	Entity* sourceEntity= nullptr;
 };
 
 struct PersistentSounds {

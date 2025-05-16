@@ -688,13 +688,50 @@ struct TestLightningRotate : Enemy
 		0
 	};
 
+	const AttackData laser4{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{dashUp},
+		dashRechargeUp,
+		8,
+		0,
+		{60, 60},
+		0,
+		3000,
+		{500, 0},
+		0,
+		0,
+		0};
+
+	const AttackData laser3{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{dashUp},
+		dashRechargeUp,
+		8,
+		M_PI / 8.f,
+		{60, 60},
+		0,
+		3000,
+		{500,0},
+		0,
+		0,
+		0};
+
+	Reaction duration = {ReactionType::DURATION,
+		1 };
+
+	EnemyPattern laserState1TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration}, 1, true, 0.f, 2000.f, laser3, };
+	EnemyPattern laserState2TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration}, 0, true, 0.f, 2000.f, laser4, };
+
+
 	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
 
 	TestLightningRotate()
 	{
 		maxHealth = 500000;
 		currHealth = maxHealth;
-		enemyPatterns = { idleState };
+		enemyPatterns = {  laserState1TwentyFiveHP, laserState2TwentyFiveHP };
 		patternIndex = 0;
 		sprite = {
 			"enemy_QuadShooter.png",
@@ -1778,11 +1815,11 @@ struct BossBigCCore : Enemy{
 		CIRCLE,
 		{bulletPierceUp},
 		dashRechargeUp,
-		36,
-		M_PI / 5,
+		48,
+		M_PI / 48,
 		{0, 20},
 		0,
-		2000,
+		1900,
 		{2.5, M_PI / 300},
 		0,
 		0,
@@ -1983,7 +2020,7 @@ struct BossBigCCore : Enemy{
 	};
 
 	EnemyPattern PlayerCloseHalfHPLaser = {
-		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration, twenty_five_HP}, 5, true, 0.f, 1000.f, laserRotate,
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 7000.f, 7000.f, {duration, twenty_five_HP}, 5, true, 0.f, 500.f, laserRotate,
 		SpecialStates::INVINCIBLE
 	};
 
@@ -2008,7 +2045,7 @@ struct BossBigCCore : Enemy{
 	};
 
 	EnemyPattern PlayerCloseTwentyFiveHPLaser = {
-		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 1000.f, laserRotate,
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 500.f, laserRotate,
 		SpecialStates::INVINCIBLE
 	};
 
