@@ -542,8 +542,9 @@ void WorldSystem::handleCollisions() {
 						}
 						if (!props.colorEffects.empty())
 						{
-							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+							// only take into account y scale, so the long rectangle bullets won't have death particles end up in the middle of room
+							props.position.variation = VecOp::rotate(vec2(0,motion.scale.y), motion.angle);
+							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,75,2);
 							//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
 							ep.defaultPos = motion.position;
 							vec2 a = wall.endPosition-wall.startPosition;

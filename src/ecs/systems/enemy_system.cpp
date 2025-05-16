@@ -58,6 +58,8 @@ void EnemySystem::step(float elapsed_ms)
                 }
                 fire.stack--;
                 fire.countdown = fire.maxCountdown;
+
+                // emit extra particles and turn orange on fire tick
                 if (!registry.emitParticles.has(e)) {
                     ParticleProps props = playerTrail;
                     props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);

@@ -2627,7 +2627,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	}
 	if (!props.colorEffects.empty())
 	{
-		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+		props.position.variation = VecOp::rotate(vec2(0, motion.scale.y), motion.angle);
 		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, 3 + 4 * bullet.isSpecial);
 	}
 
