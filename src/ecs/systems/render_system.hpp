@@ -30,6 +30,11 @@ class RenderSystem {
 
 	std::map<std::string, int> name_to_texture;
 
+	// for isntanced rendering
+	GLuint VAO, VBO;
+	std::vector<mat4> transforms;
+	const int INSTANCED_ARRAY_SIZE = 200;
+
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
 	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths =
@@ -52,7 +57,8 @@ class RenderSystem {
 		shader_path("healthbar"),
 		shader_path("roombound"),
 		shader_path("animate"),
-		shader_path("bullet")
+		shader_path("bullet"),
+		shader_path("pBullet")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -143,6 +149,8 @@ private:
 	void resetProgramToggle(GLint program);
 	void drawBasicAnimateTextured();
 	GLint setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, const mat4& projection, Motion motion, bool followCamera, int frame = 0);
+	void drawInstanced(int length, GLint program);
+	void drawPBullets(const mat4& projection);
 
 	// Window handle
 	GLFWwindow* window;

@@ -1264,14 +1264,7 @@ void RenderSystem::drawGameElements()
 			drawAllColliders(entity, projection, view);
 	}
 
-	for (Entity &entity : registry.playerBullets.entities)
-	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
-			continue;
-		effectToDrawCall(entity, projection, view);
-		if (ioState.debugMode)
-			drawAllColliders(entity, projection, view);
-	}
+	drawPBullets(projection);
 
 	for (Entity &entity : registry.bosses.entities)
 	{
@@ -2457,7 +2450,6 @@ mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 {
 	WindowState &windowState = registry.windowStates.components[0];
 	Camera &camera = registry.cameras.components[0];
-	//Motion& targetMotion = registry.motions.get(camera.target);
 	mat4 transform = glm::mat4(1.0);
 	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
 	transform = glm::scale(transform, vec3(camera.zoom));
@@ -2492,4 +2484,85 @@ mat4 createFollowCameraModelText(Motion &motion, vec2 offset)
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
 	return transform;
+}
+
+// length = how many rendering at once
+void RenderSystem::drawInstanced(int length, GLint program) {
+	if (length > 0) {
+		//printf("\nDrawing bullets instanced, count: %d, total bullets: %d", length, registry.playerBullets.entities.size());
+		//unsigned int colorLoc = glGetUniformLocation(program, "colors");
+		//glUniform4fv(colorLoc, length, &colors[0][0]);
+
+		unsigned int transformLoc = glGetUniformLocation(program, "transforms");
+		glUniformMatrix4fv(transformLoc, length, GL_FALSE, &transforms[0][0][0]); // b/c this is a vector of mat4s, need this many 0s??
+
+		//unsigned int letterMapLoc = glGetUniformLocation(program, "letterMap");
+		//glUniform1iv(letterMapLoc, length, &letterMap[0]);
+		//GLsizei num_indices = size / sizeof(uint16_t);
+		//glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, length);
+		gl_has_errors();
+	}
+}
+
+void RenderSystem::drawPBullets(const mat4& projection) {
+	int count = 0;
+	Motion motion = Motion();
+
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::PBULLET;
+	const GLuint program = (GLuint)effects[static_cast<GLuint>(used_effect_enum)];
+
+	// Setting shaders
+	glUseProgram(program);
+	resetProgramToggle(program);
+	gl_has_errors();
+
+	// Setting vertex and index buffers
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	gl_has_errors();
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles.at((GLuint)name_to_texture.at("player_bullet.png"));
+
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
+	gl_has_errors();
+
+	// need to reactive every time! since we have other vertexAttribArrays in renderSystem (like in_textcoord)
+	// otherwise, vertex info will be wrong
+	GLint in_position_loc = glGetAttribLocation(program, "vertex");
+	assert(in_position_loc >= 0);
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	for (Entity& e : registry.playerBullets.entities) {
+		if (!registry.renderRequests.has(e) || !registry.motions.has(e) || registry.invisibles.has(e))
+			continue;
+
+		Motion& m = registry.motions.get(e);
+		mat4 transform = createFollowCameraModel(m, vec2(0));
+		transforms[count] = transform;
+		count++;
+
+		if (count == INSTANCED_ARRAY_SIZE) {
+			drawInstanced(count, program);
+			count = 0;
+		}
+	}
+	drawInstanced(count, program);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	gl_has_errors();
 }

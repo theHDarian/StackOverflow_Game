@@ -2874,6 +2874,13 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 {
 	auto entity = Entity();
 
+	// exceeded bullet limit; delete an old bullet before making this one
+	if (registry.playerBullets.size() > MAX_BULLETS) {
+		if (!registry.deleteds.has(registry.playerBullets.entities[0]))
+			registry.deleteds.emplace(registry.playerBullets.entities[0]);
+		registry.playerBullets.remove(registry.playerBullets.entities[0]);
+	}
+
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -2937,6 +2944,13 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 {
 	auto entity = Entity();
 
+	// exceeded bullet limit; delete an old bullet before making this one
+	if (registry.playerBullets.size() > MAX_BULLETS) {
+		if (!registry.deleteds.has(registry.playerBullets.entities[0]))
+			registry.deleteds.emplace(registry.playerBullets.entities[0]);
+		registry.playerBullets.remove(registry.playerBullets.entities[0]);
+	}
+
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -2994,6 +3008,13 @@ void createNTentaclePlayerBullet(RenderSystem* renderer, int number, vec2 positi
 Entity createTentaclePlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range)
 {
 	auto entity = Entity();
+
+	// exceeded bullet limit; delete an old bullet before making this one
+	if (registry.playerBullets.size() > MAX_BULLETS) {
+		if (!registry.deleteds.has(registry.playerBullets.entities[0]))
+			registry.deleteds.emplace(registry.playerBullets.entities[0]);
+		registry.playerBullets.remove(registry.playerBullets.entities[0]);
+	}
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
