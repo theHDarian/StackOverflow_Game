@@ -240,11 +240,17 @@ void UISystem::step(float elapsed_ms) {
 	// update tier icons of player
 	stackui.activeTiers.clear();
 	vec2 offset = TIER_ICON_SCALE + TIER_ICON_OFFSET;
-	vec2 startingPosition = vec2(50, 280) + vec2(TIER_ICON_SCALE.x / 2.f, 0);
+	vec2 startingPosition = vec2(50, 290) + vec2(TIER_ICON_SCALE.x / 2.f, 0);
+	vec2 pos = startingPosition;
 	for (auto& tier : stack.tierThresholds) {
 		if (getEffectValue(tier.first) > 1) { // only display icon if have +1 or more towards tier
-			stackui.activeTiers[tier.first] = startingPosition;
-			startingPosition.x += offset.x;
+			// start icons on new row if overflow into pause menu
+			if ((pos.x + TIER_ICON_SCALE.x) > (registry.motions.get(pauseMenu).position.x - registry.motions.get(pauseMenu).scale.x / 2)) {
+				pos = startingPosition;
+				pos.y += offset.y;
+			}
+			stackui.activeTiers[tier.first] = pos;
+			pos.x += offset.x;
 		}
 	}
 
@@ -595,16 +601,16 @@ void UISystem::step(float elapsed_ms) {
 				}
 			}
 
+			// clear prev frame's e indicators
+			for (Entity entity : registry.interactIndicators.entities) {
+				if (!registry.deleteds.has(entity)) {
+					registry.deleteds.emplace(entity);
+				}
+			}
+
 			if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 				registry.renderRequests.get(dialogueAvatar).show = false;
 				registry.renderRequests.get(screenCutIn).show = false;
-				// clear prev frame's e indicators
-				for (Entity entity : registry.interactIndicators.entities) {
-					if (!registry.deleteds.has(entity)) {
-						registry.deleteds.emplace(entity);
-					}
-				}
-
 				// draw "press e to interact" over all items in nearby interactables list
 				for (Entity entity : registry.nearbyInteractables.entities) {
 					createInteractIndicator(registry.motions.get(entity).position);
@@ -653,7 +659,7 @@ bool UISystem::init(GLFWwindow* window) {
 	roomCounter = createRoomCounter();
 	roomName = createRoomName();
 	titleScreen = createTitleScreen();
-	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 200.f));
+	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 400.f));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 2.5, wS.height - 200.f));
 	stackAddBubble = createStackAddBubble();

@@ -7,11 +7,11 @@
 
 const vec3 COLOR_YELLOW =		{ 223 / 255.f, 173 / 255.f, 48 / 255.f };
 const vec3 COLOR_ORANGE =		{ 194 / 225.f, 112 / 225.f, 50 / 255.f };
-const vec3 COLOR_BROWN =		{ 120 / 225.f, 91 / 225.f, 38 / 255.f };
+const vec3 COLOR_BROWN =		{ 136 / 225.f, 92 / 225.f, 17 / 255.f };
 const vec3 COLOR_GREEN =		{ 22 / 255.f, 128 / 255.f, 25 / 255.f };
 const vec3 COLOR_GREEN_LIGHT =	{ 152 / 255.f, 174 / 255.f, 60/ 255.f };
 const vec3 COLOR_TURQUOISE =	{ 87 / 255.f, 186 / 255.f, 184/ 255.f };
-const vec3 COLOR_BLUE =			{ 20 / 255.f, 60 / 255.f, 212 / 255.f };
+const vec3 COLOR_BLUE =			{ 71 / 255.f, 80 / 255.f, 214 / 255.f };
 const vec3 COLOR_BLUE_SKY =		{ 93 / 255.f, 135 / 255.f, 212/ 255.f };
 const vec3 COLOR_PURPLE_LIGHT = { 168 / 255.f, 139 / 255.f, 224 / 255.f };
 const vec3 COLOR_PURPLE_MED =	{ 100 / 255.f, 85 / 255.f, 188/ 255.f };
@@ -19,7 +19,7 @@ const vec3 COLOR_PURPLE_DARK =	{ 74 / 255.f, 39 / 255.f, 109 / 255.f };
 const vec3 COLOR_PINK =			{ 194 / 255.f, 101 / 255.f, 142/ 255.f };
 const vec3 COLOR_RED =			{ 173 / 255.f, 49 / 255.f, 75/ 255.f };
 const vec3 COLOR_MAGENTA_LIGHT ={ 225 / 255.f, 82 / 255.f, 153 / 255.f };
-const vec3 COLOR_MAGENTA_MED =	{ 155 / 255.f, 56 / 255.f, 105 / 255.f };
+const vec3 COLOR_MAGENTA_MED =	{ 164 / 255.f, 48 / 255.f, 135 / 255.f };
 const vec3 COLOR_MAGENTA_DARK = { 105 / 255.f, 36 / 255.f, 75/ 255.f };
 const vec3 COLOR_LAET_LIGHT =	{ 50 / 255.f, 148 / 255.f, 197 / 255.f };
 const vec3 COLOR_TEAL_LIGHT =	{ 50 / 255.f, 197 / 255.f, 148/ 255.f };
@@ -85,10 +85,10 @@ const std::map<SpecialStates, vec3> specialStatesToColor = {
 	{SpecialStates::VULNERABLE, COLOR_PURPLE_LIGHT},
 	{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
 	{SpecialStates::UNDERGROUND, COLOR_BROWN},
-	{SpecialStates::REGENERATING, COLOR_GREEN}, // old green: {0, 1, 0}
+	{SpecialStates::REGENERATING, COLOR_TEAL_LIGHT}, // old green: {0, 1, 0}
 	{SpecialStates::CLOAKED, COLOR_MAGENTA_MED },
 	{SpecialStates::ONFIRE, COLOR_ORANGE},
 };
 
-const vec2 TIER_ICON_SCALE = { 45, 45 };
-const vec2 TIER_ICON_OFFSET = { 15, 0 };
+const vec2 TIER_ICON_SCALE = { 55, 55 };
+const vec2 TIER_ICON_OFFSET = { 15, 10 };

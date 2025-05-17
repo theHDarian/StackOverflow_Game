@@ -215,12 +215,12 @@ void ParticleSystem::step(float elapsed_ms) {
         }
         
         const Motion& motion = registry.motions.get(burningEntity);
-        props.position.base = motion.position;
+        props.position.base = { motion.position.x, motion.position.y};
         props.velocity.base = vec2(0, -200) * (registry.motions.get(burningEntity).scale.y / 150);
         props.velocity.base.y = min(-100.0f, props.velocity.base.y);
         int count = max(1, int((registry.motions.get(burningEntity).scale.x / 50) * (registry.onFires.get(burningEntity).stack / 10.f)));
         int emitCount = (int)ceil(count * elapsed_ms / 1000.f);
-        props.position.variation.y *= 0.4f;
+        props.position.variation.y = motion.scale.y / 2.5f;
         props.position.variation.x = motion.scale.x / 2.5f;
         props.velocity.base.x = 0;
         props.velocity.variation.x = 0;
@@ -238,12 +238,12 @@ void ParticleSystem::step(float elapsed_ms) {
         }
 
         const Motion& motion = registry.motions.get(e);
-        props.position.base = motion.position;
+        props.position.base = { motion.position.x, motion.position.y};
         props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);
         props.velocity.base.y = min(-100.0f, props.velocity.base.y);
         int count = max(1, int((registry.motions.get(e).scale.x / 50)));
         int emitCount = (int)ceil(count * elapsed_ms / 1000.f);
-        props.position.variation.y *= 0.4f;
+        props.position.variation.y = motion.scale.y / 2.5f;
         props.position.variation.x = motion.scale.x / 2.5f;
         props.velocity.base.x = 0;
         props.velocity.variation.x = 0;

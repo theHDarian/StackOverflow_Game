@@ -69,12 +69,12 @@ const std::map<BulletEffectType, std::string> tierNames = {
     {BulletNum,         "Many Mini Bullets"},     // Fires 4 * (1 + value-threshold) mini bullets
     {BulletBurst,       "BulletBurst"},
     {Bounce,            "Heat-seeking Bounces"},     // Bouncing towards random enemy
-    {Pierce,            "Pierce through all Defences"},     // Deal more dmg to protected enemies, and vulnerable effect stronger
+    {Pierce,            "To Pierce through all Defences"},     // Deal more dmg to protected enemies, and vulnerable effect stronger
     {Homing,            "Homing"},
     {PlayerSpeed,       "PlayerSpeed"},
     {PlayerNumDash,     "PlayerNumDash"},
     {PlayerStackSize,   "PlayerStackSize"},
-    {PlayerDashRecharge,"Outrun Inertia"}      // 50% Chance to dodge inert effect from bullets or enemies
+    {PlayerDashRecharge,"Outrun Inert(ia)"}      // 50% Chance to dodge inert effect from bullets or enemies
 };
 
 const std::unordered_map<std::string, InteractableItem> interactableItemNames = {

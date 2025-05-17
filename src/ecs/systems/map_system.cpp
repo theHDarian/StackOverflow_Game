@@ -10,6 +10,21 @@
 
 const float ELITE_SPAWN_CHANCE = 0.2f;
 
+// REMOVE LATER
+void giveEveryTierBuff() {
+    InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
+    req2.type = InteractableRequestType::AddEffect;
+
+    for (auto& tier : tierNames) {
+        BulletStackEffect b = BulletStackEffect();
+        b.type = tier.first;
+        b.value = 3;
+        b.name = bulletEffectTypeNames.at(tier.first);
+        req2.effects.push_back(b);
+        req2.effects.push_back(b);
+    }
+}
+
 MapSystem::MapSystem()
 {
     if (registry.maps.components.size() == 0)
@@ -596,22 +611,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
                 break;
         }
-        InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-        req2.type = InteractableRequestType::AddEffect;
-        req2.effects = { dmgUp,dmgUp,dmgUp,dmgUp,dmgUp, dmgUp,dmgUp,
-            fireRateUp, fireRateUp, fireRateUp, 
-            stackSizeUp, 
-            numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp,numBulletsUp,
-            key,
-            accuracyUp, accuracyUp, accuracyUp, accuracyUp, accuracyUp, 
-            bulletSpeedUp, 
-            sizeUp,  sizeUp,sizeUp,sizeUp,sizeUp,sizeUp,sizeUp,sizeUp,sizeUp,sizeUp,
-            dashRechargeUp,dashRechargeUp,dashRechargeUp,dashRechargeUp,dashRechargeUp,
-        bulletPierceUp, bulletPierceUp, bulletPierceUp, bulletPierceUp, bulletPierceUp, 
-        bulletBounceUp, bulletBounceUp, bulletBounceUp, bulletBounceUp, bulletBounceUp,
-        bulletRangeUp,bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletRangeUp,
-        dashUp};
-        //req2.effects = { homingUp, };
+
+        giveEveryTierBuff();
 
         // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
         // req2.type = InteractableRequestType::AddEffect;

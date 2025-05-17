@@ -1907,7 +1907,8 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 		Motion motion = Motion();
 		motion.position = tier.second;
 		motion.scale = TIER_ICON_SCALE;
-		setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, "enemy_bullet_square.png", bulletEffectColors.at(tier.first), projection, motion, false, (int)tier.first);
+
+		setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "tier_icons", COLOR_WHITE, projection, motion, false, tier.first);
 		GLint greyscale_toggle = glGetUniformLocation(program, "greyscale");
 		glUniform1i(greyscale_toggle, getEffectValue(tier.first) < getEffectTierThreshold(tier.first));
 		drawBasicAnimateTextured();

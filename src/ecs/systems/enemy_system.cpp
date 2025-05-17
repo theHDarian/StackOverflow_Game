@@ -1231,6 +1231,10 @@ void EnemySystem::destruct(Enemy &enemy)
 
 void EnemySystem::fetchRoomEffects(Entity entity, AttackData& atkData)
 {
+    // TEMP FIX: return immediately if game is resetting
+    if (registry.ioStates.components[0].shouldRestart)
+        return;
+    
     atkData.gottenRoomEffects = true;
     Map& map = registry.maps.components[0];
 
