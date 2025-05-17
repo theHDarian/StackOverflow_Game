@@ -311,8 +311,17 @@ void PhysicsSystem::step(float elapsed_ms)
 		EnemyBullet& eBullet = registry.enemyBullets.components[i];
 		for (uint j = 0; j < walls.components.size(); j++)
 		{
-			// Should check for collision for piledriver bullets too, because their speed gets set to 0 on collision
+			if (registry.bounds.has(walls.entities[j])) {
+				// do an aabb pre-check first for room walls
+				Motion& motion = registry.motions.get(registry.enemyBullets.entities[i]);
+				Room& room = registry.maps.components[0].currRoom;
 
+				if (withinRoomWalls(motion, room)) {
+					continue;
+				}
+			}
+
+			// Should check for collision for piledriver bullets too, because their speed gets set to 0 on collision
 			if ((eBullet.bulletPierce > -1) &&
 				(registry.circleColliders.has(eBullets.entities[i]) && CircleToWall(eBullets.entities[i], walls.entities[j])) ||
 				(registry.polyColliders.has(eBullets.entities[i]) && PolyToWall(eBullets.entities[i], walls.entities[j])))
@@ -327,6 +336,16 @@ void PhysicsSystem::step(float elapsed_ms)
 	{
 		for (uint j = 0; j < walls.components.size(); j++)
 		{
+			if (registry.bounds.has(walls.entities[j])) {
+				// do an aabb pre-check first for room walls
+				Motion& motion = registry.motions.get(pBullets.entities[i]);
+				Room& room = registry.maps.components[0].currRoom;
+				
+				if (withinRoomWalls(motion, room)) {
+					continue;
+				}
+			}
+
 			if (CircleToWall(pBullets.entities[i], walls.entities[j]))
 			{
 				registry.collisions.emplace_with_duplicates(pBullets.entities[i], walls.entities[j]);
@@ -889,4 +908,14 @@ bool PhysicsSystem::LineToLine(vec2 line1Start, vec2 line1End, vec2 line2Start, 
 	float t = cross(pq, s) / rxs, u = cross(pq, r) / rxs;
 	intersectionPoint = line1Start + t * r;
 	return (t >= 0 && t <= 1 && u >= 0 && u <= 1);
+}
+
+// do an aabb pre-check first for room walls
+bool PhysicsSystem::withinRoomWalls(Motion& motion, Room& room) {
+	// if it's still well within the room bounds, don't bother properly checking (note: if not, still should do proper check, or else won't be correct)
+	if ((motion.position.x - motion.scale.x / 2.f) > room.roomStart.x && (motion.position.y - motion.scale.y / 2.f) > room.roomStart.y &&
+		(motion.position.x + motion.scale.x / 2.f) < room.roomEnd.x && (motion.position.y + motion.scale.y / 2.f) < room.roomEnd.y) {
+		return true;
+	}
+	return false;
 }

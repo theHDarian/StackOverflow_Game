@@ -1199,7 +1199,7 @@ void RenderSystem::drawBackgroundElements()
 	glBindVertexArray(vao);
 	for (Entity entity : registry.backgrounds.entities)
 	{
-		if (!registry.renderRequests.get(entity).show)
+		if (!registry.renderRequests.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
 		effectToDrawCall(entity, projection, view);
 	}
