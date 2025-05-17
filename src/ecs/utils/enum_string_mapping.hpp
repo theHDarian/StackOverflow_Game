@@ -40,6 +40,7 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectDescriptions
     {PlayerDashRecharge, "reduced dash cooldown"},
 };
 
+// TODO: double check units
 const std::unordered_map<BulletEffectType, std::string> bulletEffectUnits = {
     {BulletDamage, ""},
     {ProjectileSpeed, "px/ms"}, //??
@@ -64,12 +65,12 @@ const std::map<BulletEffectType, std::string> tierNames = {
     {ProjectileSpeed,   "ProjectileSpeed"},
     {ProjectileSize,    "Splitting Bullets"},     // Bullet explodes into smaller bullets on deletion
     {FireRate,          "FireRate"},
-    {BulletRange,       "Sniper's Prowess"},     // Deal more damage the further away from the player the enemy is (up to 2x)
+    {BulletRange,       "Long Range Scope"},     // Deal more damage the further away from the player the enemy is (up to 2x)
     {BulletAccuracy,    "Critical Weakness"},     // Inflict vulnerable for 4000
-    {BulletNum,         "Many Mini Bullets"},     // Fires 4 * (1 + value-threshold) mini bullets
+    {BulletNum,         "Many Mini Menaces"},     // Fires 4 * (1 + value-threshold) mini bullets
     {BulletBurst,       "BulletBurst"},
     {Bounce,            "Heat-seeking Bounces"},     // Bouncing towards random enemy
-    {Pierce,            "To Pierce through all Defences"},     // Deal more dmg to protected enemies, and vulnerable effect stronger
+    {Pierce,            "To Pierce Through All Defences"},     // Deal more dmg to protected enemies, and vulnerable effect stronger
     {Homing,            "Homing"},
     {PlayerSpeed,       "PlayerSpeed"},
     {PlayerNumDash,     "PlayerNumDash"},
