@@ -531,7 +531,7 @@ void ParticleSystem::render() {
 
         Motion motion = Motion();
         motion.position = { particle.position.x, particle.position.y };
-        motion.angle = particle.rotation;
+        motion.angle = 0;
         motion.scale = { size, size };
 
         glm::mat4 transform = createFollowCameraModel(motion, vec2(0));

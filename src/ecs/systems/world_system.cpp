@@ -573,7 +573,7 @@ void WorldSystem::handleCollisions() {
 						vec2 goTo = glm::normalize(rem.position - motion.position);
 						motion.velocity = goTo * glm::length(motion.velocity);
 						motion.veer = vec2(0);
-						motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+						//motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 					}
 					else {
 						// Bounce / reflect the enemy bullet against the wall
@@ -586,7 +586,7 @@ void WorldSystem::handleCollisions() {
 						motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
 						motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 						// Assumes bullet flies towards facing direction
-						motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+						//motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 					}
 					bullet.bulletBounce -= 1;
 					bullet.bulletRange = getModifiedValue(BulletRange, PlayerBullet().bulletRange) / 1.5f; //refresh range

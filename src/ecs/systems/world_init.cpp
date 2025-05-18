@@ -2905,7 +2905,8 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 
 	// Initialize the motion
 	auto &motion = registry.motions.emplace(entity);
-	motion.angle = atan2(direction.y, direction.x);
+	//motion.angle = atan2(direction.y, direction.x);
+	motion.angle = 0;
 	motion.velocity = direction * bullet.bulletSpeed;
 	motion.position = position;
 	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
@@ -2970,7 +2971,8 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);
-	motion.angle = atan2(direction.y, direction.x);
+	motion.angle = 0;
+	//motion.angle = atan2(direction.y, direction.x);
 	motion.velocity = direction * bullet.bulletSpeed;
 	motion.position = position;
 	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
@@ -3035,7 +3037,8 @@ Entity createTentaclePlayerBullet(RenderSystem* renderer, vec2 position, vec2 di
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);
-	motion.angle = atan2(direction.y, direction.x);
+	//motion.angle = atan2(direction.y, direction.x);
+	motion.angle = 0;
 	motion.velocity = direction * bullet.bulletSpeed;
 	motion.position = position;
 	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized

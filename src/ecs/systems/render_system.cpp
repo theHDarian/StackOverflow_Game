@@ -2,6 +2,7 @@
 #include "render_system.hpp"
 #include <SDL.h>
 #include <glm/gtx/compatibility.hpp>
+# include <tgmath.h>
 
 #include "ai_system.hpp"
 #include "tiny_ecs_registry.hpp"
@@ -2437,7 +2438,9 @@ mat4 createNormalModel(Motion &motion, vec2 offset = vec2(0))
 {
 	mat4 transform = glm::mat4(1.0);
 	transform = glm::translate(transform, vec3(motion.position, 0.0f));
-	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	if (abs(std::remainder(motion.angle, 2 * M_PI)) > 0.005) {
+		transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	}
 	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
@@ -2457,8 +2460,10 @@ mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 							   vec3(motion.position.x - camera.lookAtPos.x,
 									motion.position.y - camera.lookAtPos.y,
 									0.0));
-	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
-	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
+	if (abs(std::remainder(motion.angle, 2 * M_PI)) > 0.005) {
+		transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	}
+	//transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f)); // maybe not important; mostly abandoned feature
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
 	return transform;
@@ -2479,7 +2484,9 @@ mat4 createFollowCameraModelText(Motion &motion, vec2 offset)
 							   vec3(motion.position.x - camera.lookAtPos.x,
 									motion.position.y - (windowState.height - camera.lookAtPos.y),
 									0.0));
-	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	if (abs(std::remainder(motion.angle, 2 * M_PI)) > 0.005) {
+		transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	}
 	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
@@ -2553,6 +2560,22 @@ void RenderSystem::drawPBullets(const mat4& projection) {
 
 		Motion& m = registry.motions.get(e);
 		mat4 transform = createFollowCameraModel(m, vec2(0));
+
+		//if (abs(std::remainder(m.angle, 2 * M_PI)) > 0.005) {
+		//	printf("\nBullet angle: %f", m.angle);
+		//}
+
+		/*WindowState& windowState = registry.windowStates.components[0];
+		Camera& camera = registry.cameras.components[0];
+		mat4 transform = glm::mat4(1.0);
+		transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
+		transform = glm::scale(transform, vec3(camera.zoom));
+		transform = glm::translate(transform,
+			vec3(m.position.x - camera.lookAtPos.x,
+				m.position.y - camera.lookAtPos.y,
+				0.0));
+		transform = glm::scale(transform, vec3(m.scale.x, m.scale.y, 1.0));*/
+
 		transforms[count] = transform;
 		count++;
 
