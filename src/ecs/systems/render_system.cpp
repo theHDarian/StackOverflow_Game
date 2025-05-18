@@ -2561,21 +2561,6 @@ void RenderSystem::drawPBullets(const mat4& projection) {
 		Motion& m = registry.motions.get(e);
 		mat4 transform = createFollowCameraModel(m, vec2(0));
 
-		//if (abs(std::remainder(m.angle, 2 * M_PI)) > 0.005) {
-		//	printf("\nBullet angle: %f", m.angle);
-		//}
-
-		/*WindowState& windowState = registry.windowStates.components[0];
-		Camera& camera = registry.cameras.components[0];
-		mat4 transform = glm::mat4(1.0);
-		transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
-		transform = glm::scale(transform, vec3(camera.zoom));
-		transform = glm::translate(transform,
-			vec3(m.position.x - camera.lookAtPos.x,
-				m.position.y - camera.lookAtPos.y,
-				0.0));
-		transform = glm::scale(transform, vec3(m.scale.x, m.scale.y, 1.0));*/
-
 		transforms[count] = transform;
 		count++;
 

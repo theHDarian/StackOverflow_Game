@@ -531,7 +531,13 @@ void ParticleSystem::render() {
 
         Motion motion = Motion();
         motion.position = { particle.position.x, particle.position.y };
-        motion.angle = 0;
+        motion.angle = particle.rotation;
+
+        // note to self: index works backwards from bottom right
+        // so last minus particle = index 0, last plus = 1, and so on...
+        if ((particle.textureIndex < 0 && particle.textureIndex > 4) || (particle.textureIndex < 12 && particle.textureIndex > 23) 
+            || particle.textureIndex == -1)
+            motion.angle = 0;
         motion.scale = { size, size };
 
         glm::mat4 transform = createFollowCameraModel(motion, vec2(0));
