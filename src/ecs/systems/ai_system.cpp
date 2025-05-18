@@ -100,7 +100,7 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				auto& req = registry.soundRequests.emplace(Entity());
 				req.type = SoundType::DiggingSound;
 				req.ticks = currPattern.curDuration;
-				req.sourceEntity = &entity;
+				req.sourceEntity = entity;
 			} else {
 				auto& under = registry.moles.get(entity);
 				if (under.countdown < currPattern.curDuration) {
@@ -273,7 +273,7 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				auto& req = registry.soundRequests.emplace(Entity());
 				req.type = SoundType::DiggingSound;
 				req.ticks = under.countdown;
-				req.sourceEntity = &entity;
+				req.sourceEntity = entity;
 			} else {
 				auto& under = registry.moles.get(entity);
 				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;

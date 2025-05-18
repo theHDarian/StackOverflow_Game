@@ -49,7 +49,7 @@ void UISystem::step(float elapsed_ms) {
 			gameState.gamePaused = true;
 			gameState.previousVolume = gameState.currentVolume;
 			gameState.currentVolume *= 0.125f;
-			//TODO: pause persistent sounds
+			soundSystem->pausePersistentSounds();
 		}
 		else {
 			Entity currMenu = registry.activeMenus.entities[registry.activeMenus.entities.size() - 1];
@@ -65,6 +65,7 @@ void UISystem::step(float elapsed_ms) {
 			if (ioState.activeMenu < 0) {
 				gameState.gamePaused = false;
 				gameState.currentVolume = gameState.previousVolume;
+				soundSystem->resumePersistentSounds();
 			}
 		}
 		ioState.pressedEsc = false;
@@ -679,7 +680,7 @@ void UISystem::playDialogue() {
 					soundSystem->playLaserSound(1000);
 					break;
 				case SoundType::DiggingSound:
-					soundSystem-> playDiggingSound(2000, nullptr);
+					soundSystem-> playDiggingSound(2000);
 					break;
 				case SoundType::DashSound:
 					soundSystem->playPlayerDashSound();

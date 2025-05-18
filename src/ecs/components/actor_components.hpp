@@ -766,6 +766,7 @@ struct BossEnemy {
 
 struct BossParts {
     bool diesWithBoss = true;
+    bool showHpBar = false;
 };
 
 struct EnemyBullet {

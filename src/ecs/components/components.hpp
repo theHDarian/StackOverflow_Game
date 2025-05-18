@@ -128,6 +128,10 @@ enum class SoundType {
 	PlayerDodgeSound,
 	LaserSound,
 	DiggingSound,
+	PauseSounds,
+	ResumeSounds,
+	PausePersistentSounds,
+	ResumePersistentSounds,
 };
 struct SoundRequest {
 	SoundType type;
@@ -138,7 +142,7 @@ struct SoundRequest {
 	int songIndex = -1;
 	Mix_Music* music= nullptr;
 	float delay = 0;
-	Entity* sourceEntity= nullptr;
+	Entity sourceEntity;
 };
 
 struct PersistentSounds {

@@ -497,7 +497,7 @@ void EnemySystem::step(float elapsed_ms)
                     }
                 }
             }
-            if (!registry.boids.has(entity)) {
+            if (!registry.boids.has(entity) && !registry.enemyParts.has(entity) && !registry.roomWideBuffers.has(entity)) {
                 sound-> playEnemyDeathSound(Random::Int(4));
             }
         }
@@ -990,9 +990,9 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, bool sh
         laserSound.delay = 1000.f;
         laserSound.ticks = atkData.bulletRange;
         laserSound.songIndex = shouldPlayFiringSound;
-        laserSound.sourceEntity = &enemy;
+        laserSound.sourceEntity = enemy;
     } else {
-        sound->playLaserSound(atkData.bulletRange, shouldPlayFiringSound, &enemy);
+        sound->playLaserSound(atkData.bulletRange, shouldPlayFiringSound, enemy);
     }
 }
 void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)

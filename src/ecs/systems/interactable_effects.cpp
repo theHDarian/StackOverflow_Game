@@ -360,6 +360,7 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
         		GameState& gameState = registry.gameStates.components[0];
         		gameState.gameOver = true;
         		gameState.currentVolume *= 0.15f;
+        		soundPlayer->stopPersistentSounds();
         		soundPlayer->playGameOverSound();
         		soundPlayer->setMusicVolume(gameState.currentVolume);
 				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);

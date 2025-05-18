@@ -904,6 +904,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 				gameState.gameOver = true;
 				gameState.currentVolume *= 0.15f;
 				soundPlayer->playGameOverSound();
+				soundPlayer->stopPersistentSounds();
 				soundPlayer->setMusicVolume(gameState.currentVolume);
 				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
 				req.type = UIRequestType::GameOverReport;
