@@ -34,6 +34,7 @@ public:
     void playDiggingSound(float time, const Entity *entity = nullptr);
 
     void stopDiggingSound();
+    void stopPersistentSounds();
 
     bool setMusicVolume(float volume);
 

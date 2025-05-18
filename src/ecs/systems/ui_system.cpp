@@ -49,6 +49,7 @@ void UISystem::step(float elapsed_ms) {
 			gameState.gamePaused = true;
 			gameState.previousVolume = gameState.currentVolume;
 			gameState.currentVolume *= 0.125f;
+			//TODO: pause persistent sounds
 		}
 		else {
 			Entity currMenu = registry.activeMenus.entities[registry.activeMenus.entities.size() - 1];

@@ -802,6 +802,14 @@ void SoundSystem::stopDiggingSound()
         Mix_HaltChannel(17);
 }
 
+void SoundSystem::stopPersistentSounds()
+{
+    for (auto per: registry.persistentSounds.components)
+    {
+        per.stop();
+    }
+}
+
 
 
 bool SoundSystem::setMusicVolume(float volume)
