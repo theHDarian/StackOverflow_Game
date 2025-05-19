@@ -205,12 +205,12 @@ struct StackCompile {
                     currStack[i + 1].value = 1;
                     i++;
                 }
-                else if (currStack[i].value + currStack[i + 1].value == -4 && currStack[i].value != -1) {
-                    currStack[i].value = -1;
-                    currStack[i + 1].value = -3;
-                    i--;
+                else if (currStack[i].value + currStack[i + 1].value == -4) {
+                    currStack[i].value = -3;
+                    currStack[i + 1].value = -1;
+                    i++;
                 }
-                else if (abs(currStack[i].value + currStack[i + 1].value) > 4 && currStack[i].value < currStack[i + 1].value) {
+                else if (abs(currStack[i].value + currStack[i + 1].value) > 4 && abs(currStack[i].value) < abs(currStack[i + 1].value)) {
                     int swap = currStack[i].value;
                     currStack[i].value = currStack[i + 1].value;
                     currStack[i + 1].value = swap;
@@ -933,6 +933,9 @@ struct HPBarUI {
     float alpha = 1.0;
     bool followCamera = true;
     std::vector<int> activeStatuses = std::vector<int>(static_cast<int>(SpecialStates::NORMAL));
+    std::vector<vec2> statusPositions = std::vector<vec2>(static_cast<int>(SpecialStates::NORMAL));
+    vec2 iconSize;
+    float textSize;
 };
 
 // not sure how I feel about struct just for this

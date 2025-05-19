@@ -579,38 +579,10 @@ void TextSystem::renderGameOverlayUIText() {
     WindowState& windowState = registry.windowStates.components[0];
 
     for (Entity entity : registry.hpBarHavers.entities) {
-        vec2 iconSize = STATUS_ICON_SCALE;
-        vec2 startingPos;
         HPBarUI& hpBar = registry.hpBarHavers.get(entity);
         TextRenderRequest textReq = TextRenderRequest();
-        textReq.scale = STATUS_TEXT_SCALE;
+        textReq.scale = hpBar.textSize;
         textReq.color = COLOR_WHITE;
-        vec2 offset = STATUS_ICON_OFFSET;
-        float followCameraMultiplier = -1;
-
-        // Boss hp bars on fixed on screen and are bigger
-        if (!hpBar.followCamera) {
-            followCameraMultiplier = 1;
-            iconSize *= STATUS_ICON_BOSS_MULTIPLIER;
-            offset *= STATUS_ICON_BOSS_MULTIPLIER;
-            textReq.scale *= STATUS_TEXT_BOSS_MULTIPLIER;
-        }
-
-        // position config is copied from drawing statuses in render system
-        startingPos = hpBar.position - vec2(hpBar.scale.x / 2.f, -hpBar.scale.y - iconSize.y / 2.f);
-
-        startingPos = hpBar.position - vec2(hpBar.scale.x / 2.f, followCameraMultiplier * (hpBar.scale.y + iconSize.y / 2.f));
-        startingPos.x += iconSize.x / 2.f; // account for icon size
-        startingPos.y -= iconSize.y / 2.f * followCameraMultiplier;
-
-        offset.x += iconSize.x;
-
-        // adjust for text system using diff projection matrix
-        startingPos.y = windowState.height - startingPos.y;
-
-        // this draws text to bottom right of icon
-        textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
-        textReq.y = startingPos.y - textReq.scale * DEFAULT_FONT_SIZE / 2.f - iconSize.y / 2;
 
         for (int i = 0; i < hpBar.activeStatuses.size(); i++) {
             if (hpBar.activeStatuses[i] >= 0) {
@@ -618,7 +590,11 @@ void TextSystem::renderGameOverlayUIText() {
                 if (hpBar.activeStatuses[i] > 0) {
                     count = std::to_string(hpBar.activeStatuses[i]);
                 }
-                drawAStatusText(entity, hpBar, textReq, startingPos, offset, iconSize, count);
+                // make sure adjust for text and render systems having flipped projections
+                textReq.x = hpBar.statusPositions[i].x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + hpBar.iconSize.x / 2;
+                textReq.y = windowState.height - hpBar.statusPositions[i].y - textReq.scale * DEFAULT_FONT_SIZE / 2.f - hpBar.iconSize.y / 2;
+                textReq.text = count;
+                renderText(textReq, entity, !hpBar.followCamera);
             }
         }
     }
@@ -626,17 +602,6 @@ void TextSystem::renderGameOverlayUIText() {
     glBindVertexArray(0);
     gl_has_errors();
 
-}
-
-void TextSystem::drawAStatusText(Entity& entity, HPBarUI& hpBar, TextRenderRequest& textReq, vec2 startingPos, vec2 offset, vec2 iconSize, std::string count) {
-    // start icons on new row if overflow
-    if ((textReq.x - iconSize.x) > (hpBar.position.x + hpBar.scale.x / 2)) {
-        textReq.x = startingPos.x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + iconSize.x / 2;
-        textReq.y += (iconSize.y + offset.y) * (hpBar.followCamera ? -1 : 1);
-    }
-    textReq.text = count;
-    renderText(textReq, entity, !hpBar.followCamera);
-    textReq.x += offset.x;
 }
 
 void TextSystem::renderGameUIText() {

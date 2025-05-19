@@ -614,10 +614,6 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
 
         giveEveryTierBuff();
 
-        // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-        // req2.type = InteractableRequestType::AddEffect;
-        // req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
-
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
         extendstack.choice = 4*max(0,((int)map.currRegion - 1));
@@ -674,7 +670,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
         // createEnemy(renderer, vec2(1000, 300), EnemyType::EnemyPufferfish);
         // createRamStick(renderer, vec2(500, 500));
-         //createPushConsole(renderer, vec2(500, 500), {dashUp, dashUp, dashUp, dmgDown, dmgDown, dashUp, dmgDown2, dmgDown2, dashUp, dmgDown, dashUp, dmgDown});
+        //createPushConsole(renderer, vec2(700, 500), {dashUp, dashUp, dashUp, dmgDown, dmgDown, dashUp, dmgDown2, dmgDown2, dashUp, dmgDown, dashUp, dmgDown});
         //createWishGranter(renderer, vec2(500,500));
         //createEnemy(renderer, vec2(500, 500), ScientistBoss);
         //createOracleCrab(renderer, vec2(500, 500));

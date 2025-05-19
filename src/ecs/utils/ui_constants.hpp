@@ -90,5 +90,29 @@ const std::map<SpecialStates, vec3> specialStatesToColor = {
 	{SpecialStates::ONFIRE, COLOR_ORANGE},
 };
 
+const std::map<SpecialStates, vec3> specialStateUIColors = {
+	{SpecialStates::NORMAL, COLOR_WHITE},
+	{SpecialStates::INVINCIBLE, COLOR_YELLOW},
+	{SpecialStates::PROTECTED,  COLOR_TURQUOISE},
+	{SpecialStates::VULNERABLE, COLOR_PURPLE_MED},
+	{SpecialStates::INVISIBLE, {1, 0, 1}},
+	{SpecialStates::UNDERGROUND, COLOR_BROWN},
+	{SpecialStates::REGENERATING, COLOR_TEAL_LIGHT},
+	{SpecialStates::CLOAKED, COLOR_MAGENTA_MED },
+	{SpecialStates::ONFIRE, COLOR_RED},
+};
+
+const std::map<SpecialStates, std::string> specialStateNames = {
+	{SpecialStates::NORMAL, "Normal"},
+	{SpecialStates::INVINCIBLE, "Invincible"},
+	{SpecialStates::PROTECTED,  "Protected"},
+	{SpecialStates::VULNERABLE, "Vulnerable"},
+	{SpecialStates::INVISIBLE, "Invisible"},
+	{SpecialStates::UNDERGROUND, "Underground"},
+	{SpecialStates::REGENERATING, "Regenerating"},
+	{SpecialStates::CLOAKED, "Cloaked"},
+	{SpecialStates::ONFIRE, "Burn"},
+};
+
 const vec2 TIER_ICON_SCALE = { 55, 55 };
 const vec2 TIER_ICON_OFFSET = { 15, 10 };

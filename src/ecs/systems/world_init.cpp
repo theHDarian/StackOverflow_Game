@@ -577,7 +577,7 @@ Entity createOptimizer(RenderSystem *renderer, vec2 pos)
 	Motion &m = registry.motions.emplace(console);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = {784,456} / 1.4f;
+	m.scale = vec2(784,456) / 1.4f;
 
 	auto &o = registry.objects.emplace(console);
 	o.baseOffset = 20;
@@ -615,7 +615,7 @@ Entity createInverter(RenderSystem *renderer, vec2 pos)
 	Motion &m = registry.motions.emplace(console);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = {784,456} / 1.4f;
+	m.scale = vec2(784,456) / 1.4f;
 
 	auto &o = registry.objects.emplace(console);
 	o.baseOffset = 20;

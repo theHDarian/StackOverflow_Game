@@ -526,7 +526,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		glUniform3fv(color_uloc, 1, (float*)&COLOR_GREEN_LIGHT);
 		glUniform1i(change_color_uloc, 1);
 		float auraAlpha = 1 - abs(cos(regenerates.countdown / (regenerates.max / 10)) * (0.5));
-		glUniform1f(alpha_uloc, glm::clamp(alpha*(auraAlpha - 0.3f), 0.f, 1.f));
+		glUniform1f(alpha_uloc, glm::clamp(alpha*(auraAlpha), 0.f, 1.f));
 	}
 
 	// GLsizei num_triangles = num_indices / 3;
@@ -1987,44 +1987,17 @@ void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const ma
 	Motion motion = registry.motions.get(entity);
 	HPBarUI& hpBar = registry.hpBarHavers.get(entity);
 	Motion statusMotion = Motion();
-	statusMotion.scale = STATUS_ICON_SCALE;
-	vec2 offset = STATUS_ICON_OFFSET;
-	float followCameraMultiplier = -1;
-
-	// Boss hp bars on fixed on screen and are bigger
-	if (!hpBar.followCamera) {
-		followCameraMultiplier = 1;
-		statusMotion.scale *= STATUS_ICON_BOSS_MULTIPLIER;
-		offset *= STATUS_ICON_BOSS_MULTIPLIER;
-	}
-
-	statusMotion.position = hpBar.position - vec2(hpBar.scale.x / 2.f, followCameraMultiplier * (hpBar.scale.y + statusMotion.scale.y / 2.f));
-	// account for icon size
-	statusMotion.position.x += statusMotion.scale.x / 2.f; 
-	statusMotion.position.y -= statusMotion.scale.y / 2.f * followCameraMultiplier;
-
-	offset.x += statusMotion.scale.x;
-	vec2 startingPos = statusMotion.position;
+	statusMotion.scale = hpBar.iconSize;
 
 	for (int i = 0; i < hpBar.activeStatuses.size(); i++) {
 		if (hpBar.activeStatuses[i] >= 0) {
-			drawAStatus(i, COLOR_WHITE, hpBar.position.x + hpBar.scale.x / 2, statusMotion, startingPos, offset, hpBar, projection);
+			statusMotion.position = hpBar.statusPositions[i];
+			GLint const program = setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "status_icons", COLOR_WHITE, projection, statusMotion, hpBar.followCamera, i);
+			GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+			glUniform1f(alpha_uloc, hpBar.alpha);
+			drawBasicAnimateTextured();
 		}
 	}
-}
-
-void RenderSystem::drawAStatus(int frame, vec3 color, float boundPosition, Motion& statusMotion, vec2 startingPos, vec2 offset, HPBarUI& hpBar, const mat4& projection) {
-	// start icons on new row if overflow
-	if ((statusMotion.position.x - statusMotion.scale.x) > boundPosition) {
-		statusMotion.position.x = startingPos.x;
-		statusMotion.position.y -= (statusMotion.scale.y + offset.y) * (hpBar.followCamera? -1 : 1);
-	}
-
-	GLint const program = setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "status_icons", COLOR_WHITE, projection, statusMotion, hpBar.followCamera, frame);
-	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	glUniform1f(alpha_uloc, hpBar.alpha);
-	drawBasicAnimateTextured();
-	statusMotion.position.x += offset.x;
 }
 
 void RenderSystem::drawDashes(const mat4 &projection, const mat4 &view)
@@ -2173,26 +2146,10 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 &view)
 {
-	WindowState &windowState = registry.windowStates.components[0];
-	Motion &motion = registry.motions.get(entity);
+	HPBarUI& hpbar = registry.hpBarHavers.get(entity);
 	Motion HPBarMotion = Motion();
-	HPBarMotion.scale = {600, 30};
-	HPBarMotion.position = {windowState.width / 2, windowState.height * 0.92};
-
-	if (!registry.bosses.has(entity))
-	{
-		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
-		HPBarMotion.scale = {100, 10};
-	} else if (registry.bosses.entities[0] != entity) {
-		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10 * 2.5);
-		HPBarMotion.scale = {100*2.5, 10*2.5};
-	}
-
-	if (registry.damageds.has(entity) && !registry.invincibles.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
-	{
-		HPBarMotion.position.x += (rand() % 10) - 5;
-		HPBarMotion.position.y += (rand() % 10) - 5;
-	}
+	HPBarMotion.scale = hpbar.scale;
+	HPBarMotion.position = hpbar.position;
 
 	float max = registry.enemies.get(entity).maxHealth;
 	float current = registry.enemies.get(entity).currHealth;
@@ -2256,15 +2213,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	glUniform1f(charge_boundary_uloc, chargeBoundary);
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	float alpha = 1;
-	if (registry.cloaks.has(entity))
-	{
-		//enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
-		Cloaked& cloak = registry.cloaks.get(entity);
-		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-		alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, motion.position) - cloak.cloakingDistance) / cloak.cloakingDistance);
-	}
-	glUniform1f(alpha_uloc, alpha);
+	glUniform1f(alpha_uloc, hpbar.alpha);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -2297,12 +2246,6 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	// Drawing of num_indices/3 triangles specified in the index buffer
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
 	gl_has_errors();
-
-	// set hp bar ui stats to make drawing statuses easier
-	HPBarUI& hpbar = registry.hpBarHavers.get(entity);
-	hpbar.position = HPBarMotion.position;
-	hpbar.scale = HPBarMotion.scale;
-	hpbar.alpha = alpha;
 }
 
 // a simple draw for things that aren't in the ECS (like ui)

@@ -19,6 +19,34 @@ Controls:
 UI GameOver
 ERROR: StackOverflow \nPress R to reboot
 
+	{SpecialStates::NORMAL, "Normal"},
+	{SpecialStates::INVINCIBLE, "Invincible"},
+	{SpecialStates::PROTECTED,  "Protected"},
+	{SpecialStates::VULNERABLE, "Vulnerable"},
+	{SpecialStates::INVISIBLE, "Invisible"},
+	{SpecialStates::UNDERGROUND, "Underground"},
+	{SpecialStates::REGENERATING, "Regenerating"},
+	{SpecialStates::CLOAKED, "Cloaked"},
+	{SpecialStates::ONFIRE, "Burn"},
+
+UI Status_Invincible
+Takes <color=yellow>no damage</color> while invincible.
+
+UI Status_Protected
+Takes <color=turquoise>0.5x damage</color> while protected.
+
+UI Status_Vulnerable
+Takes <color=purple_med>1.5x damage</color> while vulnerable.
+
+UI Status_Underground
+Takes <color=brown>no damage</color> while underground.
+
+UI Status_Regenerating
+Heals <color=teal_light>{0}</color> HP every <color=teal_light>{1}</color>.
+
+UI Status_Burn
+Every <color=red>{0}</color>, takes <color=red>10 damage</color> plus an additional 10 per stack, then reduces the current number of stacks by 1.
+
 UI Tier_BulletDamage
 Bullets have a 15% chance to inflict 1 stack of <color=red>Burn</color> on hit, with an additional 15% chance per <color=red>Bullet Damage Up</color> above 5. Each tick of <color=red>Burn</color> reduces the stack by 1, dealing 10 damage plus an additional 10 per stack.
 \n\nCurrent burn chance: {0}

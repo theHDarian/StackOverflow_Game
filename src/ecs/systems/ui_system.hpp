@@ -103,8 +103,12 @@ private:
 
     std::string makeBulletTooltip(BulletStackEffect bullet);
 
+    bool hoverBulletStack(IOState& ioState, StackUI& stackui, StackCompile& stack);
     void updateBulletUI(vec2 position, BulletStackEffect bullet);
+    bool hoverTierStatus(IOState& ioState, StackUI& stackui);
     void updateTierUI(vec2 position, BulletEffectType tier);
+    bool hoverBossStatus(IOState& ioState);
+    void updateStatusUI(vec2 position, SpecialStates status, Entity& enemy);
 
     void updateFlashMessageDisplay(std::string text);
 
