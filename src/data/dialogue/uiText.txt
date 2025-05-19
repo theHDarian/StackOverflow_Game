@@ -19,21 +19,11 @@ Controls:
 UI GameOver
 ERROR: StackOverflow \nPress R to reboot
 
-	{SpecialStates::NORMAL, "Normal"},
-	{SpecialStates::INVINCIBLE, "Invincible"},
-	{SpecialStates::PROTECTED,  "Protected"},
-	{SpecialStates::VULNERABLE, "Vulnerable"},
-	{SpecialStates::INVISIBLE, "Invisible"},
-	{SpecialStates::UNDERGROUND, "Underground"},
-	{SpecialStates::REGENERATING, "Regenerating"},
-	{SpecialStates::CLOAKED, "Cloaked"},
-	{SpecialStates::ONFIRE, "Burn"},
-
 UI Status_Invincible
 Takes <color=yellow>no damage</color> while invincible.
 
 UI Status_Protected
-Takes <color=turquoise>0.5x damage</color> while protected.
+Takes <color=blue_sky>0.5x damage</color> while protected.
 
 UI Status_Vulnerable
 Takes <color=purple_med>1.5x damage</color> while vulnerable.
@@ -55,22 +45,22 @@ UI Tier_ProjectileSize
 Bullets split into mini bullets on deletion (how many? random?). Reset bullet size upon reaching 5 <color=purple_light>Bullet Size up</color>.
 
 UI Tier_BulletRange
-Deal more damage the further you are from the enemy, up to a multiplier of 2x.
+Deal more damage the further you are from the enemy, up to a multiplier of <color=yellow>2x</color>.
 
 UI Tier_BulletAccuracy
-Bullets inflict <color=purple_med>Vulnerable</color> on hit, increasing damage dealt by 1.5x for 4s.
+Bullets inflict <color=purple_med>Vulnerable</color> on hit, increasing damage dealt by <color=purple_med>1.5x</color> for 4s.
 
 UI Tier_BulletNum
-Fire 4 extra mini bullets around you, with an additional 4 per <color=teal_light>Bullet Count Up</color> above 5. \n\nCurrent number of mini bullets: {0} 
+Fire <color=teal_light>4</color> extra mini bullets around you, with an additional 4 per <color=teal_light>Bullet Count Up</color> above 5. \n\nCurrent number of mini bullets: {0} 
 
 UI Tier_Bounce
 Bullets now bounce towards a random enemy.
 
 UI Tier_Pierce
-Deal 1.5x more damage to <color=turquoise>Protected</color> enemies. <color=purple_med>Vulnerable</color> multiplier increased to 1.75x.
+Deal <color=blue_sky>0.5x</color> more damage to <color=blue_sky>Protected</color> enemies. <color=purple_med>Vulnerable</color> multiplier increased to <color=purple_med>1.75x.</color>
 # note: protected goes from 0.5x -> 0.75x
 
 UI Tier_PlayerDashRecharge
-50% chance to not have <color=grey_light>Inert</color> added onto stack upon being hit by bullets or enemies. 
+<color=brown>50%</color> chance to not have <color=grey_light>Inert</color> added onto stack upon being hit by bullets or enemies. 
 
 

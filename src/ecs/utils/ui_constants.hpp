@@ -93,7 +93,7 @@ const std::map<SpecialStates, vec3> specialStatesToColor = {
 const std::map<SpecialStates, vec3> specialStateUIColors = {
 	{SpecialStates::NORMAL, COLOR_WHITE},
 	{SpecialStates::INVINCIBLE, COLOR_YELLOW},
-	{SpecialStates::PROTECTED,  COLOR_TURQUOISE},
+	{SpecialStates::PROTECTED,  COLOR_BLUE_SKY},
 	{SpecialStates::VULNERABLE, COLOR_PURPLE_MED},
 	{SpecialStates::INVISIBLE, {1, 0, 1}},
 	{SpecialStates::UNDERGROUND, COLOR_BROWN},

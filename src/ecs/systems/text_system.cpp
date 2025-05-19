@@ -186,8 +186,8 @@ float TextSystem::getTextLength(std::string text, float scale) {
 int getIndexLine(std::vector<std::string> lines, int charIndex) {
     int lineCount = 0;
     for (std::string line : lines) {
-        charIndex -= line.length();
-        if (charIndex <= 0) {
+        charIndex -= (line.length() + (line.length() > 0? 1 : 0)); // not sure if empty rows count as 1 too
+        if (charIndex < 0) {
             return lineCount;
         }
         lineCount++;

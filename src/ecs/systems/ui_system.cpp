@@ -1089,8 +1089,7 @@ void UISystem::updateStatusUI(vec2 position, SpecialStates status, Entity& enemy
 		deco.endIndex += name.length();
 	}
 
-	// note: -1 because when tokenized, \n\n will be replaced with a single space to delimit
-	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 1, color });
+	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 3, color });
 	textReq.text = name + uiTexts.at("Status_" + specialStateNames.at(status)).text;
 
 	std::vector<std::string> variables;
@@ -1199,8 +1198,8 @@ void UISystem::updateTierUI(vec2 position, BulletEffectType tier) {
 		deco.endIndex += name.length();
 	}
 
-	// note: -1 because when tokenized, \n\n will be replaced with a single space to delimit
-	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 1, color });
+	// note: -3 because -1 to end on last character, then another -2 for the two new lines we added (note a new empty row doesn't count as a character)
+	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 3, color });
 	textReq.text = name + uiTexts.at("Tier_" + bulletEffectTypeNames.at(tier)).text;
 
 	std::vector<std::string> variables;
@@ -1313,8 +1312,7 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 		textReq.formattedText = formatted;
 	}
 
-	// note: -1 because when tokenized, \n\n will be replaced with a single space to delimit
-	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 1, color });
+	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 3, color });
 
 	// scale box vertically to number of lines
 	motion.scale.y = textReq.formattedText.size() * 50;
@@ -2099,7 +2097,8 @@ void UISystem::loadText() {
 					// new ui text, so place all prev lines into map, unless this is the first one
 					if (text != "") {
 						std::string parsedBody;
-						parseBodyDecorations(text, parsedBody, decorationSpans);
+						// get rid of the extra new line at the end
+						parseBodyDecorations(text.substr(0, text.length()-1), parsedBody, decorationSpans);
 						uiTexts.insert({ uiName, {parsedBody, getTokenizedText(parsedBody), decorationSpans}});
 						tokenizedText.clear();
 						decorationSpans.clear();
@@ -2134,7 +2133,7 @@ void UISystem::loadText() {
 		}
 		entity_file.close();
 		std::string parsedBody;
-		parseBodyDecorations(text, parsedBody, decorationSpans);
+		parseBodyDecorations(text.substr(0, text.length() - 1), parsedBody, decorationSpans);
 		uiTexts.insert({ uiName, {parsedBody, getTokenizedText(parsedBody), decorationSpans} });
 	}
 	else
@@ -2309,18 +2308,6 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 	}
 
 	request.text = text;
-
-	// PROBLEM: if script variable is long, decoration spans will be short by # of lines - 1
-	// but only know after text is properly formatted, so retroactively correct this for now
-	std::vector<std::string> formattedText = getFormattedText(getTokenizedText(request.text), request.scale, request.alignment, { request.x, request.y }, request.topRightBound, request.bottomLeftBound);
-
-	for (int i = 0; i < request.decorations.size(); i++) {
-		int startLineCount = getIndexLine(formattedText, request.decorations[i].startIndex);
-		int endLineCount = getIndexLine(formattedText, request.decorations[i].endIndex);
-		if (startLineCount > 0) {
-			request.decorations[i].endIndex += endLineCount - startLineCount;
-		}
-	}
 }
 
 // merges effects as if they were on the stack
