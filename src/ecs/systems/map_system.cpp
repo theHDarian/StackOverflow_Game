@@ -238,6 +238,8 @@ void MapSystem::clearRoomActors()
     {
         if (!registry.deleteds.has(ent))
             registry.deleteds.emplace(ent);
+        if (registry.persistentSounds.has(ent))
+            registry.persistentSounds.get(ent).stop();
     }
     for (Entity ent : registry.walls.entities)
     {
@@ -431,19 +433,19 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     SoundType song = roomTypeToMusic.at(type);
         if (song == SoundType::CombatBGM && soundPlayer->currentMusicState != MusicState::PlayingNormal) {
             std::cout << "Playing normal music" << std::endl;
-            // soundPlayer->playNextMusic();
-            auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::CombatBGM;
+            soundPlayer->playNextMusic();
+            // auto& req = registry.soundRequests.emplace(Entity());
+            // req.type = SoundType::CombatBGM;
         } else if (song == SoundType::BossBGM && soundPlayer->currentMusicState != MusicState::PlayingBoss) {
             std::cout << "Playing boss music" << std::endl;
-            // soundPlayer->playBossMusic(0);
-            auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::BossBGM;
+            soundPlayer->playBossMusic(0);
+            // auto& req = registry.soundRequests.emplace(Entity());
+            // req.type = SoundType::BossBGM;
         } else if (song == SoundType::ClearedBGM && soundPlayer->currentMusicState != MusicState::PlayingSpecial) {
             std::cout << "Playing special music" << std::endl;
-            // soundPlayer->playSpecialMusic(0);
-            auto& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::ClearedBGM;
+            soundPlayer->playSpecialMusic();
+            // auto& req = registry.soundRequests.emplace(Entity());
+            // req.type = SoundType::ClearedBGM;
         }
 
     decorateRoom();

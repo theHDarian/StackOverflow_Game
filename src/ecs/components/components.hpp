@@ -128,6 +128,10 @@ enum class SoundType {
 	PlayerDodgeSound,
 	LaserSound,
 	DiggingSound,
+	PauseSounds,
+	ResumeSounds,
+	PausePersistentSounds,
+	ResumePersistentSounds,
 };
 struct SoundRequest {
 	SoundType type;
@@ -138,6 +142,30 @@ struct SoundRequest {
 	int songIndex = -1;
 	Mix_Music* music= nullptr;
 	float delay = 0;
+	Entity sourceEntity;
+};
+
+struct PersistentSounds {
+	std::unordered_map<SoundType, vec2 > channels = {
+	{SoundType::LaserSound, {-1, -1}},
+		{SoundType::DiggingSound, {-1, -1}},
+	};
+	// x = channel id, y = duration
+
+	void stop() {
+		for (auto& channel : channels) {
+			if (channel.second.x != -1) {
+				Mix_HaltChannel(channel.second.x);
+				channel.second.x = -1;
+			}
+		}
+	}
+	void stopChannel(SoundType type) {
+		if (channels[type].x != -1) {
+			Mix_HaltChannel(channels[type].x);
+			channels[type].x = -1;
+		}
+	}
 };
 
 

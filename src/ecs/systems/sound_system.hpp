@@ -29,11 +29,16 @@ public:
 
     void playEnemyDeathSound(int sfxNumber);
 
-    void playLaserSound(float time);
+    void playLaserSound(float time, bool shouldPlayFiringSound = true, Entity entity = Entity());
 
-    void playDiggingSound(float time);
+    void playDiggingSound(float time, Entity entity = Entity());
 
     void stopDiggingSound();
+    void stopPersistentSounds();
+
+    void pausePersistentSounds();
+
+    void resumePersistentSounds();
 
     bool setMusicVolume(float volume);
 

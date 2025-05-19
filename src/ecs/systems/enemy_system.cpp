@@ -14,6 +14,9 @@
 
 #include "ai_system.hpp"
 #include <mutex>
+
+#include "actor_components.hpp"
+#include "actor_components.hpp"
 #include "components/presets/particle_presets.hpp"
 #include "utils/random.hpp"
 
@@ -149,6 +152,8 @@ void EnemySystem::step(float elapsed_ms)
             {
                 Fade &f = registry.fades.emplace(entity);
                 registry.deleteds.emplace(entity);
+                if (registry.persistentSounds.has(entity))
+                    registry.persistentSounds.get(entity).stop();
             }
         }
 
@@ -477,6 +482,9 @@ void EnemySystem::step(float elapsed_ms)
                 Fade& f = registry.fades.emplace(entity);
                 registry.deleteds.emplace(entity);
 
+                if (registry.persistentSounds.has(entity))
+                    registry.persistentSounds.get(entity).stop();
+
                 ParticleProps props = enemyDeath;
                 registry.emitParticles.replace(entity, PExplode, props, f.max, Random::Int(20) + 20);
                 if (registry.enemyGroups.has(entity))
@@ -489,7 +497,7 @@ void EnemySystem::step(float elapsed_ms)
                     }
                 }
             }
-            if (!registry.boids.has(entity)) {
+            if (!registry.boids.has(entity) && !registry.enemyParts.has(entity) && !registry.roomWideBuffers.has(entity)) {
                 sound-> playEnemyDeathSound(Random::Int(4));
             }
         }
@@ -965,7 +973,7 @@ void EnemySystem::shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_m
     burst.burstCooldown = atkData.veer.y;
 }
 
-void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
+void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, bool shouldPlayFiringSound)
 {
     for (uint i = 0; i < atkData.numBullets; i++)
     {
@@ -975,13 +983,16 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData)
         }
         createEnemyLaser(render, pos, a, enemy, atkData);
     }
+
     if (atkData.veer.x >= 400) {
-        auto& laserSound = registry.soundRequests.emplace_with_duplicates(enemy);
+        SoundRequest& laserSound = registry.soundRequests.emplace(Entity());
         laserSound.type = SoundType::LaserSound;
         laserSound.delay = 1000.f;
         laserSound.ticks = atkData.bulletRange;
+        laserSound.songIndex = shouldPlayFiringSound;
+        laserSound.sourceEntity = enemy;
     } else {
-        sound->playLaserSound(atkData.bulletRange);
+        sound->playLaserSound(atkData.bulletRange, shouldPlayFiringSound, enemy);
     }
 }
 void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
@@ -1025,7 +1036,15 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
     else if (atkData.attackType == EnemyAttackPattern::LASER)
     {
-        shootLaser(pos, entity, atkData);
+        if (registry.persistentSounds.has(entity)) {
+            bool shouldPlayFiringSound = registry.persistentSounds.get(entity).channels.at(SoundType::LaserSound).x != -1;
+            shootLaser( pos, entity, atkData, shouldPlayFiringSound);
+        } else if (currPattern.maxAtkCD <= 750.f) {
+            shootLaser(pos, entity, atkData, false);
+        }
+        else {
+            shootLaser(pos, entity, atkData, true);
+        }
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
     else if (atkData.attackType == EnemyAttackPattern::TWIN_LASER)

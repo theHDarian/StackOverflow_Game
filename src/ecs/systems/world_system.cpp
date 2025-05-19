@@ -388,6 +388,7 @@ void WorldSystem::restartGame() {
 	gameState.dialogueChoice = -1;
 	gameState.resetRoom = true;
 	gameState.currentVolume = gameState.previousVolume;
+	soundPlayer->stopPersistentSounds();
 	soundPlayer->stopGameOverSound();
 
 	if (!registry.mapRequests.has(player)) {
@@ -615,7 +616,6 @@ void WorldSystem::handleInput() {
 	}
 	if (input.shouldRestart) {
 		restartGame();
-		
 	}
 
 	//move cursor
@@ -904,6 +904,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 				gameState.gameOver = true;
 				gameState.currentVolume *= 0.15f;
 				soundPlayer->playGameOverSound();
+				soundPlayer->stopPersistentSounds();
 				soundPlayer->setMusicVolume(gameState.currentVolume);
 				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
 				req.type = UIRequestType::GameOverReport;

@@ -1390,6 +1390,8 @@ void RenderSystem::drawGameUI()
 			drawHPbar(entity, projection, view);
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);
+		} else if (registry.bossParts.has(entity) && registry.bossParts.get(entity).showHpBar) {
+			drawHPbar(entity, projection, view);
 		}
 	}
 
@@ -2079,7 +2081,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	{
 		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
 		HPBarMotion.scale = {100, 10};
-	} else if (registry.bosses.entities[0] != entity) {
+	} else if (registry.bosses.entities[0] != entity || registry.bossParts.has(entity)) {
 		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10 * 2.5);
 		HPBarMotion.scale = {100*2.5, 10*2.5};
 	}

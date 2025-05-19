@@ -112,6 +112,16 @@ public:
 		}
 	};
 
+	void remove(Component &c)
+	{
+		auto it = std::find(components.begin(), components.end(), c);
+		if (it != components.end())
+		{
+			unsigned int index = std::distance(components.begin(), it);
+			remove(entities[index]);
+		}
+	}
+
 	template<typename... Args>
 	Component& replace(Entity e, Args &&... args) {
 		if (has(e)) {
