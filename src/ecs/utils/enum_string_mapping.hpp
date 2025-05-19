@@ -43,7 +43,7 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectDescriptions
 // TODO: double check units
 const std::unordered_map<BulletEffectType, std::string> bulletEffectUnits = {
     {BulletDamage, ""},
-    {ProjectileSpeed, "px/ms"}, //??
+    {ProjectileSpeed, "px/s"}, //??
     {ProjectileSize, "px"},
     {FireRate, "s"},
     {BulletRange, "px"},
@@ -53,7 +53,7 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectUnits = {
     {Bounce, ""},
     {Pierce, ""},
     {Homing, "homing effect"}, //???
-    {PlayerSpeed, "px/ms"}, //???
+    {PlayerSpeed, "px/s"}, //???
     {PlayerNumDash, ""},
     {PlayerStackSize, ""},
     {PlayerDashRecharge, "s"},
@@ -65,7 +65,7 @@ const std::map<BulletEffectType, std::string> tierNames = {
     {ProjectileSpeed,   "ProjectileSpeed"},
     {ProjectileSize,    "Splitting Bullets"},     // Bullet explodes into smaller bullets on deletion
     {FireRate,          "FireRate"},
-    {BulletRange,       "Long Range Scope"},     // Deal more damage the further away from the player the enemy is (up to 2x)
+    {BulletRange,       "Sniper's Prowess"},     // Deal more damage the further away from the player the enemy is (up to 2x)
     {BulletAccuracy,    "Critical Weakness"},     // Inflict vulnerable for 4000
     {BulletNum,         "Many Mini Menaces"},     // Fires 4 * (1 + value-threshold) mini bullets
     {BulletBurst,       "BulletBurst"},
