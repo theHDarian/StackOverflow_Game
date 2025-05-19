@@ -186,8 +186,8 @@ float TextSystem::getTextLength(std::string text, float scale) {
 int getIndexLine(std::vector<std::string> lines, int charIndex) {
     int lineCount = 0;
     for (std::string line : lines) {
-        charIndex -= line.length();
-        if (charIndex <= 0) {
+        charIndex -= (line.length() + (line.length() > 0? 1 : 0)); // not sure if empty rows count as 1 too
+        if (charIndex < 0) {
             return lineCount;
         }
         lineCount++;
@@ -257,6 +257,13 @@ void TextSystem::renderText(TextRenderRequest& request, Entity entity, bool isUI
     {
         Fade& fade = registry.fades.get(entity);
         alpha = glm::lerp(1.f, 0.f, (fade.max - fade.time) / fade.max);
+    }
+    if (registry.cloaks.has(entity))
+    {
+        //enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
+        Cloaked& cloak = registry.cloaks.get(entity);
+        Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+        alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, registry.motions.get(entity).position) - cloak.cloakingDistance) / cloak.cloakingDistance);
     }
 
     // which num char are we on now?
@@ -568,11 +575,34 @@ void TextSystem::renderGameOverlayUIText() {
         }
     }
 
+    // draw status texts
+    WindowState& windowState = registry.windowStates.components[0];
+
+    for (Entity entity : registry.hpBarHavers.entities) {
+        HPBarUI& hpBar = registry.hpBarHavers.get(entity);
+        TextRenderRequest textReq = TextRenderRequest();
+        textReq.scale = hpBar.textSize;
+        textReq.color = COLOR_WHITE;
+
+        for (int i = 0; i < hpBar.activeStatuses.size(); i++) {
+            if (hpBar.activeStatuses[i] >= 0) {
+                std::string count = "";
+                if (hpBar.activeStatuses[i] > 0) {
+                    count = std::to_string(hpBar.activeStatuses[i]);
+                }
+                // make sure adjust for text and render systems having flipped projections
+                textReq.x = hpBar.statusPositions[i].x - textReq.scale * DEFAULT_FONT_SIZE / 2.f + hpBar.iconSize.x / 2;
+                textReq.y = windowState.height - hpBar.statusPositions[i].y - textReq.scale * DEFAULT_FONT_SIZE / 2.f - hpBar.iconSize.y / 2;
+                textReq.text = count;
+                renderText(textReq, entity, !hpBar.followCamera);
+            }
+        }
+    }
+
     glBindVertexArray(0);
     gl_has_errors();
 
 }
-
 
 void TextSystem::renderGameUIText() {
     glBindVertexArray(VAO);
@@ -608,4 +638,111 @@ void TextSystem::renderDialogueUIText() {
 
     glBindVertexArray(0);
     gl_has_errors();
+}
+
+void parseBodyDecorations(std::string dialogueBody, std::string& parsedBody, std::vector<TextDecorationSpan>& decorationSpans) {
+    // need to parse for text decoration spans
+    //std::string parsedBody = "";
+    std::string openDelim = "<";
+    std::string closedDelim = ">";
+    std::string colorDecoration = "color";
+    std::string animationDecoration = "animation";
+    std::string equals = "=";
+    std::string endDecoration = "/";
+    char parameterSep = ',';
+    //std::vector<TextDecorationSpan> decorationSpans;
+    std::stack<TextDecorationSpan> processingAnimations;
+    std::stack<TextDecorationSpan> processingColors;
+    auto start = 0U;
+    auto end = dialogueBody.find(openDelim);
+    while (end != std::string::npos)
+    {
+        std::string decoration = "";
+        std::vector<std::string> decorations;
+
+        parsedBody += dialogueBody.substr(start, end - start);
+        decoration = dialogueBody.substr(end, dialogueBody.find(closedDelim, end) - end + 1);
+        // parse each decoration separated by space
+        // very messy with minimal error checking
+        decorations = getTokenizedText(decoration);
+        for (std::string dec : decorations) {
+            //std::cout << dec << std::endl;
+            assert(dec.length() > 0);
+
+            // color span
+            if (dec.find(colorDecoration) != std::string::npos) {
+                if (dec.find(endDecoration) == std::string::npos) {
+                    std::string color = dec.substr(dec.find(colorDecoration) + colorDecoration.length() + equals.length());
+                    color = color.substr(0, min(color.find(closedDelim), color.find(" ")));
+                    processingColors.push(TextDecorationSpan{ parsedBody.length(), 0, colorNames.at(color) });
+                }
+                else {
+                    decorationSpans.push_back(processingColors.top());
+                    decorationSpans.back().endIndex = parsedBody.substr(0, parsedBody.find_last_not_of(' ')).length();
+                    processingColors.pop();
+                }
+            }
+
+            // animation span
+            if (dec.find(animationDecoration) != std::string::npos) {
+                if (dec.find(endDecoration) == std::string::npos) {
+                    std::string animation = dec.substr(dec.find(animationDecoration) + animationDecoration.length() + equals.length());
+                    animation = animation.substr(0, min(animation.find(closedDelim), animation.find(" ")));
+                    // need to also parse any additional parameters
+                    std::string animationType = animation.substr(0, animation.find_first_of(parameterSep));
+                    std::vector<float> parameters;
+
+                    // ref for sstream an numbers: https://stackoverflow.com/questions/48528893/stringstream-parse-comma-separated-integers
+                    std::istringstream animation_ss(animation.substr(animation.find_first_of(parameterSep) + 1));
+                    float param;
+                    char commaDummy;
+                    while (animation_ss >> param) {
+                        parameters.push_back(param);
+                        animation_ss >> commaDummy; // eat up the comma in the stream
+                    }
+
+                    switch (textAnimationNames.at(animationType)) {
+                    case TextAnimationType::WobblyText:
+                        if (parameters.empty()) {
+                            processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<WobblyTextAnimation>() });
+                        }
+                        else {
+                            processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType),
+                                std::make_shared<WobblyTextAnimation>(parameters), parameters[parameters.size() - 1], parameters[parameters.size() - 1] });
+                            // remove the time parameter that is added to the end of wobbly in parsing
+                            processingAnimations.top().animation->parameters.erase(processingAnimations.top().animation->parameters.end() - 1);
+                        }
+                        break;
+                    case TextAnimationType::WavyText:
+                        if (parameters.empty()) {
+                            processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<WavyTextAnimation>() });
+                        }
+                        else {
+                            processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<WavyTextAnimation>(parameters) });
+                        }
+                        break;
+                    default:
+                        processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<TextAnimation>() });
+                    }
+                    // make sure have the required number of parameters
+                    assert(processingAnimations.top().animation->parameters.size() == processingAnimations.top().animation->requiredParameters);
+                }
+                else {
+                    decorationSpans.push_back(processingAnimations.top());
+                    decorationSpans.back().endIndex = parsedBody.length() - 1;
+                    processingAnimations.pop();
+                }
+
+            }
+
+
+        }
+        start = dialogueBody.find(closedDelim, end) + closedDelim.length();
+        end = dialogueBody.find(openDelim, start);
+    }
+    parsedBody += dialogueBody.substr(start, end);
+
+    // make sure spans are closed properly
+    assert(processingAnimations.empty());
+    assert(processingColors.empty());
 }

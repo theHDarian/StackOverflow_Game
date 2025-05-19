@@ -2,6 +2,7 @@
 #include "render_system.hpp"
 #include <SDL.h>
 #include <glm/gtx/compatibility.hpp>
+# include <tgmath.h>
 
 #include "ai_system.hpp"
 #include "tiny_ecs_registry.hpp"
@@ -159,7 +160,7 @@ void RenderSystem::drawCursor()
 
 void RenderSystem::effectToDrawCall(Entity entity,
 	const mat4& projection, const mat4& view, bool isUI = false) {
-	
+	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
 	switch (render_request.used_effect) {
 		case ROOM_BOUND:
@@ -188,7 +189,6 @@ void RenderSystem::effectToDrawCall(Entity entity,
 void RenderSystem::drawAnimateTextured(Entity entity,
 	const mat4& projection, const mat4& view, bool isUI = false)
 {
-	assert(registry.renderRequests.has(entity));
 	RenderRequest render_request;
 	Motion motion = registry.motions.get(entity);
 
@@ -220,6 +220,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
@@ -434,55 +435,98 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, (float*)&transform);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
 
-	bool isProtected = false;
-	if (registry.vulnerabilities.has(target)) {
-		if (registry.vulnerabilities.get(target).modifier < 1.0f) {
-			isProtected = true;
-		}
-	}
+	bool isInvincible = registry.invincibles.has(target);
+	bool isVulnerable = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier > 1.01f);
+	bool isProtected = (registry.vulnerabilities.has(target) && registry.vulnerabilities.get(target).modifier < 0.99f);
 
 	GLint shielded_uloc = glGetUniformLocation(program, "shielded");
 	glUniform1i(shielded_uloc, (registry.invincibles.has(target) || isProtected));
 
-	GLuint shield_color_uloc = glGetUniformLocation(program, "shieldColor");
-	if (registry.invincibles.has(target))
-	{
-		vec3 shieldColor = vec3(233.f / 255.f, 173.f / 255.f, 48.f / 255.f);
-		glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
-	} else if (registry.vulnerabilities.has(target))
-	{
-		if (registry.vulnerabilities.get(target).modifier < 0.9f) {
-			vec3 shieldColor = vec3(0.5f, 0.5f, 1.2f);
-			glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
-		}
-	}
+	vec3 damagedColor = vec3(1);
+	vec3 shieldColor = vec3(1);
+	Damaged damaged;
 
+	if (isInvincible) {
+		shieldColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
+		damagedColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
+	}
+	else if (isProtected) {
+		shieldColor = specialStatesToColor.at(SpecialStates::PROTECTED);
+		damagedColor = specialStatesToColor.at(SpecialStates::PROTECTED);
+	}
+	else if (isVulnerable) {
+		damagedColor = specialStatesToColor.at(SpecialStates::VULNERABLE);
+	}
+	else if (registry.damageds.has(entity)) {
+		damagedColor = { 1.2, 0.5, 0.5 }; // red;
+		damaged = registry.damageds.get(entity);
+	}
+	else if (registry.burnTicked.has(entity)) {
+		damagedColor = specialStatesToColor.at(SpecialStates::ONFIRE);
+		damaged = registry.burnTicked.get(entity);
+	} 
+
+	GLuint shield_color_uloc = glGetUniformLocation(program, "shieldColor");
+	glUniform3fv(shield_color_uloc, 1, (float*)&shieldColor);
 
 	if (registry.aoeIndicators.has(entity)) {
 		auto& aoe = registry.aoeIndicators.get(entity);
-		vec3 color = specialStatesToColor.at( aoe.type);
+		vec3 color = specialStatesToColor.at(aoe.type);
 		glUniform3fv(color_uloc, 1, (float*)&color);
 	}
 
-	if (registry.damageds.has(entity))
+	if (registry.damageds.has(entity) || registry.burnTicked.has(entity))
 	{
-		Damaged &damaged = registry.damageds.get(entity);
-		vec3 color = {1.2, 0.5, 0.5}; // red
-		if (registry.invincibles.has(target)) {
-			color = {1, 1, 0.3}; // yellow, to show that the damage is being absorbed
-		}
-		else if (registry.vulnerabilities.has(target)) {
-			if (registry.vulnerabilities.get(target).modifier < 0.9) {
-				color = {107.f/255.f, 143.f/255.f, 242/255.f}; // blue, to show that the damage is being reduced
-			}
-			else if (registry.vulnerabilities.get(target).modifier > 1.1) {
-				color = {199/255.f, 39/255.f, 145/255.f}; // purple, to show that the damage is being boosted
-			}
-		}
-		glUniform3fv(color_uloc, 1, (float *)&color);
+		glUniform3fv(color_uloc, 1, (float *)&damagedColor);
 		glUniform1i(change_color_uloc, 1);
 		alpha = glm::lerp(0.5f, 0.f, (damaged.max - damaged.countdown) / damaged.max);
 		glUniform1f(effectAlpha, alpha);
+	} 
+
+	GLint aura_uloc = glGetUniformLocation(program, "auraToggle");
+	glUniform1i(aura_uloc, false);
+	
+	if (registry.regenerates.has(entity)) {
+		Regenerate& regenerates = registry.regenerates.get(entity);
+		damagedColor = specialStatesToColor.at(SpecialStates::REGENERATING) * 0.7f;
+
+		drawBasicAnimateTextured();
+
+		float angle = glm::clamp(motion.angle, M_PI / 4, -M_PI / 4);
+		float rotHeight = motion.scale.y;
+		float rotWidth = motion.scale.x;
+
+		Motion auraMotion = Motion();
+		auraMotion.scale = motion.scale;
+		auraMotion.position = motion.position;
+
+		// don't bother resizing squares
+		if (auraMotion.scale.x != auraMotion.scale.y && motion.angle != 0) {
+			vec2 v = { auraMotion.scale.x, auraMotion.scale.y };
+			vec2 u = { auraMotion.scale.x, -auraMotion.scale.y };
+
+			// ref for vector rotation: https://matthew-brett.github.io/teaching/rotation_2d.html
+			vec2 rotated_v = { cos(angle) * v.x - sin(angle) * v.y, sin(angle) * v.x + cos(angle) * v.y };
+			vec2 rotated_u = { cos(angle) * u.x - sin(angle) * u.y, sin(angle) * u.x + cos(angle) * u.y };
+
+			rotHeight = max(abs(rotated_v.y), abs(rotated_u.y));
+			rotWidth = max(abs(rotated_v.x), abs(rotated_u.x));
+
+			auraMotion.scale = vec2(rotHeight, rotWidth);
+			auraMotion.position = { motion.position.x, motion.position.y /* - (auraMotion.scale.y - motion.scale.y) / 2*/}; // offset so aura starts from right underneath
+		}
+
+		// draw a square ontop to create "aura" effect
+		setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, "enemy_bullet_square.png", COLOR_WHITE, projection, auraMotion, !isUI);
+
+		glUniform1i(aura_uloc, true);
+		GLuint aura_color_uloc = glGetUniformLocation(program, "auraColor");
+		glUniform3fv(aura_color_uloc, 1, (float*)&damagedColor);
+
+		glUniform3fv(color_uloc, 1, (float*)&COLOR_GREEN_LIGHT);
+		glUniform1i(change_color_uloc, 1);
+		float auraAlpha = 1 - abs(cos(regenerates.countdown / (regenerates.max / 10)) * (0.5));
+		glUniform1f(alpha_uloc, glm::clamp(alpha*(auraAlpha), 0.f, 1.f));
 	}
 
 	// GLsizei num_triangles = num_indices / 3;
@@ -512,6 +556,7 @@ void RenderSystem::drawMesh(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	gl_has_errors();
 
 	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
@@ -585,6 +630,7 @@ void RenderSystem::drawBullet(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	//gl_has_errors();
 
 	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
@@ -712,6 +758,7 @@ void RenderSystem::drawRoomBound(Entity entity,
 
 	// Setting shaders
 	glUseProgram(program);
+	resetProgramToggle(program);
 	//gl_has_errors();
 
 	assert(render_request.used_geometry < GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
@@ -1153,7 +1200,7 @@ void RenderSystem::drawBackgroundElements()
 	glBindVertexArray(vao);
 	for (Entity entity : registry.backgrounds.entities)
 	{
-		if (!registry.renderRequests.get(entity).show)
+		if (!registry.renderRequests.has(entity) || !registry.renderRequests.get(entity).show)
 			continue;
 		effectToDrawCall(entity, projection, view);
 	}
@@ -1218,14 +1265,7 @@ void RenderSystem::drawGameElements()
 			drawAllColliders(entity, projection, view);
 	}
 
-	for (Entity &entity : registry.playerBullets.entities)
-	{
-		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
-			continue;
-		effectToDrawCall(entity, projection, view);
-		if (ioState.debugMode)
-			drawAllColliders(entity, projection, view);
-	}
+	drawPBullets(projection);
 
 	for (Entity &entity : registry.bosses.entities)
 	{
@@ -1387,7 +1427,6 @@ void RenderSystem::drawGameUI()
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
 		if (!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
-			drawHPbar(entity, projection, view);
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);
 		} else if (registry.bossParts.has(entity) && registry.bossParts.get(entity).showHpBar) {
@@ -1401,7 +1440,6 @@ void RenderSystem::drawGameUI()
 			continue;
 		if (!registry.boids.has(entity) && !registry.bossParts.has(entity))
 		{
-			drawHPbar(entity, projection, view);
 			drawEnemyIndicator(entity, projection, view);
 			BossEnemy &boss = registry.bosses.get(entity);
 			if (!registry.textRenderRequests.has(entity) && registry.bosses.entities[0] == entity)
@@ -1418,6 +1456,14 @@ void RenderSystem::drawGameUI()
 				textRequest.topRightBound = vec2(windowState.width, windowState.height);
 			}
 		}
+	}
+
+	for (Entity& entity : registry.hpBarHavers.entities) {
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.deleteds.has(entity))
+			continue;
+		drawHPbar(entity, projection, view);
+		// draw any statuses below hp bar
+		drawStatuses(entity, projection, view);
 	}
 
 	for (Entity &entity : registry.gameUIs.entities)
@@ -1851,6 +1897,18 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 		drawUIBullet(vec2(stackui.bulletStartPos.x + i * stackui.bulletSize.x + i * stackui.bulletOffset, stackui.bulletStartPos.y), stackui.bulletSize,
 					 bulletColor, bulletShape, stack.currStack[i].value, projection, view);
 	}
+
+	// draw tiers under
+	for (auto& tier : stackui.activeTiers) {
+		Motion motion = Motion();
+		motion.position = tier.second;
+		motion.scale = TIER_ICON_SCALE;
+
+		setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "tier_icons", COLOR_WHITE, projection, motion, false, tier.first);
+		GLint greyscale_toggle = glGetUniformLocation(program, "greyscale");
+		glUniform1i(greyscale_toggle, getEffectValue(tier.first) < getEffectTierThreshold(tier.first));
+		drawBasicAnimateTextured();
+	}
 }
 
 void RenderSystem::drawUIBullet(vec2 position, vec2 bullet_size, vec3 color, std::string shape, int bullet_value, const mat4 &projection, const mat4 &view)
@@ -1923,6 +1981,25 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	}
 	setupBasicAnimateTextured(EFFECT_ASSET_ID::TEXTURED, shape, vec3(1), projection, colliderMotion, true);
 	drawBasicAnimateTextured();
+}
+
+// pass hp bar as parameter, so that icons "shake" with hp bar
+void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const mat4& view) {
+	WindowState& windowState = registry.windowStates.components[0];
+	Motion motion = registry.motions.get(entity);
+	HPBarUI& hpBar = registry.hpBarHavers.get(entity);
+	Motion statusMotion = Motion();
+	statusMotion.scale = hpBar.iconSize;
+
+	for (int i = 0; i < hpBar.activeStatuses.size(); i++) {
+		if (hpBar.activeStatuses[i] >= 0) {
+			statusMotion.position = hpBar.statusPositions[i];
+			GLint const program = setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "status_icons", COLOR_WHITE, projection, statusMotion, hpBar.followCamera, i);
+			GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+			glUniform1f(alpha_uloc, hpBar.alpha);
+			drawBasicAnimateTextured();
+		}
+	}
 }
 
 void RenderSystem::drawDashes(const mat4 &projection, const mat4 &view)
@@ -2071,26 +2148,10 @@ void RenderSystem::drawDashCharges(vec2 position, vec2 scale, int isCharging, fl
 
 void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 &view)
 {
-	WindowState &windowState = registry.windowStates.components[0];
-	Motion &motion = registry.motions.get(entity);
+	HPBarUI& hpbar = registry.hpBarHavers.get(entity);
 	Motion HPBarMotion = Motion();
-	HPBarMotion.scale = {600, 30};
-	HPBarMotion.position = {windowState.width / 2, windowState.height * 0.92};
-
-	if (!registry.bosses.has(entity))
-	{
-		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
-		HPBarMotion.scale = {100, 10};
-	} else if (registry.bosses.entities[0] != entity || registry.bossParts.has(entity)) {
-		HPBarMotion.position = motion.position + vec2(0, motion.scale.y / 2 + 10 * 2.5);
-		HPBarMotion.scale = {100*2.5, 10*2.5};
-	}
-
-	if (registry.damageds.has(entity) && !registry.invincibles.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
-	{
-		HPBarMotion.position.x += (rand() % 10) - 5;
-		HPBarMotion.position.y += (rand() % 10) - 5;
-	}
+	HPBarMotion.scale = hpbar.scale;
+	HPBarMotion.position = hpbar.position;
 
 	float max = registry.enemies.get(entity).maxHealth;
 	float current = registry.enemies.get(entity).currHealth;
@@ -2154,15 +2215,7 @@ void RenderSystem::drawHPbar(Entity &entity, const mat4 &projection, const mat4 
 	glUniform1f(charge_boundary_uloc, chargeBoundary);
 
 	GLint alpha_uloc = glGetUniformLocation(program, "alpha");
-	float alpha = 1;
-	if (registry.cloaks.has(entity))
-	{
-		//enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
-		Cloaked& cloak = registry.cloaks.get(entity);
-		Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
-		alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, motion.position) - cloak.cloakingDistance) / cloak.cloakingDistance);
-	}
-	glUniform1f(alpha_uloc, alpha);
+	glUniform1f(alpha_uloc, hpbar.alpha);
 	gl_has_errors();
 
 	// Get number of indices from index buffer, which has elements uint16_t
@@ -2210,7 +2263,7 @@ void RenderSystem::drawBasicAnimateTextured() {
 
 // sets up basic uniforms for things that aren't in ECS
 // returns the program
-GLint RenderSystem::setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, mat4 projection, Motion motion, bool followCamera, int frame) {
+GLint RenderSystem::setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, const mat4& projection, Motion motion, bool followCamera, int frame) {
 	const GLuint used_effect_enum = (GLuint)used_effect;
 	const GLuint program = (GLuint)effects[static_cast<GLuint>(EFFECT_ASSET_ID::TEXTURED)];
 
@@ -2318,6 +2371,9 @@ void RenderSystem::resetProgramToggle(GLint program) {
 	GLint effect_size_uloc = glGetUniformLocation(program, "effectSize");
 	glUniform1i(effect_size_uloc, 1);
 
+	GLint greyscale = glGetUniformLocation(program, "greyscale");
+	glUniform1i(greyscale, false);
+
 	gl_has_errors();
 }
 
@@ -2327,7 +2383,9 @@ mat4 createNormalModel(Motion &motion, vec2 offset = vec2(0))
 {
 	mat4 transform = glm::mat4(1.0);
 	transform = glm::translate(transform, vec3(motion.position, 0.0f));
-	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	if (abs(std::remainder(motion.angle, 2 * M_PI)) > 0.005) {
+		transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	}
 	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
@@ -2340,7 +2398,6 @@ mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 {
 	WindowState &windowState = registry.windowStates.components[0];
 	Camera &camera = registry.cameras.components[0];
-	//Motion& targetMotion = registry.motions.get(camera.target);
 	mat4 transform = glm::mat4(1.0);
 	transform = glm::translate(transform, vec3(windowState.width / 2, windowState.height / 2, 0));
 	transform = glm::scale(transform, vec3(camera.zoom));
@@ -2348,8 +2405,10 @@ mat4 createFollowCameraModel(Motion &motion, vec2 offset = vec2(0))
 							   vec3(motion.position.x - camera.lookAtPos.x,
 									motion.position.y - camera.lookAtPos.y,
 									0.0));
-	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
-	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
+	if (abs(std::remainder(motion.angle, 2 * M_PI)) > 0.005) {
+		transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	}
+	//transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f)); // maybe not important; mostly abandoned feature
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
 	return transform;
@@ -2370,9 +2429,93 @@ mat4 createFollowCameraModelText(Motion &motion, vec2 offset)
 							   vec3(motion.position.x - camera.lookAtPos.x,
 									motion.position.y - (windowState.height - camera.lookAtPos.y),
 									0.0));
-	transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	if (abs(std::remainder(motion.angle, 2 * M_PI)) > 0.005) {
+		transform = glm::rotate(transform, motion.angle, vec3(0.0, 0.0, 1.0));
+	}
 	transform = glm::translate(transform, vec3(offset * glm::normalize(motion.scale), 0.0f));
 	transform = glm::scale(transform, vec3(motion.scale.x, motion.scale.y, 1.0));
 
 	return transform;
+}
+
+// length = how many rendering at once
+void RenderSystem::drawInstanced(int length, GLint program) {
+	if (length > 0) {
+		//printf("\nDrawing bullets instanced, count: %d, total bullets: %d", length, registry.playerBullets.entities.size());
+		//unsigned int colorLoc = glGetUniformLocation(program, "colors");
+		//glUniform4fv(colorLoc, length, &colors[0][0]);
+
+		unsigned int transformLoc = glGetUniformLocation(program, "transforms");
+		glUniformMatrix4fv(transformLoc, length, GL_FALSE, &transforms[0][0][0]); // b/c this is a vector of mat4s, need this many 0s??
+
+		//unsigned int letterMapLoc = glGetUniformLocation(program, "letterMap");
+		//glUniform1iv(letterMapLoc, length, &letterMap[0]);
+		//GLsizei num_indices = size / sizeof(uint16_t);
+		//glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, length);
+		gl_has_errors();
+	}
+}
+
+void RenderSystem::drawPBullets(const mat4& projection) {
+	int count = 0;
+	Motion motion = Motion();
+
+	const GLuint used_effect_enum = (GLuint)EFFECT_ASSET_ID::PBULLET;
+	const GLuint program = (GLuint)effects[static_cast<GLuint>(used_effect_enum)];
+
+	// Setting shaders
+	glUseProgram(program);
+	resetProgramToggle(program);
+	gl_has_errors();
+
+	// Setting vertex and index buffers
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	gl_has_errors();
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	GLuint texture_id =
+		texture_gl_handles.at((GLuint)name_to_texture.at("player_bullet.png"));
+
+	GLuint texture_uloc = glGetUniformLocation(program, "sampler0");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+	glUniform1i(texture_uloc, 0);
+	gl_has_errors();
+
+	// need to reactive every time! since we have other vertexAttribArrays in renderSystem (like in_textcoord)
+	// otherwise, vertex info will be wrong
+	GLint in_position_loc = glGetAttribLocation(program, "vertex");
+	assert(in_position_loc >= 0);
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+
+	for (Entity& e : registry.playerBullets.entities) {
+		if (!registry.renderRequests.has(e) || !registry.motions.has(e) || registry.invisibles.has(e))
+			continue;
+
+		Motion& m = registry.motions.get(e);
+		mat4 transform = createFollowCameraModel(m, vec2(0));
+
+		transforms[count] = transform;
+		count++;
+
+		if (count == INSTANCED_ARRAY_SIZE) {
+			drawInstanced(count, program);
+			count = 0;
+		}
+	}
+	drawInstanced(count, program);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	gl_has_errors();
 }

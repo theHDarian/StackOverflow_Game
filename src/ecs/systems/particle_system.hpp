@@ -5,6 +5,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "particle_components.hpp"
+#include "presets/particle_presets.hpp"
 #define POOLSIZE 3000
 #define TEXTURE_ROW_SIZE 4 //number of textures per row in the spritesheet
 #define TEXTURE_NUM_ROWS 8

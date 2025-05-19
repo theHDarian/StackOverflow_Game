@@ -200,6 +200,56 @@ void ParticleSystem::step(float elapsed_ms) {
         particle.rotation += 0.01f * ts;
     }
 
+    // burning enemies will emit fire while burnt; i.e. a) have burning status b) stack > 0
+    // intensity (# of particles) based on num stacks? (not working rn)
+    for (Entity& burningEntity : registry.onFires.entities) {
+        if (registry.onFires.get(burningEntity).stack <= 0) {
+            continue;
+        }
+
+        ParticleProps props = playerTrail;
+        if (registry.hpBarHavers.has(burningEntity)) {
+            HPBarUI& hp = registry.hpBarHavers.get(burningEntity);
+            props.colorEffects[0].color.start.a *= hp.alpha;
+            props.colorEffects[0].color.end.a *= hp.alpha;
+        }
+        
+        const Motion& motion = registry.motions.get(burningEntity);
+        props.position.base = { motion.position.x, motion.position.y};
+        props.velocity.base = vec2(0, -200) * (registry.motions.get(burningEntity).scale.y / 150);
+        props.velocity.base.y = min(-100.0f, props.velocity.base.y);
+        int count = max(1, int((registry.motions.get(burningEntity).scale.x / 50) * (registry.onFires.get(burningEntity).stack / 10.f)));
+        int emitCount = (int)ceil(count * elapsed_ms / 1000.f);
+        props.position.variation.y = motion.scale.y / 2.5f;
+        props.position.variation.x = motion.scale.x / 2.5f;
+        props.velocity.base.x = 0;
+        props.velocity.variation.x = 0;
+        floatUp(props, emitCount, props.velocity.base);
+    }
+
+    // particles for enemies being healed
+    for (Entity& e : registry.regenerates.entities) {
+        ParticleProps props = regenParticles;
+
+        if (registry.hpBarHavers.has(e)) {
+            HPBarUI& hp = registry.hpBarHavers.get(e);
+            props.colorEffects[0].color.start.a *= hp.alpha;
+            props.colorEffects[0].color.end.a *= hp.alpha;
+        }
+
+        const Motion& motion = registry.motions.get(e);
+        props.position.base = { motion.position.x, motion.position.y};
+        props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);
+        props.velocity.base.y = min(-100.0f, props.velocity.base.y);
+        int count = max(1, int((registry.motions.get(e).scale.x / 50)));
+        int emitCount = (int)ceil(count * elapsed_ms / 1000.f);
+        props.position.variation.y = motion.scale.y / 2.5f;
+        props.position.variation.x = motion.scale.x / 2.5f;
+        props.velocity.base.x = 0;
+        props.velocity.variation.x = 0;
+        floatUp(props, emitCount, props.velocity.base);
+    }
+
     //check emit requests
     handleEmitRequests(elapsed_ms);
 }
@@ -482,6 +532,12 @@ void ParticleSystem::render() {
         Motion motion = Motion();
         motion.position = { particle.position.x, particle.position.y };
         motion.angle = particle.rotation;
+
+        // note to self: index works backwards from bottom right
+        // so last minus particle = index 0, last plus = 1, and so on...
+        if ((particle.textureIndex < 0 && particle.textureIndex > 4) || (particle.textureIndex < 12 && particle.textureIndex > 23) 
+            || particle.textureIndex == -1)
+            motion.angle = 0;
         motion.scale = { size, size };
 
         glm::mat4 transform = createFollowCameraModel(motion, vec2(0));

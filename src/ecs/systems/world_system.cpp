@@ -307,6 +307,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	if (!registry.burnTicked.entities.empty()) {
+		for (int i = (int)registry.burnTicked.components.size() - 1; i >= 0; --i) {
+			BurnTick& entity = registry.burnTicked.components[i];
+			if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				registry.burnTicked.remove(registry.burnTicked.entities[i]);
+			}
+		}
+	}
+
 	//check spawn countdown
 	if (!registry.spawnings.entities.empty()) {
 		for (int i = (int)registry.spawnings.components.size()-1; i>=0; --i) {
@@ -534,8 +543,9 @@ void WorldSystem::handleCollisions() {
 						}
 						if (!props.colorEffects.empty())
 						{
-							props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,150,2);
+							// only take into account y scale, so the long rectangle bullets won't have death particles end up in the middle of room
+							props.position.variation = VecOp::rotate(vec2(0,motion.scale.y), motion.angle);
+							EmitParticle &ep = registry.emitParticles.emplace(Entity(),PWallCollision,props,75,2);
 							//get impact direction using the velocity of bullet projected onto the normal axis of the wall and take the negative
 							ep.defaultPos = motion.position;
 							vec2 a = wall.endPosition-wall.startPosition;
@@ -564,7 +574,7 @@ void WorldSystem::handleCollisions() {
 						vec2 goTo = glm::normalize(rem.position - motion.position);
 						motion.velocity = goTo * glm::length(motion.velocity);
 						motion.veer = vec2(0);
-						motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+						//motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 					}
 					else {
 						// Bounce / reflect the enemy bullet against the wall
@@ -577,7 +587,7 @@ void WorldSystem::handleCollisions() {
 						motion.velocity = motion.velocity - 2 * (glm::dot(motion.velocity, n)) * n;
 						motion.veer = motion.veer - 2 * (glm::dot(motion.veer, n)) * n;
 						// Assumes bullet flies towards facing direction
-						motion.angle = atan2(motion.velocity.y, motion.velocity.x);
+						//motion.angle = atan2(motion.velocity.y, motion.velocity.x);
 					}
 					bullet.bulletBounce -= 1;
 					bullet.bulletRange = getModifiedValue(BulletRange, PlayerBullet().bulletRange) / 1.5f; //refresh range

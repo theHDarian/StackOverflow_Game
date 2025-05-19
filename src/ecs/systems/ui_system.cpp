@@ -4,6 +4,7 @@
 #include "text_system.hpp"
 #include "premades.hpp"
 #include <glm/gtx/compatibility.hpp>
+#include "utils/enum_string_mapping.hpp"
 #include "utils/ui_constants.hpp"
 #include <fstream>
 #include <iomanip>
@@ -238,11 +239,113 @@ void UISystem::step(float elapsed_ms) {
 		stackui.bulletPositions.resize(stack.currStack.size());
 	}
 
+	// update tier icons of player
+	stackui.activeTiers.clear();
+	vec2 offset = TIER_ICON_SCALE + TIER_ICON_OFFSET;
+	vec2 startingPosition = vec2(50, 290) + vec2(TIER_ICON_SCALE.x / 2.f, 0);
+	vec2 pos = startingPosition;
+	for (auto& tier : stack.tierThresholds) {
+		if (getEffectValue(tier.first) > 1) { // only display icon if have +1 or more towards tier
+			// start icons on new row if overflow into pause menu
+			if ((pos.x + TIER_ICON_SCALE.x) > (registry.motions.get(pauseMenu).position.x - registry.motions.get(pauseMenu).scale.x / 2)) {
+				pos = startingPosition;
+				pos.y += offset.y;
+			}
+			stackui.activeTiers[tier.first] = pos;
+			pos.x += offset.x;
+		}
+	}
+
 	// clean up stack add notifs that have faded out
 	for (int i = registry.stackAddNotifs.size() - 1; i >= 0; i--) {
 		Entity e = registry.stackAddNotifs.entities[i];
 		if (!registry.renderRequests.get(e).show)
 			registry.deleteEntityAndRelatedEntities(e);
+	}
+
+	// decide which statuses to be drawn on enemies
+	// would be nice to use something like observer pattern, but do this for now
+	for (Entity entity : registry.hpBarHavers.entities) {
+		HPBarUI& hp = registry.hpBarHavers.get(entity);
+		Motion& motion = registry.motions.get(entity);
+
+		// configure what hpBar will look like (in terms of alpha)
+		if (registry.invisibles.has(entity) || registry.deleteds.has(entity)) {
+			hp.alpha = 0;
+		}
+		else if (registry.cloaks.has(entity))
+		{
+			//enemy gradually becomes invisible the further from the player, becomes fully invisible outside of cloak distance
+			Cloaked& cloak = registry.cloaks.get(entity);
+			Motion& playerMotion = registry.motions.get(registry.players.entities[0]);
+			hp.alpha = glm::lerp(1.f, 0.f, (glm::distance(playerMotion.position, registry.motions.get(entity).position) - cloak.cloakingDistance) / cloak.cloakingDistance);
+		}
+		else {
+			hp.alpha = 1;
+		}
+		
+		// determine which statuses are active
+		hp.activeStatuses[static_cast<int>(SpecialStates::INVINCIBLE)] = registry.invincibles.has(entity) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::UNDERGROUND)] = registry.moles.has(entity) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::VULNERABLE)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier > 1.01) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::PROTECTED)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 0.99) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::REGENERATING)] = registry.regenerates.has(entity) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::ONFIRE)] = (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) ? registry.onFires.get(entity).stack : -1;
+		
+		// configure position of hpbar
+		WindowState& windowState = registry.windowStates.components[0];
+		hp.scale = { 600, 30 };
+		hp.position = { windowState.width / 2, windowState.height * 0.92 };
+
+		if (!registry.bosses.has(entity))
+		{
+			hp.position = motion.position + vec2(0, motion.scale.y / 2 + 10);
+			hp.scale = { 100, 10 };
+		}
+		else if (registry.bosses.entities[0] != entity) {
+			hp.position = motion.position + vec2(0, motion.scale.y / 2 + 10 * 2.5);
+			hp.scale = { 100 * 2.5, 10 * 2.5 };
+		}
+
+		// make hp bar wobble
+		if (registry.damageds.has(entity) && !registry.invincibles.has(entity) && !registry.gameStates.components[0].gamePaused && !registry.gameStates.components[0].gameOver)
+		{
+			hp.position.x += (rand() % 10) - 5;
+			hp.position.y += (rand() % 10) - 5;
+		}
+
+		// configure position of status icons
+		hp.iconSize = STATUS_ICON_SCALE;
+		hp.textSize = STATUS_TEXT_SCALE;
+		vec2 offset = STATUS_ICON_OFFSET;
+		float followCameraMultiplier = -1;
+
+		// Boss hp bars on fixed on screen and are bigger
+		if (!hp.followCamera) {
+			followCameraMultiplier = 1;
+			hp.iconSize *= STATUS_ICON_BOSS_MULTIPLIER;
+			offset *= STATUS_ICON_BOSS_MULTIPLIER;
+			hp.textSize *= STATUS_TEXT_BOSS_MULTIPLIER;
+		}
+
+		vec2 iconPos = hp.position - vec2(hp.scale.x / 2.f, followCameraMultiplier * (hp.scale.y + hp.iconSize.y / 2.f));
+		// account for icon size
+		iconPos.x += hp.iconSize.x / 2.f;
+		iconPos.y -= hp.iconSize.y / 2.f * followCameraMultiplier;
+
+		offset.x += hp.iconSize.x;
+		vec2 startingPos = iconPos;
+
+		for (int i = 0; i < hp.activeStatuses.size(); i++) {
+			if (hp.activeStatuses[i] >= 0) {
+				if ((iconPos.x - hp.iconSize.x) > hp.position.x + hp.scale.x / 2) {
+					iconPos.x = startingPos.x;
+					iconPos.y -= (hp.iconSize.y + offset.y) * followCameraMultiplier;
+				}
+				hp.statusPositions[i] = iconPos;
+				iconPos.x += offset.x;
+			}
+		}
 	}
 
 	// handle ui requests
@@ -375,7 +478,7 @@ void UISystem::step(float elapsed_ms) {
 				TextRenderRequest& text = registry.textRenderRequests.get(gameOverMenu);
 				std::string report = "\n" + reportStats();
 				std::vector<std::string> reportTokenized = getTokenizedText(report);
-				text.formattedText = uiTexts["GameOver"];
+				text.formattedText = uiTexts["GameOver"].tokenizedText;
 				text.formattedText.insert(text.formattedText.end(), reportTokenized.begin(), reportTokenized.end());
 				text.formattedText = getFormattedText(text.formattedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
 				registry.activeMenus.emplace_with_duplicates(registry.menus.entities[MenuType::GameOverMenu]);
@@ -434,37 +537,9 @@ void UISystem::step(float elapsed_ms) {
 
 		if (gameState.gamePaused || gameState.dialogueScene || registry.maps.components[0].currRoom.cleared || gameState.gameOver) {
 			// is the player hovering over a stack ui bullet right now?
-			// bad: copies code from render system; consider making each bullet an entity
 			// may optimize using some other method like colour picking/just limiting search size
 			// in the future (since search space is pretty deterministic)
-			int bulletHoveredIndex = -1;
-			int count = -1;
-			vec2 bulletSize = stackui.bulletSize;
-			// should check first: is it in stack ui at all?
-			// this is point in aabb detection
-			if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
-				&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
-				for (vec2 bulletPos : stackui.bulletPositions) {
-					count++;
-					if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
-						&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
-						bulletHoveredIndex = count;
-						break;
-					}
-				}
-				if (bulletHoveredIndex > -1 && lastHoveredBullet != bulletHoveredIndex) {
-					updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset,
-						stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
-				}
-				else if (bulletHoveredIndex == -1) {
-					registry.renderRequests.get(bulletUI).show = false;
-					registry.renderRequests.get(bulletUIArrow).show = false;
-				}
-				else {
-				}
-				lastHoveredBullet = bulletHoveredIndex;
-			}
-			else {
+			if (!hoverBulletStack(ioState, stackui, stack) && !hoverBossStatus(ioState) && !hoverTierStatus(ioState, stackui)) {
 				registry.renderRequests.get(bulletUI).show = false;
 				registry.renderRequests.get(bulletUIArrow).show = false;
 			}
@@ -535,16 +610,16 @@ void UISystem::step(float elapsed_ms) {
 				}
 			}
 
+			// clear prev frame's e indicators
+			for (Entity entity : registry.interactIndicators.entities) {
+				if (!registry.deleteds.has(entity)) {
+					registry.deleteds.emplace(entity);
+				}
+			}
+
 			if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 				registry.renderRequests.get(dialogueAvatar).show = false;
 				registry.renderRequests.get(screenCutIn).show = false;
-				// clear prev frame's e indicators
-				for (Entity entity : registry.interactIndicators.entities) {
-					if (!registry.deleteds.has(entity)) {
-						registry.deleteds.emplace(entity);
-					}
-				}
-
 				// draw "press e to interact" over all items in nearby interactables list
 				for (Entity entity : registry.nearbyInteractables.entities) {
 					createInteractIndicator(registry.motions.get(entity).position);
@@ -574,6 +649,15 @@ bool UISystem::init(GLFWwindow* window) {
 	loadText();
 	loadBulletEffects();
 	
+	// REMOVE LATER
+	// put placeholder text for any tiers w/o descriptions
+	for (auto& tier : bulletEffectColors) {
+		if ((bulletEffectTypeNames.count(tier.first) > 0) && uiTexts.count("Tier_" + bulletEffectTypeNames.at(tier.first)) == 0) {
+			std::cout<<bulletEffectTypeNames.at(tier.first)<<std::endl;
+			uiTexts["Tier_" + bulletEffectTypeNames.at(tier.first)] = {"Does nothing for now!", getTokenizedText("Does nothing for now!") , {}};
+		}
+	}
+
 	stackUI = createStackUI(wS, registry.stackCompile.components[0]);
 	dialogueBox = createDialogueBox(vec2(wS.width / 2, wS.height - wS.height / 8), vec2(wS.width, wS.height / 3.5));
 	dialogueAvatar = createDialogueAvatar(vec2(150, wS.height - wS.height / 8 - 25), vec2(wS.height / 4 - 100, wS.height / 4 - 100));
@@ -584,7 +668,7 @@ bool UISystem::init(GLFWwindow* window) {
 	roomCounter = createRoomCounter();
 	roomName = createRoomName();
 	titleScreen = createTitleScreen();
-	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 200.f));
+	pauseMenu = createPauseMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 4, wS.height - 400.f));
 	controlsGuide = createControlsGuide(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 3, wS.height - 200.f));
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 2.5, wS.height - 200.f));
 	stackAddBubble = createStackAddBubble();
@@ -980,9 +1064,7 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 	tailMotion.position = motion.position - motion.scale * vec2(0.5, -0.5) - tailMotion.scale / 2.f * vec2(0.5, -0.5);
 }
 
-// update bullet ui and its arrow
-// position = top middle position
-void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
+void UISystem::updateStatusUI(vec2 position, SpecialStates status, Entity& enemy) {
 	Motion& motion = registry.motions.get(bulletUI);
 	WindowState& windowState = registry.windowStates.components[0];
 	motion.position = position;
@@ -992,9 +1074,179 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	registry.renderRequests.get(bulletUI).show = true;
 
 	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
+
+	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
+	textReq.bottomLeftBound = { textReq.x, 0 };
+	textReq.topRightBound = { textReq.x + motion.scale.x - 25, 10000 };
+	textReq.decorations.clear();
+	vec3 color = specialStateUIColors.at(status);
+
+	std::string name = specialStateNames.at(status);
+	name += "\n\n";
+	textReq.decorations = uiTexts.at("Status_" + specialStateNames.at(status)).decorations;
+
+	// need to correct any decorations from the original text...
+	for (TextDecorationSpan& deco : textReq.decorations) {
+		deco.startIndex += name.length();
+		deco.endIndex += name.length();
+	}
+
+	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 3, color });
+	textReq.text = name + uiTexts.at("Status_" + specialStateNames.at(status)).text;
+
+	std::vector<std::string> variables;
+	std::vector<std::vector<TextDecorationSpan>> variableDecos;
+	textReq.text += "\n\n";
+	std::string val = "";
+
+	// better way to do this with a map?
+	switch (status) {
+	case SpecialStates::INVINCIBLE: {
+		textReq.text += "Time remaining: ";
+		val = getTruncatedDecimal(registry.invincibles.get(enemy).countdown / 1000) + "s";
+		break;
+	}
+	case SpecialStates::VULNERABLE: {
+		textReq.text += "Time remaining: ";
+		val = getTruncatedDecimal(registry.vulnerabilities.get(enemy).countdown / 1000) + "s";
+		break;
+	}
+	case SpecialStates::PROTECTED: {
+		textReq.text += "Time remaining: ";
+		val = getTruncatedDecimal(registry.vulnerabilities.get(enemy).countdown / 1000) + "s";
+		break;
+	}
+	case SpecialStates::UNDERGROUND: {
+		textReq.text += "Time remaining: ";
+		val = getTruncatedDecimal(registry.moles.get(enemy).countdown / 1000) + "s";
+		break;
+	}
+	case SpecialStates::ONFIRE: {
+		std::string var1 = getTruncatedDecimal(registry.onFires.get(enemy).maxCountdown / 1000) + "s";
+		variables.push_back(var1);
+		textReq.text += "Stacks: ";
+		val = std::to_string(registry.onFires.get(enemy).stack);
+		break;
+	}
+	case SpecialStates::REGENERATING: {
+		std::string var1 = std::to_string(registry.regenerates.get(enemy).healAmount);
+		variables.push_back(var1);
+		std::string var2 = getTruncatedDecimal(registry.regenerates.get(enemy).healInterval / 1000) + "s";
+		variables.push_back(var2);
+		textReq.text += "Time remaining: ";
+		val =getTruncatedDecimal(registry.regenerates.get(enemy).countdown / 1000) + "s";
+		break;
+	}
+
+	default:
+		printf("\nUnknown status encountered: %d", (int)status);
+	}
+
+	textReq.decorations.push_back({ textReq.text.length(), textReq.text.length() + val.length(), color });
+	textReq.text += val;
+
+	bindScriptVariables(textReq, variables, variableDecos);
+
+	// get formatted text based on bounds
+	std::vector<std::string> formatted =
+		getFormattedText(getTokenizedText(textReq.text), textReq.scale, textReq.alignment, { textReq.x, textReq.y }, textReq.topRightBound, textReq.bottomLeftBound);
+	textReq.formattedText = formatted;
+
+	// scale box vertically to number of lines
+	// need to flip this for statuses
+	motion.scale.y = textReq.formattedText.size() * 50;
+	motion.position.y = position.y - ( motion.scale.y / 2 + 50 + 10);
+	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
+
+	// need to flip this for statuses too
+	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
+	arrowMotion.position = { position.x, motion.position.y + motion.scale.y / 2 + 10};
+	arrowMotion.scale.x = abs(arrowMotion.scale.x);
+	registry.renderRequests.get(bulletUIArrow).show = true;
+}
+
+// really just borrows the bulletUI tooltip box
+void UISystem::updateTierUI(vec2 position, BulletEffectType tier) {
+	Motion& motion = registry.motions.get(bulletUI);
+	WindowState& windowState = registry.windowStates.components[0];
+	motion.position = position;
+	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
+		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
+	}
+	registry.renderRequests.get(bulletUI).show = true;
+
+	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
+
+	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
+	textReq.bottomLeftBound = { textReq.x, 0 };
+	textReq.topRightBound = { textReq.x + motion.scale.x - 25, 10000 };
+	textReq.decorations.clear();
+	vec3 color = bulletEffectColors.at(tier);
+
+	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
+	arrowMotion.position = { position.x, position.y + 51 };
+	registry.renderRequests.get(bulletUIArrow).show = true;
+	arrowMotion.scale.x = abs(arrowMotion.scale.x) * -1;
+
+	std::string name = tierNames.at(tier);
+	name += " (" + std::to_string(getEffectValue(tier)) + "/" + std::to_string(getEffectTierThreshold(tier)) + ")";
+	name += "\n\n";
+
+	textReq.decorations = uiTexts.at("Tier_" + bulletEffectTypeNames.at(tier)).decorations;
+
+	// need to correct any decorations from the original text...
+	for (TextDecorationSpan& deco : textReq.decorations) {
+		deco.startIndex += name.length();
+		deco.endIndex += name.length();
+	}
+
+	// note: -3 because -1 to end on last character, then another -2 for the two new lines we added (note a new empty row doesn't count as a character)
+	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 3, color });
+	textReq.text = name + uiTexts.at("Tier_" + bulletEffectTypeNames.at(tier)).text;
+
+	std::vector<std::string> variables;
+	std::vector<std::vector<TextDecorationSpan>> variableDecos;
+	std::string val;
+	if (tier == BulletEffectType::BulletNum) {
+		val = std::to_string(4 * (1 + getEffectValue(tier) - getEffectTierThreshold(tier)));
+		variables.push_back(val);
+		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
+	}
+	if (tier == BulletEffectType::BulletDamage) {
+		val = std::to_string(15 * (1 + getEffectValue(tier) - getEffectTierThreshold(tier))) + "%";
+		variables.push_back(val);
+		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
+	}
+	bindScriptVariables(textReq, variables, variableDecos);
+
+	// get formatted text based on bounds
+	std::vector<std::string> formatted =
+		getFormattedText(getTokenizedText(textReq.text), textReq.scale, textReq.alignment, {textReq.x, textReq.y}, textReq.topRightBound, textReq.bottomLeftBound);
+	textReq.formattedText = formatted;
+
+	// scale box vertically to number of lines
+	motion.scale.y = textReq.formattedText.size() * 50;
+	motion.position.y = position.y + motion.scale.y / 2 + 50 + 10;
+	textReq.y = windowState.height - motion.position.y + motion.scale.y / 2 - 50;
+
+}
+
+// update bullet ui and its arrow
+// position = top middle position
+void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
+	Motion& motion = registry.motions.get(bulletUI);
+	WindowState& windowState = registry.windowStates.components[0];
+	StackCompile& stack = registry.stackCompile.components[0];
+	motion.position = position;
+	if ((motion.position.x - motion.scale.x / 2) < 0 + 25) {
+		motion.position.x += (motion.position.x - motion.scale.x / 2) * -1 + 25;
+	}
+	registry.renderRequests.get(bulletUI).show = true;
+
+	TextRenderRequest& textReq = registry.textRenderRequests.get(bulletUI);
 	if (uiTexts.count("HoverBullet_" + bullet.name) == 0) { // new effect, need to generate text and tokenize it
 		std::string tooltip = makeBulletTooltip(bullet);
-		uiTexts.insert({ "HoverBullet_" + bullet.name, getTokenizedText(tooltip) });
+		uiTexts.insert({ "HoverBullet_" + bullet.name, {tooltip, getTokenizedText(tooltip),{}} });
 	}
 
 	textReq.x = motion.position.x - motion.scale.x / 2 + 20;
@@ -1009,8 +1261,9 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	Motion& arrowMotion = registry.motions.get(bulletUIArrow);
 	arrowMotion.position = { position.x, position.y + 51 };
 	registry.renderRequests.get(bulletUIArrow).show = true;
+	arrowMotion.scale.x = abs(arrowMotion.scale.x) * -1;
 
-	std::vector<std::string> tokenizedBody = uiTexts["HoverBullet_" + bullet.name];
+	std::vector<std::string> tokenizedBody = uiTexts["HoverBullet_" + bullet.name].tokenizedText;
 	std::string name = bullet.name;
 
 	if (bullet.value != 0) {
@@ -1024,16 +1277,44 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 	}
 	name += "\n\n";
 
-	std::vector<std::string> tokenizedName = getTokenizedText(name);
-	tokenizedName.insert(tokenizedName.end(), tokenizedBody.begin(), tokenizedBody.end());
+	if (bullet.value != 0) {
+		textReq.text = name + uiTexts["HoverBullet_" + bullet.name].text + "\n\nTotal in stack: ";
 
-	// note: -1 because when tokenized, \n\n will be replaced with a single space to delimit
-	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 1, color });
+		textReq.decorations.push_back(TextDecorationSpan{ textReq.text.length(), textReq.text.length() + std::to_string(getEffectValue(bullet.type)).length(), color });
+		textReq.text += std::to_string(getEffectValue(bullet.type)) + "\nTotal " + bulletEffectDescriptions.at(bullet.type) + ": ";
+		
+		// add any units here, using map
+		float mod = stack.Call(bullet.type);
+		float futureMod = stack.Call(bullet.type, 1);
 
-	// get formatted text based on bounds
-	std::vector<std::string> formatted = 
-		getFormattedText(tokenizedName, textReq.scale, textReq.alignment, {textReq.x, textReq.y}, textReq.topRightBound, textReq.bottomLeftBound);
-	textReq.formattedText = formatted;
+		// convert ms to s if needed
+		if (bulletEffectUnits.at(bullet.type).compare("s") == 0) {
+			mod /= 1000;
+			futureMod /= 1000;
+		}
+
+		std::string modStr = getTruncatedDecimal(mod) + " " + bulletEffectUnits.at(bullet.type);
+		textReq.decorations.push_back(TextDecorationSpan{ textReq.text.length(), textReq.text.length() + modStr.length(), color });
+		textReq.text += modStr + "\nAt +1 value: "; // TODO: figure out a good name
+
+		std::string futureModStr = getTruncatedDecimal(futureMod) + " " + bulletEffectUnits.at(bullet.type);
+		textReq.decorations.push_back(TextDecorationSpan{ textReq.text.length(), textReq.text.length() + futureModStr.length(), color });
+		textReq.text += futureModStr;
+		
+		std::vector<std::string> formatted =
+			getFormattedText(getTokenizedText(textReq.text), textReq.scale, textReq.alignment, {textReq.x, textReq.y}, textReq.topRightBound, textReq.bottomLeftBound);
+		textReq.formattedText = formatted;
+	}
+	else {
+		std::vector<std::string> tokenizedName = getTokenizedText(name);
+		tokenizedName.insert(tokenizedName.end(), tokenizedBody.begin(), tokenizedBody.end());
+		// get formatted text based on bounds
+		std::vector<std::string> formatted =
+			getFormattedText(tokenizedName, textReq.scale, textReq.alignment, { textReq.x, textReq.y }, textReq.topRightBound, textReq.bottomLeftBound);
+		textReq.formattedText = formatted;
+	}
+
+	textReq.decorations.push_back(TextDecorationSpan{ 0, name.length() - 3, color });
 
 	// scale box vertically to number of lines
 	motion.scale.y = textReq.formattedText.size() * 50;
@@ -1081,7 +1362,7 @@ Entity UISystem::createBulletUI() {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-	motion.scale = { 350, 400 }; // hard code size for now; consider scaling to text in future (tho maybe not needed?)
+	motion.scale = { 500, 400 }; // hard code scale.x, scale.y scaled to # of lines
 	motion.position = { 0, 0 };
 
 	vec3& color = registry.colors.emplace(entity);
@@ -1423,7 +1704,7 @@ Entity UISystem::createControlsGuide(vec2 position, vec2 scale) {
 	text.y = position.y + scale.y / 2.f - 25.f - text.scale * DEFAULT_FONT_SIZE;
 	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
 	text.bottomLeftBound = { text.x, 0 + 25 };
-	text.formattedText = uiTexts["ControlsGuide"];
+	text.formattedText = uiTexts["ControlsGuide"].tokenizedText;
 	text.alignment = TextAlignment::CenteredAlign;
 
 	UIBorder& border = registry.uiBorders.emplace(entity);
@@ -1540,7 +1821,7 @@ Entity UISystem::createGameOverMenu(vec2 position, vec2 scale)
 	text.topRightBound = { position.x + scale.x / 2.f - 25, position.y + scale.y / 2.f - 25 };
 	text.bottomLeftBound = { 0, 0 + 25 };
 	text.alignment = TextAlignment::CenteredAlign;
-	text.formattedText = getFormattedText(uiTexts["GameOver"], text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
+	text.formattedText = getFormattedText(uiTexts["GameOver"].tokenizedText, text.scale, text.alignment, { text.x, text.y }, text.topRightBound, text.bottomLeftBound);
 
 	UIBorder& border = registry.uiBorders.emplace(entity);
 	border.borderColour = vec3(1.f);
@@ -1797,6 +2078,8 @@ void UISystem::loadText() {
 	std::ifstream entity_file(filename);
 	std::string uiName;
 	std::vector<std::string> tokenizedText;
+	std::vector<TextDecorationSpan> decorationSpans;
+	std::string text;
 
 	if (entity_file.is_open())
 	{
@@ -1814,9 +2097,14 @@ void UISystem::loadText() {
 
 				if (action.compare("UI") == 0) {
 					// new ui text, so place all prev lines into map, unless this is the first one
-					if (tokenizedText.size() > 0) {
-						uiTexts.insert({ uiName, tokenizedText });
+					if (text != "") {
+						std::string parsedBody;
+						// get rid of the extra new line at the end
+						parseBodyDecorations(text.substr(0, text.length()-1), parsedBody, decorationSpans);
+						uiTexts.insert({ uiName, {parsedBody, getTokenizedText(parsedBody), decorationSpans}});
 						tokenizedText.clear();
+						decorationSpans.clear();
+						text = "";
 					}
 
 					std::stringstream ss_line(line);
@@ -1836,16 +2124,19 @@ void UISystem::loadText() {
 						start = end + delim.length();
 						end = line.find(delim, start);
 					}
-					uiTextBody += line.substr(start, end);
-					std::vector<std::string> newTokenizedText = getTokenizedText(uiTextBody);
-					// ref: https://www.geeksforgeeks.org/concatenate-two-vectors-in-cpp/
-					tokenizedText.insert(tokenizedText.end(), newTokenizedText.begin(), newTokenizedText.end());
-					tokenizedText.push_back(newLine);
+					uiTextBody += line.substr(start, end) + "\n";
+					text += uiTextBody;
+					
+					//// ref: https://www.geeksforgeeks.org/concatenate-two-vectors-in-cpp/
+					//tokenizedText.insert(tokenizedText.end(), newTokenizedText.begin(), newTokenizedText.end());
+					//tokenizedText.push_back(newLine);
 				}
 			}
 		}
 		entity_file.close();
-		uiTexts.insert({ uiName, tokenizedText });
+		std::string parsedBody;
+		parseBodyDecorations(text.substr(0, text.length() - 1), parsedBody, decorationSpans);
+		uiTexts.insert({ uiName, {parsedBody, getTokenizedText(parsedBody), decorationSpans} });
 	}
 	else
 	{
@@ -1874,7 +2165,6 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 	std::string tooltip = /*"bullet.name + "\n\n"*/"";
 	std::string modify = "";
 	std::string effect = "";
-	std::string amount = "";
 	float intermediaryAmount = 0;
 
 	// special cases
@@ -1887,56 +2177,14 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 	else if (bullet.type == BulletEffectType::Lightning) { // not actually used
 		tooltip += "Shifts the bullets in the stack over by 1.";
 	}
-	else {
-		// ordinary bullets
-		// format: [increases/decreases] [effect] by [amount]
-
-		if (bullet.value < 0) {
+	else {// ordinary bullets
+		// Not sure if player initialized at this point
+		StackCompile stack = StackCompile();
+		if (bullet.value > 0 && stack.Call(bullet.type, 1) < 0) {
 			modify = "Decreases ";
-			//if (abs(bullet.value) - abs((int)bullet.value) > 0) {
-			//	std::stringstream amountString;
-			//	amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
-			//	amount = amountString.str();
-			//}
-			//else {
-			//	amount = std::to_string(abs((int)bullet.value));
-			//}
-			//if (bullet.type == BulletEffectType::PlayerDashRecharge) {
-			//	intermediaryAmount = abs(bullet.value / 1000.f);
-			//	std::stringstream amountString;
-			//	amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
-			//	amount = amountString.str();
-			//}
-			//if (bullet.type == BulletEffectType::Homing) {
-			//	intermediaryAmount = bullet.value * 100;
-			//	std::stringstream amountString;
-			//	amountString << (int)intermediaryAmount << "%";
-			//	amount = amountString.str();
-			//}
 		}
 		else {
 			modify = "Increases ";
-			//if (bullet.value - (int)bullet.value > 0) {
-			//	std::stringstream amountString;
-			//	amountString << std::fixed << std::setprecision(2) << bullet.value << "s";
-			//	amount = amountString.str();
-			//}
-			//else {
-			//	amount = std::to_string(abs((int)bullet.value));
-			//}
-			//if (bullet.type == BulletEffectType::PlayerDashRecharge) {
-			//	intermediaryAmount = abs(bullet.value / 1000.f);
-
-			//	std::stringstream amountString;
-			//	amountString << std::fixed << std::setprecision(2) << intermediaryAmount << "s";
-			//	amount = amountString.str();
-			//}
-			//if (bullet.type == BulletEffectType::Homing) {
-			//	intermediaryAmount = bullet.value * 100;
-			//	std::stringstream amountString;
-			//	amountString << (int)intermediaryAmount << "%";
-			//	amount = amountString.str();
-			//}
 		}
 
 		switch (bullet.type) {
@@ -1950,19 +2198,19 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			effect = "the size of bullets.";
 			break;
 		case FireRate:
-			effect = "bullet fire rate.";
+			effect = "interval of bullets fired.";
 			break;
 		case BulletRange:
 			effect = "bullet range.";
 			break;
 		case BulletAccuracy:
-			effect = "the accuracy of bullets fired.";
+			effect = "the spread of bullets fired.";
 			break;
 		case BulletNum:
 			effect = "the number of bullets shot at once.";
 			break;
 		case BulletBurst:
-			effect = "the number of bullets shot in a burst shot.";
+			effect = "the number of bullets shot in quick succession.";
 			break;
 		case Bounce:
 			effect = "the number of times bullets bounce.";
@@ -1971,7 +2219,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			effect = "the pierce of bullets.";
 			break;
 		case Homing:
-			effect = "the homing accuracy of bullets.";
+			effect = "the homing effect of bullets.";
 			break;
 		case PlayerSpeed:
 			effect = "movement speed.";
@@ -1983,12 +2231,12 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			effect = "stack size.";
 			break;
 		case PlayerDashRecharge:
-			effect = "dash recharge rate.";
+			effect = "dash cooldown.";
 			break;
 		default:
 			effect = "This bullet is not in the list?? Report immediately!";
 		}
-		tooltip += modify + effect/* + "by " + amount + "."*/;
+		tooltip += modify + effect;
 	}
 	return tooltip;
 }
@@ -1999,7 +2247,7 @@ void UISystem::loadBulletEffects() {
 		std::vector<std::string> tokenizedTooltip;
 		if (tooltip.length() > 0) {
 			tokenizedTooltip = getTokenizedText(tooltip);
-			uiTexts.insert({ "HoverBullet_" + bullet.name, tokenizedTooltip});
+			uiTexts.insert({ "HoverBullet_" + bullet.name, {tooltip, tokenizedTooltip, {}}});
 			//std::cout << tooltip << std::endl;
 		}
 	}
@@ -2015,8 +2263,6 @@ std::string UISystem::reportStats() {
 
 void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::string>& variables, std::vector<std::vector<TextDecorationSpan>> variableDecorations) {
 	std::string text = request.text;
-	int spanNum = 0;
-
 	// assumes script format: {x}, where x corresponds to the index of the variable
 	for (int i = 0; i < text.length(); i++) {
 		char c = text.at(i);
@@ -2028,10 +2274,16 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 			assert(varNum < variables.size());
 			text = text.substr(0, i) + variables[varNum] + text.substr(closingBraceIndex + 1);
 
+			int varLength = (variables[varNum].length() > 3? variables[varNum].length() : variables[varNum].length() - 3);
+
 			// make sure to readjust decoration spans too
-			if (!request.decorations.empty() && request.decorations.at(spanNum).startIndex <= i) {
-				request.decorations.at(spanNum).endIndex = variables[varNum].length() + i - 1;
-				spanNum++;
+			for (TextDecorationSpan& deco : request.decorations) {
+				if (deco.startIndex > i) {
+					deco.startIndex += varLength;
+				}
+				if (deco.endIndex >= i) {
+					deco.endIndex += varLength;
+				}
 			}
 			
 			if (variableDecorations.size() > varNum) {
@@ -2058,18 +2310,6 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 	}
 
 	request.text = text;
-
-	// PROBLEM: if script variable is long, decoration spans will be short by # of lines - 1
-	// but only know after text is properly formatted, so retroactively correct this for now
-	std::vector<std::string> formattedText = getFormattedText(getTokenizedText(request.text), request.scale, request.alignment, { request.x, request.y }, request.topRightBound, request.bottomLeftBound);
-
-	for (int i = 0; i < request.decorations.size(); i++) {
-		int startLineCount = getIndexLine(formattedText, request.decorations[i].startIndex);
-		int endLineCount = getIndexLine(formattedText, request.decorations[i].endIndex);
-		if (startLineCount > 0) {
-			request.decorations[i].endIndex += endLineCount - startLineCount;
-		}
-	}
 }
 
 // merges effects as if they were on the stack
@@ -2120,4 +2360,98 @@ std::vector<BulletStackEffect> mergeEffects(std::vector<BulletStackEffect> effec
 	}
 
 	return mergeEffects;
+}
+
+std::string getTruncatedDecimal(float num) {
+	if (abs(num - (int)num) > 0) {
+		std::stringstream amountString;
+		amountString << std::fixed << std::setprecision(2) << num;
+		return amountString.str();
+	}
+	else {
+		return std::to_string((int)num);
+	}
+}
+
+bool UISystem::hoverBulletStack(IOState& ioState, StackUI& stackui, StackCompile& stack) {
+	int bulletHoveredIndex = -1;
+	int count = 0;
+	vec2 bulletSize = stackui.bulletSize;
+
+	// should check first: is it in stack ui at all?
+	// this is point in aabb detection
+	if (ioState.mousePosition.x > (stackui.stackPos.x - stackui.stackSize.x / 2) && ioState.mousePosition.x < (stackui.stackPos.x + stackui.stackSize.x / 2)
+		&& ioState.mousePosition.y >(stackui.stackPos.y - stackui.stackSize.y / 2) && ioState.mousePosition.y < (stackui.stackPos.y + stackui.stackSize.y / 2)) {
+		for (vec2 bulletPos : stackui.bulletPositions) {
+			if (ioState.mousePosition.x > (bulletPos.x - bulletSize.x / 2) && ioState.mousePosition.x < (bulletPos.x + bulletSize.x / 2)
+				&& ioState.mousePosition.y >(bulletPos.y - bulletSize.y / 2) && ioState.mousePosition.y < (bulletPos.y + bulletSize.y / 2)) {
+				bulletHoveredIndex = count;
+				break;
+			}
+			count++;
+		}
+		if (bulletHoveredIndex > -1) {
+			updateBulletUI(vec2(stackui.bulletStartPos.x + bulletHoveredIndex * stackui.bulletSize.x + bulletHoveredIndex * stackui.bulletOffset,
+				stackui.bulletStartPos.y), stack.currStack[bulletHoveredIndex]);
+			return true;
+		}
+		else if (bulletHoveredIndex == -1) {
+			return false;
+		}
+	}
+	return false;
+}
+
+bool UISystem::hoverTierStatus(IOState& ioState, StackUI& stackui) {
+	// check tier icon hover
+	int bulletHoveredIndex = -1;
+	int count = 0;
+	for (auto& tier : stackui.activeTiers) {
+		if (ioState.mousePosition.x > (tier.second.x - TIER_ICON_SCALE.x / 2) && ioState.mousePosition.x < (tier.second.x + TIER_ICON_SCALE.x / 2)
+			&& ioState.mousePosition.y >(tier.second.y - TIER_ICON_SCALE.y / 2) && ioState.mousePosition.y < (tier.second.y + TIER_ICON_SCALE.y / 2)) {
+			bulletHoveredIndex = count;
+			// first is const so can't actually capture value, have to do call inside here instead
+			updateTierUI(tier.second, tier.first);
+			break;
+		}
+		count++;
+	}
+	lastHoveredBullet = bulletHoveredIndex;
+	if (bulletHoveredIndex == -1) {
+		return false;
+	}
+	return true;
+}
+
+bool UISystem::hoverBossStatus(IOState& ioState) {
+	int bulletHoveredIndex = -1;
+	int count = 0;
+	if (registry.bosses.entities.size() > 0) {
+		// check status icon hover
+		// feels a bit finicky
+		HPBarUI& bossHP = registry.hpBarHavers.get(registry.bosses.entities[0]);
+		for (int i = 0; i < bossHP.activeStatuses.size(); i++) {
+			if (bossHP.activeStatuses[i] >= 0) {
+				if (ioState.mousePosition.x > (bossHP.statusPositions[i].x - bossHP.iconSize.x / 2)
+					&& ioState.mousePosition.x < (bossHP.statusPositions[i].x + bossHP.iconSize.x / 2)
+					&& ioState.mousePosition.y >(bossHP.statusPositions[i].y - bossHP.iconSize.y / 2)
+					&& ioState.mousePosition.y < (bossHP.statusPositions[i].y + bossHP.iconSize.y / 2)) {
+					bulletHoveredIndex = count;
+					break;
+				}
+			}
+			count++;
+		}
+		lastHoveredBullet = bulletHoveredIndex;
+		if (bulletHoveredIndex > -1) {
+			updateStatusUI(bossHP.statusPositions[bulletHoveredIndex], static_cast<SpecialStates>(bulletHoveredIndex), registry.bosses.entities[0]);
+			lastHoveredBullet = bulletHoveredIndex;
+			return true;
+		}
+		else if (bulletHoveredIndex == -1) {
+			return false;
+		}
+	}
+	lastHoveredBullet = bulletHoveredIndex;
+	return false;
 }

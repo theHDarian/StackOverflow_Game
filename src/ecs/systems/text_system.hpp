@@ -8,6 +8,7 @@
 #include "tiny_ecs_registry.hpp"
 #include "render_system.hpp"
 
+void parseBodyDecorations(std::string dialogueBody, std::string& parsedBody, std::vector<TextDecorationSpan>& decorationSpans);
 std::vector<std::string> getTokenizedText(std::string text);
 std::vector<std::string> getFormattedText(std::vector<std::string> tokenizedText, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound);
 bool textOverflowed(std::string text, float scale, TextAlignment alignment, vec2 textPosition, vec2 topRightBound, vec2 bottomLeftBound);
@@ -62,4 +63,5 @@ private:
     void renderText(TextRenderRequest& request, Entity entity, bool isUI = true);
     void drawInstancedText(int length);
     float getTextLength(std::string text, float scale);
+    void drawAStatusText(Entity& entity, HPBarUI& hpBar, TextRenderRequest& textReq, vec2 startingPos, vec2 offset, vec2 iconSize, std::string count);
 };

@@ -19,5 +19,48 @@ Controls:
 UI GameOver
 ERROR: StackOverflow \nPress R to reboot
 
+UI Status_Invincible
+Takes <color=yellow>no damage</color> while invincible.
+
+UI Status_Protected
+Takes <color=blue_sky>0.5x damage</color> while protected.
+
+UI Status_Vulnerable
+Takes <color=purple_med>1.5x damage</color> while vulnerable.
+
+UI Status_Underground
+Takes <color=brown>no damage</color> while underground.
+
+UI Status_Regenerating
+Heals <color=teal_light>{0}</color> HP every <color=teal_light>{1}</color>.
+
+UI Status_Burn
+Every <color=red>{0}</color>, takes <color=red>10 damage</color> plus an additional 10 per stack, then reduces the current number of stacks by 1.
+
+UI Tier_BulletDamage
+Bullets have a 15% chance to inflict 1 stack of <color=red>Burn</color> on hit, with an additional 15% chance per <color=red>Bullet Damage Up</color> above 5. Each tick of <color=red>Burn</color> reduces the stack by 1, dealing 10 damage plus an additional 10 per stack.
+\n\nCurrent burn chance: {0}
+
+UI Tier_ProjectileSize
+Bullets split into mini bullets on deletion (how many? random?). Reset bullet size upon reaching 5 <color=purple_light>Bullet Size up</color>.
+
+UI Tier_BulletRange
+Deal more damage the further you are from the enemy, up to a multiplier of <color=yellow>2x</color>.
+
+UI Tier_BulletAccuracy
+Bullets inflict <color=purple_med>Vulnerable</color> on hit, increasing damage dealt by <color=purple_med>1.5x</color> for 4s.
+
+UI Tier_BulletNum
+Fire <color=teal_light>4</color> extra mini bullets around you, with an additional 4 per <color=teal_light>Bullet Count Up</color> above 5. \n\nCurrent number of mini bullets: {0} 
+
+UI Tier_Bounce
+Bullets now bounce towards a random enemy.
+
+UI Tier_Pierce
+Deal <color=blue_sky>0.5x</color> more damage to <color=blue_sky>Protected</color> enemies. <color=purple_med>Vulnerable</color> multiplier increased to <color=purple_med>1.75x.</color>
+# note: protected goes from 0.5x -> 0.75x
+
+UI Tier_PlayerDashRecharge
+<color=brown>50%</color> chance to not have <color=grey_light>Inert</color> added onto stack upon being hit by bullets or enemies. 
 
 

@@ -235,7 +235,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	ROOM_BOUND = HP_BAR + 1,			// Has own call
 	ANIMATE = ROOM_BOUND + 1,
 	BULLET = ANIMATE + 1,				// Has own call
-	EFFECT_COUNT = BULLET + 1
+	PBULLET = BULLET + 1,
+	EFFECT_COUNT = PBULLET + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -462,6 +463,12 @@ struct TextRenderRequest {
 	TextAlignment alignment = TextAlignment::LeftAlign;
 
 	// define special spans of word colours here
+	std::vector<TextDecorationSpan> decorations;
+};
+
+struct UIText {
+	std::string text;
+	std::vector<std::string> tokenizedText;
 	std::vector<TextDecorationSpan> decorations;
 };
 

@@ -577,7 +577,7 @@ Entity createOptimizer(RenderSystem *renderer, vec2 pos)
 	Motion &m = registry.motions.emplace(console);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = {784 / 1.4f,456 / 1.4f};
+	m.scale = vec2(784,456) / 1.4f;
 
 	auto &o = registry.objects.emplace(console);
 	o.baseOffset = 20;
@@ -615,7 +615,7 @@ Entity createInverter(RenderSystem *renderer, vec2 pos)
 	Motion &m = registry.motions.emplace(console);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = {784/1.4f,456/1.4f};
+	m.scale = vec2(784,456) / 1.4f;
 
 	auto &o = registry.objects.emplace(console);
 	o.baseOffset = 20;
@@ -2252,6 +2252,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	int dmgScale = registry.elites.has(entity) ? (int) map.currRegion - 1 + registry.elites.get(entity).eliteLevel : (int) map.currRegion - 1;
 	enemy.maxHealth = enemy.maxHealth * pow(1.25, (max(dmgScale , 0)));
 	enemy.currHealth = enemy.maxHealth;
+
+	// to make hp bar drawing easier
+	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity))) {
+		HPBarUI& hpbar = registry.hpBarHavers.emplace(entity);
+		if (registry.bosses.has(entity)) {
+			hpbar.followCamera = false;
+		}
+	}
+
 	return entity;
 };
 
@@ -2622,7 +2631,7 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 	}
 	if (!props.colorEffects.empty())
 	{
-		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
+		props.position.variation = VecOp::rotate(vec2(0, motion.scale.y), motion.angle);
 		EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, 3 + 4 * bullet.isSpecial);
 	}
 
@@ -2869,6 +2878,13 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 {
 	auto entity = Entity();
 
+	// exceeded bullet limit; delete an old bullet before making this one
+	if (registry.playerBullets.size() > MAX_BULLETS) {
+		if (!registry.deleteds.has(registry.playerBullets.entities[0]))
+			registry.deleteds.emplace(registry.playerBullets.entities[0]);
+		registry.playerBullets.remove(registry.playerBullets.entities[0]);
+	}
+
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh &mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -2893,7 +2909,8 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 
 	// Initialize the motion
 	auto &motion = registry.motions.emplace(entity);
-	motion.angle = atan2(direction.y, direction.x);
+	//motion.angle = atan2(direction.y, direction.x);
+	motion.angle = 0;
 	motion.velocity = direction * bullet.bulletSpeed;
 	motion.position = position;
 	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
@@ -2932,6 +2949,13 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 {
 	auto entity = Entity();
 
+	// exceeded bullet limit; delete an old bullet before making this one
+	if (registry.playerBullets.size() > MAX_BULLETS) {
+		if (!registry.deleteds.has(registry.playerBullets.entities[0]))
+			registry.deleteds.emplace(registry.playerBullets.entities[0]);
+		registry.playerBullets.remove(registry.playerBullets.entities[0]);
+	}
+
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -2951,7 +2975,8 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);
-	motion.angle = atan2(direction.y, direction.x);
+	motion.angle = 0;
+	//motion.angle = atan2(direction.y, direction.x);
 	motion.velocity = direction * bullet.bulletSpeed;
 	motion.position = position;
 	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
@@ -2990,6 +3015,13 @@ Entity createTentaclePlayerBullet(RenderSystem* renderer, vec2 position, vec2 di
 {
 	auto entity = Entity();
 
+	// exceeded bullet limit; delete an old bullet before making this one
+	if (registry.playerBullets.size() > MAX_BULLETS) {
+		if (!registry.deleteds.has(registry.playerBullets.entities[0]))
+			registry.deleteds.emplace(registry.playerBullets.entities[0]);
+		registry.playerBullets.remove(registry.playerBullets.entities[0]);
+	}
+
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -3009,7 +3041,8 @@ Entity createTentaclePlayerBullet(RenderSystem* renderer, vec2 position, vec2 di
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);
-	motion.angle = atan2(direction.y, direction.x);
+	//motion.angle = atan2(direction.y, direction.x);
+	motion.angle = 0;
 	motion.velocity = direction * bullet.bulletSpeed;
 	motion.position = position;
 	motion.scale = vec2(bullet.bulletSize, bullet.bulletSize); // Ensure scale is initialized
@@ -3047,7 +3080,8 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 	// Fixed chance of special bullet
 	float positiveProb = 0.2f;
 
-	assert(!map.currRoom.preset.negativeEffects.empty());
+	// TODO: is this needed?
+	assert(!map.currRoom.preset.negativeEffects.empty() || map.currRoom.type == TutorialRoom2);
 
 	// Non-room related effects
 	if (atkData.positiveBulletEffects.size() > 0 && Random::Float() < positiveProb && map.currRoom.preset.numSpecialBulletsToSpawn > 0)
@@ -3056,7 +3090,7 @@ std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool &isSpec
 		return atkData.positiveBulletEffects;
 	}
 	isSpecial = false;
-	if (Random::Float() < 0.2f * log((float)map.currRegion) || map.currRoom.type == Testing) {
+	if (Random::Float() < 0.2f * log((float)map.currRegion) || map.currRoom.type == Testing || map.currRoom.type == TutorialRoom2) {
 		return atkData.negativeBulletEffects;
 	}
 	return { blunt };

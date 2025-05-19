@@ -648,7 +648,7 @@ You... who have been chosen by the Free...
 
 
 ITEM WhiteBoard -1 0
-<color=red><color=teal_light animation=wobbly,5,5,600><color=red>A</color> whiteboard</color> with a blue print tacked <animation=wavy>onto it. These <color=teal_light>symbols</color> look like</animation color=red> they could come</color> in</animation> <color=teal_light>handy</color></color>.
+<color=teal_light animation=wobbly,5,5,600><color=red>A</color> whiteboard</color> with a blue print tacked <animation=wavy>onto <color=teal_light>it. These symbols</color> look like</animation color=red> they could come</color> in</animation> <color=teal_light>handy</color>.
 CUT controls.png
 
 ITEM Desk -1 0

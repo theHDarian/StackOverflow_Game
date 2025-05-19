@@ -82,8 +82,6 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 		windowState.isRetinaDisplay = true;
 	}
 
-
-
 	// Window resize callback
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -99,6 +97,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	gl_has_errors();
+	glBindVertexArray(0);
 
 	initScreenTexture();
     initializeGlTextures();
@@ -107,6 +106,30 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	#if IMGUI_ENABLED
 	initImGui();
 	#endif
+
+	// for instanced rendering -- copied from text render system
+	for (int i = 0; i < INSTANCED_ARRAY_SIZE; i++) {
+		//letterMap.push_back(0);
+		transforms.push_back(mat4(1.0f));
+		//colors.push_back(vec4(1));
+	}
+
+	GLfloat vertex_data[] = {
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+	};
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	gl_has_errors();
+	glBindVertexArray(0);
+	gl_has_errors();
 
 	return true;
 }

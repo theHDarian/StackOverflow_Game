@@ -4,6 +4,7 @@
 #include "common.hpp"
 #include "actor_components.hpp"
 #include "io_components.hpp"
+#include "presets/particle_presets.hpp"
 #include <iostream>
 #include <random>
 #include <glm/glm.hpp>

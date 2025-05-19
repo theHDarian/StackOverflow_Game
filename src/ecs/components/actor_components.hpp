@@ -205,12 +205,12 @@ struct StackCompile {
                     currStack[i + 1].value = 1;
                     i++;
                 }
-                else if (currStack[i].value + currStack[i + 1].value == -4 && currStack[i].value != -1) {
-                    currStack[i].value = -1;
-                    currStack[i + 1].value = -3;
-                    i--;
+                else if (currStack[i].value + currStack[i + 1].value == -4) {
+                    currStack[i].value = -3;
+                    currStack[i + 1].value = -1;
+                    i++;
                 }
-                else if (abs(currStack[i].value + currStack[i + 1].value) > 4 && currStack[i].value < currStack[i + 1].value) {
+                else if (abs(currStack[i].value + currStack[i + 1].value) > 4 && abs(currStack[i].value) < abs(currStack[i + 1].value)) {
                     int swap = currStack[i].value;
                     currStack[i].value = currStack[i + 1].value;
                     currStack[i + 1].value = swap;
@@ -517,13 +517,17 @@ struct AttackData {
 };
 
 enum class SpecialStates {
-    NORMAL,
-    INVISIBLE,
+    // order corresponds to order drawn in ui
     INVINCIBLE,
+    UNDERGROUND,
     VULNERABLE,
     PROTECTED,
-    UNDERGROUND,
     REGENERATING,
+    ONFIRE,
+
+    // these won't be shown in ui
+    NORMAL,
+    INVISIBLE,
     CLOAKED,
     INC_ANIM,
     CLEAR_ALL,
@@ -829,6 +833,11 @@ struct Damaged {
     float countdown = max;
 };
 
+// should be separate from damaged so that damage from player takes precedence
+struct BurnTick : Damaged {
+
+};
+
 struct BeeEnemy {
     std::set<Entity> nearbyBees;
     int mergeCount = 1;
@@ -915,4 +924,35 @@ struct Cloaked {
     float max = 1000;
     float countdown = max;
     float cloakingDistance = 400;
+};
+
+// simplest way for text system to know where hp bar is drawn in render system
+// so that text can "wobble" along with hp bar
+struct HPBarUI {
+    vec2 position;
+    vec2 scale;
+    float alpha = 1.0;
+    bool followCamera = true;
+    std::vector<int> activeStatuses = std::vector<int>(static_cast<int>(SpecialStates::NORMAL));
+    std::vector<vec2> statusPositions = std::vector<vec2>(static_cast<int>(SpecialStates::NORMAL));
+    vec2 iconSize;
+    float textSize;
+};
+
+// not sure how I feel about struct just for this
+// but is easiest way for text and render system to talk
+struct StackUI {
+    vec2 bulletStartPos;
+    vec2 bulletSize;
+    float bulletOffset; // space between bullets
+    vec2 stackSize;
+    vec2 stackPos;
+
+    std::vector<vec2> bulletPositions;
+    std::map<BulletEffectType, vec2> activeTiers; // map of active tiers and their icon position
+
+        void updateStackUISize(int bulletCapacity) {
+        stackSize = vec2(bulletCapacity * bulletSize.x + bulletCapacity * bulletOffset + 2 * bulletOffset, bulletSize.y + 2 * bulletOffset);
+        stackPos = vec2(bulletStartPos.x + stackSize.x / 2 - bulletSize.x - bulletOffset / 2, bulletStartPos.y);
+    }
 };
