@@ -2254,7 +2254,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	enemy.currHealth = enemy.maxHealth;
 
 	// to make hp bar drawing easier
-	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity))) {
+	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.invisibleEnemy.has(entity))) {
 		HPBarUI& hpbar = registry.hpBarHavers.emplace(entity);
 		if (registry.bosses.has(entity)) {
 			hpbar.followCamera = false;
