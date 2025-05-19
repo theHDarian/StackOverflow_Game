@@ -1039,7 +1039,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         if (registry.persistentSounds.has(entity)) {
             bool shouldPlayFiringSound = registry.persistentSounds.get(entity).channels.at(SoundType::LaserSound).x != -1;
             shootLaser( pos, entity, atkData, shouldPlayFiringSound);
-        } else if (currPattern.maxAtkCD <= 750.f) {
+        } else if (currPattern.maxAtkCD <= 750.f || atkData.veer.x < 5) {
             shootLaser(pos, entity, atkData, false);
         }
         else {
