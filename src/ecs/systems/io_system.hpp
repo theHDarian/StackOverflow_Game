@@ -34,6 +34,8 @@ private:
 
     void onMouseMove(vec2 mousePosition);
 
+    void mouseScroll(double xoffset, double yoffset);
+
     void handleMovementInput(int key, int action, IOState &state, GameState &gameState);
 
     void handleDialogueChoice(int key, int action, IOState& state, GameState& gameState);

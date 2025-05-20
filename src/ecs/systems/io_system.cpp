@@ -23,9 +23,11 @@ bool IOSystem::init(GLFWwindow* window) {
     auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onKey(_0, _1, _2, _3); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->onMouseMove({ _0, _1 }); };
 	auto mouseClick = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->mouseClick(_0, _1, _2); };
+	auto scroll_callback = [](GLFWwindow* wnd, double _0, double _1) { ((IOSystem*)glfwGetWindowUserPointer(wnd))->mouseScroll(_0, _1); };
 	glfwSetKeyCallback(window, key_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 	glfwSetMouseButtonCallback(window, mouseClick);
+	glfwSetScrollCallback(window, scroll_callback);
     return true;
 }
 
@@ -197,6 +199,14 @@ void IOSystem::handleDialogueChoice(int key, int action, IOState& state, GameSta
 	//		
 	//	}
 	//}
+}
+
+void IOSystem::mouseScroll(double xoffset, double yoffset) {
+	IOState& state = registry.ioStates.components[0];
+	Camera& camera = registry.cameras.components[0];
+	if (!state.lockControls && registry.cameraRequests.components.size() == 0) {
+		camera.zoom = glm::clamp(camera.zoom + yoffset/5, 0.5, 2.0);
+	}
 }
 
 void IOSystem::mouseClick(int button, int action, int mods) {
