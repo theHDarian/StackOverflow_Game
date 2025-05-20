@@ -133,6 +133,8 @@ public:
 	ComponentContainer<RoomWideBuffers> roomWideBuffers;
 	ComponentContainer<Burning> onFires;
 	ComponentContainer<UIGauge> uiGauges;
+	ComponentContainer<HPBarUI> hpBarHavers;
+	ComponentContainer<BurnTick> burnTicked;
 	ComponentContainer<PersistentSounds> persistentSounds;
 	ComponentContainer<InstanceDamage> instanceDamages;
 
@@ -253,6 +255,8 @@ public:
 		registry_list.push_back(&roomWideBuffers);
 		registry_list.push_back(&onFires);
 		registry_list.push_back(&uiGauges);
+		registry_list.push_back(&hpBarHavers);
+		registry_list.push_back(&burnTicked);
 		registry_list.push_back(&persistentSounds);
 		registry_list.push_back(&instanceDamages);
 	}

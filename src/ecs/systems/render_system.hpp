@@ -30,6 +30,11 @@ class RenderSystem {
 
 	std::map<std::string, int> name_to_texture;
 
+	// for isntanced rendering
+	GLuint VAO, VBO;
+	std::vector<mat4> transforms;
+	const int INSTANCED_ARRAY_SIZE = 200;
+
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
 	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths =
@@ -52,23 +57,14 @@ class RenderSystem {
 		shader_path("healthbar"),
 		shader_path("roombound"),
 		shader_path("animate"),
-		shader_path("bullet")
+		shader_path("bullet"),
+		shader_path("pBullet")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
 
-	const std::map<SpecialStates, vec3> specialStatesToColor = {
-		{SpecialStates::NORMAL, {1, 1, 1}},
-		{SpecialStates::INVINCIBLE, {1, 1, 0.3}}, // yellow
-		{SpecialStates::PROTECTED,  COLOR_TEAL_MED}, // cyan
-		{SpecialStates::VULNERABLE, COLOR_BLUE_BLACK}, // blue
-		{SpecialStates::INVISIBLE, {1, 0, 1}}, // purple
-		{SpecialStates::UNDERGROUND, COLOR_BROWN},
-			{SpecialStates::REGENERATING, {0, 1, 0}}, // green
-		{ SpecialStates::CLOAKED, COLOR_MAGENTA_MED }
-	};
 	const RenderRequest underGroundTexture = {
 		"underground.png",
 		EFFECT_ASSET_ID::TEXTURED,
@@ -147,10 +143,14 @@ private:
 	void drawLaserIndicator(Entity entity, const mat4& projection, const mat4& view);
 	void drawBulletStack(const mat4& projection, const mat4& view);
 	void drawDoorIndicator(Entity& enemy, const mat4& projection, const mat4& view);
+	void drawStatuses(Entity& entity, const mat4& projection, const mat4& view);
+	void drawAStatus(int frame, vec3 color, float boundPosition, Motion& statusMotion, vec2 startingPos, vec2 offset, HPBarUI& hpBar, const mat4& projection);
 
 	void resetProgramToggle(GLint program);
 	void drawBasicAnimateTextured();
-	GLint setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, mat4 projection, Motion motion, bool followCamera, int frame = 0);
+	GLint setupBasicAnimateTextured(EFFECT_ASSET_ID used_effect, std::string spriteName, vec3 color, const mat4& projection, Motion motion, bool followCamera, int frame = 0);
+	void drawInstanced(int length, GLint program);
+	void drawPBullets(const mat4& projection);
 
 	// Window handle
 	GLFWwindow* window;

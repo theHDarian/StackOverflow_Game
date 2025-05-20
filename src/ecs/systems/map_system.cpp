@@ -10,6 +10,21 @@
 
 const float ELITE_SPAWN_CHANCE = 0.2f;
 
+// REMOVE LATER
+void giveEveryTierBuff() {
+    InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
+    req2.type = InteractableRequestType::AddEffect;
+
+    for (auto& tier : tierNames) {
+        BulletStackEffect b = BulletStackEffect();
+        b.type = tier.first;
+        b.value = 3;
+        b.name = bulletEffectTypeNames.at(tier.first);
+        req2.effects.push_back(b);
+        req2.effects.push_back(b);
+    }
+}
+
 MapSystem::MapSystem()
 {
     if (registry.maps.components.size() == 0)
@@ -540,7 +555,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             map.currRoom.preset = StartingRoom;
         }
         else if (roomType == RoomType::Testing) {
-            map.currRoom.preset = TestRoom;
+            map.currRoom.preset = TestRoom2;
         }
         else {
             if (map.currRegion == Biology) {
@@ -598,14 +613,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
                 break;
         }
-        //InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-        //req2.type = InteractableRequestType::AddEffect;
-        //req2.effects = { fireRateUp,fireRateUp, fireRateUp, fireRateUp, fireRateUp, };
-        //req2.effects = { homingUp, };
 
-        // InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-        // req2.type = InteractableRequestType::AddEffect;
-        // req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp, dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
+        //giveEveryTierBuff();
 
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
@@ -646,6 +655,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
 
             d.preset = getRoomPreset(d.room, map.currRegion, d.isLocked);
 
+            // change door symbol type for offscreen ui
+            DoorSymbol& ds = registry.doorSymbols.components[i];
+            ds.doorType = d.room;
         }
         //map.currRoom.preset = TreasureRoom1;
         updateBgPositions();
@@ -660,7 +672,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
         // createEnemy(renderer, vec2(1000, 300), EnemyType::EnemyPufferfish);
         // createRamStick(renderer, vec2(500, 500));
-         //createPushConsole(renderer, vec2(500, 500), {dashUp, dashUp, dashUp, dmgDown, dmgDown, dashUp, dmgDown2, dmgDown2, dashUp, dmgDown, dashUp, dmgDown});
+        //createPushConsole(renderer, vec2(700, 500), {dashUp, dashUp, dashUp, dmgDown, dmgDown, dashUp, dmgDown2, dmgDown2, dashUp, dmgDown, dashUp, dmgDown});
         //createWishGranter(renderer, vec2(500,500));
         //createEnemy(renderer, vec2(500, 500), ScientistBoss);
         //createOracleCrab(renderer, vec2(500, 500));

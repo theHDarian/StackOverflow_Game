@@ -3,7 +3,7 @@
 #include "render_system.hpp"
 #include "SDL_mixer.h"
 #include "presets/particle_presets.hpp"
-
+#include "utils/enum_string_mapping.hpp"
 
 class SoundSystem;
 

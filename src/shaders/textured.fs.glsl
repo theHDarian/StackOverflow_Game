@@ -34,6 +34,10 @@ uniform float chargeBoundary = 1.0;
 uniform vec4 unchargedColor;
 uniform int isVertical = 1;
 
+// to give a green aura effect when regenerating
+uniform bool auraToggle = false;
+uniform vec3 auraColor;
+
 // Output color
 layout(location = 0) out  vec4 color;
 
@@ -55,6 +59,13 @@ vec4 gaugeEffect(vec4 color)
 		color.b *= fcolor.b;
 		color *= unchargedColor;
 	}
+	return color;
+}
+
+vec4 auraEffect(vec4 color)
+{
+	//return vec4(auraColor.rgb * (texcoord.y) + color.rgb * (1.0 - texcoord.y), color.w); // more of a gradient effect
+	color = vec4(auraColor.rgb, (texcoord.y * alpha) * pow(1-abs(0.5 - texcoord.x), 1/2) * color.a);
 	return color;
 }
 
@@ -88,6 +99,9 @@ void main()
 	}
 	if (gaugeToggle) {
 		color = gaugeEffect(color);
+	}
+	if (auraToggle) {
+		color = auraEffect(color);
 	}
 	// note: branches are expensive, consider using another shader instead?
 	if (changeColor == 1) {

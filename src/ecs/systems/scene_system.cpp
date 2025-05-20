@@ -335,115 +335,14 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 					}
 					dialogueBody += line.substr(start, end);
 
-					// need to parse for text decoration spans
-					std::string parsedBody = "";
-					std::string openDelim = "<";
-					std::string closedDelim = ">";
-					std::string colorDecoration = "color";
-					std::string animationDecoration = "animation";
-					std::string equals = "=";
-					std::string endDecoration = "/";
-					char parameterSep = ',';
 					std::vector<TextDecorationSpan> decorationSpans;
-					std::stack<TextDecorationSpan> processingAnimations;
-					std::stack<TextDecorationSpan> processingColors;
-					start = 0U;
-					end = dialogueBody.find(openDelim);
-					while (end != std::string::npos)
-					{
-						std::string decoration = "";
-						std::vector<std::string> decorations;
+					std::string parsedBody;
 
-						parsedBody += dialogueBody.substr(start, end - start);
-						decoration = dialogueBody.substr(end, dialogueBody.find(closedDelim, end) - end + 1);
-						// parse each decoration separated by space
-						// very messy with minimal error checking
-						decorations = getTokenizedText(decoration);
-						for (std::string dec : decorations) {
-							//std::cout << dec << std::endl;
-							assert(dec.length() > 0);
-
-							// color span
-							if (dec.find(colorDecoration) != std::string::npos) {
-								if (dec.find(endDecoration) == std::string::npos) {
-									std::string color = dec.substr(dec.find(colorDecoration) + colorDecoration.length() + equals.length());
-									color = color.substr(0, min(color.find(closedDelim), color.find(" ")));
-									processingColors.push(TextDecorationSpan{ parsedBody.length(), 0, colorNames.at(color) });
-								}
-								else {
-									decorationSpans.push_back(processingColors.top());
-									decorationSpans.back().endIndex = parsedBody.substr(0, parsedBody.find_last_not_of(' ')).length();
-									processingColors.pop();
-								}
-							}
-
-							// animation span
-							if (dec.find(animationDecoration) != std::string::npos) {
-								if (dec.find(endDecoration) == std::string::npos) {
-									std::string animation = dec.substr(dec.find(animationDecoration) + animationDecoration.length() + equals.length());
-									animation = animation.substr(0, min(animation.find(closedDelim), animation.find(" ")));
-									// need to also parse any additional parameters
-									std::string animationType = animation.substr(0, animation.find_first_of(parameterSep));
-									std::vector<float> parameters;
-
-									// ref for sstream an numbers: https://stackoverflow.com/questions/48528893/stringstream-parse-comma-separated-integers
-									std::istringstream animation_ss(animation.substr(animation.find_first_of(parameterSep) + 1));
-									float param;
-									char commaDummy;
-									while (animation_ss >> param) {
-										parameters.push_back(param);
-										animation_ss >> commaDummy; // eat up the comma in the stream
- 									}
-
-									switch (textAnimationNames.at(animationType)) {
-										case TextAnimationType::WobblyText:
-											if (parameters.empty()) {
-												processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<WobblyTextAnimation>()});
-											}
-											else {
-												processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), 
-													std::make_shared<WobblyTextAnimation>(parameters), parameters[parameters.size() - 1], parameters[parameters.size() - 1]});
-												// remove the time parameter that is added to the end of wobbly in parsing
-												processingAnimations.top().animation->parameters.erase(processingAnimations.top().animation->parameters.end() - 1);
-											}
-											break;
-										case TextAnimationType::WavyText:
-											if (parameters.empty()) {
-												processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<WavyTextAnimation>() });
-											}
-											else {
-												processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<WavyTextAnimation>(parameters) });
-											}
-											break;
-										default:
-											processingAnimations.push(TextDecorationSpan{ parsedBody.length(), 0, vec3(-1), textAnimationNames.at(animationType), std::make_shared<TextAnimation>()});
-									}
-									// make sure have the required number of parameters
-									assert(processingAnimations.top().animation->parameters.size() == processingAnimations.top().animation->requiredParameters);
-								}
-								else {
-									decorationSpans.push_back(processingAnimations.top());
-									decorationSpans.back().endIndex = parsedBody.length() - 1;
-									processingAnimations.pop();
-								}
-								
-							}
-							
-
-						}
-						start = dialogueBody.find(closedDelim, end) + closedDelim.length();
-						end = dialogueBody.find(openDelim, start);
-					}
-					parsedBody += dialogueBody.substr(start, end);
-
-					// make sure spans are closed properly
-					assert(processingAnimations.empty());
-					assert(processingColors.empty());
+					parseBodyDecorations(dialogueBody, parsedBody, decorationSpans);
 
 					lines.push_back(Dialogue{ parsedBody, decorationSpans });
 					//std::cout << "text: " << dialogueBody << std::endl;
 				}
-
 			}
 		}
 		entity_file.close();

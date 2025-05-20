@@ -41,6 +41,8 @@ inline std::string dialogue_path(const std::string& name) { return data_path() +
 #define IMGUI_ENABLED 0
 #endif
 
+#define MAX_BULLETS 1500
+
 // The 'Transform' component handles transformations passed to the Vertex shader
 // (similar to the gl Immediate mode equivalent, e.g., glTranslate()...)
 // We recomment making all components non-copyable by derving from ComponentNonCopyable
