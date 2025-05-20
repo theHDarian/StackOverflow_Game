@@ -731,7 +731,7 @@ struct TestLightningRotate : Enemy
 	{
 		maxHealth = 500000;
 		currHealth = maxHealth;
-		enemyPatterns = {  laserState1TwentyFiveHP, laserState2TwentyFiveHP };
+		enemyPatterns = { idleState, idleState };
 		patternIndex = 0;
 		sprite = {
 			"enemy_QuadShooter.png",
@@ -808,12 +808,12 @@ struct TestEffectBlunt : Enemy
 		enemyPatterns = { idleState };
 		patternIndex = 0;
 		sprite = {
-			"enemy_QuadShooter.png",
+			"BugAngelFood1.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0)
 		};
-		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		scale = vec2( 456.f, 264.f ) * 0.2f;
 		rotatePower = 0.f;
 	};
 };
@@ -845,12 +845,12 @@ struct TestEffectPlusOne : Enemy
 		enemyPatterns = { idleState };
 		patternIndex = 0;
 		sprite = {
-			"enemy_QuadShooter.png",
+			"BugAngelFood2.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0)
 		};
-		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		scale = vec2(456.f, 264.f) * 0.2f;
 		rotatePower = 0.f;
 	};
 };
@@ -882,12 +882,12 @@ struct TestEffectPlusTwo : Enemy
 		enemyPatterns = { idleState };
 		patternIndex = 0;
 		sprite = {
-			"enemy_QuadShooter.png",
+			"BugAngelFood3.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0)
 		};
-		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		scale = vec2(456.f, 264.f) * 0.2f;
 		rotatePower = 0.f;
 	};
 };
@@ -919,12 +919,12 @@ struct TestEffectPlusThree : Enemy
 		enemyPatterns = { idleState };
 		patternIndex = 0;
 		sprite = {
-			"enemy_QuadShooter.png",
+			"BugAngelFood4.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0)
 		};
-		scale = vec2({ 192.0f / 2, 192.f / 2 });
+		scale = vec2(456.f, 264.f) * 0.2f;
 		rotatePower = 0.f;
 	};
 };

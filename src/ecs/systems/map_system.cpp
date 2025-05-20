@@ -555,7 +555,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             map.currRoom.preset = StartingRoom;
         }
         else if (roomType == RoomType::Testing) {
-            map.currRoom.preset = TestRoom2;
+            map.currRoom.preset = TestRoom;
         }
         else {
             if (map.currRegion == Biology) {
