@@ -549,7 +549,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else if (map.currRegion == Mining) {
                 std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
-                map.currRoom.preset = Random::ListItem( miningBossRooms);
+                map.currRoom.preset = MedicalEnemyRoomWares;
                 // map.currRoom.preset = MiningEnemyRoomCloakedMoles;
             }
             else if (map.currRegion == Medical) {
@@ -568,7 +568,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req.type = SoundType::BossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp};
+            req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp,accuracyUp,accuracyUp,};
         }
         auto& nextRoom = map.currRoom.preset;
         switch (map.currRegion) {

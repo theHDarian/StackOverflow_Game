@@ -245,7 +245,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.vulnerabilities.entities.size() > 0) {
 			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {
 				auto& entity = registry.vulnerabilities.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0 || registry.instanceDamages.has(registry.vulnerabilities.entities[i])) {
 					registry.vulnerabilities.remove(registry.vulnerabilities.entities[i]);
 				}
 			}

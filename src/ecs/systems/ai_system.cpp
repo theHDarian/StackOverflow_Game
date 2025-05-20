@@ -408,7 +408,7 @@ void AISystem::step(float elapsed_ms)
 		// std::cout << enemy.newPattern << std::endl;
 		// std::cout << currPattern.name << "after update" << std::endl;
 
-		if (registry.regenerates.has(entity)) {
+		if (registry.regenerates.has(entity) && !registry.instanceDamages.has(entity)) {
 			auto& regen = registry.regenerates.get(entity);
 			if ((regen.currHealInterval -= elapsed_ms) <= 0) {
 				enemy.currHealth += regen.healAmount;

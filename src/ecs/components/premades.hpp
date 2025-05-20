@@ -3169,7 +3169,7 @@ struct Scissors : Enemy
 
 	Scissors()
 	{
-		maxHealth = 320;
+		maxHealth = 400;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3};
 		sprite = {
@@ -7668,6 +7668,51 @@ struct Phantom : Enemy
 
 
 // ---------- EVENTROOM ENEMIES -----------------------------------------------------------------------------------------------------------------------------
+
+struct Bubble : Enemy
+{
+
+	Bubble()
+	{
+		maxHealth = 20;
+
+		currHealth = maxHealth;
+
+		Reaction seventyPercent = {
+			ReactionType::SEVENTY_HEALTH,
+			1,
+			SpecialStates::INC_ANIM};
+
+		Reaction thirtyPercent = {
+			ReactionType::THIRTY_HEALTH,
+			2,
+			SpecialStates::INC_ANIM};
+
+		EnemyPattern idleState = {
+			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {seventyPercent}, 0, false, 2500, 7000.f, NoAttack};
+		EnemyPattern idleState2 = {
+			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, { thirtyPercent}, 1, false, 2500, 7000.f, NoAttack};
+		EnemyPattern idleState3 = {
+			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {}, 2, false, 2500, 7000.f, NoAttack};
+
+		enemyPatterns = {
+			idleState, idleState2, idleState3};
+		patternIndex = 0;
+		sprite = {
+			"bubble",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0),
+			AnimationTypes::NONE,
+			3,
+			-5
+		};
+		rotatePower = 0.15f;
+		scale = vec2({256, 256});
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+		armour = 2;
+	};
+};
 
 struct InvincibleBuffGranter : Enemy
 {

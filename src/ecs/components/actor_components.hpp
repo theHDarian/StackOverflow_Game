@@ -455,6 +455,8 @@ enum EnemyType {
     UnderGroundGranterRoomWide,
     RegenerateGranterRoomWide,
     CloakedGranterRoomWide,
+    // Enemyparts
+    EnemyBubbleShield,
 };
 
 enum class EnemyAttackPattern {
@@ -886,6 +888,10 @@ struct specialRotators {
 
 struct RoomWideBuffers {
 
+};
+
+struct InstanceDamage {
+    int instance;
 };
 
 struct Mole {

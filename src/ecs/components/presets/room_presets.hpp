@@ -2721,18 +2721,27 @@ const RoomPreset MedicalEnemyRoomWares{
     {
         {
             {EnemyMagnet, {0.5f, 0.5f}},
-            {EnemyMagnet,{random_float, random_float}},
-            {EnemyMagnet,{random_float, random_float}}
+            {EnemyMagnet,{0.3f, 0.7f}},
+            {EnemyMagnet,{0.7f, 0.3f}},
+                {EnemyBubbleShield, {0.5f, 0.5f}},
+                {EnemyBubbleShield,{0.3f, 0.7f}},
+                {EnemyBubbleShield,{0.7f, 0.3f}},
         },
         {
-            {EnemyScissors, {0.5f, 0.5f}},
-            {EnemyScissors,{random_float, random_float}},
-            {EnemyScissors,{random_float, random_float}}
+            {EnemyScissors, {0.5f, 0.2f}},
+            {EnemyScissors,{0.2f, 0.8f}},
+            {EnemyScissors,{0.8f, 0.2f}},
+                {EnemyBubbleShield, {0.5f, 0.2f}},
+                {EnemyBubbleShield,{0.2f, 0.8f}},
+                {EnemyBubbleShield,{0.8f, 0.2f}},
         },
             {
                 {EnemySword, {0.5f, 0.5f}},
-                {EnemySword,{random_float, random_float}},
-                {EnemySword,{random_float, random_float}}
+                {EnemySword,{0.2f, 0.8f}},
+                {EnemySword,{0.8f, 0.2f}},
+                {EnemyBubbleShield, {0.5f, 0.2f}},
+                {EnemyBubbleShield,{0.2f, 0.8f}},
+                {EnemyBubbleShield,{0.8f, 0.2f}},
             },
         {
             {EnemyMedicalRodA, {0.5f, 0.5f}},
@@ -3157,7 +3166,7 @@ const RoomPreset EnemyRoomSingleMage {
     {
         {
             {EnemyMage, {0.5f, 0.5f}},
-    {EnemySmallCShield, {0.5f, 0.5f}},
+    {EnemyBubbleShield, {0.5f, 0.5f}},
         },
 
     },

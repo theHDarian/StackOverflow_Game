@@ -134,6 +134,7 @@ public:
 	ComponentContainer<Burning> onFires;
 	ComponentContainer<UIGauge> uiGauges;
 	ComponentContainer<PersistentSounds> persistentSounds;
+	ComponentContainer<InstanceDamage> instanceDamages;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -253,6 +254,7 @@ public:
 		registry_list.push_back(&onFires);
 		registry_list.push_back(&uiGauges);
 		registry_list.push_back(&persistentSounds);
+		registry_list.push_back(&instanceDamages);
 	}
 
 	void clear_all_components()

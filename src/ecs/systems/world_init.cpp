@@ -2118,6 +2118,14 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		registry.invisibleEnemy.emplace(entity);
 		break;
 	}
+	case EnemyBubbleShield: {
+		enemy = Bubble();
+		auto& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0, 0};
+		ep.alwaysFollow = true;
+		auto& instance = registry.instanceDamages.emplace(entity);
+		break;
+	}
 	default:
 		assert(false);
 	};
@@ -2146,10 +2154,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 	motion.velocity = vec2(0, 0);
 	motion.scale = enemy.scale;
-	if (type == EnemyType::EnemySmallCShield && registry.motions.has(registry.enemyParts.get(entity).parent)) {
+	if ((type == EnemyType::EnemySmallCShield || type == EnemyBubbleShield)&& registry.motions.has(registry.enemyParts.get(entity).parent)) {
 		Motion& parentMotion = registry.motions.get(registry.enemyParts.get(entity).parent);
 		motion.scale.x = min(max(parentMotion.scale.x, parentMotion.scale.y) * 1.75f, min(parentMotion.scale.x, parentMotion.scale.y) + 120.f);
-		motion.scale.y = motion.scale.x * (1.998858f / 1.923352f);
+		motion.scale.y = type == EnemyType::EnemySmallCShield ? motion.scale.x * (1.998858f / 1.923352f) : motion.scale.x;
 	}
 
 	movement.posB = AISystem::getMove(enemy.currEnemyPattern().type, entity);
@@ -2252,6 +2260,10 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	int dmgScale = registry.elites.has(entity) ? (int) map.currRegion - 1 + registry.elites.get(entity).eliteLevel : (int) map.currRegion - 1;
 	enemy.maxHealth = enemy.maxHealth * pow(1.25, (max(dmgScale , 0)));
 	enemy.currHealth = enemy.maxHealth;
+	if (registry.instanceDamages.has(entity)) {
+		auto& instance = registry.instanceDamages.get(entity);
+		instance.instance = enemy.maxHealth;
+	}
 	return entity;
 };
 

@@ -59,6 +59,11 @@ void EnemySystem::step(float elapsed_ms)
                 else {
                     registry.enemies.get(e).currHealth -= fire.damage * fire.stack;
                 }
+                if (registry.instanceDamages.has(e)) {
+                    InstanceDamage& instance = registry.instanceDamages.get(e);
+                    instance.instance -= fire.stack;
+                    registry.enemies.get(e).currHealth = instance.instance;
+                }
                 fire.stack--;
                 fire.countdown = fire.maxCountdown;
             }
@@ -429,6 +434,11 @@ void EnemySystem::step(float elapsed_ms)
             if (registry.wormBodies.has(entity)) {
                Enemy& head = registry.enemies.get(registry.wormBodies.get(entity).head);
                if (!registry.invincibles.has(registry.wormBodies.get(entity).head)) head.currHealth -= damage;
+            }
+            else if (registry.instanceDamages.has(entity)) {
+                InstanceDamage& instance = registry.instanceDamages.get(entity);
+                instance.instance--;
+                registry.enemies.get(entity).currHealth = instance.instance;
             }
             else {
                 enemyStat.currHealth -= damage;
