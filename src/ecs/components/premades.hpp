@@ -919,12 +919,12 @@ struct TestEffectPlusThree : Enemy
 		enemyPatterns = { idleState };
 		patternIndex = 0;
 		sprite = {
-			"BugAngelFood4.png",
+			"BugAngelFood5.png",
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE,
 			vec2(0)
 		};
-		scale = vec2(456.f, 264.f) * 0.2f;
+		scale = vec2(464.f, 264.f) * 0.2f;
 		rotatePower = 0.f;
 	};
 };
