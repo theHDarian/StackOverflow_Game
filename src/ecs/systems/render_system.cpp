@@ -1429,8 +1429,6 @@ void RenderSystem::drawGameUI()
 		if (!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);
-		} else if (registry.bossParts.has(entity) && registry.bossParts.get(entity).showHpBar) {
-			drawHPbar(entity, projection, view);
 		}
 	}
 

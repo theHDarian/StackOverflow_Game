@@ -2266,7 +2266,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 
 	// to make hp bar drawing easier
-	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.invisibleEnemy.has(entity))) {
+	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.invisibleEnemy.has(entity)) || 
+		(registry.bossParts.has(entity) && registry.bossParts.get(entity).showHpBar)) {
 		HPBarUI& hpbar = registry.hpBarHavers.emplace(entity);
 		if (registry.bosses.has(entity)) {
 			hpbar.followCamera = false;
