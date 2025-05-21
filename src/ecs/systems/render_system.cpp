@@ -1462,6 +1462,7 @@ void RenderSystem::drawGameUI()
 		drawHPbar(entity, projection, view);
 		// draw any statuses below hp bar
 		drawStatuses(entity, projection, view);
+		drawTierIndicator(entity, projection, view);
 	}
 
 	for (Entity &entity : registry.gameUIs.entities)
@@ -1981,9 +1982,7 @@ void RenderSystem::drawCollider(Entity entity, std::string shape, const mat4 &pr
 	drawBasicAnimateTextured();
 }
 
-// pass hp bar as parameter, so that icons "shake" with hp bar
 void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const mat4& view) {
-	WindowState& windowState = registry.windowStates.components[0];
 	Motion motion = registry.motions.get(entity);
 	HPBarUI& hpBar = registry.hpBarHavers.get(entity);
 	Motion statusMotion = Motion();
@@ -1997,6 +1996,32 @@ void RenderSystem::drawStatuses(Entity& entity, const mat4& projection, const ma
 			glUniform1f(alpha_uloc, hpBar.alpha);
 			drawBasicAnimateTextured();
 		}
+	}
+}
+
+// draws additional tier indicators on each enemy
+void RenderSystem::drawTierIndicator(Entity& entity, const mat4& projection, const mat4& view) {
+	HPBarUI& hpBar = registry.hpBarHavers.get(entity);
+	Motion motion = registry.motions.get(entity);
+
+	if (checkTierThreshold(BulletEffectType::BulletRange)) {
+		Motion indicatorMotion = Motion();
+		indicatorMotion.scale = STATUS_ICON_SCALE;
+		indicatorMotion.position = motion.position - vec2(0, motion.scale.y / 2 + 10);
+
+		// copied from enemy system - modularize properly later
+		float dist = glm::length(registry.motions.get(entity).position - registry.motions.get(registry.players.entities[0]).position);
+		int frame = 0;
+		if (dist < 500) {
+			frame = 2;
+		}
+		else if (dist < 1000) {
+			frame = 1;
+		}
+		const GLint program = setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "range_tier_icons", COLOR_WHITE, projection, indicatorMotion, true, frame);
+		GLint alpha_uloc = glGetUniformLocation(program, "alpha");
+		glUniform1f(alpha_uloc, hpBar.alpha);
+		drawBasicAnimateTextured();
 	}
 }
 

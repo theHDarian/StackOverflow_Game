@@ -144,7 +144,7 @@ private:
 	void drawBulletStack(const mat4& projection, const mat4& view);
 	void drawDoorIndicator(Entity& enemy, const mat4& projection, const mat4& view);
 	void drawStatuses(Entity& entity, const mat4& projection, const mat4& view);
-	void drawAStatus(int frame, vec3 color, float boundPosition, Motion& statusMotion, vec2 startingPos, vec2 offset, HPBarUI& hpBar, const mat4& projection);
+	void drawTierIndicator(Entity& entity, const mat4& projection, const mat4& view);
 
 	void resetProgramToggle(GLint program);
 	void drawBasicAnimateTextured();
