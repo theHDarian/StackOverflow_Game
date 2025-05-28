@@ -552,7 +552,7 @@ Reaction *getReactions(std::vector<Reaction> &list, ReactionType target)
 	return nullptr;
 }
 
-void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
+void AISystem::updateState(Enemy &enemy, const EnemyMovement& movement, Entity entity)
 { // append and entity for more info on enemy for now
 	vec2 playerPos = getPlayerPos();
 	vec2 EnemyPos = movement.posA;

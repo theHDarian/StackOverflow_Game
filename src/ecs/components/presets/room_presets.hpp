@@ -2621,8 +2621,9 @@ const RoomPreset HifiRoomLane {
                     {EnemyLaserSniper,{0.8,0.9}},
                     {EnemyHifiCannon,{0.5,0.9}},
                         {EnemyHifiTackShooter, {0.5,0.5}},
-                            {EnemyHifiTackShooter, {0.5,random_float}},
-                            {EnemyHifiTackShooter, {0.5,random_float}},
+                                {EnemyBubbleShield, {0.5,0.5}},
+                        {EnemyHifiTackShooter, {random_float, 0.5f}},
+                        {EnemyHifiTackShooter, {random_float, 0.5f}},
                 },
 
                 {
@@ -2638,11 +2639,13 @@ const RoomPreset HifiRoomLane {
                     {
                         {EnemyLaserSniper,{0.2,0.9}},
                         {EnemyLaserSniper,{0.8,0.9}},
-                        {EnemyHifiCannon,{0.5,0.9}},
+                        {EnemyHifiCannonHard,{0.5,0.9}},
+                                {EnemySmallCShield, {0.5,0.9}},
                             {EnemyLaserSniper,{0.5,0.85}},
                             {EnemyHifiTackShooter, {0.5,0.5}},
-                                {EnemyHifiTackShooter, {0.5,random_float}},
-                                {EnemyHifiTackShooter, {0.5,random_float}},
+                                    {EnemyBubbleShield, {0.5,0.5}},
+                                {EnemyHifiTackShooter, {random_float, 0.5f}},
+                                {EnemyHifiTackShooter, {random_float, 0.5f}},
                             {EnemyHifiChargerHard, random_vec2},
                                     {EnemyHifiChargerHard, random_vec2},
                                     {EnemyHifiChargerHard, random_vec2},
@@ -2665,7 +2668,7 @@ const RoomPreset HifiRoomShieldedMadness{
                     {EnemyHifiWhip, {0.5f, 0.5f}},
                     {EnemyHifiTackShooter, {0.8,0.2}},
                     {EnemyHifiTackShooter, {0.2,0.8}},
-
+                        {EnemyBubbleShield, {0.5,0.5}},
                         { EnemySmallCShield, {0.5f, 0.5f}},
                     {EnemySmallCShield, {0.8,0.2}},
                     { EnemySmallCShield, {0.2,0.8}},
@@ -2754,8 +2757,6 @@ const RoomPreset MedicalEnemyRoomWares{
             {EnemyScissors, {0.5f, 0.2f}},
             {EnemyScissors,{0.2f, 0.8f}},
             {EnemyScissors,{0.8f, 0.2f}},
-                {EnemyBubbleShield, {0.5f, 0.2f}},
-                {EnemyBubbleShield,{0.2f, 0.8f}},
                 {EnemyBubbleShield,{0.8f, 0.2f}},
         },
             {
@@ -2768,6 +2769,7 @@ const RoomPreset MedicalEnemyRoomWares{
             },
         {
             {EnemyMedicalRodA, {0.5f, 0.5f}},
+                {EnemyBubbleShield, {0.5f, 0.5f}},
             {EnemyMedicalRodA,{random_float, random_float}},
             {EnemyMedicalRodA,{random_float, random_float}}
         },
@@ -3688,10 +3690,10 @@ const RoomPreset MiningEnemyRoomMoles2 {
         {
             {
                 {EnemySurfaceMole, {0.5f, 0.5f}},
-            },
-            {
-                        {EnemySmallMole, random_vec2},
-                        {EnemySmallMole, random_vec2},
+                {EnemyMagnet, {0.6f, 0.4f}},
+                    {EnemyBubbleShield, {0.6f, 0.4f}},
+                        {EnemyMagnet, {0.4f, 0.6f}},
+                        {EnemyBubbleShield, {0.4f, 0.6f}},
             },
         },
                 {},
@@ -3795,6 +3797,7 @@ const RoomPreset MiningEnemyRoomLane {
                         {EnemyPileDriverTurret,{0.2,0.1}},
                         {EnemyPileDriverTurret,{0.8,0.1}},
                         {EnemyPileDriverTurret,{0.5,0.1}},
+                            {EnemyBubbleShield,{0.5,0.1}},
                         {EnemySmallMole, random_vec2},
                         {EnemySmallMole, random_vec2},
 
@@ -3806,7 +3809,7 @@ const RoomPreset MiningEnemyRoomLane {
                     20.f,
             10,
             5,
-            "Laneway Excavation",
+            "Down the Mineshaft",
             false,
 {650, 3000}
 };
@@ -3824,6 +3827,7 @@ const RoomPreset MiningEnemyRoomAvenue {
                         {EnemyPileDriverTurret,{0.1,0.2}},
                         {EnemyPileDriverTurret,{0.1,0.8}},
                         {EnemyPileDriverTurret,{0.1,0.5}},
+                            {EnemyBubbleShield,{0.1,0.5}},
                             { EnemySmallBoulder, {0.5, random_float}},
                             { EnemySmallBoulder, {0.5, random_float}},
                             { EnemySmallBoulder, {0.5, random_float}},
@@ -3850,20 +3854,21 @@ const RoomPreset MiningEnemyRoomPileDrivers {
                             {EnemyPileDriverTurret,{0.8,0.8}},
                             {EnemyPileDriverTurret,{0.2,0.8}},
                                 {EnemyPileDriverTurret,{0.2,0.2}},
-                                    {EnemyBigBoulder, random_vec2},
+                                    {EnemyPufferfish, random_vec2},
+                                    {EnemyPufferfish, random_vec2},
                         },
 
                         {
 
                             {EnemyPileDriverTurret,{0.5,0.5}},
-                            {EnemySmallCShield,{0.5,0.5}},
-                                { EnemyBulldozer, random_vec2},
+                            {EnemyBubbleShield,{0.5,0.5}},
                                 { EnemyBulldozer, random_vec2},
                                 { EnemyBulldozer, random_vec2},
                                 {EnemySmallBoulder, random_vec2},
                                 {EnemyBigBoulder, random_vec2},
-                                    { EnemyMagnet, random_vec2},
-                                        { EnemySword, random_vec2},
+                                        {EnemyPufferfish, random_vec2},
+                            {EnemyPufferfish, random_vec2},
+                                        {EnemyPufferfish, random_vec2},
 
                         },
 
@@ -3873,7 +3878,7 @@ const RoomPreset MiningEnemyRoomPileDrivers {
                 16.0f,
                 5,
                 2,
-                "Mineshaft Excavation",
+                "Sump Draining",
                 false,
                 {1500, 1500}
 };
@@ -3885,14 +3890,9 @@ const RoomPreset MiningEnemyRoomPileDriversIntro {
                                 {EnemyPileDriverTurret,{0.8,0.8}},
                                 {EnemyPileDriverTurret,{0.2,0.8}},
                                     {EnemyPileDriverTurret,{0.2,0.2}},
-                                        {EnemyBigBoulder, random_vec2},
                                     {EnemyBigBoulder, random_vec2},
-                                {EnemySmallBoulder, random_vec2},
-                                {EnemySmallBoulder, random_vec2},
-                                {EnemySmallBoulder, random_vec2},
-                                {EnemySmallBoulder, random_vec2},
-                            { EnemySmallMole, random_vec2},
-                                { EnemyMagnet, random_vec2},
+                                    {EnemySkull, {0.5, 0.5}},
+                                { EnemyBubbleShield, {0.5, 0.5}},
                             },
 
 

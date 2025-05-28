@@ -1441,7 +1441,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		case EnemyType::BossBigCShield:
 	{
 		enemy = BigC();
-		registry.bossParts.emplace(entity);
+		auto& bp = registry.bossParts.emplace(entity);
+		bp.showHpBar = false;
 		break;
 	}
 		case EnemyType::EnemySmallCShield: {
@@ -1455,7 +1456,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	case EnemyType::BossBeehiveGun:
 	{
 		enemy = BeehiveGun();
-		registry.bossParts.emplace(entity);
+		auto& bp = registry.bossParts.emplace(entity);
+		bp.showHpBar = false;
 		break;
 	}
 	case EnemyType::EnemyMagnet:
@@ -2258,7 +2260,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	//HP and damage scaling
 	Map& map = registry.maps.components[0];
 	int dmgScale = registry.elites.has(entity) ? (int) map.currRegion - 1 + registry.elites.get(entity).eliteLevel : (int) map.currRegion - 1;
-	enemy.maxHealth = enemy.maxHealth * pow(1.25, (max(dmgScale , 0)));
+	enemy.maxHealth = enemy.maxHealth * pow(1.2, (max(dmgScale , 0)));
 	enemy.currHealth = enemy.maxHealth;
 	if (registry.instanceDamages.has(entity)) {
 		auto& instance = registry.instanceDamages.get(entity);
@@ -2266,8 +2268,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	}
 
 	// to make hp bar drawing easier
-	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.invisibleEnemy.has(entity)) || 
-		(registry.bossParts.has(entity) && registry.bossParts.get(entity).showHpBar)) {
+	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.invisibleEnemy.has(entity)) && (!registry.bossParts.has(entity) || !registry.bossParts.get(entity).showHpBar) && !registry.enemyParts.has(entity)) {
 		HPBarUI& hpbar = registry.hpBarHavers.emplace(entity);
 		if (registry.bosses.has(entity)) {
 			hpbar.followCamera = false;

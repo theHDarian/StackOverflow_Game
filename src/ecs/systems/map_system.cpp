@@ -44,7 +44,7 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     soundPlayer->playNextMusic();
 }
 
-void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity& bossEnemy, RenderSystem *renderer, bool isElite = false)
+void SpawnEnemiesInList(const std::vector<std::tuple<EnemyType,vec2>> &enemies, Entity& bossEnemy, RenderSystem *renderer, bool isElite = false)
 {
     Map& map = registry.maps.components[0];
     for (auto &e : enemies)
@@ -82,7 +82,7 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
     }
 }
 
-void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, RenderSystem *renderer)
+void SpawnEnemiesInList(const std::vector<std::tuple<EnemyType,vec2>> &enemies, RenderSystem *renderer)
 {
     Entity bossEnemy;
     SpawnEnemiesInList( enemies, bossEnemy, renderer);
@@ -583,7 +583,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req.type = SoundType::BossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp,accuracyUp,accuracyUp,};
+            req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp,dmgUp, dmgUp,  bulletBurstUp,bulletBurstUp,bulletBurstUp,};
         }
         auto& nextRoom = map.currRoom.preset;
         switch (map.currRegion) {

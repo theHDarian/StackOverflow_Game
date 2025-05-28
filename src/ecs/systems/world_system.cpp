@@ -748,8 +748,8 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		pl.currBulletBurst--;
 		pl.bulletBurstCooldown = min(
 			50.0f,
-			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst)
+			getModifiedValue(FireRate, pl.maxFiringInterval) / (getModifiedValue(
+				BulletBurst, pl.maxBulletBurst) * 2)
 		);
 		// create bullet
 
@@ -765,8 +765,9 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
 				soundPlayer->playPlayerShootSound(max(250.0f, min(
 					50.0f,
-					((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-						BulletBurst, pl.maxBulletBurst))));
+					getModifiedValue(FireRate, pl.maxFiringInterval) / (getModifiedValue(
+				BulletBurst, pl.maxBulletBurst) * 2))
+		));
 			}
 		} else {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
@@ -781,8 +782,9 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
 				soundPlayer->playPlayerShootSound(max(250.0f, min(
 					50.0f,
-					((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-						BulletBurst, pl.maxBulletBurst))));
+					getModifiedValue(FireRate, pl.maxFiringInterval) / (getModifiedValue(
+				BulletBurst, pl.maxBulletBurst) * 2))
+		));
 			}
 		}
 	}

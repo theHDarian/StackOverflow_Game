@@ -1415,18 +1415,11 @@ void RenderSystem::drawGameUI()
 	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
-	// draw an indicator for the first boid
-	//if (registry.boids.entities.size() > 0) {
-	for (Entity& entity : registry.boids.entities)
-	{
-		drawEnemyIndicator(entity, projection, view);
-	}
-
 	for (Entity &entity : registry.enemies.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
+		if (!registry.wormBodies.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity) && !registry.enemyParts.has(entity)) {
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);
 		}

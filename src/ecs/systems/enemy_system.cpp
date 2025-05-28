@@ -552,7 +552,7 @@ void EnemySystem::step(float elapsed_ms)
     }
 }
 
-void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData)
+void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, const AttackData &atkData)
 {
     float angle = atan2(velocity.y, velocity.x);
     if (atkData.numBullets % 2 == 0)
@@ -578,7 +578,7 @@ void EnemySystem::shootShotgun(vec2 velocity, vec2 pos, AttackData atkData)
     }
 }
 
-void EnemySystem::shootAllDirection(vec2 pos, float offset, AttackData atkData)
+void EnemySystem::shootAllDirection(vec2 pos, float offset, const AttackData &atkData)
 {
     for (uint i = 0; i < atkData.numBullets; i++)
     {
@@ -587,7 +587,7 @@ void EnemySystem::shootAllDirection(vec2 pos, float offset, AttackData atkData)
     }
 }
 
-void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData)
+void EnemySystem::shootRadialPolygon(vec2 pos, const AttackData &atkData)
 {
     AttackData atkData2 = atkData;
     atkData2.speed = atkData.speed * sin(M_PI / atkData.numBullets + M_PI / 2.0f);
@@ -600,7 +600,7 @@ void EnemySystem::shootRadialPolygon(vec2 pos, AttackData atkData)
     }
 }
 
-void EnemySystem::shootBurst(vec2 velocity, vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
+void EnemySystem::shootBurst(vec2 velocity, vec2 pos, const AttackData &atkData, float elapsed_ms, Burst &burst)
 {
     int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1
                                                                                                               : 2;
@@ -664,7 +664,7 @@ void EnemySystem::createAOEIndicator(vec2 pos, float radius, SpecialStates buff,
     fade.max = timer;
 }
 
-void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
+void EnemySystem::grantBuff (Entity entity, const EnemyPattern &pattern)
 {
     Buffer &buffer = registry.buffers.get(entity);
     EnemyBehavior behavior = pattern.type;
@@ -885,7 +885,7 @@ void EnemySystem::grantBuff (Entity entity, EnemyPattern &pattern)
 
 }
 
-void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
+void EnemySystem::shootWave(vec2 pos, const AttackData &atkData, float elapsed_ms, Burst &burst)
 {
     int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1
                                                                                                               : 2;
@@ -910,7 +910,7 @@ void EnemySystem::shootWave(vec2 pos, AttackData atkData, float elapsed_ms, Burs
     burst.burstCooldown = 200;
 }
 
-void EnemySystem::shootOneWall(AttackData atkData, float angle, float elapsed_ms)
+void EnemySystem::shootOneWall(const AttackData &atkData, float angle, float elapsed_ms)
 {
     Map& map = registry.maps.components[0];
     vec2 roomStartPos = map.currRoom.roomStart;
@@ -942,7 +942,7 @@ void EnemySystem::shootOneWall(AttackData atkData, float angle, float elapsed_ms
     }
 }
 
-void EnemySystem::shootTwoWall(AttackData atkData, float angle, float elapsed_ms)
+void EnemySystem::shootTwoWall(const AttackData &atkData, float angle, float elapsed_ms)
 {
     Map& map = registry.maps.components[0];
     vec2 roomStartPos = map.currRoom.roomStart;
@@ -979,7 +979,7 @@ void EnemySystem::shootTwoWall(AttackData atkData, float angle, float elapsed_ms
     }
 }
 
-void EnemySystem::shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_ms, Burst &burst)
+void EnemySystem::shootRadialBurst(vec2 pos, const AttackData &atkData, float elapsed_ms, Burst &burst)
 {
     // std::cout << burst.curBurst << std::endl;
     if ((burst.curBurst <= 0) || (burst.burstCooldown -= elapsed_ms) > 0)
@@ -995,7 +995,7 @@ void EnemySystem::shootRadialBurst(vec2 pos, AttackData atkData, float elapsed_m
     burst.burstCooldown = atkData.veer.y;
 }
 
-void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, bool shouldPlayFiringSound)
+void EnemySystem::shootLaser(vec2 pos, Entity enemy, const AttackData &atkData, bool shouldPlayFiringSound)
 {
     for (uint i = 0; i < atkData.numBullets; i++)
     {
@@ -1017,7 +1017,7 @@ void EnemySystem::shootLaser(vec2 pos, Entity enemy, AttackData atkData, bool sh
         sound->playLaserSound(atkData.bulletRange, shouldPlayFiringSound, enemy);
     }
 }
-void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
+void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, const AttackData &atkData)
 {
     // shoot towards the twin
     Entity other = registry.enemyGroups.get(enemy).others[0];
@@ -1028,7 +1028,7 @@ void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, AttackData atkData)
     Entity e = createEnemyLaser(render, pos, angle, enemy, atkData);
 }
 
-void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, AttackData atkData, float elapsed_ms)
+void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, const AttackData &atkData, float elapsed_ms)
 {
     int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
 
