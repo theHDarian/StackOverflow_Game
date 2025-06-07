@@ -451,7 +451,7 @@ void SoundSystem::loadSoundEffects()
         fprintf(stderr, "Failed to load digging sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load digging sound");
     }
-    diggingSound->volume = 0.8f * MIX_MAX_VOLUME;
+    diggingSound->volume = 0.5f * MIX_MAX_VOLUME;
 
     for (int i = 0; i < 5; i++)
     {
