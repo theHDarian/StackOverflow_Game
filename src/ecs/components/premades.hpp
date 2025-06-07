@@ -4186,22 +4186,29 @@ struct PileDriverTurret : Enemy
 		-100,
 		0
 	};
+	Reaction Duration = {
+		ReactionType::DURATION,
+		0,  SpecialStates::INC_ANIM};
 
-	EnemyPattern shootingState = { "Shooting", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {}, 0, true, 0.f, 1000.f, pileDrive };
+	EnemyPattern coolDown = { "COOLDOWN", EnemyBehavior::IDLE, {}, 0, 500.f, 500.f, {Duration}, 1, false, 0.f, 5000.f, NoAttack, };
+	EnemyPattern shootingState = { "Shooting", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {Duration}, 0, true, 0.f, 1500.f, pileDrive };
 
-	PileDriverTurret()
-	{
-		maxHealth = 200;
+	PileDriverTurret() {
+		maxHealth = 100;
 		currHealth = maxHealth;
 
-		enemyPatterns = { shootingState };
+		enemyPatterns = { coolDown, shootingState };
 
 		patternIndex = 0;
 		sprite = {
-			"SwivelPiledriver.png",
-			EFFECT_ASSET_ID::TEXTURED,
+			"pile_driver",
+			EFFECT_ASSET_ID::ANIMATE,
 			GEOMETRY_BUFFER_ID::SPRITE,
-			vec2(0, 0) };
+			vec2(0, 0),
+			NONE,
+			2,
+
+		};
 		scale = vec2({ 168.f, 96.f });
 		rotatePower = 1.0;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
