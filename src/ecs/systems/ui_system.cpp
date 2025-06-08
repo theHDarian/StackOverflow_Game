@@ -1217,6 +1217,11 @@ void UISystem::updateTierUI(vec2 position, BulletEffectType tier) {
 		variables.push_back(val);
 		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
 	}
+	if (tier == BulletEffectType::PlayerNumDash) {
+		val = std::to_string(50 * (1 + getEffectValueTierThresholdDifference(PlayerNumDash)));
+		variables.push_back(val);
+		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
+	}
 	bindScriptVariables(textReq, variables, variableDecos);
 
 	// get formatted text based on bounds

@@ -90,7 +90,7 @@ struct StackCompile {
     float pierceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
     float homingFunc(int x)             { return clamp(0.f, (float)x / 20.f, 1.f); };
     float playerSpeedFunc(int x)        { return clamp(-150.f, (float)x * 20.f, 300.f); };
-    float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 20.f); };
+    float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 5.f); };
     float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 2.f, 64.f); };
     float playerDashCDRFunc(int x)      { return clamp(-1500.f, (x > 0) ? (float)x * -150.f : (float)x * -200.f, 8000.f); };
 
@@ -150,7 +150,7 @@ struct StackCompile {
         {Pierce,            5},     // Deal more dmg to protected enemies, and vulnerable effect stronger
         {Homing,            5},
         {PlayerSpeed,       5},
-        {PlayerNumDash,     5},
+        {PlayerNumDash,     5},     // Clears non-special enemy bullets at end of dash, 50px * (1 + value-threshold) radius
         {PlayerStackSize,   5},
         {PlayerDashRecharge,5}      // 50% Chance to dodge inert effect from bullets or enemies
     };

@@ -679,6 +679,17 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 		if (dash.endTimer <= 0) {
 			registry.dashes.remove(player);
 			playerMotion.velocity = {0,0};
+			if (checkTierThreshold(PlayerNumDash)) {
+				// TODO Play bullet clear sound
+				// TODO clear bullets particles
+				float clearRadius = (getEffectValueTierThresholdDifference(PlayerNumDash) + 1) * 50.f;
+				for (auto e : registry.enemyBullets.entities) {
+					Motion m = registry.motions.get(e);
+					if (glm::length2(m.position - playerMotion.position) < clearRadius * clearRadius && !registry.enemyBullets.get(e).isSpecial && !registry.deleteds.has(e)) {
+						registry.deleteds.emplace(e);
+					}
+				}
+			}
 		} else {
 			// Tick IFrame timer
 			if (!registry.invincibles.has(player)) {

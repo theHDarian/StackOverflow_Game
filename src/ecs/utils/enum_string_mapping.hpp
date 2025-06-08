@@ -73,7 +73,7 @@ const std::map<BulletEffectType, std::string> tierNames = {
     {Pierce,            "To Pierce Through All Defences"},     // Deal more dmg to protected enemies, and vulnerable effect stronger
     {Homing,            "Homing"},
     {PlayerSpeed,       "PlayerSpeed"},
-    {PlayerNumDash,     "PlayerNumDash"},
+    {PlayerNumDash,     "Clear The Path"},
     {PlayerStackSize,   "PlayerStackSize"},
     {PlayerDashRecharge,"Outrun Inert(ia)"}      // 50% Chance to dodge inert effect from bullets or enemies
 };

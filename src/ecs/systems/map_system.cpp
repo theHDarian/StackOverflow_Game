@@ -556,6 +556,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         }
         else if (roomType == RoomType::Testing) {
             map.currRoom.preset = TestRoom;
+            InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
+            req2.type = InteractableRequestType::AddEffect;
+            req2.effects = { dashUp, dashUp, dashUp, dashUp, dashUp };
         }
         else {
             if (map.currRegion == Biology) {
