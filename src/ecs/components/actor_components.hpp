@@ -18,7 +18,6 @@ enum BulletEffectType {
     BulletRange,
     BulletAccuracy,
     BulletNum, // Number of bullets fired in a single shot
-    BulletBurst, // Number of bullets fired in a burst
     Bounce,
     Pierce,
     Homing,
@@ -81,14 +80,13 @@ struct StackCompile {
     float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
     float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f); };
     float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
-    float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? -500.f + 1000.f / ((float)x + 2.f) : -50.f * (float)x, 1000.f); };
+    float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? ((x < tierThresholds[FireRate]) ? -500.f + 1000.f / ((float)x + 2.f) : -300.f + 1000.f / ((float)x + 2.f)) : -50.f * (float)x, 1000.f); };
     float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
     float bulletSpreadFunc(int x)       { return clamp(-15.f, (x > 0) ? -2.f * (float)x : -20.f * (float)x, 330.f); };
     float bulletNumFunc(int x)          { return clamp(0.f, (float)x, 50.f); };
-    float bulletBurstFunc(int x)        { return clamp(0.f, (float)x, 50.f); };
     float bounceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
     float pierceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
-    float homingFunc(int x)             { return clamp(0.f, (float)x / 20.f, 1.f); };
+    float homingFunc(int x)             { return clamp(0.f, (float)x / 40.f, 1.f); };
     float playerSpeedFunc(int x)        { return clamp(-150.f, (float)x * 20.f, 300.f); };
     float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 5.f); };
     float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 2.f, 64.f); };
@@ -102,7 +100,6 @@ struct StackCompile {
         {BulletRange,       &StackCompile::bulletRangeFunc},
         {BulletAccuracy,    &StackCompile::bulletSpreadFunc},
         {BulletNum,         &StackCompile::bulletNumFunc},
-        {BulletBurst,       &StackCompile::bulletBurstFunc},
         {Bounce,            &StackCompile::bounceFunc},
         {Pierce,            &StackCompile::pierceFunc},
         {Homing,            &StackCompile::homingFunc},
@@ -127,7 +124,6 @@ struct StackCompile {
         {BulletRange,       0},
         {BulletAccuracy,    0},
         {BulletNum,         0},
-        {BulletBurst,       0},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -145,10 +141,9 @@ struct StackCompile {
         {BulletRange,       5},     // Deal more damage the further away from the player the enemy is (up to 2x)
         {BulletAccuracy,    5},     // Inflict vulnerable for 4000
         {BulletNum,         5},     // Fires 4 * (1 + value-threshold) mini bullets
-        {BulletBurst,       5},
         {Bounce,            5},     // Bouncing towards random enemy
         {Pierce,            5},     // Deal more dmg to protected enemies, and vulnerable effect stronger
-        {Homing,            5},
+        {Homing,            3},     // Causes all enemy bullets to get subtle homing (negative >:)
         {PlayerSpeed,       5},
         {PlayerNumDash,     5},     // Clears non-special enemy bullets at end of dash, 50px * (1 + value-threshold) radius
         {PlayerStackSize,   5},

@@ -754,7 +754,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	//}
 
 	if (pl.currFiringInterval <= 0) {
-		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
+		pl.currBulletBurst = pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate));
 		pl.currFiringInterval = getModifiedValue(FireRate, pl.maxFiringInterval);
 	}
 
@@ -763,8 +763,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		pl.currBulletBurst--;
 		pl.bulletBurstCooldown = min(
 			50.0f,
-			getModifiedValue(FireRate, pl.maxFiringInterval) / (getModifiedValue(
-				BulletBurst, pl.maxBulletBurst) * 2)
+			getModifiedValue(FireRate, pl.maxFiringInterval) / ((pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))) * 2)
 		);
 		// create bullet
 
@@ -780,16 +779,14 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
 				soundPlayer->playPlayerShootSound(max(250.0f, min(
 					50.0f,
-					getModifiedValue(FireRate, pl.maxFiringInterval) / (getModifiedValue(
-				BulletBurst, pl.maxBulletBurst) * 2))
+					getModifiedValue(FireRate, pl.maxFiringInterval) / ((pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))) * 2))
 		));
 			}
 		} else {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
 			soundPlayer->playPlayerShootSound(max(250.0f, min(
 				50.0f,
-				((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-					BulletBurst, pl.maxBulletBurst))));
+				((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / (pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))))));
 			for (int i = 0; i < (cluster - 1) / 2; i++) {
 				float a1 = angle + (i + 1) * angleOffset;
 				float a2 = angle - (i + 1) * angleOffset;
@@ -797,8 +794,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
 				soundPlayer->playPlayerShootSound(max(250.0f, min(
 					50.0f,
-					getModifiedValue(FireRate, pl.maxFiringInterval) / (getModifiedValue(
-				BulletBurst, pl.maxBulletBurst) * 2))
+					getModifiedValue(FireRate, pl.maxFiringInterval) / ((pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))) * 2))
 		));
 			}
 		}

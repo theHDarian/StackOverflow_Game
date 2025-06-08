@@ -2579,6 +2579,11 @@ Entity createEnemyBullet(RenderSystem *renderer, vec2 pos, vec2 velocity, vec2 v
 		homing.homingIntensity = atkData.homing;
 		homing.target = registry.players.entities[0];
 	}
+	else if (checkTierThreshold(Homing)) {
+		HomingBullet& homing = registry.homes.emplace(entity);
+		homing.homingIntensity = 0.02;
+		homing.target = registry.players.entities[0];
+	}
 
 	// Invisible &inv = registry.invisibles.emplace(entity);
 	//// inv.countdown = (75.0f / (bullet.bulletSpeed)) * 1000.0f;

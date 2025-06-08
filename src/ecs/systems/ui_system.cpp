@@ -1218,7 +1218,12 @@ void UISystem::updateTierUI(vec2 position, BulletEffectType tier) {
 		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
 	}
 	if (tier == BulletEffectType::PlayerNumDash) {
-		val = std::to_string(50 * (1 + getEffectValueTierThresholdDifference(PlayerNumDash)));
+		val = std::to_string(50 * (1 + getEffectValueTierThresholdDifference(PlayerNumDash))) + "px";
+		variables.push_back(val);
+		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
+	}
+	if (tier == BulletEffectType::FireRate) {
+		val = std::to_string((2 + getEffectValueTierThresholdDifference(FireRate)));
 		variables.push_back(val);
 		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
 	}
@@ -2213,9 +2218,6 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			break;
 		case BulletNum:
 			effect = "the number of bullets shot at once.";
-			break;
-		case BulletBurst:
-			effect = "the number of bullets shot in quick succession.";
 			break;
 		case Bounce:
 			effect = "the number of times bullets bounce.";

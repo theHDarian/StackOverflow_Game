@@ -134,18 +134,6 @@ const BulletStackEffect bulletRangeDown = {
 	"Range Down",
 	""};
 
-const BulletStackEffect bulletBurstUp = {
-	BulletBurst,
-	1,
-	"Burst Up",
-	""};
-
-const BulletStackEffect bulletBurstDown = {
-	BulletBurst,
-	-1,
-	"Burst Down",
-	""};
-
 const BulletStackEffect bulletPierceUp = {
 	Pierce,
 	1,
@@ -269,8 +257,6 @@ const std::vector<BulletStackEffect> premadeBullets = {
 	bulletSpeedDown,
 	bulletRangeUp,
 	bulletRangeDown,
-	bulletBurstUp,
-	bulletBurstDown,
 	bulletPierceUp,
 	bulletBounceUp,
 	bulletBounceDown,

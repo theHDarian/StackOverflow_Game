@@ -11,7 +11,6 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = 
     {BulletRange, "BulletRange"},
     {BulletAccuracy, "BulletAccuracy"},
     {BulletNum, "BulletNum"},
-    {BulletBurst, "BulletBurst"},
     {Bounce, "Bounce"},
     {Pierce, "Pierce"},
     {Homing, "Homing"},
@@ -30,7 +29,6 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectDescriptions
     {BulletRange, "bullet range"},
     {BulletAccuracy, "spread"},
     {BulletNum, "number of bullets (at once)"},
-    {BulletBurst, "number of bullets (in succession)"},
     {Bounce, "bounce"},
     {Pierce, "pierce"},
     {Homing, "homing effect"},
@@ -49,7 +47,6 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectUnits = {
     {BulletRange, "px"},
     {BulletAccuracy, "px"},
     {BulletNum, ""},
-    {BulletBurst, ""},
     {Bounce, ""},
     {Pierce, ""},
     {Homing, "homing effect"}, //???
@@ -64,14 +61,13 @@ const std::map<BulletEffectType, std::string> tierNames = {
     {BulletDamage,      "Burning Bullets"},
     {ProjectileSpeed,   "ProjectileSpeed"},
     {ProjectileSize,    "Splitting Bullets"},     // Bullet explodes into smaller bullets on deletion
-    {FireRate,          "FireRate"},
+    {FireRate,          "Burst Fire"},             // Activates burst-fire mode, +1 per firerate about threshold
     {BulletRange,       "Sniper's Prowess"},     // Deal more damage the further away from the player the enemy is (up to 2x)
     {BulletAccuracy,    "Critical Weakness"},     // Inflict vulnerable for 4000
     {BulletNum,         "Many Mini Menaces"},     // Fires 4 * (1 + value-threshold) mini bullets
-    {BulletBurst,       "BulletBurst"},
     {Bounce,            "Heat-seeking Bounces"},     // Bouncing towards random enemy
     {Pierce,            "To Pierce Through All Defences"},     // Deal more dmg to protected enemies, and vulnerable effect stronger
-    {Homing,            "Homing"},
+    {Homing,            "Greed"},
     {PlayerSpeed,       "PlayerSpeed"},
     {PlayerNumDash,     "Clear The Path"},
     {PlayerStackSize,   "PlayerStackSize"},

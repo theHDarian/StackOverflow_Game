@@ -67,4 +67,11 @@ UI Tier_PlayerNumDash
 Clears negative bullets at the end of dashes, with a radius of <color=green>50</color> per additional <color=green>Dash</color>
 \n\nCurrent clear radius: {0} 
 
+UI Tier_Homing
+Was it worth it?
+
+UI Tier_FireRate
+Burst fires bullets, increasing with additional <color=orange>Fire Rate </color>
+\n\nBullets per burst: {0} 
+
 

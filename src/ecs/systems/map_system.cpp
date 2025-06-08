@@ -558,7 +558,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             map.currRoom.preset = TestRoom;
             InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = { dashUp, dashUp, dashUp, dashUp, dashUp };
+            req2.effects = { fireRateUp, fireRateUp, fireRateUp, fireRateUp, fireRateUp };
         }
         else {
             if (map.currRegion == Biology) {
@@ -586,7 +586,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req.type = SoundType::BossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp,dmgUp, dmgUp,  bulletBurstUp,bulletBurstUp,bulletBurstUp,};
+            req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp,dmgUp, dmgUp};
         }
         auto& nextRoom = map.currRoom.preset;
         switch (map.currRegion) {
