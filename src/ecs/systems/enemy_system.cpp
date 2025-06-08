@@ -478,10 +478,11 @@ void EnemySystem::step(float elapsed_ms)
             }
 
             // Inflict burning or build burning stack if damage tier
-            if (checkTierThreshold(BulletDamage) && (rand() % 100) < (getEffectValueTierThresholdDifference(BulletDamage) + 1) * 15) {
+            if (checkTierThreshold(BulletDamage)) {
+                int chance = (getEffectValueTierThresholdDifference(BulletDamage) + 1) * 15;
+                int stacks = ((chance - (chance % 100)) / 100) + ((rand() % 100) < (chance % 100));
                 if (!registry.onFires.has(entity)) registry.onFires.emplace(entity);
-                Burning& fire = registry.onFires.get(entity);
-                fire.stack++;
+                if (stacks > 0) registry.onFires.get(entity).stack += stacks;
             }
         }
     }
