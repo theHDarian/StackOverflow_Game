@@ -11,6 +11,7 @@
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/spline.hpp>
+#include <glm/gtx/norm.hpp>
 
 // returns a vec4(min position, max position)
 vec4 getRoomBounds(Entity entity)
@@ -1127,7 +1128,7 @@ vec2 AISystem::getCharginPos(Entity entity)
 	vec2 scale = motion.scale;
 	vec2 direction = playerPos - motion.position;
 
-	if (glm::length(direction) > 0)
+	if (glm::length2(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
@@ -1153,7 +1154,7 @@ vec2 AISystem::getRecoilPos(Entity entity)
 	vec2 scale = motion.scale;
 	vec2 direction = motion.position - playerPos;
 
-	if (glm::length(direction) > 0)
+	if (glm::length2(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
@@ -1202,7 +1203,7 @@ vec2 AISystem::getTeamPos(Entity entity)
 			Motion &healerMotion = registry.motions.get(entity);
 
 			vec2 direction = teammateMotion.position - healerMotion.position;
-			if (glm::length(direction) > 0)
+			if (glm::length2(direction) > 0)
 			{
 				direction = glm::normalize(direction);
 			}
@@ -1228,7 +1229,7 @@ vec2 AISystem::getTeamPos(Entity entity)
 			Motion &bufferMotion = registry.motions.get(entity);
 
 			vec2 direction = teammateMotion.position - bufferMotion.position;
-			if (glm::length(direction) > 0)
+			if (glm::length2(direction) > 0)
 			{
 				direction = glm::normalize(direction);
 			}
@@ -1268,7 +1269,7 @@ vec2 AISystem::getRollingPos(Entity entity)
 	vec2 min = { roomBounds.x, roomBounds.y };
 	vec2 max = { roomBounds.z, roomBounds.w };
 
-	vec2 direction = glm::normalize(movement.posB - movement.posA);
+	vec2 direction = movement.posB - movement.posA;
 	float distance = glm::length(max - min);
 
 	// Wall collisions and bouncing
@@ -1291,9 +1292,9 @@ vec2 AISystem::getRollingPos(Entity entity)
 		vec2 intersection = vec2((norm.x < 0.0) ? max.x : (norm.x == 0.0) ? enemyMotion.position.x : min.x, 
 							     (norm.y < 0.0) ? max.y : (norm.y == 0.0) ? enemyMotion.position.y : min.y);
 
-		std::cout << glm::to_string(movement.posB) << " : " << glm::to_string(min) << " : " << glm::to_string(max) << std::endl;
-		std::cout << glm::to_string(intersection) << " : " << glm::to_string(norm) << " : " << glm::to_string(direction) << " : " << glm::to_string(glm::reflect(direction, norm)) << std::endl;
-		std::cout << glm::to_string(enemyMotion.position) << ", " << glm::to_string(intersection + newDirection * distance) << std::endl;
+		//std::cout << glm::to_string(movement.posB) << " : " << glm::to_string(min) << " : " << glm::to_string(max) << std::endl;
+		//std::cout << glm::to_string(intersection) << " : " << glm::to_string(norm) << " : " << glm::to_string(direction) << " : " << glm::to_string(glm::reflect(direction, norm)) << std::endl;
+		//std::cout << glm::to_string(enemyMotion.position) << ", " << glm::to_string(intersection + newDirection * distance) << std::endl;
 
 		movement.posA = intersection;
 		return intersection + newDirection * distance;
@@ -1371,7 +1372,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	{
 		boidComputeCoherence(entity, boid, 1.f, 400.f);
 		boid.velocity *= 0.8f;
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1382,7 +1383,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		boidComputeSeperation(entity, boid, 1.f);
 		boid.velocity *= 2.f;
 		maxSpeed = 700.f;
-		if (glm::length(boid.velocity) > maxSpeed)
+		if (glm::length2(boid.velocity) > maxSpeed * maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1396,7 +1397,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		// boidComputeCoherence(entity, boid, 0.01f);
 		boidComputeSeperation(entity, boid, 0.2f);
 		// boidComputeAlignment(entity, boid, 0.02f);
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1410,7 +1411,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		// boidComputeAlignment(entity, boid, 0.01f);
 		boidComputeAllFactor(entity, boid, 0.01f, 0.5f, 0.01f, 700.f);
 
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1424,7 +1425,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		// boidComputeSeperation(entity, boid, 0.05f);
 		// boidComputeAlignment(entity, boid, 0.02f);
 		boidComputeAllFactor(entity, boid, 0.02f, 0.05f, 0.02f, 700.f);
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1598,8 +1599,8 @@ void AISystem::boidFollowPlayer(Entity entity, Boid &boid, float multiplier)
 	vec2 playerPos = getPlayerPos();
 	vec2 position = boid.position;
 
-	vec2 directionToPlayer = playerPos - position;
-	float distanceToPlayer = glm::length(directionToPlayer);
+	//vec2 directionToPlayer = playerPos - position;
+	//float distanceToPlayer = glm::length(directionToPlayer);
 
 	vec2 center = (boid.position + playerPos) * 0.5f;
 	vec2 cohesionToPlayer = (center - position) * multiplier;
@@ -1614,9 +1615,9 @@ void AISystem::boidEvadePlayer(Entity entity, Boid &boid, float multiplier)
 	float evadeRadius = 150.f;
 
 	vec2 directionToPlayer = playerPos - position;
-	float distanceToPlayer = glm::length(directionToPlayer);
+	float distanceToPlayer = glm::length2(directionToPlayer);
 
-	if (distanceToPlayer < evadeRadius)
+	if (distanceToPlayer < evadeRadius * evadeRadius)
 	{
 		vec2 fleeDirection = -glm::normalize(directionToPlayer);
 
@@ -1625,13 +1626,13 @@ void AISystem::boidEvadePlayer(Entity entity, Boid &boid, float multiplier)
 		boid.velocity += fleeVelocity;
 
 		float panicBoost = 2.5f;
-		if (glm::length(boid.velocity) < panicBoost * multiplier)
+		if (glm::length2(boid.velocity) < panicBoost * multiplier * panicBoost * multiplier)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * panicBoost * multiplier;
 		}
 
 		float maxSpeed = 400.f;
-		if (glm::length(boid.velocity) > maxSpeed)
+		if (glm::length2(boid.velocity) > maxSpeed * maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * maxSpeed;
 		}

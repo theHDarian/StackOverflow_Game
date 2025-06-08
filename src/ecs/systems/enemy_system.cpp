@@ -19,6 +19,7 @@
 #include "actor_components.hpp"
 #include "components/presets/particle_presets.hpp"
 #include "utils/random.hpp"
+#include <glm/gtx/norm.hpp>
 
 std::mutex beeMutex;
 
@@ -188,7 +189,7 @@ void EnemySystem::step(float elapsed_ms)
             boid.position += boid.velocity * (elapsed_ms / 1000.f);
             motion.position += boid.velocity * (elapsed_ms / 1000.f);
 
-            if (glm::length(boid.velocity) > 0.0f)
+            if (glm::length2(boid.velocity) > 0.0f)
             {
                 motion.angle = atan2(boid.velocity.y, boid.velocity.x);
             }

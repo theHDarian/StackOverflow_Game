@@ -21,6 +21,7 @@
 #include "utils/random.hpp"
 #include "utils/vector_operations.hpp"
 #include <chrono>
+#include <glm/gtx/norm.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -476,15 +477,18 @@ void WorldSystem::handleCollisions() {
 				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 				vec2 d = a - c;
 				// Player center projects onto the wall;
-				if (abs(glm::length(c) + glm::length(b - c) - glm::length(b)) < 0.01) {
+				float cross = c.x * b.y - c.y * b.x;
+				float dot = c.x * b.x + c.y * b.y;
+				float b_len2 = b.x * b.x + b.y * b.y;
+				if (cross * cross < 0.01 * b_len2 && dot >= 0.0f && dot <= b_len2) {
 					motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
 				}
 				// Player circle collides with startPosition
-				else if (glm::length(a) < circle.radius) {
+				else if (glm::length2(a) < circle.radius * circle.radius) {
 					motion.position = (wall.startPosition + glm::normalize(a) * (circle.radius));
 				}
 				// Player circle collides with endPosition
-				else if (glm::length(motion.position - wall.endPosition) < circle.radius) {
+				else if (glm::length2(motion.position - wall.endPosition) < circle.radius * circle.radius) {
 					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
 				}
 			}
@@ -805,7 +809,7 @@ void WorldSystem::movePlayer() {
 	vec2 inputAxis = input.inputAxis;
 	Motion& player_motion = registry.motions.get(player);
 	RenderRequest& rr = registry.renderRequests.get(player);
-	if (glm::length(inputAxis) <= 0.0f) {
+	if (glm::length2(inputAxis) <= 0.0f) {
 		if (!registry.spriteTimers.has(player) && !registry.animationSequences.has(player)) {
 			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::BASE];
