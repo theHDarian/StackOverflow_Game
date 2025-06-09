@@ -1263,6 +1263,7 @@ void EnemySystem::destruct(Enemy &enemy)
 void EnemySystem::fetchRoomEffects(Entity entity, AttackData& atkData)
 {
     // TEMP FIX: return immediately if game is resetting
+    // TODO: the following problem then seems to arise: bullets getting empty effects b/c returned nothing!
     if (registry.ioStates.components[0].shouldRestart || registry.gameStates.components[0].resetRoom)
         return;
     
