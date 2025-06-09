@@ -1342,7 +1342,7 @@ const RoomPreset TreasureRoom5{
 const RoomPreset TreasureRoom6 {
     {},
     {},
-    {{{PushConsole,{bulletSpeedUp}}, {0.5f, 0.5f}}},
+    {{{PushConsole,{bulletRangeUp}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
@@ -1413,7 +1413,7 @@ const RoomPreset TreasureRoomBlunt{
 const RoomPreset TreasureRoomChoice1{
         {},
         {},
-        {{{FightConsole,{dmgUp}}, {0.4f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp}}, {0.6f, 0.5f}}},
+        {{{FightConsole,{dmgUp}}, {0.4f, 0.5f}}, {{FightConsole,{bulletRangeUp, bulletRangeUp}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1473,7 +1473,7 @@ const RoomPreset TreasureRoomChoice5{
 const RoomPreset TreasureRoomChoice6{
         {},
         {},
-        {{{FightConsole,{playerSpeedUp, playerSpeedUp, }}, {0.4f, 0.5f}}, {{FightConsole,{bulletSpeedUp, bulletSpeedUp,}}, {0.6f, 0.5f}}},
+        {{{FightConsole,{playerSpeedUp, playerSpeedUp, }}, {0.4f, 0.5f}}, {{FightConsole,{bulletRangeUp, bulletRangeUp,}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1485,7 +1485,7 @@ const RoomPreset TreasureRoomChoice6{
 const RoomPreset TreasureRoomChoice7{
         {},
         {},
-        {{{FightConsole,{dashRechargeUp, dashRechargeUp, dashRechargeUp, dashDown }}, {0.4f, 0.5f}}, {{FightConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletSpeedDown}}, {0.6f, 0.5f}}},
+        {{{FightConsole,{dashRechargeUp, dashRechargeUp, dashRechargeUp, dashDown }}, {0.4f, 0.5f}}, {{FightConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletRangeDown}}, {0.6f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -1509,7 +1509,7 @@ const RoomPreset TreasureRoomChoice8{
 const RoomPreset TreasureRoomSniper{
     {},
     {},
-    {{{PushConsole,{dmgUp,dmgUp,dmgUp,  bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, playerSpeedDown,playerSpeedDown,playerSpeedDown}}, {0.5f, 0.5f}}},
+    {{{PushConsole,{dmgUp,dmgUp,dmgUp,  bulletRangeUp, bulletRangeUp, bulletRangeUp, playerSpeedDown,playerSpeedDown,playerSpeedDown}}, {0.5f, 0.5f}}},
     0.0f,
     5,
     0,
@@ -1557,7 +1557,7 @@ const RoomPreset TreasureRoomMachineGun{
 const RoomPreset TreasureRoomSuperSize{
                 {},
                 {},
-                {{{PushConsole,{sizeUp, sizeUp,sizeUp, bulletPierceUp,bulletPierceUp, bulletPierceUp, bulletSpeedDown, bulletSpeedDown, bulletSpeedDown, }}, {0.5f, 0.5f}}},
+                {{{PushConsole,{sizeUp, sizeUp,sizeUp, bulletPierceUp,bulletPierceUp, bulletPierceUp, bulletRangeDown, bulletRangeDown }}, {0.5f, 0.5f}}},
                 0.0f,
                 5,
                 0,
@@ -1569,7 +1569,7 @@ const RoomPreset TreasureRoomSuperSize{
 const RoomPreset TreasureRoomPinBall {
         {},
         {},
-        {{{PushConsole,{bulletBounceUp, bulletBounceUp, bulletBounceUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, sizeDown, sizeDown, sizeDown, }}, {0.5f, 0.5f}}},
+        {{{PushConsole,{bulletBounceUp, bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp, bulletRangeUp, sizeDown, sizeDown, sizeDown, }}, {0.5f, 0.5f}}},
         0.0f,
         5,
         0,
@@ -2422,7 +2422,7 @@ const RoomPreset HifiRoomLaserFiesta {
     {},
 {{{PopConsole,{numBulletsUp}}, {0.5f, 0.5f}},
     {{PushConsole,{fireRateUp, bulletRangeUp}}, {0.25f, 0.5f}},
-    {{PushConsole,{bulletSpeedUp, bulletSpeedUp}}, {0.75f, 0.5f}},
+    {{PushConsole,{bulletRangeUp, bulletRangeUp}}, {0.75f, 0.5f}},
 },
     6.5f,
     5,
@@ -3517,7 +3517,7 @@ const RoomPreset MiningEnemyRoomMineField {
                     },
         },
     {},
-        {{ {PushConsole,{bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, bulletBounceUp, bulletBounceUp, bulletBounceUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+        {{ {PushConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletBounceUp, bulletBounceUp, bulletBounceUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
         10.0f,
         25,
         5,
@@ -3982,7 +3982,7 @@ const RoomPreset EnemyRoomPhantom {
         {},
         {{{PushConsole,{numBulletsUp}}, {0.5f, 0.5f}},
         {{PopConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
-        {{WishGranter,{fireRateUp, bulletSpeedUp}}, {0.75f, 0.5f}},
+        {{WishGranter,{fireRateUp, bulletRangeUp}}, {0.75f, 0.5f}},
     },
         65.0f,
         35,
@@ -4017,7 +4017,7 @@ const RoomPreset EnemyRoomEyes {
         {},
         {{{PushConsole,{numBulletsUp}}, {0.5f, 0.5f}},
         {{PopConsole,{fireRateDown, bulletBounceDown}}, {0.25f, 0.5f}},
-        {{WishGranter,{fireRateUp, bulletSpeedUp}}, {0.75f, 0.5f}},
+        {{WishGranter,{fireRateUp, bulletRangeUp}}, {0.75f, 0.5f}},
     },
         25.0f,
         35,
@@ -4462,7 +4462,6 @@ struct weightedRegionEffects {
 weightedRegionEffects biologyPositiveEffects = {
     {
         {{dmgUp},               10.f},
-        {{bulletSpeedUp},       15.f},
         {{sizeUp},              30.f},
         {{fireRateUp},          15.f},
         {{bulletRangeUp},       20.f},
@@ -4480,7 +4479,6 @@ weightedRegionEffects biologyPositiveEffects = {
 weightedRegionEffects biologyNegativeEffects = {
     {
         {{dmgDown},             5.f},
-        {{bulletSpeedDown},     5.f},
         {{sizeDown},            5.f},
         {{fireRateDown},        5.f},
         {{bulletRangeDown},     5.f},
@@ -4500,7 +4498,6 @@ weightedRegionEffects biologyNegativeEffects = {
 weightedRegionEffects miningPositiveEffects = {
     {
         {{dmgUp},               15.f},
-        {{bulletSpeedUp},       15.f},
         {{sizeUp},              10.f},
         {{fireRateUp},          15.f},
         {{bulletRangeUp},       25.f},
@@ -4518,7 +4515,6 @@ weightedRegionEffects miningPositiveEffects = {
 weightedRegionEffects miningNegativeEffects = {
     {
         {{dmgDown},             5.f},
-        {{bulletSpeedDown},     5.f},
         {{sizeDown},            5.f},
         {{fireRateDown},        5.f},
         {{bulletRangeDown},     5.f},
@@ -4538,7 +4534,6 @@ weightedRegionEffects miningNegativeEffects = {
 weightedRegionEffects hifiPositiveEffects = {
     {
         {{dmgUp},               15.f},
-        {{bulletSpeedUp},       30.f},
         {{sizeUp},              25.f},
         {{fireRateUp},          15.f},
         {{bulletRangeUp},       30.f},
@@ -4556,7 +4551,6 @@ weightedRegionEffects hifiPositiveEffects = {
 weightedRegionEffects hifiNegativeEffects = {
     {
         {{dmgDown},             5.f},
-        {{bulletSpeedDown},     5.f},
         {{sizeDown},            5.f},
         {{fireRateDown},        5.f},
         {{bulletRangeDown},     5.f},
@@ -4576,7 +4570,6 @@ weightedRegionEffects hifiNegativeEffects = {
 weightedRegionEffects medicalPositiveEffects = {
     {
         {{dmgUp},               20.f},
-        {{bulletSpeedUp},       15.f},
         {{sizeUp},              15.f},
         {{fireRateUp},          30.f},
         {{bulletRangeUp},       20.f},
@@ -4594,7 +4587,6 @@ weightedRegionEffects medicalPositiveEffects = {
 weightedRegionEffects medicalNegativeEffects = {
     {
         {{dmgDown},             5.f},
-        {{bulletSpeedDown},     5.f},
         {{sizeDown},            5.f},
         {{fireRateDown},        5.f},
         {{bulletRangeDown},     5.f},
@@ -4614,7 +4606,6 @@ weightedRegionEffects medicalNegativeEffects = {
 weightedRegionEffects militaryPositiveEffects = {
     {
         {{dmgUp},               50.f},
-        {{bulletSpeedUp},       5.f},
         {{sizeUp},              5.f},
         {{fireRateUp},          5.f},
         {{bulletRangeUp},       50.f},
@@ -4632,7 +4623,6 @@ weightedRegionEffects militaryPositiveEffects = {
 weightedRegionEffects militaryNegativeEffects = {
     {
         {{dmgDown},             5.f},
-        {{bulletSpeedDown},     5.f},
         {{sizeDown},            5.f},
         {{fireRateDown},        5.f},
         {{bulletRangeDown},     5.f},

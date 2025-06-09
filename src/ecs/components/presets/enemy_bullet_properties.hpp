@@ -8,7 +8,6 @@
 
 const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{BulletDamage,      COLOR_RED},
-			{ProjectileSpeed,   COLOR_PINK},
 			{ProjectileSize,    COLOR_PURPLE_LIGHT},
 			{FireRate,          COLOR_ORANGE},
 			{BulletRange,       COLOR_YELLOW},
@@ -29,7 +28,6 @@ const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 
 const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
 			{BulletDamage,      "bullet_values"},
-			{ProjectileSpeed,   "bullet_values"},
 			{ProjectileSize,    "bullet_values"},
 			{FireRate,          "bullet_values"},
 			{BulletRange,       "bullet_values"},
@@ -49,7 +47,6 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
 
 const std::map<BulletEffectType, Vec4StartEnd> enemyBulletParticleColors = {
     {BulletDamage, {{ bulletEffectColors.at(BulletDamage), 1.0f },{ bulletEffectColors.at(BulletDamage), 1.0f }}},
-    {ProjectileSpeed,   {{bulletEffectColors.at(ProjectileSpeed),1.f},{bulletEffectColors.at(ProjectileSpeed),1.f}}},
     {ProjectileSize,    {{bulletEffectColors.at(ProjectileSize),1.f},{bulletEffectColors.at(ProjectileSize),1.f}}},
     {FireRate,          {{bulletEffectColors.at(FireRate),1.f},{bulletEffectColors.at(FireRate),1.f}}},
     {BulletRange,       {{bulletEffectColors.at(BulletRange),1.f},{bulletEffectColors.at(BulletRange),1.f}}},

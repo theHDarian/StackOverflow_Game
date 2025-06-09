@@ -2911,7 +2911,8 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	// Setting initial values
 	PlayerBullet &bullet = registry.playerBullets.emplace(entity);
 	bullet.damage = getModifiedValue(BulletDamage, bullet.damage) / min(1.f, getModifiedValue(BulletNum, 1) - 0.5f);
-	bullet.bulletSpeed = getModifiedValue(ProjectileSpeed, bullet.bulletSpeed);
+	float x = getEffectValue(BulletRange);
+	bullet.bulletSpeed = bullet.bulletSpeed + clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f);
 	bullet.bulletRange = getModifiedValue(BulletRange, bullet.bulletRange);
 	bullet.bulletSize = getModifiedValue(ProjectileSize, bullet.bulletSize);
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);

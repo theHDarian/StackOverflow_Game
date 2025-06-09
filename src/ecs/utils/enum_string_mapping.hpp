@@ -5,7 +5,6 @@
 //used for debug name mapping
 const std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = {
     {BulletDamage, "BulletDamage"},
-    {ProjectileSpeed, "ProjectileSpeed"},
     {ProjectileSize, "ProjectileSize"},
     {FireRate, "FireRate"},
     {BulletRange, "BulletRange"},
@@ -23,10 +22,9 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectTypeNames = 
 
 const std::unordered_map<BulletEffectType, std::string> bulletEffectDescriptions = {
     {BulletDamage, "damage"},
-    {ProjectileSpeed, "bullet speed"},
     {ProjectileSize, "bullet size"},
     {FireRate, "fire rate"},
-    {BulletRange, "bullet range"},
+    {BulletRange, "bullet range and speed"},
     {BulletAccuracy, "spread"},
     {BulletNum, "number of bullets (at once)"},
     {Bounce, "bounce"},
@@ -41,7 +39,6 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectDescriptions
 // TODO: double check units
 const std::unordered_map<BulletEffectType, std::string> bulletEffectUnits = {
     {BulletDamage, ""},
-    {ProjectileSpeed, "px/s"}, //??
     {ProjectileSize, "px"},
     {FireRate, "s"},
     {BulletRange, "px"},
@@ -59,7 +56,6 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectUnits = {
 // TODO: think of better names
 const std::map<BulletEffectType, std::string> tierNames = {
     {BulletDamage,      "Burning Bullets"},
-    {ProjectileSpeed,   "ProjectileSpeed"},
     {ProjectileSize,    "Splitting Bullets"},     // Bullet explodes into smaller bullets on deletion
     {FireRate,          "Burst Fire"},             // Activates burst-fire mode, +1 per firerate about threshold
     {BulletRange,       "Sniper's Prowess"},     // Deal more damage the further away from the player the enemy is (up to 2x)

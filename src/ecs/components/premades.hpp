@@ -110,18 +110,6 @@ const BulletStackEffect accuracyDown = {
 	"Bullet Accuracy Down",
 	"" };
 
-const BulletStackEffect bulletSpeedUp = {
-	ProjectileSpeed,
-	1,
-	"Bullet Speed Up",
-	""};
-
-const BulletStackEffect bulletSpeedDown = {
-	ProjectileSpeed,
-	-1,
-	"Bullet Speed Up",
-	""};
-
 const BulletStackEffect bulletRangeUp = {
 	BulletRange,
 	1,
@@ -253,8 +241,6 @@ const std::vector<BulletStackEffect> premadeBullets = {
 	numBulletsUp,
 	sizeUp,
 	accuracyUp,
-	bulletSpeedUp,
-	bulletSpeedDown,
 	bulletRangeUp,
 	bulletRangeDown,
 	bulletPierceUp,
@@ -2483,7 +2469,7 @@ struct BeehiveGun : Enemy
 	const AttackData beehivesentry{
 		EnemyAttackPattern::BURST,
 		TRIANGLE,
-		{bulletPierceUp, bulletSpeedUp},
+		{bulletPierceUp},
 		blunt,
 		3,
 		0.0,
@@ -2760,7 +2746,7 @@ struct Mage : Enemy
 	EnemyAttackPattern::RADIAL_POLYGON,
 	RECTANGLE,
 	{fireRateUp},
-	bulletSpeedUp,
+	blunt,
 	4,
 	0,
 	{30, 30},
@@ -2776,7 +2762,7 @@ struct Mage : Enemy
 	EnemyAttackPattern::RADIAL_POLYGON,
 	TRIANGLE,
 	{fireRateUp},
-	bulletSpeedUp,
+	blunt,
 	3,
 	0,
 	{30, 30},
@@ -3018,7 +3004,7 @@ struct PillBoidSpawner : Enemy
 	const AttackData cannonShot{
 		EnemyAttackPattern::BURST,
 		CIRCLE,
-		{dmgUp, bulletSpeedUp},
+		{dmgUp},
 		{playerSpeedDown},
 		3,
 		M_PI / 2,
@@ -5522,7 +5508,7 @@ struct HifiSniper : Enemy
 	const AttackData HifiSniperShot{
 		EnemyAttackPattern::BURST,
 		TRIANGLE,
-		{bulletPierceDown, bulletSpeedDown},
+		{bulletPierceDown},
 		blunt,
 		4,
 		0,
@@ -6300,7 +6286,7 @@ struct HifiCannon : Enemy
 	const AttackData cannonShot{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{dmgUp, bulletSpeedUp, sizeUp},
+		{dmgUp, sizeUp},
 		{fireRateDown},
 		2,
 		M_PI / 2,
@@ -6315,7 +6301,7 @@ struct HifiCannon : Enemy
 	const AttackData cluster{
 		EnemyAttackPattern::BURST,
 		CIRCLE,
-		{numBulletsUp, bulletSpeedDown},
+		{numBulletsUp},
 		blunt,
 		4,
 		0,
@@ -6362,7 +6348,7 @@ struct HifiCannonHard : Enemy
 	const AttackData cannonShot{
 		EnemyAttackPattern::SHOTGUN,
 		CIRCLE,
-		{dmgUp, bulletSpeedUp},
+		{dmgUp},
 		{playerSpeedDown},
 		2,
 		M_PI / 2,

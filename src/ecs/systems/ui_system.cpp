@@ -2201,9 +2201,6 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 		case BulletDamage:
 			effect = "the damage of bullets.";
 			break;
-		case ProjectileSpeed:
-			effect = "bullet speed.";
-			break;
 		case ProjectileSize:
 			effect = "the size of bullets.";
 			break;
@@ -2211,7 +2208,7 @@ std::string UISystem::makeBulletTooltip(BulletStackEffect bullet) {
 			effect = "interval of bullets fired.";
 			break;
 		case BulletRange:
-			effect = "bullet range.";
+			effect = "bullet range and speed.";
 			break;
 		case BulletAccuracy:
 			effect = "the spread of bullets fired.";

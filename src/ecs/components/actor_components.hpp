@@ -12,7 +12,6 @@ constexpr vec2 random_vec2 = {random_float, random_float};
 
 enum BulletEffectType {
     BulletDamage,
-    ProjectileSpeed,
     ProjectileSize,
     FireRate,
     BulletRange,
@@ -76,9 +75,12 @@ struct StackCompile {
     std::vector<BulletStackEffect> recentRemoved;
 
     typedef float (StackCompile ::* FP)(int);
+
+    // Unused now
+    float projectileSpeedFunc(int x) { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f); };
+
     // x<0 does nothing (except waste space on stack)
     float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
-    float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f); };
     float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
     float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? ((x < tierThresholds[FireRate]) ? -500.f + 1000.f / ((float)x + 2.f) : -300.f + 1000.f / ((float)x + 2.f)) : -50.f * (float)x, 1000.f); };
     float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
@@ -94,7 +96,6 @@ struct StackCompile {
 
     std::map<BulletEffectType, FP> functions = {
         {BulletDamage,      &StackCompile::bulletDamageFunc},
-        {ProjectileSpeed,   &StackCompile::projectileSpeedFunc},
         {ProjectileSize,    &StackCompile::projectileSizeFunc},
         {FireRate,          &StackCompile::fireRateFunc},
         {BulletRange,       &StackCompile::bulletRangeFunc},
@@ -118,7 +119,6 @@ struct StackCompile {
 
     std::map<BulletEffectType, float> values = {
         {BulletDamage,      0},
-        {ProjectileSpeed,   0},
         {ProjectileSize,    0},
         {FireRate,          0},
         {BulletRange,       0},
@@ -135,9 +135,8 @@ struct StackCompile {
 
     std::map<BulletEffectType, float> tierThresholds = {
         {BulletDamage,      5},     // Inflict burning on hit. 15% default, +15% per additional point over threshold
-        {ProjectileSpeed,   5},
         {ProjectileSize,    5},     // Bullet explodes into smaller bullets on deletion
-        {FireRate,          5},
+        {FireRate,          5},     // Burst fire. Value over threshold is number shot per burst
         {BulletRange,       5},     // Deal more damage the further away from the player the enemy is (up to 2x)
         {BulletAccuracy,    5},     // Inflict vulnerable for 4000
         {BulletNum,         5},     // Fires 4 * (1 + value-threshold) mini bullets

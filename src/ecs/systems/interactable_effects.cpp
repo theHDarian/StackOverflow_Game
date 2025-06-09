@@ -802,7 +802,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				}
 				case 1 : {
 					if (reaction.choice == 0) {
-						addEffect(player, {bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp}, soundPlayer);
+						addEffect(player, {playerSpeedUp, playerSpeedUp, playerSpeedUp}, soundPlayer);
 						object.dialogueCount++;
 					}
 					break;
