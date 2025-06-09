@@ -1063,14 +1063,23 @@ void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 																	 // indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
 	const GLuint postprocess_program = effects[(GLuint)effect];
+
 	// Set clock
 	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
+	// Set chromatic abberation
 	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
 	float intensity = (float)stack.currStack.size() / (stack.baseStackSize + stack.Call(PlayerStackSize));
 	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
 	glUniform1f(chrom_abb_intensity_uloc, intensity);
-	gl_has_errors();
+
+	// Set bullettime effect
+	// TODO connect to player speed tier
+	// Might be good with a smooth-in-smooth-out function applied so it isn't too jarring
+	GLuint bullet_time_uloc = glGetUniformLocation(postprocess_program, "bulletTime");
+	glUniform1f(bullet_time_uloc, 0.5f);
+
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
 	GLint in_position_loc = glGetAttribLocation(postprocess_program, "in_position");

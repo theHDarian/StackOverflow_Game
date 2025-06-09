@@ -150,6 +150,7 @@ int main() {
 		textSystem.renderMenuUIText();
 		renderer.drawMenuOverlayUI();
 		textSystem.renderMenuOverlayUIText();
+		renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS4));	// Bullet time effect
 		renderer.drawCursor();
 		if (ioSystem.isPaused() || ioSystem.isGameOver()) renderer.drawToScreenExtra((EFFECT_ASSET_ID::POSTPROCESS3)); // Wibbly wobbly effect
 		renderer.drawToScreenFinal(); // Final postprocessing

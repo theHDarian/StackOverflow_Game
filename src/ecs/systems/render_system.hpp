@@ -53,6 +53,7 @@ class RenderSystem {
 		shader_path("postprocess1"),
 		shader_path("postprocess2"),
 		shader_path("postprocess3"),
+		shader_path("postprocess4"),
 		shader_path("dash"),
 		shader_path("healthbar"),
 		shader_path("roombound"),
