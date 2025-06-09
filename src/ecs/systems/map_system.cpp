@@ -617,7 +617,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 break;
         }
 
-        giveEveryTierBuff();
+        //giveEveryTierBuff();
 
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
