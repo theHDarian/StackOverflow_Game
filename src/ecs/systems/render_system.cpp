@@ -1078,7 +1078,7 @@ void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 	// TODO connect to player speed tier
 	// Might be good with a smooth-in-smooth-out function applied so it isn't too jarring
 	GLuint bullet_time_uloc = glGetUniformLocation(postprocess_program, "bulletTime");
-	glUniform1f(bullet_time_uloc, 0.5f);
+	glUniform1f(bullet_time_uloc, 0.0f);
 
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
