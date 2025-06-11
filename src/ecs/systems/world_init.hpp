@@ -50,6 +50,8 @@ Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2
 
 Entity createRamStick(RenderSystem* renderer, vec2 pos);
 
+Entity createRamlet(RenderSystem *renderer, vec2 pos);
+
 Entity createBaru(RenderSystem *renderer, vec2 pos);
 
 Entity createWishGranter(RenderSystem *renderer, vec2 pos);

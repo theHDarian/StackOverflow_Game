@@ -50,6 +50,7 @@ public:
         {InteractableItem::PushConsole, 0},
         {InteractableItem::PopConsole, 0},
         {InteractableItem::Ram, 0},
+        {InteractableItem::Ramlet, 0},
         {InteractableItem::Optimizer, 0},
         {InteractableItem::Inverter, 0},
     };

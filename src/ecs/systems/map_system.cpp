@@ -142,9 +142,9 @@ void MapSystem::step(float elapsed_ms)
     }
 
     if (map.currRoom.spawnedElite && registry.elites.entities.empty()) {
-        InteractableRequest & req = registry.interactableRequests.emplace_with_duplicates(registry.players.entities[0]);
-        req.type = InteractableRequestType::AddEffect;
-        req.effects = { stackSizeUp };
+        std::tuple<RoomInteractable, vec2> ramlet = {{Ramlet, {}}, {0.5f, 0.5f}};
+        map.currRoom.preset.interactables.emplace_back(ramlet);
+        soundPlayer->playNextDialogueSound();
         map.currRoom.spawnedElite = false;
     }
 

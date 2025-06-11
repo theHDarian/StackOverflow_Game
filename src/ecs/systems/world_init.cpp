@@ -165,6 +165,8 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 		return createPopConsole(renderer, pos);
 	case InteractableItem::Ram:
 		return createRamStick(renderer, pos);
+	case InteractableItem::Ramlet:
+		return createRamlet(renderer, pos);
 	case InteractableItem::Gardener:
 		return createGardener(renderer, pos);
 	case InteractableItem::BibleTree:
@@ -785,7 +787,7 @@ Entity createRamStick(RenderSystem *renderer, vec2 pos)
 	auto entity = Entity();
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
-	motion.scale = vec2(100, 50);
+	motion.scale = vec2(100*1.2, 50*1.2);
 	motion.angle = 0;
 	auto &object = registry.objects.emplace(entity);
 	registry.renderRequests.insert(
@@ -801,6 +803,29 @@ Entity createRamStick(RenderSystem *renderer, vec2 pos)
 
 	return entity;
 }
+
+Entity createRamlet(RenderSystem *renderer, vec2 pos)
+{
+	auto entity = Entity();
+	Motion &motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2(100*0.6, 50*0.6);
+	motion.angle = 0;
+	auto &object = registry.objects.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{"ram.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE});
+	auto &interact = registry.interactables.emplace(entity);
+	interact.name = "Ramlet";
+	interact.item = InteractableItem::Ramlet;
+	registry.circleColliders.emplace(entity).radius = motion.scale.x / 2;
+	auto &effect = registry.emitParticles.emplace(entity, PBulletTrail, playerBulletTrail, 999999, 1);
+
+	return entity;
+}
+
 
 Entity createGardener(RenderSystem *renderer, vec2 pos)
 {

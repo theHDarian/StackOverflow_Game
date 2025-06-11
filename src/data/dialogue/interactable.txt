@@ -167,6 +167,30 @@ ITEM Ram 0 2
 [Stack capacity increased!]
 SOUND rareItemPickup
 
+ITEM Ramlet -1 0
+This is a ramlet! Though it does not have the capacity of a proper ram module, it still allows you to store more data in your stack.
+Would you like to install the ramlet?
+CHOICES Yes\No
+
+ITEM Ramlet 0 0
+You install the ramlet.
+[Stack capacity slightly increased!]
+SOUND rareItemPickup
+
+ITEM Ramlet 1 0
+You decide not to install the ramlet.
+
+ITEM Ramlet -1 1
+You've already installed the ramlet. Sadly, downloading RAM isn't actually a thing.
+
+ITEM Ramlet -1 2
+Would you like to install the ramlet?
+CHOICES Yes\No
+
+ITEM Ramlet 0 2
+[Stack capacity slightly increased!]
+SOUND rareItemPickup
+
 ITEM BibleTree -1 0
 A tree with red fruit. Pick one?
 CHOICES Yes\No

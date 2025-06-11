@@ -919,7 +919,9 @@ const RoomPreset EnemyRoomMagic{
             }
         },
     {},
-    {{{PushConsole,{bulletBounceUp,bulletBounceUp, bulletPierceUp,bulletPierceUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
+    {
+        {{PushConsole, {bulletBounceUp, bulletBounceUp, bulletPierceUp, bulletPierceUp}}, {0.25f, 0.5f}},
+        {{PopConsole, {}}, {0.75f, 0.5f}},
     },
     25.0f,
     35,
@@ -967,7 +969,15 @@ const RoomPreset EnemyRoomInvisible{
                 }
             },
         {},
-        {{{PushConsole,{bulletBounceUp,bulletBounceUp,bulletBounceUp, bulletRangeUp,bulletRangeUp,bulletRangeUp}}, {0.25f, 0.5f}}, {{PopConsole,{}}, {0.75f, 0.5f}},
+        {
+            {
+                {
+                    PushConsole,
+                    {bulletBounceUp, bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp, bulletRangeUp}
+                },
+                {0.25f, 0.5f}
+            },
+            {{PopConsole, {}}, {0.75f, 0.5f}},
         },
         20.0f,
         35,
@@ -2255,8 +2265,8 @@ const RoomPreset HifiEnemyRoomSwarmLasers {
         },
 
     {},
-    {{{PopConsole,{numBulletsUp}}, {0.5f, 0.5f}},
-        {{PushConsole,{numBulletsUp}}, {0.25f, 0.5f}}},
+    {{{PopConsole,{numBulletsUp}}, {0.75f, 0.5f}},
+        {{PushConsole,{numBulletsUp,numBulletsUp,numBulletsUp}}, {0.25f, 0.5f}}},
     15.0f,
     0,
 0,
@@ -2420,9 +2430,9 @@ const RoomPreset HifiRoomLaserFiesta {
                 },
         },
     {},
-{{{PopConsole,{numBulletsUp}}, {0.5f, 0.5f}},
-    {{PushConsole,{fireRateUp, bulletRangeUp}}, {0.25f, 0.5f}},
-    {{PushConsole,{bulletRangeUp, bulletRangeUp}}, {0.75f, 0.5f}},
+{
+    {{PushConsole,{fireRateUp, fireRateUp, fireRateUp, bulletRangeUp, bulletRangeUp, bulletRangeUp}}, {0.25f, 0.5f}},
+    {{PopConsole,{}}, {0.75f, 0.5f}},
 },
     6.5f,
     5,
@@ -4051,19 +4061,46 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
         {RoomType::EnemyRoom, {{EnemyRoomDashIntro1,EnemyRoomDashIntro2,EnemyRoomDashIntro3,BioRoomSmall },{}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge},}},
         {RoomType::EventRoom, {{EventRoomGardener, EventRoomHoney, EventRoomOracleCrab}, {EventRoomMouse}}  },
-        {RoomType::TreasureRoom, {regularTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare}}},
+        {
+            RoomType::TreasureRoom,
+            {
+                regularTreasureRooms,
+                {
+                    TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,
+                    TreasureRoomSuperSize, TreasureRoomPinBall, TreasureRoomHare
+                }
+            }
+        },
     }},
     {DifficultyRegion::Easy,{
         {RoomType::EnemyRoom, {{EnemyRoomBees1, EnemyRoomDash1,EnemyRoomCrabs,BioRoomSmall, EnemyRoomBees2, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomSnails},{EnemyRoomInvisible,BioEnemyRoomSwarm}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoomPop}}},
         {RoomType::EventRoom, {{EventRoomGardener, EventRoomHoney, EventRoomOracleCrab}, {EventRoomMouse}}  },
-        {RoomType::TreasureRoom, {regularTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare}}},
+        {
+            RoomType::TreasureRoom,
+            {
+                regularTreasureRooms,
+                {
+                    TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,
+                    TreasureRoomSuperSize, TreasureRoomPinBall, TreasureRoomHare
+                }
+            }
+        },
     }},
     {DifficultyRegion::Medium,{
         {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomInvisible}}},
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomGardener, EventRoomHoney, EventRoomOracleCrab}, {EventRoomMouse}}  },
-        {RoomType::TreasureRoom, {regularTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare}}},
+        {
+            RoomType::TreasureRoom,
+            {
+                regularTreasureRooms,
+                {
+                    TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,
+                    TreasureRoomSuperSize, TreasureRoomPinBall, TreasureRoomHare
+                }
+            }
+        },
     }},
 };
 
@@ -4810,6 +4847,7 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
     {{EnemyType::EnemyMage, {0.5f,0.5f}}},
         {
          {EnemyType::EnemyBeeHive, {0.5f,0.5f}},
+{EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
             {EnemyTwoBee, random_vec2},
 {EnemyTwoBee, random_vec2},
 {EnemyThreeBee, random_vec2},

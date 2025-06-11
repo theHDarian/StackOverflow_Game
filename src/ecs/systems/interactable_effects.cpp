@@ -602,10 +602,14 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			}
 		}
 
-		if (object.item == InteractableItem::Ram) {
+		if (object.item == InteractableItem::Ram || object.item == InteractableItem::Ramlet) {
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
-				extendStack( player, 4);
+				if (object.item == InteractableItem::Ram) {
+					extendStack( player, 4);
+				} else {
+					extendStack( player, 2);
+				}
 				object.dialogueCount = 1;
 				registry.deleteds.emplace(reaction.object);
 			}

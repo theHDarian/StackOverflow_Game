@@ -535,6 +535,7 @@ enum InteractableType {
 
 enum InteractableItem {
 	Ram,
+	Ramlet,
 	PopConsole,
 	PushConsole,
 	FightConsole,
