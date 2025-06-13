@@ -12,6 +12,7 @@ int getEffectValue(BulletEffectType bf);
 int getEffectTierThreshold(BulletEffectType bf);
 int getEffectValueTierThresholdDifference(BulletEffectType bf);
 float getModifiedValue(BulletEffectType bf, float value);
+float getAdjustedTime (float elapsed_time, Entity entity = Entity());
 
 class ECSRegistry
 {

@@ -33,20 +33,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		if (registry.players.has(entity))
 			continue;
 
-		float adjustedStep = step_seconds;
-		if (!registry.playerBullets.has(entity))
-		{
-			if (registry.timeModifiers.has(player))
-			{
-				TimeModifier &timeModifier = registry.timeModifiers.get(player);
-				adjustedStep *= timeModifier.modifier;
-			}
-			if (registry.timeModifiers.has(entity))
-			{
-				TimeModifier &timeModifier = registry.timeModifiers.get(entity);
-				adjustedStep *= timeModifier.modifier;
-			}
-		}
+		float adjustedStep = getAdjustedTime(step_seconds, entity);
 		motion.position += motion.velocity * adjustedStep;
 		motion.velocity += motion.veer * adjustedStep;
 
@@ -258,17 +245,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			continue;
 
 		// check if dashing entity will intersect a wall
-		float adjustedStep = step_seconds;
-		if (registry.timeModifiers.has(player))
-		{
-			TimeModifier &timeModifier = registry.timeModifiers.get(player);
-			adjustedStep *= timeModifier.modifier;
-		}
-		if (registry.timeModifiers.has(entity))
-		{
-			TimeModifier &timeModifier = registry.timeModifiers.get(entity);
-			adjustedStep *= timeModifier.modifier;
-		}
+		float adjustedStep = getAdjustedTime(step_seconds, entity);
 		vec2 startPosition = motion.position - (motion.velocity - motion.veer * adjustedStep) * adjustedStep;
 		vec2 endPosition = motion.position;
 		bool hasCollided = false;
@@ -297,17 +274,7 @@ void PhysicsSystem::step(float elapsed_ms)
 				radius = registry.circleColliders.get(entity).radius;
 			}
 			vec2 bounceBack = vec2(0);
-			float adjustedStep = step_seconds;
-			if (registry.timeModifiers.has(player))
-			{
-				TimeModifier &timeModifier = registry.timeModifiers.get(player);
-				adjustedStep *= timeModifier.modifier;
-			}
-			if (registry.timeModifiers.has(entity))
-			{
-				TimeModifier &timeModifier = registry.timeModifiers.get(entity);
-				adjustedStep *= timeModifier.modifier;
-			}
+			float adjustedStep = getAdjustedTime(step_seconds, entity);
 			if ((motion.velocity - motion.veer * adjustedStep) != vec2(0))
 			{
 				bounceBack = glm::normalize(-(motion.velocity - motion.veer * adjustedStep)) * radius / 2.f;

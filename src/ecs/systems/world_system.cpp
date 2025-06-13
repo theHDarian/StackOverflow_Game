@@ -202,23 +202,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
 
 
-		// Updating the invincibility timer
-		if (registry.invincibles.entities.size() > 0) {
-			for (Entity& invincible : registry.invincibles.entities) {
-				float& invincible_timer = registry.invincibles.get(invincible).countdown;
-				invincible_timer -= elapsed_ms_since_last_update;
-				if (invincible_timer <= 0) {
-					registry.invincibles.remove(invincible);
-					//std::cout << "entity is no longer invincible" << std::endl;
-				}
-			}
-		}
-		//check invisibity countdown
+		//check invisibility countdown
 		if (registry.invisibles.entities.size() > 0) {
 			for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
 				Invisible& entity = registry.invisibles.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.invisibles.entities[i])) <= 0) {
 					registry.invisibles.remove(registry.invisibles.entities[i]);
+				}
+			}
+		}
+		// Updating the invincibility timer
+		if (registry.invincibles.entities.size() > 0) {
+			for (int i = (int)registry.invincibles.components.size()-1; i>=0; --i) {
+				Invincible& entity = registry.invincibles.components[i];
+				if ((entity.countdown -= getAdjustedTime( elapsed_ms_since_last_update, registry.invincibles.entities[i])) <= 0) {
+					registry.invincibles.remove(registry.invincibles.entities[i]);
 				}
 			}
 		}
@@ -226,7 +224,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.moles.entities.size() > 0) {
 			for (int i = (int)registry.moles.components.size()-1; i>=0; --i) {
 				Mole& entity = registry.moles.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.moles.entities[i])) <= 0) {
 					registry.moles.remove(registry.moles.entities[i]);
 				}
 			}
@@ -236,7 +234,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.regenerates.entities.size() > 0) {
             for (int i = (int)registry.regenerates.components.size()-1; i>=0; --i) {
                 Regenerate& entity = registry.regenerates.components[i];
-                if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+                if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.regenerates.entities[i])) <= 0) {
                     registry.regenerates.remove(registry.regenerates.entities[i]);
                 }
             }
@@ -246,7 +244,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.vulnerabilities.entities.size() > 0) {
 			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {
 				auto& entity = registry.vulnerabilities.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0 || registry.instanceDamages.has(registry.vulnerabilities.entities[i])) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.vulnerabilities.entities[i])) <= 0 || registry.instanceDamages.has(registry.vulnerabilities.entities[i])) {
 					registry.vulnerabilities.remove(registry.vulnerabilities.entities[i]);
 				}
 			}
@@ -268,7 +266,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				Entity e = registry.onFires.entities[i];
 				Burning& fire = registry.onFires.components[i];
 				if (fire.stack == 0) continue;
-				fire.countdown = max(fire.countdown - elapsed_ms_since_last_update, 0.f);
+				fire.countdown = max(fire.countdown - getAdjustedTime(elapsed_ms_since_last_update, e), 0.f);
 				if (fire.countdown <= 0.f && fire.stack > 0) {
 					if (registry.wormBodies.has(e)) {
 						Entity wh = registry.wormBodies.get(e).head;
@@ -315,15 +313,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 				EnemyBullet& bullet = registry.enemyBullets.components[i];
 				Entity entity = registry.enemyBullets.entities[i];
-				float elapsed_ms = elapsed_ms_since_last_update;
-				if (registry.timeModifiers.has(entity))
-				{
-					elapsed_ms *= registry.timeModifiers.get(entity).modifier;
-				}
-				if (registry.timeModifiers.has(player))
-				{
-					elapsed_ms *= registry.timeModifiers.get(player).modifier;
-				}
+				float elapsed_ms = getAdjustedTime(elapsed_ms_since_last_update, entity);
 				if ((bullet.bulletRange -= elapsed_ms) <= 0) {
 					// remove enemy bullet
 					if (!registry.deleteds.has(registry.enemyBullets.entities[i])) {

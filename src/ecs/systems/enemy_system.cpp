@@ -54,15 +54,7 @@ void EnemySystem::step(float Elapsed_ms)
         {
             continue;
         }
-        float elapsed_ms = Elapsed_ms;
-        if (registry.timeModifiers.has(entity))
-        {
-            elapsed_ms *= registry.timeModifiers.get(entity).modifier;
-        }
-        if (registry.timeModifiers.has(player))
-        {
-            elapsed_ms *= registry.timeModifiers.get(player).modifier;
-        }
+        float elapsed_ms = getAdjustedTime(Elapsed_ms, entity);
         Enemy &enemy = registry.enemies.get(entity);
         Motion &motion = registry.motions.get(entity);
         vec2 pos = motion.position;
@@ -229,14 +221,14 @@ void EnemySystem::step(float Elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity)) && !registry.specialRotators.has(entity))
+                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity)) && !registry.specialRotators.has(entity) && !registry.timeModifiers.has(entity) && !registry.timeModifiers.has(registry.players.entities[0]))
                     {
                         Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
                         vec2 mid = playerMotion.position - motion.position;
                         motion.angle = atan2(mid.y, mid.x);
                     } else {
                         // Assuming you have a deltaTime variable that represents the time elapsed since the last frame
-                        float deltaTime = elapsed_ms / 1000.f; // Set this to the appropriate value
+                        float deltaTime = getAdjustedTime(elapsed_ms, entity) / 1000.f;
 
                         // Define a rotation speed (radians per second)
                         float rotationSpeed = enemy.rotatePower; // Adjust this value to control the turning speed
@@ -308,14 +300,14 @@ void EnemySystem::step(float Elapsed_ms)
             {
                 if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity))  && !registry.specialRotators.has(entity))
+                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity))  && !registry.specialRotators.has(entity) && !registry.timeModifiers.has(entity) && !registry.timeModifiers.has(registry.players.entities[0]))
                     {
                          Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
                          vec2 mid = playerMotion.position - motion.position;
                          motion.angle = atan2(mid.y, mid.x);
                     } else {
                         // Assuming you have a deltaTime variable that represents the time elapsed since the last frame
-                        float deltaTime = elapsed_ms / 1000.f; // Set this to the appropriate value
+                        float deltaTime = getAdjustedTime(elapsed_ms, entity) / 1000.f; // Set this to the appropriate value
 
                         // Define a rotation speed (radians per second)
                         float rotationSpeed = enemy.rotatePower; // Adjust this value to control the turning speed
