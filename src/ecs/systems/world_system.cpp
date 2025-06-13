@@ -252,6 +252,54 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
+		if (registry.timeModifiers.entities.size() > 0)
+		{
+			for (int i = (int)registry.timeModifiers.components.size() - 1; i >= 0; --i) {
+				TimeModifier& entity = registry.timeModifiers.components[i];
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+					registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
+				}
+			}
+		}
+
+		//burning ticks
+		if (registry.onFires.entities.size() > 0) {
+			for (int i = (int)registry.onFires.components.size() - 1; i >= 0; --i) {
+				Entity e = registry.onFires.entities[i];
+				Burning& fire = registry.onFires.components[i];
+				if (fire.stack == 0) continue;
+				fire.countdown = max(fire.countdown - elapsed_ms_since_last_update, 0.f);
+				if (fire.countdown <= 0.f && fire.stack > 0) {
+					if (registry.wormBodies.has(e)) {
+						Entity wh = registry.wormBodies.get(e).head;
+						if (!registry.invincibles.has(wh)) registry.enemies.get(wh).currHealth -= fire.damage * fire.stack;
+					}
+					else {
+						registry.enemies.get(e).currHealth -= fire.damage * fire.stack;
+					}
+					if (registry.instanceDamages.has(e)) {
+						InstanceDamage& instance = registry.instanceDamages.get(e);
+						instance.instance -= fire.stack;
+						registry.enemies.get(e).currHealth = instance.instance;
+					}
+					fire.stack--;
+					fire.countdown = fire.maxCountdown;
+
+					// emit extra particles and turn orange on fire tick
+					if (!registry.emitParticles.has(e)) {
+						ParticleProps props = playerTrail;
+						props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);
+						props.velocity.base.y = min(-100.0f, props.velocity.base.y);
+						int count = max(3, int(7 * registry.motions.get(e).scale.x / 50));
+						registry.emitParticles.emplace(e, ParticleRequestType::PExplode, props, 500, Random::Int(count) + 2 * count);
+					}
+					if (!registry.burnTicked.has(e)) {
+						registry.burnTicked.emplace(e);
+					}
+				}
+			}
+		}
+
 		// Updating the bullet ranges
 		if (registry.playerBullets.entities.size() > 0) {
 			for (int i = (int)registry.playerBullets.components.size()-1; i>=0; --i) {
@@ -267,7 +315,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 				EnemyBullet& bullet = registry.enemyBullets.components[i];
 				Entity entity = registry.enemyBullets.entities[i];
-				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				float elapsed_ms = elapsed_ms_since_last_update;
+				if (registry.timeModifiers.has(entity))
+				{
+					elapsed_ms *= registry.timeModifiers.get(entity).modifier;
+				}
+				if (registry.timeModifiers.has(player))
+				{
+					elapsed_ms *= registry.timeModifiers.get(player).modifier;
+				}
+				if ((bullet.bulletRange -= elapsed_ms) <= 0) {
 					// remove enemy bullet
 					if (!registry.deleteds.has(registry.enemyBullets.entities[i])) {
 						Motion& motion = registry.motions.get(entity);
@@ -442,7 +499,7 @@ void WorldSystem::restartGame() {
 	uireq.type = UIRequestType::ResetUI;
 }
 
-// Compute collisions between entities
+// Compute `ions between entities
 void WorldSystem::handleCollisions() {
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -931,6 +988,19 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 				soundPlayer->setMusicVolume(gameState.currentVolume);
 				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
 				req.type = UIRequestType::GameOverReport;
+			}
+			if (checkTierThreshold(PlayerSpeed))
+			{
+				if (!registry.timeModifiers.has(player))
+				{
+					TimeModifier& tm = registry.timeModifiers.emplace(player);
+					tm.modifier = 0.2f;
+					tm.countdown = 5000 + (int)-(getEffectValueTierThresholdDifference(PlayerSpeed) * 1000);
+				} else {
+					TimeModifier& tm = registry.timeModifiers.get(player);
+					tm.modifier = 0.2f;
+					tm.countdown = 5000 + (int)-(getEffectValueTierThresholdDifference(PlayerSpeed) * 1000);
+				}
 			}
 		}
 	}

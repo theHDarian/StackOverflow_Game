@@ -492,7 +492,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 		drawBasicAnimateTextured();
 
-		float angle = glm::clamp(motion.angle, M_PI / 4, -M_PI / 4);
+		float angle = glm::clamp(motion.angle,(float) M_PI / 4,(float) -M_PI / 4);
 		float rotHeight = motion.scale.y;
 		float rotWidth = motion.scale.x;
 

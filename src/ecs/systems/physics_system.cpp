@@ -32,8 +32,23 @@ void PhysicsSystem::step(float elapsed_ms)
 		Entity entity = motion_registry.entities[i];
 		if (registry.players.has(entity))
 			continue;
-		motion.position += motion.velocity * step_seconds;
-		motion.velocity += motion.veer * step_seconds;
+
+		float adjustedStep = step_seconds;
+		if (!registry.playerBullets.has(entity))
+		{
+			if (registry.timeModifiers.has(player))
+			{
+				TimeModifier &timeModifier = registry.timeModifiers.get(player);
+				adjustedStep *= timeModifier.modifier;
+			}
+			if (registry.timeModifiers.has(entity))
+			{
+				TimeModifier &timeModifier = registry.timeModifiers.get(entity);
+				adjustedStep *= timeModifier.modifier;
+			}
+		}
+		motion.position += motion.velocity * adjustedStep;
+		motion.velocity += motion.veer * adjustedStep;
 
 		// slightly broken
 		if (!registry.playerBullets.has(entity) && (glm::length2(motion.velocity) > 0.001) && !registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1) /* || registry.playerBullets.has(entity)*/))
@@ -193,6 +208,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			continue;
 
 		// check if dashing entity will intersect a wall
+
 		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
 		vec2 endPosition = motion.position;
 		bool hasCollided = false;
@@ -240,7 +256,18 @@ void PhysicsSystem::step(float elapsed_ms)
 			continue;
 
 		// check if dashing entity will intersect a wall
-		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
+		float adjustedStep = step_seconds;
+		if (registry.timeModifiers.has(player))
+		{
+			TimeModifier &timeModifier = registry.timeModifiers.get(player);
+			adjustedStep *= timeModifier.modifier;
+		}
+		if (registry.timeModifiers.has(entity))
+		{
+			TimeModifier &timeModifier = registry.timeModifiers.get(entity);
+			adjustedStep *= timeModifier.modifier;
+		}
+		vec2 startPosition = motion.position - (motion.velocity - motion.veer * adjustedStep) * adjustedStep;
 		vec2 endPosition = motion.position;
 		bool hasCollided = false;
 		vec2 closestIntersection;
@@ -268,9 +295,20 @@ void PhysicsSystem::step(float elapsed_ms)
 				radius = registry.circleColliders.get(entity).radius;
 			}
 			vec2 bounceBack = vec2(0);
-			if ((motion.velocity - motion.veer * step_seconds) != vec2(0))
+			float adjustedStep = step_seconds;
+			if (registry.timeModifiers.has(player))
 			{
-				bounceBack = glm::normalize(-(motion.velocity - motion.veer * step_seconds)) * radius / 2.f;
+				TimeModifier &timeModifier = registry.timeModifiers.get(player);
+				adjustedStep *= timeModifier.modifier;
+			}
+			if (registry.timeModifiers.has(entity))
+			{
+				TimeModifier &timeModifier = registry.timeModifiers.get(entity);
+				adjustedStep *= timeModifier.modifier;
+			}
+			if ((motion.velocity - motion.veer * adjustedStep) != vec2(0))
+			{
+				bounceBack = glm::normalize(-(motion.velocity - motion.veer * adjustedStep)) * radius / 2.f;
 			}
 
 			motion.position = closestIntersection + bounceBack;

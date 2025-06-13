@@ -283,6 +283,13 @@ struct Burning {
     int stack = 0;
 };
 
+struct TimeModifier {
+    // Used for slowing down the player or enemies
+    // When countdown reaches 0, remove component
+    float countdown = 1000;
+    float modifier = 0.15f; // 1 is normal speed
+};
+
 struct PlayerAttackData {
     float currFiringInterval = 0.0f;
     float maxFiringInterval = 500.0f;

@@ -36,7 +36,7 @@ EnemySystem::EnemySystem(RenderSystem *renderer, SoundSystem *sound)
 EnemySystem::~EnemySystem() {
 };
 
-void EnemySystem::step(float elapsed_ms)
+void EnemySystem::step(float Elapsed_ms)
 {
     Entity player = registry.players.entities[0];
     Motion &playerMotion = registry.motions.get(player);
@@ -44,44 +44,6 @@ void EnemySystem::step(float elapsed_ms)
     // std::cout << "current bee enemy: " << registry.bees.entities.size() << std::endl;
     std::vector<Entity> pendingDeletion;
     std::vector<vec3> createBees;
-
-    //burning ticks
-    if (registry.onFires.entities.size() > 0) {
-        for (int i = (int)registry.onFires.components.size() - 1; i >= 0; --i) {
-            Entity e = registry.onFires.entities[i];
-            Burning& fire = registry.onFires.components[i];
-            if (fire.stack == 0) continue;
-            fire.countdown = max(fire.countdown - elapsed_ms, 0.f);
-            if (fire.countdown <= 0.f && fire.stack > 0) {
-                if (registry.wormBodies.has(e)) {
-                    Entity wh = registry.wormBodies.get(e).head;
-                    if (!registry.invincibles.has(wh)) registry.enemies.get(wh).currHealth -= fire.damage * fire.stack;
-                }
-                else {
-                    registry.enemies.get(e).currHealth -= fire.damage * fire.stack;
-                }
-                if (registry.instanceDamages.has(e)) {
-                    InstanceDamage& instance = registry.instanceDamages.get(e);
-                    instance.instance -= fire.stack;
-                    registry.enemies.get(e).currHealth = instance.instance;
-                }
-                fire.stack--;
-                fire.countdown = fire.maxCountdown;
-
-                // emit extra particles and turn orange on fire tick
-                if (!registry.emitParticles.has(e)) {
-                    ParticleProps props = playerTrail;
-                    props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);
-                    props.velocity.base.y = min(-100.0f, props.velocity.base.y);
-                    int count = max(3, int(7 * registry.motions.get(e).scale.x / 50));
-                    registry.emitParticles.emplace(e, ParticleRequestType::PExplode, props, 500, Random::Int(count) + 2 * count);
-                }
-                if (!registry.burnTicked.has(e)) {
-                    registry.burnTicked.emplace(e);
-                }
-            }
-        }
-    }
 
     // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities)
@@ -91,6 +53,16 @@ void EnemySystem::step(float elapsed_ms)
         if (!registry.enemies.has(entity))
         {
             continue;
+        }
+        float elapsed_ms = Elapsed_ms;
+        if (registry.timeModifiers.has(entity))
+        {
+            elapsed_ms *= registry.timeModifiers.get(entity).modifier;
+        }
+        if (registry.timeModifiers.has(player))
+        {
+            elapsed_ms *= registry.timeModifiers.get(player).modifier;
+            std::cout << "Old time: " << Elapsed_ms << "New Time: " <<elapsed_ms << std::endl;
         }
         Enemy &enemy = registry.enemies.get(entity);
         Motion &motion = registry.motions.get(entity);
