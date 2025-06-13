@@ -62,7 +62,6 @@ void EnemySystem::step(float Elapsed_ms)
         if (registry.timeModifiers.has(player))
         {
             elapsed_ms *= registry.timeModifiers.get(player).modifier;
-            std::cout << "Old time: " << Elapsed_ms << "New Time: " <<elapsed_ms << std::endl;
         }
         Enemy &enemy = registry.enemies.get(entity);
         Motion &motion = registry.motions.get(entity);

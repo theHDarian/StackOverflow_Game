@@ -187,6 +187,12 @@ ParticleSystem::~ParticleSystem() {
 
 void ParticleSystem::step(float elapsed_ms) {
     float ts = elapsed_ms / 1000.0f;
+    Entity player = registry.players.entities[0];
+    if (registry.timeModifiers.has(player)) {
+        auto& timeModifier = registry.timeModifiers.get(player);
+        ts *= timeModifier.modifier;
+    }
+
     for (auto& particle : particlePool) {
         if (!particle.active) {
             continue;
