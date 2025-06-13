@@ -816,6 +816,7 @@ struct Laser {
     float maxLength;
     float growth;
     float rotation;
+    float checkingInterval = 1000.0f / 60.f; // ms, how often to check for updates
 };
 
 struct Dash {

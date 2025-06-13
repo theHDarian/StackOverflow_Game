@@ -96,10 +96,14 @@ void PhysicsSystem::step(float elapsed_ms)
 			{
 				Enemy &enemy = registry.enemies.get(laser.start);
 				Motion &start = registry.motions.get(laser.start);
-				float timeScale = (1000/60)/adjustedStep;
+				float adjustedMs = adjustedStep * 1000.f;
 				if (enemy.rotationBehaviour == EnemyRotationBehavior::NONE || enemy.rotationBehaviour == EnemyRotationBehavior::REGULAR || enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP)
 				{
-					motion.angle += laser.rotation * timeScale;
+					if (laser.checkingInterval -= adjustedMs <= 0.f)
+					{
+						laser.checkingInterval = 1000.f / 60.f; // reset checking interval
+						motion.angle += laser.rotation;
+					}
 				}
 				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER)
 				{
@@ -113,7 +117,11 @@ void PhysicsSystem::step(float elapsed_ms)
 					motion.angle = laser.rotation * motion.angle + (1.f - laser.rotation) * start.angle;
 				}
 				if (laser.growth < 100.f || (eBullet.initialRange - eBullet.bulletRange > 1000))
-					laser.length += laser.growth * timeScale;
+					if (laser.checkingInterval -= adjustedMs <= 0.f)
+					{
+						laser.checkingInterval = 1000.f / 60.f; // reset checking interval
+						laser.length += laser.growth;
+					}
 				if (registry.enemyGroups.has(laser.start))
 				{
 					EnemyGroup &group = registry.enemyGroups.get(laser.start);
