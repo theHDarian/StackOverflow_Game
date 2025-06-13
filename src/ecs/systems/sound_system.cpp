@@ -16,9 +16,18 @@ void SoundSystem::step(float elapsed_ms)
         for (int i = (int) registry.persistentSounds.components.size()-1; i>=0; --i) {
             PersistentSounds &persistentSounds = registry.persistentSounds.components[i];
             int notPlaying = 0;
+            float adjustedElapsed = elapsed_ms;
+            if (registry.timeModifiers.has(registry.persistentSounds.entities[i])) {
+                TimeModifier& timeModifier = registry.timeModifiers.get(registry.persistentSounds.entities[i]);
+                adjustedElapsed *= timeModifier.modifier;
+            }
+            if (registry.timeModifiers.has(registry.players.entities[0])) {
+                TimeModifier& timeModifier = registry.timeModifiers.get(registry.players.entities[0]);
+                adjustedElapsed *= timeModifier.modifier;
+            }
             for (auto& channel : persistentSounds.channels) {
                 if (channel.second.x != -1) {
-                    channel.second.y -= elapsed_ms;
+                    channel.second.y -= adjustedElapsed;
                     if (channel.second.y <= 0) {
                         Mix_HaltChannel(channel.second.x);
                         channel.second.x = -1;
