@@ -288,6 +288,9 @@ struct TimeModifier {
     // When countdown reaches 0, remove component
     float countdown = 1000;
     float modifier = 0.15f; // 1 is normal speed
+
+    float BASECOUNTDOWN = 4000;
+    float COUNTDOWNPERSPEED = 500;
 };
 
 struct PlayerAttackData {

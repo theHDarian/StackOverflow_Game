@@ -995,11 +995,11 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 				{
 					TimeModifier& tm = registry.timeModifiers.emplace(player);
 					tm.modifier = 0.2f;
-					tm.countdown = 5000 + (int)-(getEffectValueTierThresholdDifference(PlayerSpeed) * 1000);
+					tm.countdown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
 				} else {
 					TimeModifier& tm = registry.timeModifiers.get(player);
 					tm.modifier = 0.2f;
-					tm.countdown = 5000 + (int)-(getEffectValueTierThresholdDifference(PlayerSpeed) * 1000);
+					tm.countdown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
 				}
 			}
 		}
