@@ -734,7 +734,23 @@ struct TestLightningShuffle : Enemy
 		0
 	};
 
-	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 1000, testShot };
+	const AttackData testBombard{
+		EnemyAttackPattern::BOMBARD,
+		RECTANGLE,
+		{},
+		lightningShuffle,
+		10,
+		0.0,
+		{20, 20},
+		100,
+		2000,
+		{1.0, 1.0},
+		0,
+		0,
+		0
+	};
+
+	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 5000, testShot };
 
 	TestLightningShuffle()
 	{

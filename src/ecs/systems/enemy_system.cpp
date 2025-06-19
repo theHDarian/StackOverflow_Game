@@ -20,6 +20,7 @@
 #include "components/presets/particle_presets.hpp"
 #include "utils/random.hpp"
 #include <glm/gtx/norm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 std::mutex beeMutex;
 
@@ -993,6 +994,23 @@ void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, const AttackData &atkDa
     Entity e = createEnemyLaser(render, pos, angle, enemy, atkData);
 }
 
+void EnemySystem::launchBombard(const AttackData& atkData) {
+    Map& map = registry.maps.components[0];
+    vec2 min = map.currRoom.roomStart;
+    vec2 max = map.currRoom.roomEnd;
+    float roomLength = glm::length(min - max);
+    vec2 center = (max + min) / 2.f;
+    vec2 line = (glm::normalize(atkData.veer) * roomLength / 2.2f);
+    vec2 perp = glm::normalize(vec2(atkData.veer.y, -atkData.veer.x));
+    for (uint i = 1; i < atkData.numBullets + 1; i++) {
+        float ratio = (float)i / (float)atkData.numBullets;
+        vec2 pos = (ratio * line) + ((1.f - ratio) * -line);
+        pos += center + perp * (float)(200 - rand() % 400);
+        if (pos.x < min.x || pos.y < min.y || pos.x > max.x || pos.y > max.y) continue;
+        createBombard(render, i * 300, pos);
+    }
+}
+
 void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, const AttackData &atkData, float elapsed_ms)
 {
     int sfxNum = atkData.shape == EnemyBulletShape::CIRCLE ? 0 : atkData.shape == EnemyBulletShape::RECTANGLE ? 1 : 2;
@@ -1093,6 +1111,11 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     } else if (atkData.attackType == EnemyAttackPattern::TWO_WALL)
     {
         shootTwoWall(atkData, atkData.angleOffset, elapsed_ms);
+        currPattern.currAtkCD = currPattern.maxAtkCD;
+    }
+    else if (atkData.attackType == EnemyAttackPattern::BOMBARD)
+    {
+        launchBombard(atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
 }

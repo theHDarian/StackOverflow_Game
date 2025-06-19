@@ -46,11 +46,7 @@ const RoomPreset TestRoom{
 };
 
 const RoomPreset TestRoom2{
-    {{  {EnemySmallBoulder,  {0.1f, 0.1f}},
-        {EnemySmallBoulder,  {0.1f, 0.1f}},
-        {EnemySmallBoulder,  {0.1f, 0.1f}},
-        {EnemySmallBoulder,  {0.1f, 0.1f}},
-        {EnemySmallBoulder,  {0.1f, 0.1f}},
+    {{  {EnemyTestLightningShuffle,  {0.1f, 0.1f}}
     }},
 {},
 {},

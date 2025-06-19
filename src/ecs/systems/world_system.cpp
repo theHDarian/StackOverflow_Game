@@ -250,6 +250,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
+		// Time modifiers
 		if (registry.timeModifiers.entities.size() > 0)
 		{
 			for (int i = (int)registry.timeModifiers.components.size() - 1; i >= 0; --i) {
@@ -344,6 +345,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Bombards
+	if (!registry.bombards.entities.empty()) {
+		for (int i = (int)registry.bombards.components.size() - 1; i >= 0; --i) {
+			Bombard& bombard = registry.bombards.components[i];
+			if ((bombard.cdTillAppear -= getAdjustedTime(elapsed_ms_since_last_update)) <= 0) {
+				if ((bombard.cdTillDisappear -= getAdjustedTime(elapsed_ms_since_last_update)) <= 0) {
+					Motion& bm = registry.motions.get(registry.bombards.entities[i]);
+					for (int j = 0; j < 20; j++) {
+						createEnemyBulletDeath(renderer, bm.position, vec2(cos(2.f * M_PI * j / 20.f), sin(2.f * M_PI * j / 20.f)), EnemyBulletDeath::BOMBARD);
+					}
+					registry.deleteds.emplace(registry.bombards.entities[i]);
+				}
+			}
+		}
+	}
 
 	//check damage countdown
 	if (!registry.damageds.entities.empty()) {

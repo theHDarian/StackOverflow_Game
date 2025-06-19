@@ -32,6 +32,7 @@ private:
     void shootRadialBurst(vec2 pos, const AttackData &atkData, float elapsed_ms, Burst &burst);
     void shootLaser(vec2 pos, Entity enemy, const AttackData &atkData, bool shouldPlayFiringSound = true);
     void shootTwinLaser(vec2 pos, Entity enemy, const AttackData &atkData);
+    void launchBombard(const AttackData& atkData);
     void attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, const AttackData &atkData, float elapsed_ms);
     void spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData);
     void merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion);

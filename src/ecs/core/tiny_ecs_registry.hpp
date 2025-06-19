@@ -139,6 +139,7 @@ public:
 	ComponentContainer<PersistentSounds> persistentSounds;
 	ComponentContainer<InstanceDamage> instanceDamages;
 	ComponentContainer<TimeModifier> timeModifiers;
+	ComponentContainer<Bombard> bombards;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -262,6 +263,7 @@ public:
 		registry_list.push_back(&persistentSounds);
 		registry_list.push_back(&instanceDamages);
 		registry_list.push_back( &timeModifiers);
+		registry_list.push_back(&bombards);
 	}
 
 	void clear_all_components()

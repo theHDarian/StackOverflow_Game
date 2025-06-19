@@ -2698,12 +2698,14 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 	Motion &motion = registry.motions.emplace(entity);
 	motion.position = pos;
 
+	std::string render = "";
 	if (onDeath == EnemyBulletDeath::EXPLODE)
 	{
 		bullet.bulletSpeed = 0;
 		bullet.bulletRange = 200;
 		motion.velocity = velocity * bullet.bulletSpeed;
 		motion.scale = {160, 160}; // Ensure scale is initialized
+		render = "none.png";
 	}
 	else if (onDeath == EnemyBulletDeath::CLUSTER)
 	{
@@ -2712,6 +2714,15 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		motion.velocity = velocity * bullet.bulletSpeed;
 		motion.scale = {30, 30}; // Ensure scale is initialized
 		motion.veer = -motion.velocity * 0.8f;
+		render = "enemy_bullet_circle.png";
+	}
+	else if (onDeath == EnemyBulletDeath::BOMBARD)
+	{
+		bullet.bulletSpeed = 200;
+		bullet.bulletRange = 2000;
+		motion.velocity = velocity * bullet.bulletSpeed;
+		motion.scale = { 20, 20 }; // Ensure scale is initialized
+		render = "enemy_bullet_triangle.png";
 	}
 
 	auto &spriteComponent = registry.sprites.emplace(entity);
@@ -2722,31 +2733,9 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 	registry.renderRequests.insert(
 		entity,
 		{// spriteComponent.sprites[SPRITE_STATE::BASE],
-		 (onDeath != EnemyBulletDeath::EXPLODE) ? "enemy_bullet_circle.png" : "none.png",
+		 render,
 		 EFFECT_ASSET_ID::BULLET,
 		 GEOMETRY_BUFFER_ID::SPRITE});
-
-	// bullet trail (if we decide to add effects in the future)
-	ParticleProps props = enemyBullet;
-	for (const BulletStackEffect &effect : bullet.bulletEffects)
-	{
-		BulletEffectType type = effect.type;
-		if (type == BulletEffectType::Inert)
-			continue;
-		if (enemyBulletParticleColors.count(type) > 0)
-		{
-			props.colorEffects.push_back({enemyBulletParticleColors.at(type),effect.value});
-		}
-		else
-		{
-			printf("Warning: enemy bullet color not defined\n");
-		}
-	}
-	if (!props.colorEffects.empty())
-	{
-		props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-		EmitParticle &ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(3) + 5);
-	}
 
 	return entity;
 }
@@ -3044,6 +3033,32 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 	ParticleProps props = playerBulletTrail;
 	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
 	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(2) + 1);
+	return entity;
+}
+
+Entity createBombard(RenderSystem* renderer, float wait, vec2 position)
+{
+	auto entity = Entity();
+
+	auto& bombard = registry.bombards.emplace(entity);
+	bombard.cdTillAppear = wait;
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = M_PI * (float)(rand() % 100);
+	motion.velocity = vec2(0);
+	motion.position = position;
+	motion.scale = vec2(288 / 4); // Ensure scale is initialized
+
+	auto& spriteComponent = registry.sprites.emplace(entity);
+	spriteComponent.sprites[SPRITE_STATE::BASE] = "Target.png";
+
+	registry.renderRequests.insert(
+		entity,
+		{ "Target.png",
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
 	return entity;
 }
 

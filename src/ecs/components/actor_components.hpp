@@ -478,13 +478,15 @@ enum class EnemyAttackPattern {
     ONE_WALL,
     TWO_WALL,
     SPAWNING,
+    BOMBARD,
     NONE
 };
 
 enum class EnemyBulletDeath {
     NONE,
     EXPLODE,
-    CLUSTER
+    CLUSTER,
+    BOMBARD
 };
 
 
@@ -520,6 +522,11 @@ struct AttackData {
     bool gottenRoomEffects = false;
     std::vector<BulletStackEffect> positiveBulletEffects;
     std::vector<BulletStackEffect> negativeBulletEffects;
+};
+
+struct Bombard {
+    float cdTillAppear = 0;
+    float cdTillDisappear = 2000;
 };
 
 enum class SpecialStates {
