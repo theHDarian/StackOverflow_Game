@@ -502,7 +502,6 @@ void AISystem::step(float elapsed_ms)
 
 		} else if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
-			// std::cout << currPattern.name << "after update" << std::endl;
 			// if (registry.hand.has(entity) && currPattern.type == EnemyBehavior::IDLE) {
 			// 	continue;
 			// }
@@ -1269,8 +1268,12 @@ vec2 AISystem::getRollingPos(Entity entity)
 	vec2 min = { roomBounds.x, roomBounds.y };
 	vec2 max = { roomBounds.z, roomBounds.w };
 
+	//Map& map = registry.maps.components[0];
+	//vec2 min = map.currRoom.roomStart;
+	//vec2 max = map.currRoom.roomEnd;
+
 	vec2 direction = movement.posB - movement.posA;
-	float distance = glm::length(max - min);
+	float distance = glm::length(max - min) * 2.0;
 
 	// Wall collisions and bouncing
 	vec2 norm = vec2(0, 0);
@@ -1286,18 +1289,21 @@ vec2 AISystem::getRollingPos(Entity entity)
 	else if (enemyMotion.position.y >= max.y && direction.y > 0.0) {
 		norm = vec2(0, -1);
 	}
+
+	//std::cout << glm::to_string(norm) << " " << glm::to_string(min) << " " << glm::to_string(max) << " " << glm::to_string(enemyMotion.position) << std::endl;
+
 	if (norm != vec2(0, 0)) {
 
-		vec2 newDirection = glm::reflect(direction, norm);
-		vec2 intersection = vec2((norm.x < 0.0) ? max.x : (norm.x == 0.0) ? enemyMotion.position.x : min.x, 
-							     (norm.y < 0.0) ? max.y : (norm.y == 0.0) ? enemyMotion.position.y : min.y);
+		vec2 newDirection = glm::reflect(glm::normalize(direction), norm);
 
 		//std::cout << glm::to_string(movement.posB) << " : " << glm::to_string(min) << " : " << glm::to_string(max) << std::endl;
 		//std::cout << glm::to_string(intersection) << " : " << glm::to_string(norm) << " : " << glm::to_string(direction) << " : " << glm::to_string(glm::reflect(direction, norm)) << std::endl;
 		//std::cout << glm::to_string(enemyMotion.position) << ", " << glm::to_string(intersection + newDirection * distance) << std::endl;
 
-		movement.posA = intersection;
-		return intersection + newDirection * distance;
+		//std::cout << glm::to_string(enemyMotion.position + newDirection * distance) << std::endl;
+
+		movement.posA = enemyMotion.position;
+		return enemyMotion.position + newDirection * distance;
 	}
 
 	return movement.posB;

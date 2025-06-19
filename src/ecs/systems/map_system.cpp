@@ -555,7 +555,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             map.currRoom.preset = StartingRoom;
         }
         else if (roomType == RoomType::Testing) {
-            map.currRoom.preset = TestRoom;
+            map.currRoom.preset = TestRoom2;
             InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
             req2.effects = { bulletRangeUp, bulletRangeUp };
