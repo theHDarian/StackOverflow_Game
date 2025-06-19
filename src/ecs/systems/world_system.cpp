@@ -202,23 +202,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
 
 
-		// Updating the invincibility timer
-		if (registry.invincibles.entities.size() > 0) {
-			for (Entity& invincible : registry.invincibles.entities) {
-				float& invincible_timer = registry.invincibles.get(invincible).countdown;
-				invincible_timer -= elapsed_ms_since_last_update;
-				if (invincible_timer <= 0) {
-					registry.invincibles.remove(invincible);
-					//std::cout << "entity is no longer invincible" << std::endl;
-				}
-			}
-		}
-		//check invisibity countdown
+		//check invisibility countdown
 		if (registry.invisibles.entities.size() > 0) {
 			for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
 				Invisible& entity = registry.invisibles.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.invisibles.entities[i])) <= 0) {
 					registry.invisibles.remove(registry.invisibles.entities[i]);
+				}
+			}
+		}
+		// Updating the invincibility timer
+		if (registry.invincibles.entities.size() > 0) {
+			for (int i = (int)registry.invincibles.components.size()-1; i>=0; --i) {
+				Invincible& entity = registry.invincibles.components[i];
+				if ((entity.countdown -= getAdjustedTime( elapsed_ms_since_last_update, registry.invincibles.entities[i])) <= 0) {
+					registry.invincibles.remove(registry.invincibles.entities[i]);
 				}
 			}
 		}
@@ -226,7 +224,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.moles.entities.size() > 0) {
 			for (int i = (int)registry.moles.components.size()-1; i>=0; --i) {
 				Mole& entity = registry.moles.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.moles.entities[i])) <= 0) {
 					registry.moles.remove(registry.moles.entities[i]);
 				}
 			}
@@ -236,7 +234,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.regenerates.entities.size() > 0) {
             for (int i = (int)registry.regenerates.components.size()-1; i>=0; --i) {
                 Regenerate& entity = registry.regenerates.components[i];
-                if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+                if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.regenerates.entities[i])) <= 0) {
                     registry.regenerates.remove(registry.regenerates.entities[i]);
                 }
             }
@@ -246,8 +244,56 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.vulnerabilities.entities.size() > 0) {
 			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {
 				auto& entity = registry.vulnerabilities.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0 || registry.instanceDamages.has(registry.vulnerabilities.entities[i])) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.vulnerabilities.entities[i])) <= 0 || registry.instanceDamages.has(registry.vulnerabilities.entities[i])) {
 					registry.vulnerabilities.remove(registry.vulnerabilities.entities[i]);
+				}
+			}
+		}
+
+		if (registry.timeModifiers.entities.size() > 0)
+		{
+			for (int i = (int)registry.timeModifiers.components.size() - 1; i >= 0; --i) {
+				TimeModifier& entity = registry.timeModifiers.components[i];
+				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+					registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
+				}
+			}
+		}
+
+		//burning ticks
+		if (registry.onFires.entities.size() > 0) {
+			for (int i = (int)registry.onFires.components.size() - 1; i >= 0; --i) {
+				Entity e = registry.onFires.entities[i];
+				Burning& fire = registry.onFires.components[i];
+				if (fire.stack == 0) continue;
+				fire.countdown = max(fire.countdown - getAdjustedTime(elapsed_ms_since_last_update, e), 0.f);
+				if (fire.countdown <= 0.f && fire.stack > 0) {
+					if (registry.wormBodies.has(e)) {
+						Entity wh = registry.wormBodies.get(e).head;
+						if (!registry.invincibles.has(wh)) registry.enemies.get(wh).currHealth -= fire.damage * fire.stack;
+					}
+					else {
+						registry.enemies.get(e).currHealth -= fire.damage * fire.stack;
+					}
+					if (registry.instanceDamages.has(e)) {
+						InstanceDamage& instance = registry.instanceDamages.get(e);
+						instance.instance -= fire.stack;
+						registry.enemies.get(e).currHealth = instance.instance;
+					}
+					fire.stack--;
+					fire.countdown = fire.maxCountdown;
+
+					// emit extra particles and turn orange on fire tick
+					if (!registry.emitParticles.has(e)) {
+						ParticleProps props = playerTrail;
+						props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);
+						props.velocity.base.y = min(-100.0f, props.velocity.base.y);
+						int count = max(3, int(7 * registry.motions.get(e).scale.x / 50));
+						registry.emitParticles.emplace(e, ParticleRequestType::PExplode, props, 500, Random::Int(count) + 2 * count);
+					}
+					if (!registry.burnTicked.has(e)) {
+						registry.burnTicked.emplace(e);
+					}
 				}
 			}
 		}
@@ -267,7 +313,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 				EnemyBullet& bullet = registry.enemyBullets.components[i];
 				Entity entity = registry.enemyBullets.entities[i];
-				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				float elapsed_ms = getAdjustedTime(elapsed_ms_since_last_update, entity);
+				if ((bullet.bulletRange -= elapsed_ms) <= 0) {
 					// remove enemy bullet
 					if (!registry.deleteds.has(registry.enemyBullets.entities[i])) {
 						Motion& motion = registry.motions.get(entity);
@@ -442,7 +489,7 @@ void WorldSystem::restartGame() {
 	uireq.type = UIRequestType::ResetUI;
 }
 
-// Compute collisions between entities
+// Compute `ions between entities
 void WorldSystem::handleCollisions() {
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -931,6 +978,19 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 				soundPlayer->setMusicVolume(gameState.currentVolume);
 				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
 				req.type = UIRequestType::GameOverReport;
+			}
+			if (checkTierThreshold(PlayerSpeed))
+			{
+				if (!registry.timeModifiers.has(player))
+				{
+					TimeModifier& tm = registry.timeModifiers.emplace(player);
+					tm.modifier = 0.2f;
+					tm.countdown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+				} else {
+					TimeModifier& tm = registry.timeModifiers.get(player);
+					tm.modifier = 0.2f;
+					tm.countdown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+				}
 			}
 		}
 	}

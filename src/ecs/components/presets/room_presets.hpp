@@ -2700,9 +2700,8 @@ const RoomPreset HifiRoomShieldedMadness{
             },
 
         {},
-        {{{PopConsole,{numBulletsUp}}, {0.5f, 0.5f}},
-            {{PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.25f, 0.5f}},
-            {{PushConsole,{fireRateUp, fireRateUp}}, {0.75f, 0.5f}}},
+        {{{PopConsole,{numBulletsUp}}, {0.25f, 0.5f}},
+                {{PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp, fireRateUp, fireRateUp}}, {0.75f, 0.5f}}},
         15.0f,
         45,
     10,

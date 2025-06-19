@@ -186,7 +186,8 @@ ParticleSystem::~ParticleSystem() {
 }
 
 void ParticleSystem::step(float elapsed_ms) {
-    float ts = elapsed_ms / 1000.0f;
+    float ts = getAdjustedTime(elapsed_ms) / 1000.0f;
+
     for (auto& particle : particlePool) {
         if (!particle.active) {
             continue;

@@ -492,7 +492,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 		drawBasicAnimateTextured();
 
-		float angle = glm::clamp(motion.angle, M_PI / 4, -M_PI / 4);
+		float angle = glm::clamp(motion.angle,(float) M_PI / 4,(float) -M_PI / 4);
 		float rotHeight = motion.scale.y;
 		float rotWidth = motion.scale.x;
 
@@ -1077,8 +1077,14 @@ void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 	// Set bullettime effect
 	// TODO connect to player speed tier
 	// Might be good with a smooth-in-smooth-out function applied so it isn't too jarring
+	float bulletTime = 0.f;
+	if (registry.timeModifiers.entities.size() > 0) {
+		TimeModifier tm = registry.timeModifiers.components[0];
+		bulletTime = 1.f - (tm.countdown / (tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED)));
+		bulletTime = max(0.f, -powf(bulletTime, 8) + 1);
+	}
 	GLuint bullet_time_uloc = glGetUniformLocation(postprocess_program, "bulletTime");
-	glUniform1f(bullet_time_uloc, 0.0f);
+	glUniform1f(bullet_time_uloc, bulletTime);
 
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)

@@ -15,7 +15,7 @@ class EnemySystem
 public:
     EnemySystem(RenderSystem *renderer, SoundSystem *sound);
     ~EnemySystem();
-    void step(float elapsed_ms);
+    void step(float Elapsed_ms);
 
 private:
     // void shoot(::Entity &enemy, vec2 pos, vec2 bulletDir, float elapsed_ms_since_last_update, int cluster, float BulletAccuracy);

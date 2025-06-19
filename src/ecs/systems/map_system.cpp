@@ -588,6 +588,9 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req2.type = InteractableRequestType::AddEffect;
             req2.effects = {numBulletsUp, numBulletsUp,numBulletsUp, dmgUp,dmgUp, dmgUp};
         }
+        InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
+        req2.type = InteractableRequestType::AddEffect;
+        req2.effects = { playerSpeedUp, playerSpeedUp,playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp,  };
         auto& nextRoom = map.currRoom.preset;
         switch (map.currRegion) {
             case MapRegion::Biology:

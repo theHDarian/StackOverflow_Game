@@ -12,6 +12,7 @@ int getEffectValue(BulletEffectType bf);
 int getEffectTierThreshold(BulletEffectType bf);
 int getEffectValueTierThresholdDifference(BulletEffectType bf);
 float getModifiedValue(BulletEffectType bf, float value);
+float getAdjustedTime (float elapsed_time, Entity entity = Entity());
 
 class ECSRegistry
 {
@@ -137,6 +138,7 @@ public:
 	ComponentContainer<BurnTick> burnTicked;
 	ComponentContainer<PersistentSounds> persistentSounds;
 	ComponentContainer<InstanceDamage> instanceDamages;
+	ComponentContainer<TimeModifier> timeModifiers;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -259,6 +261,7 @@ public:
 		registry_list.push_back(&burnTicked);
 		registry_list.push_back(&persistentSounds);
 		registry_list.push_back(&instanceDamages);
+		registry_list.push_back( &timeModifiers);
 	}
 
 	void clear_all_components()
