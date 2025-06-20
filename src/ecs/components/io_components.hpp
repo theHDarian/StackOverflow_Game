@@ -48,7 +48,7 @@ struct IOState {
 struct GameState {
 	bool gamePaused;
 	bool gameOver;
-	bool hardMode = true; // hard mode is 25% faster
+	bool hardMode = false; // hard mode is 25% faster
 	bool dialogueScene = false;
 	bool cutScene = false;
 	int dialogueChoice = -1;
