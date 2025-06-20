@@ -1007,7 +1007,7 @@ void EnemySystem::launchBombard(const AttackData& atkData) {
         vec2 pos = (ratio * line) + ((1.f - ratio) * -line);
         pos += center + perp * (float)(200 - rand() % 400);
         if (pos.x < min.x || pos.y < min.y || pos.x > max.x || pos.y > max.y) continue;
-        createBombard(render, i * 300, pos);
+        createBombard(render, i * 300, pos, atkData.attackType);
     }
 }
 
@@ -1113,7 +1113,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         shootTwoWall(atkData, atkData.angleOffset, elapsed_ms);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
-    else if (atkData.attackType == EnemyAttackPattern::BOMBARD)
+    else if (atkData.attackType == EnemyAttackPattern::BOMBARD || atkData.attackType == EnemyAttackPattern::BOMBARDBOMBING)
     {
         launchBombard(atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;

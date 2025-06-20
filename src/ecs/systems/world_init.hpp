@@ -120,7 +120,7 @@ void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 positio
 
 Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range = 1000);
 
-Entity createBombard(RenderSystem* renderer, float wait, vec2 position);
+Entity createBombard(RenderSystem* renderer, float wait, vec2 position, EnemyAttackPattern pattern);
 
 void createNTentaclePlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction, float range = 1000);
 

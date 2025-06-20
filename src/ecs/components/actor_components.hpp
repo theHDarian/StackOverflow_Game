@@ -479,6 +479,7 @@ enum class EnemyAttackPattern {
     TWO_WALL,
     SPAWNING,
     BOMBARD,
+    BOMBARDBOMBING,
     NONE
 };
 
@@ -486,7 +487,8 @@ enum class EnemyBulletDeath {
     NONE,
     EXPLODE,
     CLUSTER,
-    BOMBARD
+    BOMBARD,
+    BOMBARDBOMBING
 };
 
 
@@ -527,6 +529,7 @@ struct AttackData {
 struct Bombard {
     float cdTillAppear = 0;
     float cdTillDisappear = 2000;
+    EnemyBulletDeath effect = EnemyBulletDeath::BOMBARD;
 };
 
 enum class SpecialStates {

@@ -2724,6 +2724,15 @@ Entity createEnemyBulletDeath(RenderSystem *renderer, vec2 pos, vec2 velocity, E
 		motion.scale = { 20, 20 }; // Ensure scale is initialized
 		render = "enemy_bullet_triangle.png";
 	}
+	else if (onDeath == EnemyBulletDeath::BOMBARDBOMBING)
+	{
+		bullet.bulletSpeed = 200;
+		bullet.bulletRange = 200;
+		motion.velocity = velocity * bullet.bulletSpeed;
+		motion.scale = { 0, 0 }; // Ensure scale is initialized
+		bullet.onDeath = EnemyBulletDeath::EXPLODE;
+		render = "none.png";
+	}
 
 	auto &spriteComponent = registry.sprites.emplace(entity);
 
@@ -3036,16 +3045,17 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 	return entity;
 }
 
-Entity createBombard(RenderSystem* renderer, float wait, vec2 position)
+Entity createBombard(RenderSystem* renderer, float wait, vec2 position, EnemyAttackPattern pattern)
 {
 	auto entity = Entity();
 
 	auto& bombard = registry.bombards.emplace(entity);
 	bombard.cdTillAppear = wait;
+	bombard.effect = (pattern == EnemyAttackPattern::BOMBARD) ? EnemyBulletDeath::BOMBARD : EnemyBulletDeath::BOMBARDBOMBING;
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);
-	motion.angle = M_PI * (float)(rand() % 100);
+	motion.angle = M_PI * (float)(rand() % 100) / 100.f;
 	motion.velocity = vec2(0);
 	motion.position = position;
 	motion.scale = vec2(288 / 4); // Ensure scale is initialized

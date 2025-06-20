@@ -353,7 +353,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if ((bombard.cdTillDisappear -= getAdjustedTime(elapsed_ms_since_last_update)) <= 0) {
 					Motion& bm = registry.motions.get(registry.bombards.entities[i]);
 					for (int j = 0; j < 20; j++) {
-						createEnemyBulletDeath(renderer, bm.position, vec2(cos(2.f * M_PI * j / 20.f), sin(2.f * M_PI * j / 20.f)), EnemyBulletDeath::BOMBARD);
+						createEnemyBulletDeath(renderer, bm.position, vec2(cos(2.f * M_PI * j / 20.f), sin(2.f * M_PI * j / 20.f)), bombard.effect);
 					}
 					registry.deleteds.emplace(registry.bombards.entities[i]);
 				}
