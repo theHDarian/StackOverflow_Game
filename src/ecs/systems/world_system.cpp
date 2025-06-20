@@ -1023,7 +1023,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 						tm.coolDown = tm.BASECOOLDOWN ;
 					}
 					else {
-						tm.coolDown -= getEffectValueTierThresholdDifference(PlayerSpeed) * (tm.COUNTDOWNPERSPEED/2);
+						tm.coolDown -= getEffectValueTierThresholdDifference(PlayerSpeed) * (tm.COUNTDOWNPERSPEED*2);
 					}
 				}
 			}

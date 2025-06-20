@@ -72,6 +72,9 @@ Was it worth it?
 
 UI Tier_FireRate
 Burst fires bullets, increasing with additional <color=orange>Fire Rate </color>
-\n\nBullets per burst: {0} 
+\n\nBullets per burst: {0}
+
+UI Tier_PlayerSpeed
+Upon contact with a bullet or enemy, drastically slow down time for <color=purple_med>4s</color>, with an additional <color=purple_med>0.5s</color> per <color=purple_med>Bullet Speed Up</color> above 5. Can only be triggered once every <color=purple_med>10s</color>. Taking damage reduces the cooldown by <color=purple_med>1s</color>.
 
 

@@ -58,16 +58,16 @@ const std::map<BulletEffectType, std::string> tierNames = {
     {BulletDamage,      "Burning Bullets"},
     {ProjectileSize,    "Splitting Bullets"},     // Bullet explodes into smaller bullets on deletion
     {FireRate,          "Burst Fire"},             // Activates burst-fire mode, +1 per firerate about threshold
-    {BulletRange,       "Sniper's Prowess"},     // Deal more damage the further away from the player the enemy is (up to 2x)
+    {BulletRange,       "Hawk-eyed"},     // Deal more damage the further away from the player the enemy is (up to 2x)
     {BulletAccuracy,    "Critical Weakness"},     // Inflict vulnerable for 4000
     {BulletNum,         "Many Mini Menaces"},     // Fires 4 * (1 + value-threshold) mini bullets
     {Bounce,            "Heat-seeking Bounces"},     // Bouncing towards random enemy
     {Pierce,            "To Pierce Through All Defences"},     // Deal more dmg to protected enemies, and vulnerable effect stronger
     {Homing,            "Greed"},
-    {PlayerSpeed,       "PlayerSpeed"},
+    {PlayerSpeed,       "Momentary Reprieve"}, //Enter bullet time (non-player entities slowed by 80%) upon taking damage
     {PlayerNumDash,     "Clear The Path"},
     {PlayerStackSize,   "PlayerStackSize"},
-    {PlayerDashRecharge,"Outrun Inert(ia)"}      // 50% Chance to dodge inert effect from bullets or enemies
+    {PlayerDashRecharge,"Outrun Inert(ia)"},      // 50% Chance to dodge inert effect from bullets or enemies
 };
 
 const std::unordered_map<std::string, InteractableItem> interactableItemNames = {
