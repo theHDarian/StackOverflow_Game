@@ -26,10 +26,7 @@
 using Clock = std::chrono::high_resolution_clock;
 
 // Game configuration
-const size_t MAX_NUM_EELS = 15;
-const size_t MAX_NUM_FISH = 5;
-const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
-const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
+constexpr size_t HARD_MODE_TIME_MODIFIER = 1.25f; // 25% faster
 
 
 #pragma region init
@@ -255,8 +252,23 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		{
 			for (int i = (int)registry.timeModifiers.components.size() - 1; i >= 0; --i) {
 				TimeModifier& entity = registry.timeModifiers.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
-					registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
+				entity.countDown -= elapsed_ms_since_last_update;
+				if (entity.countDown <= 0) {
+					if (entity.coolDown != -9999) {
+						entity.coolDown -= elapsed_ms_since_last_update;
+						if (entity.coolDown <= 0) {
+							registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
+						}
+					}
+					else {
+						// remove time modifier if it is not the player
+						registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
+					}
+					// if (entity.modifier != HARD_MODE_TIME_MODIFIER && registry.gameStates.has(registry.timeModifiers.entities[i]) && registry.gameStates.get(registry.timeModifiers.entities[i]).hardMode) {
+					// 	entity.modifier = HARD_MODE_TIME_MODIFIER;
+					// 	continue;
+					// }
+
 				}
 			}
 		}
@@ -1001,11 +1013,18 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 				{
 					TimeModifier& tm = registry.timeModifiers.emplace(player);
 					tm.modifier = 0.2f;
-					tm.countdown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+					tm.countDown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+					tm.coolDown = tm.BASECOOLDOWN;
 				} else {
 					TimeModifier& tm = registry.timeModifiers.get(player);
-					tm.modifier = 0.2f;
-					tm.countdown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+					if (tm.coolDown < 0) {
+						tm.modifier = 0.2f;
+						tm.countDown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+						tm.coolDown = tm.BASECOOLDOWN ;
+					}
+					else {
+						tm.coolDown -= getEffectValueTierThresholdDifference(PlayerSpeed) * (tm.COUNTDOWNPERSPEED/2);
+					}
 				}
 			}
 		}

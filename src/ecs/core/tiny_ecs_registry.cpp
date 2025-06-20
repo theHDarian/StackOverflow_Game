@@ -36,12 +36,19 @@ float getAdjustedTime (float elapsed_time, Entity entity)
     if (registry.timeModifiers.has(entity))
     {
         TimeModifier& timeModifier = registry.timeModifiers.get(entity);
-        adjustedTime *= timeModifier.modifier;
+        if (!(timeModifier.countDown <= 0 && timeModifier.coolDown > 0 && timeModifier.coolDown != -9999))
+        {
+            adjustedTime *= timeModifier.modifier;
+        }
     }
     if (registry.timeModifiers.has(registry.players.entities[0]))
     {
         TimeModifier& timeModifier = registry.timeModifiers.get(registry.players.entities[0]);
-        adjustedTime *= timeModifier.modifier;
+        if (!(timeModifier.countDown <= 0 && timeModifier.coolDown > 0 && timeModifier.coolDown != -9999))
+        {
+            adjustedTime *= timeModifier.modifier;
+        }
+
     }
     return adjustedTime;
 }

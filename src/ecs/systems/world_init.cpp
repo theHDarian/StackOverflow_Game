@@ -92,6 +92,9 @@ Entity resetPlayer()
 	{
 		registry.invincibles.remove(ent);
 	}
+	if (registry.timeModifiers.has(ent)) {
+		registry.timeModifiers.remove(ent);
+	}
 
 	return ent;
 }
@@ -2290,6 +2293,13 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	if (registry.instanceDamages.has(entity)) {
 		auto& instance = registry.instanceDamages.get(entity);
 		instance.instance = enemy.maxHealth;
+	}
+	if (registry.gameStates.components[0].hardMode) {
+		enemy.maxHealth *= 1.5f;
+		enemy.currHealth = enemy.maxHealth;
+		TimeModifier& tm = registry.timeModifiers.emplace(entity);
+		tm.modifier = 1.25f;
+		tm.countDown = 9999999999999999999.f;
 	}
 
 	// to make hp bar drawing easier

@@ -286,11 +286,14 @@ struct Burning {
 struct TimeModifier {
     // Used for slowing down the player or enemies
     // When countdown reaches 0, remove component
-    float countdown = 1000;
-    float modifier = 0.15f; // 1 is normal speed
-
     float BASECOUNTDOWN = 4000;
     float COUNTDOWNPERSPEED = 500;
+    float BASECOOLDOWN = 30000;
+
+    float countDown = 1000;
+    float modifier = 0.2f; // 1 is normal speed
+    float coolDown = -9999; // -9999 means no cooldown
+
 };
 
 struct PlayerAttackData {

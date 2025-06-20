@@ -1080,7 +1080,7 @@ void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 	float bulletTime = 0.f;
 	if (registry.timeModifiers.entities.size() > 0) {
 		TimeModifier tm = registry.timeModifiers.components[0];
-		bulletTime = 1.f - (tm.countdown / (tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED)));
+		bulletTime = 1.f - (tm.countDown / (tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED)));
 		bulletTime = max(0.f, -powf(bulletTime, 8) + 1);
 	}
 	GLuint bullet_time_uloc = glGetUniformLocation(postprocess_program, "bulletTime");
