@@ -1075,11 +1075,10 @@ void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 	glUniform1f(chrom_abb_intensity_uloc, intensity);
 
 	// Set bullettime effect
-	// TODO connect to player speed tier
 	// Might be good with a smooth-in-smooth-out function applied so it isn't too jarring
 	float bulletTime = 0.f;
-	if (registry.timeModifiers.entities.size() > 0) {
-		TimeModifier tm = registry.timeModifiers.components[0];
+	if (registry.timeModifiers.has(registry.players.entities[0])) {
+		TimeModifier tm = registry.timeModifiers.get(registry.players.entities[0]);
 		bulletTime = 1.f - (tm.countDown / (tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED)));
 		bulletTime = max(0.f, -powf(bulletTime, 8) + 1);
 	}
@@ -1919,7 +1918,13 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 
 		setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "tier_icons", COLOR_WHITE, projection, motion, false, tier.first);
 		GLint greyscale_toggle = glGetUniformLocation(program, "greyscale");
-		glUniform1i(greyscale_toggle, getEffectValue(tier.first) < getEffectTierThreshold(tier.first));
+		float greyscaleLevel = 1 - ((float)getEffectValue(tier.first) / (float)getEffectTierThreshold(tier.first));
+		if (tier.first == PlayerSpeed && checkTierThreshold(PlayerSpeed) && registry.timeModifiers.has(registry.players.entities[0])) {
+			TimeModifier tm = registry.timeModifiers.get(registry.players.entities[0]);
+			greyscaleLevel = tm.coolDown / tm.BASECOOLDOWN;
+		}
+		greyscaleLevel = max(greyscaleLevel, 0.f);
+		glUniform1f(greyscale_toggle, greyscaleLevel);
 		drawBasicAnimateTextured();
 	}
 }
@@ -2409,7 +2414,7 @@ void RenderSystem::resetProgramToggle(GLint program) {
 	glUniform1i(effect_size_uloc, 1);
 
 	GLint greyscale = glGetUniformLocation(program, "greyscale");
-	glUniform1i(greyscale, false);
+	glUniform1f(greyscale, 0.0);
 
 	gl_has_errors();
 }

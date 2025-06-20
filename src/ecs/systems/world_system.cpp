@@ -251,12 +251,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.timeModifiers.entities.size() > 0)
 		{
 			for (int i = (int)registry.timeModifiers.components.size() - 1; i >= 0; --i) {
-				TimeModifier& entity = registry.timeModifiers.components[i];
-				entity.countDown -= elapsed_ms_since_last_update;
-				if (entity.countDown <= 0) {
-					if (entity.coolDown != -9999) {
-						entity.coolDown -= elapsed_ms_since_last_update;
-						if (entity.coolDown <= 0) {
+				TimeModifier& tm = registry.timeModifiers.components[i];
+				tm.countDown -= elapsed_ms_since_last_update;
+				if (tm.countDown <= 0) {
+					if (tm.coolDown != -9999) {
+						tm.coolDown -= elapsed_ms_since_last_update;
+						if (tm.coolDown <= 0) {
 							registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
 						}
 					}
@@ -264,7 +264,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 						// remove time modifier if it is not the player
 						registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
 					}
-					// if (entity.modifier != HARD_MODE_TIME_MODIFIER && registry.gameStates.has(registry.timeModifiers.entities[i]) && registry.gameStates.get(registry.timeModifiers.entities[i]).hardMode) {
+					// if (tm.modifier != HARD_MODE_TIME_MODIFIER && registry.gameStates.has(registry.timeModifiers.entities[i]) && registry.gameStates.get(registry.timeModifiers.entities[i]).hardMode) {
 					// 	entity.modifier = HARD_MODE_TIME_MODIFIER;
 					// 	continue;
 					// }
@@ -1020,7 +1020,7 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 					if (tm.coolDown < 0) {
 						tm.modifier = 0.2f;
 						tm.countDown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
-						tm.coolDown = tm.BASECOOLDOWN ;
+						tm.coolDown = tm.BASECOOLDOWN;
 					}
 					else {
 						tm.coolDown -= getEffectValueTierThresholdDifference(PlayerSpeed) * (tm.COUNTDOWNPERSPEED/2);
