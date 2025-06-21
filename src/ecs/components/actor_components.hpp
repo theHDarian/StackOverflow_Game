@@ -941,6 +941,12 @@ struct EnemyPart {
     Entity parent;
     vec2 offset;
     bool alwaysFollow = false;
+    float damageShare = 0.f;
+    bool showHpBar = false;
+    // How much damage the parent takes when this part is hit:
+    // 0.f means the parent takes no damage, 0.f < damageShare < 1.f means the damage is split between the parent and this part
+    //  > 1.f means this part takes no damage while the parent takes all the damage multiplied by damageShare
+    // < 0.f means this part takes the full damage, while the parent also takes damage multiplied by the absolute value of damageShare
 };
 
 struct Cloaked {

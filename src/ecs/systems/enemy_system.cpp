@@ -410,12 +410,43 @@ void EnemySystem::step(float Elapsed_ms)
             }
             if (registry.wormBodies.has(entity)) {
                Enemy& head = registry.enemies.get(registry.wormBodies.get(entity).head);
-               if (!registry.invincibles.has(registry.wormBodies.get(entity).head)) head.currHealth -= damage;
+               if (!registry.invincibles.has(registry.wormBodies.get(entity).head)) {
+                   float mult = 1.f;
+                   if (registry.vulnerabilities.has(registry.wormBodies.get(entity).head))
+                        mult = registry.vulnerabilities.get(registry.wormBodies.get(entity).head).modifier;
+                   head.currHealth -= damage * mult;
+               }
             }
             else if (registry.instanceDamages.has(entity)) {
                 InstanceDamage& instance = registry.instanceDamages.get(entity);
                 instance.instance--;
                 registry.enemies.get(entity).currHealth = instance.instance;
+            }
+            else if (registry.enemyParts.has(entity) && registry.enemies.has(registry.enemyParts.get(entity).parent) && registry.enemyParts.get(entity).damageShare != 0) {
+                EnemyPart& part = registry.enemyParts.get(entity);
+                if (part.damageShare < 0) {
+                    // If damage share is negative, it takes full damage and the parent takes the same damage multiplied by the damage share
+                    if (!registry.invincibles.has (part.parent)) {
+                        Enemy& parentStat = registry.enemies.get(part.parent);
+                        float mult = 1.f;
+                        if (registry.vulnerabilities.has(part.parent))
+                            mult = registry.vulnerabilities.get(part.parent).modifier;
+                        parentStat.currHealth -= -part.damageShare * damage * mult;
+                    }
+                    enemyStat.currHealth -= damage;
+                } else {
+                    // If damage share is positive, the damage is split between the part and the parent
+                    if (!registry.invincibles.has (part.parent)) {
+                        float mult = 1.f;
+                        if (registry.vulnerabilities.has(part.parent))
+                            mult = registry.vulnerabilities.get(part.parent).modifier;
+                        Enemy& parentStat = registry.enemies.get(part.parent);
+                        parentStat.currHealth -= part.damageShare * damage * mult;
+                    }
+                    if (enemyStat.currHealth > 0) {
+                        enemyStat.currHealth -= max((1 - part.damageShare), 0.f) * damage;
+                    }
+                }
             }
             else {
                 enemyStat.currHealth -= damage;

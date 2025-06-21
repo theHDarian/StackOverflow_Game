@@ -7669,7 +7669,7 @@ struct Bubble : Enemy
 
 	Bubble()
 	{
-		maxHealth = 20;
+		maxHealth = 35;
 
 		currHealth = maxHealth;
 

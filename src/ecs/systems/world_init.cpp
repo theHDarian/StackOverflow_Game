@@ -1954,6 +1954,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		auto& bp = registry.bossParts.emplace(entity);
 		bp.diesWithBoss = true;
 		bp.showHpBar = true;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.damageShare = -0.67f;
+		ep.showHpBar = true;
 		break;
 	}
 	case BossConstructPURPLE:
@@ -1966,6 +1969,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		auto& bp = registry.bossParts.emplace(entity);
 		bp.diesWithBoss = true;
 		bp.showHpBar = true;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.damageShare = -0.67f;
+		ep.showHpBar = true;
 		break;
 	}
 	case BossConstructGREEN:
@@ -1978,6 +1984,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		auto& bp = registry.bossParts.emplace(entity);
 		bp.diesWithBoss = true;
 		bp.showHpBar = true;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.damageShare = -0.67f;
+		ep.showHpBar = true;
 		break;
 	}
 	case BossConstructRED:
@@ -1990,6 +1999,9 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		auto& bp = registry.bossParts.emplace(entity);
 		bp.diesWithBoss = true;
 		bp.showHpBar = true;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.damageShare = -0.67f;
+		ep.showHpBar = true;
 		break;
 	}
 	case EnemyEyeCube:
@@ -2302,8 +2314,23 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		tm.countDown = 9999999999999999999.f;
 	}
 
+	bool bossPart = registry.bossParts.has(entity);
+	if (bossPart) {
+		auto& bp = registry.bossParts.get(entity);
+		if (bp.showHpBar) {
+			bossPart = false;
+		}
+	}
+
+	bool enemyPart = registry.enemyParts.has(entity);
+	if (enemyPart) {
+		auto& ep = registry.enemyParts.get(entity);
+		if (ep.showHpBar) {
+			enemyPart = false;
+		}
+	}
 	// to make hp bar drawing easier
-	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.invisibleEnemy.has(entity)) && (!registry.bossParts.has(entity) || !registry.bossParts.get(entity).showHpBar) && !registry.enemyParts.has(entity)) {
+	if ((!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.invisibleEnemy.has(entity)) && !bossPart && !enemyPart) {
 		HPBarUI& hpbar = registry.hpBarHavers.emplace(entity);
 		if (registry.bosses.has(entity)) {
 			hpbar.followCamera = false;
