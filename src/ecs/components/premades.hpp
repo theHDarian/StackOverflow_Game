@@ -2640,6 +2640,8 @@ struct HifiBoid : Enemy
 		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
 		rotatePower = 1.f;
+
+		collisionBullet = {playerSpeedUp};
 	}
 };
 
@@ -2664,6 +2666,8 @@ struct HifiTemporaryBoid : Enemy
 		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
 		rotatePower = 1.f;
+
+		collisionBullet = { playerSpeedUp };
 	}
 };
 
@@ -2888,6 +2892,7 @@ struct BioBoid : Enemy
 		};
 		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
+
 		collisionBullet = {playerSpeedUp};
 	}
 };
@@ -2911,6 +2916,8 @@ struct FishBoid : Enemy
 		};
 		scale = vec2({20.f, 20.f});
 		patternIndex = 0;
+
+		collisionBullet = { playerSpeedUp };
 	}
 };
 
@@ -2961,7 +2968,8 @@ struct MedBoid : Enemy
 		};
 		scale = vec2({72.f / 1.25, 48.f / 1.25});
 		patternIndex = 0;
-		collisionBullet = {bulletPierceDown};
+
+		collisionBullet = {playerSpeedUp, bulletBounceDown};
 	}
 };
 
@@ -3010,7 +3018,8 @@ struct PillBoid : Enemy
 		scale = vec2({48.f, 24.f});
 		patternIndex = 0;
 		rotatePower = 1.f;
-		collisionBullet = {bulletRangeDown, bulletRangeDown};
+
+		collisionBullet = { playerSpeedUp };
 	}
 };
 
@@ -4166,9 +4175,9 @@ struct PileDriverTurret : Enemy
 		blunt,
 		2,
 		M_PI/30.f,
-		{300, 20},
+		{100, 20},
 		400,
-		12000,
+		8000,
 		{0, 0},
 		100,
 		-100,
@@ -7425,22 +7434,6 @@ struct EyeCube : Enemy {
 	0 };
 
 
-	const AttackData wallTest{
-	EnemyAttackPattern::TWO_WALL,
-	CIRCLE,
-	{},
-	dmgDown,
-	0,
-	0,
-	{40, 40},
-	150,
-	14000.f,
-	{0,0},
-	-100,
-	0,
-	0 };
-
-
 	Reaction duration0 = {
 	ReactionType::DURATION,
 	0 };
@@ -7453,7 +7446,6 @@ struct EyeCube : Enemy {
 
 	EnemyPattern followState = { "ROLLING", EnemyBehavior::ROOK_FOLLOW, {}, 0, 7000.f, 7000.f, {duration1}, 1, false, 0.f, 5000.f, quadShot };
 	EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration0}, 0, true, 0.f, 3000.f, laserSweep };
-	//EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 4000.f, 4000.f, {duration0}, 0, true, 0.f, 2000.f, wallTest };
 
 
 	EyeCube()
@@ -7472,6 +7464,88 @@ struct EyeCube : Enemy {
 		scale = vec2({ 336.0f / 2, 336.f / 2 });
 		rotatePower = 1.0;
 		speedMultiplier = 4.0f;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+	};
+};
+
+struct Maw : Enemy {
+
+	const AttackData radialBurst1{
+	EnemyAttackPattern::BURST_RADIAL,
+	TRIANGLE,
+	{},
+	blunt,
+	64,
+	M_PI / 20,
+	{20, 20},
+	150,
+	9000,
+	{4, 200},
+	0,
+	0,
+	0 };
+
+	const AttackData teethBlast{
+	EnemyAttackPattern::SHOTGUN,
+	TRIANGLE,
+	{},
+	blunt,
+	3,
+	M_PI / 16,
+	{20, 20},
+	500,
+	3000,
+	{0, 0},
+	2,
+	0,
+	0 };
+
+	Reaction centered = {
+		ReactionType::FINISH_PATROL,
+		1
+	};
+
+	Reaction duration0 = {
+		ReactionType::DURATION,
+		0
+	};
+
+	Reaction duration1 = {
+		ReactionType::DURATION,
+		1
+	};
+
+	Reaction duration2 = {
+		ReactionType::DURATION,
+		2
+	};
+
+
+	EnemyPattern centerState = { "ROLLING", EnemyBehavior::PATROLLING, {{0.5,0.5}}, 0, 7000.f, 7000.f, {centered}, 1, false, 0.f, 5000.f, quadShot };
+	EnemyPattern attackState = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 12800.f, 12800.f, {duration2}, 2, true, 0.f, 100.f, radialBurst1, SpecialStates::PROTECTED };
+	EnemyPattern followState = { "ROLLING", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 10000.f, 10000.f, {duration0}, 0, true, 0.f, 1000.f, teethBlast };
+
+
+	Maw()
+	{
+		maxHealth = 2000;
+		currHealth = maxHealth;
+
+		enemyPatterns = { centerState, attackState, followState };
+
+		patternIndex = 0;
+		sprite = {
+			"military_maw",
+			EFFECT_ASSET_ID::ANIMATE,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0),
+			AnimationTypes::REGULAR,
+			8,
+			50
+		};
+		scale = vec2({ 336.0f / 2, 336.f / 2 });
+		rotatePower = 1.0;
+		speedMultiplier = 3.0f;
 		rotationBehaviour = EnemyRotationBehavior::NONE;
 	};
 };

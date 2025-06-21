@@ -81,14 +81,14 @@ struct StackCompile {
 
     // x<0 does nothing (except waste space on stack)
     float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
-    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
+    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x) * 5.f) : (float)x, 80.f); };
     float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? ((x < tierThresholds[FireRate]) ? -500.f + 1000.f / ((float)x + 2.f) : -300.f + 1000.f / ((float)x + 2.f)) : -50.f * (float)x, 1000.f); };
     float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
     float bulletSpreadFunc(int x)       { return clamp(-15.f, (x > 0) ? -2.f * (float)x : -20.f * (float)x, 330.f); };
     float bulletNumFunc(int x)          { return clamp(0.f, (float)x, 50.f); };
     float bounceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
     float pierceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
-    float homingFunc(int x)             { return clamp(0.f, (float)x / 40.f, 1.f); };
+    float homingFunc(int x)             { return clamp(0.f, (float)x / 30.f, 1.f); };
     float playerSpeedFunc(int x)        { return clamp(-150.f, (float)x * 20.f, 300.f); };
     float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 5.f); };
     float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 2.f, 64.f); };
@@ -444,6 +444,7 @@ enum EnemyType {
     // Military
     EnemyEyeCube,
     EnemyPhantom,
+    EnemyMaw,
 
     // event room enemies
     // single target buffs, place at the same position as target
@@ -569,7 +570,7 @@ enum class EnemyBehavior {
     FOLLOW_PLAYER,
     RETREAT,
     RECOIL,
-    ANGRY,
+    ANGRY, // Unused
     PATROLLING,
     EVADEBULLET,
     CIRCLINGPLAYER,

@@ -2009,6 +2009,11 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 			enemy = EyeCube();
 			break;
 		}
+	case EnemyMaw:
+	{
+		enemy = Maw();
+		break;
+	}
 	case EnemyPhantom: {
 		enemy = Phantom();
 		Buffer& buffer = registry.buffers.emplace(entity);
@@ -3075,10 +3080,6 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
-	// add bullet trail
-	ParticleProps props = playerBulletTrail;
-	props.position.variation = VecOp::rotate(motion.scale, motion.angle);
-	EmitParticle& ep = registry.emitParticles.emplace(entity, PBulletTrail, props, 10000, Random::Int(2) + 1);
 	return entity;
 }
 
