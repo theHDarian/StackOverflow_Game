@@ -446,7 +446,7 @@ void AISystem::step(float elapsed_ms)
 	// std::cout << enemy_registry.entities.size() << " is the size of enemy entity" << std::endl;
 	for (Entity entity : enemy_registry.entities)
 	{
-
+		float Elapsed_ms = getAdjustedTime(elapsed_ms, entity);
 		Enemy &enemy = enemy_registry.get(entity);
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
 		enemy.newPattern = false;
@@ -454,7 +454,7 @@ void AISystem::step(float elapsed_ms)
 		// std::cout << currPattern.name << " initial" << std::endl;
 		EnemyMovement &movement = movement_registry.get(entity);
 		Motion &motion = registry.motions.get(entity);
-		currPattern.curDuration -= elapsed_ms;
+		currPattern.curDuration -= Elapsed_ms;
 		// SENSING
 		updateState(enemy, movement, entity);
 		// if (enemy.newPattern) {
@@ -466,7 +466,7 @@ void AISystem::step(float elapsed_ms)
 
 		if (registry.regenerates.has(entity) && !registry.instanceDamages.has(entity)) {
 			auto& regen = registry.regenerates.get(entity);
-			if ((regen.currHealInterval -= elapsed_ms) <= 0) {
+			if ((regen.currHealInterval -= Elapsed_ms) <= 0) {
 				enemy.currHealth += regen.healAmount;
 				if (enemy.currHealth > enemy.maxHealth) enemy.currHealth = enemy.maxHealth;
 				regen.currHealInterval = regen.healInterval;
