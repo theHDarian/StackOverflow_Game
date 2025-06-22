@@ -7795,7 +7795,7 @@ struct SkullMissile : Enemy
 		ReactionType::DURATION,
 		0 };
 
-	EnemyPattern waitingState = { "ROLLING", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 1000000.f, 1000000.f, {playerClose}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern waitingState = { "ROLLING", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 5000.f, 5000.f, {duration, playerClose}, 2, false, 0.f, 5000.f, quadShot };
 	EnemyPattern explodingState = { "ROLLING", EnemyBehavior::DEATHSTATE, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 5000.f, blowup,  };
 	EnemyPattern laserExplode = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 400.f, 400.f, {duration}, 1, true, 0.f, 5000.f, bomberManExplosion };
 	SkullMissile()
@@ -7871,19 +7871,20 @@ struct Cross : Enemy
 		EnemyType::EnemySmallCShield};
 
 	const AttackData halo{
-		EnemyAttackPattern::SHOTGUN,
+		EnemyAttackPattern::BOMBARD,
 		RECTANGLE,
 		{dmgUp2, bulletRangeUp},
 		dmgDown2,
-		12,
+		2,
 		M_PI / 6.f,
 		{60, 10},
 		250,
-		10000,
+		1200,
 		{200, -2 * M_PI / 3.0},
 		0,
 		0,
-		0
+		0,
+		EnemyBulletDeath::EXPLODE
 	};
 
 	Reaction duration = {
