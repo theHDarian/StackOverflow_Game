@@ -75,6 +75,11 @@ Burst fires bullets, increasing with additional <color=orange>Fire Rate </color>
 \n\nBullets per burst: {0}
 
 UI Tier_PlayerSpeed
-Upon contact with a bullet or enemy, drastically slow down time for <color=purple_med>4s</color>, with an additional <color=purple_med>0.5s</color> per <color=purple_med>Bullet Speed Up</color> above 5. Can only be triggered once every <color=purple_med>10s</color>. Taking damage reduces the cooldown by <color=purple_med>1s</color>.
+#Drastically slow down time upon contact with a bullet or enemy. Can only be triggered once every <color=green_light> 10 </color> seconds. Taking damage reduces the cooldown.
+#\n<color=green_light>OverCharge</color>: Effect duration increased by <color=green_light>0.5s</color> and cooldown reduction increased by <color=green_light>1s</color> per <color=green_light>Bullet Speed Up</color> above tier threshold.
+
+
+
+Upon contact with a bullet or enemy, drastically slow down time for <color=green_light>{0}</color>, with an additional <color=green_light>0.5s</color> per <color=green_light>Bullet Speed Up</color> above tier threshold. Can only be triggered once every <color=green_light>10s</color>. ,,,,Taking damage reduces the cooldown by <color=green_light>1s</color>.
 
 

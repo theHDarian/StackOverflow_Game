@@ -13,6 +13,12 @@
 #include <glm/gtx/spline.hpp>
 #include <glm/gtx/norm.hpp>
 
+//global values
+float HASTY_TIME_MODIFIER = 1.75f; // 75% faster
+float SLUGGISH_TIME_MODIFIER = 0.5f; // 50% slower
+float PROTECTED_DAMAGE_MODIFIER = 0.5f; // 50% less damage
+float VULNERABLE_DAMAGE_MODIFIER = 1.5f; // 50% extra damage
+
 // returns a vec4(min position, max position)
 vec4 getRoomBounds(Entity entity)
 {
@@ -41,9 +47,40 @@ vec2 boundPosition(vec2 position, Entity entity)
 	return glm::clamp(position, min, max);
 }
 
+void clearAllSpecialStates (Entity entity)
+{
+	if (registry.invincibles.has(entity)) {
+		registry.invincibles.remove(entity);
+	}
+	if (registry.invisibles.has(entity)) {
+		registry.invisibles.remove(entity);
+	}
+	if (registry.vulnerabilities.has(entity)) {
+		registry.vulnerabilities.remove(entity);
+	}
+	if (registry.moles.has(entity)) {
+		registry.moles.remove(entity);
+		if (registry.persistentSounds.has(entity))
+			registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
+	}
+	if (registry.regenerates.has(entity)) {
+		registry.regenerates.remove(entity);
+	}
+	if (registry.cloaks.has(entity)) {
+		registry.cloaks.remove(entity);
+	}
+	if (registry.timeModifiers.has(entity)) {
+		registry.timeModifiers.remove(entity);
+	}
+	if (registry.onFires.has(entity)) {
+		registry.onFires.remove(entity);
+	}
+}
+
+
 void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 {
-
+	//INC_ANIM for pattern special states is not handled here, it is handled in enemy system when the enemy attacks
 	switch (currPattern.specialState) {
 		case SpecialStates::INVINCIBLE:
 			if (!registry.invincibles.has(entity)) {
@@ -88,11 +125,11 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				if (vul.countdown < currPattern.curDuration || vul.modifier != 2.f) {
 					vul.countdown = currPattern.curDuration;
 				}
-				vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+				vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
                 vul.countdown = currPattern.curDuration;
-                vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+                vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
             }
 		break;
 		case SpecialStates::UNDERGROUND:
@@ -132,33 +169,34 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				}
 			}
 		break;
+		case SpecialStates::HASTY:
+			if (!registry.timeModifiers.has(entity)) {
+				auto& tm = registry.timeModifiers.emplace(entity);
+				tm.modifier = HASTY_TIME_MODIFIER;
+				tm.countDown = currPattern.curDuration;
+				tm.coolDown = -9999; // no cooldown
+			} else {
+				auto& tm = registry.timeModifiers.get(entity);
+				if (tm.countDown < currPattern.curDuration) {
+					tm.countDown = currPattern.curDuration;
+				}
+			}
+		break;
+		case SpecialStates::SLUGGISH:
+		if (!registry.timeModifiers.has(entity)) {
+			auto& tm = registry.timeModifiers.emplace(entity);
+			tm.modifier = SLUGGISH_TIME_MODIFIER;
+			tm.countDown = currPattern.curDuration;
+			tm.coolDown = -9999; // no cooldown
+		} else {
+			auto& tm = registry.timeModifiers.get(entity);
+			if (tm.countDown < currPattern.curDuration) {
+				tm.countDown = currPattern.curDuration;
+			}
+		}
+		break;
 		case SpecialStates::CLEAR_ALL:
-			if (registry.invincibles.has(entity)) {
-				auto& inv = registry.invincibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.invisibles.has(entity)) {
-				auto& inv = registry.invisibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.vulnerabilities.has(entity)) {
-				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = -1;
-			}
-			if (registry.moles.has(entity)) {
-				auto& under = registry.moles.get(entity);
-				under.countdown = -1;
-				if (registry.persistentSounds.has(entity))
-					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
-			}
-			if (registry.regenerates.has(entity)) {
-				auto& under = registry.regenerates.get(entity);
-				under.countdown = -1;
-			}
-			if (registry.cloaks.has(entity)) {
-				auto& cloak = registry.cloaks.get(entity);
-				cloak.countdown = -1;
-			}
+			clearAllSpecialStates(entity);
 			break;
 		case SpecialStates::CLEAR_INVINCIBLE:
 			if (registry.invincibles.has(entity)) {
@@ -258,14 +296,14 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
 				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
-				vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+				vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
                 float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 				if (countdown > vul.countdown || vul.modifier != 2.f) {
 					vul.countdown = countdown;
 				}
-                vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+                vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
             }
 		break;
 		case SpecialStates::UNDERGROUND:
@@ -314,33 +352,36 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			}
 		break;
 
+		case SpecialStates::HASTY:
+			if (!registry.timeModifiers.has(entity)) {
+				auto& tm = registry.timeModifiers.emplace(entity);
+				tm.modifier = HASTY_TIME_MODIFIER;
+				tm.countDown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			} else {
+				auto& tm = registry.timeModifiers.get(entity);
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > tm.countDown) {
+					tm.countDown = countdown;
+				}
+			}
+		break;
+
+		case SpecialStates::SLUGGISH:
+			if (!registry.timeModifiers.has(entity)) {
+				auto& tm = registry.timeModifiers.emplace(entity);
+				tm.modifier = SLUGGISH_TIME_MODIFIER;
+				tm.countDown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			} else {
+				auto& tm = registry.timeModifiers.get(entity);
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > tm.countDown) {
+					tm.countDown = countdown;
+				}
+			}
+		break;
+
 		case SpecialStates::CLEAR_ALL:
-			if (registry.invincibles.has(entity)) {
-				auto& inv = registry.invincibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.invisibles.has(entity)) {
-				auto& inv = registry.invisibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.vulnerabilities.has(entity)) {
-				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = -1;
-			}
-			if (registry.moles.has(entity)) {
-				auto& under = registry.moles.get(entity);
-				under.countdown = -1;
-				if (registry.persistentSounds.has(entity))
-					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
-			}
-			if (registry.regenerates.has(entity)) {
-				auto& under = registry.regenerates.get(entity);
-				under.countdown = -1;
-			}
-			if (registry.cloaks.has(entity)) {
-				auto& cloak = registry.cloaks.get(entity);
-				cloak.countdown = -1;
-			}
+			clearAllSpecialStates( entity );
 		break;
 		case SpecialStates::CLEAR_INVINCIBLE:
 			if (registry.invincibles.has(entity)) {
@@ -373,13 +414,26 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				under.countdown = -1;
 			}
 		break;
-			case SpecialStates::CLEAR_UNDERGROUND:
-			if (registry.moles.has(entity)) {
-				auto& under = registry.moles.get(entity);
-				under.countdown = -1;
-				if (registry.persistentSounds.has(entity))
-					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
-			}
+		case SpecialStates::CLEAR_UNDERGROUND:
+		if (registry.moles.has(entity)) {
+			auto& under = registry.moles.get(entity);
+			under.countdown = -1;
+			if (registry.persistentSounds.has(entity))
+				registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
+		}
+		case SpecialStates::CLEAR_HASTY:
+		case SpecialStates::CLEAR_SLUGGISH:
+		if (registry.timeModifiers.has(entity)) {
+			auto& tm = registry.timeModifiers.get(entity);
+			tm.countDown = -1;
+			tm.coolDown = -1;
+		}
+		case SpecialStates::CLEAR_ONFIRE:
+		if (registry.onFires.has(entity)) {
+			auto& fire = registry.onFires.get(entity);
+			fire.stack = 0;
+			fire.countdown = -1;
+		}
 		break;
 		default: break;
 	}

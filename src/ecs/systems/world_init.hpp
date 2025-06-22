@@ -96,7 +96,7 @@ Entity createLine(vec2 position, vec2 size);
 Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b);
 
 // the enemy
-Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type);
+Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type, const Entity& summoner = Entity());
 
 void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity head, int index);
 

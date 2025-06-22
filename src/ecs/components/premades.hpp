@@ -1,6 +1,7 @@
 #pragma once
 #include "actor_components.hpp"
 #include "render_system.hpp"
+#include "presets/particle_presets.hpp"
 
 //////////////////////////////////////////
 ///////////  BulletEffects  //////////////
@@ -1702,7 +1703,7 @@ struct SmallC : Enemy
 		rotatePower = 0.6f;
 		scale = vec2({300, 300 * (1.998858f / 1.923352f)});
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
-		armour = 2;
+		armour = 4;
 	};
 };
 
@@ -7736,6 +7737,199 @@ struct Phantom : Enemy
 };
 
 
+struct SkullMissile : Enemy
+{
+	const AttackData blowup{
+		EnemyAttackPattern::RADIAL,
+		TRIANGLE,
+		{},
+		blunt,
+		10,
+		0.0,
+		{20, 20},
+		300,
+		350,
+		{0.0, 0.0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	const AttackData bomberManExplosion{
+		EnemyAttackPattern::LASER,
+		TRIANGLE,
+		{},
+		fireRateDown,
+		4,
+		0.0,
+		{30, 30},
+		300,
+		400,
+		{25, 0.0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::EXPLODE
+	};
+
+	Reaction playerClose = {
+		ReactionType::PLAYER_REALLY_CLOSE,
+		2,
+		SpecialStates::INVINCIBLE
+	};
+
+	Reaction bulletClose = {
+		ReactionType::PLAYER_BULLET_CLOSE,
+		2,
+		SpecialStates::INVINCIBLE
+	};
+
+	Reaction tenpercent = {
+		ReactionType::TEN_HEALTH,
+		2,
+		SpecialStates::INVINCIBLE
+	};
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	EnemyPattern waitingState = { "ROLLING", EnemyBehavior::FOLLOW_PLAYER, {}, 0, 1000000.f, 1000000.f, {playerClose}, 0, false, 0.f, 5000.f, quadShot };
+	EnemyPattern explodingState = { "ROLLING", EnemyBehavior::DEATHSTATE, {}, 0, 1000000.f, 1000000.f, {}, 0, true, 0.f, 5000.f, blowup,  };
+	EnemyPattern laserExplode = { "ROLLING", EnemyBehavior::IDLE, {}, 0, 400.f, 400.f, {duration}, 1, true, 0.f, 5000.f, bomberManExplosion };
+	SkullMissile()
+	{
+		maxHealth = 100;
+		currHealth = maxHealth;
+
+		enemyPatterns = { waitingState, explodingState, laserExplode };
+
+		patternIndex = 0;
+		sprite = {
+			"RedSkull.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+			vec2(0, 0) };
+		scale = vec2({ 35, 35 });
+		rotatePower = 0.0;
+		speedMultiplier = 4.0f;
+	};
+};
+
+struct Cross : Enemy
+{
+	const AttackData spawning{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemySkullMissile };
+
+	const AttackData spawnBubble{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyBubbleShield};
+
+	const AttackData spawnCShield{
+		EnemyAttackPattern::SPAWNING,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemySmallCShield};
+
+	const AttackData halo{
+		EnemyAttackPattern::SHOTGUN,
+		RECTANGLE,
+		{dmgUp2, bulletRangeUp},
+		dmgDown2,
+		12,
+		M_PI / 6.f,
+		{60, 10},
+		250,
+		10000,
+		{200, -2 * M_PI / 3.0},
+		0,
+		0,
+		0
+	};
+
+	Reaction duration = {
+		ReactionType::DURATION,
+		0 };
+
+	Reaction halfHp = {
+		ReactionType::FORTY_HEALTH,
+		3,
+		SpecialStates::HASTY
+	};
+	EnemyPattern init =  {"GiveInvincibility", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 1500.f, 1500.f, {duration}, 1, true, 0.f, 2500.f, spawnBubble, SpecialStates::INVINCIBLE};
+	EnemyPattern phase1 = {"spawn skulls", EnemyBehavior::RANDOM_NEAR, {{0.5, 0.5}}, 0, 7000.f, 7000.f, {duration, halfHp}, 2, true, 1000.f, 2000.f, spawning};
+	EnemyPattern randomState = { "Cooldown", EnemyBehavior::RANDOM_FAR, {}, 0, 5000.f, 5000.f, {duration, halfHp}, 1, false, 0.f, 2000.f, halo, SpecialStates::VULNERABLE };
+
+	EnemyPattern initPhase2 = {"GiveInvincibility", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 100.f, 100.f, {duration}, 4, true, 0.f, 500.f, spawnBubble, SpecialStates::INVINCIBLE};
+	EnemyPattern initPhase2Part2 = {"GiveInvincibility", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 100.f, 100.f, {duration}, 5, true, 0.f, 500.f, spawnCShield, SpecialStates::INVINCIBLE};
+	EnemyPattern phase2 = {"GiveInvincibility", EnemyBehavior::RANDOM_NEAR, {{0.5, 0.5}}, 0, 4000.f, 4000.f, {duration}, 6, true, 1000.f, 1000.f, spawning, SpecialStates::VULNERABLE};
+	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 5000.f, 5000.f, {duration}, 5, true, 0.f, 1250.f, halo, SpecialStates::PROTECTED };
+
+	Cross()
+	{
+		maxHealth = 1500;
+		currHealth = maxHealth;
+		enemyPatterns = { init, phase1, randomState,
+			initPhase2, initPhase2Part2, phase2, randomStatePhase2,
+	};
+		patternIndex = 0;
+		sprite = {
+			"military_skullNCross",
+				EFFECT_ASSET_ID::ANIMATE,
+				GEOMETRY_BUFFER_ID::SPRITE,
+				vec2(0),
+				AnimationTypes::REGULAR,
+				16,
+				35
+
+		};
+		scale = vec2({ 250.f/1.5, 300.f/1.5 });
+		rotatePower = 0.f;
+		rotationBehaviour = EnemyRotationBehavior::NONE;
+		speedMultiplier = 0.75f;
+	};
+};
+
+
 // ---------- EVENTROOM ENEMIES -----------------------------------------------------------------------------------------------------------------------------
 
 struct Bubble : Enemy
@@ -7779,7 +7973,7 @@ struct Bubble : Enemy
 		rotatePower = 0.15f;
 		scale = vec2({256, 256});
 		rotationBehaviour = EnemyRotationBehavior::NONE;
-		armour = 2;
+		armour = 4;
 	};
 };
 

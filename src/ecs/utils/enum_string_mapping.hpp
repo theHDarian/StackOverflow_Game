@@ -76,5 +76,11 @@ const std::unordered_map<std::string, InteractableItem> interactableItemNames = 
     {"OpenDoor", InteractableItem::OpenDoor},
     {"LockedDoor", InteractableItem::LockedDoor},
     {"BibleTree", InteractableItem::BibleTree},
-    {"Gardener", InteractableItem::Gardener}
+    {"Gardener", InteractableItem::Gardener},
+    {"Ramlet", InteractableItem::Ramlet},
+    {"PushConsole", InteractableItem::PushConsole},
+    {"FightConsole", InteractableItem::FightConsole},
+    {"ClosedDoor", InteractableItem::ClosedDoor},
+
+
 };

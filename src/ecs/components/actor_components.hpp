@@ -445,6 +445,8 @@ enum EnemyType {
     EnemyEyeCube,
     EnemyPhantom,
     EnemyMaw,
+    EnemySkullMissile,
+    EnemyCross,
 
     // event room enemies
     // single target buffs, place at the same position as target
@@ -545,6 +547,10 @@ enum class SpecialStates {
     REGENERATING,
     ONFIRE,
 
+    //ui wip
+    HASTY,
+    SLUGGISH,
+
     // these won't be shown in ui
     NORMAL,
     INVISIBLE,
@@ -558,6 +564,9 @@ enum class SpecialStates {
     CLEAR_UNDERGROUND,
     CLEAR_REGENERATING,
     CLEAR_CLOAKED,
+    CLEAR_ONFIRE,
+    CLEAR_HASTY,
+    CLEAR_SLUGGISH,
 };
 
 enum class EnemyBehavior {

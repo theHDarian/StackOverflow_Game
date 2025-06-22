@@ -362,6 +362,16 @@ void EnemySystem::step(float Elapsed_ms)
                     attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
                 else
                     spawn(entity, pattern, pos, atkData);
+                if (pattern.specialState == SpecialStates::INC_ANIM) {
+                    std::cout << "INC" << std::endl;
+                    if (registry.animations.has(entity)) {
+                        auto& anim = registry.animations.get(entity);
+                        std::cout << "b4:" << anim.frame << std::endl;
+                        anim.frame = (anim.frame + 1) % anim.max_frames;
+                        std::cout << "aft:" << anim.frame << std::endl;
+                    }
+                }
+
             }
         }
     }
@@ -1168,14 +1178,14 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
             if (registry.shield.entities.size() > 0) {
                 break;
             }
-            Entity shield = createEnemy(render, pos, atkData.spawn);
+            Entity shield = createEnemy(render, pos, atkData.spawn, entity);
             Scientist &scientist = registry.scientist.get(entity);
             scientist.shield = shield;
             continue;
         }
         else if (atkData.spawn == EnemyType::ScientistHand && registry.scientist.has(entity))
         {
-            Entity hand = createEnemy(render, pos, atkData.spawn);
+            Entity hand = createEnemy(render, pos, atkData.spawn, entity);
             Scientist &scientist = registry.scientist.get(entity);
             scientist.hand = hand;
             continue;
@@ -1188,7 +1198,7 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
         }
         else
         {
-            createEnemy(render, pos, atkData.spawn);
+            createEnemy(render, pos, atkData.spawn, entity);
         }
     }
 

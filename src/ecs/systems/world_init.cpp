@@ -1384,7 +1384,7 @@ float getRandomFloat(float min, float max)
 	return min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
 }
 
-Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
+Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entity& summoner)
 {
 	auto entity = Entity();
 
@@ -2173,6 +2173,20 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 		auto& instance = registry.instanceDamages.emplace(entity);
 		break;
 	}
+
+	case EnemyCross: {
+		enemy = Cross();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 1000.f;
+		buffer.duration = 10000.f;
+		buffer.maxCoolDown = 1000.f;
+		break;
+	}
+
+	case EnemySkullMissile: {
+		enemy = SkullMissile();
+		break;
+	}
 	default:
 		assert(false);
 	};
@@ -2183,6 +2197,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type)
 	motion.position = pos;
 	if (registry.enemyParts.has(entity)) {
 		auto& ep = registry.enemyParts.get(entity);
+		ep.parent = summoner;
 		if (!registry.enemies.has(ep.parent)) {
 			float mindistence = 1000000;
 			for (Entity e  : registry.enemies.entities) {
