@@ -1035,6 +1035,9 @@ void EnemySystem::shootTwinLaser(vec2 pos, Entity enemy, const AttackData &atkDa
     Entity e = createEnemyLaser(render, pos, angle, enemy, atkData);
 }
 
+// AtkData.numBullets = number of bombards
+// AtkData.veer = line through center bombards are dropped. 0,0 is random
+// AtkData.bulletRange = random offset from the drop line
 void EnemySystem::launchBombard(const AttackData& atkData) {
     Map& map = registry.maps.components[0];
     vec2 min = map.currRoom.roomStart;
@@ -1045,10 +1048,18 @@ void EnemySystem::launchBombard(const AttackData& atkData) {
     vec2 perp = glm::normalize(vec2(atkData.veer.y, -atkData.veer.x));
     for (uint i = 1; i < atkData.numBullets + 1; i++) {
         float ratio = (float)i / (float)atkData.numBullets;
-        vec2 pos = (ratio * line) + ((1.f - ratio) * -line);
-        pos += center + perp * (float)(200 - rand() % 400);
+        vec2 pos = vec2(0);
+        if (atkData.veer == vec2(0)) {
+            float randX = (float)(rand() % 90) / 100.f;
+            float randY = (float)(rand() % 90) / 100.f;
+            pos = vec2(min.x * randX + max.x * (1.f - randX), min.y * randY + max.y * (1.f - randY));
+        }
+        else {
+            pos = (ratio * line) + ((1.f - ratio) * -line);
+            pos += center + perp * (float)((atkData.bulletRange / 2.f) - rand() % (int)(atkData.bulletRange));
+        }
         if (pos.x < min.x || pos.y < min.y || pos.x > max.x || pos.y > max.y) continue;
-        createBombard(render, i * 300, pos, atkData.attackType);
+        createBombard(render, i * 300, pos, atkData.onDeath);
     }
 }
 
@@ -1154,7 +1165,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
         shootTwoWall(atkData, atkData.angleOffset, elapsed_ms);
         currPattern.currAtkCD = currPattern.maxAtkCD;
     }
-    else if (atkData.attackType == EnemyAttackPattern::BOMBARD || atkData.attackType == EnemyAttackPattern::BOMBARDBOMBING)
+    else if (atkData.attackType == EnemyAttackPattern::BOMBARD)
     {
         launchBombard(atkData);
         currPattern.currAtkCD = currPattern.maxAtkCD;

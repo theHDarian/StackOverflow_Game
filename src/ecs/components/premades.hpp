@@ -736,7 +736,7 @@ struct TestLightningShuffle : Enemy
 	};
 
 	const AttackData testBombard{
-		EnemyAttackPattern::BOMBARDBOMBING,
+		EnemyAttackPattern::BOMBARD,
 		RECTANGLE,
 		{},
 		lightningShuffle,
@@ -744,11 +744,12 @@ struct TestLightningShuffle : Enemy
 		0.0,
 		{20, 20},
 		100,
-		2000,
-		{1.0, 1.0},
+		400,
+		{0.0, 0.0},
 		0,
 		0,
-		0
+		0,
+		EnemyBulletDeath::BOMBARDBOMBING
 	};
 
 	EnemyPattern idleState = { "IDLE", EnemyBehavior::IDLE, {}, 0, 500000.f, 500000.f, {}, 0, true, 0, 5000, testBombard };
@@ -7879,12 +7880,12 @@ struct Cross : Enemy
 		M_PI / 6.f,
 		{60, 10},
 		250,
-		1200,
+		400,
 		{200, -2 * M_PI / 3.0},
 		0,
 		0,
 		0,
-		EnemyBulletDeath::EXPLODE
+		EnemyBulletDeath::BOMBARD
 	};
 
 	Reaction duration = {

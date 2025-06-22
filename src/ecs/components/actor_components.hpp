@@ -485,7 +485,6 @@ enum class EnemyAttackPattern {
     TWO_WALL,
     SPAWNING,
     BOMBARD,
-    BOMBARDBOMBING,
     NONE
 };
 

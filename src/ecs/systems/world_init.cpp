@@ -3098,13 +3098,13 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 	return entity;
 }
 
-Entity createBombard(RenderSystem* renderer, float wait, vec2 position, EnemyAttackPattern pattern)
+Entity createBombard(RenderSystem* renderer, float wait, vec2 position, EnemyBulletDeath onDeath)
 {
 	auto entity = Entity();
 
 	auto& bombard = registry.bombards.emplace(entity);
 	bombard.cdTillAppear = wait;
-	bombard.effect = (pattern == EnemyAttackPattern::BOMBARD) ? EnemyBulletDeath::BOMBARD : EnemyBulletDeath::BOMBARDBOMBING;
+	bombard.effect = onDeath;
 
 	// Initialize the motion
 	auto& motion = registry.motions.emplace(entity);
