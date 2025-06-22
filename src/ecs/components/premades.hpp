@@ -7880,12 +7880,12 @@ struct Cross : Enemy
 		M_PI / 6.f,
 		{60, 10},
 		250,
-		400,
-		{200, -2 * M_PI / 3.0},
+		100,
+		{0,0},
 		0,
 		0,
 		0,
-		EnemyBulletDeath::BOMBARD
+		EnemyBulletDeath::EXPLODE
 	};
 
 	Reaction duration = {
@@ -7897,13 +7897,13 @@ struct Cross : Enemy
 		3,
 		SpecialStates::HASTY
 	};
-	EnemyPattern init =  {"GiveInvincibility", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 1500.f, 1500.f, {duration}, 1, true, 0.f, 2500.f, spawnBubble, SpecialStates::INVINCIBLE};
-	EnemyPattern phase1 = {"spawn skulls", EnemyBehavior::RANDOM_NEAR, {{0.5, 0.5}}, 0, 7000.f, 7000.f, {duration, halfHp}, 2, true, 1000.f, 2000.f, spawning};
+	EnemyPattern init =  {"GiveInvincibility", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {duration}, 1, true, 0.f, 2500.f, spawnBubble, SpecialStates::INVINCIBLE};
+	EnemyPattern phase1 = {"spawn skulls", EnemyBehavior::RANDOM_NEAR, {}, 0, 7000.f, 7000.f, {duration, halfHp}, 2, true, 1000.f, 2000.f, spawning};
 	EnemyPattern randomState = { "Cooldown", EnemyBehavior::RANDOM_FAR, {}, 0, 5000.f, 5000.f, {duration, halfHp}, 1, false, 0.f, 2000.f, halo, SpecialStates::VULNERABLE };
 
-	EnemyPattern initPhase2 = {"GiveInvincibility", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 100.f, 100.f, {duration}, 4, true, 0.f, 500.f, spawnCShield, SpecialStates::INVINCIBLE};
-	EnemyPattern initPhase2Part2 = {"GiveInvincibility", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 100.f, 100.f, {duration}, 5, true, 0.f, 500.f, spawnBubble, SpecialStates::INVINCIBLE};
-	EnemyPattern phase2 = {"GiveInvincibility", EnemyBehavior::RANDOM_NEAR, {{0.5, 0.5}}, 0, 4000.f, 4000.f, {duration}, 6, true, 1000.f, 1000.f, spawning, SpecialStates::VULNERABLE};
+	EnemyPattern initPhase2 = {"GiveInvincibility", EnemyBehavior::IDLE, {}, 0, 100.f, 100.f, {duration}, 4, true, 0.f, 500.f, spawnCShield, SpecialStates::INVINCIBLE};
+	EnemyPattern initPhase2Part2 = {"GiveInvincibility", EnemyBehavior::IDLE, {}, 0, 100.f, 100.f, {duration}, 5, true, 0.f, 500.f, spawnBubble, SpecialStates::INVINCIBLE};
+	EnemyPattern phase2 = {"GiveInvincibility", EnemyBehavior::RANDOM_NEAR, {}, 0, 4000.f, 4000.f, {duration}, 6, true, 1000.f, 1000.f, spawning, SpecialStates::VULNERABLE};
 	EnemyPattern randomStatePhase2 = { "PatrolSide", EnemyBehavior::RANDOM_FAR, {}, 0, 5000.f, 5000.f, {duration}, 5, true, 0.f, 1250.f, halo,  };
 
 	Cross()
