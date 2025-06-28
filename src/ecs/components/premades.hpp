@@ -2478,6 +2478,7 @@ struct BossBeeHive : Enemy
 		patternIndex = 0;
 		scale = vec2(384, 480);
 		armour = 2;
+		ignoreRoomBulletEffects = true;
 	};
 };
 
@@ -2884,7 +2885,7 @@ struct BioBoid : Enemy
 	EnemyPattern boidState = {"BOID", EnemyBehavior::BOIDSWARMPLAYER, {}, 0, 5000.f, 5000.f, {}, 0, false, 0.f, 0.f, NoAttack};
 	BioBoid()
 	{
-		maxHealth = 1;
+		maxHealth = 2;
 		currHealth = maxHealth;
 		enemyPatterns = {boidState};
 		sprite = {
@@ -3368,19 +3369,20 @@ struct RodOfC : Enemy {
 	};
 
 	const AttackData magicMissile{
-		EnemyAttackPattern::RADIAL,
-		TRIANGLE,
-		{dmgUp, bulletRangeDown},
-		bulletPierceUp,
-		5,
+		EnemyAttackPattern::BOMBARD,
+		RECTANGLE,
+		{dmgUp2, bulletRangeUp},
+		dmgDown2,
+		1,
+		M_PI / 6.f,
+		{60, 10},
+		250,
+		100,
+		{0,0},
 		0,
-		{20, 40},
-		500,
-		2000,
-		{120, 30},
 		0,
 		0,
-		0.02
+		EnemyBulletDeath::EXPLODE
 	};
 
 	const AttackData fireball{
@@ -4778,6 +4780,7 @@ struct ConstructYELLOW : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE };
 		scale = vec2({ 135.f, 135.f });
 		rotatePower = 1.50f;
+		ignoreRoomBulletEffects = true;
 	};
 };
 struct ConstructPURPLE : Enemy
@@ -4864,6 +4867,7 @@ struct ConstructPURPLE : Enemy
 		scale = vec2({ 135.f, 135.f });
 		rotatePower = 1.50f;
 		speedMultiplier = 1.3;
+		ignoreRoomBulletEffects = true;
 	};
 };
 struct ConstructGREEN : Enemy
@@ -4943,6 +4947,7 @@ struct ConstructGREEN : Enemy
 		rotatePower = 1.50f;
 		speedMultiplier = 4.F;
 		rotationBehaviour = EnemyRotationBehavior::FACE_CENTER;
+		ignoreRoomBulletEffects = true;
 	};
 };
 struct ConstructRED : Enemy
@@ -5010,6 +5015,7 @@ struct ConstructRED : Enemy
 		scale = vec2({ 135.f, 135.f });
 		speedMultiplier = 1.9;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		ignoreRoomBulletEffects = true;
 	};
 };
 
@@ -5416,6 +5422,7 @@ struct MultiCube : Enemy
 		rotatePower = 90.0f;
 		speedMultiplier = 2.5f;
 		rotationBehaviour = EnemyRotationBehavior::NONE;
+		ignoreRoomBulletEffects = true;
 	};
 };
 
@@ -7976,6 +7983,7 @@ struct Bubble : Enemy
 		scale = vec2({256, 256});
 		rotationBehaviour = EnemyRotationBehavior::NONE;
 		armour = 4;
+		type = EnemyType::EnemyBubbleShield;
 	};
 };
 
@@ -8000,6 +8008,7 @@ struct InvincibleBuffGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::InvincibleGranter;
 	};
 };
 
@@ -8024,6 +8033,7 @@ struct InvisibleBuffGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::InvisibleGranter;
 	};
 };
 
@@ -8048,6 +8058,7 @@ struct CloakedBuffGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::CloakedGranter;
 	};
 };
 
@@ -8072,6 +8083,7 @@ struct RegenerateBuffGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::RegeneratingGranter;
 	};
 };
 
@@ -8096,6 +8108,7 @@ struct ProtectedBuffGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::ProtectedGranter;
 	};
 };
 
@@ -8120,6 +8133,7 @@ struct VulnerableBuffGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::VulnerableGranter;
 	};
 };
 
@@ -8144,8 +8158,61 @@ struct UnderGroundBuffGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::UnderGroundGranter;
 	};
 };
+
+struct  HastyBuffGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"HASTY", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 5000.f, 5000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::HASTY};
+
+	HastyBuffGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+		type = EnemyType::HastyGranter;
+	};
+};
+
+struct  SluggishBuffGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"SLUGGISH", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 5000.f, 5000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::SLUGGISH};
+
+	SluggishBuffGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+		type = EnemyType::SluggishGranter;
+	};
+};
+
+
 
 struct WholeRoomInvincibleGranter : Enemy
 {
@@ -8168,6 +8235,7 @@ struct WholeRoomInvincibleGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::InvincibleGranterRoomWide;
 	};
 };
 
@@ -8192,6 +8260,7 @@ struct WholeRoomCloakedGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::CloakedGranterRoomWide;
 	};
 };
 
@@ -8216,6 +8285,7 @@ struct WholeRoomRegenerateGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::RegenerateGranterRoomWide;
 	};
 };
 
@@ -8240,6 +8310,7 @@ struct WholeRoomProtectedGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::ProtectedGranterRoomWide;
 	};
 };
 
@@ -8264,6 +8335,7 @@ struct WholeRoomVulnerableGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::VulnerableGranterRoomWide;
 	};
 };
 
@@ -8288,6 +8360,7 @@ struct WholeRoomUnderGroundGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::UnderGroundGranterRoomWide;
 	};
 };
 
@@ -8312,6 +8385,61 @@ struct WholeRoomInvisibleGranter : Enemy
 		patternIndex = 0;
 		scale = vec2(0, 0);
 		rotatePower = 0.f;
+		type = EnemyType::InvisibleGranterRoomWide;
 	};
 };
+
+struct  WholeRoomHastyGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM HASTY", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::HASTY};
+
+	WholeRoomHastyGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+		type = EnemyType::HastyGranterRoomWide;
+	};
+};
+
+struct  WholeRoomSluggishGranter : Enemy
+{
+	Reaction duration{
+		ReactionType::DURATION,
+		0, SpecialStates::INVISIBLE};
+
+	EnemyPattern buff = {"WHOLE ROOM SLUGGISH", EnemyBehavior::GRANTINGBUFFSAOE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 0.f, 3000.f, NoAttack, SpecialStates::NORMAL, SpecialStates::SLUGGISH};
+
+	WholeRoomSluggishGranter()
+	{
+		maxHealth = 1;
+		currHealth = maxHealth;
+		enemyPatterns = {buff};
+		sprite = {
+			"enemy_Angel.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(0, 0);
+		rotatePower = 0.f;
+		type = EnemyType::SluggishGranterRoomWide;
+	};
+};
+
+
+
+
 

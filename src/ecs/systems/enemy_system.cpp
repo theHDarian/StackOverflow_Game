@@ -425,6 +425,12 @@ void EnemySystem::step(float Elapsed_ms)
                    if (registry.vulnerabilities.has(registry.wormBodies.get(entity).head))
                         mult = registry.vulnerabilities.get(registry.wormBodies.get(entity).head).modifier;
                    head.currHealth -= damage * mult;
+                   if (registry.damageds.has(registry.wormBodies.get(entity).head))
+                       registry.damageds.get(registry.wormBodies.get(entity).head).countdown = registry.damageds.get(registry.wormBodies.get(entity).head).max;
+                   else {
+                      auto& dmg = registry.damageds.emplace(registry.wormBodies.get(entity).head);
+                       dmg.flash = false;
+                   }
                }
             }
             else if (registry.instanceDamages.has(entity)) {
@@ -442,6 +448,12 @@ void EnemySystem::step(float Elapsed_ms)
                         if (registry.vulnerabilities.has(part.parent))
                             mult = registry.vulnerabilities.get(part.parent).modifier;
                         parentStat.currHealth -= -part.damageShare * damage * mult;
+                        if (registry.damageds.has(part.parent))
+                            registry.damageds.get(part.parent).countdown = registry.damageds.get(part.parent).max;
+                        else {
+                            auto& dmg = registry.damageds.emplace(part.parent);
+                            dmg.flash = false;
+                        }
                     }
                     enemyStat.currHealth -= damage;
                 } else {
@@ -452,6 +464,12 @@ void EnemySystem::step(float Elapsed_ms)
                             mult = registry.vulnerabilities.get(part.parent).modifier;
                         Enemy& parentStat = registry.enemies.get(part.parent);
                         parentStat.currHealth -= part.damageShare * damage * mult;
+                        if (registry.damageds.has(part.parent))
+                            registry.damageds.get(part.parent).countdown = registry.damageds.get(part.parent).max;
+                        else {
+                            auto& dmg = registry.damageds.emplace(part.parent);
+                            dmg.flash = false;
+                        }
                     }
                     if (enemyStat.currHealth > 0) {
                         enemyStat.currHealth -= max((1 - part.damageShare), 0.f) * damage;
@@ -1309,7 +1327,7 @@ void EnemySystem::fetchRoomEffects(Entity entity, AttackData& atkData)
     Map& map = registry.maps.components[0];
 
     // Add checks here to exclude certain enemies from adopting room effects
-    if (registry.bosses.has(entity) || registry.bossParts.has(entity) 
+    if ((registry.enemies.has (entity) && registry.enemies.get(entity).ignoreRoomBulletEffects)
         || registry.elites.has(entity) || map.currRoom.type == Testing || map.currRoom.type == TutorialRoom2) {
         atkData.positiveBulletEffects = atkData.rareBulletEffects;
         atkData.negativeBulletEffects.push_back(atkData.defaultEffect);

@@ -457,6 +457,9 @@ enum EnemyType {
     UnderGroundGranter,
     RegeneratingGranter,
     CloakedGranter,
+    HastyGranter,
+    SluggishGranter,
+
     // room wide buffs, place at the center of the room
     InvincibleGranterRoomWide,
     InvisibleGranterRoomWide,
@@ -465,6 +468,9 @@ enum EnemyType {
     UnderGroundGranterRoomWide,
     RegenerateGranterRoomWide,
     CloakedGranterRoomWide,
+    HastyGranterRoomWide,
+    SluggishGranterRoomWide,
+
     // Enemyparts
     EnemyBubbleShield,
 };
@@ -749,7 +755,6 @@ struct SpriteData
 };
 
 
-
 // anything that is deadly to the player
 struct Enemy {
     int maxHealth;
@@ -774,6 +779,8 @@ struct Enemy {
     float speedMultiplier = 1.0f;
     int armour = 1;
     WormHead headData;
+    EnemyType type; // Should be set by the enemy spawner or the enemy struct
+    bool ignoreRoomBulletEffects = false; // If true, the enemy will not apply the room effects to its bullets, and will use the effect in its attack data instead
 };
 
 struct EnemyGroup {
@@ -857,8 +864,10 @@ struct Motion {
 };
 
 struct Damaged {
-    float max = 200;
+    float max = 500;
     float countdown = max;
+    bool flash = true; // if true, entity will flash when damaged
+    bool shakeHPBar = true; // if true, entity will shake hp bar when damaged
 };
 
 // should be separate from damaged so that damage from player takes precedence

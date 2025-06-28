@@ -4749,7 +4749,7 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
 
     // Elite
     if (type == RoomType::EnemyRoom && roomsTraversed > 6 && Random::Float() < eliteSpawnChance) {
-        nextRoom.hasElite = true;
+        nextRoom.hasElite = max(1, min(Random::Int((int) currRegion),3));
     }
 
     return nextRoom;
@@ -4791,16 +4791,26 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
          {EnemyType::EnemyBeeHive, {0.5f,0.5f}},
 {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
             {EnemyTwoBee, random_vec2},
-{EnemyTwoBee, random_vec2},
-{EnemyThreeBee, random_vec2},
-{EnemyTwoBee, random_vec2}
+        {EnemyTwoBee, random_vec2},
+        {EnemyThreeBee, random_vec2},
+        {EnemyTwoBee, random_vec2}
         },
+        {
+        {EnemyType::EnemyBigBoulder, random_vec2},
+        {EnemyType::EnemyBigBoulder, random_vec2},
+        },
+    {
+        {EnemyHifiJellyFish, {0.5f, 0.5f}},
+            {EnemyHifiJellyFish, {0.5f, 0.5f}},
+    },
+        {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
 };
 
 std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
     {
         {EnemyType::EnemyMage, {0.5f,0.5f}},
     },
+
     {
                 {EnemyType::EnemySurfaceMole, {0.5f,0.5f}},
                 {EnemyType::EnemySmallMole, random_vec2},
@@ -4810,14 +4820,43 @@ std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
                 {EnemyType::EnemyBigBoulder, random_vec2},
                 {EnemyType::EnemyBigBoulder, random_vec2},
         },
+
+{
+                 {EnemyType::EnemyBeeHive, {0.5f,0.5f}},
+        {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
+                    {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+    {EnemyType::EnemyLaserCrab, random_vec2},
+    {EnemyType::EnemyCrab, random_vec2},
+    {EnemyType::EnemyEvilCrab, random_vec2},
+        {EnemyThreeBee, random_vec2},
+        {EnemyTwoBee, random_vec2},
+        },
         {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
         {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
+            {{EnemyType::EnemyCross, {0.5f,0.5f}}},
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
-    {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
-            {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
-{{EnemyType::EnemyMage, {0.5f,0.5f}}},
+    {
+        {EnemyType::EnemyPhantom, {0.5f,0.5f}},
+        {EnemyType::ProtectedGranter, {0.5f,0.5f}},
+    },
+            {
+                {EnemyType::EnemyEyeCube, {0.5f,0.5f}},
+                {EnemyType::HastyGranter, {0.5f,0.5f}},
+            },
+{
+
+    {EnemyType::EnemyCross, {0.5f,0.5f}},
+    {EnemyType::CloakedGranter, {0.5f,0.5f}},
+},
+{
+    {EnemyType::EnemyMage, {0.5f,0.5f}},
+    {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
+},
+
     {
                 {EnemyType::EnemyMage, random_vec2},
                 {EnemyType::EnemyMage, random_vec2},
@@ -4833,16 +4872,54 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
                 {EnemySmallCShield, {0.4f, 0.6f}},
                 {EnemySmallCShield, {0.6f, 0.4f}},
         },
+    {
+                    {EnemyType::EnemySurfaceMole, {0.5f,0.5f}},
+                        {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
+                    {EnemyType::EnemySmallMole, random_vec2},
+                    {EnemyPileDriverTurret,{0.8,0.2}},
+                    {EnemyPileDriverTurret,{0.8,0.8}},
+                    {EnemyPileDriverTurret,{0.2,0.8}},
+                       {EnemyPileDriverTurret,{0.2,0.2}},
+                    {EnemyType::EnemyBigBoulder, random_vec2},
+                    {EnemyType::EnemyBigBoulder, random_vec2},
+    },
+    {
+             {EnemyType::EnemyBeeHive, {0.35f,0.5f}},
+    {EnemyType::EnemyBubbleShield, {0.35f,0.5f}},
+{EnemyType::EnemyBeeHive, {0.65f,0.5f}},
+{EnemyType::EnemyBubbleShield, {0.65f,0.5f}},
+                {EnemyThreeBee, random_vec2},
+            {EnemyTwoBee, random_vec2},
+            {EnemyThreeBee, random_vec2},
+            {EnemyTwoBee, random_vec2},
+{EnemyType::EnemyCrab, random_vec2},
+{EnemyType::EnemyLaserCrab, random_vec2},
+{EnemyType::EnemyCrab, random_vec2},
+{EnemyType::EnemyEvilCrab, random_vec2},
+
+    },
 
 };
 
 std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
-    {{EnemyType::EnemyMage, {0.5f,0.5f}}},
-{{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
-    {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
+    {
+        {EnemyType::EnemyPhantom, {0.5f,0.5f}},
+        {EnemyType::ProtectedGranterRoomWide, {0.5f,0.5f}},
+    },
+            {
+                    {EnemyType::EnemyEyeCube, {0.5f,0.5f}},
+                    {EnemyType::HastyGranterRoomWide, {0.5f,0.5f}},
+                },
+    {
+
+        {EnemyType::EnemyCross, {0.5f,0.5f}},
+        {EnemyType::CloakedGranterRoomWide, {0.5f,0.5f}},
+    },
     {
                 {EnemyType::EnemyMage, random_vec2},
+    {EnemyType::EnemyBubbleShield, random_vec2},
                 {EnemyType::EnemyMage, random_vec2},
+    {EnemyType::EnemyBubbleShield, random_vec2},
         {EnemyType::EnemyMage, random_vec2},
         },
     {
@@ -4853,7 +4930,55 @@ std::vector<std::vector<std::tuple<EnemyType, vec2>> > medicalEliteEnemies = {
         { EnemyType::EnemyMedicalSyringe, random_vec2},
     },
     {
-    }
+                 {EnemyType::EnemyBeeHive, {0.35f,0.5f}},
+        {EnemyType::EnemyBubbleShield, {0.35f,0.5f}},
+    {EnemyType::EnemyBeeHive, {0.65f,0.5f}},
+    {EnemyType::EnemyBubbleShield, {0.65f,0.5f}},
+                    {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+                {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+    {EnemyType::EnemyCrab, random_vec2},
+    {EnemyType::EnemyLaserCrab, random_vec2},
+    {EnemyType::EnemyCrab, random_vec2},
+    {EnemyType::EnemyEvilCrab, random_vec2},
+{EnemyType::EnemyEvilSnail, random_vec2},
+{EnemyType::EnemySnail, random_vec2},
+        {InvisibleGranterRoomWide, {0.5f, 0.5f}},
+        },
+        {
+            {EnemyType::EnemyPileDriverTurret, {0.5f,0.5f}},
+                {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
+            {EnemyType::EnemySmallMole, random_vec2},
+                    {EnemyType::EnemySurfaceMole, random_vec2},
+            {EnemyPileDriverTurret,{0.8,0.2}},
+            {EnemyPileDriverTurret,{0.8,0.8}},
+            {EnemyPileDriverTurret,{0.2,0.8}},
+               {EnemyPileDriverTurret,{0.2,0.2}},
+            {EnemyType::EnemyBigBoulder, random_vec2},
+            {EnemyType::EnemyBigBoulder, random_vec2},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        },
+        {
+                                {EnemyHifiJellyFish, {0.6f, 0.6f}},
+            {EnemyHifiJellyFish, {0.4f, 0.4f}},
+    {EnemySmallCShield, {0.6f, 0.6f}},
+        {EnemySmallCShield, {0.4f, 0.4f}},
+                { EnemyHifiJellyFish, {0.4f, 0.6f}},
+                                {EnemyHifiJellyFish, {0.6f, 0.4f}},
+                    {EnemySmallCShield, {0.4f, 0.6f}},
+                    {EnemySmallCShield, {0.6f, 0.4f}},
+            {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+            {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
+            {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
+            {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
+            },
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>>> militaryEliteEnemies = {

@@ -457,7 +457,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	else if (isVulnerable) {
 		damagedColor = specialStatesToColor.at(SpecialStates::VULNERABLE);
 	}
-	else if (registry.damageds.has(entity)) {
+	else if (registry.damageds.has(entity) && registry.damageds.get(entity).flash) {
 		damagedColor = { 1.2, 0.5, 0.5 }; // red;
 		damaged = registry.damageds.get(entity);
 	}
@@ -475,7 +475,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		glUniform3fv(color_uloc, 1, (float*)&color);
 	}
 
-	if (registry.damageds.has(entity) || registry.burnTicked.has(entity))
+	if ((registry.damageds.has(entity) && registry.damageds.get(entity).flash) || registry.burnTicked.has(entity))
 	{
 		glUniform3fv(color_uloc, 1, (float *)&damagedColor);
 		glUniform1i(change_color_uloc, 1);

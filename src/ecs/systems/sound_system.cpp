@@ -436,7 +436,7 @@ void SoundSystem::loadSoundEffects()
         fprintf(stderr, "Failed to load laser loop sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load laser loop sound");
     }
-    laserLoopSound->volume = 0.3f * MIX_MAX_VOLUME;
+    laserLoopSound->volume = 0.2f * MIX_MAX_VOLUME;
 
     laserSound = Mix_LoadWAV(audio_path("sfx/laser.wav").c_str());
     if (!laserSound)
@@ -452,7 +452,7 @@ void SoundSystem::loadSoundEffects()
         fprintf(stderr, "Failed to load digging sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load digging sound");
     }
-    diggingSound->volume = 0.5f * MIX_MAX_VOLUME;
+    diggingSound->volume = 0.3f * MIX_MAX_VOLUME;
 
     for (int i = 0; i < 5; i++)
     {

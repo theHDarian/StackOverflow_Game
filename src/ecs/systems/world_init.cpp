@@ -2095,6 +2095,31 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 		registry.invisibleEnemy.emplace(entity);
 		break;
 	}
+	case HastyGranter : {
+		enemy = HastyBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+	case SluggishGranter : {
+		enemy = SluggishBuffGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 10.f;
+		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 5000.f;
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+
 	case InvincibleGranterRoomWide : {
 		enemy = WholeRoomInvincibleGranter();
 		Buffer& buffer = registry.buffers.emplace(entity);
@@ -2165,6 +2190,28 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 		registry.invisibleEnemy.emplace(entity);
 		break;
 	}
+	case HastyGranterRoomWide : {
+		enemy = WholeRoomHastyGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 999999999.f;
+		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 5000.f;
+		RoomWideBuffers& roomWide = registry.roomWideBuffers.emplace(entity);
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+
+	case SluggishGranterRoomWide : {
+		enemy = WholeRoomSluggishGranter();
+		Buffer& buffer = registry.buffers.emplace(entity);
+		buffer.range = 999999999.f;
+		buffer.duration = 3000.f;
+		buffer.maxCoolDown = 5000.f;
+		RoomWideBuffers& roomWide = registry.roomWideBuffers.emplace(entity);
+		registry.invisibleEnemy.emplace(entity);
+		break;
+	}
+
 	case EnemyBubbleShield: {
 		enemy = Bubble();
 		auto& ep = registry.enemyParts.emplace(entity);
@@ -2320,13 +2367,13 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 	//HP and damage scaling
 	Map& map = registry.maps.components[0];
 	int dmgScale = registry.elites.has(entity) ? (int) map.currRegion - 1 + registry.elites.get(entity).eliteLevel : (int) map.currRegion - 1;
-	enemy.maxHealth = enemy.maxHealth * pow(1.2, (max(dmgScale , 0)));
+	enemy.maxHealth = (enemy.maxHealth) * pow(1.35 + (0.05 * registry.gameStates.components[0].difficulty), (max(dmgScale , 0)));
 	enemy.currHealth = enemy.maxHealth;
 	if (registry.instanceDamages.has(entity)) {
 		auto& instance = registry.instanceDamages.get(entity);
 		instance.instance = enemy.maxHealth;
 	}
-	if (registry.gameStates.components[0].hardMode) {
+	if (registry.gameStates.components[0].difficulty > 3) {
 		enemy.maxHealth *= 1.5f;
 		enemy.currHealth = enemy.maxHealth;
 		TimeModifier& tm = registry.timeModifiers.emplace(entity);

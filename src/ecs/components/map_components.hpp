@@ -55,7 +55,7 @@ struct RoomPreset {
     std::string ID;
     bool oneTime = false; //if true, room will not appear again
     vec2 roomSize = { 1600, 1600 };
-    bool hasElite = false;
+    int hasElite = false;
 
     // Effect and chance tuple
     std::vector<std::vector<BulletStackEffect>> positiveEffects;

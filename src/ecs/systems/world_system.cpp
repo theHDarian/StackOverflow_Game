@@ -264,7 +264,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 						// remove time modifier if it is not the player
 						registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
 					}
-					// if (tm.modifier != HARD_MODE_TIME_MODIFIER && registry.gameStates.has(registry.timeModifiers.entities[i]) && registry.gameStates.get(registry.timeModifiers.entities[i]).hardMode) {
+					// if (tm.modifier != HARD_MODE_TIME_MODIFIER && registry.gameStates.has(registry.timeModifiers.entities[i]) && registry.gameStates.get(registry.timeModifiers.entities[i]).difficulty) {
 					// 	entity.modifier = HARD_MODE_TIME_MODIFIER;
 					// 	continue;
 					// }

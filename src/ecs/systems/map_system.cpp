@@ -126,13 +126,14 @@ void MapSystem::step(float elapsed_ms)
         }
     }
 
-    if (map.currRoom.preset.hasElite) {
+    if (map.currRoom.preset.hasElite > 0) {
         if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.size() <= registry.roomWideBuffers.size()) ) {
             Entity bossEnemy;
             SpawnEnemiesInList( Random::ListItem(eliteEnemies.at(map.currRegion)), bossEnemy, renderer, true);
-            map.currRoom.preset.hasElite = false;
+            map.currRoom.preset.hasElite = max(0, map.currRoom.preset.hasElite - 1);
             map.currRoom.spawnedElite = true;
             soundPlayer->playAlarmSound(3);
+            map.currRoom.eliteTimer += Random::Float(12.0f) + 3.0f; // reset timer
         }
     }
 
@@ -141,7 +142,7 @@ void MapSystem::step(float elapsed_ms)
         map.currRoom.enemiesToSpawn.clear();
     }
 
-    if (map.currRoom.spawnedElite && registry.elites.entities.empty()) {
+    if (map.currRoom.spawnedElite && registry.elites.entities.empty() && map.currRoom.preset.hasElite == 0) {
         std::tuple<RoomInteractable, vec2> ramlet = {{Ramlet, {}}, {0.5f, 0.5f}};
         map.currRoom.preset.interactables.emplace_back(ramlet);
         soundPlayer->playNextDialogueSound();
@@ -551,6 +552,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         std::cout << "New Map" << std::endl;
         map.currRegion = region;
         map.currRoom.type = roomType;
+        std::vector<RoomPreset> presetOverRide = {};
         if (roomType == RoomType::TutorialRoom) {
             map.currRoom.preset = StartingRoom;
         }
@@ -561,32 +563,30 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             req2.effects = { bulletRangeUp, bulletRangeUp };
         }
         else {
-            if (map.currRegion == Biology) {
-                std::vector<RoomPreset> bioBossRooms = {BossRoomCrab, BossRoomBee};
-                map.currRoom.preset = Random::ListItem( bioBossRooms);
-            }
-            else if (map.currRegion == Mining) {
-                std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
-                map.currRoom.preset = Random::ListItem( miningBossRooms);
-                // map.currRoom.preset = MedicalEnemyRoomWares;
-            }
-            else if (map.currRegion == Medical) {
-                 map.currRoom.preset = ScientistBossRoom;
-                // map.currRoom.preset = EnemyRoomInvisible;
-            }
-            else if (map.currRegion == Physics) {
-                std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};
-                map.currRoom.preset = Random::ListItem( physicsBossRooms);
-                // map.currRoom.preset = BossRoomMultiCube;
-                // map.currRoom.preset = HifiRoomLaserFiesta;
-            } else {
-                map.currRoom.preset =  EnemyRoomPhantom;
-            }
-            SoundRequest& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::BossBGM;
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
             req2.effects = {};
+            if (map.currRegion == Biology) {
+                std::vector<RoomPreset> bioBossRooms = {BossRoomCrab, BossRoomBee};
+                presetOverRide = bioBossRooms;
+            }
+            else if (map.currRegion == Mining) {
+                std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
+                presetOverRide = miningBossRooms;
+
+                req2.effects = {  dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp,};
+            }
+            else if (map.currRegion == Medical) {
+                 presetOverRide= {ScientistBossRoom};
+            }
+            else if (map.currRegion == Physics) {
+                std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};
+                presetOverRide = physicsBossRooms;
+                req2.effects = { bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp,};
+            } else {
+                map.currRoom.preset =  EnemyRoomPhantom;
+            }
+            map.currRoom.preset = StartingRoom;
         }
         InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
         req2.type = InteractableRequestType::AddEffect;
@@ -633,18 +633,24 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             Door& d = registry.doors.components[i];
             d.reset();
             d.room = newRooms[i];
+            if (!presetOverRide.empty()) {
+                d.preset = presetOverRide[i%presetOverRide.size()];
+                d.room = BossRoom;
+                d.isLocked = false;
 
-            if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
-                //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
-                std:: cout << "Spawning locked room" << std::endl;
-                d.isLocked = true;
-            }
-            else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
-                //have a chance of spawning locked rooms
-                d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
             } else {
-                if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
-                    //d.room = RoomType::EnemyRoom;
+                if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
+                    //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
+                    std:: cout << "Spawning locked room" << std::endl;
+                    d.isLocked = true;
+                }
+                else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
+                    //have a chance of spawning locked rooms
+                    d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
+                } else {
+                    if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
+                        //d.room = RoomType::EnemyRoom;
+                    }
                 }
             }
             registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
