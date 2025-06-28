@@ -448,7 +448,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	if (isInvincible) {
 		shieldColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
-		damagedColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
+		damagedColor = { 1, 1, 0.3 }; // this is a brighter yellow than usual
 	}
 	else if (isProtected) {
 		shieldColor = specialStatesToColor.at(SpecialStates::PROTECTED);
