@@ -2991,8 +2991,7 @@ Entity createPlayerBullet(RenderSystem *renderer, vec2 position, vec2 direction)
 	// Setting initial values
 	PlayerBullet &bullet = registry.playerBullets.emplace(entity);
 	bullet.damage = getModifiedValue(BulletDamage, bullet.damage) / min(1.f, getModifiedValue(BulletNum, 1) - 0.5f);
-	float x = getEffectValue(BulletRange);
-	bullet.bulletSpeed = bullet.bulletSpeed + clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f);
+	bullet.bulletSpeed = getModifiedBulletSpeed(getEffectValue(BulletRange));
 	bullet.bulletRange = getModifiedValue(BulletRange, bullet.bulletRange);
 	bullet.bulletSize = getModifiedValue(ProjectileSize, bullet.bulletSize);
 	bullet.bulletPierce = getModifiedValue(Pierce, bullet.bulletPierce);
@@ -3224,4 +3223,9 @@ vec2 lerpToRoom(vec2 point) {
 	Map& map = registry.maps.components[0];
 	//return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, point);
 	return map.currRoom.roomStart * (vec2(1) - point) + map.currRoom.roomEnd * point;
+}
+
+float getModifiedBulletSpeed(float bulletRange) {
+	PlayerBullet pb = PlayerBullet();
+	return pb.bulletSpeed + clamp(-400.f, (bulletRange > 0) ? (float)bulletRange * 120.f : (float)bulletRange * -80.f, 1400.f);
 }

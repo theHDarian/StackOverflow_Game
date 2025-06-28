@@ -13,12 +13,6 @@
 #include <glm/gtx/spline.hpp>
 #include <glm/gtx/norm.hpp>
 
-//global values
-float HASTY_TIME_MODIFIER = 1.75f; // 75% faster
-float SLUGGISH_TIME_MODIFIER = 0.5f; // 50% slower
-float PROTECTED_DAMAGE_MODIFIER = 0.5f; // 50% less damage
-float VULNERABLE_DAMAGE_MODIFIER = 1.5f; // 50% extra damage
-
 // returns a vec4(min position, max position)
 vec4 getRoomBounds(Entity entity)
 {

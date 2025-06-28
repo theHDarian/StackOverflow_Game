@@ -2,6 +2,7 @@
 
 #include "sound_system.hpp"
 #include "text_system.hpp"
+#include "ai_system.hpp"
 #include "premades.hpp"
 #include <glm/gtx/compatibility.hpp>
 #include "utils/enum_string_mapping.hpp"
@@ -291,7 +292,9 @@ void UISystem::step(float elapsed_ms) {
 		hp.activeStatuses[static_cast<int>(SpecialStates::PROTECTED)] = (registry.vulnerabilities.has(entity) && registry.vulnerabilities.get(entity).modifier < 0.99) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::REGENERATING)] = registry.regenerates.has(entity) - 1;
 		hp.activeStatuses[static_cast<int>(SpecialStates::ONFIRE)] = (registry.onFires.has(entity) && registry.onFires.get(entity).stack > 0) ? registry.onFires.get(entity).stack : -1;
-		
+		hp.activeStatuses[static_cast<int>(SpecialStates::HASTY)] = (registry.timeModifiers.has(entity) && registry.timeModifiers.get(entity).modifier == HASTY_TIME_MODIFIER) - 1;
+		hp.activeStatuses[static_cast<int>(SpecialStates::SLUGGISH)] = (registry.timeModifiers.has(entity) && registry.timeModifiers.get(entity).modifier == SLUGGISH_TIME_MODIFIER) - 1;
+
 		// configure position of hpbar
 		WindowState& windowState = registry.windowStates.components[0];
 		hp.scale = { 600, 30 };
@@ -1227,6 +1230,15 @@ void UISystem::updateTierUI(vec2 position, BulletEffectType tier) {
 		variables.push_back(val);
 		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
 	}
+	if (tier == BulletEffectType::PlayerSpeed) {
+		TimeModifier tm = TimeModifier();
+		val = getTruncatedDecimal(tm.BASECOUNTDOWN / 1000) + "s"; // TODO: comma is also coloured green for some reason
+		variables.push_back(val);
+		variableDecos.push_back({ { 0, val.length(), bulletEffectColors.at(tier)} });
+		std::string val2 = getTruncatedDecimal((tm.BASECOUNTDOWN + getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED) / 1000) + "s";
+		variables.push_back(val2);
+		variableDecos.push_back({ { 0, val2.length(), bulletEffectColors.at(tier)} });
+	}
 	bindScriptVariables(textReq, variables, variableDecos);
 
 	// get formatted text based on bounds
@@ -1304,10 +1316,19 @@ void UISystem::updateBulletUI(vec2 position, BulletStackEffect bullet) {
 		}
 
 		std::string modStr = getTruncatedDecimal(mod) + " " + bulletEffectUnits.at(bullet.type);
+		// special case: bullet range is range and bullet speed
+		if (bullet.type == BulletEffectType::BulletRange) {
+			modStr += ", " + getTruncatedDecimal(getModifiedBulletSpeed(stack.Call(bullet.type))) + " px/s";
+		}
+
 		textReq.decorations.push_back(TextDecorationSpan{ textReq.text.length(), textReq.text.length() + modStr.length(), color });
 		textReq.text += modStr + "\nAt +1 value: "; // TODO: figure out a good name
 
 		std::string futureModStr = getTruncatedDecimal(futureMod) + " " + bulletEffectUnits.at(bullet.type);
+		// special case: bullet range is range and bullet speed
+		if (bullet.type == BulletEffectType::BulletRange) {
+			futureModStr += ", " + getTruncatedDecimal(getModifiedBulletSpeed(stack.Call(bullet.type, 1))) + " px/s";
+		}
 		textReq.decorations.push_back(TextDecorationSpan{ textReq.text.length(), textReq.text.length() + futureModStr.length(), color });
 		textReq.text += futureModStr;
 		
@@ -2252,7 +2273,6 @@ void UISystem::loadBulletEffects() {
 		if (tooltip.length() > 0) {
 			tokenizedTooltip = getTokenizedText(tooltip);
 			uiTexts.insert({ "HoverBullet_" + bullet.name, {tooltip, tokenizedTooltip, {}}});
-			//std::cout << tooltip << std::endl;
 		}
 	}
 }
@@ -2275,7 +2295,7 @@ void UISystem::bindScriptVariables(TextRenderRequest& request, std::vector<std::
 			assert(text.find_first_of('}', i) != -1);
 			int closingBraceIndex = text.find_first_of('}', i);
 			int varNum = std::stoi(text.substr(i + 1, closingBraceIndex)); // assume this will work for now
-			assert(varNum < variables.size());
+			assert(varNum < variables.size() || variables.size() == 0);
 			text = text.substr(0, i) + variables[varNum] + text.substr(closingBraceIndex + 1);
 
 			int varLength = (variables[varNum].length() > 3? variables[varNum].length() : variables[varNum].length() - 3);

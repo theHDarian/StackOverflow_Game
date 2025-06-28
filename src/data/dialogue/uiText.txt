@@ -65,21 +65,18 @@ UI Tier_PlayerDashRecharge
 
 UI Tier_PlayerNumDash
 Clears negative bullets at the end of dashes, with a radius of <color=green>50</color> per additional <color=green>Dash</color>
-\n\nCurrent clear radius: {0} 
+\n\nCurrent clear radius: <color=green>{0}</color>
 
 UI Tier_Homing
 Was it worth it?
 
 UI Tier_FireRate
 Burst fires bullets, increasing with additional <color=orange>Fire Rate </color>
-\n\nBullets per burst: {0}
+\n\nBullets per burst: <color=orange>{0}</color>
 
 UI Tier_PlayerSpeed
 #Drastically slow down time upon contact with a bullet or enemy. Can only be triggered once every <color=green_light> 10 </color> seconds. Taking damage reduces the cooldown.
 #\n<color=green_light>OverCharge</color>: Effect duration increased by <color=green_light>0.5s</color> and cooldown reduction increased by <color=green_light>1s</color> per <color=green_light>Bullet Speed Up</color> above tier threshold.
-
-
-
-Upon contact with a bullet or enemy, drastically slow down time for <color=green_light>{0}</color>, with an additional <color=green_light>0.5s</color> per <color=green_light>Bullet Speed Up</color> above tier threshold. Can only be triggered once every <color=green_light>10s</color>. ,,,,Taking damage reduces the cooldown by <color=green_light>1s</color>.
-
+Upon contact with a bullet or enemy, drastically slow down time for <color=green_light>{0}</color>, with an additional <color=green_light>0.5s</color> per <color=green_light>Bullet Speed Up</color> above 5. Can only be triggered once every <color=green_light>10s</color>. Taking damage reduces the cooldown by <color=green_light>1s</color>.
+\nCurrent duration: <color=green_light>{1}</color>
 

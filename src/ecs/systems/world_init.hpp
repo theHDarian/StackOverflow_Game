@@ -131,3 +131,5 @@ Entity createSkipDialogue();
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial);
 
 vec2 lerpToRoom(vec2 point);
+
+float getModifiedBulletSpeed(float bulletRange);
