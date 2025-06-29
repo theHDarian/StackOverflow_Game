@@ -260,7 +260,7 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.shape = EnemyBulletShape::RECTANGLE;
 		atkData.defaultEffect = b;
 		atkData.rareBulletEffects = {b};
-		atkData.speed = 200 + (15 * numBullets);
+		atkData.speed = 200 + (50 * max(0.0, log(numBullets)));
 		atkData.size = vec2(20,50);
 		atkData.bulletRange = max(6000.f, numBullets * 1000.f);
 		atkData.bulletBounce = max(2, numBullets / 3);
@@ -271,7 +271,7 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 
 
 
-void resetStack(Entity player, RenderSystem* renderer, float offset) {
+void resetStack(const Entity &player, RenderSystem* renderer, float offset, const std::vector<BulletStackEffect> &effects) {
 
     //Invincible& inv =registry.invincibles.emplace(player);
     //inv.countdown = 1000.0f;
@@ -282,7 +282,11 @@ void resetStack(Entity player, RenderSystem* renderer, float offset) {
             return;
         }
         int size = reg.baseStackSize;
-        CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, offset);
+    	if (effects.empty()) {
+    		CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, offset);
+    	} else {
+			CreateXPopBullets( renderer, registry.motions.get(player).position, 0, effects, 2.0f * M_PI, offset);
+		}
     	std::vector<BulletStackEffect> temp = reg.currStack;
         // reg.currStack.clear();
         registry.stackCompile.remove(player);
@@ -344,7 +348,7 @@ void closeDoors (SoundSystem* soundPlayer) {
 	soundPlayer->playNextMusic();
 }
 
-void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSystem* soundPlayer) {
+void addEffect(const Entity &player, const std::vector<BulletStackEffect> &effects, SoundSystem* soundPlayer) {
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
@@ -352,7 +356,7 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
 		UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
 		req.type = UIRequestType::StackNotifBullet;
 		req.effects = effects;
-        for (BulletStackEffect b : effects) {
+        for (const BulletStackEffect& b : effects) {
             printf("Adding: %s\n",b.name.c_str());
             bool success = reg.add(b);
         	if (!success) {
@@ -484,7 +488,7 @@ void resetDashes () {
 }
 
 
-void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
+void interact(float elapsed_ms, Entity &player, RenderSystem* renderer, SoundSystem* soundPlayer) {
 	// interactible object management placed here and hard coded for now
 	// can consider: each behaviour type is component, when choice X is selected then enact that behaviour
 	GameState& gameState = registry.gameStates.components[0];
@@ -587,6 +591,51 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
 			}
 		}
+
+		if (object.item == GlitchedPopConsole) { // the choices are known implicitly by person who wrote object script for now
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+				std::vector<BulletStackEffect> effects = {};
+				if (registry.stackCompile.has(player)) {
+					auto& stack = registry.stackCompile.get(player);
+					for (BulletStackEffect b : stack.currStack) {
+						float rand = Random::Float(1);
+						if (rand < 0.1f) {
+							b.value = -b.value; // 10% chance to negate the effect
+							effects.push_back(b);
+						} else if (rand < 0.6f) {
+							effects.push_back(b); // 50% chance to keep the effect
+						} else if (rand < 0.75f) {
+							if (b.type != BulletEffectType::Key) {
+								std::vector<BulletEffectType> possibleEffects = {BulletDamage,
+																				ProjectileSize,
+																				FireRate,
+																				BulletRange,
+																				BulletAccuracy,
+																				BulletNum, // Number of bullets fired in a single shot
+																				Bounce,
+																				Pierce,
+																				Homing,
+																				PlayerSpeed,
+																				PlayerNumDash,
+																				PlayerDashRecharge,};
+								auto newEffect = Random::ListItem(possibleEffects); // 15% chance to change the effect to a random effect
+								b.color = bulletEffectColors.at(newEffect);
+								b.type = newEffect;
+							}
+							effects.push_back(b);
+						}
+						// 25% chance to remove the effect
+					}
+				}
+				resetStack(player, renderer, 150, effects);
+				resetDashes();
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
+			}
+		}
+
 
 		if (object.item == BibleTree) {
 			if (reaction.choice == 0) { // yes

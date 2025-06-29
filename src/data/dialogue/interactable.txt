@@ -115,6 +115,27 @@ ITEM PopStack -1 2
 Would you like to pop your stack?
 CHOICES Yes\No
 
+ITEM GlitchedPopStack -1 0
+This seems to be one of those machines that can directly link to robots and pop data off their stacks.
+It seems to be a bit glitchy, though. You wonder if it will work properly.
+Try and use it anyway?
+SPEAKER N N
+CHOICES Yes\No
+
+ITEM GlitchedPopStack 0 0
+Stack popped!
+SOUND rareItemPickup
+
+ITEM GlitchedPopStack 1 0
+You decide not to pop your stack.
+
+ITEM GlitchedPopStack -1 1
+You've already used this! Thinking back, why does a run-down lab have a machine like this anyway?
+
+ITEM GlitchedPopStack -1 2
+Use this glitchy machine to pop your stack?
+CHOICES Yes\No
+
 ITEM PushStack -1 0
 This seems to be one of those machines that can directly link to robots and push data onto their stacks.
 This one in particular seems to have the following data: {0}

@@ -130,14 +130,14 @@ void MapSystem::step(float elapsed_ms)
         }
     }
 
-    if (map.currRoom.preset.hasElite > 0) {
+    if (map.currRoom.preset.hasElite > 0 && map.currRoom.type == EnemyRoom) {
         if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.size() <= registry.roomWideBuffers.size()) ) {
             Entity bossEnemy;
             SpawnEnemiesInList( Random::ListItem(eliteEnemies.at(map.currRegion)), bossEnemy, renderer, true);
             map.currRoom.preset.hasElite = max(0, map.currRoom.preset.hasElite - 1);
             map.currRoom.spawnedElite = true;
             soundPlayer->playAlarmSound(3);
-            map.currRoom.eliteTimer += Random::Float(12.0f) + 3.0f; // reset timer
+            map.currRoom.eliteTimer = map.currRoom.timeElapsed + Random::Float(12.0f) + 3.0f; // reset timer
         }
     }
 
@@ -157,14 +157,18 @@ void MapSystem::step(float elapsed_ms)
         for (auto& e : map.currRoom.preset.interactables)
         {
             vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, std::get<vec2>(e));
-            createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+            auto item = std::get<RoomInteractable>(e).item;
+            if (item == PopConsole && map.currRoom.preset.hasElite > 0) {
+                item = GlitchedPopConsole;
+            }
+            createInteractable(renderer, pos, item, std::get<RoomInteractable>(e).pushConsoleEffects);
         }
         map.currRoom.preset.interactables = {};
 
     }
 
     // set room to cleared if all enemies are defeated
-    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !map.currRoom.preset.hasElite)
+    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !(map.currRoom.preset.hasElite > 0 && map.currRoom.type == EnemyRoom))
     {
         map.currRoom.cleared = true;
 

@@ -53,6 +53,7 @@ public:
         {InteractableItem::Ramlet, 0},
         {InteractableItem::Optimizer, 0},
         {InteractableItem::Inverter, 0},
+            {InteractableItem::GlitchedPopConsole, 0}
     };
 
 private:

@@ -4795,7 +4795,7 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     }
 
     // Elite
-    if (type == RoomType::EnemyRoom && roomsTraversed > 6 && Random::Float() < eliteSpawnChance) {
+    if ((type == RoomType::EnemyRoom || type == TreasureRoom || type == RestRoom) && roomsTraversed > 6 && Random::Float() < eliteSpawnChance) {
         nextRoom.hasElite = max(1, min(Random::Int((int) currRegion),3));
     }
 
