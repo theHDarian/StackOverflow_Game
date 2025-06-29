@@ -165,7 +165,8 @@ Entity createInteractable(RenderSystem *renderer, vec2 pos, InteractableItem ite
 	switch (item)
 	{
 	case InteractableItem::PopConsole:
-		return createPopConsole(renderer, pos);
+	case InteractableItem::GlitchedPopConsole:
+		return createPopConsole(renderer, pos, item);
 	case InteractableItem::Ram:
 		return createRamStick(renderer, pos);
 	case InteractableItem::Ramlet:
@@ -533,7 +534,7 @@ Entity createFightConsole(RenderSystem *renderer, vec2 pos, std::vector<BulletSt
 	return console;
 }
 
-Entity createPopConsole(RenderSystem *renderer, vec2 pos)
+Entity createPopConsole(RenderSystem *renderer, vec2 pos, InteractableItem type)
 {
 	const Entity console = Entity();
 
@@ -558,8 +559,13 @@ Entity createPopConsole(RenderSystem *renderer, vec2 pos)
 	 cc.radius = m.scale.y / 4;
 
 	InteractableObject &object = registry.interactables.emplace(console);
-	object.name = "PopStack";
-	object.item = PopConsole;
+	if (type == GlitchedPopConsole) {
+		object.name = "GlitchedPopStack";
+		object.item = GlitchedPopConsole;
+	} else {
+		object.name = "PopStack";
+		object.item = PopConsole;
+	}
 	// or maybe object type enum? This is not a unique id, just an object type identifier
 
 	Animation &a = registry.animations.emplace(console);

@@ -307,6 +307,9 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 				break;
 			}
 		}
+	} else if (registry.interactables.has(entity) && registry.interactables.get(entity).item == InteractableItem::GlitchedPopConsole)
+	{
+		should_glitch = true;
 	}
 
 	glUniform1i(glitchToggle_uloc, (registry.elites.has(target) || should_glitch));

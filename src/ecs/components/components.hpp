@@ -537,6 +537,7 @@ enum InteractableItem {
 	Ram,
 	Ramlet,
 	PopConsole,
+	GlitchedPopConsole,
 	PushConsole,
 	FightConsole,
 	OpenDoor,

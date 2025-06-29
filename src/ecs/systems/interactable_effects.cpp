@@ -260,7 +260,7 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.shape = EnemyBulletShape::RECTANGLE;
 		atkData.defaultEffect = b;
 		atkData.rareBulletEffects = {b};
-		atkData.speed = 200;
+		atkData.speed = 200 + (15 * numBullets);
 		atkData.size = vec2(20,50);
 		atkData.bulletRange = max(6000.f, numBullets * 1000.f);
 		atkData.bulletBounce = max(2, numBullets / 3);

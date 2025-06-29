@@ -36,7 +36,7 @@ Entity createInverter(RenderSystem *renderer, vec2 pos);
 
 Entity createWhiteBoard(RenderSystem* renderer, vec2 pos);
 
-Entity createPopConsole(RenderSystem* renderer, vec2 pos);
+Entity createPopConsole(RenderSystem* renderer, vec2 pos, InteractableItem type);
 
 Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData);
 

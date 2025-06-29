@@ -9,6 +9,7 @@
 
 constexpr float random_float = -9999;
 constexpr vec2 random_vec2 = {random_float, random_float};
+constexpr vec2 random_batch = {-9998, -9998}; // Used to indicate the enemy should spawn at one of the predetermined random positions in the room
 
 enum BulletEffectType {
     BulletDamage,

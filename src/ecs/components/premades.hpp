@@ -3100,7 +3100,7 @@ struct PillBoidSpawner : Enemy
 
 	PillBoidSpawner()
 	{
-		maxHealth = 400;
+		maxHealth = 1400;
 		currHealth = maxHealth;
 		enemyPatterns = {random1, chargingState, backUp, shootCannon, spawn, rest, laser};
 		patternIndex = 0;
@@ -3169,7 +3169,7 @@ struct Scissors : Enemy
 
 	Scissors()
 	{
-		maxHealth = 400;
+		maxHealth = 1200;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3};
 		sprite = {
@@ -3211,7 +3211,7 @@ struct BMP : Enemy {
 	EnemyPattern telePortState = {"TELEPORT", EnemyBehavior::IDLE, {}, 0, 1500.f, 1500.f, {AttackLaser}, 0, true, 0.f, 700.f, spiral, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	BMP()
 	{
-		maxHealth = 1000;
+		maxHealth = 1800;
 		currHealth = maxHealth;
 		enemyPatterns = {heal_state, telePortState};
 		sprite = {
@@ -3301,7 +3301,7 @@ struct Syringe : Enemy
 
 	Syringe()
 	{
-		maxHealth = 350;
+		maxHealth = 550;
 		currHealth = maxHealth;
 		enemyPatterns = {random, random2, random3, random4, healing, spawn,  charge, recoil, farRandom};
 		patternIndex = 0;
@@ -3451,7 +3451,7 @@ struct RodOfC : Enemy {
 	EnemyPattern Spawning = {"TELEPORT", EnemyBehavior::RANDOM_NEAR, {}, 0, 5000.f, 5000.f, {duration}, 2, true, 0.f, 2500.f, Spawn, SpecialStates::VULNERABLE, SpecialStates::NORMAL};
 	RodOfC()
 	{
-		maxHealth = 1500;
+		maxHealth = 2500;
 		currHealth = maxHealth;
 		enemyPatterns = {heal_state, random_pos, coolDown, whipState, coolDown2, protection_pulse, wall, coolDown3, Spawning};
 		sprite = {
@@ -3492,7 +3492,7 @@ struct RodOfA : Enemy {
 
 	RodOfA()
 	{
-		maxHealth = 300;
+		maxHealth = 450;
 		currHealth = maxHealth;
 		enemyPatterns = {heal_state, telePortState, chargingState};
 		sprite = {
@@ -3545,7 +3545,7 @@ struct ProstheticHand : Enemy
 
 	ProstheticHand()
 	{
-		maxHealth = 500;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 
 		enemyPatterns = { restingState, movingState };
@@ -3587,7 +3587,7 @@ struct SpineChainedWormHead : Enemy
 
 	SpineChainedWormHead()
 	{
-		maxHealth = 2000;
+		maxHealth = 2500;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState };
@@ -3649,7 +3649,7 @@ struct SpinePatrolWormHead : Enemy
 
 	SpinePatrolWormHead()
 	{
-		maxHealth = 2000;
+		maxHealth = 3400;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState, loopState};
@@ -3714,7 +3714,7 @@ struct SpineFollowWormHead : Enemy
 
 	SpineFollowWormHead()
 	{
-		maxHealth = 300;
+		maxHealth = 3000;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState};
@@ -4089,7 +4089,7 @@ struct SurfaceMole : Enemy
 
 	Reaction halfHP = {
 		ReactionType::FIFTY_HEALTH,
-		2, SpecialStates::INVINCIBLE
+		2, SpecialStates::PROTECTED
 	};
 
 	Reaction playerClose = {
@@ -4100,7 +4100,7 @@ struct SurfaceMole : Enemy
 	EnemyPattern diggingState = { "Digging", EnemyBehavior::RANDOM, {}, 0, 4000.f, 4000.f, {duration, halfHP}, 1, true, 0.f, 1500.f, fastDirtBlast };
 	EnemyPattern emergeState = { "Emerge", EnemyBehavior::RANDOM_FAR, {}, 0, 4000.f, 4000.f, {duration, halfHP}, 0, true, 0.f, 1500.f, dirtBlast };
 
-	EnemyPattern spawnBoulders = { "Summon Boulders", EnemyBehavior::RANDOM_FAR, {}, 0, 1000.f, 1000.f, {duration}, 3, true, 900.f, 500.f, summonBoulders, SpecialStates::UNDERGROUND };
+	EnemyPattern spawnBoulders = { "Summon Boulders", EnemyBehavior::RANDOM_FAR, {}, 0, 2000.f, 2000.f, {duration}, 3, true, 900.f, 500.f, summonBoulders, SpecialStates::UNDERGROUND };
 
 	EnemyPattern diggingStatePhase2 = { "Digging", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f, {duration}, 4, true, 0.f, 1000.f, fastDirtBlast };
 	EnemyPattern emergeStatePhase2 = { "Emerge", EnemyBehavior::RANDOM_FAR, {}, 0, 3000.f, 3000.f, {duration, playerClose}, 3, true, 0.f, 1000.f, dirtBlast };
@@ -4108,7 +4108,7 @@ struct SurfaceMole : Enemy
 
 	SurfaceMole()
 	{
-		maxHealth = 1250;
+		maxHealth = 1000;
 		currHealth = maxHealth;
 
 		enemyPatterns = {  diggingState, emergeState,  spawnBoulders, diggingStatePhase2, emergeStatePhase2,  };
@@ -4381,7 +4381,7 @@ struct BigBoulder : Enemy
 	EnemyPattern blowUp = { "ROLLING", EnemyBehavior::ROLLING, {}, 0, 200.f, 200.f, {duration}, 1, true, 0.f, 1000.f, blowup };
 	BigBoulder()
 	{
-		maxHealth = 700;
+		maxHealth = 600;
 		currHealth = maxHealth;
 
 		enemyPatterns = { rollingState, DeathState, blowUp };
@@ -5407,7 +5407,11 @@ struct MultiCube : Enemy
 	{
 		maxHealth = 3000;
 		currHealth = maxHealth;
-		enemyPatterns = { zeroState1, zeroState2, spawnYellow, oneState1, oneState2, spawnPurple, twoState1, twoState2, spawnGreen, threeState1, threeState2, spawnRed, soloState1, soloState2, PredeathSuper, PredeathSuper2, PredeathSuper3, PredeathSuper4, PredeathSuper5, finalState1, finalState2 };
+		enemyPatterns = {
+			zeroState1, zeroState2, spawnYellow, oneState1, oneState2, spawnPurple, twoState1, twoState2, spawnGreen,
+			threeState1, threeState2, spawnRed, soloState1, soloState2, PredeathSuper, PredeathSuper2, PredeathSuper3,
+			PredeathSuper4, PredeathSuper5, finalState1, finalState2
+		};
 		patternIndex = 0;
 		sprite = {
 			"hifi_boss_2_phases",
@@ -5450,7 +5454,7 @@ struct TwinLaserVertical1 : Enemy
 	EnemyPattern randomState = {"PatrolSide", EnemyBehavior::PATROLLING, {{0.01, 0.01}, {0.01, 0.99}, {0.01, 0.01}}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 1000000000.f, crabLaser};
 	TwinLaserVertical1()
 	{
-		maxHealth = 300;
+		maxHealth = 500;
 		currHealth = maxHealth;
 		enemyPatterns = {
 			randomState};
@@ -5575,7 +5579,7 @@ struct HifiSniper : Enemy
 
 	HifiSniper()
 	{
-		maxHealth = 120;
+		maxHealth = 220;
 		currHealth = maxHealth;
 		enemyPatterns = {random, random2, random3, random4};
 		patternIndex = 0;
@@ -5632,7 +5636,7 @@ struct HifiSniperHard : Enemy
 
 	HifiSniperHard()
 	{
-		maxHealth = 100;
+		maxHealth = 500;
 		currHealth = maxHealth;
 		enemyPatterns = {random, random2, random3, random4};
 		patternIndex = 0;
@@ -5661,7 +5665,7 @@ struct HifiCharger : Enemy
 
 	HifiCharger()
 	{
-		maxHealth = 150;
+		maxHealth = 350;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, randomPosNoCharge};
 		sprite = {
@@ -5708,7 +5712,7 @@ struct HifiChargerHard : Enemy
 
 	HifiChargerHard()
 	{
-		maxHealth = 200;
+		maxHealth = 500;
 		currHealth = maxHealth;
 		enemyPatterns = {randomPos, chargingState, idleStateCD1, chargingMidState, idleStateCD2, chargingEndState, idleState, explodingCharge, idleState3, randomPosNoCharge};
 		sprite = {
@@ -5817,7 +5821,7 @@ struct HifiTrail : Enemy
 
 	HifiTrail()
 	{
-		maxHealth = 300;
+		maxHealth = 600;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState};
@@ -5931,7 +5935,7 @@ struct HifiTrailHard : Enemy
 
 	HifiTrailHard()
 	{
-		maxHealth = 170;
+		maxHealth = 970;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState};
@@ -6071,7 +6075,7 @@ struct HifiJellyFish : Enemy
 
 	HifiJellyFish()
 	{
-		maxHealth = 250;
+		maxHealth = 750;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, chargingState, chargingState2, shootingState, chargingState3, shootingState2};
@@ -6156,7 +6160,7 @@ struct HifiTackShooter : Enemy
 
 	HifiTackShooter()
 	{
-		maxHealth = 250;
+		maxHealth = 650;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, shootingState, rotateState2};
@@ -6227,7 +6231,7 @@ struct HifiBallLauncher : Enemy
 
 	HifiBallLauncher()
 	{
-		maxHealth = 150;
+		maxHealth = 650;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, shootingState};
@@ -6297,7 +6301,7 @@ struct HifiWhip : Enemy
 
 	HifiWhip()
 	{
-		maxHealth = 150;
+		maxHealth = 950;
 		currHealth = maxHealth;
 
 		enemyPatterns = {rotateState, restState};
@@ -6357,7 +6361,7 @@ struct HifiCannon : Enemy
 
 	HifiCannon()
 	{
-		maxHealth = 350;
+		maxHealth = 1350;
 		currHealth = maxHealth;
 		enemyPatterns = {random1, chargingState, backUp, shootCannon, shootCluster};
 		patternIndex = 0;
@@ -6421,7 +6425,7 @@ struct HifiCannonHard : Enemy
 
 	HifiCannonHard()
 	{
-		maxHealth = 500;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 		enemyPatterns = {random1, chargingState, backUp, shootCannon, spawn, rest, laser};
 		patternIndex = 0;
@@ -6922,7 +6926,7 @@ struct ScientistBossEnemy : Enemy
 
 	ScientistBossEnemy()
 	{
-		maxHealth = 3500;
+		maxHealth = 5000;
 		currHealth = maxHealth;
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
@@ -7400,7 +7404,7 @@ struct ScientistHandEnemy : Enemy
 
 	ScientistHandEnemy()
 	{
-		maxHealth = 1500;
+		maxHealth = 2500;
 		currHealth = maxHealth;
 		enemyPatterns = {idling, chargePlayer, idling2,
 						 BombingState, idling3,teleportToScientist2,
@@ -7459,7 +7463,7 @@ struct EyeCube : Enemy {
 
 	EyeCube()
 	{
-		maxHealth = 2000;
+		maxHealth = 2500;
 		currHealth = maxHealth;
 
 		enemyPatterns = { followState, attackState };
@@ -7725,7 +7729,7 @@ struct Phantom : Enemy
 
 	Phantom()
 	{
-		maxHealth = 750;
+		maxHealth = 1050;
 		currHealth = maxHealth;
 		enemyPatterns = {IdleState, teleport,grantInvisible, shootingState,  teleport2, RetreatAndShoot, teleport3};
 		sprite = {
@@ -7915,7 +7919,7 @@ struct Cross : Enemy
 
 	Cross()
 	{
-		maxHealth = 1250;
+		maxHealth = 1500;
 		currHealth = maxHealth;
 		enemyPatterns = { init, phase1, randomState,
 			initPhase2, initPhase2Part2, phase2, randomStatePhase2,
@@ -7946,7 +7950,7 @@ struct Bubble : Enemy
 
 	Bubble()
 	{
-		maxHealth = 35;
+		maxHealth = 50;
 
 		currHealth = maxHealth;
 

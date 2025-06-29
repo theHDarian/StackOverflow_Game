@@ -50,8 +50,12 @@ void SpawnEnemiesInList(const std::vector<std::tuple<EnemyType,vec2>> &enemies, 
     for (auto &e : enemies)
     {
         vec2 location = std::get<vec2>(e);
-        location.x = location.x == random_float ? Random::Float() : location.x;
-        location.y = location.y == random_float ? Random::Float() : location.y;
+        if (location == random_batch) {
+            location = Random::ListItem(map.currRoom.batchedEnemyPositions);
+        } else {
+            location.x = location.x == random_float ? Random::Float() : location.x;
+            location.y = location.y == random_float ? Random::Float() : location.y;
+        }
         vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
         if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
             createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
@@ -364,6 +368,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom.preset = door.preset;
     std::cout << "Changing room to: " << map.currRoom.preset.ID << std::endl;
     map.currRoom.type = door.room;
+    map.currRoom.batchedEnemyPositions = {Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+    Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}), Random::Vec2({1,1}),Random::Vec2({1,1}),
+    Random::Vec2({1,1}),Random::Vec2({1,1})};
 
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
