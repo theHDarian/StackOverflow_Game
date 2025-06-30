@@ -571,7 +571,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             map.currRoom.preset = TestRoom2;
             InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = { bulletRangeUp, bulletRangeUp };
+            req2.effects = { bulletRangeUp, bulletRangeUp, bulletRangeUp,};
+
         }
         else {
             InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
@@ -589,6 +590,8 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else if (map.currRegion == Medical) {
                  presetOverRide= {ScientistBossRoom};
+                req2.effects = { bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp, numBulletsUp, numBulletsUp, bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp};
+
             }
             else if (map.currRegion == Physics) {
                 std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};

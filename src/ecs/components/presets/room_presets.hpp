@@ -941,6 +941,45 @@ const RoomPreset EnemyRoomAngelTank{
     "An Angel's Touch",
 };
 
+const RoomPreset BioEnemyRoomDogs{
+            {
+                {
+
+                        {EnemyType::EnemyChainDogHead, {0.2f, 0.8f}},
+                    {EnemyType::EnemyChainDogHead, {0.8f, 0.2f}},
+                    {EnemyType::EnemySkull, {0.5f, 0.5f}},
+                {EnemyType::EnemyBubbleShield, {0.5f, 0.5f}},
+                    {EnemyType::EnemyChainDogHead, {0.8, 0.8}},
+                    {EnemyType::EnemyChainDogHead, {0.2, 0.2}}
+                },
+            {
+                    {EnemyType::EnemySword, {0.2f, 0.8f}},
+        {EnemyType::EnemySword, {0.8f, 0.2f}},
+{EnemyType::EnemyCrab, random_vec2},
+{EnemyType::EnemyCrab, random_vec2},
+
+        },
+                {
+            {EnemyType::EnemyPufferfish, random_vec2},
+    {EnemyType::EnemyPufferfish, random_vec2},
+{EnemyType::EnemyChainDogHead, {0.35f, 0.5f}},
+{EnemyType::EnemyChainDogHead, {0.65f, 0.5f}},
+{EnemyType::EnemyChainDogHead, {0.5, 0.35}},
+{EnemyType::EnemyChainDogHead, {0.5, 0.65}}
+
+                }
+            },
+
+    {},
+    {},
+    17.25f,
+    5,
+    2,
+    "Derelict Kennels",
+};
+
+
+
 const RoomPreset EnemyRoomMagic{
         {
             {
@@ -3450,13 +3489,82 @@ const RoomPreset MedicalEnemyRoomWorms {
 
     },
 {},
-    {{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
-    20.0f,
-    25,
+    {
+    },
+    12.0f,
     5,
-    "Critical Mass",
+    5,
+    "Steel ",
     false,
     {1500, 1500}
+};
+
+const RoomPreset MedicalEnemyRoomChain {
+        {
+
+                {
+                    {EnemyChainDogHead, {random_float, random_float}},
+                {EnemyChainDogHead, {random_float, random_float}},
+                {EnemyChainDogHead, {random_float, random_float}},
+                        {EnemyChainDogHead, {random_float, random_float}},
+                        {EnemyChainDogHead, {random_float, random_float}},
+                        {EnemyChainDogHead, {random_float, random_float}},
+                    {EnemyChainDogHead, {random_float, random_float}},
+                    {EnemySpinePatrolWormHead, {0.1f, 0.9f}},
+                    {CloakedGranterRoomWide, {0.5f, 0.5f}},
+                    {EnemyScissors, {random_float, random_float}},
+                    {EnemyScissors, {random_float, random_float}},
+                    {EnemyScissors, {random_float, random_float}},
+                            {EnemyPufferfish, {0.25f, 0.75f}},
+                            {EnemyPufferfish, {0.25f, 0.25f}},
+                            {EnemyPufferfish, {0.75f, 0.25f}},
+                            {EnemyPufferfish, {0.75f, 0.75f}},
+        {EnemyBubbleShield, {0.25f, 0.75f}},
+        {EnemyBubbleShield, {0.25f, 0.25f}},
+        {EnemyBubbleShield, {0.75f, 0.25f}},
+        {EnemyBubbleShield, {0.75f, 0.75f}},
+
+                },
+                {
+                            {EnemyEvilCrab, {random_float, random_float}},
+                            {EnemyEvilCrab, {random_float, random_float}},
+                            {EnemyEvilCrab, {random_float, random_float}},
+{EnemyCrab, {random_float, random_float}},
+{EnemyCrab, {random_float, random_float}},
+{EnemyCrab, {random_float, random_float}},
+{EnemyCrab, {random_float, random_float}},
+{EnemyScissors, {random_float, random_float}},
+ {EnemyScissors, {random_float, random_float}},
+ {EnemyScissors, {random_float, random_float}},
+{EnemyLaserCrab, {random_float, random_float}},
+{EnemyCrab, {random_float, random_float}},
+{EnemySpinePatrolWormHead, {0.9f, 0.1f}},
+                },
+
+                {
+                        {EnemySurfaceMole, {random_float, random_float}},
+                    {EnemySurfaceMole, {random_float, random_float}},
+                {EnemySurfaceMole, {random_float, random_float}},
+                {EnemySurfaceMole, {random_float, random_float}},
+                        {EnemySpineChainedWormHead, {0.25f, 0.75f}},
+                        {EnemySpineChainedWormHead, {0.25f, 0.25f}},
+                        {EnemySpineChainedWormHead, {0.75f, 0.25f}},
+                        {EnemySpineChainedWormHead, {0.75f, 0.75f}},
+{EnemySpineChainedWormHead, {0.9f, 0.9f}},
+{EnemySpinePatrolWormHead, {0.9f, 0.1f}},
+{EnemySpinePatrolWormHead, {0.1f, 0.9f}},
+{EnemySpineChainedWormHead, {0.1f, 0.1f}},
+                },
+
+        },
+    {},
+        {},
+        16.0f,
+        5,
+        5,
+        "Veterinary Quarantine",
+        false,
+        {3500, 3500}
 };
 
 
@@ -4077,7 +4185,13 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> bioRoomDirectory = {
         },
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{EnemyRoomAngelTank,EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2},{EnemyRoomInvisible}}},
+        {
+            RoomType::EnemyRoom,
+            {
+                {EnemyRoomAngelTank, EnemyRoomCrabs, EnemyRoomDashHard, EnemyRoomBees3, EnemyRoomDash2, EnemyRoomBees2, BioEnemyRoomDogs},
+                {EnemyRoomInvisible}
+            }
+        },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
         {RoomType::EventRoom, {{EventRoomGardener, EventRoomHoney, EventRoomOracleCrab}, {EventRoomMouse}}  },
         {
@@ -4222,7 +4336,16 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
     }},
     {DifficultyRegion::Medium,{
-        {RoomType::EnemyRoom, {{MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes },{MedicalEnemyRoomHeartBeat3,MedicalEnemyRoomInvincible}}},
+        {
+            RoomType::EnemyRoom,
+            {
+                {
+                    MedicalEnemyRoomHeartBeat4, MedicalEnemyRoomHeartBeat2, MedicalEnemyRoomHand, MedicalEnemyRoomChain,
+                    MedicalEnemyRoomSpineWormQuadShooters, MedicalEnemyRoomSyringes
+                },
+                {MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible}
+            }
+        },
         {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{}}},
         {RoomType::EventRoom, {{ EventRoomOracleCrab, EventRoomOven, EventRoomInverter}, { EventRoomOptimizer}}  },
         {RoomType::TreasureRoom, {choiceTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},

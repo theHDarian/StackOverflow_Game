@@ -1072,7 +1072,7 @@ struct ChainDogHead : Enemy
 
 	ChainDogHead()
 	{
-		maxHealth = 200;
+		maxHealth = 400;
 		currHealth = maxHealth;
 
 		enemyPatterns = { followState };
