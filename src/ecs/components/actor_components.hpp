@@ -143,7 +143,7 @@ struct StackCompile {
         {BulletNum,         5},     // Fires 4 * (1 + value-threshold) mini bullets
         {Bounce,            5},     // Bouncing towards random enemy
         {Pierce,            5},     // Deal more dmg to protected enemies, and vulnerable effect stronger
-        {Homing,            3},     // Causes all enemy bullets to get subtle homing (negative >:)
+        {Homing,            5},     // Causes all enemy bullets to get subtle homing (negative >:)
         {PlayerSpeed,       5},
         {PlayerNumDash,     5},     // Clears non-special enemy bullets at end of dash, 50px * (1 + value-threshold) radius
         {PlayerStackSize,   5},
