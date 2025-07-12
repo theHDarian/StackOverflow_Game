@@ -362,15 +362,20 @@ void UISystem::step(float elapsed_ms) {
 				registry.deleteEntityAndRelatedEntities(e);
 			}
 
-			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+			if (!registry.motions.has(uiRequest.targetEntity)) {
+				// if target entity is not present, then assume the request is for the player
+				uiRequest.targetEntity = registry.players.entities[0];
+			}
+
+			vec2 position = registry.motions.get(uiRequest.targetEntity).position;
 			registry.renderRequests.get(stackAddBubble).show = true;
 			registry.renderRequests.get(stackAddTail).show = true;
 
 			if (uiRequest.effects.size() > 0) {
-				updateStackAddBubble(playerPos, uiRequest.effects.size());
+				updateStackAddBubble(position, uiRequest.effects.size());
 			}
 			else {
-				updateStackAddBubble(playerPos, 1);
+				updateStackAddBubble(position, 1);
 			}
 
 			if (!registry.showTimers.has(stackAddBubble)) {
@@ -382,7 +387,7 @@ void UISystem::step(float elapsed_ms) {
 				registry.showTimers.emplace(stackAddTail);
 			}
 
-			vec2 bulletStartPos = playerPos;
+			vec2 bulletStartPos = position;
 
 			// first merge effects
 			uiRequest.effects = mergeEffects(uiRequest.effects);
@@ -410,7 +415,15 @@ void UISystem::step(float elapsed_ms) {
 						}
 
 						createStackAddNotif(vec2(bulletStartPos.x, bulletStartPos.y), vec2(192) / 2.5f, bulletSprite, vec3(1), BulletStackEffect());
-					} else {
+					}
+					else if (uiRequest.effects[index].type == BulletEffectType::Eat) {
+						//TODO MAKE A NOTIFICATION FOR EAT
+					}
+					else if (uiRequest.effects[index].type == BulletEffectType::Knock) {
+						//TODO MAKE A NOTIFICATION FOR EAT
+					}
+
+					else {
 						bulletSprite = bulletEffectShapes.at(uiRequest.effects[index].type);
 						bulletColor = bulletEffectColors.at(uiRequest.effects[index].type);
 						effectStr = getFormattedBulletEffectString(uiRequest.effects[index]);

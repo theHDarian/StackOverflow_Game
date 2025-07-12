@@ -909,6 +909,8 @@ enum InteractableRequestType {
     RemoveEffect, // removes effect from stack
     SpawnEnemy, // spawns enemy based on region, or can pass in specific enemy
     PopX, // creates x bullets with effects (used for key)
+    KnockX, // knocks x effects off the stack (similar to PopX, but Random)
+    EatX, // eats x effects off the stack and push them to the enemy/enemy bullet's stack
 };
 
 struct InteractableRequest {
@@ -916,6 +918,7 @@ struct InteractableRequest {
     int choice = -1;
     std::vector<std::tuple<EnemyType,vec2>> enemies = {};
     std::vector<BulletStackEffect> effects = {};
+    Entity targetEntity; // Entity that the request is for, can be player or enemy
 };
 
 struct UIRequest {
@@ -927,6 +930,7 @@ struct UIRequest {
         this->text = text;
         this->effects = effects;
     }
+    Entity targetEntity;
 };
 
 struct specialRotators {

@@ -46,7 +46,9 @@ const RoomPreset TestRoom{
 };
 
 const RoomPreset TestRoom2{
-    {{  {EnemyCross,  {0.1f, 0.1f}}
+    {{
+        {EnemyMaw,  {0.1f, 0.1f},},
+{EnemyHifiCharger,  {0.9f, 0.1f},}
     }},
 {},
 {},

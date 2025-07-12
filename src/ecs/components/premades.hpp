@@ -232,6 +232,41 @@ const BulletStackEffect popCurrentStack = {
 	""
 };
 
+const BulletStackEffect eat5Bullets = {
+	Eat,
+	5,
+	"Eat 5 Bullets",
+	""
+};
+
+const BulletStackEffect eat10Bullets = {
+	Eat,
+	10,
+	"Eat 10 Bullets",
+	""
+};
+
+const BulletStackEffect knock5Bullets = {
+	Knock,
+	5,
+	"Knock 5 Bullets",
+	""
+};
+
+const BulletStackEffect knock10Bullets = {
+	Knock,
+	10,
+	"Knock 10 Bullets",
+	""
+};
+
+const BulletStackEffect knock15Bullets = {
+	Knock,
+	15,
+	"Knock 15 Bullets",
+	""
+};
+
 
 // note: adding the effect to list is not necessary
 // but guarantees it will be tokenized on game load
@@ -1093,6 +1128,7 @@ struct ChainDogHead : Enemy
 		headData.body = EnemyChainDogBody;
 		headData.constrainDistance = 30.f;
 		headData.anchor = true;
+		collisionBullet = { eat5Bullets};
 	};
 };
 
@@ -5678,6 +5714,7 @@ struct HifiCharger : Enemy
 		rotatePower = 1.8f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 1.6f;
+		collisionBullet = {knock5Bullets};
 	}
 };
 
@@ -7560,6 +7597,7 @@ struct Maw : Enemy {
 		rotatePower = 1.0;
 		speedMultiplier = 3.0f;
 		rotationBehaviour = EnemyRotationBehavior::NONE;
+		collisionBullet = { eat10Bullets };
 	};
 };
 

@@ -248,7 +248,7 @@ std::map<char, float> doorSideToAngle = {
 	{'L', 3 * M_PI / 2}
 };
 
-void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange = 2.0f * M_PI, float offset = 150) {
+void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange, float offset) {
 	if (!registry.invincibles.has(registry.players.entities[0])) {
 		registry.invincibles.emplace(registry.players.entities[0]);
 	}
@@ -269,6 +269,33 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 	}
 }
 
+void reloadStack(const Entity &player, const std::vector<BulletStackEffect> &removedEffects = {}) {
+	if (registry.stackCompile.has(player)) {
+		StackCompile& reg = registry.stackCompile.get(player);
+		if (reg.currStack.empty()) {
+			return;
+		}
+		int size = reg.baseStackSize;
+		std::vector<BulletStackEffect> temp = std::move(reg.currStack);
+		// reg.currStack.clear();
+		registry.stackCompile.remove(player);
+		StackCompile& newreg = registry.stackCompile.emplace(player);
+		newreg.baseStackSize = size;
+		if (!removedEffects.empty()) {
+			newreg.recentRemoved = removedEffects;
+		}
+		for (const auto& effect : temp) {
+			newreg.add(effect);
+		}
+		Player& pl = registry.players.get(player);
+		if (pl.currDashCharges > getModifiedValue( PlayerNumDash, pl.baseDashNum)) {
+			pl.currDashCharges = getModifiedValue( PlayerNumDash, pl.baseDashNum);
+		}
+
+		StackUI& ui = registry.stackUI.components[0];
+		ui.updateStackUISize(newreg.baseStackSize);
+	}
+}
 
 
 void resetStack(const Entity &player, RenderSystem* renderer, float offset, const std::vector<BulletStackEffect> &effects) {
@@ -326,6 +353,67 @@ void extendStack (Entity player, int extension) {
     	ui.updateStackUISize(getModifiedValue( PlayerStackSize, reg.baseStackSize));
     }
 }
+
+void knockEffectsOffStack (const Entity &player, RenderSystem* renderer, int numEffects) {
+	if (registry.stackCompile.has(player)) {
+		StackCompile& reg = registry.stackCompile.get(player);
+		if (reg.currStack.empty()) {
+			return;
+		}
+
+		std::vector<BulletStackEffect> effectsToKnock(min(numEffects, (int)reg.currStack.size()));
+
+		//get a random selection of effects to knock off
+		for (int i = 0; i < effectsToKnock.size(); i++) {
+			if (reg.currStack.size() == 0) {
+				break;
+			}
+			int index = Random::Int(reg.currStack.size());
+			effectsToKnock[i] = (reg.currStack[index]);
+			reg.currStack.erase(reg.currStack.begin() + index);
+			std::cout << "Knocked #"<< i <<" : "<<effectsToKnock.size() << "Knocking off: " << effectsToKnock.back().name << std::endl;
+		}
+
+		CreateXPopBullets(renderer, registry.motions.get(player).position, 0, effectsToKnock, 2.0f * M_PI, 0);
+		reloadStack(player, effectsToKnock);
+	}
+}
+
+void eatEffectsOffStack (const Entity &player, const Entity &other,  int numEffects) {
+	if (registry.stackCompile.has(player)) {
+		StackCompile& reg = registry.stackCompile.get(player);
+		if (reg.currStack.empty()) {
+			return;
+		}
+
+		std::vector<BulletStackEffect> effectsToKnockOff(min(numEffects, (int)reg.currStack.size()));
+
+		//get a random selection of effects to eat
+		for (int i = 0; i < effectsToKnockOff.size(); i++) {
+			if (reg.currStack.size() == 0) {
+				break;
+			}
+			int index = Random::Int(reg.currStack.size());
+			effectsToKnockOff[i] = (reg.currStack[index]);
+			reg.currStack.erase(reg.currStack.begin() + index);
+		}
+
+		if (!registry.stackCompile.has(other)) {
+			registry.stackCompile.emplace(other);
+		}
+		auto& otherStack = registry.stackCompile.get(other);
+		otherStack.currStack.insert(otherStack.currStack.end(), effectsToKnockOff.begin(), effectsToKnockOff.end());
+		UIRequest& ui_req = registry.uiRequests.emplace_with_duplicates(other);
+		ui_req.type = UIRequestType::StackNotifBullet;
+		ui_req.effects = otherStack.currStack;
+		ui_req.targetEntity = other;
+
+		reloadStack(player, effectsToKnockOff);
+
+	}
+}
+
+
 
 void closeDoors (SoundSystem* soundPlayer) {
 	Map& map = registry.maps.components[0];
@@ -476,6 +564,23 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 				}  else
 					spawnEnemies(soundPlayer, request.enemies);
 				break;
+			case InteractableRequestType::EatX:
+				if (request.choice == -1) {
+					eatEffectsOffStack( player, request.targetEntity, 5);
+				}
+				else {
+					eatEffectsOffStack( player, request.targetEntity, request.choice);
+				}
+				break;
+			case InteractableRequestType::KnockX:
+				if (request.choice == -1) {
+					knockEffectsOffStack(player, renderer, 5);
+				}
+				else {
+					knockEffectsOffStack(player, renderer, request.choice);
+				}
+				break;
+			default: break;
 		}
 	}
 	registry.interactableRequests.clear();
