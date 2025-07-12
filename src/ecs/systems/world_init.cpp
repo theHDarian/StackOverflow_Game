@@ -73,8 +73,12 @@ Entity resetPlayer()
 	PlayerAttackData &shoot = registry.shoots.get(ent);
 	shoot = PlayerAttackData();
 
-	StackCompile &sc = registry.stackCompile.get(ent);
-	sc = StackCompile();
+	if (registry.stackCompile.has(ent)) {
+		StackCompile &sc = registry.stackCompile.get(ent);
+		sc = StackCompile();
+	} else {
+		registry.stackCompile.emplace(ent);
+	}
 
 	Animation &anim = registry.animations.get(ent);
 	anim = Animation();
