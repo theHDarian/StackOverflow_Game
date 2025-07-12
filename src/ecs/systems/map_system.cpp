@@ -521,6 +521,7 @@ void MapSystem::resetMap() {
 void MapSystem::newMap(MapRegion region, RoomType roomType)
 {
     IOState& iostate = registry.ioStates.components[0];
+    iostate.lastInputAxis = vec2(1, 1);
     Map& map = registry.maps.components[0];
     map.roomsTraversed = 0;
     if (iostate.tutorialOn) {

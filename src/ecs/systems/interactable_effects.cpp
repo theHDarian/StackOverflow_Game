@@ -371,7 +371,7 @@ void knockEffectsOffStack (const Entity &player, RenderSystem* renderer, int num
 			int index = Random::Int(reg.currStack.size());
 			effectsToKnock[i] = (reg.currStack[index]);
 			reg.currStack.erase(reg.currStack.begin() + index);
-			std::cout << "Knocked #"<< i <<" : "<<effectsToKnock.size() << "Knocking off: " << effectsToKnock.back().name << std::endl;
+			// std::cout << "Knocked #" <<effectsToKnock.size() << "Knocking off: " << effectsToKnock.back().name << std::endl;
 		}
 
 		CreateXPopBullets(renderer, registry.motions.get(player).position, 0, effectsToKnock, 2.0f * M_PI, 0);

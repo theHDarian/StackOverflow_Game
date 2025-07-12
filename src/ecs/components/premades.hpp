@@ -3221,7 +3221,7 @@ struct Scissors : Enemy
 		rotatePower = 1.8f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 2.6f;
-		collisionBullet = {dmgDown};
+		collisionBullet = {knock5Bullets, dmgDown2};
 	}
 };
 
@@ -3541,7 +3541,7 @@ struct RodOfA : Enemy {
 		rotatePower = 0.2f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		armour = 1;
-		collisionBullet = {playerSpeedDown, playerSpeedDown};
+		collisionBullet = {knock5Bullets, playerSpeedDown, playerSpeedDown};
 	};
 
 };
@@ -5762,6 +5762,7 @@ struct HifiChargerHard : Enemy
 		rotatePower = 1.8f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 		speedMultiplier = 2.6f;
+		collisionBullet = {knock5Bullets, blunt};
 	}
 };
 
