@@ -3130,6 +3130,11 @@ Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 dir
 	bullet.bulletBounce = 0;
 	bullet.generic = true;
 
+	if (checkTierThreshold(Homing)) {
+		HomingBullet& home = registry.homes.emplace(entity);
+		home.homingIntensity = 1.0;
+	}
+
 	// Invisible &inv = registry.invisibles.emplace(entity);
 	// inv.countdown = (75.0f / bullet.bulletSpeed) * 1000.0f;
 

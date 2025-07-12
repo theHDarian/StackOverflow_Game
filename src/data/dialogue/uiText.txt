@@ -69,6 +69,7 @@ Clears negative bullets at the end of dashes, with a radius of <color=green>50</
 
 UI Tier_Homing
 Was it worth it?
+\nEVERYTHING HOMES
 
 UI Tier_FireRate
 Burst fires bullets, increasing with additional <color=orange>Fire Rate </color>
