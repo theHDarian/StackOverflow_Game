@@ -626,7 +626,7 @@ Entity createInverter(RenderSystem *renderer, vec2 pos)
 	Motion &m = registry.motions.emplace(console);
 	m.position = pos;
 	m.velocity = vec2(0);
-	m.scale = vec2(784,456) / 1.4f;
+	m.scale = vec2(960,600) / 1.3f;
 
 	auto &o = registry.objects.emplace(console);
 	o.baseOffset = 20;
@@ -2373,7 +2373,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 	//HP and damage scaling
 	Map& map = registry.maps.components[0];
 	int dmgScale = registry.elites.has(entity) ? (int) map.currRegion - 1 + registry.elites.get(entity).eliteLevel : (int) map.currRegion - 1;
-	enemy.maxHealth = (enemy.maxHealth) * pow(1.35 + (0.05 * registry.gameStates.components[0].difficulty), (max(dmgScale , 0)));
+	if (map.currRegion == Military && !registry.boids.has(entity)) {
+		if (registry.instanceDamages.has(entity)) {
+			enemy.maxHealth *= 3.0f;
+		} else {
+			enemy.maxHealth += 1000.f;
+		}
+		enemy.armour *= 2.5f;
+	}
+	enemy.maxHealth *= pow(1.35 + (0.05 * registry.gameStates.components[0].difficulty), (max(dmgScale , 0)));
 	enemy.currHealth = enemy.maxHealth;
 	if (registry.instanceDamages.has(entity)) {
 		auto& instance = registry.instanceDamages.get(entity);

@@ -28,6 +28,8 @@ enum BulletEffectType {
     Inert, // Bullet that does nothing but take up stack space
     Lightning,
     Key,
+    Knock, // Bullet that knocks some effects off the stack
+    Eat, // Bullet that some effects off the stack, should only be a contact effect
     Pop, // Bullet that pops the stack, should only be a contact effect
 };
 

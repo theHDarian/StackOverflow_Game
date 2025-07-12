@@ -4134,6 +4134,143 @@ const RoomPreset EnemyRoomEyes {
         {2500, 2000}
 };
 
+const RoomPreset MilitaryEnemyRoomTimeLine {
+                {
+    {
+                {EnemyType::EnemyMage, random_vec2},
+    {EnemyType::EnemyBubbleShield, random_vec2},
+                {EnemyType::EnemyMage, random_vec2},
+{EnemyType::EnemySword, random_vec2},
+{EnemyType::EnemySword, random_vec2},
+{EnemyType::EnemySword, random_vec2},
+{EnemyType::EnemySword, random_vec2},
+    {EnemyType::EnemyBubbleShield, random_vec2},
+        {EnemyType::EnemyMage, random_vec2},
+{EnemyType::EnemyChainDogHead, random_vec2},
+{EnemyType::EnemyChainDogHead, random_vec2},
+{EnemyType::EnemyChainDogHead, random_vec2},
+{EnemyType::EnemyChainDogHead, random_vec2},
+        {EnemyType::EnemyBubbleShield, {0.5f, 0.5f}},
+{EnemyType::EnemyEvilSkull, {0.5f, 0.5f}},
+{EnemyType::EnemySmallCShield, {0.5f, 0.5f}},
+
+{HastyGranterRoomWide, {0.4f, 0.2f}},
+        },
+    {
+    {EnemyType::EnemyBeeHive, {0.35f,0.5f}},
+        {EnemyType::EnemyBubbleShield, {0.35f,0.5f}},
+    {EnemyType::EnemyBeeHive, {0.65f,0.5f}},
+    {EnemyType::EnemyBubbleShield, {0.65f,0.5f}},
+{EnemyType::EnemyBeeHive, {0.5f,0.35f}},
+{EnemyType::EnemyBubbleShield, {0.5f,0.65f}},
+{EnemyType::EnemyBeeHive, {0.5f,0.65f}},
+{EnemyType::EnemyBubbleShield, {0.5f,0.35f}},
+                    {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+                {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+                        {EnemyThreeBee, random_vec2},
+                        {EnemyTwoBee, random_vec2},
+                        {EnemyThreeBee, random_vec2},
+                        {EnemyTwoBee, random_vec2},
+                        {EnemyThreeBee, random_vec2},
+                        {EnemyTwoBee, random_vec2},
+                        {EnemyThreeBee, random_vec2},
+                        {EnemyTwoBee, random_vec2},
+        },
+
+                    {
+                            {EnemyType::EnemyCrab, random_vec2},
+        {EnemyType::EnemyLaserCrab, random_vec2},
+        {EnemyType::EnemyCrab, random_vec2},
+        {EnemyType::EnemyEvilCrab, random_vec2},
+    {EnemyType::EnemyEvilSnail, random_vec2},
+    {EnemyType::EnemySnail, random_vec2},
+{EnemyType::EnemyCrab, random_vec2},
+{EnemyType::EnemyEvilCrab, random_vec2},
+{EnemyType::EnemyEvilSnail, random_vec2},
+{EnemyType::EnemySnail, random_vec2},
+                        {EnemyPufferfish, random_vec2},
+{EnemyPufferfish, random_vec2},
+{EnemyPufferfish, random_vec2},
+
+                    },
+        {
+            {EnemyType::EnemyPileDriverTurret, {0.5f,0.5f}},
+                {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
+            {EnemyType::EnemySmallMole, random_vec2},
+                    {EnemyType::EnemySurfaceMole, random_vec2},
+            {EnemyPileDriverTurret,{0.8,0.2}},
+            {EnemyPileDriverTurret,{0.8,0.8}},
+            {EnemyPileDriverTurret,{0.2,0.8}},
+               {EnemyPileDriverTurret,{0.2,0.2}},
+            {EnemyType::EnemyBigBoulder, random_vec2},
+            {EnemyType::EnemyBigBoulder, random_vec2},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
+        },
+        {
+                                {EnemyHifiJellyFish, {0.6f, 0.6f}},
+            {EnemyHifiJellyFish, {0.4f, 0.4f}},
+    {EnemySmallCShield, {0.6f, 0.6f}},
+        {EnemySmallCShield, {0.4f, 0.4f}},
+                { EnemyHifiJellyFish, {0.4f, 0.6f}},
+                                {EnemyHifiJellyFish, {0.6f, 0.4f}},
+                    {EnemySmallCShield, {0.4f, 0.6f}},
+                    {EnemySmallCShield, {0.6f, 0.4f}},
+            {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.7f,0.1f}},
+            {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.3f}},
+            {EnemyType::EnemyHifiTwinLaserHorizontal1, {0.3f,0.1f}},
+            {EnemyType::EnemyTwinLaserVertical1, {0.1f,0.7f}},
+            },
+
+                        {
+                                                 {EnemyType::EnemyLaserSniperHard, random_vec2},
+                                    {EnemyType::EnemyLaserSniperHard, random_vec2},
+
+                            {EnemyType::EnemyLaserSniperHard, {0.7, 0.3}},
+                                {EnemyType::EnemySmallCShield, {0.7, 0.3}},
+                            {EnemyType::EnemyLaserSniperHard, { 0.3, 0.7}},
+                                {EnemyType::EnemySmallCShield, { 0.3, 0.7}},
+                        {EnemyType::EnemySniper, random_vec2},
+                            {EnemyType::EnemySniper, random_vec2},
+                        {EnemyType::EnemySniper, random_vec2},
+
+                        {EnemyType::EnemyHifiCannonHard, random_vec2},
+                    {EnemyType::EnemyHifiCannonHard, random_vec2},
+                    {EnemyType::EnemyHifiCannonHard, random_vec2},
+                },
+{
+            {EnemyMedicalRodC, {0.5f, 0.5f}},
+            {InvisibleGranter, {0.5f, 0.5f}},
+    {EnemyType::EnemyMedicalBMP, random_vec2},
+    {EnemyType::EnemyMedicalPillBoidSpawner, random_vec2},
+            { EnemyType::EnemyMedicalSyringe, random_vec2},
+        },
+{
+            {EnemyType::EnemyPhantom, random_vec2},
+                        {EnemyType::EnemyEyeCube, random_vec2},
+            {EnemyType::EnemyCross, random_vec2},
+{EnemyType::EnemyPhantom, random_vec2},
+        {EnemyType::EnemyEyeCube, random_vec2},
+{EnemyType::EnemyCross, random_vec2},
+        },
+    },
+    {}, {},
+
+            7.5f,
+            35,
+            12,
+            "Timeworn Enmities",
+            false,
+            {2500, 2500}
+};
+
 
 const std::vector<RoomPreset> bossRooms = {
     BossRoomBee, BossRoomCrab, BossRoomMole, BossRoomWorm, BossRoomBigC, BossRoomMultiCube
@@ -4364,7 +4501,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDir
             RoomType::EnemyRoom,
             {
                 {
-                    EnemyRoomMagic,HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible, EnemyRoomPhantom, EnemyRoomEyes,
+                    EnemyRoomMagic,MilitaryEnemyRoomTimeLine, HifiEnemyRoomSwarmLasers, HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible, EnemyRoomPhantom, EnemyRoomEyes,
 
                 },
                 bossRooms
@@ -4378,7 +4515,7 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDir
         {
             RoomType::EnemyRoom,
             {
-                {HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible, EnemyRoomPhantom, EnemyRoomEyes,},
+                {HifiRoomShieldedMadness, HifiRoomLaserFiesta, MedicalEnemyRoomHeartBeat3, MedicalEnemyRoomInvincible,MilitaryEnemyRoomTimeLine, EnemyRoomPhantom, EnemyRoomEyes,},
                 bossRooms,
             }
         },
