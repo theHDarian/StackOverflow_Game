@@ -4215,7 +4215,7 @@ struct PileDriverTurret : Enemy
 		blunt,
 		2,
 		M_PI/30.f,
-		{100, 20},
+		{150, 20},
 		400,
 		8000,
 		{0, 0},
@@ -4840,8 +4840,8 @@ struct ConstructPURPLE : Enemy
 	const AttackData bigBulletPhase2{
 		EnemyAttackPattern::BURST,
 		CIRCLE,
-		{fireRateUp},
-		fireRateDown,
+		{accuracyUp, accuracyUp},
+		accuracyDown,
 		3,
 		0,
 		{100, 100},
@@ -4857,8 +4857,8 @@ struct ConstructPURPLE : Enemy
 	const AttackData radialSquare{
 		EnemyAttackPattern::RADIAL_POLYGON,
 		RECTANGLE,
-		{fireRateUp},
-		fireRateDown,
+		{accuracyUp, accuracyUp},
+		accuracyDown,
 		4,
 		0,
 		{30, 30},
@@ -4926,7 +4926,7 @@ struct ConstructGREEN : Enemy
 	const AttackData LaserPhase2{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
-		{},
+		{numBulletsUp, numBulletsUp},
 		numBulletsDown,
 		1,
 		0,
@@ -5008,7 +5008,7 @@ struct ConstructRED : Enemy
 	const AttackData Blast{
 		EnemyAttackPattern::SHOTGUN,
 		TRIANGLE,
-		{dmgUp},
+		{dmgUp2},
 		dmgDown,
 		4,
 		M_PI / 6.f,
@@ -6996,8 +6996,8 @@ struct ScientistSheildEnemy : Enemy
 	EnemyPattern IdleState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {IdleTransition}, 0, false, 0.f, 600.f, NoAttack};
 	ScientistSheildEnemy()
 	{
-		maxHealth = 500;
-		currHealth = 500;
+		maxHealth = 5000;
+		currHealth = 5000;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_bullet_square.png",
@@ -7007,7 +7007,7 @@ struct ScientistSheildEnemy : Enemy
 		patternIndex = 0;
 		scale = vec2(300, 300);
 		rotatePower = 0.f;
-		armour = 10;
+		armour = 12;
 	}
 };
 

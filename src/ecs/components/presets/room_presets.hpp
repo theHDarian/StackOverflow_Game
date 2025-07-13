@@ -93,7 +93,7 @@ const RoomPreset StartingRoom{
 };
 
 const RoomPreset ScientistBossRoom{
-    {{{EnemyType::ScientistBoss, {0.5, 0.2}}}},
+    {{{EnemyType::ScientistBoss, opposite_of_player}}},
     {},
     {},
     0.0f,
@@ -3276,8 +3276,8 @@ const RoomPreset MedicalEnemyRoomHand {
 const RoomPreset EnemyRoomSingleMage {
     {
         {
-            {EnemyMage, {0.5f, 0.5f}},
-    {EnemyBubbleShield, {0.5f, 0.5f}},
+            {EnemyMage, opposite_of_player},
+    {EnemyBubbleShield, opposite_of_player},
         },
 
     },

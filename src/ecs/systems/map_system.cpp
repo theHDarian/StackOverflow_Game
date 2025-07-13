@@ -44,19 +44,40 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     soundPlayer->playNextMusic();
 }
 
+vec2 getOppositeSideOfPlayer(const vec2& playerPos, const vec2& roomStart, const vec2& roomEnd) {
+    vec2 center = (roomStart + roomEnd) / 2.0f;
+    vec2 opposite = center + (center - playerPos);
+    // Clamp the opposite position to within the room bounds shrunken by 15% on each side
+    opposite.x = glm::clamp(opposite.x, roomStart.x + (roomEnd.x - roomStart.x) * 0.15f, roomEnd.x - (roomEnd.x - roomStart.x) * 0.15f);
+    opposite.y = glm::clamp(opposite.y, roomStart.y + (roomEnd.y - roomStart.y) * 0.15f, roomEnd.y - (roomEnd.y - roomStart.y) * 0.15f);
+    return opposite;
+}
+
+
+vec2 calculateSpawnPosition(Map &map, const std::vector<std::tuple<EnemyType, vec2>>::value_type &e) {
+    vec2 location = std::get<vec2>(e);
+    if (location == random_batch) {
+        location = Random::ListItem(map.currRoom.batchedEnemyPositions);
+    } else if (location == opposite_of_player) {
+        if (registry.players.entities.size() > 0 && registry.motions.has(registry.players.entities[0])) {
+            vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+            return getOppositeSideOfPlayer(playerPos, map.currRoom.roomStart, map.currRoom.roomEnd);
+        } else {
+            location = vec2(0.5f, 0.5f); // fallback to center
+        }
+    } else {
+        location.x = location.x == random_float ? Random::Float() : location.x;
+        location.y = location.y == random_float ? Random::Float() : location.y;
+    }
+    return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
+}
+
 void SpawnEnemiesInList(const std::vector<std::tuple<EnemyType,vec2>> &enemies, Entity& bossEnemy, RenderSystem *renderer, bool isElite = false)
 {
     Map& map = registry.maps.components[0];
     for (auto &e : enemies)
     {
-        vec2 location = std::get<vec2>(e);
-        if (location == random_batch) {
-            location = Random::ListItem(map.currRoom.batchedEnemyPositions);
-        } else {
-            location.x = location.x == random_float ? Random::Float() : location.x;
-            location.y = location.y == random_float ? Random::Float() : location.y;
-        }
-        vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
+        vec2 pos = calculateSpawnPosition(map, e);
         if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
             createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
         } else {
@@ -413,8 +434,12 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         d.room = newRooms[i];
 
-        if (d.room == RoomType::BossRoom && ((spawnIndex + 2) % 4 != i)) {
-            d.room = RoomType::None;
+        if ( (d.room == RoomType::BossRoom || (map.currRoom.preset == ScientistBossRoom)) ) {
+            if ((spawnIndex + 2) % 4 != i)
+                d.room = RoomType::None;
+            else if (map.currRoom.preset == ScientistBossRoom) {
+                d.room = RoomType::TutorialRoom;
+            }
         }
 
         if ((lockedRooms + noneRooms < 2) && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {

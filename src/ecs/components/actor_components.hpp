@@ -10,6 +10,7 @@
 constexpr float random_float = -9999;
 constexpr vec2 random_vec2 = {random_float, random_float};
 constexpr vec2 random_batch = {-9998, -9998}; // Used to indicate the enemy should spawn at one of the predetermined random positions in the room
+constexpr vec2 opposite_of_player = {-9997, -9997}; // Used to indicate the enemy should spawn at the opposite side of the room from the player
 
 enum BulletEffectType {
     BulletDamage,
