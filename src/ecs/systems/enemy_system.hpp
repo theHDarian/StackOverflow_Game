@@ -36,7 +36,7 @@ private:
     void attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, const AttackData &atkData, float elapsed_ms);
     void spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData);
     void merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion);
-    void creatingMergeBee(int count, vec2 pos);
+    void creatingMergeBee(int count, vec2 pos, bool isElite) const;
     void destruct(Enemy& enemy);
     void heal(Entity entoty, EnemyPattern &currPattern);
     void createAOEIndicator(vec2 pos, float radius, SpecialStates buff, float timer);

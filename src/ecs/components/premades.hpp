@@ -80,9 +80,33 @@ const BulletStackEffect numBulletsUp = {
 	"Bullet Count Up",
 	""};
 
+const BulletStackEffect numBulletsUp2 = {
+	BulletNum,
+	2,
+	"Bullet Count Up",
+	""};
+
+const BulletStackEffect numBulletsUp3 = {
+	BulletNum,
+	3,
+	"Bullet Count Up",
+	""};
+
 const BulletStackEffect numBulletsDown = {
 	BulletNum,
 	-1,
+	"Bullet Count Down",
+	"" };
+
+const BulletStackEffect numBulletsDown2 = {
+	BulletNum,
+	-2,
+	"Bullet Count Down",
+	"" };
+
+const BulletStackEffect numBulletsDown3 = {
+	BulletNum,
+	-3,
 	"Bullet Count Down",
 	"" };
 
@@ -91,11 +115,35 @@ const BulletStackEffect sizeUp = {
 	1,
 	"Bullet Size Up",
 	"" };
+const BulletStackEffect sizeUp2 = {
+	ProjectileSize,
+	2,
+	"Bullet Size Up",
+	"" };
+
+const BulletStackEffect sizeUp3 = {
+	ProjectileSize,
+	3,
+	"Bullet Size Up",
+	"" };
+
 
 const BulletStackEffect sizeDown = {
 	ProjectileSize,
 	-1,
 	"Bullet Size Up",
+	"" };
+
+const BulletStackEffect sizeDown2 = {
+	ProjectileSize,
+	-2,
+	"Bullet Size Down",
+	"" };
+
+const BulletStackEffect sizeDown3 = {
+	ProjectileSize,
+	-3,
+	"Bullet Size Down",
 	"" };
 
 
@@ -105,9 +153,33 @@ const BulletStackEffect accuracyUp = {
 	"Bullet Accuracy Up",
 	""};
 
+const BulletStackEffect accuracyUp2 = {
+	BulletAccuracy,
+	2,
+	"Bullet Accuracy Up",
+	"" };
+
+const BulletStackEffect accuracyUp3 = {
+	BulletAccuracy,
+	3,
+	"Bullet Accuracy Up",
+	"" };
+
 const BulletStackEffect accuracyDown = {
 	BulletAccuracy,
 	-1,
+	"Bullet Accuracy Down",
+	"" };
+
+const BulletStackEffect accuracyDown2 = {
+	BulletAccuracy,
+	-2,
+	"Bullet Accuracy Down",
+	"" };
+
+const BulletStackEffect accuracyDown3 = {
+	BulletAccuracy,
+	-3,
 	"Bullet Accuracy Down",
 	"" };
 
@@ -117,9 +189,34 @@ const BulletStackEffect bulletRangeUp = {
 	"Range Up",
 	""};
 
+const BulletStackEffect bulletRangeUp2 = {
+	BulletRange,
+	2,
+	"Range Up",
+	""};
+
+const BulletStackEffect bulletRangeUp3 = {
+	BulletRange,
+	3,
+	"Range Up",
+	""};
+
 const BulletStackEffect bulletRangeDown = {
 	BulletRange,
 	-1,
+	"Range Down",
+	""};
+
+const BulletStackEffect bulletRangeDown2 = {
+	BulletRange,
+	-2,
+	"Range Down",
+	""};
+
+
+const BulletStackEffect bulletRangeDown3 = {
+	BulletRange,
+	-3,
 	"Range Down",
 	""};
 
@@ -129,9 +226,33 @@ const BulletStackEffect bulletPierceUp = {
 	"Pierce Up",
 	""};
 
+const BulletStackEffect bulletPierceUp2 = {
+	Pierce,
+	2,
+	"Pierce Up",
+	""};
+
+const BulletStackEffect bulletPierceUp3 = {
+	Pierce,
+	3,
+	"Pierce Up",
+	""};
+
 const BulletStackEffect bulletPierceDown = {
 	Pierce,
 	-1,
+	"Pierce Down",
+	""};
+
+const BulletStackEffect bulletPierceDown2 = {
+	Pierce,
+	-2,
+	"Pierce Down",
+	""};
+
+const BulletStackEffect bulletPierceDown3 = {
+	Pierce,
+	-3,
 	"Pierce Down",
 	""};
 
@@ -141,9 +262,33 @@ const BulletStackEffect bulletBounceUp = {
 	"Bounce Up",
 	""};
 
+const BulletStackEffect bulletBounceUp2 = {
+	Bounce,
+	2,
+	"Bounce Up",
+	""};
+
+const BulletStackEffect bulletBounceUp3 = {
+	Bounce,
+	3,
+	"Bounce Up",
+	""};
+
 const BulletStackEffect bulletBounceDown = {
 	Bounce,
 	-1,
+	"Bounce Down",
+	""};
+
+const BulletStackEffect bulletBounceDown2 = {
+	Bounce,
+	-2,
+	"Bounce Down",
+	""};
+
+const BulletStackEffect bulletBounceDown3 = {
+	Bounce,
+	-3,
 	"Bounce Down",
 	""};
 
@@ -153,9 +298,33 @@ const BulletStackEffect dashUp = {
 	"Dash Count Up",
 	""};
 
+const BulletStackEffect dashUp2 = {
+	PlayerNumDash,
+	2,
+	"Dash Count Up",
+	""};
+
+const BulletStackEffect dashUp3 = {
+	PlayerNumDash,
+	3,
+	"Dash Count Up",
+	""};
+
 const BulletStackEffect dashDown = {
 	PlayerNumDash,
 	-1,
+	"Dash Count Down",
+	""};
+
+const BulletStackEffect dashDown2 = {
+	PlayerNumDash,
+	-2,
+	"Dash Count Down",
+	""};
+
+const BulletStackEffect dashDown3 = {
+	PlayerNumDash,
+	-3,
 	"Dash Count Down",
 	""};
 
@@ -177,9 +346,33 @@ const BulletStackEffect dashRechargeUp = {
 	"Dash Recharge Rate Up",
 	""};
 
+const BulletStackEffect dashRechargeUp2 = {
+	PlayerDashRecharge,
+	2,
+	"Dash Recharge Rate Up",
+	""};
+
+const BulletStackEffect dashRechargeUp3 = {
+	PlayerDashRecharge,
+	3,
+	"Dash Recharge Rate Up",
+	""};
+
 const BulletStackEffect dashRechargeDown = {
 	PlayerDashRecharge,
 	-1,
+	"Dash Recharge Rate Down",
+	""};
+
+const BulletStackEffect dashRechargeDown2 = {
+	PlayerDashRecharge,
+	-2,
+	"Dash Recharge Rate Down",
+	""};
+
+const BulletStackEffect dashRechargeDown3 = {
+	PlayerDashRecharge,
+	-3,
 	"Dash Recharge Rate Down",
 	""};
 
@@ -189,9 +382,33 @@ const BulletStackEffect playerSpeedUp = {
 	"Movement Speed Up",
 	""};
 
+const BulletStackEffect playerSpeedUp2 = {
+	PlayerSpeed,
+	2,
+	"Movement Speed Up",
+	""};
+
+const BulletStackEffect playerSpeedUp3 = {
+	PlayerSpeed,
+	3,
+	"Movement Speed Up",
+	""};
+
 const BulletStackEffect playerSpeedDown = {
 	PlayerSpeed,
 	-1,
+	"Movement Speed Down",
+	""};
+
+const BulletStackEffect playerSpeedDown2 = {
+	PlayerSpeed,
+	-2,
+	"Movement Speed Down",
+	""};
+
+const BulletStackEffect playerSpeedDown3 = {
+	PlayerSpeed,
+	-3,
 	"Movement Speed Down",
 	""};
 
@@ -201,9 +418,33 @@ const BulletStackEffect fireRateUp = {
 	"Fire Rate Up",
 	""};
 
+const BulletStackEffect fireRateUp2 = {
+	FireRate,
+	2,
+	"Fire Rate Up",
+	""};
+
+const BulletStackEffect fireRateUp3 = {
+	FireRate,
+	3,
+	"Fire Rate Up",
+	""};
+
 const BulletStackEffect fireRateDown = {
 	FireRate,
 	-1,
+	"Fire Rate Down",
+	""};
+
+const BulletStackEffect fireRateDown2 = {
+	FireRate,
+	-2,
+	"Fire Rate Down",
+	""};
+
+const BulletStackEffect fireRateDown3 = {
+	FireRate,
+	-3,
 	"Fire Rate Down",
 	""};
 
@@ -219,9 +460,33 @@ const BulletStackEffect homingUp = {
 	"Homing Accuracy Up",
 	"" };
 
+const BulletStackEffect homingUp2 = {
+	Homing,
+	2,
+	"Homing Accuracy Up",
+	"" };
+
+const BulletStackEffect homingUp3 = {
+	Homing,
+	3,
+	"Homing Accuracy Up",
+	"" };
+
 const BulletStackEffect homingDown = {
 	Homing,
 	-1,
+	"Homing Accuracy Down",
+	"" };
+
+const BulletStackEffect homingDown2 = {
+	Homing,
+	-2,
+	"Homing Accuracy Down",
+	"" };
+
+const BulletStackEffect homingDown3 = {
+	Homing,
+	-3,
 	"Homing Accuracy Down",
 	"" };
 
@@ -1719,7 +1984,7 @@ struct SmallC : Enemy
 			1};
 
 		EnemyPattern idleState = {
-			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {duration}, 2, false, 2500, 7000.f, NoAttack};
+			"IDLE", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 15000.f, 15000.f, {duration}, 0, false, 2500, 7000.f, NoAttack};
 
 		EnemyPattern LaserSpin = {
 			"FOLLOW", EnemyBehavior::ROTATE_IN_PLACE, {}, 0, 10000.f, 10000.f, {duration}, 3, true, 0.f, 10000.f, NoAttack};
@@ -2746,6 +3011,7 @@ struct Sword : Enemy
 		patternIndex = 0;
 		rotatePower = 2.0f;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
+		collisionBullet = { knock5Bullets };
 	}
 };
 
@@ -3418,7 +3684,7 @@ struct RodOfC : Enemy {
 		0,
 		0,
 		0,
-		EnemyBulletDeath::EXPLODE
+		EnemyBulletDeath::BOMBARDBOMBING
 	};
 
 	const AttackData fireball{
@@ -6787,11 +7053,11 @@ struct ScientistBossEnemy : Enemy
 		{}};
 
 	const AttackData lethalShot{
-		EnemyAttackPattern::BURST,
+		EnemyAttackPattern::BOMBARD,
 		TRIANGLE,
 		{dmgUp,dmgUp,dmgUp,},
 		dmgDown,
-		3,
+		2,
 		M_PI,
 		{35, 35},
 		1000,
@@ -6799,7 +7065,8 @@ struct ScientistBossEnemy : Enemy
 		{0, 0},
 		0,
 		0,
-		0.025};
+		0.025,
+	EnemyBulletDeath::BOMBARD};
 
 	const AttackData laserBoss{
 		EnemyAttackPattern::LASER,
@@ -6964,7 +7231,7 @@ struct ScientistBossEnemy : Enemy
 
 	ScientistBossEnemy()
 	{
-		maxHealth = 5000;
+		maxHealth = 12500;
 		currHealth = maxHealth;
 		enemyPatterns = {spawnLaserHorizontalState, spawnLaserVerticalState, spawnHomingState,
 						 spawnBoidState, spawnLaserRotateState,
@@ -6987,17 +7254,17 @@ struct ScientistBossEnemy : Enemy
 	}
 };
 
-struct ScientistSheildEnemy : Enemy
+struct ScientistShieldEnemy : Enemy
 {
 	Reaction IdleTransition{
 		ReactionType::DURATION,
 		0};
 
 	EnemyPattern IdleState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {IdleTransition}, 0, false, 0.f, 600.f, NoAttack};
-	ScientistSheildEnemy()
+	ScientistShieldEnemy()
 	{
-		maxHealth = 5000;
-		currHealth = 5000;
+		maxHealth = 7500;
+		currHealth = 7500;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_bullet_square.png",
@@ -7005,9 +7272,9 @@ struct ScientistSheildEnemy : Enemy
 			GEOMETRY_BUFFER_ID::SPRITE,
 		};
 		patternIndex = 0;
-		scale = vec2(300, 300);
+		scale = vec2(350, 380);
 		rotatePower = 0.f;
-		armour = 12;
+		armour = 10;
 	}
 };
 
@@ -7935,7 +8202,7 @@ struct Cross : Enemy
 		0,
 		0,
 		0,
-		EnemyBulletDeath::EXPLODE
+		EnemyBulletDeath::BOMBARDBOMBING
 	};
 
 	Reaction duration = {

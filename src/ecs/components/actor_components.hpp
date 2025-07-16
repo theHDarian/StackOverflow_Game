@@ -885,6 +885,7 @@ struct BeeEnemy {
     int maxMerge = 3;
     bool canMerge = true;
     bool merge = false;
+    bool elite = false; // if true, the bee will be an elite bee, which has more health
 };
 
 struct Critter {

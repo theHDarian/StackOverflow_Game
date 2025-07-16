@@ -1765,7 +1765,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 	}
 	case EnemyType::ScientistShield:
 	{
-		enemy = ScientistSheildEnemy();
+		enemy = ScientistShieldEnemy();
 		registry.shield.emplace(entity);
 		auto& ep = registry.enemyParts.emplace(entity);
 		ep.offset = {0,0};
@@ -2256,12 +2256,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 		auto& ep = registry.enemyParts.get(entity);
 		ep.parent = summoner;
 		if (!registry.enemies.has(ep.parent)) {
-			float mindistence = 1000000;
+			float dist = 1000000;
 			for (Entity e  : registry.enemies.entities) {
 				Motion &motion = registry.motions.get(e);
-				if (glm::distance(motion.position, pos) < mindistence && !registry.enemyParts.has(e) && e != entity && !registry.bossParts.has(e)) {
+				if (glm::distance(motion.position, pos) < dist && !registry.enemyParts.has(e)  && !registry.bossParts.has(e) && !registry.roomWideBuffers.has(e)) {
 					ep.parent = e;
-					mindistence = glm::distance(motion.position, pos);
+					dist = glm::distance(motion.position, pos);
 				}
 			}
 		}
@@ -2273,6 +2273,15 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 	}
 	motion.velocity = vec2(0, 0);
 	motion.scale = enemy.scale;
+
+	if (registry.elites.has(summoner)) {
+		// if the summoner is an elite, then the enemy should be an elite too
+		if (!registry.elites.has(entity)) {
+			Elite& elite = registry.elites.emplace(entity);
+			elite.eliteLevel = registry.elites.get(summoner).eliteLevel;
+		}
+	}
+
 	if ((type == EnemyType::EnemySmallCShield || type == EnemyBubbleShield)&& registry.motions.has(registry.enemyParts.get(entity).parent)) {
 		Motion& parentMotion = registry.motions.get(registry.enemyParts.get(entity).parent);
 		motion.scale.x = min(max(parentMotion.scale.x, parentMotion.scale.y) * 1.75f, min(parentMotion.scale.x, parentMotion.scale.y) + 120.f);

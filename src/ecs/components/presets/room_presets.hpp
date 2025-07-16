@@ -101,7 +101,7 @@ const RoomPreset ScientistBossRoom{
     0,
     "\"Viceroy\"",
     false,
-    {1600,1300}
+    {2000,1800}
 };
 
 const RoomPreset TutorialRoom2Preset{
@@ -740,7 +740,8 @@ const RoomPreset EnemyRoomDash2{
            {EnemyType::EnemyQuadshooter, {0.8f, 0.4f}},
             {EnemyType::EnemyPufferfish, {0.7, 0.4}},
                {EnemySnail, {0.5f, 0.7f}},
-            {EnemyType::EnemySkull, {0.5f, 0.5f}}
+            {EnemyType::EnemySkull, {0.5f, 0.5f}},
+{EnemyType::EnemyBubbleShield, {0.5f, 0.5f}}
             }
         },
     {},
@@ -830,11 +831,15 @@ const RoomPreset EnemyRoomCrabs{
             {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
             {EnemyType::EnemyCrab, {0.2f, 0.2f}},
             {EnemyType::EnemyEvilCrab, {0.5f, 0.5f}},
-           }
+           },
+            {
+                    {EnemyType::EnemyCrab, random_vec2},
+                {EnemyType::EnemyCrab, random_vec2},
+            }
         },
     {},
     {},
-    0.0f,
+    10.0f,
     5,
     2,
     "Crabby Cove",
@@ -1751,7 +1756,7 @@ const RoomPreset BossRoomBee{
 
 
 const RoomPreset BossRoomCrab{
-    {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
+    {{{BossCrab, opposite_of_player}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
@@ -3015,7 +3020,7 @@ const RoomPreset MedicalEnemyRoomHeartBeat3 {
 
     },
     {},
-{{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+{{ {PushConsole,{accuracyUp3,  bulletPierceUp3}}, {0.3f, 0.5f}},  { {PopConsole,{}}, {0.7f, 0.5f}}},
     16.0f,
     20,
     5,
@@ -3626,7 +3631,7 @@ const RoomPreset MiningEnemyRoomMineField {
                     },
         },
     {},
-        {{ {PushConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletBounceUp, bulletBounceUp, bulletBounceUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+        {{ {PushConsole,{sizeUp3, bulletBounceUp, bulletBounceUp, bulletBounceUp}}, {0.4f, 0.5f}}, { {PopConsole,{}}, {0.6f, 0.5f}}},
         10.0f,
         25,
         5,
@@ -3695,6 +3700,7 @@ const RoomPreset MiningEnemyRoomQuadShooterBoulders {
                 {
                     {
                         {EnemyQuadshooterElite,{0.5,0.5}},
+                    {EnemyBubbleShield,{0.5,0.5}},
                         {EnemySmallBoulder, random_vec2},
                             {EnemySmallBoulder, random_vec2},
                             {EnemySmallBoulder, random_vec2},
@@ -5112,10 +5118,10 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
         {EnemyHifiJellyFish, {0.5f, 0.5f}},
             {EnemySmallCShield, {0.5f, 0.5f}},
     },
-        {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
-                {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
-                {{EnemyType::EnemyCross, {0.5f,0.5f}}},
-                {{EnemyType::EnemyMaw, {0.5f,0.5f}}},
+        {{EnemyType::EnemyEyeCube, opposite_of_player}},
+                {{EnemyType::EnemyPhantom, opposite_of_player}},
+                {{EnemyType::EnemyCross, opposite_of_player}},
+                {{EnemyType::EnemyMaw, opposite_of_player}},
 };
 
 std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
@@ -5145,35 +5151,46 @@ std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
         {EnemyThreeBee, random_vec2},
         {EnemyTwoBee, random_vec2},
         },
-        {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
-        {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
-            {{EnemyType::EnemyCross, {0.5f,0.5f}}},
-        {{EnemyType::EnemyMaw, {0.5f,0.5f}}},
+        {{EnemyType::EnemyEyeCube, opposite_of_player}},
+        {{EnemyType::EnemyPhantom, opposite_of_player}},
+        {{EnemyType::EnemyCross, opposite_of_player}},
+        {{EnemyType::EnemyMaw, opposite_of_player}},
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
     {
         {EnemyType::EnemyPhantom, {0.5f,0.5f}},
         {EnemyType::ProtectedGranter, {0.5f,0.5f}},
+{EnemyType::EnemyMaw, opposite_of_player},
+{EnemyType::EnemyEyeCube, random_vec2}
+
     },
             {
                 {EnemyType::EnemyEyeCube, {0.5f,0.5f}},
                 {EnemyType::HastyGranter, {0.5f,0.5f}},
+                {EnemyType::EnemyCross, opposite_of_player},
+                {EnemyType::EnemyMaw, random_vec2}
             },
 {
 
     {EnemyType::EnemyCross, {0.5f,0.5f}},
     {EnemyType::CloakedGranter, {0.5f,0.5f}},
+{EnemyType::EnemyPhantom, opposite_of_player},
+{EnemyType::EnemyEyeCube, random_vec2}
 },
 {
-    {EnemyType::EnemyMage, {0.5f,0.5f}},
-    {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
+    {EnemyType::EnemyMage, {0.3f,0.5f}},
+    {EnemyType::EnemyBubbleShield, {0.3f,0.5f}},
+{EnemyType::EnemyMage, {0.7f,0.5f}},
+{EnemyType::EnemyBubbleShield, {0.7f,0.5f}},
 },
 
     {
                 {EnemyType::EnemyMage, random_vec2},
                 {EnemyType::EnemyMage, random_vec2},
         {EnemyType::EnemyMage, random_vec2},
+{EnemyType::EnemyMage, random_vec2},
+{EnemyType::EnemyMage, random_vec2},
         },
         {
                             {EnemyHifiJellyFish, {0.6f, 0.6f}},
@@ -5195,12 +5212,26 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
                        {EnemyPileDriverTurret,{0.2,0.2}},
                     {EnemyType::EnemyBigBoulder, random_vec2},
                     {EnemyType::EnemyBigBoulder, random_vec2},
+                    {EnemyType::EnemySmallMole, random_vec2},
+                    {EnemyType::EnemySmallMole, random_vec2},
     },
     {
-             {EnemyType::EnemyBeeHive, {0.35f,0.5f}},
-    {EnemyType::EnemyBubbleShield, {0.35f,0.5f}},
-{EnemyType::EnemyBeeHive, {0.65f,0.5f}},
-{EnemyType::EnemyBubbleShield, {0.65f,0.5f}},
+             {EnemyType::EnemyBeeHive, {0.35f,0.35f}},
+    {EnemyType::EnemyBubbleShield, {0.35f,0.35f}},
+{EnemyType::EnemyBeeHive, {0.65f,0.65f}},
+{EnemyType::EnemyBubbleShield, {0.65f,0.65f}},
+{EnemyType::EnemyBeeHive, {0.65f,0.35f}},
+        { EnemyType::EnemyBubbleShield, {0.65f,0.35f}},
+        { EnemyType::EnemyBeeHive, {0.35f,0.65f}},
+        { EnemyType::EnemyBubbleShield, {0.35f,0.65f}},
+                {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+                {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+        {EnemyEvilSkull, {0.5f, 0.5f}},
+{EnemyBubbleShield, {0.5f, 0.5f}},
+        {InvincibleGranterRoomWide, {0.54f, 0.85f}},
+
                 {EnemyThreeBee, random_vec2},
             {EnemyTwoBee, random_vec2},
             {EnemyThreeBee, random_vec2},

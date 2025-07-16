@@ -509,6 +509,14 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // refresh player Dash charges and cooldown
     player.currDashCharges = getModifiedValue( PlayerNumDash, player.maxDashCharges);
     player.currDashCooldown = getModifiedValue( PlayerDashRecharge, player.baseDashCDR);
+
+    if (registry.timeModifiers.has(playerEntity)) {
+        TimeModifier& timeMod = registry.timeModifiers.get(playerEntity);
+        timeMod.coolDown = 0;
+    }
+
+    //clear bullet death and bombard
+    registry.bombards.clear();
 }
 
 void MapSystem::decorateRoom() {
@@ -546,7 +554,7 @@ void MapSystem::resetMap() {
 void MapSystem::newMap(MapRegion region, RoomType roomType)
 {
     IOState& iostate = registry.ioStates.components[0];
-    iostate.lastInputAxis = vec2(1, 1);
+    iostate.lastInputAxis = vec2(0, 1);
     Map& map = registry.maps.components[0];
     map.roomsTraversed = 0;
     if (iostate.tutorialOn) {
@@ -625,7 +633,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             else if (map.currRegion == Medical) {
                  presetOverRide= {ScientistBossRoom};
-                req2.effects = { bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp, numBulletsUp, numBulletsUp, bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp};
+                req2.effects = { bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp};
 
             }
             else if (map.currRegion == Physics) {

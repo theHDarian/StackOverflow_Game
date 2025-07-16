@@ -22,6 +22,9 @@
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "actor_components.hpp"
+#include "actor_components.hpp"
+
 std::mutex beeMutex;
 
 float COOLDOWN_SHOOT_MS = 2000;
@@ -44,7 +47,7 @@ void EnemySystem::step(float Elapsed_ms)
     // std::cout << "current enemy :" << registry.enemies.entities.size() << std::endl;
     // std::cout << "current bee enemy: " << registry.bees.entities.size() << std::endl;
     std::vector<Entity> pendingDeletion;
-    std::vector<vec3> createBees;
+    std::vector<vec4> createBees;
 
     // handle enemy moving & shooting
     for (Entity entity : registry.enemies.entities)
@@ -555,14 +558,15 @@ void EnemySystem::step(float Elapsed_ms)
     {
         if (!registry.deleteds.has(bee) && registry.bees.get(bee).merge)
         {
-            createBees.push_back(vec3(registry.motions.get(bee).position.x, registry.motions.get(bee).position.y, registry.bees.get(bee).mergeCount));
+
+            createBees.push_back(vec4(registry.motions.get(bee).position.x, registry.motions.get(bee).position.y, registry.bees.get(bee).mergeCount, registry.bees.get(bee).elite));
             registry.deleteds.emplace(bee);
         }
     }
 
-    for (vec3 newBee : createBees)
+    for (vec4 newBee : createBees)
     {
-        creatingMergeBee(newBee.z, vec2(newBee.x, newBee.y));
+        creatingMergeBee(newBee.z, vec2(newBee.x, newBee.y), newBee.w > 0);
     }
 
     // Clear straggler boids
@@ -1067,13 +1071,15 @@ void EnemySystem::launchBombard(const AttackData& atkData) {
     for (uint i = 1; i < atkData.numBullets + 1; i++) {
         float ratio = (float)i / (float)atkData.numBullets;
         vec2 pos = vec2(0);
-        if (atkData.veer == vec2(0)) {
+        if (atkData.veer == vec2(0) || atkData.veer == random_vec2) {
             float randX = (float)(rand() % 90) / 100.f;
             float randY = (float)(rand() % 90) / 100.f;
             pos = vec2(min.x * randX + max.x * (1.f - randX), min.y * randY + max.y * (1.f - randY));
         }
         else {
             pos = (ratio * line) + ((1.f - ratio) * -line);
+            pos.x = pos.x == random_float ? (float)(rand() % 90) / 100.f * (max.x - min.x) + min.x : pos.x;
+            pos.y = pos.y == random_float ? (float)(rand() % 90) / 100.f * (max.y - min.y) + min.y : pos.y;
             pos += center + perp * (float)((atkData.bulletRange / 2.f) - rand() % (int)(atkData.bulletRange));
         }
         if (pos.x < min.x || pos.y < min.y || pos.x > max.x || pos.y > max.y) continue;
@@ -1234,20 +1240,29 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
     currPattern.currAtkCD = currPattern.maxAtkCD;
 }
 
-void EnemySystem::creatingMergeBee(int count, vec2 pos)
-{
+void EnemySystem::creatingMergeBee(int count, vec2 pos, bool isElite) const {
+    Entity e;
     switch (count)
     {
     case 2:
         // std::cout << "CREATING" << std::endl;
-        createEnemy(render, pos, EnemyType::EnemyTwoBee);
+         e = createEnemy(render, pos, EnemyType::EnemyTwoBee);
         break;
     case 3:
-        createEnemy(render, pos, EnemyType::EnemyThreeBee);
+         e = createEnemy(render, pos, EnemyType::EnemyThreeBee);
         break;
     default:
         // std::cout << "CREATING 1" << std::endl;
-        createEnemy(render, pos, EnemyType::EnemyOneBee);
+         e = createEnemy(render, pos, EnemyType::EnemyOneBee);
+    }
+    if (isElite && !registry.elites.has(e)) {
+        auto& el = registry.elites.emplace(e);
+        el.eliteLevel = Random::Int(5);
+        if (registry.enemies.has(e)) {
+            Enemy& enemy = registry.enemies.get(e);
+            enemy.maxHealth *= pow(1.35f, el.eliteLevel);
+            enemy.currHealth = enemy.maxHealth;
+        }
     }
 }
 
@@ -1269,6 +1284,10 @@ void EnemySystem::merge(Entity entity, EnemyPattern &currPattern, std::vector<En
             if (!registry.deleteds.has(otherBeeEntity) && !registry.bees.get(otherBeeEntity).merge /* && otherBeeEntity != NULL*/)
             {
                 BeeEnemy &otherBee = registry.bees.get(otherBeeEntity);
+                if (registry.elites.has( otherBeeEntity) || registry.elites.has (entity))
+                {
+                    bee.elite = true;
+                }
                 // int mergeTotal = otherBee.mergeCount + bee.mergeCount;
                 // Motion &motion = registry.motions.get(entity);
                 // if(otherBee.merge == false && bee.merge == false)
