@@ -19,3 +19,6 @@ void extendStack (Entity player, int extension);
 void addEffect(const Entity &player, const std::vector<BulletStackEffect> &effects, SoundSystem* soundPlayer);
 void interact(float elapsed_ms, Entity &player, RenderSystem* renderer, SoundSystem* soundPlayer);
 void resetDashes ();
+void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange = 2.0f * M_PI, float offset = 150);
+void knockEffectsOffStack (const Entity &player, RenderSystem* renderer, int numEffects);
+void eatEffectsOffStack (const Entity &player, const Entity &other, int numEffects);

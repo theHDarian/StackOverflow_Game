@@ -10,6 +10,7 @@
 constexpr float random_float = -9999;
 constexpr vec2 random_vec2 = {random_float, random_float};
 constexpr vec2 random_batch = {-9998, -9998}; // Used to indicate the enemy should spawn at one of the predetermined random positions in the room
+constexpr vec2 opposite_of_player = {-9997, -9997}; // Used to indicate the enemy should spawn at the opposite side of the room from the player
 
 enum BulletEffectType {
     BulletDamage,
@@ -349,7 +350,7 @@ enum EnemyType {
 
     // Biology
     BossCrab,
-    BossCrabLaser,
+    BigCLaserSniper,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -493,6 +494,7 @@ enum class EnemyAttackPattern {
     ONE_WALL,
     TWO_WALL,
     SPAWNING,
+    REFRESH,
     BOMBARD,
     NONE
 };
@@ -884,6 +886,7 @@ struct BeeEnemy {
     int maxMerge = 3;
     bool canMerge = true;
     bool merge = false;
+    bool elite = false; // if true, the bee will be an elite bee, which has more health
 };
 
 struct Critter {
@@ -909,6 +912,8 @@ enum InteractableRequestType {
     RemoveEffect, // removes effect from stack
     SpawnEnemy, // spawns enemy based on region, or can pass in specific enemy
     PopX, // creates x bullets with effects (used for key)
+    KnockX, // knocks x effects off the stack (similar to PopX, but Random)
+    EatX, // eats x effects off the stack and push them to the enemy/enemy bullet's stack
 };
 
 struct InteractableRequest {
@@ -916,6 +921,7 @@ struct InteractableRequest {
     int choice = -1;
     std::vector<std::tuple<EnemyType,vec2>> enemies = {};
     std::vector<BulletStackEffect> effects = {};
+    Entity targetEntity; // Entity that the request is for, can be player or enemy
 };
 
 struct UIRequest {
@@ -927,6 +933,7 @@ struct UIRequest {
         this->text = text;
         this->effects = effects;
     }
+    Entity targetEntity;
 };
 
 struct specialRotators {

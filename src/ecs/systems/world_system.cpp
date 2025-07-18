@@ -365,6 +365,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if ((bombard.cdTillDisappear -= getAdjustedTime(elapsed_ms_since_last_update)) <= 0) {
 					Motion& bm = registry.motions.get(registry.bombards.entities[i]);
 					for (int j = 0; j < 20; j++) {
+						soundPlayer->playEnemyShootSound(2, 0);
 						createEnemyBulletDeath(renderer, bm.position, vec2(cos(2.f * M_PI * j / 20.f), sin(2.f * M_PI * j / 20.f)), bombard.effect);
 					}
 					registry.deleteds.emplace(registry.bombards.entities[i]);
@@ -497,6 +498,7 @@ void WorldSystem::restartGame() {
 	registry.maps.components[0].currRoom.dialogueDone = true;
 
 	registry.interactableInDialogue.clear();
+	registry.stackCompile.clear();
 
 	//DialogueRequest& resetReq = registry.dialogueRequests.emplace(player);
 	//resetReq.type = DialogueRequestType::ResetDialogue;
@@ -995,6 +997,28 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			req.type = InteractableRequestType::PopStack;
 			req.choice = effects[i].value;
 		}
+		else if (effects[i].type == Knock) {
+			// InteractableRequest& req = registry.interactableRequests.emplace(Entity());
+			// req.type = InteractableRequestType::KnockX;
+			// req.choice = effects[i].value;
+			// req.targetEntity = other;
+			knockEffectsOffStack( player, renderer, effects[i].value);
+		}
+		else if (effects[i].type == Eat) {
+			// InteractableRequest& req = registry.interactableRequests.emplace(Entity());
+			// req.type = InteractableRequestType::EatX;
+			// req.choice = effects[i].value;
+			// req.targetEntity = other;
+			eatEffectsOffStack( player, other, effects[i].value);
+			if (registry.enemies.has(other)) {
+				Enemy& enemy = registry.enemies.get(other);
+				if (enemy.collisionBullet[0].type == Eat) {
+					enemy.collisionBullet[0].type = Inert; // prevent enemy from eating player again
+					enemy.collisionBullet[0].value = 0;
+				}
+			}
+		}
+
 		else {
 			bool success = registry.stackCompile.get(player).add(effects[i]);
 			if (!success) {
@@ -1056,6 +1080,15 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 void WorldSystem::clearDeleteQueue() {
 	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
 		Entity e = registry.deleteds.entities[i];
+
+		if (registry.stackCompile.has(e) && !registry.players.has(e) && registry.motions.has(e)) {
+			// if enemy has a stack, we need to pop everything on it
+			StackCompile& stack = registry.stackCompile.get(e);
+			vec2 pos = registry.motions.get(e).position;
+			float angle = registry.motions.get(e).angle;
+			CreateXPopBullets(renderer, pos, angle, stack.currStack,  2.0f * M_PI, 0);
+			stack.currStack.clear();
+		}
 
 		// right now, all our entities that fade will also emit particles (enemies)
 		// but should be generalized for more things in the future

@@ -46,7 +46,9 @@ const RoomPreset TestRoom{
 };
 
 const RoomPreset TestRoom2{
-    {{  {EnemyCross,  {0.1f, 0.1f}}
+    {{
+        {EnemyMaw,  {0.1f, 0.1f},},
+{EnemyHifiCharger,  {0.9f, 0.1f},}
     }},
 {},
 {},
@@ -91,7 +93,7 @@ const RoomPreset StartingRoom{
 };
 
 const RoomPreset ScientistBossRoom{
-    {{{EnemyType::ScientistBoss, {0.5, 0.2}}}},
+    {{{EnemyType::ScientistBoss, opposite_of_player}}},
     {},
     {},
     0.0f,
@@ -99,7 +101,7 @@ const RoomPreset ScientistBossRoom{
     0,
     "\"Viceroy\"",
     false,
-    {1600,1300}
+    {2000,1800}
 };
 
 const RoomPreset TutorialRoom2Preset{
@@ -738,7 +740,8 @@ const RoomPreset EnemyRoomDash2{
            {EnemyType::EnemyQuadshooter, {0.8f, 0.4f}},
             {EnemyType::EnemyPufferfish, {0.7, 0.4}},
                {EnemySnail, {0.5f, 0.7f}},
-            {EnemyType::EnemySkull, {0.5f, 0.5f}}
+            {EnemyType::EnemySkull, {0.5f, 0.5f}},
+{EnemyType::EnemyBubbleShield, {0.5f, 0.5f}}
             }
         },
     {},
@@ -828,11 +831,15 @@ const RoomPreset EnemyRoomCrabs{
             {EnemyType::EnemyLaserCrab, {0.8f, 0.2f}},
             {EnemyType::EnemyCrab, {0.2f, 0.2f}},
             {EnemyType::EnemyEvilCrab, {0.5f, 0.5f}},
-           }
+           },
+            {
+                    {EnemyType::EnemyCrab, random_vec2},
+                {EnemyType::EnemyCrab, random_vec2},
+            }
         },
     {},
     {},
-    0.0f,
+    10.0f,
     5,
     2,
     "Crabby Cove",
@@ -997,10 +1004,15 @@ const RoomPreset EnemyRoomMagic{
                 {EnemyType::EnemySword, {random_float, random_float}},
                     {EnemyType::EnemyHealer, {random_float, random_float}},
                 {EnemyType::EnemyHealer, {random_float, random_float}},
+{ EnemyType::EnemyMage, {0.5f, 0.5f}},
             },
 
             {
                     {EnemyType::EnemyMage, {0.5f, 0.5f}},
+                {EnemyPileDriverTurret,{0.8,0.2}},
+                            {EnemyPileDriverTurret,{0.8,0.8}},
+                            {EnemyPileDriverTurret,{0.2,0.8}},
+                                {EnemyPileDriverTurret,{0.2,0.2}},
             }
         },
     {},
@@ -1749,7 +1761,7 @@ const RoomPreset BossRoomBee{
 
 
 const RoomPreset BossRoomCrab{
-    {{{BossCrab, {0.5f, 0.5f}}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
+    {{{BossCrab, opposite_of_player}, {EnemyCrab,{0.25, 0.6}},{EnemyCrab,{0.75, 0.6}}}},
     {},
     {{{Ram,{}}, {0.5f, 0.55f}}, { {PopConsole,{}}, {0.5f, 0.45f}},},
     0.0f,
@@ -2801,9 +2813,9 @@ const RoomPreset BossRoomBigC {
             {
                 {
                     {BossBigC, {0.5f, 0.5f}},
-                    {EnemyLaserSniper,{0.5, 0.63}},
-                        {EnemyLaserSniper,{0.38, 0.42}},
-                    {EnemyLaserSniper,{1-0.38, 0.42}},
+                    {BigCLaserSniper,{0.5, 0.63}},
+                        {BigCLaserSniper,{0.38, 0.42}},
+                    {BigCLaserSniper,{1-0.38, 0.42}},
                 },
             },
         {},
@@ -3013,7 +3025,7 @@ const RoomPreset MedicalEnemyRoomHeartBeat3 {
 
     },
     {},
-{{ {PushConsole,{bulletBounceUp, bulletBounceUp, bulletRangeUp, bulletRangeUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+{{ {PushConsole,{accuracyUp3,  bulletPierceUp3}}, {0.3f, 0.5f}},  { {PopConsole,{}}, {0.7f, 0.5f}}},
     16.0f,
     20,
     5,
@@ -3274,8 +3286,8 @@ const RoomPreset MedicalEnemyRoomHand {
 const RoomPreset EnemyRoomSingleMage {
     {
         {
-            {EnemyMage, {0.5f, 0.5f}},
-    {EnemyBubbleShield, {0.5f, 0.5f}},
+            {EnemyMage, opposite_of_player},
+    {EnemyBubbleShield, opposite_of_player},
         },
 
     },
@@ -3587,6 +3599,10 @@ const RoomPreset MiningEnemyRoomMineField {
                 {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
                 },
                 {
+                                                            {EnemySmallMiningWormHead, {-1.12f, random_float}},
+    {EnemySmallMiningWormHead, { random_float, 1.12f}},
+    {EnemySmallMiningWormHead, {1.12f, random_float}},
+    {EnemySmallMiningWormHead, {-1.12f, random_float}},
                 {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
                 {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
                 {EnemyDynamite, {random_float, random_float}},{EnemyDynamite, {random_float, random_float}},
@@ -3624,7 +3640,7 @@ const RoomPreset MiningEnemyRoomMineField {
                     },
         },
     {},
-        {{ {PushConsole,{bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletBounceUp, bulletBounceUp, bulletBounceUp}}, {0.3f, 0.5f}}, { {PushConsole,{bulletPierceUp, bulletPierceUp, bulletPierceUp}}, {0.7f, 0.5f}}, { {PopConsole,{}}, {0.5f, 0.5f}}},
+        {{ {PushConsole,{sizeUp3, bulletBounceUp, bulletBounceUp, bulletBounceUp}}, {0.4f, 0.5f}}, { {PopConsole,{}}, {0.6f, 0.5f}}},
         10.0f,
         25,
         5,
@@ -3693,13 +3709,16 @@ const RoomPreset MiningEnemyRoomQuadShooterBoulders {
                 {
                     {
                         {EnemyQuadshooterElite,{0.5,0.5}},
+                    {EnemyBubbleShield,{0.5,0.5}},
                         {EnemySmallBoulder, random_vec2},
                             {EnemySmallBoulder, random_vec2},
                             {EnemySmallBoulder, random_vec2},
                     },
                     {
-                            {EnemySmallBoulder, random_vec2},
-                        {EnemySmallBoulder, random_vec2},
+                            {EnemySmallMiningWormHead, random_vec2},
+                                        {EnemySmallBoulder, random_vec2},
+                {EnemySmallMiningWormHead, random_vec2},
+
                     },
                     {
                         {EnemyBigBoulder, random_vec2}
@@ -3716,6 +3735,98 @@ const RoomPreset MiningEnemyRoomQuadShooterBoulders {
             false,
             {1600, 1600}
 };
+
+const RoomPreset MiningEnemyRoomWorms {
+                    {
+                        {
+                            {EnemyPileDriverTurret,{0.5,0.5}},
+                        {EnemyBubbleShield,{0.5,0.5}},
+                            {EnemyBulldozer, random_vec2},{EnemyBulldozer, random_vec2},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, { random_float, -1.12f}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, {-1.12f, random_float}},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+                        },
+                        {
+                                    {EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, { random_float, -1.12f}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, {-1.12f, random_float}},
+                            {EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyBulldozer, random_vec2},{EnemyBulldozer, random_vec2},
+                        },
+{
+                                        {EnemySmallMiningWormHead, {1.12f, random_float}},
+    {EnemySmallMiningWormHead, { random_float, -1.12f}},
+    {EnemySmallMiningWormHead, {1.12f, random_float}},
+    {EnemySmallMiningWormHead, {-1.12f, random_float}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, { random_float, -1.12f}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, {-1.12f, random_float}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, { random_float, -1.12f}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, {-1.12f, random_float}},
+                                {EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+    {EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+    {EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+    {EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+    {EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyBulldozer, random_vec2},{EnemyBulldozer, random_vec2},{EnemyBulldozer, random_vec2},
+                            },
+
+
+                    },
+                {},
+                {},
+                18.0f,
+                5,
+                2,
+                "Natural Burrowers",
+                false,
+                {1600, 1600}
+};
+
+const RoomPreset MiningEnemyRoomWormsBasic {
+                    {
+                        {
+                            {EnemySkull,{0.5,0.5}},
+                        {EnemyBubbleShield,{0.5,0.5}},
+                            {EnemySmallBoulder, random_vec2},{EnemySmallBoulder, random_vec2},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, { random_float, -1.12f}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, {-1.12f, random_float}},
+                  },
+                        {
+                                    {EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, { random_float, -1.12f}},
+{EnemySmallMiningWormHead, {1.12f, random_float}},
+{EnemySmallMiningWormHead, {-1.12f, random_float}},
+                            {EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyBigBoulder, random_vec2},{EnemyBigBoulder, random_vec2},
+                        },
+
+
+                    },
+                {},
+                {},
+                18.0f,
+                5,
+                2,
+                "Hollowed Cavern",
+                false,
+                {1850, 1400}
+};
+
 
 
 const RoomPreset MiningEnemyRoomMolesIntro {
@@ -3832,6 +3943,12 @@ const RoomPreset MiningEnemyRoomCloakedMoles {
                 { CloakedGranterRoomWide, {0.6, 0.5}},
 
             },
+            {
+                {EnemySmallMiningWormHead, {1.12f, random_float}},
+    {EnemySmallMiningWormHead, { random_float, -1.12f}},
+    {EnemySmallMiningWormHead, {1.12f, random_float}},
+    {EnemySmallMiningWormHead, {-1.12f, random_float}},
+            },
 
             {
                 {EnemySurfaceMole, {0.4, 0.4}},
@@ -3856,7 +3973,7 @@ const RoomPreset MiningEnemyRoomCloakedMoles {
 
 
                 },
-            18.5f,
+            24.5f,
     10,
     5,
     "Shrouded in Darkness",
@@ -3963,6 +4080,15 @@ const RoomPreset MiningEnemyRoomPileDrivers {
                                     {EnemyPufferfish, random_vec2},
                                     {EnemyPufferfish, random_vec2},
                         },
+                        {
+                            {EnemyPufferfish, random_vec2},
+                                        {EnemyPufferfish, random_vec2},
+                            {EnemyPufferfish, random_vec2},
+                                    {EnemySmallMiningWormHead, random_vec2},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},{EnemyMiningBoidWormHead, random_batch},
+
+                        },
 
                         {
 
@@ -3981,7 +4107,7 @@ const RoomPreset MiningEnemyRoomPileDrivers {
                     },
                 {},
                 {},
-                16.0f,
+                20.0f,
                 5,
                 2,
                 "Sump Draining",
@@ -3996,16 +4122,20 @@ const RoomPreset MiningEnemyRoomPileDriversIntro {
                                 {EnemyPileDriverTurret,{0.8,0.8}},
                                 {EnemyPileDriverTurret,{0.2,0.8}},
                                     {EnemyPileDriverTurret,{0.2,0.2}},
-                                    {EnemyBigBoulder, random_vec2},
-                                    {EnemySkull, {0.5, 0.5}},
-                                { EnemyBubbleShield, {0.5, 0.5}},
-                            },
 
+                            },
+{
+    {EnemyBigBoulder, random_vec2},
+{EnemySmallMiningWormHead, random_vec2},
+        {EnemySkull, {0.5, 0.5}},
+    { EnemyBubbleShield, {0.5, 0.5}},
+
+                            },
 
                         },
                     {},
                     {},
-                    16.0f,
+                    15.0f,
                     5,
                     2,
                     "Spelunking",
@@ -4022,6 +4152,10 @@ const RoomPreset MiningEnemyRoomBulldozers {
                                 {EnemyBigBoulder,{random_float, 0.5} },
                                 {EnemySmallBoulder,{random_float, 0.5} },
                                 {EnemySmallBoulder,{random_float, 0.5} },
+                            {EnemyChainDogHead, {0.4f, 0.5f}},
+                            {EnemyChainDogHead, {0.6f, 0.5f}},
+                            {EnemyChainDogHead, {0.5f, 0.4f}},
+                            {EnemyChainDogHead, {0.5f, 0.6f}},
                         },
 
                         {
@@ -4400,7 +4534,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             {
                 {
                     QuadShooterRoomSmall, MiningEnemyRoomIntro, MiningEnemyRoomMoles, MiningEnemyRoomPileDrivers,
-                    MiningEnemyRoomBulldozers, MiningEnemyRoomPileDriversIntro, MiningEnemyRoomMoles2,
+                    MiningEnemyRoomBulldozers, MiningEnemyRoomPileDriversIntro, MiningEnemyRoomMoles2, MiningEnemyRoomWormsBasic, EnemyRoomSingleMage,
                 },
                 {EnemyRoomMagic, MiningEnemyRoomCloakedMoles,}
             }
@@ -4415,7 +4549,7 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             {
                 {
                      QuadShooterRoomSmall, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue,MiningEnemyRoomPileDrivers, MiningEnemyRoomBulldozers, MiningEnemyRoomMoles2,
-                    MiningEnemyRoomPileDriversIntro, MiningEnemyRoomQuadShooterBoulders,
+                    MiningEnemyRoomPileDriversIntro, MiningEnemyRoomQuadShooterBoulders,MiningEnemyRoomWormsBasic, MiningEnemyRoomWorms
                 },
                 {EnemyRoomMagic, MiningEnemyRoomMineField, MiningEnemyRoomCloakedMoles,}
             }
@@ -4429,7 +4563,9 @@ std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MiningRoomDirectory =
             RoomType::EnemyRoom,
             {
                 {
-                    EnemyRoomSingleMage, MiningEnemyRoomBoulders, MiningEnemyRoomMoles,MiningEnemyRoomLane, MiningEnemyRoomAvenue,MiningEnemyRoomPileDrivers ,MiningEnemyRoomMoles2,MiningEnemyRoomQuadShooterBoulders,MiningEnemyRoomBulldozers,
+                     MiningEnemyRoomBoulders, MiningEnemyRoomMoles, MiningEnemyRoomLane,
+                    MiningEnemyRoomAvenue, MiningEnemyRoomPileDrivers, MiningEnemyRoomMoles2,
+                    MiningEnemyRoomQuadShooterBoulders, MiningEnemyRoomBulldozers, MiningEnemyRoomWorms
                 },
                 {EnemyRoomMagic, MiningEnemyRoomMineField, MiningEnemyRoomCloakedMoles,}
             }
@@ -5110,10 +5246,10 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>>> bioEliteEnemies = {
         {EnemyHifiJellyFish, {0.5f, 0.5f}},
             {EnemySmallCShield, {0.5f, 0.5f}},
     },
-        {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
-                {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
-                {{EnemyType::EnemyCross, {0.5f,0.5f}}},
-                {{EnemyType::EnemyMaw, {0.5f,0.5f}}},
+        {{EnemyType::EnemyEyeCube, opposite_of_player}},
+                {{EnemyType::EnemyPhantom, opposite_of_player}},
+                {{EnemyType::EnemyCross, opposite_of_player}},
+                {{EnemyType::EnemyMaw, opposite_of_player}},
 };
 
 std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
@@ -5143,35 +5279,46 @@ std::vector<std::vector<std::tuple<EnemyType, vec2>> > miningEliteEnemies = {
         {EnemyThreeBee, random_vec2},
         {EnemyTwoBee, random_vec2},
         },
-        {{EnemyType::EnemyEyeCube, {0.5f,0.5f}}},
-        {{EnemyType::EnemyPhantom, {0.5f,0.5f}}},
-            {{EnemyType::EnemyCross, {0.5f,0.5f}}},
-        {{EnemyType::EnemyMaw, {0.5f,0.5f}}},
+        {{EnemyType::EnemyEyeCube, opposite_of_player}},
+        {{EnemyType::EnemyPhantom, opposite_of_player}},
+        {{EnemyType::EnemyCross, opposite_of_player}},
+        {{EnemyType::EnemyMaw, opposite_of_player}},
 };
 
 std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
     {
         {EnemyType::EnemyPhantom, {0.5f,0.5f}},
         {EnemyType::ProtectedGranter, {0.5f,0.5f}},
+{EnemyType::EnemyMaw, opposite_of_player},
+{EnemyType::EnemyEyeCube, random_vec2}
+
     },
             {
                 {EnemyType::EnemyEyeCube, {0.5f,0.5f}},
                 {EnemyType::HastyGranter, {0.5f,0.5f}},
+                {EnemyType::EnemyCross, opposite_of_player},
+                {EnemyType::EnemyMaw, random_vec2}
             },
 {
 
     {EnemyType::EnemyCross, {0.5f,0.5f}},
     {EnemyType::CloakedGranter, {0.5f,0.5f}},
+{EnemyType::EnemyPhantom, opposite_of_player},
+{EnemyType::EnemyEyeCube, random_vec2}
 },
 {
-    {EnemyType::EnemyMage, {0.5f,0.5f}},
-    {EnemyType::EnemyBubbleShield, {0.5f,0.5f}},
+    {EnemyType::EnemyMage, {0.3f,0.5f}},
+    {EnemyType::EnemyBubbleShield, {0.3f,0.5f}},
+{EnemyType::EnemyMage, {0.7f,0.5f}},
+{EnemyType::EnemyBubbleShield, {0.7f,0.5f}},
 },
 
     {
                 {EnemyType::EnemyMage, random_vec2},
                 {EnemyType::EnemyMage, random_vec2},
         {EnemyType::EnemyMage, random_vec2},
+{EnemyType::EnemyMage, random_vec2},
+{EnemyType::EnemyMage, random_vec2},
         },
         {
                             {EnemyHifiJellyFish, {0.6f, 0.6f}},
@@ -5193,12 +5340,26 @@ std::vector<std::vector<std::tuple<EnemyType,vec2>> > physicsEliteEnemies = {
                        {EnemyPileDriverTurret,{0.2,0.2}},
                     {EnemyType::EnemyBigBoulder, random_vec2},
                     {EnemyType::EnemyBigBoulder, random_vec2},
+                    {EnemyType::EnemySmallMole, random_vec2},
+                    {EnemyType::EnemySmallMole, random_vec2},
     },
     {
-             {EnemyType::EnemyBeeHive, {0.35f,0.5f}},
-    {EnemyType::EnemyBubbleShield, {0.35f,0.5f}},
-{EnemyType::EnemyBeeHive, {0.65f,0.5f}},
-{EnemyType::EnemyBubbleShield, {0.65f,0.5f}},
+             {EnemyType::EnemyBeeHive, {0.35f,0.35f}},
+    {EnemyType::EnemyBubbleShield, {0.35f,0.35f}},
+{EnemyType::EnemyBeeHive, {0.65f,0.65f}},
+{EnemyType::EnemyBubbleShield, {0.65f,0.65f}},
+{EnemyType::EnemyBeeHive, {0.65f,0.35f}},
+        { EnemyType::EnemyBubbleShield, {0.65f,0.35f}},
+        { EnemyType::EnemyBeeHive, {0.35f,0.65f}},
+        { EnemyType::EnemyBubbleShield, {0.35f,0.65f}},
+                {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+                {EnemyThreeBee, random_vec2},
+                {EnemyTwoBee, random_vec2},
+        {EnemyEvilSkull, {0.5f, 0.5f}},
+{EnemyBubbleShield, {0.5f, 0.5f}},
+        {InvincibleGranterRoomWide, {0.54f, 0.85f}},
+
                 {EnemyThreeBee, random_vec2},
             {EnemyTwoBee, random_vec2},
             {EnemyThreeBee, random_vec2},
