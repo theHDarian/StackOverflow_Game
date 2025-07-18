@@ -1932,12 +1932,11 @@ struct BossChimeraCrab : Enemy {
 	};
 };
 
-struct chimeraCrabSniper : Enemy
+struct bigCLaserSniper : Enemy
 {
-	EnemyPattern randomState = {"Follow", EnemyBehavior::FOLLOW_PLAYER, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 150.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
-	// EnemyPattern charging = {"Charge", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 0.f, 30000.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, NoAttack};
+	EnemyPattern randomState = {"Laser active", EnemyBehavior::IDLE, {{0.99, 0.01}, {0.99, 0.99}, {0.01, 0.99}, {0.01, 0.01}, {0.99, 0.01}}, 0, 0.f, 100.f, {{ReactionType::DURATION, 0}}, 0, true, 0.f, 5000.f, FastLaser};
 
-	chimeraCrabSniper()
+	bigCLaserSniper()
 	{
 		maxHealth = 100;
 		currHealth = maxHealth;
@@ -1948,7 +1947,7 @@ struct chimeraCrabSniper : Enemy
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE};
 		scale = vec2({160.0f / 2, 160.f / 2});
-		rotatePower = 1.0f;
+		rotatePower = 0.55f;
 		speedMultiplier = 1.3;
 		rotationBehaviour = EnemyRotationBehavior::FACE_PLAYER;
 	};
@@ -2116,6 +2115,21 @@ struct BossBigCCore : Enemy{
 		0,
 		0};
 
+	const AttackData laserRotateLowHP{
+		EnemyAttackPattern::LASER,
+		CIRCLE,
+		{bulletPierceUp},
+		fireRateUp2,
+		48,
+		M_PI / 48,
+		{0, 20},
+		0,
+		1900,
+		{2.5, M_PI / 300},
+		0,
+		0,
+		0};
+
 
 	const AttackData spawning{
 		EnemyAttackPattern::SPAWNING,
@@ -2168,7 +2182,7 @@ struct BossBigCCore : Enemy{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeUp,
+		bulletPierceUp,
 		8,
 		0,
 		{60, 60},
@@ -2183,7 +2197,7 @@ struct BossBigCCore : Enemy{
 		EnemyAttackPattern::LASER,
 		CIRCLE,
 		{dashUp},
-		dashRechargeUp,
+		bulletPierceUp,
 		8,
 		M_PI / 8.f,
 		{60, 60},
@@ -2209,9 +2223,28 @@ struct BossBigCCore : Enemy{
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyLaserSniper,
+		EnemyType::BigCLaserSniper,
 			{{0.5f, 1-0.651f}, {0.368, 1-0.4}, {1-0.368, 1-0.4} }
 		};
+
+	const AttackData spawningLaserSniper2{
+		EnemyAttackPattern::REFRESH,
+		CIRCLE,
+		{},
+		blunt,
+		3,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::BigCLaserSniper,
+			{{0.5, 0.63}, {0.38, 0.42}, {1-0.38, 0.42} }
+	};
 
 	const AttackData spawningState2{
 		EnemyAttackPattern::SPAWNING,
@@ -2265,6 +2298,23 @@ struct BossBigCCore : Enemy{
 		0,
 		EnemyBulletDeath::NONE,
 		EnemyType::EnemyHifiCharger};
+
+	const AttackData spawningStateBubbleShield{
+		EnemyAttackPattern::REFRESH,
+		CIRCLE,
+		{},
+		blunt,
+		1,
+		0,
+		{60, 60},
+		600,
+		1000,
+		{0, 0},
+		0,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::EnemyBubbleShield};
 
 
 	Reaction duration = {
@@ -2322,40 +2372,62 @@ struct BossBigCCore : Enemy{
 	EnemyPattern laserState1 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP, twenty_five_HP }, 6, true, 0.f, 2000.f, laser1,};
 	EnemyPattern laserState2 = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseHalfHP, twenty_five_HP}, 4, true, 0.f, 2000.f, laser2,};
 
-	EnemyPattern spawningLaserSniper = {"SPAWNING", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 2000.f, spawningLaserSniper1, };
+	EnemyPattern spawningLaserSniper = {
+		"SPAWNING", EnemyBehavior::SPAWNING, {}, 0, 1000.f, 1000.f, {duration}, 4, true, 0.f, 2000.f,
+		spawningLaserSniper1,
+	};
 
 	EnemyPattern randomStateHalfHP = {
 		"RANDOM POSITION", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, playerCloseHalfHP, twenty_five_HP}, 5, true,
 		0.f, 1500.f, spawningState2, SpecialStates::PROTECTED
 	};
 
-	EnemyPattern spawningState = {"SPAWNING", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f, {duration}, 11, true, 0.f, 1000.f, spawningState3, };
+	EnemyPattern spawningState = {
+		"SPAWNING", EnemyBehavior::SPAWNING, {}, 0, 1000.f, 1000.f, {duration}, 19, true, 0.f, 1000.f, spawningState3,
+	};
 
 	EnemyPattern PlayerCloseTwentyFiveHP = {
-		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 11, false, 0.f, 100.f, laserRotate,
+		"PlayerClose", EnemyBehavior::SPAWNING, {}, 0, 5000.f, 5000.f, {duration}, 11, true, 0.f, 5000.f, spawningStateBubbleShield,
 	};
 
 	EnemyPattern PlayerCloseTwentyFiveHPLaser = {
-		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 500.f, laserRotate,
+		"PlayerClose", EnemyBehavior::SPAWNING, {}, 0, 10000.f, 10000.f, {duration}, 12, true, 0.f, 500.f, laserRotateLowHP,
 		SpecialStates::INVINCIBLE
 	};
 
 	EnemyPattern randomStateTwentyFiveHP = {
+		"RANDOM POSITION", EnemyBehavior::IDLE, {}, 0, 100.f, 100.f, {duration, playerCloseTwentyFiveHP}, 20, true,
+		0.f, 1500.f, spawningLaserSniper2, SpecialStates::PROTECTED
+	};
+
+	EnemyPattern laserState1TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 14, true, 0.f, 2000.f, laser3, };
+	EnemyPattern laserState2TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 15, true, 0.f, 2000.f, laser4, };
+	EnemyPattern laserState3TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 16, true, 0.f, 2000.f, laser3, };
+	EnemyPattern laserState4TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 17, true, 0.f, 2000.f, laser4, };
+	EnemyPattern laserState5TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 18, true, 0.f, 2000.f, laser3, };
+	EnemyPattern laserState6TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 19, true, 0.f, 2000.f, laser4, };
+
+
+
+	EnemyPattern SpawnShieldTwentyFiveHP = {
+		"PlayerClose", EnemyBehavior::IDLE, {}, 0, 150.f, 150.f, {duration}, 13, true, 0.f, 3000.f, spawningStateBubbleShield,
+	};
+
+	EnemyPattern randomStateTwentyFiveHP2 = {
 		"RANDOM POSITION", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {duration, playerCloseTwentyFiveHP}, 13, true,
 		0.f, 1500.f, spawningState4, SpecialStates::PROTECTED
 	};
 
-	EnemyPattern laserState1TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 14, true, 0.f, 2000.f, laser3, };
-	EnemyPattern laserState2TwentyFiveHP = {"ATTACK LASER", EnemyBehavior::IDLE, {}, 0, 2000.f, 2000.f, {duration, playerCloseTwentyFiveHP}, 13, true, 0.f, 2000.f, laser4, };
-
 	BossBigCCore()
 	{
-		maxHealth = 7500;
+		maxHealth = 10000;
 		currHealth = maxHealth;
 		enemyPatterns = {
-			idleState, PlayerClose, PlayerCloseHalfHP, PlayerCloseHalfHPLaser, randomStateSevenFiveHP, laserState1,
-			laserState2, spawningLaserSniper, randomStateHalfHP, spawningState,
+			idleState, PlayerClose, PlayerCloseHalfHP, PlayerCloseHalfHPLaser, randomStateSevenFiveHP,
+			laserState1, laserState2, spawningLaserSniper, randomStateHalfHP, spawningState,
 			PlayerCloseTwentyFiveHP, PlayerCloseTwentyFiveHPLaser, randomStateTwentyFiveHP, laserState1TwentyFiveHP, laserState2TwentyFiveHP,
+			laserState3TwentyFiveHP, laserState4TwentyFiveHP, laserState5TwentyFiveHP, laserState6TwentyFiveHP, SpawnShieldTwentyFiveHP,
+			randomStateTwentyFiveHP2
 		};
 		patternIndex = 0;
 		sprite = {
@@ -4723,7 +4795,7 @@ struct DrillWormHead : Enemy
 		CIRCLE,
 		{},
 		blunt,
-		2,
+		5,
 		0,
 		{60, 60},
 		600,
@@ -4733,7 +4805,10 @@ struct DrillWormHead : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyMiningBoidWormHead };
+		EnemyType::EnemyMiningBoidWormHead,
+	 { random_batch, random_batch,random_batch,random_batch,random_batch,}
+
+	};
 
 	Reaction seventyFiveHp = {
 		ReactionType::SEVENTYFIVE_HEALTH,
@@ -4914,7 +4989,7 @@ struct SmallMiningWormHead : Enemy
 
 	SmallMiningWormHead()
 	{
-		maxHealth = 200;
+		maxHealth = 1000;
 		currHealth = maxHealth;
 
 		enemyPatterns = { followState };
@@ -4928,7 +5003,7 @@ struct SmallMiningWormHead : Enemy
 		};
 		scale = vec2({ 96.0f / 2, 72.f / 2 });
 		rotationBehaviour = EnemyRotationBehavior::LASER_CONTROL;
-		speedMultiplier = 0.8f;
+		speedMultiplier = 1.35f;
 
 		headData.size = 15;
 		headData.body = EnemySmallMiningWormBody;
@@ -4968,7 +5043,7 @@ struct MiningBoidWormHead : Enemy
 
 	MiningBoidWormHead()
 	{
-		maxHealth = 30;
+		maxHealth = 230;
 		currHealth = maxHealth;
 
 		enemyPatterns = { startState };
@@ -4986,6 +5061,7 @@ struct MiningBoidWormHead : Enemy
 		headData.size = 15;
 		headData.body = EnemyMiningBoidWormBody;
 		headData.constrainDistance = 24.f;
+		speedMultiplier = 1.35f;
 	};
 };
 

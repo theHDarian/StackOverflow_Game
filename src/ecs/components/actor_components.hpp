@@ -350,7 +350,7 @@ enum EnemyType {
 
     // Biology
     BossCrab,
-    BossCrabLaser,
+    BigCLaserSniper,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -494,6 +494,7 @@ enum class EnemyAttackPattern {
     ONE_WALL,
     TWO_WALL,
     SPAWNING,
+    REFRESH,
     BOMBARD,
     NONE
 };

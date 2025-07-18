@@ -602,18 +602,18 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             map.currRoom.preset = StartingRoom;
         }
         else if (roomType == RoomType::Testing) {
-            map.currRoom.preset = TestRoom2;
+            map.currRoom.preset = MiningEnemyRoomWorms;
             InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
             extendstack.type = InteractableRequestType::ExtendStack;
             extendstack.choice = 24;
             InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
             req2.type = InteractableRequestType::AddEffect;
-            req2.effects = { homingUp, homingUp, homingUp, homingUp, homingUp,
+            req2.effects = {
                              bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletRangeUp,
-                             dmgUp3, dmgUp3, dmgUp3, dmgUp3, dmgUp3, blunt, blunt, blunt, blunt, blunt,
+                              dmgUp3, dmgUp3, blunt, blunt, blunt, blunt, blunt,
                              playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp,
-                             numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp,
-                             fireRateUp, fireRateUp, fireRateUp, fireRateUp, fireRateUp};
+                             numBulletsUp, numBulletsUp,
+                             fireRateUp,fireRateUp, fireRateUp};
 
 
         }

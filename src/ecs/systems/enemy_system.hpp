@@ -34,7 +34,7 @@ private:
     void shootTwinLaser(vec2 pos, Entity enemy, const AttackData &atkData);
     void launchBombard(const AttackData& atkData);
     void attack(Entity entity, EnemyPattern &currPattern, Motion playerMotion, vec2 pos, const AttackData &atkData, float elapsed_ms);
-    void spawn(Entity entity, EnemyPattern& currPattern, vec2 pos, AttackData atkData);
+    void spawn(::Entity entity, ::EnemyPattern &currPattern, vec2 pos, AttackData &atkData) const;
     void merge(Entity entity, EnemyPattern &currPattern, std::vector<Entity> &pendingDeletion);
     void creatingMergeBee(int count, vec2 pos, bool isElite) const;
     void destruct(Enemy& enemy);

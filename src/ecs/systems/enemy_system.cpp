@@ -24,6 +24,8 @@
 
 #include "actor_components.hpp"
 #include "actor_components.hpp"
+#include "actor_components.hpp"
+#include "actor_components.hpp"
 
 std::mutex beeMutex;
 
@@ -225,7 +227,9 @@ void EnemySystem::step(float Elapsed_ms)
                 }
                 else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_PLAYER)
                 {
-                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity)) && !registry.specialRotators.has(entity) && !registry.timeModifiers.has(entity) && !registry.timeModifiers.has(registry.players.entities[0]))
+                    if ((!registry.bosses.has(entity) && !registry.bossParts.has(entity)) && !registry.specialRotators.
+                        has(entity) && !registry.timeModifiers.has(entity) && !registry.timeModifiers.has(
+                            registry.players.entities[0]))
                     {
                         Motion &playerMotion = registry.motions.get(registry.players.entities[0]);
                         vec2 mid = playerMotion.position - motion.position;
@@ -361,10 +365,26 @@ void EnemySystem::step(float Elapsed_ms)
             {
                 if (!pattern.atkData.gottenRoomEffects) fetchRoomEffects(entity, pattern.atkData);
                 AttackData atkData = pattern.atkData;
-                if (atkData.attackType != EnemyAttackPattern::SPAWNING)
+                if (atkData.attackType != EnemyAttackPattern::SPAWNING && atkData.attackType != EnemyAttackPattern::REFRESH)
                     attack(entity, pattern, playerMotion, pos, atkData, elapsed_ms);
-                else
+                else {
+                    if (atkData.attackType == EnemyAttackPattern::REFRESH) {
+                        for (int i = (int)registry.enemyParts.components.size() - 1; i >= 0; --i) {
+                            Entity& partEntity = registry.enemyParts.entities[i];
+                            EnemyPart& part = registry.enemyParts.components[i];
+                            if (registry.enemies.has(partEntity)) {
+                                if (part.parent == entity) {
+                                    Enemy& partEnemy = registry.enemies.get(partEntity);
+                                    if (partEnemy.type == atkData.spawn) {
+                                        destruct(partEnemy);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
                     spawn(entity, pattern, pos, atkData);
+                }
                 if (pattern.specialState == SpecialStates::INC_ANIM) {
                     std::cout << "INC" << std::endl;
                     if (registry.animations.has(entity)) {
@@ -1196,8 +1216,7 @@ void EnemySystem::attack(Entity entity, EnemyPattern &currPattern, Motion player
     }
 }
 
-void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, AttackData atkData)
-{
+void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, AttackData& atkData) const {
     if (registry.enemies.components.size() > MAX_ENEMY_SPAWN)
         return;
 

@@ -111,7 +111,7 @@ struct Room {
     vec2 roomEnd = vec2(0.f);
     bool spawnedElite = false;
     float eliteTimer = Random::Float(12.0f) + 3.0f;
-    std::vector<vec2> batchedEnemyPositions = {}; // used for spawning enemies in randomized batches, mostly for boids swarms
+    std::vector<vec2> batchedEnemyPositions = {Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),}; // used for spawning enemies in randomized batches, mostly for boids swarms
 };
 enum MapRequestType {
     RestartGame = 'R',

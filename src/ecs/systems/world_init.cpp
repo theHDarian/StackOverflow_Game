@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "components/presets/particle_presets.hpp"
+#include "utils/enum_string_mapping.hpp"
 #include "utils/vector_operations.hpp"
 
 Entity createPlayer(RenderSystem *renderer, vec2 pos)
@@ -401,7 +402,7 @@ void createEffectString (InteractableObject &object, std::vector<BulletStackEffe
 		if (effects[i].type == Key) {
 			color = COLOR_YELLOW;
 		}
-		
+
 		if (i == effects.size() - 1) {
 			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 1, color });
 		}
@@ -409,7 +410,7 @@ void createEffectString (InteractableObject &object, std::vector<BulletStackEffe
 			effectsString += ", ";
 			object.decorations.at(0).push_back(TextDecorationSpan{ next, effectsString.length() - 2, color });
 		}
-		
+
 		next = effectsString.length();
 	}
 
@@ -1785,11 +1786,12 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
         boss.name = "Chimeric Crab";
         break;
     }
-	case BossCrabLaser :
+	case BigCLaserSniper :
 	{
-		enemy = chimeraCrabSniper();
-		InvisibleEnemy& inv = registry.invisibleEnemy.emplace(entity);
-		BossParts& bp = registry.bossParts.emplace(entity);
+		enemy = bigCLaserSniper();
+		EnemyPart& ep = registry.enemyParts.emplace(entity);
+		ep.alwaysFollow = false;
+		ep.showHpBar = true;
 		break;
 	}
 	case EnemyMedicalBoid :
@@ -2248,6 +2250,8 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 		assert(false);
 	};
 
+	enemy.type = type;
+
 
 	Motion &motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
@@ -2266,11 +2270,24 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 			}
 		}
 		if (registry.motions.has(ep.parent)) {
-			motion.position = registry.motions.get(ep.parent).position + ep.offset;
+			if (ep.alwaysFollow) {
+				// if the enemy part always follows its parent, then we need to set the position to the parent's position + offset
+				motion.position = registry.motions.get(ep.parent).position + ep.offset;
+			}
 		} else {
 			registry.deleteds.emplace(entity);
 		}
 	}
+
+	// if (registry.wormBodies.has(entity)) {
+	// 	auto& wb = registry.wormBodies.get(entity);
+	// 	wb.head = summoner;
+	// 	if (!registry.wormHeads.has(wb.head)) {
+	// 		enemy.maxHealth = -1; // if the head is not a worm head, then the body should not exist
+	// 		enemy.currHealth = -1;
+	// 	}
+	// }
+
 	motion.velocity = vec2(0, 0);
 	motion.scale = enemy.scale;
 
@@ -2346,7 +2363,7 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 
 	if (type == EnemyType::ScientistBoss) {
 		auto& animate = registry.animations.emplace(entity);
-		animate.max_frames = 24; 
+		animate.max_frames = 24;
 		animate.animation_countdown = 36;
 		animate.animation_countdown_base = 36;
 	}
@@ -2385,6 +2402,18 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 
 	//HP and damage scaling
 	Map& map = registry.maps.components[0];
+
+	try {
+		auto emRegion = EnemyTypeToRegion.at(type);
+		if (!registry.boids.has(entity) && emRegion != MapRegion::Tutorial && (int)map.currRegion > (int)emRegion) {
+			int dmgmult = registry.bosses.has(entity) ? 1500 : 125;
+			enemy.maxHealth += ((int)map.currRegion - (int)emRegion) * dmgmult;
+		}
+	} catch (const std::out_of_range&) {
+		// If the enemy type is not in the map, we do nothing
+	}
+
+
 	int dmgScale = registry.elites.has(entity) ? (int) map.currRegion - 1 + registry.elites.get(entity).eliteLevel : (int) map.currRegion - 1;
 	if (map.currRegion == Military && !registry.boids.has(entity)) {
 		if (registry.instanceDamages.has(entity)) {
@@ -2633,7 +2662,7 @@ Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 vee
 	auto& spriteComponent = registry.sprites.emplace(entity);
 	spriteComponent.sprites[SPRITE_STATE::BASE] = "bullet_values";
 	renderShape = "bullet_values";
-	
+
 	registry.renderRequests.insert(
 		entity,
 		{ renderShape,
