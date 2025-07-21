@@ -558,7 +558,8 @@ enum InteractableItem {
 	Oven,
 	Optimizer,
 	Inverter,
-	NA
+	MilitaryDoor,
+	NA,
 };
 
 struct InteractableObject {

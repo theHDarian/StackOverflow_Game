@@ -253,6 +253,10 @@ void MapSystem::handleMapRequests()
             resetMap();
         else if (r.requestType == MapRequestType::NewGame)
             newMap(r.region, r.type);
+        else if (r.requestType == MapRequestType::SetRoom) {
+            Map &map = registry.maps.components[0];
+            setNewRoom(r.doorIndex, false);
+        }
         registry.mapRequests.clear();
     }
 }
@@ -551,6 +555,85 @@ void MapSystem::resetMap() {
     clearRoomActors();
 }
 
+void MapSystem::setNewRoom(int lockedRooms, bool excludeNone, const std::vector<RoomPreset> &presetOverRide) {
+    auto& map = registry.maps.components[0];
+    auto& nextRoom = map.currRoom.preset;
+    switch (map.currRegion) {
+        case MapRegion::Biology:
+            nextRoom.positiveEffects = biologyPositiveEffects.getNWeightedEffects(2);
+            nextRoom.negativeEffects = biologyNegativeEffects.getNWeightedEffects(1, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Mining:
+            nextRoom.positiveEffects = miningPositiveEffects.getNWeightedEffects(2);
+            nextRoom.negativeEffects = miningNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Physics:
+            nextRoom.positiveEffects = hifiPositiveEffects.getNWeightedEffects(3);
+            nextRoom.negativeEffects = hifiNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Medical:
+            nextRoom.positiveEffects = medicalPositiveEffects.getNWeightedEffects(3);
+            nextRoom.negativeEffects = medicalNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+            break;
+        case MapRegion::Military:
+            nextRoom.positiveEffects = militaryPositiveEffects.getNWeightedEffects(1);
+            nextRoom.negativeEffects = militaryNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
+            break;
+        default:
+            std::cout << "WARNING: Enemy room in unexpected region!" << std::endl;
+            nextRoom.positiveEffects = { biologyPositiveEffects.getWeightedEffect() };
+            nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
+            break;
+    }
+
+    map.directory = getDirectory(map.currRegion);
+    std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
+    for (int i = 0; i < 4; i++)
+    {
+        Door& d = registry.doors.components[i];
+        d.reset();
+        d.room = newRooms[i];
+        if (!presetOverRide.empty()) {
+            d.preset = presetOverRide[i%presetOverRide.size()];
+            d.room = BossRoom;
+            d.isLocked = false;
+
+        } else {
+            if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
+                //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
+                std:: cout << "Spawning locked room" << std::endl;
+                d.isLocked = true;
+            }
+            else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
+                //have a chance of spawning locked rooms
+                d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
+            } else {
+                if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
+                    //d.room = RoomType::EnemyRoom;
+                }
+            }
+        }
+        registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
+        registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
+        if (d.room == RoomType::None) {
+            excludeNone = true;
+            registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
+        }
+        if (d.isLocked) {
+            registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
+            lockedRooms++;
+        }
+        registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
+
+        d.preset = getRoomPreset(d.room, map.currRegion, d.isLocked);
+
+        // change door symbol type for offscreen ui
+        DoorSymbol& ds = registry.doorSymbols.components[i];
+        ds.doorType = d.room;
+    }
+    updateBgPositions();
+}
+
 void MapSystem::newMap(MapRegion region, RoomType roomType)
 {
     IOState& iostate = registry.ioStates.components[0];
@@ -645,106 +728,16 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             }
             map.currRoom.preset = StartingRoom;
         }
-        InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
-        req2.type = InteractableRequestType::AddEffect;
-        req2.effects = {};
-        auto& nextRoom = map.currRoom.preset;
-        switch (map.currRegion) {
-            case MapRegion::Biology:
-                nextRoom.positiveEffects = biologyPositiveEffects.getNWeightedEffects(2);
-                nextRoom.negativeEffects = biologyNegativeEffects.getNWeightedEffects(1, nextRoom.positiveEffects);
-                break;
-            case MapRegion::Mining:
-                nextRoom.positiveEffects = miningPositiveEffects.getNWeightedEffects(2);
-                nextRoom.negativeEffects = miningNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
-                break;
-            case MapRegion::Physics:
-                nextRoom.positiveEffects = hifiPositiveEffects.getNWeightedEffects(3);
-                nextRoom.negativeEffects = hifiNegativeEffects.getNWeightedEffects(2, nextRoom.positiveEffects);
-                break;
-            case MapRegion::Medical:
-                nextRoom.positiveEffects = medicalPositiveEffects.getNWeightedEffects(3);
-                nextRoom.negativeEffects = medicalNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
-                break;
-            case MapRegion::Military:
-                nextRoom.positiveEffects = militaryPositiveEffects.getNWeightedEffects(1);
-                nextRoom.negativeEffects = militaryNegativeEffects.getNWeightedEffects(3, nextRoom.positiveEffects);
-                break;
-            default:
-                std::cout << "WARNING: Enemy room in unexpected region!" << std::endl;
-                nextRoom.positiveEffects = { biologyPositiveEffects.getWeightedEffect() };
-                nextRoom.negativeEffects = { biologyNegativeEffects.getWeightedEffect() };
-                break;
-        }
-
-        //giveEveryTierBuff();
 
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
         extendstack.choice = 4*max(0,((int)map.currRegion - 1));
 
-        map.directory = getDirectory(map.currRegion);
-        std::vector<RoomType> newRooms = getRandomRoomTypes(excludeNone, map.roomsTraversed);
-        for (int i = 0; i < 4; i++)
-        {
-            Door& d = registry.doors.components[i];
-            d.reset();
-            d.room = newRooms[i];
-            if (!presetOverRide.empty()) {
-                d.preset = presetOverRide[i%presetOverRide.size()];
-                d.room = BossRoom;
-                d.isLocked = false;
+        InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
+        req2.type = InteractableRequestType::AddEffect;
+        req2.effects = {};
 
-            } else {
-                if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
-                    //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
-                    std:: cout << "Spawning locked room" << std::endl;
-                    d.isLocked = true;
-                }
-                else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
-                    //have a chance of spawning locked rooms
-                    d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
-                } else {
-                    if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
-                        //d.room = RoomType::EnemyRoom;
-                    }
-                }
-            }
-            registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
-            registry.interactables.get(registry.doors.entities[i]).name = "ClosedDoor";
-            if (d.room == RoomType::None) {
-                excludeNone = true;
-                registry.interactables.get(registry.doors.entities[i]).name = "EmptyDoor";
-            }
-            if (d.isLocked) {
-                registry.interactables.get(registry.doors.entities[i]).name = "LockedDoor";
-                lockedRooms++;
-            }
-            registry.interactables.get(registry.doors.entities[i]).interactType = InteractableType::DialogueInteractable;
-
-            d.preset = getRoomPreset(d.room, map.currRegion, d.isLocked);
-
-            // change door symbol type for offscreen ui
-            DoorSymbol& ds = registry.doorSymbols.components[i];
-            ds.doorType = d.room;
-        }
-        //map.currRoom.preset = TreasureRoom1;
-        updateBgPositions();
-        //
-        // InteractableRequest& req = registry.interactableRequests.emplace(Entity());
-        // req.type = InteractableRequestType::AddEffect;
-        // req.effects = {key, dashUp, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUp, key, dashUp, dashCDRDownA, dmgUpM, dashCDRDownA, dmgUpM, SniperPower, dashUp,};
-
-        //createProp3D(renderer, vec2(700, 300), "controls.png", vec2(576, 300), vec2(280, 80), 100);
-        // createBibleTree(renderer, vec2(700, 500));
-        // createGardener(renderer, vec2(1000, 700));
-        // createEnemy(renderer, vec2(1000, 500), EnemyType::EnemySkull);
-        // createEnemy(renderer, vec2(1000, 300), EnemyType::EnemyPufferfish);
-        // createRamStick(renderer, vec2(500, 500));
-        //createPushConsole(renderer, vec2(700, 500), {dashUp, dashUp, dashUp, dmgDown, dmgDown, dashUp, dmgDown2, dmgDown2, dashUp, dmgDown, dashUp, dmgDown});
-        //createWishGranter(renderer, vec2(500,500));
-        //createEnemy(renderer, vec2(500, 500), ScientistBoss);
-        //createOracleCrab(renderer, vec2(500, 500));
+        setNewRoom(lockedRooms, excludeNone, presetOverRide);
     }
     decorateRoom();
 }

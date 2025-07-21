@@ -116,7 +116,8 @@ struct Room {
 enum MapRequestType {
     RestartGame = 'R',
     ChangeRoom = 'C',
-    NewGame = 'N'
+    NewGame = 'N',
+    SetRoom = 'S',
 };
 
 enum MapRegion {
@@ -139,6 +140,7 @@ struct MapRequest {
         this->region = region;
         this->doorIndex = doorIndex;
     }
+    MapRequest() : requestType(MapRequestType::RestartGame), type(RoomType::None), doorIndex(0), region(MapRegion::Tutorial) {};
 };
 
 

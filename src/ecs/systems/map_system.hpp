@@ -18,6 +18,9 @@ class MapSystem {
     private:
         RenderSystem* renderer;
         void resetMap();
+
+        void setNewRoom(int lockedRooms, bool excludeNone, const std::vector<RoomPreset> &presetOverRide = {});
+
         void changeRoom(RoomType type,int doorIndex);
         void handleMapRequests();
 

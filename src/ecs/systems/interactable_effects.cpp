@@ -436,6 +436,17 @@ void closeDoors (SoundSystem* soundPlayer) {
 	soundPlayer->playNextMusic();
 }
 
+void changeRegion (MapRegion region, SoundSystem* soundPlayer) {
+	Map& map = registry.maps.components[0];
+	map.currRegion = region;
+	map.roomsTraversed = 0;
+	auto& req = registry.mapRequests.emplace(Entity());
+	req.requestType = MapRequestType::SetRoom;
+	req.doorIndex = 0; // Set to the first door index, as we are changing the region
+	//move player to center of the room
+	soundPlayer->playNextMusic();
+}
+
 void addEffect(const Entity &player, const std::vector<BulletStackEffect> &effects, SoundSystem* soundPlayer) {
 
     if (registry.stackCompile.has(player)) {
@@ -601,7 +612,7 @@ void interact(float elapsed_ms, Entity &player, RenderSystem* renderer, SoundSys
 		InteractableObject& object = registry.interactables.get(reaction.object);
 		MapRegion region = Tutorial;
 		RoomType room = TutorialRoom;
-		if (object.name.compare("SkipTutorial") == 0) {
+		if (object.name == "SkipTutorial") {
 			IOState& iostate = registry.ioStates.components[0];
 			if (reaction.choice == 0) { // do tutorial
 				iostate.tutorialOn = true;
@@ -1163,7 +1174,8 @@ void interact(float elapsed_ms, Entity &player, RenderSystem* renderer, SoundSys
 					}
 					break;
 				}
-
+				default:
+					break;
 			}
 		}
 		if (object.item == InteractableItem::Inverter) {
@@ -1183,6 +1195,13 @@ void interact(float elapsed_ms, Entity &player, RenderSystem* renderer, SoundSys
 				}
 			}
 		}
+
+		if (object.item == InteractableItem::MilitaryDoor) {
+			if (reaction.choice == 0) {
+				changeRegion( Military, soundPlayer);
+			}
+		}
+
 		registry.interactableReactions.clear();
 	}
 	handleRequests( elapsed_ms, player, renderer, soundPlayer);

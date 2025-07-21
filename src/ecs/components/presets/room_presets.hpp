@@ -5115,6 +5115,10 @@ inline RoomPreset getRoomPreset(RoomType type, MapRegion currRegion, bool locked
     else if (type == RoomType::TutorialRoom2) {
         nextRoom = TutorialRoom2Preset;
     }
+
+    else if (map.currRoom.preset.ID == "\"Viceroy\"") {
+        nextRoom = TutorialRoom1Preset;
+    }
     
     // Regular rooms
     else {
