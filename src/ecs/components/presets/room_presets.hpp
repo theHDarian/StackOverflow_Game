@@ -116,6 +116,18 @@ const RoomPreset TutorialRoom2Preset{
     {1000,800}
 };
 
+const RoomPreset EndingRoom{
+        {},
+        {},
+        {},
+        0.0f,
+        0,
+        0,
+        "The End?",
+        false,
+        {1000,1000}
+};
+
 const RoomPreset BioEnemyRoomSwarm{
     {
         {
@@ -4627,10 +4639,19 @@ const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MedicalRoomDire
 
 const std::map<DifficultyRegion,std::map<RoomType, RoomPresets>> MilitaryRoomDirectory = {
     {DifficultyRegion::Intro,{
-        {RoomType::EnemyRoom, {{EnemyRoomInvisible, MiningEnemyRoomMineField, MiningEnemyRoomCloakedMoles, EnemyRoomMagic,EnemyRoomPhantom, EnemyRoomEyes,},bossRooms}},
-        {RoomType::RestRoom, {{RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall},{RestingRoom3PopLarge}}},
-        {RoomType::EventRoom, {{EventRoomOracleCrab, }, { }}  },
-        {RoomType::TreasureRoom, {bothTreasureRooms,{TreasureRoomSniper, TreasureRoomShotgun, TreasureRoomOstrich, TreasureRoomMachineGun,TreasureRoomSuperSize,TreasureRoomPinBall,TreasureRoomHare, TreasureRoomRisky}}},
+        {RoomType::EnemyRoom, {
+            {
+                // EnemyRoomInvisible, MiningEnemyRoomMineField, MiningEnemyRoomCloakedMoles, EnemyRoomMagic,EnemyRoomPhantom, EnemyRoomEyes,
+                EndingRoom,
+            },}
+        },
+        {RoomType::RestRoom, {
+            {
+                // RestingRoomPop, RestingRoomPopLarge, RestingRoomPopLong, RestingRoomPopTall, RestingRoomPopSmall
+                EndingRoom
+            },{RestingRoom3PopLarge}}},
+        {RoomType::EventRoom, {{EndingRoom, }, { }}  },
+        {RoomType::TreasureRoom, {{EndingRoom},{}}},
     }},
     {DifficultyRegion::Easy,{
         {

@@ -170,6 +170,7 @@ elseif (IS_OS_WINDOWS)
         # non-const references, yay microsoft) into an error
         "/we4239"
     )
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
 endif()
 
 # Can't find the include and lib. Quit.

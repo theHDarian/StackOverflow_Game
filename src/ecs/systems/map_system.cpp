@@ -437,9 +437,6 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         if ( (d.room == RoomType::BossRoom || (map.currRoom.preset == ScientistBossRoom)) ) {
             if ((spawnIndex + 2) % 4 != i)
                 d.room = RoomType::None;
-            else if (map.currRoom.preset == ScientistBossRoom) {
-                d.room = RoomType::TutorialRoom;
-            }
         }
 
         if ((lockedRooms + noneRooms < 2) && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
@@ -468,6 +465,11 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         }
 
         d.preset = getRoomPreset(d.room, region, d.isLocked, roomTraversed, ELITE_SPAWN_CHANCE);
+
+        if (map.currRoom.preset == ScientistBossRoom && (spawnIndex + 2) % 4 == i) {
+            //Once Final boss is beaten, goto ending room
+            d.room = RoomType::TutorialRoom2;
+        }
 
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
         ds.doorType = d.room;

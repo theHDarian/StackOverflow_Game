@@ -157,12 +157,78 @@ struct StackCompile {
     	if (effect.type == Lightning) {
 	        if (currStack.size() < 1) return true;
 	        if (effect.value == -1) {
-		        std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+		        // std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+
+	            //invert the value of a random non-key, non-Inert bullet
+	            auto g = std::mt19937(std::random_device{}());
+
+	            // Find all valid indices (non-Key, non-Inert)
+	            std::vector<int> validIndices;
+	            for (int i = 0; i < currStack.size(); i++) {
+	                if (currStack[i].type != Key && currStack[i].type != Inert) {
+	                    validIndices.push_back(i);
+	                }
+	            }
+
+	            if (validIndices.empty()) return true;
+
+	            std::uniform_int_distribution<> indexDist(0, validIndices.size() - 1);
+	            int randomIndex = validIndices[indexDist(g)];
+
+	            // Update values map
+	            if (values.find(currStack[randomIndex].type) != values.end()) {
+	                values[currStack[randomIndex].type] -= currStack[randomIndex].value;
+	                currStack[randomIndex].value = -currStack[randomIndex].value;
+	                values[currStack[randomIndex].type] += currStack[randomIndex].value;
+	            }
+
 	        }
 	        else {
-		        std::random_device rd;
-		        std::mt19937 g(rd());
-		        std::shuffle(currStack.begin(), currStack.end(), g);
+		        // std::random_device rd;
+		        // std::mt19937 g(rd());
+
+	            // Change a random bullet to a random other type
+	            auto g = std::mt19937(std::random_device{}());
+	            // Shuffle current stack
+	            std::shuffle(currStack.begin(), currStack.end(), g);
+
+	            // Find all valid indices (non-Key)
+	            std::vector<int> validIndices;
+	            for (int i = 0; i < currStack.size(); i++) {
+	                if (currStack[i].type != Key) {
+	                    validIndices.push_back(i);
+	                }
+	            }
+
+	            if (validIndices.empty()) return true;
+
+	            std::uniform_int_distribution<> indexDist(0, validIndices.size() - 1);
+	            int randomIndex = validIndices[indexDist(g)];
+
+	            // Get all possible bullet effect types
+	            std::vector<BulletEffectType> allTypes = {
+	                BulletDamage, ProjectileSize, FireRate, BulletRange, BulletAccuracy,
+                    BulletNum, Bounce, Pierce, Homing, PlayerSpeed, PlayerNumDash,
+                    PlayerStackSize, PlayerDashRecharge, Inert
+                };
+	            std::uniform_int_distribution<> typeDist(0, allTypes.size() - 1);
+	            BulletEffectType newType = allTypes[typeDist(g)];
+
+	            // Update values map
+	            if (values.find(currStack[randomIndex].type) != values.end()) {
+	                values[currStack[randomIndex].type] -= currStack[randomIndex].value;
+	            }
+	            currStack[randomIndex].type = newType;
+                //if the value of the new type is 0 (Inert), set the value to 1
+                if (currStack[randomIndex].value == 0) {
+                    currStack[randomIndex].value = 1;
+                }
+
+	            if (values.find(newType) != values.end()) {
+	                values[newType] += currStack[randomIndex].value;
+	            }
+
+
 	        }
             stackMerge();
     	    return true;
@@ -441,6 +507,7 @@ enum EnemyType {
     ScientistLaserGridAttack,
     ScientistLaserGridVerticalAttack,
     ScientistShield,
+    ScientistShieldWeak,
     ScientistBoss,
     ScientistHand,
     ScientistlaserAttack,

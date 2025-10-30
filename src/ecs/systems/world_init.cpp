@@ -1773,6 +1773,17 @@ Entity createEnemy(RenderSystem *renderer, vec2 pos, EnemyType type, const Entit
 		ep.alwaysFollow = true;
 		break;
 	}
+	case EnemyType::ScientistShieldWeak: {
+
+		enemy = ScientistShieldEnemyWeak();
+		registry.shield.emplace(entity);
+		auto& ep = registry.enemyParts.emplace(entity);
+		ep.offset = {0,0};
+		ep.alwaysFollow = true;
+		break;
+
+	}
+
 	case EnemyType::ScientistHand:
 	{
 		enemy = ScientistHandEnemy();

@@ -7110,6 +7110,24 @@ struct ScientistBossEnemy : Enemy
 		EnemyType::ScientistShield,
 		{}};
 
+	const AttackData spawnShieldPhaseTwo{
+		EnemyAttackPattern::SPAWNING,
+		TRIANGLE,
+		{dashRechargeUp},
+		blunt,
+		1,
+		0,
+		{20, 20},
+		100,
+		3000,
+		{0.5, 0.5},
+		-1,
+		0,
+		0,
+		EnemyBulletDeath::NONE,
+		EnemyType::ScientistShieldWeak,
+		{}};
+
 	const AttackData spawnHand{
 		EnemyAttackPattern::SPAWNING,
 		TRIANGLE,
@@ -7179,7 +7197,7 @@ struct ScientistBossEnemy : Enemy
 		TRIANGLE,
 		{numBulletsUp},
 		playerSpeedDown,
-		150,
+		25,
 		M_PI,
 		{20, 20},
 		600,
@@ -7207,8 +7225,8 @@ struct ScientistBossEnemy : Enemy
 		0,
 		0,
 		EnemyBulletDeath::NONE,
-		EnemyType::EnemyMedicalRodC,
-		{}};
+		EnemyType::EnemyCross,
+		{random_vec2}};
 
 	EnemyPattern spawnLaserHorizontalState = {
 		"SHOOT HORIZONTAL", EnemyBehavior::IDLE, {}, 0, 1000.f, 1000.f,
@@ -7261,12 +7279,12 @@ struct ScientistBossEnemy : Enemy
 
 	EnemyPattern patrollingState2 = {
 		"RANDOM", EnemyBehavior::GRANTINGBUFFSAOE, {{0.2, 0.8}, {0.2, 0.2}}, 0, 2000.f, 2000.f, {duration, playerFar}, 13, true, 0.f,
-		2000.f, spawnLaserHorizontal, SpecialStates::PROTECTED, SpecialStates::INVINCIBLE
+		2000.f, spawnLaserHorizontal, SpecialStates::CLEAR_VULNERABLE, SpecialStates::INVINCIBLE
 	};
 
 	EnemyPattern patrollingState3 = {
 		"RANDOM", EnemyBehavior::RANDOM, {{0.5, 0.5}, {0.7, 0.7}}, 0, 5000.f, 5000.f, {duration, playerFar}, 14, true, 0.f, 5000.f,
-		spawnExplosive, SpecialStates::PROTECTED
+		spawnExplosive,
 	};
 	EnemyPattern teleportState = {
 		"TELEPORT", EnemyBehavior::TELEPORT, {{0.5, 0.5}}, 0, 3000.f, 3000.f, {duration, playerFar}, 15, true, 0.f, 3000.f,
@@ -7296,13 +7314,13 @@ struct ScientistBossEnemy : Enemy
 	};
 
 	EnemyPattern spawnShieldStatePhase2 = {
-		"Shield", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 12, true, 0.f, 1000.f,
-		spawnShield
+		"Shield", EnemyBehavior::RANDOM, {}, 0, 1000.f, 1000.f, {duration}, 11, true, 0.f, 1000.f,
+		spawnShieldPhaseTwo, SpecialStates::VULNERABLE
 	};
 
 	EnemyPattern spawnRodC = {
-		"SHOOT ROD C", EnemyBehavior::RANDOM, {}, 0, 3000.f, 3000.f,
-		{duration}, 21, true, 0.f, 4000.f, rodCSummon, SpecialStates::INVINCIBLE
+		"SHOOT ROD C", EnemyBehavior::RANDOM, {}, 0, 10000.f, 10000.f,
+		{duration}, 21, true, 5000.f, 100000.f, rodCSummon, SpecialStates::VULNERABLE
 	};
 
 	ScientistBossEnemy()
@@ -7341,6 +7359,30 @@ struct ScientistShieldEnemy : Enemy
 	{
 		maxHealth = 7500;
 		currHealth = 7500;
+		enemyPatterns = {IdleState};
+		sprite = {
+			"enemy_bullet_square.png",
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE,
+		};
+		patternIndex = 0;
+		scale = vec2(350, 380);
+		rotatePower = 0.f;
+		armour = 10;
+	}
+};
+
+struct ScientistShieldEnemyWeak : Enemy
+{
+	Reaction IdleTransition{
+		ReactionType::DURATION,
+		0};
+
+	EnemyPattern IdleState = {"", EnemyBehavior::IDLE, {}, 0, 5000.f, 5000.f, {IdleTransition}, 0, false, 0.f, 600.f, NoAttack};
+	ScientistShieldEnemyWeak()
+	{
+		maxHealth = 1000;
+		currHealth = 1000;
 		enemyPatterns = {IdleState};
 		sprite = {
 			"enemy_bullet_square.png",
@@ -7763,21 +7805,21 @@ struct ScientistHandEnemy : Enemy
 		0,
 		0};
 
-	EnemyPattern idling = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
+	EnemyPattern idling = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 1, false, 0.f, 0.f, NoAttack, };
 	EnemyPattern chargePlayer = {"CHARGE", EnemyBehavior::CHARGING, {}, 0, 3000.f, 3000.f, {duration}, 2, false, 0.f, 0.f, NoAttack, SpecialStates::VULNERABLE};
-	EnemyPattern idling2 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 3, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE };
+	EnemyPattern idling2 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 3, false, 0.f, 0.f, NoAttack,  };
 	EnemyPattern BombingState = {"PATROL", EnemyBehavior::IDLE, {{0.5, 0.5}}, 0, 6000.f, 6000.f, {duration}, 4, true, 1000.f, 1000.f, HandBomb};
-	EnemyPattern idling3 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 5, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
+	EnemyPattern idling3 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 5, false, 0.f, 0.f, NoAttack, };
 	EnemyPattern teleportToScientist2 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 6, true, 500.f, 1000.f, quakeShot};
 	EnemyPattern laserAttackPrepareState = {"PATROL", EnemyBehavior::TELEPORT, {{1, 0.1}}, 0, 2000.f, 2000.f, {duration}, 7, false, 1000.f, 1000.f, NoAttack, SpecialStates::VULNERABLE};
 	EnemyPattern patrolLaserState = {"PATROLLING", EnemyBehavior::PATROLLING, {{1, 0.1}, {1, 0.95}}, 0, 15000.f, 15000.f, {duration}, 8, true, 0.f, 15000.f, laserOne, SpecialStates::VULNERABLE};
 	EnemyPattern teleportToScientist3 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 9, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling4 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 10, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
+	EnemyPattern idling4 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 10, false, 0.f, 0.f, NoAttack, };
 	EnemyPattern SprayingState = {"PATROL", EnemyBehavior::PATROLLING, {{0.5, 0.5}}, 4, 6000.f, 6000.f, {duration}, 11, true, 1000.f, 1000.f, sprayingShot};
 	EnemyPattern teleportToScientist4 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 12, true, 500.f, 1000.f, quakeShot};
-	EnemyPattern idling5 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 13, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
+	EnemyPattern idling5 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 13, false, 0.f, 0.f, NoAttack, };
 	EnemyPattern sprayHomingState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 6000.f, 6000.f, {duration}, 14, true, 0.f, 3000.f, sprayHoming};
-	EnemyPattern idling6 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 15, false, 0.f, 0.f, NoAttack, SpecialStates::INVINCIBLE};
+	EnemyPattern idling6 = {"IDLE", EnemyBehavior::FOLLOWSCIENTIST, {}, 0, 7000.f, 7000.f, {duration}, 15, false, 0.f, 0.f, NoAttack, };
 	EnemyPattern teleportToScientist5 = {"IDLE", EnemyBehavior::IDLE, {}, 4, 1000.f, 1000.f, {duration}, 16, true, 500.f, 1000.f, quakeShot};
 	EnemyPattern teleportToWall = {"TELEPORT", EnemyBehavior::TELEPORT, {{1, 0.5}}, 0, 2000.f, 2000.f, {duration}, 17, false, 1000.f, 1000.f, NoAttack};
 	EnemyPattern laserRotateState = {"SHOOT", EnemyBehavior::IDLE, {}, 0, 3000.f, 3000.f, {duration}, 0, true, 0.f, 3000.f, laserArea};
@@ -7785,7 +7827,7 @@ struct ScientistHandEnemy : Enemy
 
 	ScientistHandEnemy()
 	{
-		maxHealth = 2500;
+		maxHealth = 4250;
 		currHealth = maxHealth;
 		enemyPatterns = {idling, chargePlayer, idling2,
 						 BombingState, idling3,teleportToScientist2,

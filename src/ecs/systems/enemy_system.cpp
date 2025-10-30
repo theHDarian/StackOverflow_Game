@@ -1227,7 +1227,7 @@ void EnemySystem::spawn(Entity entity, EnemyPattern &currPattern, vec2 pos, Atta
 
     for (uint i = 0; i < atkData.numBullets; i++)
     {
-        if (atkData.spawn == EnemyType::ScientistShield && registry.scientist.has(entity))
+        if ((atkData.spawn == EnemyType::ScientistShield || atkData.spawn == ScientistShieldWeak) && registry.scientist.has(entity))
         {
             if (registry.shield.entities.size() > 0) {
                 break;
