@@ -408,6 +408,15 @@ void PhysicsSystem::step(float elapsed_ms)
 		else {
 			registry.interactables.get(registry.doors.entities[i]).timer = registry.interactables.get(registry.doors.entities[i]).base;
 		}
+
+		Motion& doorMotion = registry.motions.get(doors.entities[i]);
+		CircleCollider& cc = registry.circleColliders.get(doors.entities[i]);
+
+		// player is within range of door, show room bullets preview
+		if (CheapCircleToCircle(m.position, c.radius, doorMotion.position, cc.radius))
+		{
+			
+		}
 	}
 
 	// Critters

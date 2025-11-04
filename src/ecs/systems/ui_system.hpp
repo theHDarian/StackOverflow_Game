@@ -44,6 +44,8 @@ private:
     Entity titleScreen;
     Entity stackAddBubble; // seems like bad practice; what's the best way for multi-part ui?
     Entity stackAddTail;
+    Entity roomPreviewBubble;
+    Entity roomPreviewTail;
     Entity dialogueReminder;
     Entity flashMessageDisplay;
 
@@ -93,9 +95,13 @@ private:
 
     Entity createStackAddNotif(vec2 position, vec2 scale, std::string sprite, vec3 color, BulletStackEffect effect);
 
+    Entity createUIBullet(vec2 position, vec2 scale, std::string sprite, vec3 c, BulletStackEffect effect);
+
     Entity createDialogueReminder();
 
-    void updateStackAddBubble(vec2 playerPosition, int bulletNum);
+    void updateStackAddBubble(vec2 position, int bulletNum, Entity bubbleEntity, Entity tailEntity);
+
+    std::vector<BulletStackEffect> extractBulletEffects(std::vector<std::vector<BulletStackEffect>> bulletChances);
 
     void loadText();
 

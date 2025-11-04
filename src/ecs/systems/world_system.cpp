@@ -495,7 +495,7 @@ void WorldSystem::handleCollisions() {
 			if (registry.interactables.has(entity_other) && (room.cleared || room.type == RoomType::TutorialRoom1)) {
 				// bad singleton implementation: only interested in one E so just io system can just grab most recent one
 				// consider grabbing nearest one instead
-				if (!registry.interactableReactions.has(entity_other))
+				if (!registry.nearbyInteractables.has(entity_other))
 					registry.nearbyInteractables.emplace(entity_other);
 			}
 		}

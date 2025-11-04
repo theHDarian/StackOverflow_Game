@@ -998,8 +998,7 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	auto &door = registry.doors.emplace(entity);
 	door.startPos = startPos;
 	door.endPos = endPos;
-	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'B' : 'T' : (door.startPos.x < ws.width / 2.f) ? 'L'
-																																		  : 'R';
+	door.side = (door.startPos.y == door.endPos.y) ? (door.startPos.y < ws.height / 2.f) ? 'B' : 'T' : (door.startPos.x < ws.width / 2.f) ? 'L'																												  : 'R';
 
 	registry.roomSizeScaleds.emplace(entity, "Door");
 	std::cout << glm::to_string(startPos) << ", " << glm::to_string(endPos) << ", " << door.side << std::endl;
@@ -1008,6 +1007,9 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos)
 	object.name = "LockedDoor";
 	object.base = 500;
 	object.timer = 500;
+
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = 200;
 
 	registry.renderRequests.insert(
 		entity,
