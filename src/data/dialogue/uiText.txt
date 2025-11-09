@@ -42,7 +42,7 @@ Bullets have a 15% chance to inflict 1 stack of <color=red>Burn</color> on hit, 
 \n\nCurrent burn chance: {0}
 
 UI Tier_ProjectileSize
-Bullets split into mini bullets on deletion (how many? random?). Reset bullet size upon reaching 5 <color=purple_light>Bullet Size up</color>.
+Bullets split into <color=purple_light>4</color> mini bullets on deletion. Reset bullet size upon reaching 5 <color=purple_light>Bullet Size up</color>.
 
 UI Tier_BulletRange
 Deal more damage the further you are from the enemy, up to a multiplier of <color=yellow>2x</color>.
@@ -51,7 +51,7 @@ UI Tier_BulletAccuracy
 Bullets inflict <color=purple_med>Vulnerable</color> on hit, increasing damage dealt by <color=purple_med>1.5x</color> for 4s.
 
 UI Tier_BulletNum
-Fire <color=teal_light>4</color> extra mini bullets around you, with an additional 4 per <color=teal_light>Bullet Count Up</color> above 5. \n\nCurrent number of mini bullets: {0} 
+Fire extra mini bullets around you, with an additional 4 per <color=teal_light>Bullet Count Up</color> above 5. \n\nCurrent number of mini bullets: {0} 
 
 UI Tier_Bounce
 Bullets now bounce towards a random enemy.
@@ -63,4 +63,21 @@ Deal <color=blue_sky>0.5x</color> more damage to <color=blue_sky>Protected</colo
 UI Tier_PlayerDashRecharge
 <color=brown>50%</color> chance to not have <color=grey_light>Inert</color> added onto stack upon being hit by bullets or enemies. 
 
+UI Tier_PlayerNumDash
+Clears negative bullets at the end of dashes, with a radius of <color=green>50</color> per additional <color=green>Dash</color>
+\n\nCurrent clear radius: <color=green>{0}</color>
+
+UI Tier_Homing
+Was it worth it?
+\nEVERYTHING HOMES
+
+UI Tier_FireRate
+Burst fires bullets, increasing with additional <color=orange>Fire Rate </color>
+\n\nBullets per burst: <color=orange>{0}</color>
+
+UI Tier_PlayerSpeed
+#Drastically slow down time upon contact with a bullet or enemy. Can only be triggered once every <color=green_light> 10 </color> seconds. Taking damage reduces the cooldown.
+#\n<color=green_light>OverCharge</color>: Effect duration increased by <color=green_light>0.5s</color> and cooldown reduction increased by <color=green_light>1s</color> per <color=green_light>Bullet Speed Up</color> above tier threshold.
+Upon contact with a bullet or enemy, drastically slow down time for <color=green_light>{0}</color>, with an additional <color=green_light>0.5s</color> per <color=green_light>Bullet Speed Up</color> above 5. Can only be triggered once every <color=green_light>10s</color>. Taking damage reduces the cooldown by <color=green_light>1s</color>.
+\nCurrent duration: <color=green_light>{1}</color>
 

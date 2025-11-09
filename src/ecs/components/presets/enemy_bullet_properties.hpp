@@ -8,13 +8,11 @@
 
 const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 			{BulletDamage,      COLOR_RED},
-			{ProjectileSpeed,   COLOR_PINK},
 			{ProjectileSize,    COLOR_PURPLE_LIGHT},
 			{FireRate,          COLOR_ORANGE},
 			{BulletRange,       COLOR_YELLOW},
 			{BulletAccuracy,      COLOR_PURPLE_MED},
 			{BulletNum,         COLOR_TEAL_LIGHT},
-			{BulletBurst,       COLOR_MAGENTA_MED},
 			{Bounce,            COLOR_BLUE},
 			{Pierce,            COLOR_BLUE_SKY},
 			{Homing,            COLOR_TURQUOISE},
@@ -30,13 +28,11 @@ const std::unordered_map<BulletEffectType, vec3> bulletEffectColors = {
 
 const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
 			{BulletDamage,      "bullet_values"},
-			{ProjectileSpeed,   "bullet_values"},
 			{ProjectileSize,    "bullet_values"},
 			{FireRate,          "bullet_values"},
 			{BulletRange,       "bullet_values"},
 			{BulletAccuracy,      "bullet_values"},
 			{BulletNum,         "bullet_values"},
-			{BulletBurst,       "bullet_values"},
 			{Bounce,            "bullet_values"},
 			{Pierce,            "bullet_values"},
 			{Homing,            "bullet_values"},
@@ -51,13 +47,11 @@ const std::unordered_map<BulletEffectType, std::string> bulletEffectShapes = {
 
 const std::map<BulletEffectType, Vec4StartEnd> enemyBulletParticleColors = {
     {BulletDamage, {{ bulletEffectColors.at(BulletDamage), 1.0f },{ bulletEffectColors.at(BulletDamage), 1.0f }}},
-    {ProjectileSpeed,   {{bulletEffectColors.at(ProjectileSpeed),1.f},{bulletEffectColors.at(ProjectileSpeed),1.f}}},
     {ProjectileSize,    {{bulletEffectColors.at(ProjectileSize),1.f},{bulletEffectColors.at(ProjectileSize),1.f}}},
     {FireRate,          {{bulletEffectColors.at(FireRate),1.f},{bulletEffectColors.at(FireRate),1.f}}},
     {BulletRange,       {{bulletEffectColors.at(BulletRange),1.f},{bulletEffectColors.at(BulletRange),1.f}}},
     {BulletAccuracy,      {{bulletEffectColors.at(BulletAccuracy),1.f},{bulletEffectColors.at(BulletAccuracy),1.f}}},
     {BulletNum,         {{bulletEffectColors.at(BulletNum),1.f},{bulletEffectColors.at(BulletNum),1.f}}},
-    {BulletBurst,       {{bulletEffectColors.at(BulletBurst),1.f},{bulletEffectColors.at(BulletBurst),1.f}}},
     {Bounce,            {{bulletEffectColors.at(Bounce),1.f},{bulletEffectColors.at(Bounce),1.f}}},
     {Pierce,            {{bulletEffectColors.at(Pierce),1.f},{bulletEffectColors.at(Pierce),1.f}}},
     {Homing,            {{bulletEffectColors.at(Homing),1.f},{bulletEffectColors.at(Homing),1.f}}},

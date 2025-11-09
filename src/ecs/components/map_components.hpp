@@ -55,7 +55,7 @@ struct RoomPreset {
     std::string ID;
     bool oneTime = false; //if true, room will not appear again
     vec2 roomSize = { 1600, 1600 };
-    bool hasElite = false;
+    int hasElite = false;
 
     // Effect and chance tuple
     std::vector<std::vector<BulletStackEffect>> positiveEffects;
@@ -111,6 +111,7 @@ struct Room {
     vec2 roomEnd = vec2(0.f);
     bool spawnedElite = false;
     float eliteTimer = Random::Float(12.0f) + 3.0f;
+    std::vector<vec2> batchedEnemyPositions = {Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),}; // used for spawning enemies in randomized batches, mostly for boids swarms
 };
 enum MapRequestType {
     RestartGame = 'R',

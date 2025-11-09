@@ -48,6 +48,7 @@ struct IOState {
 struct GameState {
 	bool gamePaused;
 	bool gameOver;
+	int difficulty = 0;
 	bool dialogueScene = false;
 	bool cutScene = false;
 	int dialogueChoice = -1;

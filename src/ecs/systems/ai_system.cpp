@@ -11,6 +11,7 @@
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/spline.hpp>
+#include <glm/gtx/norm.hpp>
 
 // returns a vec4(min position, max position)
 vec4 getRoomBounds(Entity entity)
@@ -40,9 +41,40 @@ vec2 boundPosition(vec2 position, Entity entity)
 	return glm::clamp(position, min, max);
 }
 
+void clearAllSpecialStates (Entity entity)
+{
+	if (registry.invincibles.has(entity)) {
+		registry.invincibles.remove(entity);
+	}
+	if (registry.invisibles.has(entity)) {
+		registry.invisibles.remove(entity);
+	}
+	if (registry.vulnerabilities.has(entity)) {
+		registry.vulnerabilities.remove(entity);
+	}
+	if (registry.moles.has(entity)) {
+		registry.moles.remove(entity);
+		if (registry.persistentSounds.has(entity))
+			registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
+	}
+	if (registry.regenerates.has(entity)) {
+		registry.regenerates.remove(entity);
+	}
+	if (registry.cloaks.has(entity)) {
+		registry.cloaks.remove(entity);
+	}
+	if (registry.timeModifiers.has(entity)) {
+		registry.timeModifiers.remove(entity);
+	}
+	if (registry.onFires.has(entity)) {
+		registry.onFires.remove(entity);
+	}
+}
+
+
 void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 {
-
+	//INC_ANIM for pattern special states is not handled here, it is handled in enemy system when the enemy attacks
 	switch (currPattern.specialState) {
 		case SpecialStates::INVINCIBLE:
 			if (!registry.invincibles.has(entity)) {
@@ -87,11 +119,11 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				if (vul.countdown < currPattern.curDuration || vul.modifier != 2.f) {
 					vul.countdown = currPattern.curDuration;
 				}
-				vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+				vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
                 vul.countdown = currPattern.curDuration;
-                vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+                vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
             }
 		break;
 		case SpecialStates::UNDERGROUND:
@@ -131,33 +163,34 @@ void handleSpecialStates (const EnemyPattern &currPattern, Entity entity)
 				}
 			}
 		break;
+		case SpecialStates::HASTY:
+			if (!registry.timeModifiers.has(entity)) {
+				auto& tm = registry.timeModifiers.emplace(entity);
+				tm.modifier = HASTY_TIME_MODIFIER;
+				tm.countDown = currPattern.curDuration;
+				tm.coolDown = -9999; // no cooldown
+			} else {
+				auto& tm = registry.timeModifiers.get(entity);
+				if (tm.countDown < currPattern.curDuration) {
+					tm.countDown = currPattern.curDuration;
+				}
+			}
+		break;
+		case SpecialStates::SLUGGISH:
+		if (!registry.timeModifiers.has(entity)) {
+			auto& tm = registry.timeModifiers.emplace(entity);
+			tm.modifier = SLUGGISH_TIME_MODIFIER;
+			tm.countDown = currPattern.curDuration;
+			tm.coolDown = -9999; // no cooldown
+		} else {
+			auto& tm = registry.timeModifiers.get(entity);
+			if (tm.countDown < currPattern.curDuration) {
+				tm.countDown = currPattern.curDuration;
+			}
+		}
+		break;
 		case SpecialStates::CLEAR_ALL:
-			if (registry.invincibles.has(entity)) {
-				auto& inv = registry.invincibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.invisibles.has(entity)) {
-				auto& inv = registry.invisibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.vulnerabilities.has(entity)) {
-				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = -1;
-			}
-			if (registry.moles.has(entity)) {
-				auto& under = registry.moles.get(entity);
-				under.countdown = -1;
-				if (registry.persistentSounds.has(entity))
-					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
-			}
-			if (registry.regenerates.has(entity)) {
-				auto& under = registry.regenerates.get(entity);
-				under.countdown = -1;
-			}
-			if (registry.cloaks.has(entity)) {
-				auto& cloak = registry.cloaks.get(entity);
-				cloak.countdown = -1;
-			}
+			clearAllSpecialStates(entity);
 			break;
 		case SpecialStates::CLEAR_INVINCIBLE:
 			if (registry.invincibles.has(entity)) {
@@ -257,14 +290,14 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			if (registry.vulnerabilities.has(entity)) {
 				auto& vul = registry.vulnerabilities.get(entity);
 				vul.countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
-				vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+				vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
 			} else {
                 auto& vul = registry.vulnerabilities.emplace(entity);
                 float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
 				if (countdown > vul.countdown || vul.modifier != 2.f) {
 					vul.countdown = countdown;
 				}
-                vul.modifier = checkTierThreshold(Pierce) ? 1.75 : 1.5;
+                vul.modifier = checkTierThreshold(Pierce) ? VULNERABLE_DAMAGE_MODIFIER + 0.25f : VULNERABLE_DAMAGE_MODIFIER;
             }
 		break;
 		case SpecialStates::UNDERGROUND:
@@ -313,33 +346,36 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 			}
 		break;
 
+		case SpecialStates::HASTY:
+			if (!registry.timeModifiers.has(entity)) {
+				auto& tm = registry.timeModifiers.emplace(entity);
+				tm.modifier = HASTY_TIME_MODIFIER;
+				tm.countDown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			} else {
+				auto& tm = registry.timeModifiers.get(entity);
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > tm.countDown) {
+					tm.countDown = countdown;
+				}
+			}
+		break;
+
+		case SpecialStates::SLUGGISH:
+			if (!registry.timeModifiers.has(entity)) {
+				auto& tm = registry.timeModifiers.emplace(entity);
+				tm.modifier = SLUGGISH_TIME_MODIFIER;
+				tm.countDown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+			} else {
+				auto& tm = registry.timeModifiers.get(entity);
+				float countdown =  registry.bosses.has( entity ) ? (int)registry.maps.components[0].currRegion* (Random::Float( 5000) + 5000.f) : Random::Float( 10000 ) + 10000;
+				if (countdown > tm.countDown) {
+					tm.countDown = countdown;
+				}
+			}
+		break;
+
 		case SpecialStates::CLEAR_ALL:
-			if (registry.invincibles.has(entity)) {
-				auto& inv = registry.invincibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.invisibles.has(entity)) {
-				auto& inv = registry.invisibles.get(entity);
-				inv.countdown = -1;
-			}
-			if (registry.vulnerabilities.has(entity)) {
-				auto& vul = registry.vulnerabilities.get(entity);
-				vul.countdown = -1;
-			}
-			if (registry.moles.has(entity)) {
-				auto& under = registry.moles.get(entity);
-				under.countdown = -1;
-				if (registry.persistentSounds.has(entity))
-					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
-			}
-			if (registry.regenerates.has(entity)) {
-				auto& under = registry.regenerates.get(entity);
-				under.countdown = -1;
-			}
-			if (registry.cloaks.has(entity)) {
-				auto& cloak = registry.cloaks.get(entity);
-				cloak.countdown = -1;
-			}
+			clearAllSpecialStates( entity );
 		break;
 		case SpecialStates::CLEAR_INVINCIBLE:
 			if (registry.invincibles.has(entity)) {
@@ -372,13 +408,26 @@ void handleSpecialStates (const Reaction &reaction, Entity entity)
 				under.countdown = -1;
 			}
 		break;
-			case SpecialStates::CLEAR_UNDERGROUND:
-			if (registry.moles.has(entity)) {
-				auto& under = registry.moles.get(entity);
-				under.countdown = -1;
-				if (registry.persistentSounds.has(entity))
-					registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
-			}
+		case SpecialStates::CLEAR_UNDERGROUND:
+		if (registry.moles.has(entity)) {
+			auto& under = registry.moles.get(entity);
+			under.countdown = -1;
+			if (registry.persistentSounds.has(entity))
+				registry.persistentSounds.get(entity).stopChannel(SoundType::DiggingSound);
+		}
+		case SpecialStates::CLEAR_HASTY:
+		case SpecialStates::CLEAR_SLUGGISH:
+		if (registry.timeModifiers.has(entity)) {
+			auto& tm = registry.timeModifiers.get(entity);
+			tm.countDown = -1;
+			tm.coolDown = -1;
+		}
+		case SpecialStates::CLEAR_ONFIRE:
+		if (registry.onFires.has(entity)) {
+			auto& fire = registry.onFires.get(entity);
+			fire.stack = 0;
+			fire.countdown = -1;
+		}
 		break;
 		default: break;
 	}
@@ -391,7 +440,7 @@ void AISystem::step(float elapsed_ms)
 	// std::cout << enemy_registry.entities.size() << " is the size of enemy entity" << std::endl;
 	for (Entity entity : enemy_registry.entities)
 	{
-
+		float Elapsed_ms = getAdjustedTime(elapsed_ms, entity);
 		Enemy &enemy = enemy_registry.get(entity);
 		EnemyPattern &currPattern = enemy.currEnemyPattern();
 		enemy.newPattern = false;
@@ -399,7 +448,7 @@ void AISystem::step(float elapsed_ms)
 		// std::cout << currPattern.name << " initial" << std::endl;
 		EnemyMovement &movement = movement_registry.get(entity);
 		Motion &motion = registry.motions.get(entity);
-		currPattern.curDuration -= elapsed_ms;
+		currPattern.curDuration -= Elapsed_ms;
 		// SENSING
 		updateState(enemy, movement, entity);
 		// if (enemy.newPattern) {
@@ -411,7 +460,7 @@ void AISystem::step(float elapsed_ms)
 
 		if (registry.regenerates.has(entity) && !registry.instanceDamages.has(entity)) {
 			auto& regen = registry.regenerates.get(entity);
-			if ((regen.currHealInterval -= elapsed_ms) <= 0) {
+			if ((regen.currHealInterval -= Elapsed_ms) <= 0) {
 				enemy.currHealth += regen.healAmount;
 				if (enemy.currHealth > enemy.maxHealth) enemy.currHealth = enemy.maxHealth;
 				regen.currHealInterval = regen.healInterval;
@@ -501,7 +550,6 @@ void AISystem::step(float elapsed_ms)
 
 		} else if (currPattern.type == EnemyBehavior::FOLLOWSCIENTIST || currPattern.type == EnemyBehavior::IDLE || currPattern.type == EnemyBehavior::FOLLOW_PLAYER || movement.distanceTraveled >= glm::distance(movement.posA, movement.posB) || enemy.newPattern == true)
 		{
-			// std::cout << currPattern.name << "after update" << std::endl;
 			// if (registry.hand.has(entity) && currPattern.type == EnemyBehavior::IDLE) {
 			// 	continue;
 			// }
@@ -552,7 +600,7 @@ Reaction *getReactions(std::vector<Reaction> &list, ReactionType target)
 	return nullptr;
 }
 
-void AISystem::updateState(Enemy &enemy, EnemyMovement movement, Entity entity)
+void AISystem::updateState(Enemy &enemy, const EnemyMovement& movement, Entity entity)
 { // append and entity for more info on enemy for now
 	vec2 playerPos = getPlayerPos();
 	vec2 EnemyPos = movement.posA;
@@ -1127,7 +1175,7 @@ vec2 AISystem::getCharginPos(Entity entity)
 	vec2 scale = motion.scale;
 	vec2 direction = playerPos - motion.position;
 
-	if (glm::length(direction) > 0)
+	if (glm::length2(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
@@ -1153,7 +1201,7 @@ vec2 AISystem::getRecoilPos(Entity entity)
 	vec2 scale = motion.scale;
 	vec2 direction = motion.position - playerPos;
 
-	if (glm::length(direction) > 0)
+	if (glm::length2(direction) > 0)
 	{
 		direction = glm::normalize(direction);
 	}
@@ -1202,7 +1250,7 @@ vec2 AISystem::getTeamPos(Entity entity)
 			Motion &healerMotion = registry.motions.get(entity);
 
 			vec2 direction = teammateMotion.position - healerMotion.position;
-			if (glm::length(direction) > 0)
+			if (glm::length2(direction) > 0)
 			{
 				direction = glm::normalize(direction);
 			}
@@ -1228,7 +1276,7 @@ vec2 AISystem::getTeamPos(Entity entity)
 			Motion &bufferMotion = registry.motions.get(entity);
 
 			vec2 direction = teammateMotion.position - bufferMotion.position;
-			if (glm::length(direction) > 0)
+			if (glm::length2(direction) > 0)
 			{
 				direction = glm::normalize(direction);
 			}
@@ -1268,8 +1316,12 @@ vec2 AISystem::getRollingPos(Entity entity)
 	vec2 min = { roomBounds.x, roomBounds.y };
 	vec2 max = { roomBounds.z, roomBounds.w };
 
-	vec2 direction = glm::normalize(movement.posB - movement.posA);
-	float distance = glm::length(max - min);
+	//Map& map = registry.maps.components[0];
+	//vec2 min = map.currRoom.roomStart;
+	//vec2 max = map.currRoom.roomEnd;
+
+	vec2 direction = movement.posB - movement.posA;
+	float distance = glm::length(max - min) * 2.0;
 
 	// Wall collisions and bouncing
 	vec2 norm = vec2(0, 0);
@@ -1285,18 +1337,21 @@ vec2 AISystem::getRollingPos(Entity entity)
 	else if (enemyMotion.position.y >= max.y && direction.y > 0.0) {
 		norm = vec2(0, -1);
 	}
+
+	//std::cout << glm::to_string(norm) << " " << glm::to_string(min) << " " << glm::to_string(max) << " " << glm::to_string(enemyMotion.position) << std::endl;
+
 	if (norm != vec2(0, 0)) {
 
-		vec2 newDirection = glm::reflect(direction, norm);
-		vec2 intersection = vec2((norm.x < 0.0) ? max.x : (norm.x == 0.0) ? enemyMotion.position.x : min.x, 
-							     (norm.y < 0.0) ? max.y : (norm.y == 0.0) ? enemyMotion.position.y : min.y);
+		vec2 newDirection = glm::reflect(glm::normalize(direction), norm);
 
-		std::cout << glm::to_string(movement.posB) << " : " << glm::to_string(min) << " : " << glm::to_string(max) << std::endl;
-		std::cout << glm::to_string(intersection) << " : " << glm::to_string(norm) << " : " << glm::to_string(direction) << " : " << glm::to_string(glm::reflect(direction, norm)) << std::endl;
-		std::cout << glm::to_string(enemyMotion.position) << ", " << glm::to_string(intersection + newDirection * distance) << std::endl;
+		//std::cout << glm::to_string(movement.posB) << " : " << glm::to_string(min) << " : " << glm::to_string(max) << std::endl;
+		//std::cout << glm::to_string(intersection) << " : " << glm::to_string(norm) << " : " << glm::to_string(direction) << " : " << glm::to_string(glm::reflect(direction, norm)) << std::endl;
+		//std::cout << glm::to_string(enemyMotion.position) << ", " << glm::to_string(intersection + newDirection * distance) << std::endl;
 
-		movement.posA = intersection;
-		return intersection + newDirection * distance;
+		//std::cout << glm::to_string(enemyMotion.position + newDirection * distance) << std::endl;
+
+		movement.posA = enemyMotion.position;
+		return enemyMotion.position + newDirection * distance;
 	}
 
 	return movement.posB;
@@ -1371,7 +1426,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 	{
 		boidComputeCoherence(entity, boid, 1.f, 400.f);
 		boid.velocity *= 0.8f;
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1382,7 +1437,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		boidComputeSeperation(entity, boid, 1.f);
 		boid.velocity *= 2.f;
 		maxSpeed = 700.f;
-		if (glm::length(boid.velocity) > maxSpeed)
+		if (glm::length2(boid.velocity) > maxSpeed * maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1396,7 +1451,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		// boidComputeCoherence(entity, boid, 0.01f);
 		boidComputeSeperation(entity, boid, 0.2f);
 		// boidComputeAlignment(entity, boid, 0.02f);
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1410,7 +1465,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		// boidComputeAlignment(entity, boid, 0.01f);
 		boidComputeAllFactor(entity, boid, 0.01f, 0.5f, 0.01f, 700.f);
 
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1424,7 +1479,7 @@ void AISystem::computeBoidVelocity(Entity entity, Boid &boid)
 		// boidComputeSeperation(entity, boid, 0.05f);
 		// boidComputeAlignment(entity, boid, 0.02f);
 		boidComputeAllFactor(entity, boid, 0.02f, 0.05f, 0.02f, 700.f);
-		if (glm::length(boid.velocity) > boid.maxSpeed)
+		if (glm::length2(boid.velocity) > boid.maxSpeed * boid.maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * boid.maxSpeed;
 		}
@@ -1598,8 +1653,8 @@ void AISystem::boidFollowPlayer(Entity entity, Boid &boid, float multiplier)
 	vec2 playerPos = getPlayerPos();
 	vec2 position = boid.position;
 
-	vec2 directionToPlayer = playerPos - position;
-	float distanceToPlayer = glm::length(directionToPlayer);
+	//vec2 directionToPlayer = playerPos - position;
+	//float distanceToPlayer = glm::length(directionToPlayer);
 
 	vec2 center = (boid.position + playerPos) * 0.5f;
 	vec2 cohesionToPlayer = (center - position) * multiplier;
@@ -1614,9 +1669,9 @@ void AISystem::boidEvadePlayer(Entity entity, Boid &boid, float multiplier)
 	float evadeRadius = 150.f;
 
 	vec2 directionToPlayer = playerPos - position;
-	float distanceToPlayer = glm::length(directionToPlayer);
+	float distanceToPlayer = glm::length2(directionToPlayer);
 
-	if (distanceToPlayer < evadeRadius)
+	if (distanceToPlayer < evadeRadius * evadeRadius)
 	{
 		vec2 fleeDirection = -glm::normalize(directionToPlayer);
 
@@ -1625,13 +1680,13 @@ void AISystem::boidEvadePlayer(Entity entity, Boid &boid, float multiplier)
 		boid.velocity += fleeVelocity;
 
 		float panicBoost = 2.5f;
-		if (glm::length(boid.velocity) < panicBoost * multiplier)
+		if (glm::length2(boid.velocity) < panicBoost * multiplier * panicBoost * multiplier)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * panicBoost * multiplier;
 		}
 
 		float maxSpeed = 400.f;
-		if (glm::length(boid.velocity) > maxSpeed)
+		if (glm::length2(boid.velocity) > maxSpeed * maxSpeed)
 		{
 			boid.velocity = glm::normalize(boid.velocity) * maxSpeed;
 		}

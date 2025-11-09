@@ -24,7 +24,7 @@ uniform float time;
 uniform sampler2DArray glitchMask;
 uniform sampler2DArray glitch;
 
-uniform bool greyscale = false;
+uniform float greyscale = 0.0;
 
 float glitchOffset = 0.05;
 
@@ -110,7 +110,7 @@ void main()
 		color.b = fcolor.b * effectAlpha + color.b * (1.0 - effectAlpha);
 	}
 
-	if (greyscale) {
+	if (texcoord.y < greyscale) {
 		color = vec4(vec3(0.21 * color.r + 0.71 * color.g + 0.07 * color.b), color.a);
 	}
 }

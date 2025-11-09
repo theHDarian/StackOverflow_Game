@@ -16,9 +16,10 @@ void SoundSystem::step(float elapsed_ms)
         for (int i = (int) registry.persistentSounds.components.size()-1; i>=0; --i) {
             PersistentSounds &persistentSounds = registry.persistentSounds.components[i];
             int notPlaying = 0;
+            float adjustedElapsed = getAdjustedTime(elapsed_ms, registry.persistentSounds.entities[i]);
             for (auto& channel : persistentSounds.channels) {
                 if (channel.second.x != -1) {
-                    channel.second.y -= elapsed_ms;
+                    channel.second.y -= adjustedElapsed;
                     if (channel.second.y <= 0) {
                         Mix_HaltChannel(channel.second.x);
                         channel.second.x = -1;
@@ -46,7 +47,8 @@ void SoundSystem::step(float elapsed_ms)
         if (soundRequest.delay > 0)
         {
             if (!gameState.gamePaused) {
-                soundRequest.delay -= elapsed_ms;
+                float adjustedElapsed = getAdjustedTime(elapsed_ms, registry.soundRequests.entities[i]);
+                soundRequest.delay -= adjustedElapsed;
             }
             if (gameState.gameOver || gameState.titleScreen) {
                 registry.soundRequests.remove(registry.soundRequests.entities[i]);
@@ -435,7 +437,7 @@ void SoundSystem::loadSoundEffects()
         fprintf(stderr, "Failed to load laser loop sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load laser loop sound");
     }
-    laserLoopSound->volume = 0.3f * MIX_MAX_VOLUME;
+    laserLoopSound->volume = 0.8f * MIX_MAX_VOLUME;
 
     laserSound = Mix_LoadWAV(audio_path("sfx/laser.wav").c_str());
     if (!laserSound)
@@ -451,7 +453,7 @@ void SoundSystem::loadSoundEffects()
         fprintf(stderr, "Failed to load digging sound: %s\n", Mix_GetError());
         throw std::runtime_error("Failed to load digging sound");
     }
-    diggingSound->volume = 0.8f * MIX_MAX_VOLUME;
+    diggingSound->volume = 0.45f * MIX_MAX_VOLUME;
 
     for (int i = 0; i < 5; i++)
     {
@@ -766,8 +768,8 @@ void SoundSystem::playLaserSound(float time, bool shouldPlayFiringSound, Entity 
 
     if (time > 2000) {
         if (!registry.enemies.has(entity)) {
-            Mix_FadeInChannelTimed( 16, laserLoopSound, -1, 1000, time);
             Mix_Volume(16, laserLoopSound->volume * sfxVolume);
+            Mix_FadeInChannelTimed( 16, laserLoopSound, -1, 1000, time);
             return;
         }
         if (!registry.persistentSounds.has(entity)) {
@@ -779,12 +781,12 @@ void SoundSystem::playLaserSound(float time, bool shouldPlayFiringSound, Entity 
             channel.y = time;
         }
         if (channel.x == -1) {
-            channel.x = Mix_FadeInChannelTimed(-1, laserLoopSound, -1, 1000, time);
             Mix_Volume(channel.x, laserLoopSound->volume * sfxVolume);
+            channel.x = Mix_FadeInChannelTimed(-1, laserLoopSound, -1, 1000, time);
             channel.y = time;
         } else if (!Mix_Playing(channel.x) && channel.y > 0) {
-            Mix_FadeInChannelTimed(channel.x, laserLoopSound, -1, 1000, channel.y);
             Mix_Volume(channel.x, laserLoopSound->volume * sfxVolume);
+            Mix_FadeInChannelTimed(channel.x, laserLoopSound, -1, 1000, channel.y);
         }
 
     }
@@ -793,8 +795,8 @@ void SoundSystem::playLaserSound(float time, bool shouldPlayFiringSound, Entity 
 void SoundSystem::playDiggingSound(float time, Entity entity)
 {
     if (!registry.enemies.has(entity)) {
-        Mix_FadeInChannelTimed(17, diggingSound, -1, 1000, time);
         Mix_Volume(17, diggingSound->volume * sfxVolume);
+        Mix_FadeInChannelTimed(17, diggingSound, -1, 1000, time);
         return;
     }
 
@@ -807,12 +809,12 @@ void SoundSystem::playDiggingSound(float time, Entity entity)
         channel.y = time;
     }
     if (channel.x == -1) {
-        channel.x = Mix_FadeInChannelTimed(-1, diggingSound, -1, 1000, time);
         Mix_Volume(channel.x, diggingSound->volume * sfxVolume);
+        channel.x = Mix_FadeInChannelTimed(-1, diggingSound, -1, 1000, time);
         channel.y = time;
     } else if (!Mix_Playing(channel.x) && channel.y > 0) {
-        Mix_FadeInChannelTimed(channel.x, diggingSound, -1, 1000, channel.y);
         Mix_Volume(channel.x, diggingSound->volume * sfxVolume);
+        Mix_FadeInChannelTimed(channel.x, diggingSound, -1, 1000, channel.y);
     }
 }
 

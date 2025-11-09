@@ -44,15 +44,40 @@ void MapSystem::init(RenderSystem *renderer, SoundSystem *soundPlayer_arg)
     soundPlayer->playNextMusic();
 }
 
-void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity& bossEnemy, RenderSystem *renderer, bool isElite = false)
+vec2 getOppositeSideOfPlayer(const vec2& playerPos, const vec2& roomStart, const vec2& roomEnd) {
+    vec2 center = (roomStart + roomEnd) / 2.0f;
+    vec2 opposite = center + (center - playerPos);
+    // Clamp the opposite position to within the room bounds shrunken by 15% on each side
+    opposite.x = glm::clamp(opposite.x, roomStart.x + (roomEnd.x - roomStart.x) * 0.15f, roomEnd.x - (roomEnd.x - roomStart.x) * 0.15f);
+    opposite.y = glm::clamp(opposite.y, roomStart.y + (roomEnd.y - roomStart.y) * 0.15f, roomEnd.y - (roomEnd.y - roomStart.y) * 0.15f);
+    return opposite;
+}
+
+
+vec2 calculateSpawnPosition(Map &map, const std::vector<std::tuple<EnemyType, vec2>>::value_type &e) {
+    vec2 location = std::get<vec2>(e);
+    if (location == random_batch) {
+        location = Random::ListItem(map.currRoom.batchedEnemyPositions);
+    } else if (location == opposite_of_player) {
+        if (registry.players.entities.size() > 0 && registry.motions.has(registry.players.entities[0])) {
+            vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
+            return getOppositeSideOfPlayer(playerPos, map.currRoom.roomStart, map.currRoom.roomEnd);
+        } else {
+            location = vec2(0.5f, 0.5f); // fallback to center
+        }
+    } else {
+        location.x = location.x == random_float ? Random::Float() : location.x;
+        location.y = location.y == random_float ? Random::Float() : location.y;
+    }
+    return glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
+}
+
+void SpawnEnemiesInList(const std::vector<std::tuple<EnemyType,vec2>> &enemies, Entity& bossEnemy, RenderSystem *renderer, bool isElite = false)
 {
     Map& map = registry.maps.components[0];
     for (auto &e : enemies)
     {
-        vec2 location = std::get<vec2>(e);
-        location.x = location.x == random_float ? Random::Float() : location.x;
-        location.y = location.y == random_float ? Random::Float() : location.y;
-        vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, location);
+        vec2 pos = calculateSpawnPosition(map, e);
         if (std::get<EnemyType>(e) == EnemyType::EnemyTwinLaserVertical1 || std::get<EnemyType>(e) == EnemyType::EnemyHifiTwinLaserHorizontal1) {
             createEnemyGroup(renderer,pos, std::get<EnemyType>(e));
         } else {
@@ -82,7 +107,7 @@ void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, Entity&
     }
 }
 
-void SpawnEnemiesInList(std::vector<std::tuple<EnemyType,vec2>> enemies, RenderSystem *renderer)
+void SpawnEnemiesInList(const std::vector<std::tuple<EnemyType,vec2>> &enemies, RenderSystem *renderer)
 {
     Entity bossEnemy;
     SpawnEnemiesInList( enemies, bossEnemy, renderer);
@@ -126,13 +151,14 @@ void MapSystem::step(float elapsed_ms)
         }
     }
 
-    if (map.currRoom.preset.hasElite) {
+    if (map.currRoom.preset.hasElite > 0 && map.currRoom.type == EnemyRoom) {
         if (map.currRoom.eliteTimer < map.currRoom.timeElapsed || (map.currRoom.preset.enemies.empty() && registry.enemies.entities.size() <= registry.roomWideBuffers.size()) ) {
             Entity bossEnemy;
             SpawnEnemiesInList( Random::ListItem(eliteEnemies.at(map.currRegion)), bossEnemy, renderer, true);
-            map.currRoom.preset.hasElite = false;
+            map.currRoom.preset.hasElite = max(0, map.currRoom.preset.hasElite - 1);
             map.currRoom.spawnedElite = true;
             soundPlayer->playAlarmSound(3);
+            map.currRoom.eliteTimer = map.currRoom.timeElapsed + Random::Float(12.0f) + 3.0f; // reset timer
         }
     }
 
@@ -141,10 +167,10 @@ void MapSystem::step(float elapsed_ms)
         map.currRoom.enemiesToSpawn.clear();
     }
 
-    if (map.currRoom.spawnedElite && registry.elites.entities.empty()) {
-        InteractableRequest & req = registry.interactableRequests.emplace_with_duplicates(registry.players.entities[0]);
-        req.type = InteractableRequestType::AddEffect;
-        req.effects = { stackSizeUp };
+    if (map.currRoom.spawnedElite && registry.elites.entities.empty() && map.currRoom.preset.hasElite == 0) {
+        std::tuple<RoomInteractable, vec2> ramlet = {{Ramlet, {}}, {0.5f, 0.5f}};
+        map.currRoom.preset.interactables.emplace_back(ramlet);
+        soundPlayer->playNextDialogueSound();
         map.currRoom.spawnedElite = false;
     }
 
@@ -152,14 +178,18 @@ void MapSystem::step(float elapsed_ms)
         for (auto& e : map.currRoom.preset.interactables)
         {
             vec2 pos = glm::lerp(map.currRoom.roomStart, map.currRoom.roomEnd, std::get<vec2>(e));
-            createInteractable(renderer, pos, std::get<RoomInteractable>(e).item, std::get<RoomInteractable>(e).pushConsoleEffects);
+            auto item = std::get<RoomInteractable>(e).item;
+            if (item == PopConsole && map.currRoom.preset.hasElite > 0) {
+                item = GlitchedPopConsole;
+            }
+            createInteractable(renderer, pos, item, std::get<RoomInteractable>(e).pushConsoleEffects);
         }
         map.currRoom.preset.interactables = {};
 
     }
 
     // set room to cleared if all enemies are defeated
-    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !map.currRoom.preset.hasElite)
+    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !(map.currRoom.preset.hasElite > 0 && map.currRoom.type == EnemyRoom))
     {
         map.currRoom.cleared = true;
 
@@ -363,6 +393,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     map.currRoom.preset = door.preset;
     std::cout << "Changing room to: " << map.currRoom.preset.ID << std::endl;
     map.currRoom.type = door.room;
+    map.currRoom.batchedEnemyPositions = {Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}),
+    Random::Vec2({1,1}),Random::Vec2({1,1}),Random::Vec2({1,1}), Random::Vec2({1,1}),Random::Vec2({1,1}),
+    Random::Vec2({1,1}),Random::Vec2({1,1})};
 
     // randomize the doors other than the one you came from
     doors[spawnIndex].room = doors[doorIndex].room;
@@ -401,8 +434,9 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         d.room = newRooms[i];
 
-        if (d.room == RoomType::BossRoom && ((spawnIndex + 2) % 4 != i)) {
-            d.room = RoomType::None;
+        if ( (d.room == RoomType::BossRoom || (map.currRoom.preset == ScientistBossRoom)) ) {
+            if ((spawnIndex + 2) % 4 != i)
+                d.room = RoomType::None;
         }
 
         if ((lockedRooms + noneRooms < 2) && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
@@ -431,6 +465,11 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
         }
 
         d.preset = getRoomPreset(d.room, region, d.isLocked, roomTraversed, ELITE_SPAWN_CHANCE);
+
+        if (map.currRoom.preset == ScientistBossRoom && (spawnIndex + 2) % 4 == i) {
+            //Once Final boss is beaten, goto ending room
+            d.room = RoomType::TutorialRoom2;
+        }
 
         registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
         ds.doorType = d.room;
@@ -472,6 +511,14 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // refresh player Dash charges and cooldown
     player.currDashCharges = getModifiedValue( PlayerNumDash, player.maxDashCharges);
     player.currDashCooldown = getModifiedValue( PlayerDashRecharge, player.baseDashCDR);
+
+    if (registry.timeModifiers.has(playerEntity)) {
+        TimeModifier& timeMod = registry.timeModifiers.get(playerEntity);
+        timeMod.coolDown = 0;
+    }
+
+    //clear bullet death and bombard
+    registry.bombards.clear();
 }
 
 void MapSystem::decorateRoom() {
@@ -509,6 +556,7 @@ void MapSystem::resetMap() {
 void MapSystem::newMap(MapRegion region, RoomType roomType)
 {
     IOState& iostate = registry.ioStates.components[0];
+    iostate.lastInputAxis = vec2(0, 1);
     Map& map = registry.maps.components[0];
     map.roomsTraversed = 0;
     if (iostate.tutorialOn) {
@@ -551,40 +599,57 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
         std::cout << "New Map" << std::endl;
         map.currRegion = region;
         map.currRoom.type = roomType;
+        std::vector<RoomPreset> presetOverRide = {};
         if (roomType == RoomType::TutorialRoom) {
             map.currRoom.preset = StartingRoom;
         }
         else if (roomType == RoomType::Testing) {
-            map.currRoom.preset = TestRoom;
+            map.currRoom.preset = MiningEnemyRoomWorms;
+            InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
+            extendstack.type = InteractableRequestType::ExtendStack;
+            extendstack.choice = 24;
+            InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
+            req2.type = InteractableRequestType::AddEffect;
+            req2.effects = {
+                             bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletRangeUp, bulletRangeUp,
+                              dmgUp3, dmgUp3, blunt, blunt, blunt, blunt, blunt,
+                             playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp,
+                             numBulletsUp, numBulletsUp,
+                             fireRateUp,fireRateUp, fireRateUp};
+
+
         }
         else {
+            InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
+            req2.type = InteractableRequestType::AddEffect;
+            req2.effects = {};
             if (map.currRegion == Biology) {
                 std::vector<RoomPreset> bioBossRooms = {BossRoomCrab, BossRoomBee};
-                map.currRoom.preset = Random::ListItem( bioBossRooms);
+                presetOverRide = bioBossRooms;
             }
             else if (map.currRegion == Mining) {
                 std::vector<RoomPreset> miningBossRooms = {BossRoomMole, BossRoomWorm};
-                map.currRoom.preset = Random::ListItem( miningBossRooms);
-                // map.currRoom.preset = MedicalEnemyRoomWares;
+                presetOverRide = miningBossRooms;
+
+                req2.effects = {  dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp,};
             }
             else if (map.currRegion == Medical) {
-                 map.currRoom.preset = ScientistBossRoom;
-                // map.currRoom.preset = EnemyRoomInvisible;
+                 presetOverRide= {ScientistBossRoom};
+                req2.effects = { bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, numBulletsUp, numBulletsUp, bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp};
+
             }
             else if (map.currRegion == Physics) {
                 std::vector<RoomPreset> physicsBossRooms = {BossRoomBigC, BossRoomMultiCube};
-                map.currRoom.preset = Random::ListItem( physicsBossRooms);
-                // map.currRoom.preset = BossRoomMultiCube;
-                // map.currRoom.preset = HifiRoomLaserFiesta;
+                presetOverRide = physicsBossRooms;
+                req2.effects = { bulletRangeUp, bulletRangeUp, bulletRangeUp, dmgUp3, dmgUp3, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp, numBulletsUp, numBulletsUp, fireRateUp,fireRateUp,fireRateUp,fireRateUp,fireRateUp,};
             } else {
                 map.currRoom.preset =  EnemyRoomPhantom;
             }
-            SoundRequest& req = registry.soundRequests.emplace(Entity());
-            req.type = SoundType::BossBGM;
-            InteractableRequest &req2 = registry.interactableRequests.emplace(Entity());
-            req2.type = InteractableRequestType::AddEffect;
-            req2.effects = {numBulletsUp, numBulletsUp, dmgUp,dmgUp, dmgUp, fireRateUp,fireRateUp,fireRateUp, bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, accuracyUp,accuracyUp,accuracyUp,accuracyUp,accuracyUp,};
+            map.currRoom.preset = StartingRoom;
         }
+        InteractableRequest& req2 = registry.interactableRequests.emplace(Entity());
+        req2.type = InteractableRequestType::AddEffect;
+        req2.effects = {};
         auto& nextRoom = map.currRoom.preset;
         switch (map.currRegion) {
             case MapRegion::Biology:
@@ -614,7 +679,7 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
                 break;
         }
 
-        giveEveryTierBuff();
+        //giveEveryTierBuff();
 
         InteractableRequest &extendstack = registry.interactableRequests.emplace(Entity());
         extendstack.type = InteractableRequestType::ExtendStack;
@@ -627,18 +692,24 @@ void MapSystem::newMap(MapRegion region, RoomType roomType)
             Door& d = registry.doors.components[i];
             d.reset();
             d.room = newRooms[i];
+            if (!presetOverRide.empty()) {
+                d.preset = presetOverRide[i%presetOverRide.size()];
+                d.room = BossRoom;
+                d.isLocked = false;
 
-            if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
-                //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
-                std:: cout << "Spawning locked room" << std::endl;
-                d.isLocked = true;
-            }
-            else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
-                //have a chance of spawning locked rooms
-                d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
             } else {
-                if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
-                    //d.room = RoomType::EnemyRoom;
+                if (lockedRooms + excludeNone < 2 && !hasUnlocked(d.room,map.roomsTraversed + 1) && hasLocked(d.room,map.roomsTraversed + 1)) {
+                    //if there are no unlocked rooms but still are locked rooms, spawn locked rooms
+                    std:: cout << "Spawning locked room" << std::endl;
+                    d.isLocked = true;
+                }
+                else if (lockedRooms + excludeNone < 2 && (hasLocked(d.room,map.roomsTraversed + 1) && hasUnlocked(d.room,map.roomsTraversed + 1))) { //check if next room has locked
+                    //have a chance of spawning locked rooms
+                    d.isLocked = Random::Float() < 0.3f; //probability of 30% of being locked
+                } else {
+                    if ((d.room != RoomType::None && lockedRooms + excludeNone < 2) && d.room != RoomType::BossRoom) {
+                        //d.room = RoomType::EnemyRoom;
+                    }
                 }
             }
             registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);

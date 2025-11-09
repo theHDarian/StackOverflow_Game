@@ -5,6 +5,12 @@
 #include "tiny_ecs_registry.hpp"
 #include "common.hpp"
 
+//global values
+const float HASTY_TIME_MODIFIER = 1.75f; // 75% faster
+const float SLUGGISH_TIME_MODIFIER = 0.5f; // 50% slower
+const float PROTECTED_DAMAGE_MODIFIER = 0.5f; // 50% less damage
+const float VULNERABLE_DAMAGE_MODIFIER = 1.5f; // 50% extra damage
+
 class AISystem
 {
 public:
@@ -25,7 +31,7 @@ private:
 	static vec2 getTeleportPos(Entity entity);
 	static vec2 getScientistPos(Entity entity);
 	static vec2 getParentPos(Entity entity);
-	static void updateState(Enemy& enemy, EnemyMovement movement, Entity entity);
+	static void updateState(Enemy &enemy, const EnemyMovement &movement, Entity entity);
 	static bool updateHealerState(Enemy &enemy, Entity entity);
 	static void angryMode(Entity entity);
 	static void computeBoidVelocity(Entity entity , Boid& boid);

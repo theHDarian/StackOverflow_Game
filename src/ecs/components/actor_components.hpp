@@ -9,16 +9,16 @@
 
 constexpr float random_float = -9999;
 constexpr vec2 random_vec2 = {random_float, random_float};
+constexpr vec2 random_batch = {-9998, -9998}; // Used to indicate the enemy should spawn at one of the predetermined random positions in the room
+constexpr vec2 opposite_of_player = {-9997, -9997}; // Used to indicate the enemy should spawn at the opposite side of the room from the player
 
 enum BulletEffectType {
     BulletDamage,
-    ProjectileSpeed,
     ProjectileSize,
     FireRate,
     BulletRange,
     BulletAccuracy,
     BulletNum, // Number of bullets fired in a single shot
-    BulletBurst, // Number of bullets fired in a burst
     Bounce,
     Pierce,
     Homing,
@@ -29,6 +29,8 @@ enum BulletEffectType {
     Inert, // Bullet that does nothing but take up stack space
     Lightning,
     Key,
+    Knock, // Bullet that knocks some effects off the stack
+    Eat, // Bullet that some effects off the stack, should only be a contact effect
     Pop, // Bullet that pops the stack, should only be a contact effect
 };
 
@@ -72,37 +74,37 @@ struct Player
 // When adding/removing something to the stack, update relevant fields
 // Must be easily accessible
 struct StackCompile {
-    int baseStackSize = 200;
+    int baseStackSize = 20;
     std::vector<BulletStackEffect> currStack;
     std::vector<BulletStackEffect> recentRemoved;
 
     typedef float (StackCompile ::* FP)(int);
+
+    // Unused now
+    float projectileSpeedFunc(int x) { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f); };
+
     // x<0 does nothing (except waste space on stack)
     float bulletDamageFunc(int x)       { return clamp(0.f, (float)x * 8.f, 90.f); };
-    float projectileSpeedFunc(int x)    { return clamp(-400.f, (x > 0) ? (float)x * 120.f : (float)x * -80.f, 1400.f); };
-    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x - 5) * 5.f) : (float)x, 80.f); };
-    float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? -500.f + 1000.f / ((float)x + 2.f) : -50.f * (float)x, 1000.f); };
+    float projectileSizeFunc(int x)     { return clamp(-5.f, (x > 0) ? ((x < tierThresholds[ProjectileSize]) ? (float)x * 8.f : ((float)x) * 5.f) : (float)x, 80.f); };
+    float fireRateFunc(int x)           { return clamp(-400.f, (x > 0) ? ((x < tierThresholds[FireRate]) ? -500.f + 1000.f / ((float)x + 2.f) : -300.f + 1000.f / ((float)x + 2.f)) : -50.f * (float)x, 1000.f); };
     float bulletRangeFunc(int x)        { return clamp(-500.f, (x > 0) ? (float)x * 200.f : (float)x * 100.f, 1000000.f); };
     float bulletSpreadFunc(int x)       { return clamp(-15.f, (x > 0) ? -2.f * (float)x : -20.f * (float)x, 330.f); };
     float bulletNumFunc(int x)          { return clamp(0.f, (float)x, 50.f); };
-    float bulletBurstFunc(int x)        { return clamp(0.f, (float)x, 50.f); };
     float bounceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
     float pierceFunc(int x)             { return clamp(0.f, (float)x, 100.f); };
-    float homingFunc(int x)             { return clamp(0.f, (float)x / 20.f, 1.f); };
+    float homingFunc(int x)             { return clamp(0.f, (float)x / 30.f, 1.f); };
     float playerSpeedFunc(int x)        { return clamp(-150.f, (float)x * 20.f, 300.f); };
-    float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 20.f); };
+    float playerNumDashFunc(int x)      { return clamp(0.f, (float)x, 5.f); };
     float playerStackSizeFunc(int x)    { return clamp(0.f, (float)x * 2.f, 64.f); };
     float playerDashCDRFunc(int x)      { return clamp(-1500.f, (x > 0) ? (float)x * -150.f : (float)x * -200.f, 8000.f); };
 
     std::map<BulletEffectType, FP> functions = {
         {BulletDamage,      &StackCompile::bulletDamageFunc},
-        {ProjectileSpeed,   &StackCompile::projectileSpeedFunc},
         {ProjectileSize,    &StackCompile::projectileSizeFunc},
         {FireRate,          &StackCompile::fireRateFunc},
         {BulletRange,       &StackCompile::bulletRangeFunc},
         {BulletAccuracy,    &StackCompile::bulletSpreadFunc},
         {BulletNum,         &StackCompile::bulletNumFunc},
-        {BulletBurst,       &StackCompile::bulletBurstFunc},
         {Bounce,            &StackCompile::bounceFunc},
         {Pierce,            &StackCompile::pierceFunc},
         {Homing,            &StackCompile::homingFunc},
@@ -121,13 +123,11 @@ struct StackCompile {
 
     std::map<BulletEffectType, float> values = {
         {BulletDamage,      0},
-        {ProjectileSpeed,   0},
         {ProjectileSize,    0},
         {FireRate,          0},
         {BulletRange,       0},
         {BulletAccuracy,    0},
         {BulletNum,         0},
-        {BulletBurst,       0},
         {Bounce,            0},
         {Pierce,            0},
         {Homing,            0},
@@ -139,18 +139,16 @@ struct StackCompile {
 
     std::map<BulletEffectType, float> tierThresholds = {
         {BulletDamage,      5},     // Inflict burning on hit. 15% default, +15% per additional point over threshold
-        {ProjectileSpeed,   5},
         {ProjectileSize,    5},     // Bullet explodes into smaller bullets on deletion
-        {FireRate,          5},
+        {FireRate,          5},     // Burst fire. Value over threshold is number shot per burst
         {BulletRange,       5},     // Deal more damage the further away from the player the enemy is (up to 2x)
         {BulletAccuracy,    5},     // Inflict vulnerable for 4000
         {BulletNum,         5},     // Fires 4 * (1 + value-threshold) mini bullets
-        {BulletBurst,       5},
         {Bounce,            5},     // Bouncing towards random enemy
         {Pierce,            5},     // Deal more dmg to protected enemies, and vulnerable effect stronger
-        {Homing,            5},
+        {Homing,            5},     // Causes all enemy bullets to get subtle homing (negative >:)
         {PlayerSpeed,       5},
-        {PlayerNumDash,     5},
+        {PlayerNumDash,     5},     // Clears non-special enemy bullets at end of dash, 50px * (1 + value-threshold) radius
         {PlayerStackSize,   5},
         {PlayerDashRecharge,5}      // 50% Chance to dodge inert effect from bullets or enemies
     };
@@ -159,12 +157,78 @@ struct StackCompile {
     	if (effect.type == Lightning) {
 	        if (currStack.size() < 1) return true;
 	        if (effect.value == -1) {
-		        std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+		        // std::rotate(currStack.begin(), currStack.begin() + currStack.size() - 1, currStack.end());
+
+	            //invert the value of a random non-key, non-Inert bullet
+	            auto g = std::mt19937(std::random_device{}());
+
+	            // Find all valid indices (non-Key, non-Inert)
+	            std::vector<int> validIndices;
+	            for (int i = 0; i < currStack.size(); i++) {
+	                if (currStack[i].type != Key && currStack[i].type != Inert) {
+	                    validIndices.push_back(i);
+	                }
+	            }
+
+	            if (validIndices.empty()) return true;
+
+	            std::uniform_int_distribution<> indexDist(0, validIndices.size() - 1);
+	            int randomIndex = validIndices[indexDist(g)];
+
+	            // Update values map
+	            if (values.find(currStack[randomIndex].type) != values.end()) {
+	                values[currStack[randomIndex].type] -= currStack[randomIndex].value;
+	                currStack[randomIndex].value = -currStack[randomIndex].value;
+	                values[currStack[randomIndex].type] += currStack[randomIndex].value;
+	            }
+
 	        }
 	        else {
-		        std::random_device rd;
-		        std::mt19937 g(rd());
-		        std::shuffle(currStack.begin(), currStack.end(), g);
+		        // std::random_device rd;
+		        // std::mt19937 g(rd());
+
+	            // Change a random bullet to a random other type
+	            auto g = std::mt19937(std::random_device{}());
+	            // Shuffle current stack
+	            std::shuffle(currStack.begin(), currStack.end(), g);
+
+	            // Find all valid indices (non-Key)
+	            std::vector<int> validIndices;
+	            for (int i = 0; i < currStack.size(); i++) {
+	                if (currStack[i].type != Key) {
+	                    validIndices.push_back(i);
+	                }
+	            }
+
+	            if (validIndices.empty()) return true;
+
+	            std::uniform_int_distribution<> indexDist(0, validIndices.size() - 1);
+	            int randomIndex = validIndices[indexDist(g)];
+
+	            // Get all possible bullet effect types
+	            std::vector<BulletEffectType> allTypes = {
+	                BulletDamage, ProjectileSize, FireRate, BulletRange, BulletAccuracy,
+                    BulletNum, Bounce, Pierce, Homing, PlayerSpeed, PlayerNumDash,
+                    PlayerStackSize, PlayerDashRecharge, Inert
+                };
+	            std::uniform_int_distribution<> typeDist(0, allTypes.size() - 1);
+	            BulletEffectType newType = allTypes[typeDist(g)];
+
+	            // Update values map
+	            if (values.find(currStack[randomIndex].type) != values.end()) {
+	                values[currStack[randomIndex].type] -= currStack[randomIndex].value;
+	            }
+	            currStack[randomIndex].type = newType;
+                //if the value of the new type is 0 (Inert), set the value to 1
+                if (currStack[randomIndex].value == 0) {
+                    currStack[randomIndex].value = 1;
+                }
+
+	            if (values.find(newType) != values.end()) {
+	                values[newType] += currStack[randomIndex].value;
+	            }
+
+
 	        }
             stackMerge();
     	    return true;
@@ -289,6 +353,19 @@ struct Burning {
     int stack = 0;
 };
 
+struct TimeModifier {
+    // Used for slowing down the player or enemies
+    // When countdown reaches 0, remove component
+    float BASECOUNTDOWN = 4000;
+    float COUNTDOWNPERSPEED = 500;
+    float BASECOOLDOWN = 20000;
+
+    float countDown = 1000;
+    float modifier = 0.2f; // 1 is normal speed
+    float coolDown = -9999; // -9999 means no cooldown
+
+};
+
 struct PlayerAttackData {
     float currFiringInterval = 0.0f;
     float maxFiringInterval = 500.0f;
@@ -339,7 +416,7 @@ enum EnemyType {
 
     // Biology
     BossCrab,
-    BossCrabLaser,
+    BigCLaserSniper,
     BossBeehiveGun,
     BossBeehiveMain,
     EnemySnail,
@@ -430,6 +507,7 @@ enum EnemyType {
     ScientistLaserGridAttack,
     ScientistLaserGridVerticalAttack,
     ScientistShield,
+    ScientistShieldWeak,
     ScientistBoss,
     ScientistHand,
     ScientistlaserAttack,
@@ -437,6 +515,9 @@ enum EnemyType {
     // Military
     EnemyEyeCube,
     EnemyPhantom,
+    EnemyMaw,
+    EnemySkullMissile,
+    EnemyCross,
 
     // event room enemies
     // single target buffs, place at the same position as target
@@ -447,6 +528,9 @@ enum EnemyType {
     UnderGroundGranter,
     RegeneratingGranter,
     CloakedGranter,
+    HastyGranter,
+    SluggishGranter,
+
     // room wide buffs, place at the center of the room
     InvincibleGranterRoomWide,
     InvisibleGranterRoomWide,
@@ -455,6 +539,9 @@ enum EnemyType {
     UnderGroundGranterRoomWide,
     RegenerateGranterRoomWide,
     CloakedGranterRoomWide,
+    HastyGranterRoomWide,
+    SluggishGranterRoomWide,
+
     // Enemyparts
     EnemyBubbleShield,
 };
@@ -474,13 +561,17 @@ enum class EnemyAttackPattern {
     ONE_WALL,
     TWO_WALL,
     SPAWNING,
+    REFRESH,
+    BOMBARD,
     NONE
 };
 
 enum class EnemyBulletDeath {
     NONE,
     EXPLODE,
-    CLUSTER
+    CLUSTER,
+    BOMBARD,
+    BOMBARDBOMBING
 };
 
 
@@ -518,6 +609,12 @@ struct AttackData {
     std::vector<BulletStackEffect> negativeBulletEffects;
 };
 
+struct Bombard {
+    float cdTillAppear = 0;
+    float cdTillDisappear = 2000;
+    EnemyBulletDeath effect = EnemyBulletDeath::BOMBARD;
+};
+
 enum class SpecialStates {
     // order corresponds to order drawn in ui
     INVINCIBLE,
@@ -526,6 +623,10 @@ enum class SpecialStates {
     PROTECTED,
     REGENERATING,
     ONFIRE,
+
+    //ui wip
+    HASTY,
+    SLUGGISH,
 
     // these won't be shown in ui
     NORMAL,
@@ -540,6 +641,9 @@ enum class SpecialStates {
     CLEAR_UNDERGROUND,
     CLEAR_REGENERATING,
     CLEAR_CLOAKED,
+    CLEAR_ONFIRE,
+    CLEAR_HASTY,
+    CLEAR_SLUGGISH,
 };
 
 enum class EnemyBehavior {
@@ -552,7 +656,7 @@ enum class EnemyBehavior {
     FOLLOW_PLAYER,
     RETREAT,
     RECOIL,
-    ANGRY,
+    ANGRY, // Unused
     PATROLLING,
     EVADEBULLET,
     CIRCLINGPLAYER,
@@ -723,7 +827,6 @@ struct SpriteData
 };
 
 
-
 // anything that is deadly to the player
 struct Enemy {
     int maxHealth;
@@ -748,6 +851,8 @@ struct Enemy {
     float speedMultiplier = 1.0f;
     int armour = 1;
     WormHead headData;
+    EnemyType type; // Should be set by the enemy spawner or the enemy struct
+    bool ignoreRoomBulletEffects = false; // If true, the enemy will not apply the room effects to its bullets, and will use the effect in its attack data instead
 };
 
 struct EnemyGroup {
@@ -831,8 +936,10 @@ struct Motion {
 };
 
 struct Damaged {
-    float max = 200;
+    float max = 500;
     float countdown = max;
+    bool flash = true; // if true, entity will flash when damaged
+    bool shakeHPBar = true; // if true, entity will shake hp bar when damaged
 };
 
 // should be separate from damaged so that damage from player takes precedence
@@ -846,6 +953,7 @@ struct BeeEnemy {
     int maxMerge = 3;
     bool canMerge = true;
     bool merge = false;
+    bool elite = false; // if true, the bee will be an elite bee, which has more health
 };
 
 struct Critter {
@@ -871,6 +979,8 @@ enum InteractableRequestType {
     RemoveEffect, // removes effect from stack
     SpawnEnemy, // spawns enemy based on region, or can pass in specific enemy
     PopX, // creates x bullets with effects (used for key)
+    KnockX, // knocks x effects off the stack (similar to PopX, but Random)
+    EatX, // eats x effects off the stack and push them to the enemy/enemy bullet's stack
 };
 
 struct InteractableRequest {
@@ -878,6 +988,7 @@ struct InteractableRequest {
     int choice = -1;
     std::vector<std::tuple<EnemyType,vec2>> enemies = {};
     std::vector<BulletStackEffect> effects = {};
+    Entity targetEntity; // Entity that the request is for, can be player or enemy
 };
 
 struct UIRequest {
@@ -889,6 +1000,7 @@ struct UIRequest {
         this->text = text;
         this->effects = effects;
     }
+    Entity targetEntity;
 };
 
 struct specialRotators {
@@ -924,6 +1036,12 @@ struct EnemyPart {
     Entity parent;
     vec2 offset;
     bool alwaysFollow = false;
+    float damageShare = 0.f;
+    bool showHpBar = false;
+    // How much damage the parent takes when this part is hit:
+    // 0.f means the parent takes no damage, 0.f < damageShare < 1.f means the damage is split between the parent and this part
+    //  > 1.f means this part takes no damage while the parent takes all the damage multiplied by damageShare
+    // < 0.f means this part takes the full damage, while the parent also takes damage multiplied by the absolute value of damageShare
 };
 
 struct Cloaked {

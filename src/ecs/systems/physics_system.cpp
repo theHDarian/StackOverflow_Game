@@ -5,6 +5,7 @@
 #include "components.hpp"
 #include <glm/gtx/string_cast.hpp>
 #include <bitset>
+#include <glm/gtx/norm.hpp>
 
 auto &motion_registry = registry.motions;
 auto &dash_registry = registry.dashes;
@@ -31,11 +32,13 @@ void PhysicsSystem::step(float elapsed_ms)
 		Entity entity = motion_registry.entities[i];
 		if (registry.players.has(entity))
 			continue;
-		motion.position += motion.velocity * step_seconds;
-		motion.velocity += motion.veer * step_seconds;
+
+		float adjustedStep = getAdjustedTime(step_seconds, entity);
+		motion.position += motion.velocity * adjustedStep;
+		motion.velocity += motion.veer * adjustedStep;
 
 		// slightly broken
-		if (!registry.playerBullets.has(entity) && glm::length(motion.velocity) > 0.01 && !registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1) /* || registry.playerBullets.has(entity)*/))
+		if (!registry.playerBullets.has(entity) && (glm::length2(motion.velocity) > 0.001) && !registry.lasers.has(entity) && ((registry.enemyBullets.has(entity) && registry.enemyBullets.get(entity).bulletBounce > -1) /* || registry.playerBullets.has(entity)*/))
 			motion.angle = atan2(motion.velocity.y, motion.velocity.x) + motion.angleOffset;
 
 		if (registry.homes.has(entity))
@@ -80,9 +83,10 @@ void PhysicsSystem::step(float elapsed_ms)
 			{
 				Enemy &enemy = registry.enemies.get(laser.start);
 				Motion &start = registry.motions.get(laser.start);
+				float adjustedMs = adjustedStep * 1000.f; // convert to ms
 				if (enemy.rotationBehaviour == EnemyRotationBehavior::NONE || enemy.rotationBehaviour == EnemyRotationBehavior::REGULAR || enemy.rotationBehaviour == EnemyRotationBehavior::FACE_UP)
 				{
-					motion.angle += laser.rotation;
+					motion.angle += laser.rotation * (adjustedMs/12.f); // rotate the laser
 				}
 				else if (enemy.rotationBehaviour == EnemyRotationBehavior::FACE_CENTER)
 				{
@@ -96,7 +100,8 @@ void PhysicsSystem::step(float elapsed_ms)
 					motion.angle = laser.rotation * motion.angle + (1.f - laser.rotation) * start.angle;
 				}
 				if (laser.growth < 100.f || (eBullet.initialRange - eBullet.bulletRange > 1000))
-					laser.length += laser.growth;
+					laser.length += laser.growth * (adjustedMs/12.f);
+
 				if (registry.enemyGroups.has(laser.start))
 				{
 					EnemyGroup &group = registry.enemyGroups.get(laser.start);
@@ -192,6 +197,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			continue;
 
 		// check if dashing entity will intersect a wall
+
 		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
 		vec2 endPosition = motion.position;
 		bool hasCollided = false;
@@ -239,7 +245,8 @@ void PhysicsSystem::step(float elapsed_ms)
 			continue;
 
 		// check if dashing entity will intersect a wall
-		vec2 startPosition = motion.position - (motion.velocity - motion.veer * step_seconds) * step_seconds;
+		float adjustedStep = getAdjustedTime(step_seconds, entity);
+		vec2 startPosition = motion.position - (motion.velocity - motion.veer * adjustedStep) * adjustedStep;
 		vec2 endPosition = motion.position;
 		bool hasCollided = false;
 		vec2 closestIntersection;
@@ -267,9 +274,10 @@ void PhysicsSystem::step(float elapsed_ms)
 				radius = registry.circleColliders.get(entity).radius;
 			}
 			vec2 bounceBack = vec2(0);
-			if ((motion.velocity - motion.veer * step_seconds) != vec2(0))
+			float adjustedStep = getAdjustedTime(step_seconds, entity);
+			if ((motion.velocity - motion.veer * adjustedStep) != vec2(0))
 			{
-				bounceBack = glm::normalize(-(motion.velocity - motion.veer * step_seconds)) * radius / 2.f;
+				bounceBack = glm::normalize(-(motion.velocity - motion.veer * adjustedStep)) * radius / 2.f;
 			}
 
 			motion.position = closestIntersection + bounceBack;
@@ -600,8 +608,10 @@ bool PhysicsSystem::CircleToLine(vec2 p1, float r, vec2 p2, vec2 p3)
 		return true;
 
 	// Circle center projected onto the line is between p2 and p3
-	// Costly check, could use refining but idk how yet lol
-	if (abs(glm::length(c) + glm::length(b - c) - glm::length(b)) < 0.01)
+	float cross = c.x * b.y - c.y * b.x;
+	float dot = c.x * b.x + c.y * b.y;
+	float b_len2 = b.x * b.x + b.y * b.y;
+	if (cross * cross < 0.01 * b_len2 && dot >= 0.0f && dot <= b_len2)
 	{
 		vec2 d = a - c;
 		return (glm::dot(d, d) < r * r);

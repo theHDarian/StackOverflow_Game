@@ -230,7 +230,8 @@ enum  EFFECT_ASSET_ID : unsigned int {
 	POSTPROCESS1 = TEXTURED + 1,		// Extra
 	POSTPROCESS2 = POSTPROCESS1 + 1,	// Extra
 	POSTPROCESS3 = POSTPROCESS2 + 1,	// Extra
-	DASH = POSTPROCESS3 + 1,			// Has own call
+	POSTPROCESS4 = POSTPROCESS3 + 1,	// Extra
+	DASH = POSTPROCESS4 + 1,			// Has own call
 	HP_BAR = DASH + 1,					// Has own call
 	ROOM_BOUND = HP_BAR + 1,			// Has own call
 	ANIMATE = ROOM_BOUND + 1,
@@ -534,7 +535,9 @@ enum InteractableType {
 
 enum InteractableItem {
 	Ram,
+	Ramlet,
 	PopConsole,
+	GlitchedPopConsole,
 	PushConsole,
 	FightConsole,
 	OpenDoor,

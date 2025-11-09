@@ -307,6 +307,9 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 				break;
 			}
 		}
+	} else if (registry.interactables.has(entity) && registry.interactables.get(entity).item == InteractableItem::GlitchedPopConsole)
+	{
+		should_glitch = true;
 	}
 
 	glUniform1i(glitchToggle_uloc, (registry.elites.has(target) || should_glitch));
@@ -448,7 +451,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 	if (isInvincible) {
 		shieldColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
-		damagedColor = specialStatesToColor.at(SpecialStates::INVINCIBLE);
+		damagedColor = { 1, 1, 0.3 }; // this is a brighter yellow than usual
 	}
 	else if (isProtected) {
 		shieldColor = specialStatesToColor.at(SpecialStates::PROTECTED);
@@ -457,7 +460,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 	else if (isVulnerable) {
 		damagedColor = specialStatesToColor.at(SpecialStates::VULNERABLE);
 	}
-	else if (registry.damageds.has(entity)) {
+	else if (registry.damageds.has(entity) && registry.damageds.get(entity).flash) {
 		damagedColor = { 1.2, 0.5, 0.5 }; // red;
 		damaged = registry.damageds.get(entity);
 	}
@@ -475,7 +478,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 		glUniform3fv(color_uloc, 1, (float*)&color);
 	}
 
-	if (registry.damageds.has(entity) || registry.burnTicked.has(entity))
+	if ((registry.damageds.has(entity) && registry.damageds.get(entity).flash) || registry.burnTicked.has(entity))
 	{
 		glUniform3fv(color_uloc, 1, (float *)&damagedColor);
 		glUniform1i(change_color_uloc, 1);
@@ -492,7 +495,7 @@ void RenderSystem::drawAnimateTextured(Entity entity,
 
 		drawBasicAnimateTextured();
 
-		float angle = glm::clamp(motion.angle, M_PI / 4, -M_PI / 4);
+		float angle = glm::clamp(motion.angle,(float) M_PI / 4,(float) -M_PI / 4);
 		float rotHeight = motion.scale.y;
 		float rotWidth = motion.scale.x;
 
@@ -1063,14 +1066,28 @@ void RenderSystem::drawToScreenExtra(EFFECT_ASSET_ID effect)
 																	 // indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
 	const GLuint postprocess_program = effects[(GLuint)effect];
+
 	// Set clock
 	GLuint time_uloc = glGetUniformLocation(postprocess_program, "time");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+
+	// Set chromatic abberation
 	StackCompile &stack = registry.stackCompile.get(registry.players.entities[0]);
 	float intensity = (float)stack.currStack.size() / (stack.baseStackSize + stack.Call(PlayerStackSize));
 	GLuint chrom_abb_intensity_uloc = glGetUniformLocation(postprocess_program, "chromatic_abberation_intensity");
 	glUniform1f(chrom_abb_intensity_uloc, intensity);
-	gl_has_errors();
+
+	// Set bullettime effect
+	// Might be good with a smooth-in-smooth-out function applied so it isn't too jarring
+	float bulletTime = 0.f;
+	if (registry.timeModifiers.has(registry.players.entities[0])) {
+		TimeModifier tm = registry.timeModifiers.get(registry.players.entities[0]);
+		bulletTime = 1.f - (tm.countDown / (tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED)));
+		bulletTime = max(0.f, -powf(bulletTime, 8) + 1);
+	}
+	GLuint bullet_time_uloc = glGetUniformLocation(postprocess_program, "bulletTime");
+	glUniform1f(bullet_time_uloc, bulletTime);
+
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
 	GLint in_position_loc = glGetAttribLocation(postprocess_program, "in_position");
@@ -1247,7 +1264,13 @@ void RenderSystem::drawGameElements()
 	// and won't render all render requests if not given the proper component
 	// Note, its not very efficient to access elements indirectly via the entity
 	// albeit iterating through all Sprites in sequence. A good point to optimize
-
+	
+	for (Entity& entity : registry.bombards.entities)
+	{
+		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity) || registry.bombards.get(entity).cdTillAppear > 0)
+			continue;
+		registry.renderRequests.get(entity).show ? effectToDrawCall(entity, projection, view) : void();
+	}
 	for (Entity &entity : registry.aoeIndicators.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
@@ -1415,18 +1438,11 @@ void RenderSystem::drawGameUI()
 	mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	mat4 projection = glm::ortho(0.0f, (float)windowState.width, (float)windowState.height, 0.0f, -3.0f, 3.0f);
 
-	// draw an indicator for the first boid
-	//if (registry.boids.entities.size() > 0) {
-	for (Entity& entity : registry.boids.entities)
-	{
-		drawEnemyIndicator(entity, projection, view);
-	}
-
 	for (Entity &entity : registry.enemies.entities)
 	{
 		if (!registry.renderRequests.has(entity) || !registry.motions.has(entity) || registry.invisibles.has(entity))
 			continue;
-		if (!registry.wormBodies.has(entity) && !registry.boids.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity)) {
+		if (!registry.wormBodies.has(entity) && !registry.bossParts.has(entity) && !registry.invisibleEnemy.has(entity) && !registry.bosses.has(entity) && !registry.enemyParts.has(entity)) {
 			if(!registry.shield.has(entity))
 				drawEnemyIndicator(entity, projection, view);
 		}
@@ -1905,7 +1921,13 @@ void RenderSystem::drawBulletStack(const mat4 &projection, const mat4 &view)
 
 		setupBasicAnimateTextured(EFFECT_ASSET_ID::ANIMATE, "tier_icons", COLOR_WHITE, projection, motion, false, tier.first);
 		GLint greyscale_toggle = glGetUniformLocation(program, "greyscale");
-		glUniform1i(greyscale_toggle, getEffectValue(tier.first) < getEffectTierThreshold(tier.first));
+		float greyscaleLevel = 1 - ((float)getEffectValue(tier.first) / (float)getEffectTierThreshold(tier.first));
+		if (tier.first == PlayerSpeed && checkTierThreshold(PlayerSpeed) && registry.timeModifiers.has(registry.players.entities[0])) {
+			TimeModifier tm = registry.timeModifiers.get(registry.players.entities[0]);
+			greyscaleLevel = tm.coolDown / tm.BASECOOLDOWN;
+		}
+		greyscaleLevel = max(greyscaleLevel, 0.f);
+		glUniform1f(greyscale_toggle, greyscaleLevel);
 		drawBasicAnimateTextured();
 	}
 }
@@ -2395,7 +2417,7 @@ void RenderSystem::resetProgramToggle(GLint program) {
 	glUniform1i(effect_size_uloc, 1);
 
 	GLint greyscale = glGetUniformLocation(program, "greyscale");
-	glUniform1i(greyscale, false);
+	glUniform1f(greyscale, 0.0);
 
 	gl_has_errors();
 }

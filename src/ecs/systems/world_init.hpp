@@ -36,7 +36,7 @@ Entity createInverter(RenderSystem *renderer, vec2 pos);
 
 Entity createWhiteBoard(RenderSystem* renderer, vec2 pos);
 
-Entity createPopConsole(RenderSystem* renderer, vec2 pos);
+Entity createPopConsole(RenderSystem* renderer, vec2 pos, InteractableItem type);
 
 Entity createPopBullet(RenderSystem* renderer, vec2 pos, vec2 velocity, vec2 veer, AttackData atkData);
 
@@ -49,6 +49,8 @@ Entity createProp(RenderSystem* renderer, vec2 pos, std::string filename, vec2 s
 Entity createProp3D(RenderSystem* renderer, vec2 pos, std::string filename, vec2 scale, vec2 wallOffset, float baseOffset, EFFECT_ASSET_ID effect = EFFECT_ASSET_ID::TEXTURED);
 
 Entity createRamStick(RenderSystem* renderer, vec2 pos);
+
+Entity createRamlet(RenderSystem *renderer, vec2 pos);
 
 Entity createBaru(RenderSystem *renderer, vec2 pos);
 
@@ -94,7 +96,7 @@ Entity createLine(vec2 position, vec2 size);
 Entity drawLineAtoB(RenderSystem* renderer, vec2 a, vec2 b);
 
 // the enemy
-Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type);
+Entity createEnemy(RenderSystem* renderer, vec2 pos, EnemyType type, const Entity& summoner = Entity());
 
 void createWormBody(RenderSystem* renderer, vec2 pos, EnemyType type, Entity head, int index);
 
@@ -118,6 +120,8 @@ void createNGenericPlayerBullet(RenderSystem* renderer, int number, vec2 positio
 
 Entity createGenericPlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range = 1000);
 
+Entity createBombard(RenderSystem* renderer, float wait, vec2 position, EnemyBulletDeath onDeath);
+
 void createNTentaclePlayerBullet(RenderSystem* renderer, int number, vec2 position, vec2 direction, float range = 1000);
 
 Entity createTentaclePlayerBullet(RenderSystem* renderer, vec2 position, vec2 direction, float range = 1000);
@@ -127,3 +131,5 @@ Entity createSkipDialogue();
 std::vector<BulletStackEffect> getBulletEffects(AttackData atkData, bool& isSpecial);
 
 vec2 lerpToRoom(vec2 point);
+
+float getModifiedBulletSpeed(float bulletRange);

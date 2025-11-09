@@ -248,7 +248,7 @@ std::map<char, float> doorSideToAngle = {
 	{'L', 3 * M_PI / 2}
 };
 
-void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange = 2.0f * M_PI, float offset = 150) {
+void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, std::vector<BulletStackEffect> effects, float angleRange, float offset) {
 	if (!registry.invincibles.has(registry.players.entities[0])) {
 		registry.invincibles.emplace(registry.players.entities[0]);
 	}
@@ -260,7 +260,7 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 		atkData.shape = EnemyBulletShape::RECTANGLE;
 		atkData.defaultEffect = b;
 		atkData.rareBulletEffects = {b};
-		atkData.speed = 200;
+		atkData.speed = 200 + (50 * max(0.0, log(numBullets)));
 		atkData.size = vec2(20,50);
 		atkData.bulletRange = max(6000.f, numBullets * 1000.f);
 		atkData.bulletBounce = max(2, numBullets / 3);
@@ -269,9 +269,36 @@ void CreateXPopBullets(RenderSystem* renderer, vec2 position, float direction, s
 	}
 }
 
+void reloadStack(const Entity &player, const std::vector<BulletStackEffect> &removedEffects = {}) {
+	if (registry.stackCompile.has(player)) {
+		StackCompile& reg = registry.stackCompile.get(player);
+		if (reg.currStack.empty()) {
+			return;
+		}
+		int size = reg.baseStackSize;
+		std::vector<BulletStackEffect> temp = std::move(reg.currStack);
+		// reg.currStack.clear();
+		registry.stackCompile.remove(player);
+		StackCompile& newreg = registry.stackCompile.emplace(player);
+		newreg.baseStackSize = size;
+		if (!removedEffects.empty()) {
+			newreg.recentRemoved = removedEffects;
+		}
+		for (const auto& effect : temp) {
+			newreg.add(effect);
+		}
+		Player& pl = registry.players.get(player);
+		if (pl.currDashCharges > getModifiedValue( PlayerNumDash, pl.baseDashNum)) {
+			pl.currDashCharges = getModifiedValue( PlayerNumDash, pl.baseDashNum);
+		}
+
+		StackUI& ui = registry.stackUI.components[0];
+		ui.updateStackUISize(newreg.baseStackSize);
+	}
+}
 
 
-void resetStack(Entity player, RenderSystem* renderer, float offset) {
+void resetStack(const Entity &player, RenderSystem* renderer, float offset, const std::vector<BulletStackEffect> &effects) {
 
     //Invincible& inv =registry.invincibles.emplace(player);
     //inv.countdown = 1000.0f;
@@ -282,7 +309,11 @@ void resetStack(Entity player, RenderSystem* renderer, float offset) {
             return;
         }
         int size = reg.baseStackSize;
-        CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, offset);
+    	if (effects.empty()) {
+    		CreateXPopBullets( renderer, registry.motions.get(player).position, 0, reg.currStack, 2.0f * M_PI, offset);
+    	} else {
+			CreateXPopBullets( renderer, registry.motions.get(player).position, 0, effects, 2.0f * M_PI, offset);
+		}
     	std::vector<BulletStackEffect> temp = reg.currStack;
         // reg.currStack.clear();
         registry.stackCompile.remove(player);
@@ -323,6 +354,67 @@ void extendStack (Entity player, int extension) {
     }
 }
 
+void knockEffectsOffStack (const Entity &player, RenderSystem* renderer, int numEffects) {
+	if (registry.stackCompile.has(player)) {
+		StackCompile& reg = registry.stackCompile.get(player);
+		if (reg.currStack.empty()) {
+			return;
+		}
+
+		std::vector<BulletStackEffect> effectsToKnock(min(numEffects, (int)reg.currStack.size()));
+
+		//get a random selection of effects to knock off
+		for (int i = 0; i < effectsToKnock.size(); i++) {
+			if (reg.currStack.size() == 0) {
+				break;
+			}
+			int index = Random::Int(reg.currStack.size());
+			effectsToKnock[i] = (reg.currStack[index]);
+			reg.currStack.erase(reg.currStack.begin() + index);
+			// std::cout << "Knocked #" <<effectsToKnock.size() << "Knocking off: " << effectsToKnock.back().name << std::endl;
+		}
+
+		CreateXPopBullets(renderer, registry.motions.get(player).position, 0, effectsToKnock, 2.0f * M_PI, 0);
+		reloadStack(player, effectsToKnock);
+	}
+}
+
+void eatEffectsOffStack (const Entity &player, const Entity &other,  int numEffects) {
+	if (registry.stackCompile.has(player)) {
+		StackCompile& reg = registry.stackCompile.get(player);
+		if (reg.currStack.empty()) {
+			return;
+		}
+
+		std::vector<BulletStackEffect> effectsToKnockOff(min(numEffects, (int)reg.currStack.size()));
+
+		//get a random selection of effects to eat
+		for (int i = 0; i < effectsToKnockOff.size(); i++) {
+			if (reg.currStack.size() == 0) {
+				break;
+			}
+			int index = Random::Int(reg.currStack.size());
+			effectsToKnockOff[i] = (reg.currStack[index]);
+			reg.currStack.erase(reg.currStack.begin() + index);
+		}
+
+		if (!registry.stackCompile.has(other)) {
+			registry.stackCompile.emplace(other);
+		}
+		auto& otherStack = registry.stackCompile.get(other);
+		otherStack.currStack.insert(otherStack.currStack.end(), effectsToKnockOff.begin(), effectsToKnockOff.end());
+		UIRequest& ui_req = registry.uiRequests.emplace_with_duplicates(other);
+		ui_req.type = UIRequestType::StackNotifBullet;
+		ui_req.effects = otherStack.currStack;
+		ui_req.targetEntity = other;
+
+		reloadStack(player, effectsToKnockOff);
+
+	}
+}
+
+
+
 void closeDoors (SoundSystem* soundPlayer) {
 	Map& map = registry.maps.components[0];
 	map.currRoom.cleared = false;
@@ -344,7 +436,7 @@ void closeDoors (SoundSystem* soundPlayer) {
 	soundPlayer->playNextMusic();
 }
 
-void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSystem* soundPlayer) {
+void addEffect(const Entity &player, const std::vector<BulletStackEffect> &effects, SoundSystem* soundPlayer) {
 
     if (registry.stackCompile.has(player)) {
         StackCompile& reg = registry.stackCompile.get(player);
@@ -352,7 +444,7 @@ void addEffect(Entity player, std::vector<BulletStackEffect> effects, SoundSyste
 		UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
 		req.type = UIRequestType::StackNotifBullet;
 		req.effects = effects;
-        for (BulletStackEffect b : effects) {
+        for (const BulletStackEffect& b : effects) {
             printf("Adding: %s\n",b.name.c_str());
             bool success = reg.add(b);
         	if (!success) {
@@ -472,6 +564,23 @@ void handleRequests(float elapsed_ms, Entity player, RenderSystem* renderer, Sou
 				}  else
 					spawnEnemies(soundPlayer, request.enemies);
 				break;
+			case InteractableRequestType::EatX:
+				if (request.choice == -1) {
+					eatEffectsOffStack( player, request.targetEntity, 5);
+				}
+				else {
+					eatEffectsOffStack( player, request.targetEntity, request.choice);
+				}
+				break;
+			case InteractableRequestType::KnockX:
+				if (request.choice == -1) {
+					knockEffectsOffStack(player, renderer, 5);
+				}
+				else {
+					knockEffectsOffStack(player, renderer, request.choice);
+				}
+				break;
+			default: break;
 		}
 	}
 	registry.interactableRequests.clear();
@@ -484,7 +593,7 @@ void resetDashes () {
 }
 
 
-void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSystem* soundPlayer) {
+void interact(float elapsed_ms, Entity &player, RenderSystem* renderer, SoundSystem* soundPlayer) {
 	// interactible object management placed here and hard coded for now
 	// can consider: each behaviour type is component, when choice X is selected then enact that behaviour
 	GameState& gameState = registry.gameStates.components[0];
@@ -588,6 +697,51 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			}
 		}
 
+		if (object.item == GlitchedPopConsole) { // the choices are known implicitly by person who wrote object script for now
+			if (reaction.choice == 0) { // yes
+				object.dialogueCount++;
+				std::vector<BulletStackEffect> effects = {};
+				if (registry.stackCompile.has(player)) {
+					auto& stack = registry.stackCompile.get(player);
+					for (BulletStackEffect b : stack.currStack) {
+						float rand = Random::Float(1);
+						if (rand < 0.1f) {
+							b.value = -b.value; // 10% chance to negate the effect
+							effects.push_back(b);
+						} else if (rand < 0.6f) {
+							effects.push_back(b); // 50% chance to keep the effect
+						} else if (rand < 0.75f) {
+							if (b.type != BulletEffectType::Key) {
+								std::vector<BulletEffectType> possibleEffects = {BulletDamage,
+																				ProjectileSize,
+																				FireRate,
+																				BulletRange,
+																				BulletAccuracy,
+																				BulletNum, // Number of bullets fired in a single shot
+																				Bounce,
+																				Pierce,
+																				Homing,
+																				PlayerSpeed,
+																				PlayerNumDash,
+																				PlayerDashRecharge,};
+								auto newEffect = Random::ListItem(possibleEffects); // 15% chance to change the effect to a random effect
+								b.color = bulletEffectColors.at(newEffect);
+								b.type = newEffect;
+							}
+							effects.push_back(b);
+						}
+						// 25% chance to remove the effect
+					}
+				}
+				resetStack(player, renderer, 150, effects);
+				resetDashes();
+			}
+			else if (reaction.choice == 1) { // no
+				// not incrementing allows player to keep asking to pop until pop, but potentially finicky
+			}
+		}
+
+
 		if (object.item == BibleTree) {
 			if (reaction.choice == 0) { // yes
 				object.dialogueCount++;
@@ -602,10 +756,14 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 			}
 		}
 
-		if (object.item == InteractableItem::Ram) {
+		if (object.item == InteractableItem::Ram || object.item == InteractableItem::Ramlet) {
 			if (reaction.choice == 0) {
 				DialogueRequest& req = registry.dialogueRequests.emplace(reaction.object);
-				extendStack( player, 4);
+				if (object.item == InteractableItem::Ram) {
+					extendStack( player, 4);
+				} else {
+					extendStack( player, 2);
+				}
 				object.dialogueCount = 1;
 				registry.deleteds.emplace(reaction.object);
 			}
@@ -802,7 +960,7 @@ void interact(float elapsed_ms, Entity player, RenderSystem* renderer, SoundSyst
 				}
 				case 1 : {
 					if (reaction.choice == 0) {
-						addEffect(player, {bulletSpeedUp, bulletSpeedUp, bulletSpeedUp, playerSpeedUp, playerSpeedUp, playerSpeedUp}, soundPlayer);
+						addEffect(player, {playerSpeedUp, playerSpeedUp, playerSpeedUp}, soundPlayer);
 						object.dialogueCount++;
 					}
 					break;

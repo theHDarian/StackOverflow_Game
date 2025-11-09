@@ -21,14 +21,12 @@
 #include "utils/random.hpp"
 #include "utils/vector_operations.hpp"
 #include <chrono>
+#include <glm/gtx/norm.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 
 // Game configuration
-const size_t MAX_NUM_EELS = 15;
-const size_t MAX_NUM_FISH = 5;
-const size_t EEL_SPAWN_DELAY_MS = 2000 * 3;
-const size_t FISH_SPAWN_DELAY_MS = 5000 * 3;
+constexpr size_t HARD_MODE_TIME_MODIFIER = 1.25f; // 25% faster
 
 
 #pragma region init
@@ -99,7 +97,7 @@ GLFWwindow* WorldSystem::createWindow() {
 	// FOR DEBUGGING AT SMALLER WINDOW SIZES
 	//window_width_px = 1280;
 	//window_height_px = 720;
-	 window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
+	 //window = glfwCreateWindow(window_width_px, window_height_px, "StackOverflow", nullptr , nullptr);
 	 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -201,23 +199,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		shoot(elapsed_ms_since_last_update, getModifiedValue(BulletNum, registry.players.get(player).bulletCluster));
 
 
-		// Updating the invincibility timer
-		if (registry.invincibles.entities.size() > 0) {
-			for (Entity& invincible : registry.invincibles.entities) {
-				float& invincible_timer = registry.invincibles.get(invincible).countdown;
-				invincible_timer -= elapsed_ms_since_last_update;
-				if (invincible_timer <= 0) {
-					registry.invincibles.remove(invincible);
-					//std::cout << "entity is no longer invincible" << std::endl;
-				}
-			}
-		}
-		//check invisibity countdown
+		//check invisibility countdown
 		if (registry.invisibles.entities.size() > 0) {
 			for (int i = (int)registry.invisibles.components.size()-1; i>=0; --i) {
 				Invisible& entity = registry.invisibles.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.invisibles.entities[i])) <= 0) {
 					registry.invisibles.remove(registry.invisibles.entities[i]);
+				}
+			}
+		}
+		// Updating the invincibility timer
+		if (registry.invincibles.entities.size() > 0) {
+			for (int i = (int)registry.invincibles.components.size()-1; i>=0; --i) {
+				Invincible& entity = registry.invincibles.components[i];
+				if ((entity.countdown -= getAdjustedTime( elapsed_ms_since_last_update, registry.invincibles.entities[i])) <= 0) {
+					registry.invincibles.remove(registry.invincibles.entities[i]);
 				}
 			}
 		}
@@ -225,7 +221,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.moles.entities.size() > 0) {
 			for (int i = (int)registry.moles.components.size()-1; i>=0; --i) {
 				Mole& entity = registry.moles.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.moles.entities[i])) <= 0) {
 					registry.moles.remove(registry.moles.entities[i]);
 				}
 			}
@@ -235,7 +231,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.regenerates.entities.size() > 0) {
             for (int i = (int)registry.regenerates.components.size()-1; i>=0; --i) {
                 Regenerate& entity = registry.regenerates.components[i];
-                if ((entity.countdown -= elapsed_ms_since_last_update) <= 0) {
+                if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.regenerates.entities[i])) <= 0) {
                     registry.regenerates.remove(registry.regenerates.entities[i]);
                 }
             }
@@ -245,8 +241,72 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (registry.vulnerabilities.entities.size() > 0) {
 			for (int i = (int)registry.vulnerabilities.components.size()-1; i>=0; --i) {
 				auto& entity = registry.vulnerabilities.components[i];
-				if ((entity.countdown -= elapsed_ms_since_last_update) <= 0 || registry.instanceDamages.has(registry.vulnerabilities.entities[i])) {
+				if ((entity.countdown -= getAdjustedTime(elapsed_ms_since_last_update, registry.vulnerabilities.entities[i])) <= 0 || registry.instanceDamages.has(registry.vulnerabilities.entities[i])) {
 					registry.vulnerabilities.remove(registry.vulnerabilities.entities[i]);
+				}
+			}
+		}
+
+		// Time modifiers
+		if (registry.timeModifiers.entities.size() > 0)
+		{
+			for (int i = (int)registry.timeModifiers.components.size() - 1; i >= 0; --i) {
+				TimeModifier& tm = registry.timeModifiers.components[i];
+				tm.countDown -= elapsed_ms_since_last_update;
+				if (tm.countDown <= 0) {
+					if (tm.coolDown != -9999) {
+						tm.coolDown -= elapsed_ms_since_last_update;
+						if (tm.coolDown <= 0) {
+							registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
+						}
+					}
+					else {
+						// remove time modifier if it is not the player
+						registry.timeModifiers.remove(registry.timeModifiers.entities[i]);
+					}
+					// if (tm.modifier != HARD_MODE_TIME_MODIFIER && registry.gameStates.has(registry.timeModifiers.entities[i]) && registry.gameStates.get(registry.timeModifiers.entities[i]).difficulty) {
+					// 	entity.modifier = HARD_MODE_TIME_MODIFIER;
+					// 	continue;
+					// }
+
+				}
+			}
+		}
+
+		//burning ticks
+		if (registry.onFires.entities.size() > 0) {
+			for (int i = (int)registry.onFires.components.size() - 1; i >= 0; --i) {
+				Entity e = registry.onFires.entities[i];
+				Burning& fire = registry.onFires.components[i];
+				if (fire.stack == 0) continue;
+				fire.countdown = max(fire.countdown - getAdjustedTime(elapsed_ms_since_last_update, e), 0.f);
+				if (fire.countdown <= 0.f && fire.stack > 0) {
+					if (registry.wormBodies.has(e)) {
+						Entity wh = registry.wormBodies.get(e).head;
+						if (!registry.invincibles.has(wh)) registry.enemies.get(wh).currHealth -= fire.damage * fire.stack;
+					}
+					else {
+						registry.enemies.get(e).currHealth -= fire.damage * fire.stack;
+					}
+					if (registry.instanceDamages.has(e)) {
+						InstanceDamage& instance = registry.instanceDamages.get(e);
+						instance.instance -= fire.stack;
+						registry.enemies.get(e).currHealth = instance.instance;
+					}
+					fire.stack--;
+					fire.countdown = fire.maxCountdown;
+
+					// emit extra particles and turn orange on fire tick
+					if (!registry.emitParticles.has(e)) {
+						ParticleProps props = playerTrail;
+						props.velocity.base = vec2(0, -200) * (registry.motions.get(e).scale.y / 150);
+						props.velocity.base.y = min(-100.0f, props.velocity.base.y);
+						int count = max(3, int(7 * registry.motions.get(e).scale.x / 50));
+						registry.emitParticles.emplace(e, ParticleRequestType::PExplode, props, 500, Random::Int(count) + 2 * count);
+					}
+					if (!registry.burnTicked.has(e)) {
+						registry.burnTicked.emplace(e);
+					}
 				}
 			}
 		}
@@ -266,7 +326,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			for (int i = (int)registry.enemyBullets.components.size()-1; i>=0; --i) {
 				EnemyBullet& bullet = registry.enemyBullets.components[i];
 				Entity entity = registry.enemyBullets.entities[i];
-				if ((bullet.bulletRange -= elapsed_ms_since_last_update) <= 0) {
+				float elapsed_ms = getAdjustedTime(elapsed_ms_since_last_update, entity);
+				if ((bullet.bulletRange -= elapsed_ms) <= 0) {
 					// remove enemy bullet
 					if (!registry.deleteds.has(registry.enemyBullets.entities[i])) {
 						Motion& motion = registry.motions.get(entity);
@@ -296,6 +357,22 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Bombards
+	if (!registry.bombards.entities.empty()) {
+		for (int i = (int)registry.bombards.components.size() - 1; i >= 0; --i) {
+			Bombard& bombard = registry.bombards.components[i];
+			if ((bombard.cdTillAppear -= getAdjustedTime(elapsed_ms_since_last_update)) <= 0) {
+				if ((bombard.cdTillDisappear -= getAdjustedTime(elapsed_ms_since_last_update)) <= 0) {
+					Motion& bm = registry.motions.get(registry.bombards.entities[i]);
+					for (int j = 0; j < 20; j++) {
+						soundPlayer->playEnemyShootSound(2, 0);
+						createEnemyBulletDeath(renderer, bm.position, vec2(cos(2.f * M_PI * j / 20.f), sin(2.f * M_PI * j / 20.f)), bombard.effect);
+					}
+					registry.deleteds.emplace(registry.bombards.entities[i]);
+				}
+			}
+		}
+	}
 
 	//check damage countdown
 	if (!registry.damageds.entities.empty()) {
@@ -421,6 +498,7 @@ void WorldSystem::restartGame() {
 	registry.maps.components[0].currRoom.dialogueDone = true;
 
 	registry.interactableInDialogue.clear();
+	registry.stackCompile.clear();
 
 	//DialogueRequest& resetReq = registry.dialogueRequests.emplace(player);
 	//resetReq.type = DialogueRequestType::ResetDialogue;
@@ -441,7 +519,7 @@ void WorldSystem::restartGame() {
 	uireq.type = UIRequestType::ResetUI;
 }
 
-// Compute collisions between entities
+// Compute `ions between entities
 void WorldSystem::handleCollisions() {
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -476,15 +554,18 @@ void WorldSystem::handleCollisions() {
 				vec2 c = (glm::dot(a, glm::normalize(b)) * glm::normalize(b));
 				vec2 d = a - c;
 				// Player center projects onto the wall;
-				if (abs(glm::length(c) + glm::length(b - c) - glm::length(b)) < 0.01) {
+				float cross = c.x * b.y - c.y * b.x;
+				float dot = c.x * b.x + c.y * b.y;
+				float b_len2 = b.x * b.x + b.y * b.y;
+				if (cross * cross < 0.01 * b_len2 && dot >= 0.0f && dot <= b_len2) {
 					motion.position = (wall.startPosition + c + glm::normalize(d) * (circle.radius));
 				}
 				// Player circle collides with startPosition
-				else if (glm::length(a) < circle.radius) {
+				else if (glm::length2(a) < circle.radius * circle.radius) {
 					motion.position = (wall.startPosition + glm::normalize(a) * (circle.radius));
 				}
 				// Player circle collides with endPosition
-				else if (glm::length(motion.position - wall.endPosition) < circle.radius) {
+				else if (glm::length2(motion.position - wall.endPosition) < circle.radius * circle.radius) {
 					motion.position = (wall.endPosition + glm::normalize(motion.position - wall.endPosition) * (circle.radius));
 				}
 			}
@@ -675,6 +756,17 @@ void WorldSystem::dash(vec2 direction, float elapsed_ms_since_last_update) {
 		if (dash.endTimer <= 0) {
 			registry.dashes.remove(player);
 			playerMotion.velocity = {0,0};
+			if (checkTierThreshold(PlayerNumDash)) {
+				// TODO Play bullet clear sound
+				// TODO clear bullets particles
+				float clearRadius = (getEffectValueTierThresholdDifference(PlayerNumDash) + 1) * 50.f;
+				for (auto e : registry.enemyBullets.entities) {
+					Motion m = registry.motions.get(e);
+					if (glm::length2(m.position - playerMotion.position) < clearRadius * clearRadius && !registry.enemyBullets.get(e).isSpecial && !registry.deleteds.has(e)) {
+						registry.deleteds.emplace(e);
+					}
+				}
+			}
 		} else {
 			// Tick IFrame timer
 			if (!registry.invincibles.has(player)) {
@@ -739,7 +831,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 	//}
 
 	if (pl.currFiringInterval <= 0) {
-		pl.currBulletBurst = getModifiedValue(BulletBurst, pl.maxBulletBurst);
+		pl.currBulletBurst = pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate));
 		pl.currFiringInterval = getModifiedValue(FireRate, pl.maxFiringInterval);
 	}
 
@@ -748,8 +840,7 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 		pl.currBulletBurst--;
 		pl.bulletBurstCooldown = min(
 			50.0f,
-			((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-				BulletBurst, pl.maxBulletBurst)
+			getModifiedValue(FireRate, pl.maxFiringInterval) / ((pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))) * 2)
 		);
 		// create bullet
 
@@ -765,15 +856,14 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
 				soundPlayer->playPlayerShootSound(max(250.0f, min(
 					50.0f,
-					((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-						BulletBurst, pl.maxBulletBurst))));
+					getModifiedValue(FireRate, pl.maxFiringInterval) / ((pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))) * 2))
+		));
 			}
 		} else {
 			createPlayerBullet(renderer, bulletPos, bulletDir);
 			soundPlayer->playPlayerShootSound(max(250.0f, min(
 				50.0f,
-				((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-					BulletBurst, pl.maxBulletBurst))));
+				((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / (pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))))));
 			for (int i = 0; i < (cluster - 1) / 2; i++) {
 				float a1 = angle + (i + 1) * angleOffset;
 				float a2 = angle - (i + 1) * angleOffset;
@@ -781,8 +871,8 @@ void WorldSystem::shoot(float elapsed_ms_since_last_update, int cluster) {
 				createPlayerBullet(renderer, bulletPos, { cos(a2), sin(a2) });
 				soundPlayer->playPlayerShootSound(max(250.0f, min(
 					50.0f,
-					((1 / getModifiedValue(FireRate, 1000 / pl.maxFiringInterval)) * 1000) / getModifiedValue(
-						BulletBurst, pl.maxBulletBurst))));
+					getModifiedValue(FireRate, pl.maxFiringInterval) / ((pl.maxBulletBurst + max(0, 1 + getEffectValueTierThresholdDifference(FireRate))) * 2))
+		));
 			}
 		}
 	}
@@ -803,7 +893,7 @@ void WorldSystem::movePlayer() {
 	vec2 inputAxis = input.inputAxis;
 	Motion& player_motion = registry.motions.get(player);
 	RenderRequest& rr = registry.renderRequests.get(player);
-	if (glm::length(inputAxis) <= 0.0f) {
+	if (glm::length2(inputAxis) <= 0.0f) {
 		if (!registry.spriteTimers.has(player) && !registry.animationSequences.has(player)) {
 			rr.used_effect = EFFECT_ASSET_ID::TEXTURED;
 			rr.texture_name = registry.sprites.get(player).sprites[SPRITE_STATE::BASE];
@@ -907,6 +997,28 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 			req.type = InteractableRequestType::PopStack;
 			req.choice = effects[i].value;
 		}
+		else if (effects[i].type == Knock) {
+			// InteractableRequest& req = registry.interactableRequests.emplace(Entity());
+			// req.type = InteractableRequestType::KnockX;
+			// req.choice = effects[i].value;
+			// req.targetEntity = other;
+			knockEffectsOffStack( player, renderer, effects[i].value);
+		}
+		else if (effects[i].type == Eat) {
+			// InteractableRequest& req = registry.interactableRequests.emplace(Entity());
+			// req.type = InteractableRequestType::EatX;
+			// req.choice = effects[i].value;
+			// req.targetEntity = other;
+			eatEffectsOffStack( player, other, effects[i].value);
+			if (registry.enemies.has(other)) {
+				Enemy& enemy = registry.enemies.get(other);
+				if (enemy.collisionBullet[0].type == Eat) {
+					enemy.collisionBullet[0].type = Inert; // prevent enemy from eating player again
+					enemy.collisionBullet[0].value = 0;
+				}
+			}
+		}
+
 		else {
 			bool success = registry.stackCompile.get(player).add(effects[i]);
 			if (!success) {
@@ -918,6 +1030,26 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 				soundPlayer->setMusicVolume(gameState.currentVolume);
 				UIRequest& req = registry.uiRequests.emplace_with_duplicates(player);
 				req.type = UIRequestType::GameOverReport;
+			}
+			if (checkTierThreshold(PlayerSpeed))
+			{
+				if (!registry.timeModifiers.has(player))
+				{
+					TimeModifier& tm = registry.timeModifiers.emplace(player);
+					tm.modifier = 0.2f;
+					tm.countDown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+					tm.coolDown = tm.BASECOOLDOWN;
+				} else {
+					TimeModifier& tm = registry.timeModifiers.get(player);
+					if (tm.coolDown < 0) {
+						tm.modifier = 0.2f;
+						tm.countDown = tm.BASECOUNTDOWN + (getEffectValueTierThresholdDifference(PlayerSpeed) * tm.COUNTDOWNPERSPEED);
+						tm.coolDown = tm.BASECOOLDOWN;
+					}
+					else {
+						tm.coolDown -= getEffectValueTierThresholdDifference(PlayerSpeed) * (tm.COUNTDOWNPERSPEED*2);
+					}
+				}
 			}
 		}
 	}
@@ -948,6 +1080,15 @@ void WorldSystem::handlePlayerHit(Entity& other) {
 void WorldSystem::clearDeleteQueue() {
 	for (int i = registry.deleteds.size() - 1; i >= 0; i--) {
 		Entity e = registry.deleteds.entities[i];
+
+		if (registry.stackCompile.has(e) && !registry.players.has(e) && registry.motions.has(e)) {
+			// if enemy has a stack, we need to pop everything on it
+			StackCompile& stack = registry.stackCompile.get(e);
+			vec2 pos = registry.motions.get(e).position;
+			float angle = registry.motions.get(e).angle;
+			CreateXPopBullets(renderer, pos, angle, stack.currStack,  2.0f * M_PI, 0);
+			stack.currStack.clear();
+		}
 
 		// right now, all our entities that fade will also emit particles (enemies)
 		// but should be generalized for more things in the future
