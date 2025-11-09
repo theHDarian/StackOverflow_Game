@@ -668,8 +668,8 @@ void UISystem::step(float elapsed_ms) {
 						std::vector<BulletStackEffect> allEffects = positiveEffects;
 						allEffects.insert(allEffects.end(), negativeEffects.begin(), negativeEffects.end());
 
-						vec2 doorDirection = { 1, 1 };
-						vec2 doorOffset = { -50, 0 };
+						vec2 doorDirection;
+						vec2 doorOffset;
 						switch (door.side) {
 						case 'B':
 							doorDirection = { 0, -1 };
@@ -682,6 +682,10 @@ void UISystem::step(float elapsed_ms) {
 						case 'L':
 							doorDirection = { -1, 1 };
 							doorOffset = { 50, 0 };
+							break;
+						case 'R':
+							doorDirection = { 1, 1 };
+							doorOffset = { -100, 0 };
 							break;
 						}
 
