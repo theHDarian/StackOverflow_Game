@@ -99,7 +99,7 @@ private:
 
     Entity createDialogueReminder();
 
-    void updateStackAddBubble(vec2 position, int bulletNum, Entity bubbleEntity, Entity tailEntity);
+    void updateStackAddBubble(vec2 bubblePosition, vec2 tailDirection, int bulletNum, Entity bubbleEntity, Entity tailEntity);
 
     std::vector<BulletStackEffect> extractBulletEffects(std::vector<std::vector<BulletStackEffect>> bulletChances);
 

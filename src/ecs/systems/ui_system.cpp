@@ -364,10 +364,10 @@ void UISystem::step(float elapsed_ms) {
 			registry.renderRequests.get(stackAddTail).show = true;
 
 			if (uiRequest.effects.size() > 0) {
-				updateStackAddBubble(playerPos, uiRequest.effects.size(), stackAddBubble, stackAddTail);
+				updateStackAddBubble(playerPos, { -1, 1 }, uiRequest.effects.size(), stackAddBubble, stackAddTail);
 			}
 			else {
-				updateStackAddBubble(playerPos, 1, stackAddBubble, stackAddTail);
+				updateStackAddBubble(playerPos, { -1, 1 }, 1, stackAddBubble, stackAddTail);
 			}
 
 			if (!registry.showTimers.has(stackAddBubble)) {
@@ -503,7 +503,7 @@ void UISystem::step(float elapsed_ms) {
 		if (registry.stackAddNotifs.entities.size() > 0) {
 			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
 			vec2 bulletStartPos = playerPos + abs(registry.motions.get(registry.players.entities[0]).scale) * vec2(1, -1);
-			updateStackAddBubble(bulletStartPos, registry.stackAddNotifs.entities.size(), stackAddBubble, stackAddTail);
+			updateStackAddBubble(bulletStartPos, { -1, 1 }, registry.stackAddNotifs.entities.size(), stackAddBubble, stackAddTail);
 			int index = 0;
 			for (Entity entity : registry.stackAddNotifs.entities) {
 				registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * STACK_NOTIF_SCALE + index * stackui.bulletOffset * STACK_NOTIF_SCALE, bulletStartPos.y);
@@ -636,7 +636,7 @@ void UISystem::step(float elapsed_ms) {
 						Door& door = registry.doors.get(entity);
 
 						// TODO: only show for enemy rooms, or other rooms too?
-						if (door.room != RoomType::EnemyRoom || door.isPrev) {
+						if (door.isPrev || (door.room != RoomType::EnemyRoom && door.room != RoomType::BossRoom)) {
 							continue;
 						}
 
@@ -652,8 +652,25 @@ void UISystem::step(float elapsed_ms) {
 						std::vector<BulletStackEffect> allEffects = positiveEffects;
 						allEffects.insert(allEffects.end(), negativeEffects.begin(), negativeEffects.end());
 
+						vec2 doorDirection = { 1, 1 };
+						vec2 doorOffset = { -50, 0 };
+						switch (door.side) {
+						case 'B':
+							doorDirection = { 0, -1 };
+							doorOffset = { -doorMotion.scale.x / 4, 50 };
+							break;
+						case 'T':
+							doorDirection = { 0, 1 };
+							doorOffset = { -doorMotion.scale.x / 4, -50 };
+							break;
+						case 'L':
+							doorDirection = { -1, 1 };
+							doorOffset = { 50, 0 };
+							break;
+						}
+
 						int numBullets = allEffects.size();
-						vec2 bulletStartPos = doorMotion.position;
+						vec2 bulletStartPos = doorMotion.position + doorOffset;
 
 						// draw bullets here
 						for (int index = 0; index < allEffects.size(); index++) {
@@ -670,7 +687,7 @@ void UISystem::step(float elapsed_ms) {
 							registry.roomPreviewBullets.emplace(bullet);
 						}
 
-						updateStackAddBubble(bulletStartPos, numBullets, roomPreviewBubble, roomPreviewTail);
+						updateStackAddBubble(bulletStartPos, doorDirection, numBullets, roomPreviewBubble, roomPreviewTail);
 
 					} else {
 						createInteractIndicator(registry.motions.get(entity).position);
@@ -1109,7 +1126,7 @@ Entity UISystem::createUIBullet(vec2 position, vec2 scale, std::string sprite, v
 	return entity;
 }
 
-void UISystem::updateStackAddBubble(vec2 position, int bulletNum, Entity bubbleEntity, Entity tailEntity) {
+void UISystem::updateStackAddBubble(vec2 position, vec2 tailDirection, int bulletNum, Entity bubbleEntity, Entity tailEntity) {
 	Motion& motion = registry.motions.get(bubbleEntity);
 	vec2 bulletSize = registry.stackUI.components[0].bulletSize;
 	float bulletOffset = registry.stackUI.components[0].bulletOffset;
@@ -1120,7 +1137,24 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum, Entity bubbleE
 	motion.scale += vec2(10.f, 0);
 
 	Motion& tailMotion = registry.motions.get(tailEntity);
-	tailMotion.position = motion.position - motion.scale * vec2(0.5, -0.5) - tailMotion.scale / 2.f * vec2(0.5, -0.5);
+
+	tailMotion.position = motion.position + motion.scale * vec2(0.5 * tailDirection.x, 0.5 * tailDirection.y) 
+		+ tailMotion.scale / 2.f * vec2(0.5 * tailDirection.x, 0.5 * tailDirection.y);
+
+	if (tailDirection.x < 0 && tailDirection.y > 0) { // bottom left
+		tailMotion.angle = M_PI - M_PI / 4.f;
+	}
+	else if (tailDirection.x == 0 && tailDirection.y > 0) { // direct top
+		tailMotion.angle = M_PI / 2;
+		tailMotion.position.y += tailMotion.scale.y / 2;
+	}
+	else if (tailDirection.x == 0 && tailDirection.y < 0) { // direct bottom
+		tailMotion.angle = -M_PI / 2;
+		tailMotion.position.y -= tailMotion.scale.y / 2;
+	}
+	else { // used to catch bottom right case
+		tailMotion.angle = M_PI / 4.f;
+	}
 }
 
 void UISystem::updateStatusUI(vec2 position, SpecialStates status, Entity& enemy) {
