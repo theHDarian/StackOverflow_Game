@@ -610,42 +610,40 @@ void interact(float elapsed_ms, Entity &player, RenderSystem* renderer, SoundSys
 				iostate.tutorialOn = false;
 				if (reaction.choice == 1) {
 					region = Biology;
-					room = Testing;
 				} else if (reaction.choice == 2) { // bio region
-					region = Biology;
+					region = Mining;
 				}
 				else if (reaction.choice == 3) {
 					region = Physics;
 				}
 				else if (reaction.choice == 4) {
-					region = Biology;
-					room = BossRoom;
-				}
-				else if (reaction.choice == 5) {
-					region = Mining;
-				}
-				else if (reaction.choice == 6) {
-					region = Physics;
-					room = BossRoom;
-				}
-				else if (reaction.choice == 7) {
-					region = Mining;
-					room = BossRoom;
-				}
-				else if (reaction.choice == 8) {
 					region = Medical;
 				}
-				else if (reaction.choice == 9) {
-					region = Medical;
-					room = BossRoom;
-				}
-				else if (reaction.choice == 10) {
-					region = Military;
-				}
-				else if (reaction.choice == 11) {
-					region = Military;
-					room = BossRoom;
-				}
+				// else if (reaction.choice == 5) {
+				// 	region = Mining;
+				// }
+				// else if (reaction.choice == 6) {
+				// 	region = Physics;
+				// 	room = BossRoom;
+				// }
+				// else if (reaction.choice == 7) {
+				// 	region = Mining;
+				// 	room = BossRoom;
+				// }
+				// else if (reaction.choice == 8) {
+				// 	region = Medical;
+				// }
+				// else if (reaction.choice == 9) {
+				// 	region = Medical;
+				// 	room = BossRoom;
+				// }
+				// else if (reaction.choice == 10) {
+				// 	region = Military;
+				// }
+				// else if (reaction.choice == 11) {
+				// 	region = Military;
+				// 	room = BossRoom;
+				// }
 			}
 			MapRequest& req = registry.mapRequests.emplace(player, NewGame);
 			req.type = room;

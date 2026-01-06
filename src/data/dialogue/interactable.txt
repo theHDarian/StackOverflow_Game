@@ -55,7 +55,7 @@ ITEM SkipTutorial -1 0
 #Select where you would like to start in:
  
 CUT blackscreen.png
-CHOICES Start in Tutorial\Start in Testing\Start in Biology Region\Start in Physics Region\Start in Biology Boss\Start in Mining Region\Start in Physics Boss\Start in Mining Boss\Start in Medical Region\Start in Medical Boss\Start in Military Region\Start in Military Boss
+CHOICES Start in Tutorial\Start in Biology Region\Start in Mining Region\Start in Physics Region\Start in Medical Region
 
 ITEM ClosedTutorialDoor -1 0
 The door seems to be locked. Maybe there's something in this room that could help...
@@ -736,6 +736,7 @@ For example, if you have two SPEED +1 effects on your stack, they will combine t
 Effects have a maximum upgrade level of +3 or -3.
 If you have +5 or more of the same effect on your stack, you will receive a special ULTIMATE version of that effect.
 Go ahead and experiment with different combinations of effects to see what works best for you!
+Hover over the effects on your stack to see what they do.
 
 ITEM CallScientist 1 0
 There are 5 different room types: REST rooms, TREASURE rooms, EVENT rooms, ENEMY rooms, and BOSS rooms.
