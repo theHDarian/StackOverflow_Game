@@ -743,7 +743,7 @@ There are 5 different room types: REST rooms, TREASURE rooms, EVENT rooms, ENEMY
 Rest rooms have a POP console in them that allow you to pop all items on your stack, and then an opportunity to collect any effects you want to keep.
 Treasure rooms have special bullet effects in them delivered via PUSH and FIGHT consoles. Though the rewards are great for fight consoles, you do have to fight for them!
 Event rooms are mysterious rooms with special NPC reactions that you can only encounter once.
-Enemy rooms are filled with various rogue robots.
+Enemy rooms are filled with various rogue robots. Generally, you can inspect the doors to see what effects the enemies in the room will have on your stack.
 And finally, boss rooms have especially dangerous rogue robots. Unfortunately, once you've entered their domain, you've no choice but to fight them!
 
 ITEM CallScientist 2 0
