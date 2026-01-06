@@ -1067,6 +1067,9 @@ Entity createDoor(RenderSystem *renderer, vec2 startPos, vec2 endPos) {
 	object.base = 500;
 	object.timer = 500;
 
+	CircleCollider& cc = registry.circleColliders.emplace(entity);
+	cc.radius = 200;
+
 	registry.renderRequests.insert(
 		entity,
 		{

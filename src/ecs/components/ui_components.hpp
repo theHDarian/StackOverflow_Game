@@ -87,12 +87,16 @@ struct StackAddNotif {
 
 };
 
+struct RoomPreviewBullet {
+
+};
+
 enum UIRequestType {
 	ResetUI,
 	GameOverReport,
 	CallNotif,
 	DisplayFlashMessage,
-	StackNotifBullet
+	StackNotifBullet,
 };
 
 struct UIButton {

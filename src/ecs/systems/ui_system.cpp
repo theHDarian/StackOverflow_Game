@@ -372,10 +372,10 @@ void UISystem::step(float elapsed_ms) {
 			registry.renderRequests.get(stackAddTail).show = true;
 
 			if (uiRequest.effects.size() > 0) {
-				updateStackAddBubble(position, uiRequest.effects.size());
+				updateStackAddBubble(position, { -1, 1 }, uiRequest.effects.size(), stackAddBubble, stackAddTail);
 			}
 			else {
-				updateStackAddBubble(position, 1);
+				updateStackAddBubble(position, { -1, 1 }, 1, stackAddBubble, stackAddTail);
 			}
 
 			if (!registry.showTimers.has(stackAddBubble)) {
@@ -519,7 +519,7 @@ void UISystem::step(float elapsed_ms) {
 		if (registry.stackAddNotifs.entities.size() > 0) {
 			vec2 playerPos = registry.motions.get(registry.players.entities[0]).position;
 			vec2 bulletStartPos = playerPos + abs(registry.motions.get(registry.players.entities[0]).scale) * vec2(1, -1);
-			updateStackAddBubble(bulletStartPos, registry.stackAddNotifs.entities.size());
+			updateStackAddBubble(bulletStartPos, { -1, 1 }, registry.stackAddNotifs.entities.size(), stackAddBubble, stackAddTail);
 			int index = 0;
 			for (Entity entity : registry.stackAddNotifs.entities) {
 				registry.motions.get(entity).position = vec2(bulletStartPos.x + index * stackui.bulletSize.x * STACK_NOTIF_SCALE + index * stackui.bulletOffset * STACK_NOTIF_SCALE, bulletStartPos.y);
@@ -633,14 +633,86 @@ void UISystem::step(float elapsed_ms) {
 				}
 			}
 
+			// TEMP: hide previous frame's door preview
+			registry.renderRequests.get(roomPreviewBubble).show = false;
+			registry.renderRequests.get(roomPreviewTail).show = false;
+
+			for (Entity entity : registry.roomPreviewBullets.entities) {
+				if (!registry.deleteds.has(entity)) {
+					registry.deleteds.emplace(entity);
+				}
+			}
+
 			if (!gameState.dialogueScene && !gameState.cutScene && !gameState.gamePaused) { // normal game uis
 				registry.renderRequests.get(dialogueAvatar).show = false;
 				registry.renderRequests.get(screenCutIn).show = false;
 				// draw "press e to interact" over all items in nearby interactables list
 				for (Entity entity : registry.nearbyInteractables.entities) {
-					createInteractIndicator(registry.motions.get(entity).position);
-				}
+					if (registry.doors.has(entity)) { // doors should show room bullet previews instead
+						Door& door = registry.doors.get(entity);
 
+						// TODO: only show for enemy rooms, or other rooms too?
+						if (door.isPrev || (door.room != RoomType::EnemyRoom && door.room != RoomType::BossRoom)) {
+							continue;
+						}
+
+						registry.renderRequests.get(roomPreviewBubble).show = true;
+						registry.renderRequests.get(roomPreviewTail).show = true;
+
+						Motion& doorMotion = registry.motions.get(entity);
+
+						std::vector<BulletStackEffect> positiveEffects = extractBulletEffects(door.preset.positiveEffects);
+						std::vector<BulletStackEffect> negativeEffects = extractBulletEffects(door.preset.negativeEffects);
+
+						// TEMP: figure out collapsing later
+						std::vector<BulletStackEffect> allEffects = positiveEffects;
+						allEffects.insert(allEffects.end(), negativeEffects.begin(), negativeEffects.end());
+
+						vec2 doorDirection;
+						vec2 doorOffset;
+						switch (door.side) {
+						case 'B':
+							doorDirection = { 0, -1 };
+							doorOffset = { -doorMotion.scale.x / 4, 50 };
+							break;
+						case 'T':
+							doorDirection = { 0, 1 };
+							doorOffset = { -doorMotion.scale.x / 4, -50 };
+							break;
+						case 'L':
+							doorDirection = { -1, 1 };
+							doorOffset = { 50, 0 };
+							break;
+						case 'R':
+							doorDirection = { 1, 1 };
+							doorOffset = { -100, 0 };
+							break;
+						}
+
+						int numBullets = allEffects.size();
+						vec2 bulletStartPos = doorMotion.position + doorOffset;
+
+						// draw bullets here
+						for (int index = 0; index < allEffects.size(); index++) {
+							BulletStackEffect effect = allEffects[index];
+							std::string bulletSprite = bulletEffectShapes.at(effect.type);
+							vec3 bulletColor = bulletEffectColors.at(effect.type);
+
+							Entity bullet = createUIBullet(vec2(bulletStartPos.x + index * stackui.bulletSize.x + index * stackui.bulletOffset, bulletStartPos.y),
+								registry.stackUI.components[0].bulletSize* STACK_NOTIF_SCALE,
+								bulletSprite,
+								bulletColor,
+								effect);
+
+							registry.roomPreviewBullets.emplace(bullet);
+						}
+
+						updateStackAddBubble(bulletStartPos, doorDirection, numBullets, roomPreviewBubble, roomPreviewTail);
+
+					} else {
+						createInteractIndicator(registry.motions.get(entity).position);
+					}
+				}
 			}
 			if (gameState.dialogueScene) {
 				// update which dialogue choice is highlighted. Consider updating only when necessary?
@@ -689,6 +761,8 @@ bool UISystem::init(GLFWwindow* window) {
 	gameOverMenu = createGameOverMenu(vec2(wS.width / 2, wS.height / 2), vec2(wS.width / 2.5, wS.height - 200.f));
 	stackAddBubble = createStackAddBubble();
 	stackAddTail = createStackAddTail();
+	roomPreviewBubble = createStackAddBubble();
+	roomPreviewTail = createStackAddTail();
 	dialogueReminder = createDialogueReminder();
 	flashMessageDisplay = createFlashMessageDisplay();
 
@@ -1033,6 +1107,15 @@ Entity UISystem::createStackAddBubble() {
 }
 
 Entity UISystem::createStackAddNotif(vec2 position, vec2 scale, std::string sprite, vec3 c, BulletStackEffect effect) {
+	Entity entity = createUIBullet(position, scale, sprite, c, effect);
+	
+	registry.showTimers.emplace(entity);
+	registry.stackAddNotifs.emplace(entity);
+
+	return entity;
+}
+
+Entity UISystem::createUIBullet(vec2 position, vec2 scale, std::string sprite, vec3 c, BulletStackEffect effect) {
 	Entity entity = Entity();
 
 	Motion& motion = registry.motions.emplace(entity);
@@ -1059,15 +1142,12 @@ Entity UISystem::createStackAddNotif(vec2 position, vec2 scale, std::string spri
 
 	vec3& color = registry.colors.emplace(entity);
 	color = c;
-	
-	registry.showTimers.emplace(entity);
-	registry.stackAddNotifs.emplace(entity);
 
 	return entity;
 }
 
-void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
-	Motion& motion = registry.motions.get(stackAddBubble);
+void UISystem::updateStackAddBubble(vec2 position, vec2 tailDirection, int bulletNum, Entity bubbleEntity, Entity tailEntity) {
+	Motion& motion = registry.motions.get(bubbleEntity);
 	vec2 bulletSize = registry.stackUI.components[0].bulletSize;
 	float bulletOffset = registry.stackUI.components[0].bulletOffset;
 	vec2 bulletStartPos = position;
@@ -1076,8 +1156,25 @@ void UISystem::updateStackAddBubble(vec2 position, int bulletNum) {
 	motion.position = vec2(bulletStartPos.x + motion.scale.x / 2 - bulletSize.x * STACK_NOTIF_SCALE - bulletOffset * STACK_NOTIF_SCALE / 2, bulletStartPos.y);
 	motion.scale += vec2(10.f, 0);
 
-	Motion& tailMotion = registry.motions.get(stackAddTail);
-	tailMotion.position = motion.position - motion.scale * vec2(0.5, -0.5) - tailMotion.scale / 2.f * vec2(0.5, -0.5);
+	Motion& tailMotion = registry.motions.get(tailEntity);
+
+	tailMotion.position = motion.position + motion.scale * vec2(0.5 * tailDirection.x, 0.5 * tailDirection.y) 
+		+ tailMotion.scale / 2.f * vec2(0.5 * tailDirection.x, 0.5 * tailDirection.y);
+
+	if (tailDirection.x < 0 && tailDirection.y > 0) { // bottom left
+		tailMotion.angle = M_PI - M_PI / 4.f;
+	}
+	else if (tailDirection.x == 0 && tailDirection.y > 0) { // direct top
+		tailMotion.angle = M_PI / 2;
+		tailMotion.position.y += tailMotion.scale.y / 2;
+	}
+	else if (tailDirection.x == 0 && tailDirection.y < 0) { // direct bottom
+		tailMotion.angle = -M_PI / 2;
+		tailMotion.position.y -= tailMotion.scale.y / 2;
+	}
+	else { // used to catch bottom right case
+		tailMotion.angle = M_PI / 4.f;
+	}
 }
 
 void UISystem::updateStatusUI(vec2 position, SpecialStates status, Entity& enemy) {
@@ -2491,4 +2588,16 @@ bool UISystem::hoverBossStatus(IOState& ioState) {
 	}
 	lastHoveredBullet = bulletHoveredIndex;
 	return false;
+}
+
+std::vector<BulletStackEffect> UISystem::extractBulletEffects(std::vector<std::vector<BulletStackEffect>> bulletChances) {
+	std::vector<BulletStackEffect> effects;
+	
+	for (auto chance : bulletChances) {
+		for (auto effect : chance) {
+			effects.push_back(effect);
+		}
+	}
+
+	return effects;
 }
