@@ -733,6 +733,7 @@ These bullets will modify you stats, with the exception of INERT and KEYS effect
 In most cases, when you collide with an enemy, you'll only get an inert bullet, so try not to run into them.
 Consecutive Effects of the same type will upgrade the effect Bullet.
 For example, if you have two SPEED +1 effects on your stack, they will combine to form a single SPEED +2 effect.
+Conversely, if you have a SPEED +1 effect and a SPEED -1 effect on your stack, they will cancel each other out and result in an INERT effect.
 Effects have a maximum upgrade level of +3 or -3.
 If you have +5 or more of the same effect on your stack, you will receive a special ULTIMATE version of that effect.
 Go ahead and experiment with different combinations of effects to see what works best for you!
