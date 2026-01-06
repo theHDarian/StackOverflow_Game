@@ -468,11 +468,14 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         if (map.currRoom.preset == ScientistBossRoom && (spawnIndex + 2) % 4 == i) {
             //Once Final boss is beaten, goto ending room
-            d.room = RoomType::TutorialRoom2;
+            d.room = RoomType::EndRoom;
         }
 
-        registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
-        ds.doorType = d.room;
+        auto roomWrapper = d.room;
+        if (d.room == RoomType::EndRoom)
+            roomWrapper = RoomType::TutorialRoom2;
+        registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(roomWrapper);
+        ds.doorType = roomWrapper;
     }
 
     updateBgPositions();

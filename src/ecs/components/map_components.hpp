@@ -31,6 +31,7 @@ enum RoomType : int {
     TutorialRoom,
     TutorialRoom1,
     TutorialRoom2,
+    EndRoom,
     BossRoom,
 };
 
