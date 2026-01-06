@@ -1,7 +1,10 @@
 ## Credits
 Team Members: 
-- theHDarian (Haotian Huang), Developer, Audio direction, Level Design
-
+- Yelf42, Game Design Lead, Level Design, Game Mechanics
+- Corvexxia, Visual Design Lead, Art Direction, Asset Creation, Graphics Programming, UI/UX Design
+- theHDarian, Developer, Audio Direction, Level Design, Asset Creation
+- nekopudding, Developer, Game Mechanics, Level Design, Graphics Programming
+- vingilbee, Developer, Game Design, Game Mechanics
 
 
 ## Open Source Assets Used:
