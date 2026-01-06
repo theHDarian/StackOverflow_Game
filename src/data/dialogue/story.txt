@@ -91,15 +91,14 @@ SPEAKER N N
 # SCENE TutorialRoom2 3 0 1 -1
 # Thanks for answering!
 
-SCENE EndRoom 0 0 1 -1
+SCENE EndRoom 0 0 0 -1
 Finally, you overcame the trials of this forsaken lab and made it out in one piece.
+SPEAKER N N
+CUT blackscreen.png
 You look back one last time at the building, now far behind you.
 The sky is clear, the sun is shining, and yet you can't help but feel an ill omen about what lies ahead.
 Suddenly, in the distance, you see massive structures rising up into the sky, with dark clouds swirling around them.
 All at once, red lights begin flashing from the structures, and sounds of screeching metal fill the air.
 It seems your journey is far from over...
-CUT blackscreen.png
 
-THE END
 Thank you for playing the Demo!
-SPEAKER N N

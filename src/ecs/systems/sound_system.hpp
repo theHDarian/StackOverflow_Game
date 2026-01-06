@@ -12,9 +12,9 @@ enum class MusicState {
     Stopped,
     FadingOut,
     FadingIn,
-    PlayingNormal,
+    PlayingCombat,
     PlayingBoss,
-    PlayingSpecial,
+    PlayingCleared,
     PlayingTitle,
     Crossfading,
 };
