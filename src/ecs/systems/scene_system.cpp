@@ -107,6 +107,10 @@ void SceneSystem::step(float elapsed_ms) {
 			input.lockControls = true;
 			map.currRoom.dialogueCount++;
 		}
+		if (map.currRoom.type == RoomType::EndRoom && map.currRoom.dialogueCount == 1) {
+			map.currRoom.cleared = true;
+			input.shouldRestart = true;
+		}
 
 		if (storyDialogue.count(scene) > 0) {
 			DialogueLines& lines = registry.dialogueLines.components[0];
@@ -245,11 +249,11 @@ void SceneSystem::loadDialogue(std::string dialogueType) {
 
 					// lazy way to deal with room enums for now, fix later
 					RoomType room;
-					if (roomName.compare("TutorialRoom1") == 0) {
-						room = RoomType::TutorialRoom1;
-					}
-					else {
-						room = RoomType::TutorialRoom2;
+					try {
+						room = roomTypeNames.at(roomName);
+					} catch (const std::out_of_range& oor) {
+						std::cout << "ERROR: room type not found: " << roomName << std::endl;
+						room = RoomType::None;
 					}
 
 					scene = { room, dialogueCount, cutsceneCount, roomCleared, choice };

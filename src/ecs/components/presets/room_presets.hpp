@@ -123,7 +123,10 @@ const RoomPreset TutorialRoom2Preset{
 };
 
 const RoomPreset EndingRoom{
-    {},
+    {
+        {
+        }
+    },
     {},
     {},
     0.0f,
@@ -5673,7 +5676,8 @@ const std::map<RoomType, int> roomTypeToSymbols = {
     {RoomType::EventRoom, 4},
     {RoomType::None, 5},
     {RoomType::TutorialRoom1, 6},
-    {RoomType::TutorialRoom2, 6}
+    {RoomType::TutorialRoom2, 6},
+        {RoomType::EndRoom, 6},
 };
 
 const std::map<RoomType, SoundType> roomTypeToMusic = {
@@ -5686,7 +5690,8 @@ const std::map<RoomType, SoundType> roomTypeToMusic = {
     {RoomType::TutorialRoom1, SoundType::TitleBGM},
     {RoomType::TutorialRoom2, SoundType::CombatBGM},
     {RoomType::EventRoom, SoundType::ClearedBGM},
-    {RoomType::None, SoundType::ClearedBGM}
+    {RoomType::None, SoundType::ClearedBGM},
+    {RoomType::EndRoom, SoundType::TitleBGM},
 
 };
 

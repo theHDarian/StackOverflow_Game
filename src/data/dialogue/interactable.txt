@@ -591,7 +591,7 @@ You decide to leave the crab alone.
 
 ITEM OracleCrab 0 1
 ! you feel a literal surge of power flowing through you.
-Is this what the crab meant by assistance? If a human was shocked by this, they would have been fried to a crisp.
+Is this what the crab meant by assistance? If a human was shocked like this, they would have been fried to a crisp.
 Regardless, it seems the order of data on your stack has been rearranged.
 C0mrade... Y0u h@ve... the p0wer... t0... f1ght...
 SPEAKER Broken Crab BrokenCrab.png
@@ -627,7 +627,7 @@ ITEM OracleCrab 1 2
 SPEAKER Broken Crab BrokenCrab.png
 You feel a milder surge of power flowing through you.
 SPEAKER N N
-It seems the order of data on your stack has shifted, though not as drastically as before.
+It seems the data on your stack has changed.
 
 ITEM OracleCrab 2 2
 You decide that you've had enough.
@@ -730,11 +730,16 @@ CHOICES Ask about the stack mechanic\Ask about the types of rooms\Ask about ligh
 ITEM CallScientist 0 0
 When you get hit by enemies, you will get the corresponding effects pushed onto your stack.
 These bullets will modify you stats, with the exception of INERT and KEYS effects. Keys are useful for unlocking doors, but inert bullets are just plain useless!
-Whenever you collide with an enemy, you'll only get an inert bullet, so try not to run into them!
+In most cases, when you collide with an enemy, you'll only get an inert bullet, so try not to run into them.
+Consecutive Effects of the same type will upgrade the effect Bullet.
+For example, if you have two SPEED +1 effects on your stack, they will combine to form a single SPEED +2 effect.
+Effects have a maximum upgrade level of +3 or -3.
+If you have +5 or more of the same effect on your stack, you will receive a special ULTIMATE version of that effect.
+Go ahead and experiment with different combinations of effects to see what works best for you!
 
 ITEM CallScientist 1 0
 There are 5 different room types: REST rooms, TREASURE rooms, EVENT rooms, ENEMY rooms, and BOSS rooms.
-Rest rooms have a POP console in them that allow you to pop all items on your stack, and then an oppurtunity to collect any effects you want to keep.
+Rest rooms have a POP console in them that allow you to pop all items on your stack, and then an opportunity to collect any effects you want to keep.
 Treasure rooms have special bullet effects in them delivered via PUSH and FIGHT consoles. Though the rewards are great for fight consoles, you do have to fight for them!
 Event rooms are mysterious rooms with special NPC reactions that you can only encounter once.
 Enemy rooms are filled with various rogue robots.
@@ -742,14 +747,15 @@ And finally, boss rooms have especially dangerous rogue robots. Unfortunately, o
 
 ITEM CallScientist 2 0
 "LIGHTNING bullets" are packets of concentrated electricity that leak from severely damaged robots, and thus, do not add effects to your stack or take up stack space.
-However,if you make contact with these packets, your systems will experience a shock, causing the order of data on your stack will be rearranged.
-BLUE lightning shifts all your effects to the right by one, and YELLOW shuffles your stack.
+However,if you make contact with these packets, your systems will experience a shock, causing the data on your stack to change in some way.
+BLUE lightning causes one bullet on your stack to flip from positive to negative, or vise versa.
+YELLOW lightning shuffles your stack and causes one random bullet to change to another random bullet.
 When rogue robots are nearing death, they tend to spit out more of these lightning bullets.
-The order of effects in your stack could be important when it comes to using keys, which will remove all effects following the key once you use them!
 
 ITEM CallScientist 3 0
 KEYS are special bullets that are occasionally fired by rogue robots. They are used to unlock locked rooms.
-These rooms tend to have stronger enemies or even better rewards!
+Locked rooms tend to have stronger enemies or even better rewards! Find keys and unlock these rooms to reap the benefits!
+Using a key will pop all effect bullets following the key! Be aware of this when using keys, as you might lose some important effects on your stack.
 
 ITEM Oven  -1 0
 It's... a regular oven? It seems to be in working condition.

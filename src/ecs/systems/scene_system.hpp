@@ -56,6 +56,19 @@ public:
             {InteractableItem::GlitchedPopConsole, 0}
     };
 
+    std::unordered_map<std::string, RoomType> roomTypeNames = {
+        {"EnemyRoom", RoomType::EnemyRoom},
+        {"TreasureRoom", RoomType::TreasureRoom},
+        {"RestRoom", RoomType::RestRoom},
+        {"EventRoom", RoomType::EventRoom},
+        {"Testing", RoomType::Testing},
+        {"TutorialRoom", RoomType::TutorialRoom},
+        {"TutorialRoom1", RoomType::TutorialRoom1},
+        {"TutorialRoom2", RoomType::TutorialRoom2},
+        {"EndRoom", RoomType::EndRoom},
+        {"BossRoom", RoomType::BossRoom},
+    };
+
 private:
     SoundSystem* soundSystem;
     // fun fact: if you don't ask it to hash certain parts, it won't!

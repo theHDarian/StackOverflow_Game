@@ -530,7 +530,7 @@ void SoundSystem::playNextMusic(int songIndex) {
     } else {
         fprintf(stderr, "Failed to play background music: %s\n", Mix_GetError());
     }
-    currentMusicState = MusicState::PlayingNormal;
+    currentMusicState = MusicState::PlayingCombat;
 }
 
 
@@ -587,7 +587,7 @@ void SoundSystem::playSpecialMusic(int songIndex) {
     } else {
         fprintf(stderr, "Failed to play special music: %s\n", Mix_GetError());
     }
-    currentMusicState = MusicState::PlayingSpecial;
+    currentMusicState = MusicState::PlayingCleared;
 }
 
 

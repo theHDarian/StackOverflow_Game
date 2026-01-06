@@ -189,7 +189,7 @@ void MapSystem::step(float elapsed_ms)
     }
 
     // set room to cleared if all enemies are defeated
-    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 && !(map.currRoom.preset.hasElite > 0 && map.currRoom.type == EnemyRoom))
+    if (!map.currRoom.cleared && registry.enemies.entities.empty() && map.currRoom.preset.enemies.empty() && map.currRoom.type != TutorialRoom1 &&  map.currRoom.type != EndRoom && !(map.currRoom.preset.hasElite > 0 && map.currRoom.type == EnemyRoom))
     {
         map.currRoom.cleared = true;
 
@@ -468,11 +468,12 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
 
         if (map.currRoom.preset == ScientistBossRoom && (spawnIndex + 2) % 4 == i) {
             //Once Final boss is beaten, goto ending room
-            d.room = RoomType::TutorialRoom2;
+            d.room = RoomType::EndRoom;
         }
 
-        registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(d.room);
-        ds.doorType = d.room;
+        auto roomWrapper = d.room;
+        registry.animations.get(registry.doorSymbols.entities[i]).frame = roomTypeToSymbols.at(roomWrapper);
+        ds.doorType = roomWrapper;
     }
 
     updateBgPositions();
@@ -484,8 +485,8 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
     // clear enemies and obstacles
     clearRoomActors();
 
-    SoundType song = roomTypeToMusic.at(type);
-        if (song == SoundType::CombatBGM && soundPlayer->currentMusicState != MusicState::PlayingNormal) {
+    const SoundType song = roomTypeToMusic.at(type);
+        if (song == SoundType::CombatBGM && soundPlayer->currentMusicState != MusicState::PlayingCombat) {
             std::cout << "Playing normal music" << std::endl;
             soundPlayer->playNextMusic();
             // auto& req = registry.soundRequests.emplace(Entity());
@@ -495,11 +496,14 @@ void MapSystem::changeRoom(RoomType type, int doorIndex)
             soundPlayer->playBossMusic(0);
             // auto& req = registry.soundRequests.emplace(Entity());
             // req.type = SoundType::BossBGM;
-        } else if (song == SoundType::ClearedBGM && soundPlayer->currentMusicState != MusicState::PlayingSpecial) {
+        } else if (song == SoundType::ClearedBGM && soundPlayer->currentMusicState != MusicState::PlayingCleared) {
             std::cout << "Playing special music" << std::endl;
             soundPlayer->playSpecialMusic();
             // auto& req = registry.soundRequests.emplace(Entity());
             // req.type = SoundType::ClearedBGM;
+        } else if (song == SoundType::TitleBGM && soundPlayer->currentMusicState != MusicState::PlayingTitle) {
+            std::cout << "Playing ending music" << std::endl;
+            soundPlayer->playTitleMusic();
         }
 
     decorateRoom();
