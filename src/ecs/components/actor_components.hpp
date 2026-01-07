@@ -7,6 +7,8 @@
 #include "components.hpp"
 #include <random>
 
+#include "utils/random.hpp"
+
 constexpr float random_float = -9999;
 constexpr vec2 random_vec2 = {random_float, random_float};
 constexpr vec2 random_batch = {-9998, -9998}; // Used to indicate the enemy should spawn at one of the predetermined random positions in the room
@@ -178,7 +180,10 @@ struct StackCompile {
 	            // Update values map
 	            if (values.find(currStack[randomIndex].type) != values.end()) {
 	                values[currStack[randomIndex].type] -= currStack[randomIndex].value;
-	                currStack[randomIndex].value = -currStack[randomIndex].value;
+	                if ((currStack[randomIndex].value > 0 && Random::Float() < 0.5f) || (currStack[randomIndex].value < 0) ){
+                        // 50% chance for positive values to become negative, always invert negative values
+	                    currStack[randomIndex].value = -currStack[randomIndex].value;
+                    }
 	                values[currStack[randomIndex].type] += currStack[randomIndex].value;
 	            }
 

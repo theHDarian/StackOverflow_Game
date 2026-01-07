@@ -750,7 +750,7 @@ And finally, boss rooms have especially dangerous rogue robots. Unfortunately, o
 ITEM CallScientist 2 0
 "LIGHTNING bullets" are packets of concentrated electricity that leak from severely damaged robots, and thus, do not add effects to your stack or take up stack space.
 However,if you make contact with these packets, your systems will experience a shock, causing the data on your stack to change in some way.
-BLUE lightning causes one bullet on your stack to flip from positive to negative, or vise versa.
+BLUE lightning has a 50% chance of flipping one bullet on your stack from positive to negative, or vise versa.
 YELLOW lightning shuffles your stack and causes one random bullet to change to another random bullet.
 When rogue robots are nearing death, they tend to spit out more of these lightning bullets.
 
