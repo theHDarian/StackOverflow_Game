@@ -45,11 +45,15 @@ if (IS_OS_MAC)
   link_directories(/opt/homebrew/lib)
 endif()
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} "ext/project_path.hpp"
+add_executable(${PROJECT_NAME}
+        WIN32
+        ${SOURCE_FILES} "ext/project_path.hpp"
         src/ecs/systems/sound_system.cpp
         src/ecs/systems/sound_system.hpp
         src/ecs/systems/interactable_effects.cpp
-        src/ecs/systems/interactable_effects.h)
+        src/ecs/systems/interactable_effects.h
+        src/platform/winmain_shim.cpp
+)
 target_include_directories(${PROJECT_NAME} PUBLIC src/)
 
 # Added this so policy CMP0065 doesn't scream
